@@ -4781,6 +4781,7 @@
     "hiddenTooltip": "مخفي - انقر للإظهار",
     "approveLabel": "موافقة",
     "hideLabel": "إخفاء",
+    "saveFailed": "فشل الحفظ. حاول مرة أخرى.",
     "today": "اليوم",
     "yesterday": "أمس",
     "daysAgo": "أيام",

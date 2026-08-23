@@ -1175,43 +1175,46 @@ export async function saveReview(review: Review): Promise<Review | null> {
   }
 }
 
-export async function replyToReview(id: string, reply: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('reviews')
-    .update({ 
-      reply, 
-      replied_at: new Date().toISOString() 
-    })
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error replying to review:', error)
+function adminDbUpdatedRows(data: unknown): unknown[] {
+  if (Array.isArray(data)) return data
+  return data ? [data] : []
+}
+
+export async function replyToReview(id: string, reply: string, tenantSlug: string): Promise<boolean> {
+  /** RLS: anon mag reviews niet updaten — schrijven via admin-proxy (service-role). */
+  const r = await adminDb.update(
+    'reviews',
+    { reply, replied_at: new Date().toISOString() },
+    { id, tenant_slug: tenantSlug },
+    { tenantSlug, select: 'id' },
+  )
+  if (!r.ok || adminDbUpdatedRows(r.data).length === 0) {
+    console.error('Error replying to review:', r.error || 'geen rij bijgewerkt')
     return false
   }
   return true
 }
 
-export async function toggleReviewVisible(id: string, isVisible: boolean): Promise<boolean> {
-  const { error } = await supabase
-    .from('reviews')
-    .update({ is_visible: isVisible })
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error toggling review visibility:', error)
+export async function toggleReviewVisible(id: string, isVisible: boolean, tenantSlug: string): Promise<boolean> {
+  /** RLS: anon mag reviews niet updaten — goedkeuren/verbergen via admin-proxy. */
+  const r = await adminDb.update(
+    'reviews',
+    { is_visible: isVisible },
+    { id, tenant_slug: tenantSlug },
+    { tenantSlug, select: 'id,is_visible' },
+  )
+  if (!r.ok || adminDbUpdatedRows(r.data).length === 0) {
+    console.error('Error toggling review visibility:', r.error || 'geen rij bijgewerkt')
     return false
   }
   return true
 }
 
-export async function deleteReview(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('reviews')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting review:', error)
+export async function deleteReview(id: string, tenantSlug: string): Promise<boolean> {
+  /** RLS: anon mag reviews niet verwijderen — wissen via admin-proxy. */
+  const r = await adminDb.delete('reviews', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting review:', r.error)
     return false
   }
   return true

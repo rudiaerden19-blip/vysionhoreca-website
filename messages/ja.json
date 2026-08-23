@@ -4781,6 +4781,7 @@
     "hiddenTooltip": "非表示 - クリックして表示",
     "approveLabel": "承認",
     "hideLabel": "非表示",
+    "saveFailed": "保存に失敗しました。もう一度お試しください。",
     "today": "今日",
     "yesterday": "昨日",
     "daysAgo": "日前",

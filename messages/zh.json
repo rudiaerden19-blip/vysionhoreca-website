@@ -4781,6 +4781,7 @@
     "hiddenTooltip": "已隐藏 - 点击显示",
     "approveLabel": "通过",
     "hideLabel": "隐藏",
+    "saveFailed": "保存失败，请重试。",
     "today": "今天",
     "yesterday": "昨天",
     "daysAgo": "天前",

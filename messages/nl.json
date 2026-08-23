@@ -5080,6 +5080,7 @@
     "hiddenTooltip": "Verborgen - Klik om te tonen",
     "approveLabel": "Goedkeuren",
     "hideLabel": "Verbergen",
+    "saveFailed": "Opslaan mislukt. Probeer opnieuw.",
     "today": "Vandaag",
     "yesterday": "Gisteren",
     "daysAgo": "dagen geleden",

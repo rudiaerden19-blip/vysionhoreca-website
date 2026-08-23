@@ -4781,6 +4781,7 @@
     "hiddenTooltip": "Nascosto - Clicca per mostrare",
     "approveLabel": "Approva",
     "hideLabel": "Nascondi",
+    "saveFailed": "Salvataggio non riuscito. Riprova.",
     "today": "Oggi",
     "yesterday": "Ieri",
     "daysAgo": "giorni fa",

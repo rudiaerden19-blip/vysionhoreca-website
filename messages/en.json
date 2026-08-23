@@ -5079,6 +5079,7 @@
     "visibleTooltip": "Visible - Click to hide",
     "hiddenTooltip": "Hidden - Click to show",
     "approveLabel": "Approve",
+    "saveFailed": "Could not save. Please try again.",
     "hideLabel": "Hide",
     "today": "Today",
     "yesterday": "Yesterday",

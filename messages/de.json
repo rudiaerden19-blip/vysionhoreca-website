@@ -4804,6 +4804,7 @@
     "hiddenTooltip": "Verborgen - Klicken zum Anzeigen",
     "approveLabel": "Freigeben",
     "hideLabel": "Verbergen",
+    "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
     "today": "Heute",
     "yesterday": "Gestern",
     "daysAgo": "Tage her",

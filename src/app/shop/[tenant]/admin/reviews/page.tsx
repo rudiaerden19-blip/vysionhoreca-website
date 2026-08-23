@@ -30,20 +30,24 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
   }
 
   const handleToggleVisible = async (id: string, currentVisible: boolean) => {
-    const success = await toggleReviewVisible(id, !currentVisible)
+    const success = await toggleReviewVisible(id, !currentVisible, params.tenant)
     if (success) {
-      setReviews(prev => prev.map(r => 
+      setReviews(prev => prev.map(r =>
         r.id === id ? { ...r, is_visible: !currentVisible } : r
       ))
+    } else {
+      alert(t('reviewsPage.saveFailed'))
     }
   }
 
   const handleDelete = async (id: string) => {
     if (!(await ask(t('common.delete') + '?'))) return
 
-    const success = await deleteReview(id)
+    const success = await deleteReview(id, params.tenant)
     if (success) {
       setReviews(prev => prev.filter(r => r.id !== id))
+    } else {
+      alert(t('reviewsPage.saveFailed'))
     }
   }
 
@@ -51,13 +55,15 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
     if (!replyText.trim()) return
     
     setSavingReply(true)
-    const success = await replyToReview(id, replyText)
+    const success = await replyToReview(id, replyText, params.tenant)
     if (success) {
       setReviews(prev => prev.map(r => 
         r.id === id ? { ...r, reply: replyText, replied_at: new Date().toISOString() } : r
       ))
       setReplyingTo(null)
       setReplyText('')
+    } else {
+      alert(t('reviewsPage.saveFailed'))
     }
     setSavingReply(false)
   }

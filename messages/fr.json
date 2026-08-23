@@ -4804,6 +4804,7 @@
     "hiddenTooltip": "Masqué - Cliquer pour afficher",
     "approveLabel": "Approuver",
     "hideLabel": "Masquer",
+    "saveFailed": "Enregistrement impossible. Réessayez.",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
     "daysAgo": "jours",
