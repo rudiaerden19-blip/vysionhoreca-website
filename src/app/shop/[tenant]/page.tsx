@@ -19,6 +19,18 @@ import {
   resolvePublicOnlineOrderingEnabled,
   type TenantModuleFlagsPayload,
 } from '@/lib/tenant-public-online-ordering'
+import {
+  ShopIconBuilding,
+  ShopIconChat,
+  ShopIconClock,
+  ShopIconFacebook,
+  ShopIconGlobe,
+  ShopIconInstagram,
+  ShopIconMail,
+  ShopIconMapPin,
+  ShopIconPhone,
+  ShopIconTikTok,
+} from '@/lib/shop-contact-icons'
 
 const MarketingDemoSessionPrime = dynamic(
   () => import('@/components/MarketingDemoSessionPrime').then((mod) => ({ default: mod.MarketingDemoSessionPrime })),
@@ -1810,7 +1822,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             {/* Opening Hours */}
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <span className="text-4xl"></span>
+                <ShopIconClock className="h-8 w-8" />
                 {t('shopPage.openingHours')}
               </h2>
               <div className="space-y-3">
@@ -1845,7 +1857,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             {/* Contact */}
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <span className="text-4xl"></span>
+                <ShopIconChat className="h-8 w-8" />
                 {t('shopPage.contact')}
               </h2>
               <div className="space-y-6">
@@ -1856,7 +1868,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                      <span className="text-xl"></span>
+                      <ShopIconMapPin className="h-6 w-6" />
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.address}</p>
@@ -1873,7 +1885,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.btw_number && (
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                      <span className="text-xl"></span>
+                      <ShopIconBuilding className="h-6 w-6" />
                     </div>
                     <div>
                       <p className="font-semibold">BTW: {business.btw_number}</p>
@@ -1885,7 +1897,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.phone && (
                   <a href={`tel:${business.phone}`} className="flex items-start gap-4 group">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                      <span className="text-xl"></span>
+                      <ShopIconPhone className="h-6 w-6" />
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.phone}</p>
@@ -1897,7 +1909,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {business.email && (
                   <a href={`mailto:${business.email}`} className="flex items-start gap-4 group">
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-orange-500 transition-colors">
-                      <span className="text-xl"></span>
+                      <ShopIconMail className="h-6 w-6" />
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.email}</p>
@@ -1920,7 +1932,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-green-500 transition-colors">
-                      <span className="text-xl"></span>
+                      <ShopIconGlobe className="h-6 w-6" />
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-green-400 transition-colors">
@@ -1939,7 +1951,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       target="_blank"
                       className="w-12 h-12 bg-white/10 hover:bg-blue-600 rounded-xl flex items-center justify-center transition-colors"
                     >
-                      <span className="text-xl"></span>
+                      <ShopIconFacebook className="h-6 w-6" />
                     </a>
                   )}
                   {business.social_instagram && (
@@ -1948,7 +1960,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       target="_blank"
                       className="w-12 h-12 bg-white/10 hover:bg-pink-600 rounded-xl flex items-center justify-center transition-colors"
                     >
-                      <span className="text-xl"></span>
+                      <ShopIconInstagram className="h-6 w-6" />
                     </a>
                   )}
                   {business.social_tiktok && (
@@ -1957,7 +1969,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       target="_blank"
                       className="w-12 h-12 bg-white/10 hover:bg-black rounded-xl flex items-center justify-center transition-colors"
                     >
-                      <span className="text-xl"></span>
+                      <ShopIconTikTok className="h-6 w-6" />
                     </a>
                   )}
                 </div>
