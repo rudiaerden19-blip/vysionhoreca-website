@@ -700,6 +700,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <ImageZoomPicker
                 tenantSlug={params.tenant}
                 label={t('ui.productLabel').replace('{{n}}', '1')}
+                objectFit="contain"
                 value={parseImageZoomSettings(formData.top_seller_1)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, top_seller_1: stringifyImageZoomSettings(settings) }))
@@ -711,6 +712,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <ImageZoomPicker
                 tenantSlug={params.tenant}
                 label={t('ui.productLabel').replace('{{n}}', '2')}
+                objectFit="contain"
                 value={parseImageZoomSettings(formData.top_seller_2)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, top_seller_2: stringifyImageZoomSettings(settings) }))
@@ -722,6 +724,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <ImageZoomPicker
                 tenantSlug={params.tenant}
                 label={t('ui.productLabel').replace('{{n}}', '3')}
+                objectFit="contain"
                 value={parseImageZoomSettings(formData.top_seller_3)}
                 onChange={(settings) => {
                   setFormData(prev => ({ ...prev, top_seller_3: stringifyImageZoomSettings(settings) }))

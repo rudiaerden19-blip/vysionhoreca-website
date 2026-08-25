@@ -18,9 +18,11 @@ interface ImageZoomPickerProps {
   value: ImageZoomSettings
   onChange: (settings: ImageZoomSettings) => void
   label?: string
+  /** cover = hero/sfeer (knippen mag). contain = productfoto’s, hele beeld zichtbaar. */
+  objectFit?: 'cover' | 'contain'
 }
 
-export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: ImageZoomPickerProps) {
+export default function ImageZoomPicker({ tenantSlug, value, onChange, label, objectFit = 'cover' }: ImageZoomPickerProps) {
   const { t } = useLanguage()
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -119,7 +121,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               onTouchStart={() => setIsDragging(true)}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleMouseUp}
-              className="relative w-full h-32 rounded-lg overflow-hidden bg-gray-200 cursor-move"
+              className={`relative w-full h-32 rounded-lg overflow-hidden cursor-move ${objectFit === 'contain' ? 'bg-white' : 'bg-gray-200'}`}
               style={{ touchAction: 'none'}}
             >
               {/* Deze preview toont exact hoe de foto op de website verschijnt */}
@@ -127,10 +129,17 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
                 src={settings.url}
                 alt={t('ui.imageZoomPickerAlt')}
                 fill
-                className="object-cover"
+                className={objectFit === 'contain' ? 'object-contain object-center' : 'object-cover'}
                 style={{
                   objectPosition: `${settings.positionX}% ${settings.positionY}%`,
-                  transform: settings.zoom !== 1 ? `scale(${settings.zoom})`: undefined,
+                  transform:
+                    objectFit === 'contain'
+                      ? settings.zoom < 1
+                        ? `scale(${settings.zoom})`
+                        : undefined
+                      : settings.zoom !== 1
+                        ? `scale(${settings.zoom})`
+                        : undefined,
                   transformOrigin: `${settings.positionX}% ${settings.positionY}%`,
                 }}
                 unoptimized
