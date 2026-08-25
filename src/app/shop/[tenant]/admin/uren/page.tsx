@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconPencil, AdminIconTrash } from '@/lib/admin-action-icons'
 import { authFetch } from '@/lib/auth-headers'
 import { 
   getActiveStaff,
@@ -1175,8 +1176,10 @@ Met vriendelijke groeten`,
                                 openEntryModal(new Date(selectedDate), entry)
                               }}
                               className="px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                              title={t('adminPages.common.edit')}
+                              aria-label={t('adminPages.common.edit')}
                             >
-                              
+                              <AdminIconPencil className="h-4 w-4" />
                             </button>
                             <button
                               onClick={(e) => {
@@ -1184,8 +1187,10 @@ Met vriendelijke groeten`,
                                 handleDeleteEntry(entry)
                               }}
                               className="px-2 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                              title={t('adminPages.common.delete')}
+                              aria-label={t('adminPages.common.delete')}
                             >
-                              
+                              <AdminIconTrash className="h-4 w-4" />
                             </button>
                           </div>
                         </div>

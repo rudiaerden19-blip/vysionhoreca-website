@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getTeamMembers, saveTeamMember, deleteTeamMember, TeamMember } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconPencil, AdminIconTrash } from '@/lib/admin-action-icons'
 
 export default function TeamPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -176,14 +177,18 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                 <button
                   onClick={() => handleEdit(member)}
                   className="p-3 bg-white rounded-xl hover:bg-gray-100 transition-colors"
+                  title={t('adminPages.common.edit')}
+                  aria-label={t('adminPages.common.edit')}
                 >
-                  
+                  <AdminIconPencil className="h-5 w-5 text-gray-700" />
                 </button>
                 <button
                   onClick={() => member.id && handleDelete(member.id)}
                   className="p-3 bg-white rounded-xl hover:bg-red-100 transition-colors"
+                  title={t('adminPages.common.delete')}
+                  aria-label={t('adminPages.common.delete')}
                 >
-                  
+                  <AdminIconTrash className="h-5 w-5 text-red-600" />
                 </button>
               </div>
             </motion.div>

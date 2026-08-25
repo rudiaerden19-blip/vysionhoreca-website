@@ -27,6 +27,7 @@ import {
   stopDragActivationOnField,
   useAdminCatalogDragSensors,
 } from '@/lib/admin-dnd-sensors'
+import { AdminIconClose, AdminIconPencil, AdminIconPlus, AdminIconTrash } from '@/lib/admin-action-icons'
 
 // Sortable Choice Component
 function SortableChoice({ 
@@ -117,8 +118,9 @@ function SortableChoice({
         <button
           onClick={onRemove}
           className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+          aria-label="Keuze verwijderen"
         >
-          
+          <AdminIconTrash className="h-4 w-4" />
         </button>
       )}
     </div>
@@ -315,7 +317,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           onClick={openAddModal}
           className="px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium flex items-center gap-2"
         >
-          <span></span>
+          <AdminIconPlus className="h-5 w-5" />
           <span>{t('adminPages.opties.addOption')}</span>
         </motion.button>
       </div>
@@ -370,14 +372,18 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 <button 
                   onClick={() => openEditModal(option)}
                   className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  title={t('adminPages.common.edit')}
+                  aria-label={t('adminPages.common.edit')}
                 >
-                  
+                  <AdminIconPencil className="h-5 w-5 text-gray-700" />
                 </button>
                 <button 
                   onClick={() => handleDelete(option.id!)}
                   className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
+                  title={t('adminPages.common.delete')}
+                  aria-label={t('adminPages.common.delete')}
                 >
-                  
+                  <AdminIconTrash className="h-5 w-5" />
                 </button>
               </div>
             </div>
@@ -458,8 +464,9 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   <button
                     onClick={closeModal}
                     className="p-2 hover:bg-gray-100 rounded-xl text-gray-400 hover:text-gray-600"
+                    aria-label={t('adminPages.common.cancel')}
                   >
-                    
+                    <AdminIconClose className="h-5 w-5" />
                   </button>
                 </div>
               </div>

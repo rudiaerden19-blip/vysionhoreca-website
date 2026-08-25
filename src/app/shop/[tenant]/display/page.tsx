@@ -1497,7 +1497,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   onClick={() => setShowReservationsModal(false)}
                   className="p-2 hover:bg-gray-700 rounded-lg text-gray-400"
                 >
-                  
+                  <KassaIconClose className="h-5 w-5" />
                 </button>
               </div>
 

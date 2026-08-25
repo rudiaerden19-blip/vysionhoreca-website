@@ -30,6 +30,7 @@ import {
   focusKassaFloorModalInput,
   isFloorModalTextEntryFocused,
 } from '@/lib/kassa-floor-plan-modal-input'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export type TableShape = FloorPlanTable['shape']
 export type TableStatus = FloorPlanTable['status']
@@ -1501,7 +1502,9 @@ export default function KassaFloorPlan({
                   ? t('kassaApp.floorPlanSidebarTitlePlant')
                   : t('kassaApp.floorPlanSidebarTitleBar')}
               </h3>
-              <button onClick={() => setSelectedDecor(null)} className="text-gray-400 hover:text-gray-700 text-xl"></button>
+              <button onClick={() => setSelectedDecor(null)} className="text-gray-400 hover:text-gray-700 text-xl p-1" aria-label={t('kassaApp.closeAria')}>
+                <KassaIconClose className="h-6 w-6" />
+              </button>
             </div>
 
             {/* Bar segment: kruk nummers + bestellingen + bestelling starten */}
@@ -1690,7 +1693,9 @@ export default function KassaFloorPlan({
                     {t('kassaApp.floorPlanSeatsLine').replace(/\{count\}/g, String(selected.seats))}
                   </p>
                 </div>
-                <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-xl"></button>
+                <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-700 text-xl p-1" aria-label={t('kassaApp.closeAria')}>
+                  <KassaIconClose className="h-6 w-6" />
+                </button>
               </div>
 
               {/* Bestellingen */}
@@ -1831,7 +1836,9 @@ export default function KassaFloorPlan({
           <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">{t('kassaApp.floorPlanModalAddBarTitle')}</h3>
-              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700"></button>
+              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700 inline-flex items-center justify-center" aria-label={t('kassaApp.closeAria')}>
+                <KassaIconClose className="h-6 w-6" />
+              </button>
             </div>
             <div className="p-5 space-y-4">
               <p className="text-sm text-gray-500">{t('kassaApp.floorPlanModalAddBarIntro')}</p>
@@ -1888,7 +1895,9 @@ export default function KassaFloorPlan({
           <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">{t('kassaApp.floorPlanModalAddTableTitle')}</h3>
-              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700"></button>
+              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700 inline-flex items-center justify-center" aria-label={t('kassaApp.closeAria')}>
+                <KassaIconClose className="h-6 w-6" />
+              </button>
             </div>
             <div className="p-5 space-y-4">
               <div>

@@ -3331,7 +3331,9 @@ export default function KassaReservationsView({
                           className="min-h-[44px] min-w-[44px] shrink-0 text-2xl text-white/50 hover:text-white"
                           aria-label={rk('closeAria')}
                         >
-                          
+                          <span className="select-none text-[1.35rem] font-semibold leading-none" aria-hidden>
+                            ✕
+                          </span>
                         </button>
                       </div>
 

@@ -28,6 +28,7 @@ import {
 } from '@/lib/order-items-display'
 import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 import { KitchenStyleOrderCard } from '@/components/shop-display/KitchenStyleOrderCard'
 
@@ -676,7 +677,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     className={`flex h-11 w-11 shrink-0 items-center justify-center text-xl ${ui.btn}`}
                     aria-label={t('shopDisplay.cancel')}
                   >
-                    
+                    <KassaIconClose className="h-6 w-6" />
                   </button>
                 </div>
               </div>

@@ -3,6 +3,7 @@
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconRefresh, AdminIconTrash } from '@/lib/admin-action-icons'
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
@@ -375,8 +376,10 @@ export default function PersoneelPage() {
                 <button
                   onClick={() => handleDelete(member)}
                   className="px-3 py-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors text-sm"
+                  title={t('adminPages.common.delete')}
+                  aria-label={t('adminPages.common.delete')}
                 >
-                  
+                  <AdminIconTrash className="h-5 w-5" />
                 </button>
               </div>
             </div>
@@ -471,8 +474,9 @@ export default function PersoneelPage() {
                     onClick={() => setFormData({ ...formData, pin: generatePin() })}
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
                     title="Of genereer willekeurig"
+                    aria-label="Of genereer willekeurig"
                   >
-                    
+                    <AdminIconRefresh className="h-5 w-5" />
                   </button>
                 </div>
               </div>

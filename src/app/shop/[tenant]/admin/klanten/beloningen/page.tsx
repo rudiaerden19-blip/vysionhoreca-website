@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { getLoyaltyRewards, saveLoyaltyReward, deleteLoyaltyReward, LoyaltyReward } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconTrash } from '@/lib/admin-action-icons'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
 
 export default function BeloningenPage({ params }: { params: { tenant: string } }) {
@@ -225,8 +226,10 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   <button
                     onClick={() => handleDelete(reward.id!)}
                     className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg font-medium transition-colors"
+                    title={t('adminPages.common.delete')}
+                    aria-label={t('adminPages.common.delete')}
                   >
-                    
+                    <AdminIconTrash className="h-5 w-5" />
                   </button>
                 </div>
               </div>

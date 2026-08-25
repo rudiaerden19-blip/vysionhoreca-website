@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconClose, AdminIconPlus } from '@/lib/admin-action-icons'
 
 interface MediaItem {
   id: string
@@ -531,13 +532,14 @@ export default function MediaPicker({
                     }}
                     className="px-4 py-2 bg-black text-white rounded-lg hover:bg-neutral-900 transition-colors text-sm font-medium flex items-center gap-2"
                   >
-                    <span></span> {t('mediaPicker.uploadNewPhoto')}
+                    <AdminIconPlus className="h-4 w-4" /> {t('mediaPicker.uploadNewPhoto')}
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
                     className="p-2 hover:bg-gray-100 rounded-lg"
+                    aria-label={t('common.close')}
                   >
-                    
+                    <AdminIconClose className="h-5 w-5 text-gray-500" />
                   </button>
                 </div>
               </div>

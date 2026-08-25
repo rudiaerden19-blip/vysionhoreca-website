@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconArchive, AdminIconPencil, AdminIconUsers } from '@/lib/admin-action-icons'
 
 interface OrderGroup {
   id: string
@@ -272,9 +273,15 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  <button onClick={() => openEditModal(group)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.editGroup')}></button>
-                  <a href={`/shop/${params.tenant}/admin/groepen/leden?group=${group.id}`} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.members')}></a>
-                  <button onClick={() => archiveGroup(group.id)} className="p-2 hover:bg-red-50 rounded-lg text-red-500" title="Archiveren"></button>
+                  <button onClick={() => openEditModal(group)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title={t('groupsModule.groups.editGroup')} aria-label={t('groupsModule.groups.editGroup')}>
+                    <AdminIconPencil className="h-5 w-5" />
+                  </button>
+                  <a href={`/shop/${params.tenant}/admin/groepen/leden?group=${group.id}`} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 inline-flex" title={t('groupsModule.groups.members')} aria-label={t('groupsModule.groups.members')}>
+                    <AdminIconUsers className="h-5 w-5" />
+                  </a>
+                  <button onClick={() => archiveGroup(group.id)} className="p-2 hover:bg-red-50 rounded-lg text-red-500" title="Archiveren" aria-label="Archiveren">
+                    <AdminIconArchive className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
             </motion.div>

@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconCheck, AdminIconClose, AdminIconList, AdminIconTrash } from '@/lib/admin-action-icons'
 
 // =====================================================
 // AUTOMATISCHE IMAGE RESIZE FUNCTIE
@@ -424,18 +425,22 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               />
               <button
                 onClick={createCategory}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium"
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium inline-flex items-center justify-center"
+                title={t('adminPages.common.add')}
+                aria-label={t('adminPages.common.add')}
               >
-                
+                <AdminIconCheck className="h-5 w-5" />
               </button>
               <button
                 onClick={() => {
                   setShowNewCategory(false)
                   setNewCategoryName('')
                 }}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium"
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium inline-flex items-center justify-center"
+                title={t('adminPages.common.cancel')}
+                aria-label={t('adminPages.common.cancel')}
               >
-                
+                <AdminIconClose className="h-5 w-5" />
               </button>
             </motion.div>
           )}
@@ -569,8 +574,10 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           <button
             onClick={() => setViewMode('list')}
             className={`px-3 py-1 rounded-md transition-colors ${viewMode === 'list'? 'bg-white shadow': ''}`}
+            title="Lijst"
+            aria-label="Lijst"
           >
-            
+            <AdminIconList className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -613,8 +620,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 onClick={(e) => deleteSingleMedia(e, item)}
                 className="absolute top-2 right-2 w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-xl border-2 border-white z-20"
                 title="Verwijderen"
+                aria-label="Verwijderen"
               >
-                <span className="text-lg"></span>
+                <AdminIconTrash className="h-5 w-5" />
               </button>
               <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity pointer-events-none ${
                 selectedItems.includes(item.id) ? 'opacity-100': 'opacity-0 group-hover:opacity-100'
@@ -677,8 +685,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 onClick={(e) => deleteSingleMedia(e, item)}
                 className="w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-lg flex-shrink-0 relative z-10"
                 title="Verwijderen"
+                aria-label="Verwijderen"
               >
-                <span className="text-lg"></span>
+                <AdminIconTrash className="h-5 w-5" />
               </button>
             </div>
           ))}

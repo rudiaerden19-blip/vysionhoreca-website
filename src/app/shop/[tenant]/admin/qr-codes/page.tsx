@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { AdminIconPrint, AdminIconTrash } from '@/lib/admin-action-icons'
 
 const getQrTypes = (t: (key: string) => string) => [
   { id: 'menu', name: t('marketingQr.types.menu'), icon: '', description: t('marketingQr.types.menuDesc') },
@@ -265,16 +266,18 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                     }}
                     className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg"
                     title="Afdrukken"
+                    aria-label="Afdrukken"
                   >
-                    
+                    <AdminIconPrint className="h-5 w-5" />
                   </button>
                   <button
                     type="button"
                     onClick={(e) => handleDelete(e, qr.id)}
                     className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg"
                     title="Verwijderen"
+                    aria-label="Verwijderen"
                   >
-                    
+                    <AdminIconTrash className="h-5 w-5" />
                   </button>
                 </div>
               </div>

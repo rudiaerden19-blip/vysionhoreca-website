@@ -5,6 +5,7 @@ import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   kassaPosButtonClass,
 } from '@/lib/kassa-pos-surface'
+import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export type KassaStaffSalesPickRow = { id: string; name: string; hasOpenSession: boolean }
 
@@ -53,7 +54,7 @@ export function KassaStaffSalesPickModal({
             className="rounded-xl p-2 text-white/80 hover:bg-white/10"
             aria-label={t('staffClock.close')}
           >
-            
+            <KassaIconClose className="h-6 w-6" />
           </button>
         </div>
         <div className="flex-1 space-y-3 overflow-y-auto p-5">

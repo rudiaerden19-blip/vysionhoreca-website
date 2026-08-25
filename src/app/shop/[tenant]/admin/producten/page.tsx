@@ -911,8 +911,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     type="button"
                     onClick={closeModal}
                     className="p-2 hover:bg-gray-100 rounded-lg"
+                    aria-label={t('adminPages.common.cancel')}
                   >
-                    
+                    <ProductIconX className="h-5 w-5 text-gray-500" />
                   </button>
                 </div>
                 {error ? (

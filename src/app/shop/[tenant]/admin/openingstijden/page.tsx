@@ -8,6 +8,7 @@ import {
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
+import { AdminIconCopy } from '@/lib/admin-action-icons'
 
 // ── Tijdinvoer helper ─────────────────────────────────────────────
 function formatTimeInput(raw: string): string {
@@ -422,9 +423,11 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                     {/* Copy Button */}
                     <button
                       onClick={() => copyToAllDays(index)}
-                      className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                      className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors inline-flex items-center justify-center"
+                      title="Kopieer naar alle dagen"
+                      aria-label="Kopieer naar alle dagen"
                     >
-                      
+                      <AdminIconCopy className="h-4 w-4" />
                     </button>
                   </div>
                 ) : (
