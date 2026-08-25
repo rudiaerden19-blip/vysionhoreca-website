@@ -1047,6 +1047,7 @@
     "loginButton": "Inloggen",
     "loggingIn": "Inloggen...",
     "forgotPassword": "Wachtwoord vergeten?",
+    "staySignedInHint": "Op dit apparaat blijven we 14 dagen ingelogd tot je uitlogt. E-mail wordt onthouden; het wachtwoord mag de browser invullen.",
     "emailSent": "Email verzonden!",
     "resetLinkSent": "We hebben een link naar {email} gestuurd om je wachtwoord te resetten.",
     "backToLogin": "Terug naar inloggen",

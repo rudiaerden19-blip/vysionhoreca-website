@@ -729,6 +729,7 @@
     "loginButton": "Accedi",
     "loggingIn": "Accesso in corso...",
     "forgotPassword": "Password dimenticata?",
+    "staySignedInHint": "Questo dispositivo resta connesso 14 giorni finché non esci. L’email viene ricordata; il browser può compilare la password.",
     "emailSent": "Email inviata!",
     "resetLinkSent": "Abbiamo inviato un link a {email} per reimpostare la tua password.",
     "backToLogin": "Torna all'accesso",

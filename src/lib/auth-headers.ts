@@ -181,6 +181,31 @@ export function persistTenantSessionWithToday(tenant: Record<string, unknown>): 
     sessionExpiresAt,
   }
   localStorage.setItem('vysion_tenant', JSON.stringify(enriched))
+  const em = typeof tenant.email === 'string' ? tenant.email : ''
+  rememberOwnerLoginEmail(em)
+}
+
+const OWNER_LAST_LOGIN_EMAIL_KEY = 'vysion_last_owner_login_email'
+
+/** Laatste zaak-login e-mail op dit apparaat (geen wachtwoord). */
+export function rememberOwnerLoginEmail(email: string): void {
+  if (typeof window === 'undefined') return
+  const e = email.trim()
+  if (!e) return
+  try {
+    localStorage.setItem(OWNER_LAST_LOGIN_EMAIL_KEY, e)
+  } catch {
+    /* private mode */
+  }
+}
+
+export function readRememberedOwnerLoginEmail(): string {
+  if (typeof window === 'undefined') return ''
+  try {
+    return (localStorage.getItem(OWNER_LAST_LOGIN_EMAIL_KEY) || '').trim()
+  } catch {
+    return ''
+  }
 }
 
 /**

@@ -729,6 +729,7 @@
     "loginButton": "Iniciar sesión",
     "loggingIn": "Iniciando sesión...",
     "forgotPassword": "¿Olvidaste tu contraseña?",
+    "staySignedInHint": "Este dispositivo permanece conectado 14 días hasta que cierre sesión. Guardamos el correo; el navegador puede rellenar la contraseña.",
     "emailSent": "¡Correo electrónico enviado!",
     "resetLinkSent": "Hemos enviado un enlace a {email} para restablecer tu contraseña.",
     "backToLogin": "Volver al inicio de sesión",

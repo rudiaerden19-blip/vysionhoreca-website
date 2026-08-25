@@ -1047,6 +1047,7 @@
     "loginButton": "Log in",
     "loggingIn": "Logging in...",
     "forgotPassword": "Forgot password?",
+    "staySignedInHint": "This device stays signed in for 14 days until you log out. We remember your email; the browser can fill in the password.",
     "emailSent": "Email sent!",
     "resetLinkSent": "We have sent a link to {email} to reset your password.",
     "backToLogin": "Back to login",

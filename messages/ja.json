@@ -729,6 +729,7 @@
     "loginButton": "ログイン",
     "loggingIn": "ログイン中...",
     "forgotPassword": "パスワードをお忘れですか？",
+    "staySignedInHint": "この端末ではログアウトするまで14日間ログインしたままです。メールは記憶され、パスワードはブラウザが入力できます。",
     "emailSent": "メールを送信しました！",
     "resetLinkSent": "{email}にパスワードをリセットするためのリンクを送信しました。",
     "backToLogin": "ログインに戻る",

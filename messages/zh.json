@@ -729,6 +729,7 @@
     "loginButton": "登录",
     "loggingIn": "登录中...",
     "forgotPassword": "忘记密码？",
+    "staySignedInHint": "本设备在退出登录前会保持登录 14 天。我们会记住邮箱，浏览器可以自动填写密码。",
     "emailSent": "邮件已发送！",
     "resetLinkSent": "我们已向 {email} 发送了重置密码的链接。",
     "backToLogin": "返回登录",

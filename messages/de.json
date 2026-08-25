@@ -729,6 +729,7 @@
     "loginButton": "Anmelden",
     "loggingIn": "Anmeldung...",
     "forgotPassword": "Passwort vergessen?",
+    "staySignedInHint": "Dieses Gerät bleibt 14 Tage angemeldet, bis Sie sich abmelden. Die E-Mail wird gespeichert; das Passwort darf der Browser ausfüllen.",
     "emailSent": "E-Mail gesendet!",
     "resetLinkSent": "Wir haben einen Link an {email} gesendet, um Ihr Passwort zurückzusetzen.",
     "backToLogin": "Zurück zur Anmeldung",

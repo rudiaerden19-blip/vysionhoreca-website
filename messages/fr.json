@@ -729,6 +729,7 @@
     "loginButton": "Se connecter",
     "loggingIn": "Connexion...",
     "forgotPassword": "Mot de passe oublié?",
+    "staySignedInHint": "Cet appareil reste connecté 14 jours jusqu’à déconnexion. L’e-mail est mémorisé ; le navigateur peut remplir le mot de passe.",
     "emailSent": "E-mail envoyé!",
     "resetLinkSent": "Nous avons envoyé un lien à {email} pour réinitialiser votre mot de passe.",
     "backToLogin": "Retour à la connexion",

@@ -10,6 +10,9 @@ import {
   normalizeLoginNextPath,
   internalShopPathToTenantHostPath,
   isSuperAdminLoggedIn,
+  isOwnerSessionFreshForTenant,
+  readRememberedOwnerLoginEmail,
+  rememberOwnerLoginEmail,
 } from '@/lib/auth-headers'
 import { clearTerminalLogout, readTerminalLogout } from '@/lib/session-broadcast'
 import { getCurrentTenantSlug as tenantSlugFromLocation } from '@/lib/tenant-url'
@@ -47,7 +50,6 @@ export default function LoginPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
-  const [passwordFieldReady, setPasswordFieldReady] = useState(false)
   const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
   const [marketingHomeHref, setMarketingHomeHref] = useState('/')
 
@@ -88,6 +90,31 @@ export default function LoginPage() {
           router.replace(safeNext)
         } else {
           const hostPath = internalShopPathToTenantHostPath(safeNext, tenantSlug)
+          window.location.replace(`${window.location.origin}${hostPath}`)
+        }
+        return
+      }
+    }
+
+    // Zaak nog ingelogd op dit apparaat (rollende 14 dagen) → kassa/admin zonder opnieuw wachtwoord.
+    if (term?.kind !== 'staff') {
+      let ownerSlug = tenantSlugFromLocation()
+      if (nextRaw) {
+        try {
+          const dec = decodeURIComponent(nextRaw.trim())
+          const m = dec.match(/^\/shop\/([^/?#]+)/)
+          if (m?.[1]) ownerSlug = m[1]
+        } catch {
+          /* ignore */
+        }
+      }
+      if (ownerSlug && isOwnerSessionFreshForTenant(ownerSlug)) {
+        const safeNext = normalizeLoginNextPath(nextRaw, ownerSlug) ?? `/shop/${ownerSlug}/admin`
+        const host = window.location.hostname.toLowerCase().split(':')[0]
+        if (stayOnMainDomainForShopSession(host)) {
+          router.replace(safeNext)
+        } else {
+          const hostPath = internalShopPathToTenantHostPath(safeNext, ownerSlug)
           window.location.replace(`${window.location.origin}${hostPath}`)
         }
         return
@@ -145,21 +172,11 @@ export default function LoginPage() {
     }
   }, [setLocale, locales])
 
-  // Geen vooringevuld wachtwoord (browser-autofill): veld blijft leeg tot de gebruiker typt.
+  // E-mail van vorige login op dit apparaat; wachtwoord via browser-autofill (kassa).
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const clearPassword = () => {
-      setPassword('')
-      const el = passwordInputRef.current
-      if (el) el.value = ''
-    }
-    clearPassword()
-    const t1 = window.setTimeout(clearPassword, 50)
-    const t2 = window.setTimeout(clearPassword, 300)
-    return () => {
-      window.clearTimeout(t1)
-      window.clearTimeout(t2)
-    }
+    const remembered = readRememberedOwnerLoginEmail()
+    if (remembered) setEmail(remembered)
   }, [])
 
   // Geen programmatische e-mail/wachtwoord: alle tenants gebruiken /login; autofill alleen via browser
@@ -233,6 +250,7 @@ export default function LoginPage() {
       }
 
       persistTenantSessionWithToday(tenant as Record<string, unknown>)
+      rememberOwnerLoginEmail(email)
       clearTerminalLogout()
 
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
@@ -335,31 +353,19 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="relative space-y-6" autoComplete="off" method="post">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
-              >
-                <input type="text" name="fake_username" autoComplete="username" tabIndex={-1} />
-                <input
-                  type="password"
-                  name="fake_password"
-                  autoComplete="current-password"
-                  tabIndex={-1}
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="relative space-y-6" autoComplete="on" method="post">
               <div>
                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
                   {t('login.emailAddress')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="email"
-                  name="vysion_email"
+                  name="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  autoComplete="off"
+                  autoComplete="username"
                   autoCorrect="off"
                   spellCheck={false}
                   placeholder={t('login.emailPlaceholder')}
@@ -374,17 +380,16 @@ export default function LoginPage() {
                 <input
                   ref={passwordInputRef}
                   id="password"
-                  name="vysion_password"
+                  name="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  autoComplete="new-password"
-                  readOnly={!passwordFieldReady}
-                  onFocus={() => setPasswordFieldReady(true)}
+                  autoComplete="current-password"
                   placeholder=""
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
                 />
+                <p className="mt-2 text-xs text-gray-500">{t('login.staySignedInHint')}</p>
               </div>
 
               {error && (
