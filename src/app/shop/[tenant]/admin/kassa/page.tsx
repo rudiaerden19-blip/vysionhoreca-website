@@ -941,14 +941,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
   // Bij nieuwe browsersessie (volgende ochtend) verschijnt het opnieuw.
   const SESSION_KEY = `vysion_kassa_audio_ok_${tenant}`
-  const [soundActivated, setSoundActivated] = useState(() => {
-    if (demoViewOnly) return true
-    return typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === 'true'
-  })
-  const [showSoundActivation, setShowSoundActivation] = useState(() => {
-    if (demoViewOnly) return false
-    return typeof window === 'undefined'? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
-  })
+  const [soundActivated, setSoundActivated] = useState(() => demoViewOnly)
+  const [showSoundActivation, setShowSoundActivation] = useState(false)
 
   const activateSound = () => {
     // Zelfde singleton AudioContext + notification.mp3 als playOrderNotification (niet aparte AudioContext)
@@ -1155,10 +1149,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, stopAlarm])
 
   useEffect(() => {
-    if (!demoViewOnly) return
+    if (demoViewOnly) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, 'true')
+      } catch { /* ignore */ }
+      setSoundActivated(true)
+      setShowSoundActivation(false)
+      return
+    }
+    let ok = false
     try {
-      sessionStorage.setItem(SESSION_KEY, 'true')
+      ok = sessionStorage.getItem(SESSION_KEY) === 'true'
     } catch { /* ignore */ }
+    setSoundActivated(ok)
+    setShowSoundActivation(!ok)
   }, [demoViewOnly, SESSION_KEY])
 
   // Poll elke 3s: alleen modules die aan staan (geen geheugen/CPU voor uitgeschakelde onderdelen).

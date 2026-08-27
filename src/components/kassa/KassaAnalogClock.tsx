@@ -20,14 +20,16 @@ function getWallClockHms(date: Date, timeZone: string): { h: number; m: number; 
 
 /** Analog clock with live hands — tap opens staff clock elsewhere on parent UI. */
 export function KassaAnalogClock({ size = 80 }: { size?: number }) {
-  const [now, setNow] = useState(() => new Date())
+  const [now, setNow] = useState<Date | null>(null)
   useLayoutEffect(() => {
     const tick = () => setNow(new Date())
     tick()
     const id = window.setInterval(tick, 1000)
     return () => window.clearInterval(id)
   }, [])
-  const { h, m, s } = getWallClockHms(now, KASSA_DISPLAY_TIMEZONE)
+  const { h, m, s } = now
+    ? getWallClockHms(now, KASSA_DISPLAY_TIMEZONE)
+    : { h: 0, m: 0, s: 0 }
   const hDeg = ((h % 12) + m / 60 + s / 3600) * 30
   const mDeg = (m + s / 60) * 6
   const sDeg = s * 6

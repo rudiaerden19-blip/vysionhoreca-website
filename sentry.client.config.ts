@@ -100,6 +100,7 @@ Sentry.init({
     /the operation was aborted/i,
     /signal is aborted without reason/i,
     /the user aborted a request/i,
+    /SCDynamicBridge/i,
   ],
 
   beforeSend(event, hint) {
