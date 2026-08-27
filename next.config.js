@@ -4,11 +4,11 @@ const { withSentryConfig } = require("@sentry/nextjs");
 // Content Security Policy - professionele beveiliging
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://maps.googleapis.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://maps.googleapis.com https://va.vercel-scripts.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: blob: https: http:;
   font-src 'self' https://fonts.gstatic.com data:;
-  connect-src 'self' http://127.0.0.1:9742 http://localhost:9742 https://*.supabase.co https://*.supabase.in https://api.stripe.com https://*.upstash.io wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io https://graph.facebook.com;
+  connect-src 'self' http://127.0.0.1:9742 http://localhost:9742 https://*.supabase.co https://*.supabase.in https://api.stripe.com https://*.upstash.io wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io https://graph.facebook.com https://va.vercel-scripts.com;
   frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com;
   frame-ancestors 'self';
   form-action 'self';
