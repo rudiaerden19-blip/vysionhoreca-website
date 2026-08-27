@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { LanguageProvider } from '@/i18n'
 import '@/lib/silence-console-prod'// Silence console.log in production
@@ -195,6 +196,7 @@ export default function RootLayout({
           <SectorChoiceGate />
           {children}
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   )

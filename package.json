@@ -29,6 +29,7 @@
     "@supabase/supabase-js": "^2.89.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.1",
+    "@vercel/analytics": "^2.0.1",
     "@zxing/browser": "^0.2.0",
     "@zxing/library": "^0.22.0",
     "framer-motion": "^12.26.2",
