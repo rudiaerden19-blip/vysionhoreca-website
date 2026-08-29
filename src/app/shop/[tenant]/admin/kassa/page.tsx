@@ -176,6 +176,9 @@ import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
+import { KassaTerminalPayModal } from '@/components/kassa/KassaTerminalPayModal'
+import { kassaCardPayGoesToCloudTerminal } from '@/lib/kassa-payment-terminal'
+import { useKassaCloudTerminals } from '@/lib/kassa-payment-terminal-client'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
@@ -2337,6 +2340,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   // Betaling
+  const paymentTerminals = useKassaCloudTerminals(tenant)
+  const [showTerminalPayModal, setShowTerminalPayModal] = useState(false)
+  const [terminalPayMethod, setTerminalPayMethod] = useState<'CARD' | 'BANCONTACT'>('CARD')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showSplitModal, setShowSplitModal] = useState(false)
@@ -6392,7 +6398,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         total={total}
         options={paymentMethodOptions}
         onClose={() => setShowPaymentModal(false)}
-        onPay={(method) => void completePayment(method)}
+        onPay={(method) => {
+          if (kassaCardPayGoesToCloudTerminal(method, paymentTerminals)) {
+            setTerminalPayMethod(method === 'BANCONTACT' ? 'BANCONTACT' : 'CARD')
+            setShowPaymentModal(false)
+            setShowTerminalPayModal(true)
+            return
+          }
+          void completePayment(method)
+        }}
         onOpenSplit={() => {
           setSplitCash(0)
           setSplitCard(total)
@@ -6400,6 +6414,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowPaymentModal(false)
         }}
         appearance={kassaAppearanceDark ? 'dark': 'light'}
+      />
+
+      <KassaTerminalPayModal
+        open={showTerminalPayModal}
+        tenantSlug={tenant}
+        total={total}
+        method={terminalPayMethod}
+        terminals={paymentTerminals}
+        appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        onSucceeded={() => {
+          setShowTerminalPayModal(false)
+          void completePayment(terminalPayMethod)
+        }}
+        onCancelBack={() => {
+          setShowTerminalPayModal(false)
+          setShowPaymentModal(true)
+        }}
       />
 
       <KassaSplitPaymentModal

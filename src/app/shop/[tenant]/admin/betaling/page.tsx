@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
 import PinGate from '@/components/PinGate'
+import { KassaPaymentTerminalsAdmin } from '@/components/KassaPaymentTerminalsAdmin'
 
 export default function BetalingPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -295,6 +296,8 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           </div>
         )}
       </motion.div>
+
+      <KassaPaymentTerminalsAdmin tenantSlug={params.tenant} />
     </div>
       </PinGate>
   )
