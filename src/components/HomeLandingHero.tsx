@@ -136,6 +136,11 @@ function HeroCtaFlipCard() {
                 </span>
               ) : null}
             </div>
+            {t('pricing.exclVat') ? (
+              <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs font-medium text-white/70 leading-snug">
+                {t('pricing.exclVat')}
+              </p>
+            ) : null}
             <p className="mt-2.5 sm:mt-3 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
               {frontPriceNote}
             </p>
@@ -176,6 +181,11 @@ function HeroCtaFlipCard() {
                 </span>
               ) : null}
             </div>
+            {t('pricing.exclVat') ? (
+              <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs font-medium text-white/70 leading-snug">
+                {t('pricing.exclVat')}
+              </p>
+            ) : null}
             <p className="mt-2.5 sm:mt-3 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
               {t('heroLanding.ctaModulesBackPriceNote')}
             </p>
