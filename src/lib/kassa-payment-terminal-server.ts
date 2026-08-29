@@ -31,16 +31,27 @@ export async function loadTenantTerminalSecrets(
   supabase: NonNullable<ReturnType<typeof getServerSupabaseClient>>,
   tenantSlug: string,
 ): Promise<TenantTerminalSecrets> {
-  const { data } = await supabase
+  const fullSelect =
+    'stripe_secret_key, stripe_terminal_access_token, stripe_terminal_location_id, sumup_api_key, sumup_merchant_code, mollie_api_key, business_name, address, city, postal_code, country'
+  const first = await supabase
     .from('tenant_settings')
-    .select(
-      'stripe_secret_key, stripe_terminal_location_id, sumup_api_key, sumup_merchant_code, mollie_api_key, business_name, address, city, postal_code, country',
-    )
+    .select(fullSelect)
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
-  const row = data as TenantTerminalSecrets | null
+  let row = first.data as TenantTerminalSecrets | null
+  if (first.error && /stripe_terminal_access_token|42703/i.test(first.error.message || '')) {
+    const retry = await supabase
+      .from('tenant_settings')
+      .select(
+        'stripe_secret_key, stripe_terminal_location_id, sumup_api_key, sumup_merchant_code, mollie_api_key, business_name, address, city, postal_code, country',
+      )
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+    row = retry.data as TenantTerminalSecrets | null
+  }
   return {
     stripe_secret_key: row?.stripe_secret_key ?? null,
+    stripe_terminal_access_token: row?.stripe_terminal_access_token ?? null,
     stripe_terminal_location_id: row?.stripe_terminal_location_id ?? null,
     sumup_api_key: row?.sumup_api_key ?? null,
     sumup_merchant_code: row?.sumup_merchant_code ?? null,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
@@ -297,7 +297,9 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         )}
       </motion.div>
 
-      <KassaPaymentTerminalsAdmin tenantSlug={params.tenant} />
+      <Suspense fallback={null}>
+        <KassaPaymentTerminalsAdmin tenantSlug={params.tenant} />
+      </Suspense>
     </div>
       </PinGate>
   )

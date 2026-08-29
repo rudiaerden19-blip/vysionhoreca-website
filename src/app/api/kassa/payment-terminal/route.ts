@@ -12,6 +12,7 @@ import {
   providerHasKeys,
 } from '@/lib/kassa-payment-terminal-providers'
 import { isKassaTerminalProvider } from '@/lib/kassa-payment-terminal'
+import { terminalOauthAppsReady } from '@/lib/kassa-payment-terminal-oauth'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest) {
         ok: true,
         terminals: [],
         providers: { stripe: !!secrets.stripe_secret_key, sumup: false, mollie: false },
+        connect: terminalOauthAppsReady(),
         table_ready: false,
       })
     }
@@ -52,6 +54,7 @@ export async function GET(request: NextRequest) {
       sumup: providerHasKeys('sumup', secrets),
       mollie: providerHasKeys('mollie', secrets),
     },
+    connect: terminalOauthAppsReady(),
     table_ready: true,
   })
 }
@@ -79,6 +82,21 @@ export async function POST(request: NextRequest) {
   const provider = body.provider as 'stripe' | 'sumup' | 'mollie'
   const label = (body.label || '').trim() || provider
   const secrets = await loadTenantTerminalSecrets(auth.supabase, auth.tenantSlug)
+
+  if (body.action === 'disconnect') {
+    const patch: Record<string, null> =
+      provider === 'stripe'
+        ? { stripe_terminal_access_token: null }
+        : provider === 'sumup'
+          ? { sumup_api_key: null, sumup_merchant_code: null }
+          : { mollie_api_key: null }
+    const { error } = await auth.supabase
+      .from('tenant_settings')
+      .update(patch)
+      .eq('tenant_slug', auth.tenantSlug)
+    if (error) return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  }
 
   if (body.action === 'list_remote') {
     const listed = await listRemoteReaders(provider, secrets)

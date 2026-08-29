@@ -8,6 +8,7 @@ export type TerminalPayStatus = 'pending' | 'succeeded' | 'failed' | 'canceled'
 
 export type TenantTerminalSecrets = {
   stripe_secret_key: string | null
+  stripe_terminal_access_token: string | null
   stripe_terminal_location_id: string | null
   sumup_api_key: string | null
   sumup_merchant_code: string | null
@@ -17,6 +18,10 @@ export type TenantTerminalSecrets = {
   city: string | null
   postal_code: string | null
   country: string | null
+}
+
+export function stripeApiKey(secrets: TenantTerminalSecrets): string | null {
+  return secrets.stripe_terminal_access_token?.trim() || secrets.stripe_secret_key?.trim() || null
 }
 
 function missing(name: string): TerminalProviderResult {
@@ -81,7 +86,7 @@ export function providerHasKeys(
   provider: KassaTerminalProvider,
   secrets: TenantTerminalSecrets,
 ): boolean {
-  if (provider === 'stripe') return !!secrets.stripe_secret_key?.trim()
+  if (provider === 'stripe') return !!stripeApiKey(secrets)
   if (provider === 'sumup') {
     return !!secrets.sumup_api_key?.trim() && !!secrets.sumup_merchant_code?.trim()
   }
@@ -91,7 +96,7 @@ export function providerHasKeys(
 export async function ensureStripeTerminalLocation(
   secrets: TenantTerminalSecrets,
 ): Promise<TerminalProviderResult & { locationId?: string }> {
-  const secret = secrets.stripe_secret_key?.trim()
+  const secret = stripeApiKey(secrets)
   if (!secret) return missing('stripe')
   if (secrets.stripe_terminal_location_id?.trim()) {
     return { ok: true, id: secrets.stripe_terminal_location_id.trim() }
@@ -117,7 +122,7 @@ export async function pairStripeReader(
   registrationCode: string,
   label: string,
 ): Promise<TerminalProviderResult> {
-  const secret = secrets.stripe_secret_key?.trim()
+  const secret = stripeApiKey(secrets)
   if (!secret) return missing('stripe')
   const loc = await ensureStripeTerminalLocation(secrets)
   if (!loc.ok) return loc
@@ -138,7 +143,7 @@ export async function listRemoteReaders(
   secrets: TenantTerminalSecrets,
 ): Promise<{ ok: true; readers: { id: string; label: string }[] } | { ok: false; error: string }> {
   if (provider === 'stripe') {
-    const secret = secrets.stripe_secret_key?.trim()
+    const secret = stripeApiKey(secrets)
     if (!secret) return { ok: false, error: 'stripe_not_configured' }
     const { status, json } = await stripeRequest(secret, 'GET', '/terminal/readers?limit=30')
     if (status >= 400) return { ok: false, error: 'stripe_list_failed' }
@@ -211,7 +216,7 @@ export async function startTerminalCheckout(opts: {
   if (amountCents < 1) return { ok: false, error: 'invalid_amount' }
 
   if (provider === 'stripe') {
-    const secret = secrets.stripe_secret_key?.trim()
+    const secret = stripeApiKey(secrets)
     if (!secret) return missing('stripe')
     const pi = await stripeRequest(secret, 'POST', '/payment_intents', {
       amount: String(amountCents),
@@ -285,7 +290,7 @@ export async function readTerminalCheckoutStatus(opts: {
 }): Promise<{ ok: true; status: TerminalPayStatus } | { ok: false; error: string }> {
   const { provider, secrets, providerPaymentId } = opts
   if (provider === 'stripe') {
-    const secret = secrets.stripe_secret_key?.trim()
+    const secret = stripeApiKey(secrets)
     if (!secret) return { ok: false, error: 'stripe_not_configured' }
     const { status, json } = await stripeRequest(
       secret,
@@ -356,7 +361,7 @@ export async function cancelTerminalCheckout(opts: {
 }): Promise<TerminalProviderResult> {
   const { provider, secrets, providerPaymentId, readerExternalId } = opts
   if (provider === 'stripe') {
-    const secret = secrets.stripe_secret_key?.trim()
+    const secret = stripeApiKey(secrets)
     if (!secret) return missing('stripe')
     await stripeRequest(
       secret,
