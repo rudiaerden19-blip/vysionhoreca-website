@@ -111,7 +111,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         localeFlags,
       }}
     >
-      <div style={{ visibility: isHydrated ? 'visible': 'hidden', minHeight: '100vh'}}>{children}</div>
+      {/* Altijd zichtbaar: visibility:hidden tot na mount gaf op Safari een hydration-mismatch
+          (Sentry: witte server-HTML vs zichtbare client-HTML bij /admin). Taal blijft defaultLocale
+          tot useLayoutEffect — geen localStorage in de eerste render. */}
+      <div style={{ minHeight: '100vh' }}>{children}</div>
     </LanguageContext.Provider>
   )
 }

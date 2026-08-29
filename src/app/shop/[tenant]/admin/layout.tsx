@@ -128,6 +128,12 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
    * sessie na eerdere demo-URL — hele /admin/* zonder login (niet alleen kassa).
    */
   const [demoPublicUnauthenticated, setDemoPublicUnauthenticated] = useState(false)
+  /** Pas ná mount: localStorage/cookie — anders Safari hydration (server ≠ eerste client-HTML). */
+  const [clientAuthReady, setClientAuthReady] = useState(false)
+
+  useLayoutEffect(() => {
+    setClientAuthReady(true)
+  }, [])
 
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
@@ -372,12 +378,12 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   ])
 
   const ownerSessionFreshOnClient =
-    typeof window !== 'undefined' && isOwnerSessionFreshForTenant(params.tenant)
+    clientAuthReady && isOwnerSessionFreshForTenant(params.tenant)
 
   /** Kassa alleen na login-verify — nooit vóór /login (pending/login). */
   const canShowKassaPos =
     demoPublicUnauthenticated ||
-    (typeof window !== 'undefined' && isSuperAdminLoggedIn()) ||
+    (clientAuthReady && isSuperAdminLoggedIn()) ||
     adminAccess === 'ok' ||
     (adminAccess === 'verifying' && ownerSessionFreshOnClient)
 
