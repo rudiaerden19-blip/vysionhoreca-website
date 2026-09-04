@@ -26,7 +26,7 @@ import {
   orderItemDisplayOptionLines,
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
-import { adminDineInSeatAuditLine, dineInSeatLineNl } from '@/lib/admin-order-display'
+import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
@@ -267,8 +267,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   async function printOrder(order: Order) {
-    /** Probeer eerst de lokale Vysion Print Agent (ESC/POS bonprinter).
-     *  Lukt niet? Val terug op browser-printvenster (HTML). */
+    const tableNumber =
+      order.table_number == null || String(order.table_number).trim() === ''
+        ? null
+        : order.floor_plan_zone?.trim()
+          ? `${order.table_number} (${order.floor_plan_zone.trim()})`
+          : order.table_number
     const items = (order.items || []).map((item: unknown) => {
       const optLines = orderItemDisplayOptionLines(item)
       return {
@@ -280,137 +284,54 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       }
     })
     const requestedDateTime = order.scheduled_date
-      ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' '+ order.scheduled_time : ''}`
+      ? `${new Date(order.scheduled_date).toLocaleDateString('nl-BE')}${order.scheduled_time ? ' ' + order.scheduled_time : ''}`
       : ''
-    const printResult = await sendToVysionPrintAgent({
+    const bonLines = [
+      '*** KEUKEN BON ***',
+      `#${order.order_number}`,
+      ...(tableNumber != null ? [`Tafel ${tableNumber}`] : []),
+      ...items.flatMap((item) => [
+        `${item.quantity}x ${item.name}`,
+        ...(item.choices || []).map((c) => ` + ${c.name}`),
+        ...(item.notes ? [`  ! ${item.notes}`] : []),
+      ]),
+      ...(order.customer_notes ? [String(order.customer_notes)] : []),
+    ]
+    await sendToVysionPrintAgent({
       winkelnaam: business?.business_name || '',
-      bonInhoud: '',
+      bonInhoud: bonLines.join('\n'),
       copies: 1,
       receiptMode: 'keuken',
       orderData: {
         orderNumber: order.order_number,
         orderType: order.order_type,
-        tableNumber: null,
+        tableNumber,
         items,
         subtotal: 0,
         tax: 0,
         total: 0,
-        // Extra velden die buildKitchenReceipt gebruikt:
         ...(order.customer_name ? { customerName: order.customer_name } : {}),
         ...(order.customer_phone ? { customerPhone: order.customer_phone } : {}),
-        ...((order as any).customer_address || (order as any).delivery_address
-          ? { customerAddress: (order as any).customer_address || (order as any).delivery_address }
+        ...((order as { customer_address?: string }).customer_address ||
+        (order as { delivery_address?: string }).delivery_address
+          ? {
+              customerAddress:
+                (order as { customer_address?: string }).customer_address ||
+                (order as { delivery_address?: string }).delivery_address,
+            }
           : {}),
         ...(order.customer_notes ? { customerNotes: order.customer_notes } : {}),
         ...(requestedDateTime ? { requestedDateTime } : {}),
-      } as any,
+      } as never,
       businessInfo: {
         name: business?.business_name,
-        address: (business as any)?.address ?? undefined,
-        postalCode: (business as any)?.postal_code ?? undefined,
-        city: (business as any)?.city ?? undefined,
-        phone: (business as any)?.phone ?? undefined,
-        vatNumber: (business as any)?.btw_number ?? undefined,
+        address: (business as { address?: string } | null)?.address,
+        postalCode: (business as { postal_code?: string } | null)?.postal_code,
+        city: (business as { city?: string } | null)?.city,
+        phone: business?.phone,
+        vatNumber: business?.btw_number,
       },
     })
-    if (printResult.ok) return
-
-    window.alert(
-      `${t('kassaApp.printAgentFailedDebugTitle')}\n\n${printResult.error}\n\n${t('kassaApp.printAgentFailedDebugFooter')}`,
-    )
-    browserPrintOrder(order)
-  }
-
-  function browserPrintOrder(order: Order) {
-    const printWindow = window.open('', '_blank', 'width=300,height=600')
-    if (!printWindow) return
-
-    const nlDineInSeat = dineInSeatLineNl(order.order_type, order.table_number, order.floor_plan_zone)
-
-    const itemsHtml = order.items?.map((item: unknown) => {
-      const label = orderItemDisplayName(item)
-      const optLines = orderItemDisplayOptionLines(item)
-      const qty = Number((item as { quantity?: unknown }).quantity) || 1
-      return `
-      <tr>
-        <td style="font-size: 18px; font-weight: bold; padding: 4px 0;">${qty}x</td>
-        <td style="font-size: 18px; padding: 4px 0;">${label}</td>
-      </tr>
-      ${optLines.map((line) => `
-        <tr><td></td><td style="font-size: 14px; color: #666; padding-left: 10px;">+ ${line}</td></tr>
-      `).join('')}
-      ${(item as { notes?: unknown }).notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;"> ${String((item as { notes?: unknown }).notes)}</td></tr>`: ''}
-    `
-    }).join('') || ''
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Keuken Bon #${order.order_number}</title>
-          <style>
-            body { 
-              font-family: 'Courier New', monospace; 
-              padding: 10px; 
-              max-width: 280px;
-              margin: 0 auto;
-            }
-            .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
-            .order-number { font-size: 32px; font-weight: bold; }
-            .order-type { font-size: 24px; margin: 10px 0; padding: 5px; background: #000; color: #fff; display: inline-block; }
-            table { width: 100%; border-collapse: collapse; }
-            .notes { margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
-            .footer { text-align: center; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
-            @media print { body { -webkit-print-color-adjust: exact; } }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">*** KEUKEN BON ***</div>
-            <div class="order-number">#${order.order_number}</div>
-            <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY'? 'BEZORGEN': order.order_type === 'DINE_IN'? 'TER PLAATSE': order.order_type === 'TAKEAWAY'? 'AFHALEN': 'AFHALEN'}</div>
-            ${nlDineInSeat ? `<div style="font-size: 16px; font-weight: bold; margin-top: 6px;">${nlDineInSeat}</div>`: ''}
-            ${(order.scheduled_date || order.scheduled_time) ? `
-            <div style="margin: 6px 0; padding: 6px; background: #000; color: #fff; font-size: 16px; font-weight: bold; border-radius: 4px;">
-               LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric'}) : ''}${order.scheduled_time ? 'om '+ order.scheduled_time : ''}
-            </div>`: ''}
-            <div style="font-size: 14px; margin-top: 5px;">
-              ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
-            </div>
-          </div>
-          
-          <div style="margin-bottom: 10px;">
-            <strong>Klant: ${order.customer_name}</strong>
-            ${order.customer_phone ? `<br>Tel: ${order.customer_phone}`: ''}
-          </div>
-
-          <table>
-            ${itemsHtml}
-          </table>
-
-          ${order.customer_notes ? `
-            <div class="notes">
-              <strong> OPMERKING:</strong><br>
-              ${order.customer_notes}
-            </div>
-          `: ''}
-
-          <div class="footer">
-            ${business?.business_name || ''}<br>
-            ${business?.address || ''}<br>
-            ${business?.phone ? `Tel: ${business.phone}`: ''}<br>
-            ${business?.btw_number ? `BTW: ${business.btw_number}`: ''}<br>
-            ${new Date().toLocaleDateString('nl-BE')}
-          </div>
-        </body>
-      </html>
-    `)
-    printWindow.document.close()
-    printWindow.focus()
-    setTimeout(() => {
-      printWindow.print()
-      printWindow.close()
-    }, 250)
   }
 
   const getTimeSince = (dateString: string) => {
