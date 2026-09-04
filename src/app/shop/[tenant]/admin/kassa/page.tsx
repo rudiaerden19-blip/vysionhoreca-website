@@ -1177,6 +1177,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [numpadValue, setNumpadValue] = useState('')
   /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
+  /** Snelmenu-balk onderaan: aan tot de knop wordt getikt. Alle modes. */
+  const [kassaQuickMenuVisible, setKassaQuickMenuVisible] = useState(true)
   useEffect(() => {
     if (cart.length > 0) setNumpadPanelVisible(false)
   }, [cart.length])
@@ -2947,11 +2949,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const toggleKassaQuickMenu = useCallback(() => {
     playClick()
-    if (typeof document === 'undefined') return
-    document.querySelector('[data-testid="kassa-quick-menu-panel"]')?.scrollIntoView({
-      block: 'nearest',
-      behavior: 'smooth',
-    })
+    setKassaQuickMenuVisible((open) => !open)
   }, [])
 
   /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
@@ -5515,6 +5513,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )
             )}
           </div>
+          {kassaQuickMenuVisible ? (
           <div
             data-testid="kassa-quick-menu-panel"
             className={`shrink-0 border-t px-2 py-1.5 ${
@@ -5575,6 +5574,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               })}
             </div>
           </div>
+          ) : null}
             </div>
           </div>
         </div>
@@ -6100,9 +6100,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 data-testid="kassa-quick-menu"
-                aria-pressed={true}
+                aria-pressed={kassaQuickMenuVisible}
                 onClick={toggleKassaQuickMenu}
-                className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(false, posChrome)}`}
+                className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)}`}
                 title={t('kassaApp.quickMenu')}
               >
                 <span className={`leading-tight ${kassaSidebarActionLabelClass}`}>{t('kassaApp.quickMenu')}</span>
@@ -6243,10 +6243,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 data-testid="kassa-quick-menu"
-                aria-pressed={true}
+                aria-pressed={kassaQuickMenuVisible}
                 onClick={toggleKassaQuickMenu}
                 className={`flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold leading-tight ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${
-                  kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_ACTION_BTN_FACE
+                  kassaLight
+                    ? kassaQuickMenuVisible
+                      ? KASSA_LIGHT_BTN_FACE_ON
+                      : KASSA_LIGHT_BTN_FACE
+                    : kassaQuickMenuVisible
+                      ? KASSA_CLASSIC_ACTION_BTN_FACE_ON
+                      : KASSA_CLASSIC_ACTION_BTN_FACE
                 }`}
                 title={t('kassaApp.quickMenu')}
               >
