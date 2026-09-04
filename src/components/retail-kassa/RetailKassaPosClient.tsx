@@ -625,7 +625,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap px-3 py-2 font-bold text-[11px] leading-tight transition-colors sm:px-4 sm:py-2.5 sm:text-xs min-h-[2.35rem] sm:min-h-[2.6rem]'
   const retailTopNavBtnClass = (selected: boolean) =>
     `${retailTopNavShellClass} ${kassaPosButtonClass(selected, posChrome)}`
-  const retailTopNavLinkClass = `${retailTopNavShellClass} ${kassaPosButtonClass(false)}`
+  const retailTopNavLinkClass = `${retailTopNavShellClass} ${kassaPosButtonClass(false, posChrome)}`
   const retailScanRowBtnClass = (selected: boolean) =>
     `${retailTopNavShellClass} ${kassaPosButtonClass(selected, posChrome)}`
   /** Toevoegen + OK:zelfde breedte (past op langste label). */
@@ -638,7 +638,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
 
   const headerQuickLinkBtnClass = appearanceDark
-    ? `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false)}`
+    ? `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false, posChrome)}`
     : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap rounded-lg bg-white/10 px-2 py-1.5 font-bold text-white transition-colors hover:bg-white/20 sm:rounded-xl sm:px-3 sm:py-2'
 
   const headerUtilityBtnClass = (selected: boolean) =>
@@ -970,7 +970,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function renderRetailPlateTiles() {
-    const tileClass = `${kassaPosQuickMenuPanelButtonClass()} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
+    const tileClass = `${kassaPosQuickMenuPanelButtonClass(posChrome)} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
     return RETAIL_GRAY_TRAY_TILES.map((tile) => {
       const label = t(tile.labelKey)
       if (tile.kind === 'loyaltyNoCard') {
@@ -1892,7 +1892,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   setLoyaltyRedeemModalOpen(false)
                   focusBarcodeCapture()
                 }}
-                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false)}`}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false, posChrome)}`}
               >
                 {t('common.cancel')}
               </button>
@@ -1949,7 +1949,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 type="button"
                 disabled={priceFixSaving}
                 onClick={cancelPriceFix}
-                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false)}`}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(false, posChrome)}`}
               >
                 {t('common.cancel')}
               </button>
@@ -2107,7 +2107,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
               <button
                 type="button"
-                className={`w-full py-2.5 sm:w-auto ${kassaPosButtonClass(false)}`}
+                className={`w-full py-2.5 sm:w-auto ${kassaPosButtonClass(false, posChrome)}`}
                 onClick={() => setPrintAgentFallbackHtml(null)}
               >
                 {t('kassaApp.printAgentFallbackModalClose')}
@@ -2147,7 +2147,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </div>
               <button
                 type="button"
-                className={`shrink-0 px-3 py-2 text-sm font-bold ${kassaPosButtonClass(false)}`}
+                className={`shrink-0 px-3 py-2 text-sm font-bold ${kassaPosButtonClass(false, posChrome)}`}
                 onClick={closeArticleSearchModal}
               >
                 {t('common.close')}
@@ -2211,7 +2211,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   setImportPreview([])
                   setImportHighlight(null)
                 }}
-                className={`flex-1 py-2.5 ${kassaPosButtonClass(false)}`}
+                className={`flex-1 py-2.5 ${kassaPosButtonClass(false, posChrome)}`}
               >
                 {t('common.cancel')}
               </button>
@@ -3040,7 +3040,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 <div
                   role="status"
                   aria-live="polite"
-                  className={`flex min-h-[3.35rem] w-full min-w-0 items-center justify-between gap-2 px-3 py-2.5 sm:min-h-[3.65rem] ${kassaPosRaisedStripClass()}`}
+                  className={`flex min-h-[3.35rem] w-full min-w-0 items-center justify-between gap-2 px-3 py-2.5 sm:min-h-[3.65rem] ${kassaPosRaisedStripClass(posChrome)}`}
                 >
                   <span className={`shrink-0 text-lg font-bold tracking-[0.04em] sm:text-xl ${ui.numpadMeta}`}>
                     {mode === 'sales'
@@ -3085,7 +3085,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     <button
                       type="button"
                       onClick={() => void openCashDrawer()}
-                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
+                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false, posChrome)}`}
                       title={t('kassaApp.drawerOpen')}
                     >
                       <span className={kassaSidebarActionLabelClass}>{t('kassaApp.drawerOpen')}</span>
@@ -3094,7 +3094,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       type="button"
                       disabled={cart.length === 0 || draftBonPrinting}
                       onClick={() => void printDraftBonFromCart()}
-                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
+                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false, posChrome)}`}
                       title={t('kassaApp.cartBonTitle')}
                     >
                       <span className={kassaSidebarActionLabelClass}>
@@ -3105,7 +3105,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       type="button"
                       onClick={clearCart}
                       disabled={cart.length === 0}
-                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
+                      className={`flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false, posChrome)}`}
                       title={t('kassaApp.remove')}
                     >
                       <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
@@ -3115,7 +3115,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   <button
                     type="button"
                     onClick={() => switchMode('sales')}
-                    className={`col-span-3 flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
+                    className={`col-span-3 flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false, posChrome)}`}
                   >
                     <span className={kassaSidebarActionLabelClass}>
                       {t('retailKassaPage.exchangeGoToSales')}
@@ -3126,7 +3126,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     type="button"
                     onClick={clearStockActivity}
                     disabled={stockActivity.length === 0}
-                    className={`col-span-3 flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false)}`}
+                    className={`col-span-3 flex items-center justify-center px-2 py-3 ${retailSidebarFooterActionMinH} ${kassaPosButtonClass(false, posChrome)}`}
                     title={t('kassaApp.remove')}
                   >
                     <span className={kassaSidebarActionLabelClass}>{t('retailKassaPage.clearStockLog')}</span>
@@ -3177,7 +3177,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </button>
                 ) : (
                   <div
-                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-base font-semibold text-white/80 sm:text-lg ${retailSidebarFooterPrimaryMinH} ${kassaPosRaisedStripClass()}`}
+                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-base font-semibold text-white/80 sm:text-lg ${retailSidebarFooterPrimaryMinH} ${kassaPosRaisedStripClass(posChrome)}`}
                   >
                     {stockBusy ? t('retailKassaPage.paying') : t('retailKassaPage.stockAutoSave')}
                   </div>

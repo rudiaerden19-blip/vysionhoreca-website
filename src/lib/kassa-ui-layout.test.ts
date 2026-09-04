@@ -64,8 +64,9 @@ describe('isMissingKassaUiLayoutColumn', () => {
 })
 
 describe('Speels bruine knoppen', () => {
-  it('laat ongeselecteerde knoppen ongewijzigd', () => {
-    expect(kassaPosButtonClass(false, 'speels')).toBe(kassaPosButtonClass(false))
+  it('laat ongeselecteerde Speels-knoppen zonder beige rand', () => {
+    expect(kassaPosButtonClass(false, 'speels')).not.toContain('#d4b483')
+    expect(kassaPosButtonClass(false, 'luxe')).toContain('#d4b483')
   })
 
   it('maakt geselecteerde knoppen zwart met zilveren rand', () => {

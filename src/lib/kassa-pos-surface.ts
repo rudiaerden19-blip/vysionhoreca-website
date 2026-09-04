@@ -41,6 +41,16 @@ export const KASSA_POS_SELECTED_LIFT_SHADOW =
 
 const KASSA_BTN_EDGE = `border border-[#3d352c] ${KASSA_POS_SUBTLE_LIFT_SHADOW}`
 
+const KASSA_LUXE_BTN_EDGE = `border border-[#d4b483] ${KASSA_POS_SUBTLE_LIFT_SHADOW}`
+
+const KASSA_LUXE_BTN_PRESS = [
+  'transition-[transform,box-shadow,filter,background] duration-100 ease-out',
+  'active:translate-y-[2px]',
+  'active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.62),inset_0_1px_2px_rgba(0,0,0,0.38)]',
+  'active:brightness-[0.9]',
+  'active:border-[#c4a46a]',
+].join(' ')
+
 export const KASSA_POS_BTN_PRESS = [
   'transition-[transform,box-shadow,filter,background] duration-100 ease-out',
   'active:translate-y-[2px]',
@@ -61,6 +71,15 @@ export const KASSA_POS_BTN = [
   KASSA_BTN_FACE,
   KASSA_BTN_EDGE,
   KASSA_POS_BTN_PRESS,
+  KASSA_BTN_PRESS_FACE,
+  KASSA_POS_BTN_DISABLED_SAME_LOOK,
+  'text-[#f0f0f0] disabled:text-[#f0f0f0]',
+].join(' ')
+
+export const KASSA_POS_BTN_LUXE = [
+  KASSA_BTN_FACE,
+  KASSA_LUXE_BTN_EDGE,
+  KASSA_LUXE_BTN_PRESS,
   KASSA_BTN_PRESS_FACE,
   KASSA_POS_BTN_DISABLED_SAME_LOOK,
   'text-[#f0f0f0] disabled:text-[#f0f0f0]',
@@ -119,13 +138,13 @@ export const KASSA_POS_QUICK_MENU_LIFT_SHADOW =
   'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46),0_0_14px_rgba(212,180,131,0.22),0_0_20px_rgba(196,164,106,0.16),0_0_8px_rgba(212,180,131,0.24)]'
 
 /** Snelmenu-balk: POS-knop met champagne-gloed achter elk tegel. */
-export function kassaPosQuickMenuPanelButtonClass(): string {
+export function kassaPosQuickMenuPanelButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   return [
     KASSA_POS_BTN_SHAPE,
     KASSA_BTN_FACE,
-    'border border-[#3d352c]',
+    look === 'speels' ? 'border border-[#3d352c]' : 'border border-[#d4b483]',
     KASSA_POS_QUICK_MENU_LIFT_SHADOW,
-    KASSA_POS_BTN_PRESS,
+    look === 'speels' ? KASSA_POS_BTN_PRESS : KASSA_LUXE_BTN_PRESS,
     KASSA_BTN_PRESS_FACE,
     KASSA_POS_BTN_DISABLED_SAME_LOOK,
     'text-[#f0f0f0] disabled:text-[#f0f0f0]',
@@ -174,15 +193,18 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
   if (look === 'speels' && selected) {
     return `${KASSA_POS_BTN_SHAPE} ${KASSA_SPEELS_BTN_SELECTED}`
   }
-  return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN}`
+  if (look === 'speels') {
+    return `${KASSA_POS_BTN_SHAPE} ${KASSA_POS_BTN}`
+  }
+  return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN_LUXE}`
 }
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   return look === 'speels' ? KASSA_SPEELS_CHECKOUT_BTN : KASSA_POS_CHECKOUT_BTN
 }
 
-export function kassaPosRaisedStripClass(): string {
-  return kassaPosButtonClass(false)
+export function kassaPosRaisedStripClass(look: KassaPosChromeLook = 'luxe'): string {
+  return kassaPosButtonClass(false, look)
 }
 
 export const KASSA_CLOCK_TILE_ON_BAR = [
@@ -214,9 +236,9 @@ export const KASSA_POS_CART_ROW = [
 export const KASSA_POS_CART_THUMB_SHELL =
   'rounded-lg border border-[#3d352c] bg-[#2a241c] overflow-hidden shrink-0'
 
-export function kassaPosCartQtyButtonClass(compact?: boolean): string {
+export function kassaPosCartQtyButtonClass(compact?: boolean, look: KassaPosChromeLook = 'luxe'): string {
   const size = compact ? 'h-7 w-7 min-h-7 min-w-7 text-sm': 'h-8 w-8 min-h-8 min-w-8 text-base'
-  return `${kassaPosButtonClass(false)} ${size} shrink-0 flex items-center justify-center leading-none`
+  return `${kassaPosButtonClass(false, look)} ${size} shrink-0 flex items-center justify-center leading-none`
 }
 
 export function kassaClockBarClass(): string {
