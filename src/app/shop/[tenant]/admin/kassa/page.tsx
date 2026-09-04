@@ -81,6 +81,7 @@ import {
 } from '@/lib/demo-links'
 import { cache, cacheKey } from '@/lib/cache'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
+import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
 import {
   kassaUiLayoutUsesPosLuxury,
@@ -413,6 +414,11 @@ const KASSA_LIGHT_BTN_FACE_ON =
 const KASSA_LIGHT_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5 ${KASSA_LIGHT_BTN_FACE}`
 
+const KASSA_CLASSIC_BTN_FACE = 'bg-[#1e3a5f] text-white hover:bg-[#254a75]'
+const KASSA_CLASSIC_BTN_FACE_ON = 'bg-[#2b6cb0] text-white'
+const KASSA_CLASSIC_HEADER_QUICK_LINK_BTN =
+  `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5 ${KASSA_CLASSIC_BTN_FACE}`
+
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5': 'min-h-[2.75rem] py-2'
@@ -663,26 +669,6 @@ const KASSA_MENU_TILE_LABEL_CLASS =
 const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
   'm-0 line-clamp-1 text-center text-xs font-black leading-tight tracking-tight text-black sm:text-[13px]'
 
-/** Oude dark mode (gunmetal) — geen witte kaarten, geen espresso-studio. */
-const KASSA_DARK_TILE_BUTTON_CLASS_BASE =
-  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-zinc-600 bg-[#1a2230] text-left shadow-[0_8px_30px_rgba(0,0,0,0.45)] active:brightness-95'
-const KASSA_DARK_TILE_IMAGE_WELL =
-  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-[#151a21]'
-const KASSA_DARK_TILE_IMAGE_WELL_SXGA =
-  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-[#151a21]'
-const KASSA_DARK_TILE_PLACEHOLDER =
-  'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#151a21] px-2'
-const KASSA_DARK_TILE_PLACEHOLDER_SXGA =
-  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-[#151a21] px-2 aspect-square'
-const KASSA_DARK_TILE_LABEL_WRAP =
-  'pointer-events-none shrink-0 w-full border-t border-zinc-600 bg-[#151a21] px-2 pb-2 pt-1.5 sm:px-3'
-const KASSA_DARK_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full border-t border-zinc-600 bg-[#151a21] px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0'
-const KASSA_DARK_TILE_LABEL_CLASS =
-  'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-tight text-zinc-50 sm:text-[15px] md:text-base'
-const KASSA_DARK_TILE_LABEL_CLASS_SXGA =
-  'm-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-tight text-zinc-50 sm:text-[13px]'
-
 type KassaTileLook = 'light' | 'dark' | 'luxury' | 'speels'
 
 function kassaTileLook(posLuxury: boolean, classicDark: boolean, speels: boolean): KassaTileLook {
@@ -695,6 +681,8 @@ function kassaTileLook(posLuxury: boolean, classicDark: boolean, speels: boolean
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
+  tileIndex?: number
+  classicGridCols?: number
   sxgaDenseTileLayout?: boolean
   posLuxuryAppearance?: boolean
   classicDarkAppearance?: boolean
@@ -704,21 +692,34 @@ type KassaCategoryTileButtonProps = {
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   category,
   imageUrl,
+  tileIndex = 0,
+  classicGridCols = 6,
   sxgaDenseTileLayout,
   posLuxuryAppearance = false,
   classicDarkAppearance = false,
   speelsAppearance = false,
 }: KassaCategoryTileButtonProps) {
   const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance, speelsAppearance)
+  if (look === 'dark') {
+    return (
+      <button
+        type="button"
+        data-kassa-category-id={category.id != null ? String(category.id) : undefined}
+        className={`touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left shadow-[0_8px_22px_rgba(0,0,0,0.35)] active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+      >
+        <p className="m-0 line-clamp-3 text-center text-sm font-bold leading-tight tracking-tight text-white sm:text-[15px] md:text-base">
+          {category.name}
+        </p>
+      </button>
+    )
+  }
   const luxuryChrome = look === 'luxury' || look === 'speels'
   const btnClass =
     luxuryChrome
       ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
-      : look === 'dark'
-        ? `${KASSA_DARK_TILE_BUTTON_CLASS_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
-          : KASSA_MENU_TILE_BUTTON_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
+        : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell =
     look === 'speels'
       ? sxgaDenseTileLayout
@@ -728,13 +729,9 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
         : KASSA_POS_MENU_TILE_IMAGE_WELL
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_IMAGE_WELL_SXGA
-          : KASSA_DARK_TILE_IMAGE_WELL
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
-          : KASSA_MENU_TILE_IMAGE_WELL
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
+        : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap =
     look === 'speels'
       ? sxgaDenseTileLayout
@@ -744,25 +741,17 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_POS_MENU_TILE_LABEL_WRAP
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_LABEL_WRAP_SXGA
-          : KASSA_DARK_TILE_LABEL_WRAP
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
-          : KASSA_MENU_TILE_LABEL_WRAP
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
+        : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass =
     luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
         : KASSA_POS_MENU_TILE_LABEL_CLASS
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_LABEL_CLASS_SXGA
-          : KASSA_DARK_TILE_LABEL_CLASS
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
-          : KASSA_MENU_TILE_LABEL_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
+        : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
     look === 'speels'
@@ -773,13 +762,9 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA
         : KASSA_POS_MENU_TILE_PLACEHOLDER_WELL
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_PLACEHOLDER_SXGA
-          : KASSA_DARK_TILE_PLACEHOLDER
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
-          : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
+        : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
   const imgClass =
     luxuryChrome
@@ -846,6 +831,8 @@ type KassaProductTileButtonProps = {
   product: MenuProduct
   inCart: number
   hasOpts: boolean
+  tileIndex?: number
+  classicGridCols?: number
   sxgaDenseTileLayout?: boolean
   posLuxuryAppearance?: boolean
   classicDarkAppearance?: boolean
@@ -856,6 +843,8 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   product,
   inCart,
   hasOpts,
+  tileIndex = 0,
+  classicGridCols = 6,
   sxgaDenseTileLayout,
   posLuxuryAppearance = false,
   classicDarkAppearance = false,
@@ -863,15 +852,39 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
 }: KassaProductTileButtonProps) {
   const { t } = useLanguage()
   const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance, speelsAppearance)
+  if (look === 'dark') {
+    return (
+      <button
+        type="button"
+        data-kassa-product-id={product.id != null ? String(product.id) : undefined}
+        className={`touch-manipulation select-none relative flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left shadow-[0_8px_22px_rgba(0,0,0,0.35)] active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+      >
+        <p className="m-0 line-clamp-3 text-center text-sm font-bold leading-tight tracking-tight text-white sm:text-[15px] md:text-base">
+          {product.name}
+        </p>
+        <span className="mt-1 text-xs font-bold tabular-nums text-white/90">
+          €{Number(product.price ?? 0).toFixed(2)}
+        </span>
+        {inCart > 0 ? (
+          <div className="absolute top-1.5 right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-md">
+            {inCart}
+          </div>
+        ) : null}
+        {hasOpts ? (
+          <div className="absolute top-1.5 left-1.5 z-20 rounded-md bg-white/20 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            {t('kassaApp.optionBadgeShort')}
+          </div>
+        ) : null}
+      </button>
+    )
+  }
   const luxuryChrome = look === 'luxury' || look === 'speels'
   const btnClass =
     luxuryChrome
       ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
-      : look === 'dark'
-        ? `${KASSA_DARK_TILE_BUTTON_CLASS_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
-          : KASSA_MENU_TILE_BUTTON_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
+        : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell =
     look === 'speels'
       ? sxgaDenseTileLayout
@@ -881,13 +894,9 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
         : KASSA_POS_MENU_TILE_IMAGE_WELL
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_IMAGE_WELL_SXGA
-          : KASSA_DARK_TILE_IMAGE_WELL
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
-          : KASSA_MENU_TILE_IMAGE_WELL
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
+        : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap =
     look === 'speels'
       ? sxgaDenseTileLayout
@@ -897,25 +906,17 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_POS_MENU_TILE_LABEL_WRAP
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_LABEL_WRAP_SXGA
-          : KASSA_DARK_TILE_LABEL_WRAP
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
-          : KASSA_MENU_TILE_LABEL_WRAP
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
+        : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass =
     luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
         : KASSA_POS_MENU_TILE_LABEL_CLASS
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? KASSA_DARK_TILE_LABEL_CLASS_SXGA
-          : KASSA_DARK_TILE_LABEL_CLASS
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
-          : KASSA_MENU_TILE_LABEL_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
+        : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
     look === 'speels'
@@ -926,13 +927,9 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ? sxgaDenseTileLayout
         ? `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA} pt-2`
         : `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL} pt-4`
-      : look === 'dark'
-        ? sxgaDenseTileLayout
-          ? `${KASSA_DARK_TILE_PLACEHOLDER_SXGA} pt-2`
-          : `${KASSA_DARK_TILE_PLACEHOLDER} pt-4`
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
-          : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
+        : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
   const imgClass =
     luxuryChrome
@@ -4699,7 +4696,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         kassaPosLuxury
           ? kassaPosQuickMenuPanelButtonClass(posChrome)
           : kassaClassicDark
-            ? 'rounded-xl border border-zinc-600 bg-[#263043] text-zinc-50 hover:bg-[#2f3b52] active:brightness-95'
+            ? `rounded-xl ${KASSA_CLASSIC_BTN_FACE} active:brightness-95`
             : `rounded-xl ${KASSA_LIGHT_BTN_FACE} ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
         !enabled
           ? kassaLight
@@ -4753,7 +4750,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ? `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false, posChrome)}`
     : kassaLight
       ? KASSA_LIGHT_HEADER_QUICK_LINK_BTN
-      : KASSA_HEADER_QUICK_LINK_BTN
+      : kassaClassicDark
+        ? KASSA_CLASSIC_HEADER_QUICK_LINK_BTN
+        : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
     kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)}`: ''
@@ -4783,6 +4782,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? selected
           ? KASSA_LIGHT_BTN_FACE_ON
           : KASSA_LIGHT_BTN_FACE
+        : kassaClassicDark
+          ? selected
+            ? KASSA_CLASSIC_BTN_FACE_ON
+            : KASSA_CLASSIC_BTN_FACE
         : selected
           ? 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
           : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
@@ -5009,9 +5012,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ? kassaPosButtonClass(true, posChrome)
                 : kassaLight
                   ? `rounded-xl ${hamburgerOpen ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
-                : hamburgerOpen
-                  ? 'rounded-xl bg-[#47c6fe] text-[#063042]'
-                  : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                : `rounded-xl ${hamburgerOpen ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
             }`}
             type="button"
             title={t('kassaApp.hamburgerMenu')}
@@ -5216,7 +5217,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ? headerQuickLinkBtnClass
                     : `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
                   : isOnline
-                    ? `rounded-xl px-3 py-2 font-bold ${kassaLight ? KASSA_LIGHT_BTN_FACE : 'bg-[#3C4D6B] text-white'}`
+                    ? `rounded-xl px-3 py-2 font-bold ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
                     : 'rounded-xl bg-red-600/95 px-3 py-2 font-bold text-white'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
@@ -5251,7 +5252,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : `inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium transition-colors sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3 ${
                       kassaLight
                         ? KASSA_LIGHT_BTN_FACE
-                        : 'bg-white/10 text-white hover:bg-white/20'
+                        : KASSA_CLASSIC_BTN_FACE
                     }`
               }
             >
@@ -5283,7 +5284,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : `relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE
-                    : 'bg-[#58CCFF] text-black hover:bg-[#47c6fe]'
+                    : KASSA_CLASSIC_BTN_FACE
                 }`
           }
         >
@@ -5380,6 +5381,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       } ${
                         kassaPosLuxury
                           ? kassaPosButtonClass(active, posChrome)
+                          : kassaClassicDark
+                            ? `rounded-lg border-transparent ${active ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                           : active
                             ? 'rounded-lg border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
                             : `rounded-lg border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
@@ -5434,13 +5437,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     : { gridAutoRows: `${kassaMenuRowPx}px`}
                   }
                 >
-                  {categories.map((cat) => {
+                  {categories.map((cat, catIndex) => {
                     const tile = cat.id ? categoryTileImageByCategoryId.get(cat.id) : undefined
                     return (
                       <KassaCategoryTileButton
                         key={cat.id}
                         category={cat}
                         imageUrl={tile?.url}
+                        tileIndex={catIndex}
+                        classicGridCols={kassaSxgaDenseTiles ? 5 : 6}
                         sxgaDenseTileLayout={kassaSxgaDenseTiles}
                         posLuxuryAppearance={kassaPosLuxury}
                         classicDarkAppearance={kassaClassicDark}
@@ -5473,7 +5478,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       : { gridAutoRows: `${kassaMenuRowPx}px`}
                     }
                   >
-                    {productsInSelectedCategory.map((product) => {
+                    {productsInSelectedCategory.map((product, productIndex) => {
                       const inCart = product.id
                         ? (cartQtyByProductId.get(String(product.id)) ?? 0)
                         : 0
@@ -5484,6 +5489,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           product={product}
                           inCart={inCart}
                           hasOpts={hasOpts}
+                          tileIndex={productIndex}
+                          classicGridCols={kassaSxgaDenseTiles ? 5 : 6}
                           sxgaDenseTileLayout={kassaSxgaDenseTiles}
                           posLuxuryAppearance={kassaPosLuxury}
                           classicDarkAppearance={kassaClassicDark}
@@ -5600,11 +5607,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'sales', posChrome)}`
                     : kassaLight
                       ? `rounded-xl font-bold ${kassaZoneTab === 'sales' ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
-                    : `rounded-xl font-bold ${
-                        kassaZoneTab === 'sales'
-                          ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
-                          : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      }`
+                    : `rounded-xl font-bold ${kassaZoneTab === 'sales' ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                 }`}
                 data-testid="kassa-zone-sales"
               >
@@ -5633,11 +5636,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'inside', posChrome)}`
                     : kassaLight
                       ? `rounded-xl font-bold ${kassaZoneTab === 'inside' ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
-                    : `rounded-xl font-bold ${
-                        kassaZoneTab === 'inside'
-                          ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
-                          : 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
-                      }`
+                    : `rounded-xl font-bold ${kassaZoneTab === 'inside' ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                 }`}
               >
                 <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneInside')}</span>
@@ -5670,11 +5669,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace', posChrome)}`
                     : kassaLight
                       ? `rounded-xl font-bold ${kassaZoneTab === 'terrace' ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
-                    : `rounded-xl font-bold ${
-                        kassaZoneTab === 'terrace'
-                          ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
-                          : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                      }`
+                    : `rounded-xl font-bold ${kassaZoneTab === 'terrace' ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                 }`}
               >
                 <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneTerrace')}</span>
@@ -5914,7 +5909,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={addCustomAmount}
                   className={
                     kassaAppearanceDark
-                      ? `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosButtonClass(true, posChrome)}`
+                      ? kassaClassicDark
+                        ? `mt-3 shrink-0 touch-manipulation rounded-xl py-4 text-base font-bold ${KASSA_CLASSIC_BTN_FACE_ON}`
+                        : `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosButtonClass(true, posChrome)}`
                       : 'mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
                   }
                 >
@@ -6221,7 +6218,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           </div>
         ) : (
-          <div className="shrink-0 border-t border-gray-200 px-3 py-2.5 space-y-2.5">
+          <div className={`shrink-0 border-t px-3 py-2.5 space-y-2.5 ${
+            kassaClassicDark ? 'border-zinc-700' : 'border-gray-200'
+          }`}>
             <div
               className={`flex w-full gap-2 ${kassaFooterActionTouchMinHClass(
                 kassaSxgaDenseTiles,
@@ -6234,7 +6233,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 aria-pressed={true}
                 onClick={toggleKassaQuickMenu}
                 className={`flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold leading-tight ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${
-                  kassaLight ? KASSA_LIGHT_BTN_FACE : 'text-white bg-[#3C4D6B] hover:bg-[#2D3A52]'
+                  kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE
                 }`}
                 title={t('kassaApp.quickMenu')}
               >
@@ -6243,10 +6242,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div
                 role="status"
                 aria-live="polite"
-                className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-xl border border-gray-200 bg-gray-50 px-2.5 py-2"
+                className={`flex min-w-0 flex-1 items-center justify-between gap-2 rounded-xl px-2.5 py-2 ${
+                  kassaClassicDark
+                    ? 'border border-zinc-600 bg-[#151a21]'
+                    : 'border border-gray-200 bg-gray-50'
+                }`}
               >
                 <span className={`text-sm font-bold ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
-                <span className="truncate text-right text-xl font-bold tabular-nums text-black">
+                <span className={`truncate text-right text-xl font-bold tabular-nums ${
+                  kassaClassicDark ? 'text-red-500' : 'text-black'
+                }`}>
                   €{total.toFixed(2)}
                 </span>
               </div>
@@ -6258,7 +6263,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE
-                    : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                    : KASSA_CLASSIC_BTN_FACE
                 } ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
@@ -6274,7 +6279,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 disabled:pointer-events-none ${
                   kassaLight
                     ? `${KASSA_LIGHT_BTN_FACE} disabled:opacity-100`
-                    : 'bg-yellow-400 text-yellow-950 hover:bg-yellow-300 disabled:opacity-45'
+                    : `${KASSA_CLASSIC_BTN_FACE} disabled:opacity-100`
                 } ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
@@ -6289,7 +6294,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
                   kassaLight
                     ? `${KASSA_LIGHT_BTN_FACE} disabled:opacity-100 disabled:pointer-events-none`
-                    : 'bg-rose-500 text-white hover:bg-rose-600 disabled:opacity-45 disabled:bg-rose-900/50'
+                    : `${KASSA_CLASSIC_BTN_FACE} disabled:opacity-100 disabled:pointer-events-none`
                 } ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
@@ -6305,7 +6310,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
                   title={t('kassaApp.parkTableKitchenBonAria')}
                   aria-label={t('kassaApp.parkTableKitchenBonAria')}
-                  className={`min-w-0 flex-1 rounded-xl bg-[#3C4D6B] px-2 py-2.5 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                  className={`min-w-0 flex-1 rounded-xl px-2 py-2.5 text-center text-xs font-bold active:brightness-95 ${
+                    kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE
+                  } ${kassaFooterActionTouchMinHClass(
                     kassaSxgaDenseTiles,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -6317,7 +6324,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
                   title={t('kassaApp.parkTableKassaBonAria')}
                   aria-label={t('kassaApp.parkTableKassaBonAria')}
-                  className={`min-w-0 flex-1 flex flex-col items-center justify-center gap-0.5 rounded-xl bg-[#3C4D6B] px-2 py-2 text-center text-xs font-bold text-white hover:bg-[#2D3A52] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                  className={`min-w-0 flex-1 flex flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-2 text-center text-xs font-bold active:brightness-95 ${
+                    kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE
+                  } ${kassaFooterActionTouchMinHClass(
                     kassaSxgaDenseTiles,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -6345,7 +6354,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ? numpadPanelVisible
                       ? KASSA_LIGHT_BTN_FACE_ON
                       : KASSA_LIGHT_BTN_FACE
-                    : `bg-black text-white hover:bg-zinc-800 ${numpadPanelVisible ? 'ring-2 ring-white/40' : ''}`
+                    : numpadPanelVisible
+                      ? KASSA_CLASSIC_BTN_FACE_ON
+                      : KASSA_CLASSIC_BTN_FACE
                 }`}
               >
                 {t('kassaApp.numpadToggle')}
@@ -6597,7 +6608,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   }}
                   className={`flex items-center justify-center py-3 text-sm font-semibold ${tableNumber ? 'flex-1': 'w-full'} ${
                     kassaAppearanceDark
-                      ? kassaPosButtonClass(false, posChrome)
+                      ? kassaClassicDark
+                        ? `rounded-xl ${KASSA_CLASSIC_BTN_FACE}`
+                        : kassaPosButtonClass(false, posChrome)
                       : 'rounded-xl bg-[#3C4D6B] text-white transition-colors hover:bg-[#2D3A52]'
                   }`}
                 >
