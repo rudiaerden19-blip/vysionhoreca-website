@@ -20,6 +20,10 @@ export function isKassaUiLayoutId(value: unknown): value is KassaUiLayoutId {
   return typeof value === 'string' && (KASSA_UI_LAYOUT_IDS as readonly string[]).includes(value)
 }
 
+function isKnownLayoutRaw(value: unknown): boolean {
+  return isKassaUiLayoutId(value) || (typeof value === 'string' && value in LEGACY_LAYOUT_MAP)
+}
+
 /** Ontbrekende layout: donker → luxe (huidige default), licht → light. Oude ids worden gemapt. */
 export function parseKassaUiLayout(
   raw: unknown,
@@ -28,6 +32,17 @@ export function parseKassaUiLayout(
   if (isKassaUiLayoutId(raw)) return raw
   if (typeof raw === 'string' && raw in LEGACY_LAYOUT_MAP) return LEGACY_LAYOUT_MAP[raw]
   return darkFallback === false ? 'light' : 'luxe'
+}
+
+/** Server-id wint; ontbreekt die, gebruik lokaal; anders de donker/licht-fallback. */
+export function resolveKassaUiLayout(
+  serverRaw: unknown,
+  serverDark: boolean | null | undefined,
+  localRaw: unknown,
+): KassaUiLayoutId {
+  if (isKnownLayoutRaw(serverRaw)) return parseKassaUiLayout(serverRaw, serverDark)
+  if (isKnownLayoutRaw(localRaw)) return parseKassaUiLayout(localRaw, serverDark)
+  return parseKassaUiLayout(null, serverDark)
 }
 
 export function kassaUiLayoutIsDark(layout: KassaUiLayoutId): boolean {

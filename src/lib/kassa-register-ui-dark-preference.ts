@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { fetchKassaPosState, patchKassaPosState } from '@/lib/kassa-pos-state-client'
 import {
+  isKassaUiLayoutId,
   kassaUiLayoutIsDark,
-  parseKassaUiLayout,
+  resolveKassaUiLayout,
   type KassaUiLayoutId,
 } from '@/lib/kassa-ui-layout'
 
@@ -13,8 +14,31 @@ export const KASSA_UI_DARK_EVENT = 'vysion:kassa-ui-dark-change'
 /** Donker/licht-toggle in kassa-titelbalk — opgeslagen in Supabase `kassa_pos_state`. */
 export const KASSA_UI_APPEARANCE_TOGGLE_ENABLED = true
 
+export function kassaUiLayoutStorageKey(tenantSlug: string): string {
+  return `vysion_kassa_ui_layout_v1:${tenantSlug}`
+}
+
 export function kassaUiDarkStorageKey(_tenantSlug: string): string {
   return ''
+}
+
+export function readKassaUiLayoutPreference(tenantSlug: string): KassaUiLayoutId | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(kassaUiLayoutStorageKey(tenantSlug))
+    return isKassaUiLayoutId(raw) ? raw : null
+  } catch {
+    return null
+  }
+}
+
+export function persistKassaUiLayoutLocal(tenantSlug: string, layout: KassaUiLayoutId): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(kassaUiLayoutStorageKey(tenantSlug), layout)
+  } catch {
+    /* noop */
+  }
 }
 
 export function readKassaUiDarkPreference(_tenantSlug: string): boolean {
@@ -27,6 +51,7 @@ export function writeKassaUiDarkPreference(tenantSlug: string, dark: boolean): v
 
 export function writeKassaUiLayoutPreference(tenantSlug: string, layout: KassaUiLayoutId): void {
   if (typeof window === 'undefined') return
+  persistKassaUiLayoutLocal(tenantSlug, layout)
   const dark = kassaUiLayoutIsDark(layout)
   void patchKassaPosState(tenantSlug, { kassa_ui_dark: dark, kassa_ui_layout: layout })
   try {
@@ -47,15 +72,28 @@ export function useKassaUiLayoutSync(tenantSlug: string): {
   setDark: (next: boolean) => void
   toggle: () => void
 } {
-  const [layout, setLayoutState] = useState<KassaUiLayoutId>('luxe')
+  const [layout, setLayoutState] = useState<KassaUiLayoutId>(
+    () => readKassaUiLayoutPreference(tenantSlug) ?? 'luxe',
+  )
   const [hydrated, setHydrated] = useState(false)
   const dark = kassaUiLayoutIsDark(layout)
+
+  useLayoutEffect(() => {
+    const local = readKassaUiLayoutPreference(tenantSlug)
+    if (local) setLayoutState(local)
+  }, [tenantSlug])
 
   useEffect(() => {
     let cancelled = false
     void fetchKassaPosState(tenantSlug).then((state) => {
       if (cancelled) return
-      setLayoutState(parseKassaUiLayout(state.kassa_ui_layout, state.kassa_ui_dark))
+      const next = resolveKassaUiLayout(
+        state.kassa_ui_layout,
+        state.kassa_ui_dark,
+        readKassaUiLayoutPreference(tenantSlug),
+      )
+      persistKassaUiLayoutLocal(tenantSlug, next)
+      setLayoutState(next)
       setHydrated(true)
     })
     return () => {

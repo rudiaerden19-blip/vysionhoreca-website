@@ -4,6 +4,7 @@ import {
   kassaUiLayoutIsDark,
   kassaUiLayoutUsesPosLuxury,
   parseKassaUiLayout,
+  resolveKassaUiLayout,
 } from './kassa-ui-layout'
 import {
   kassaPosButtonClass,
@@ -26,6 +27,23 @@ describe('parseKassaUiLayout', () => {
     expect(parseKassaUiLayout(null, true)).toBe('luxe')
     expect(parseKassaUiLayout(undefined, null)).toBe('luxe')
     expect(parseKassaUiLayout('nope', false)).toBe('light')
+  })
+})
+
+describe('resolveKassaUiLayout', () => {
+  it('houdt de server-id als die bekend is', () => {
+    expect(resolveKassaUiLayout('dark', true, 'luxe')).toBe('dark')
+    expect(resolveKassaUiLayout('light', true, 'speels')).toBe('light')
+  })
+
+  it('gebruikt de lokale keuze als de server geen layout heeft', () => {
+    expect(resolveKassaUiLayout(null, true, 'dark')).toBe('dark')
+    expect(resolveKassaUiLayout(undefined, true, 'light')).toBe('light')
+  })
+
+  it('valt alleen terug op luxe zonder server- of lokale id', () => {
+    expect(resolveKassaUiLayout(null, true, null)).toBe('luxe')
+    expect(resolveKassaUiLayout(null, false, null)).toBe('light')
   })
 })
 

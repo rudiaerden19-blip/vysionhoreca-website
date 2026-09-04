@@ -34,12 +34,11 @@ function rowToJson(row: PosStateRow | null) {
       bar_bon_watermarks: {} as Record<string, unknown>,
     }
   }
-  const layout = parseKassaUiLayout(row.kassa_ui_layout, row.kassa_ui_dark)
   return {
     active_staff_id: row.active_staff_id,
     active_staff_name: row.active_staff_name,
     kassa_ui_dark: row.kassa_ui_dark,
-    kassa_ui_layout: row.kassa_ui_layout ?? layout,
+    kassa_ui_layout: row.kassa_ui_layout ?? null,
     bar_bon_watermarks:
       row.bar_bon_watermarks && typeof row.bar_bon_watermarks === 'object'
         ? row.bar_bon_watermarks
