@@ -226,6 +226,28 @@ export const KASSA_POS_MENU_TILE_IMG_FRAME =
 export const KASSA_POS_MENU_TILE_IMAGE_FILM =
   'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_42%,transparent_0%,transparent_62%,rgba(22,19,16,0.12)_88%,rgba(16,13,10,0.22)_100%)]'
 
+/** Speels: zelfde tegel, veel minder cream-shimmer. */
+const KASSA_SPEELS_MENU_TILE_STUDIO_BG =
+  'bg-[radial-gradient(ellipse_at_50%_42%,#5c5c5c_0%,#3f3f3f_50%,#2a2a2a_82%,#1f1f1f_100%)]'
+
+export const KASSA_SPEELS_MENU_TILE_IMAGE_WELL =
+  `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+
+export const KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SXGA =
+  `pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+
+export const KASSA_SPEELS_MENU_TILE_IMG_FRAME =
+  `pointer-events-none relative z-0 h-full w-full min-h-0 min-w-0 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+
+export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL =
+  `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+
+export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
+  `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+
+export const KASSA_SPEELS_MENU_TILE_IMAGE_FILM =
+  'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_42%,transparent_0%,transparent_70%,rgba(0,0,0,0.08)_100%)]'
+
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 

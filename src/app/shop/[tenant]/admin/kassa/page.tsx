@@ -115,6 +115,12 @@ import {
   KASSA_POS_MENU_TILE_PLACEHOLDER_WELL,
   KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   KASSA_POS_MENU_TILE_QTY_BADGE,
+  KASSA_SPEELS_MENU_TILE_IMAGE_WELL,
+  KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SXGA,
+  KASSA_SPEELS_MENU_TILE_IMG_FRAME,
+  KASSA_SPEELS_MENU_TILE_IMAGE_FILM,
+  KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL,
+  KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   kassaPosButtonClass,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosCartQtyButtonClass,
@@ -667,9 +673,10 @@ const KASSA_DARK_TILE_LABEL_CLASS =
 const KASSA_DARK_TILE_LABEL_CLASS_SXGA =
   'm-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-tight text-zinc-50 sm:text-[13px]'
 
-type KassaTileLook = 'light' | 'dark' | 'luxury'
+type KassaTileLook = 'light' | 'dark' | 'luxury' | 'speels'
 
-function kassaTileLook(posLuxury: boolean, classicDark: boolean): KassaTileLook {
+function kassaTileLook(posLuxury: boolean, classicDark: boolean, speels: boolean): KassaTileLook {
+  if (speels) return 'speels'
   if (posLuxury) return 'luxury'
   if (classicDark) return 'dark'
   return 'light'
@@ -681,6 +688,7 @@ type KassaCategoryTileButtonProps = {
   sxgaDenseTileLayout?: boolean
   posLuxuryAppearance?: boolean
   classicDarkAppearance?: boolean
+  speelsAppearance?: boolean
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
@@ -689,10 +697,12 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   sxgaDenseTileLayout,
   posLuxuryAppearance = false,
   classicDarkAppearance = false,
+  speelsAppearance = false,
 }: KassaCategoryTileButtonProps) {
-  const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance)
+  const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance, speelsAppearance)
+  const luxuryChrome = look === 'luxury' || look === 'speels'
   const btnClass =
-    look === 'luxury'
+    luxuryChrome
       ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
       : look === 'dark'
         ? `${KASSA_DARK_TILE_BUTTON_CLASS_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
@@ -700,7 +710,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
           : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell =
-    look === 'luxury'
+    look === 'speels'
+      ? sxgaDenseTileLayout
+        ? KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SXGA
+        : KASSA_SPEELS_MENU_TILE_IMAGE_WELL
+      : look === 'luxury'
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
         : KASSA_POS_MENU_TILE_IMAGE_WELL
@@ -712,7 +726,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
           : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap =
-    look === 'luxury'
+    luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_POS_MENU_TILE_LABEL_WRAP
@@ -724,7 +738,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
           : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass =
-    look === 'luxury'
+    luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
         : KASSA_POS_MENU_TILE_LABEL_CLASS
@@ -737,7 +751,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
-    look === 'luxury'
+    look === 'speels'
+      ? sxgaDenseTileLayout
+        ? KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA
+        : KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL
+      : look === 'luxury'
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA
         : KASSA_POS_MENU_TILE_PLACEHOLDER_WELL
@@ -750,11 +768,22 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
   const imgClass =
-    look === 'luxury'
+    luxuryChrome
       ? KASSA_POS_MENU_TILE_IMG_CLASS
       : sxgaDenseTileLayout
         ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
         : KASSA_MENU_TILE_IMG_CLASS
+
+  const imgFrame = look === 'speels'
+    ? KASSA_SPEELS_MENU_TILE_IMG_FRAME
+    : posLuxuryAppearance
+      ? KASSA_POS_MENU_TILE_IMG_FRAME
+      : 'relative h-full w-full min-h-0'
+  const imgFilm = look === 'speels'
+    ? KASSA_SPEELS_MENU_TILE_IMAGE_FILM
+    : posLuxuryAppearance
+      ? KASSA_POS_MENU_TILE_IMAGE_FILM
+      : null
 
   return (
     <button
@@ -765,7 +794,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       {imageUrl ? (
         <>
           <div className={imgWell}>
-            <div className={posLuxuryAppearance ? KASSA_POS_MENU_TILE_IMG_FRAME : 'relative h-full w-full min-h-0'}>
+            <div className={imgFrame}>
               <img
                 src={imageUrl}
                 alt={category.name}
@@ -775,7 +804,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
                 className={imgClass}
               />
             </div>
-            {posLuxuryAppearance ? <div className={KASSA_POS_MENU_TILE_IMAGE_FILM} aria-hidden /> : null}
+            {imgFilm ? <div className={imgFilm} aria-hidden /> : null}
           </div>
           <div className={labelWrap}>
             <p className={labelClass}>{category.name}</p>
@@ -806,6 +835,7 @@ type KassaProductTileButtonProps = {
   sxgaDenseTileLayout?: boolean
   posLuxuryAppearance?: boolean
   classicDarkAppearance?: boolean
+  speelsAppearance?: boolean
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
@@ -815,11 +845,13 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   sxgaDenseTileLayout,
   posLuxuryAppearance = false,
   classicDarkAppearance = false,
+  speelsAppearance = false,
 }: KassaProductTileButtonProps) {
   const { t } = useLanguage()
-  const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance)
+  const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance, speelsAppearance)
+  const luxuryChrome = look === 'luxury' || look === 'speels'
   const btnClass =
-    look === 'luxury'
+    luxuryChrome
       ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
       : look === 'dark'
         ? `${KASSA_DARK_TILE_BUTTON_CLASS_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
@@ -827,7 +859,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
           : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell =
-    look === 'luxury'
+    look === 'speels'
+      ? sxgaDenseTileLayout
+        ? KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SXGA
+        : KASSA_SPEELS_MENU_TILE_IMAGE_WELL
+      : look === 'luxury'
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
         : KASSA_POS_MENU_TILE_IMAGE_WELL
@@ -839,7 +875,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
           : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap =
-    look === 'luxury'
+    luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_POS_MENU_TILE_LABEL_WRAP
@@ -851,7 +887,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
           : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass =
-    look === 'luxury'
+    luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
         : KASSA_POS_MENU_TILE_LABEL_CLASS
@@ -864,7 +900,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
-    look === 'luxury'
+    look === 'speels'
+      ? sxgaDenseTileLayout
+        ? `${KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA} pt-2`
+        : `${KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL} pt-4`
+      : look === 'luxury'
       ? sxgaDenseTileLayout
         ? `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA} pt-2`
         : `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL} pt-4`
@@ -877,11 +917,22 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
   const imgClass =
-    look === 'luxury'
+    luxuryChrome
       ? KASSA_POS_MENU_TILE_IMG_CLASS
       : sxgaDenseTileLayout
         ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
         : KASSA_MENU_TILE_IMG_CLASS
+
+  const imgFrame = look === 'speels'
+    ? KASSA_SPEELS_MENU_TILE_IMG_FRAME
+    : posLuxuryAppearance
+      ? KASSA_POS_MENU_TILE_IMG_FRAME
+      : 'relative h-full w-full min-h-0'
+  const imgFilm = look === 'speels'
+    ? KASSA_SPEELS_MENU_TILE_IMAGE_FILM
+    : posLuxuryAppearance
+      ? KASSA_POS_MENU_TILE_IMAGE_FILM
+      : null
 
   return (
     <button
@@ -892,7 +943,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       {product.image_url ? (
         <>
           <div className={imgWell}>
-            <div className={posLuxuryAppearance ? KASSA_POS_MENU_TILE_IMG_FRAME : 'relative h-full w-full min-h-0'}>
+            <div className={imgFrame}>
               <img
                 src={product.image_url}
                 alt={product.name}
@@ -902,7 +953,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
                 className={imgClass}
               />
             </div>
-            {posLuxuryAppearance ? <div className={KASSA_POS_MENU_TILE_IMAGE_FILM} aria-hidden /> : null}
+            {imgFilm ? <div className={imgFilm} aria-hidden /> : null}
           </div>
           <div className={labelWrap}>
             <p className={labelClass}>{product.name}</p>
@@ -5353,6 +5404,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         sxgaDenseTileLayout={kassaSxgaDenseTiles}
                         posLuxuryAppearance={kassaPosLuxury}
                         classicDarkAppearance={kassaClassicDark}
+                        speelsAppearance={kassaLayout === 'speels'}
                       />
                     )
                   })}
@@ -5395,6 +5447,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           sxgaDenseTileLayout={kassaSxgaDenseTiles}
                           posLuxuryAppearance={kassaPosLuxury}
                           classicDarkAppearance={kassaClassicDark}
+                          speelsAppearance={kassaLayout === 'speels'}
                         />
                       )
                     })}
