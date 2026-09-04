@@ -19,12 +19,15 @@ export const KASSA_POS_RULE_BLACK = 'border-black'
 
 export const KASSA_POS_BTN_SHAPE = 'rounded-xl'
 
-export const KASSA_POS_SELECTED_ACCENT_TEXT = 'text-[#d4b483]'
+export const KASSA_POS_SELECTED_ACCENT_TEXT = 'text-[#1a1612]'
 
-export const KASSA_POS_SELECTED_TOP_RIM = 'border-t-[#d4b483]/35'
+export const KASSA_POS_SELECTED_TOP_RIM = 'border-t-[#f0d9a8]/55'
 
 const KASSA_BTN_FACE =
   'bg-[linear-gradient(180deg,#1a1612_0%,#3a3228_46%,#1c1814_100%)]'
+
+const KASSA_BTN_FACE_CHAMPAGNE =
+  'bg-[linear-gradient(180deg,#e0c48a_0%,#c4a46a_48%,#a8884e_100%)]'
 
 export const KASSA_POS_SUBTLE_LIFT_SHADOW =
   'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46),-6px_0_14px_rgba(0,0,0,0.38),6px_0_14px_rgba(0,0,0,0.38)]'
@@ -80,13 +83,14 @@ export const KASSA_NUMPAD_CART_RECESS_MOTION =
   'transition-[opacity,transform] duration-[560ms] ease-[cubic-bezier(0.22,1,0.36,1)]'
 
 export const KASSA_POS_BTN_SELECTED = [
-  KASSA_BTN_FACE,
-  'border border-[#3d352c]',
+  KASSA_BTN_FACE_CHAMPAGNE,
+  'border border-[#c4a46a]',
   KASSA_POS_SELECTED_TOP_RIM,
   KASSA_POS_SELECTED_LIFT_SHADOW,
   KASSA_POS_BTN_PRESS,
-  KASSA_BTN_PRESS_FACE,
+  'active:bg-[linear-gradient(180deg,#c4a46a_0%,#a8884e_52%,#8f7344_100%)]',
   KASSA_POS_SELECTED_ACCENT_TEXT,
+  'font-semibold',
 ].join(' ')
 
 export const KASSA_POS_CHECKOUT_LIFT_SHADOW =
@@ -94,15 +98,15 @@ export const KASSA_POS_CHECKOUT_LIFT_SHADOW =
 
 export const KASSA_POS_CHECKOUT_BTN = [
   KASSA_POS_BTN_SHAPE,
-  KASSA_BTN_FACE,
-  'border border-[#3d352c]',
+  KASSA_BTN_FACE_CHAMPAGNE,
+  'border border-[#c4a46a]',
   KASSA_POS_SELECTED_TOP_RIM,
   KASSA_POS_CHECKOUT_LIFT_SHADOW,
   KASSA_POS_BTN_PRESS,
-  KASSA_BTN_PRESS_FACE,
+  'active:bg-[linear-gradient(180deg,#c4a46a_0%,#a8884e_52%,#8f7344_100%)]',
   KASSA_POS_SELECTED_ACCENT_TEXT,
   KASSA_POS_BTN_ARIA_DISABLED,
-  'aria-disabled:text-[#d4b483]',
+  'aria-disabled:text-[#1a1612]',
   'touch-manipulation',
   'font-bold',
 ].join(' ')
@@ -198,34 +202,37 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   'active:translate-y-[1px] active:brightness-[0.93]',
 ].join(' ')
 
-/** Fotovlak rand-tot-rand; ivoor zodat `object-contain` in donkere kassa warmer oogt. */
+/** Fotovlak — studio-vignette: taupe midden, donkerbruin naar de randen. */
+const KASSA_POS_MENU_TILE_STUDIO_BG =
+  'bg-[radial-gradient(ellipse_at_50%_38%,#9a8d7a_0%,#6b6256_38%,#3a3228_72%,#1a1612_100%)]'
+
 export const KASSA_POS_MENU_TILE_IMAGE_WELL =
-  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-[#f3ece0]'
+  `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA =
-  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-[#f3ece0]'
+  `pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_POS_MENU_TILE_IMG_CLASS =
   'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
 export const KASSA_POS_MENU_TILE_IMG_FRAME =
-  'pointer-events-none relative z-0 h-full w-full min-h-0 min-w-0 overflow-hidden bg-[#f3ece0]'
+  `pointer-events-none relative z-0 h-full w-full min-h-0 min-w-0 overflow-hidden ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
-/** Dunne donkere laag over foto (niet over titel); tegels blenden in donkere kassa. */
+/** Vignette over de foto (niet over titel): midden open, randen donker. */
 export const KASSA_POS_MENU_TILE_IMAGE_FILM =
-  'pointer-events-none absolute inset-0 z-[1] bg-[#1a1612]/[0.18]'
+  'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_40%,transparent_0%,transparent_40%,rgba(22,19,16,0.28)_74%,rgba(16,13,10,0.58)_100%)]'
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
-  'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#1a1612] px-2 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]'
+  `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
-  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-[#1a1612] px-2 aspect-square shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]'
+  `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_POS_MENU_TILE_LABEL_WRAP =
-  'pointer-events-none shrink-0 w-full border-t border-[#3d352c]/90 bg-[linear-gradient(180deg,#2c2620_0%,#1f1b17_100%)] px-2 pb-2 pt-1.5 sm:px-3'
+  'pointer-events-none shrink-0 w-full border-t border-[#2a241c] bg-[#1c1814] px-2 pb-2 pt-1.5 sm:px-3'
 
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full border-t border-[#3d352c]/90 bg-[linear-gradient(180deg,#2c2620_0%,#1f1b17_100%)] px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0'
+  'pointer-events-none shrink-0 w-full border-t border-[#2a241c] bg-[#1c1814] px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0'
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-[#f2f2f2] sm:text-[15px] md:text-base'

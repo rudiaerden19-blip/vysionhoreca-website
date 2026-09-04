@@ -22,7 +22,7 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
   return {
     ...base,
     shellBg: KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
-    soundBackdrop: 'bg-[#2a241e]',
+    soundBackdrop: 'bg-[#161310]',
     flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
     flyMenuBorder: 'border-[#3d352c]',
     flyMenuDivider: 'border-[#3d352c]',
@@ -37,7 +37,7 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
     productTileSolidBorder: 'border-[#14110e]',
     productTileFooterBar: `border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
     sidebarBg: KASSA_POS_MENU_TRANSPARENT_CLASS,
-    ringOffset: 'ring-offset-[#2a241e]',
+    ringOffset: 'ring-offset-[#161310]',
     tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} overflow-hidden`,
     tablePickerHeader: `border-b border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
     tablePickerFooterBar: `p-2 border-t border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} flex gap-2`,
