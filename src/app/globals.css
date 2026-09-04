@@ -497,10 +497,10 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Luxe: één Chesterfield-vlak achter het hele kassascherm (nooit tegelen). */
+/* Luxe: één doek-vlak achter het hele kassascherm (nooit tegelen). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
-  background-color: #050505 !important;
+  background-color: #c4a46a !important;
   background-image: none !important;
 }
 
@@ -509,8 +509,8 @@ html.kassa-luxe-leather body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: #050505;
-  background-image: url('/images/kassa-luxe-chesterfield.jpg');
+  background-color: #c4a46a;
+  background-image: url('/images/kassa-luxe-doek.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
