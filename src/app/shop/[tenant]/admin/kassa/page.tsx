@@ -407,10 +407,10 @@ const KASSA_HEADER_QUICK_LINK_BTN =
   'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52] min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
-/** Light mode — zelfde petrolblauw als Reserveringen (afb. 4). */
-const KASSA_LIGHT_BTN_FACE = 'bg-[#0E5D82] text-white hover:bg-[#0c4f6e]'
+/** Light mode — zelfde donkergrijs als Klassiek-knoppen. */
+const KASSA_LIGHT_BTN_FACE = 'bg-[#2d2d2d] text-white hover:bg-[#3a3a3a]'
 const KASSA_LIGHT_BTN_FACE_ON =
-  'bg-[#0E5D82] text-white ring-2 ring-sky-200/80 ring-offset-2 ring-offset-[#e3e3e3]'
+  'bg-[#2d2d2d] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]'
 const KASSA_LIGHT_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5 ${KASSA_LIGHT_BTN_FACE}`
 
