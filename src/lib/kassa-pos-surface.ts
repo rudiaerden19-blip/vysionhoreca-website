@@ -204,7 +204,7 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
 
 /** Fotovlak — studio-vignette zoals de afgesproken look: licht midden, donker naar de randen. */
 const KASSA_POS_MENU_TILE_STUDIO_BG =
-  'bg-[radial-gradient(ellipse_at_50%_40%,#b5a894_0%,#8a7d6c_32%,#5c5348_58%,#2a241c_82%,#161310_100%)]'
+  'bg-[radial-gradient(ellipse_at_50%_42%,#d4c8b4_0%,#b5a894_36%,#8a7d6c_62%,#4a4238_88%,#2a241c_100%)]'
 
 export const KASSA_POS_MENU_TILE_IMAGE_WELL =
   `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_POS_MENU_TILE_STUDIO_BG}`
@@ -220,7 +220,7 @@ export const KASSA_POS_MENU_TILE_IMG_FRAME =
 
 /** Vignette over de foto (niet over titel): midden open, randen donker. */
 export const KASSA_POS_MENU_TILE_IMAGE_FILM =
-  'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_40%,transparent_0%,transparent_48%,rgba(22,19,16,0.22)_80%,rgba(16,13,10,0.48)_100%)]'
+  'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_42%,transparent_0%,transparent_62%,rgba(22,19,16,0.12)_88%,rgba(16,13,10,0.22)_100%)]'
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_POS_MENU_TILE_STUDIO_BG}`
