@@ -329,10 +329,10 @@ export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
   `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_POS_MENU_TILE_LABEL_WRAP =
-  'pointer-events-none shrink-0 w-full border-t border-black bg-black px-2 pb-2 pt-1.5 sm:px-3'
+  `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-2 pt-1.5 sm:px-3`
 
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
-  'pointer-events-none shrink-0 w-full border-t border-black bg-black px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0'
+  `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
 /** Speels: titelstrook dezelfde bruine knopkleur als snelmenu (afb. 2). */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
