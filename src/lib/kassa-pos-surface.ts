@@ -132,8 +132,53 @@ export function kassaPosQuickMenuPanelButtonClass(): string {
   ].join(' ')
 }
 
-export function kassaPosButtonClass(selected: boolean): string {
+export type KassaPosChromeLook = 'luxe' | 'speels'
+
+/** Speels: alleen de bruine (champagne) knoppen — zwart + zilveren rand. */
+const KASSA_SPEELS_BROWN_BTN_FACE =
+  'bg-[linear-gradient(180deg,#141414_0%,#1f1f1f_46%,#0a0a0a_100%)]'
+
+const KASSA_SPEELS_BROWN_BTN_PRESS_FACE =
+  'active:bg-[linear-gradient(180deg,#0a0a0a_0%,#171717_52%,#050505_100%)]'
+
+const KASSA_SPEELS_SILVER_BORDER = 'border border-[#c8c8c8] border-t-[#ececec]'
+
+const KASSA_SPEELS_SELECTED_LIFT_SHADOW =
+  'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_0_18px_rgba(200,200,208,0.28),0_0_10px_rgba(220,220,228,0.22)]'
+
+export const KASSA_SPEELS_BTN_SELECTED = [
+  KASSA_SPEELS_BROWN_BTN_FACE,
+  KASSA_SPEELS_SILVER_BORDER,
+  KASSA_SPEELS_SELECTED_LIFT_SHADOW,
+  KASSA_POS_BTN_PRESS,
+  KASSA_SPEELS_BROWN_BTN_PRESS_FACE,
+  'text-[#f5f5f5]',
+  'font-semibold',
+].join(' ')
+
+export const KASSA_SPEELS_CHECKOUT_BTN = [
+  KASSA_POS_BTN_SHAPE,
+  KASSA_SPEELS_BROWN_BTN_FACE,
+  KASSA_SPEELS_SILVER_BORDER,
+  KASSA_SPEELS_SELECTED_LIFT_SHADOW,
+  KASSA_POS_BTN_PRESS,
+  KASSA_SPEELS_BROWN_BTN_PRESS_FACE,
+  'text-[#f5f5f5]',
+  KASSA_POS_BTN_ARIA_DISABLED,
+  'aria-disabled:text-[#f5f5f5]',
+  'touch-manipulation',
+  'font-bold',
+].join(' ')
+
+export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook = 'luxe'): string {
+  if (look === 'speels' && selected) {
+    return `${KASSA_POS_BTN_SHAPE} ${KASSA_SPEELS_BTN_SELECTED}`
+  }
   return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN}`
+}
+
+export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
+  return look === 'speels' ? KASSA_SPEELS_CHECKOUT_BTN : KASSA_POS_CHECKOUT_BTN
 }
 
 export function kassaPosRaisedStripClass(): string {

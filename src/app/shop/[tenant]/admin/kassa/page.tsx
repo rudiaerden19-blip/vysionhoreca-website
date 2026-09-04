@@ -87,7 +87,7 @@ import {
 } from '@/lib/kassa-ui-layout'
 import {
   KASSA_POS_BTN_SHAPE,
-  KASSA_POS_CHECKOUT_BTN,
+  kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
@@ -122,6 +122,7 @@ import {
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL,
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   kassaPosButtonClass,
+  type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosCartQtyButtonClass,
   kassaPosRaisedStripClass,
@@ -1023,6 +1024,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     useKassaUiLayoutSync(tenant)
   const kassaPosLuxury = kassaUiLayoutUsesPosLuxury(kassaLayout)
   const kassaClassicDark = kassaLayout === 'dark'
+  const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
   const kassaPlateBgClass =
     kassaLayout === 'speels'
       ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
@@ -4730,7 +4732,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
-    kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`: ''
+    kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)}`: ''
 
   const cartLineQtyBtnCompact = kassaSxgaDenseTiles && kassaSidebarFooterTier === 'dense'
 
@@ -4976,7 +4978,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
             className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
               kassaPosLuxury
-                ? kassaPosButtonClass(true)
+                ? kassaPosButtonClass(true, posChrome)
                 : hamburgerOpen
                   ? 'rounded-xl bg-[#47c6fe] text-[#063042]'
                   : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
@@ -5339,7 +5341,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
                       } ${
                         kassaPosLuxury
-                          ? kassaPosButtonClass(active)
+                          ? kassaPosButtonClass(active, posChrome)
                           : active
                             ? 'rounded-lg border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
                             : `rounded-lg border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
@@ -5557,7 +5559,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'sales')}`
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'sales', posChrome)}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'sales'
                           ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
@@ -5588,7 +5590,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'inside')}`
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'inside', posChrome)}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'inside'
                           ? `bg-[#3C4D6B] text-white ring-2 ring-[#58CCFF]/55 ring-offset-2 ${ui.ringOffset}`
@@ -5623,7 +5625,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                 )} ${
                   kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace')}`
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace', posChrome)}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'terrace'
                           ? `bg-emerald-600 text-white ring-2 ring-emerald-300/80 ring-offset-2 ${ui.ringOffset}`
@@ -5661,7 +5663,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('DINE_IN')}
               className={
                 kassaPosLuxury
-                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DINE_IN')}`
+                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DINE_IN', posChrome)}`
                   : kassaLightOrderTypeButtonClass(orderType === 'DINE_IN')
               }
             >
@@ -5681,7 +5683,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('TAKEAWAY')}
               className={
                 kassaPosLuxury
-                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'TAKEAWAY')}`
+                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'TAKEAWAY', posChrome)}`
                   : kassaLightOrderTypeButtonClass(orderType === 'TAKEAWAY')
               }
             >
@@ -5693,7 +5695,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => selectOrderType('DELIVERY')}
               className={
                 kassaPosLuxury
-                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DELIVERY')}`
+                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DELIVERY', posChrome)}`
                   : kassaLightOrderTypeButtonClass(orderType === 'DELIVERY')
               }
             >
@@ -5868,7 +5870,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={addCustomAmount}
                   className={
                     kassaAppearanceDark
-                      ? `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosButtonClass(true)}`
+                      ? `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosButtonClass(true, posChrome)}`
                       : 'mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
                   }
                 >
@@ -6151,7 +6153,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible)} ${
+                className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
                   kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
                 }`}
               >
@@ -6166,7 +6168,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setShowPaymentModal(true)
                 }}
                 disabled={billLines.length === 0}
-                className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_POS_CHECKOUT_BTN} ${
+                className={`flex min-w-0 flex-1 items-center justify-center ${kassaPosCheckoutButtonClass(posChrome)} ${
                   kassaSxgaDenseTiles ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >

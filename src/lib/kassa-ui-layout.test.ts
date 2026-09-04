@@ -4,6 +4,7 @@ import {
   kassaUiLayoutUsesPosLuxury,
   parseKassaUiLayout,
 } from './kassa-ui-layout'
+import { kassaPosButtonClass, kassaPosCheckoutButtonClass } from './kassa-pos-surface'
 
 describe('parseKassaUiLayout', () => {
   it('houdt een geldige id', () => {
@@ -51,5 +52,26 @@ describe('isMissingKassaUiLayoutColumn', () => {
     expect(isMissingKassaUiLayoutColumn({ message: 'permission denied for table kassa_pos_state' })).toBe(
       false,
     )
+  })
+})
+
+import { kassaPosButtonClass, kassaPosCheckoutButtonClass } from './kassa-pos-surface'
+
+describe('Speels bruine knoppen', () => {
+  it('laat ongeselecteerde knoppen ongewijzigd', () => {
+    expect(kassaPosButtonClass(false, 'speels')).toBe(kassaPosButtonClass(false))
+  })
+
+  it('maakt geselecteerde knoppen zwart met zilveren rand', () => {
+    const selected = kassaPosButtonClass(true, 'speels')
+    expect(selected).toContain('#c8c8c8')
+    expect(selected).not.toContain('#c4a46a')
+    expect(kassaPosButtonClass(true, 'luxe')).toContain('#c4a46a')
+  })
+
+  it('maakt Afrekenen in Speels zwart met zilveren rand', () => {
+    expect(kassaPosCheckoutButtonClass('speels')).toContain('#c8c8c8')
+    expect(kassaPosCheckoutButtonClass('speels')).not.toContain('#c4a46a')
+    expect(kassaPosCheckoutButtonClass('luxe')).toContain('#c4a46a')
   })
 })

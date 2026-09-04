@@ -18,7 +18,7 @@ import {
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import { KassaCartIconTrash } from '@/lib/kassa-ui-icons'
 import {
-  KASSA_POS_CHECKOUT_BTN,
+  kassaPosCheckoutButtonClass,
   KASSA_POS_FIELD,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
@@ -26,6 +26,7 @@ import {
   KASSA_POS_BTN_SHAPE,
   KASSA_SIDEBAR_FOOTER_LEFT_COL,
   kassaPosButtonClass,
+  type KassaPosChromeLook,
   kassaPosCartQtyButtonClass,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosRaisedStripClass,
@@ -186,6 +187,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const { layout: kassaLayout, dark: appearanceDark, setLayout: setKassaLayout } =
     useKassaUiLayoutSync(tenant)
+  const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
   const ui = useMemo(() => createKassaThemeForLayout(kassaLayout), [kassaLayout])
 
   const { soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
@@ -612,7 +614,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const headerFileBtnClass = (active: boolean) =>
     `inline-flex shrink-0 items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 sm:py-1.5 font-bold text-[11px] leading-tight sm:text-xs ${
       appearanceDark
-        ? kassaPosButtonClass(active)
+        ? kassaPosButtonClass(active, posChrome)
         : active
           ? 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
           : 'rounded-xl border border-white/25 bg-transparent text-white hover:bg-white/10'
@@ -622,10 +624,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const retailTopNavShellClass =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap px-3 py-2 font-bold text-[11px] leading-tight transition-colors sm:px-4 sm:py-2.5 sm:text-xs min-h-[2.35rem] sm:min-h-[2.6rem]'
   const retailTopNavBtnClass = (selected: boolean) =>
-    `${retailTopNavShellClass} ${kassaPosButtonClass(selected)}`
+    `${retailTopNavShellClass} ${kassaPosButtonClass(selected, posChrome)}`
   const retailTopNavLinkClass = `${retailTopNavShellClass} ${kassaPosButtonClass(false)}`
   const retailScanRowBtnClass = (selected: boolean) =>
-    `${retailTopNavShellClass} ${kassaPosButtonClass(selected)}`
+    `${retailTopNavShellClass} ${kassaPosButtonClass(selected, posChrome)}`
   /** Toevoegen + OK:zelfde breedte (past op langste label). */
   const retailScanRowActionSizeClass =
     'min-w-[7.25rem] w-[7.25rem] max-w-[7.25rem] justify-center sm:min-w-[7.75rem] sm:w-[7.75rem] sm:max-w-[7.75rem]'
@@ -641,7 +643,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const headerUtilityBtnClass = (selected: boolean) =>
     appearanceDark
-      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`
+      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)}`
       : `inline-flex shrink-0 touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 ${
           selected ? 'bg-white/20': 'bg-white/10'
         }`
@@ -1897,7 +1899,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <button
                 type="button"
                 onClick={() => applyLoyaltyRedeemModal()}
-                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true, posChrome)}`}
               >
                 {t('retailKassaPage.loyaltyRedeemModalConfirm')}
               </button>
@@ -1955,7 +1957,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 type="button"
                 disabled={priceFixSaving}
                 onClick={() => void savePriceFix()}
-                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true)}`}
+                className={`flex-1 py-3 font-bold ${kassaPosButtonClass(true, posChrome)}`}
               >
                 {priceFixSaving ? t('retailKassaPage.paying') : t('retailKassaPage.priceFixSave')}
               </button>
@@ -2113,7 +2115,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               <button
                 type="button"
                 disabled={!printAgentFallbackHtml || isAndroidTabletPrintClient()}
-                className={`w-full py-2.5 sm:w-auto ${kassaPosButtonClass(true)} disabled:opacity-50`}
+                className={`w-full py-2.5 sm:w-auto ${kassaPosButtonClass(true, posChrome)} disabled:opacity-50`}
                 onClick={() => {
                   const h = printAgentFallbackHtml
                   setPrintAgentFallbackHtml(null)
@@ -2217,7 +2219,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 type="button"
                 disabled={importBusy}
                 onClick={() => void confirmProductImport()}
-                className={`flex-1 py-2.5 font-bold ${kassaPosButtonClass(true)}`}
+                className={`flex-1 py-2.5 font-bold ${kassaPosButtonClass(true, posChrome)}`}
               >
                 {importBusy ? t('retailKassaPage.importBusy') : t('retailKassaPage.importConfirm')}
               </button>
@@ -2265,7 +2267,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               }}
               className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
                 appearanceDark
-                  ? kassaPosButtonClass(true)
+                  ? kassaPosButtonClass(true, posChrome)
                   : hamburgerOpen
                     ? 'rounded-xl bg-[#47c6fe] text-[#063042]'
                     : 'rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
@@ -2732,7 +2734,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         type="button"
                         disabled={exchangeLookupBusy}
                         onClick={() => void loadExchangeOrder()}
-                        className={`shrink-0 px-4 py-2.5 font-semibold ${kassaPosButtonClass(true)}`}
+                        className={`shrink-0 px-4 py-2.5 font-semibold ${kassaPosButtonClass(true, posChrome)}`}
                       >
                         {exchangeLookupBusy
                           ? t('retailKassaPage.exchangeLoading')
@@ -3022,7 +3024,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       type="button"
                       data-testid="retail-add-custom-amount"
                       onClick={addCustomAmountFromNumpad}
-                      className={`mt-3 shrink-0 touch-manipulation py-4 text-base font-bold ${kassaPosButtonClass(true)}`}
+                      className={`mt-3 shrink-0 touch-manipulation py-4 text-base font-bold ${kassaPosButtonClass(true, posChrome)}`}
                     >
                       {t('kassaApp.addAmount').replace('{amount}', parseFloat(numpadValue || '0').toFixed(2))}
                     </button>
@@ -3137,7 +3139,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   aria-pressed={numpadPanelVisible}
                   data-testid="retail-numpad-toggle"
                   onClick={toggleNumpadPanel}
-                  className={`flex items-center justify-center px-3 py-3.5 ${retailSidebarFooterPrimaryMinH} ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible)}`}
+                  className={`flex items-center justify-center px-3 py-3.5 ${retailSidebarFooterPrimaryMinH} ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(numpadPanelVisible, posChrome)}`}
                   title={t('kassaApp.numpadToggle')}
                 >
                   <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
@@ -3153,7 +3155,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       playClick()
                     }}
                     disabled={cart.length === 0}
-                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-xl font-bold sm:text-[1.35rem] ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}
+                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-xl font-bold sm:text-[1.35rem] ${retailSidebarFooterPrimaryMinH} ${kassaPosCheckoutButtonClass(posChrome)}`}
                   >
                     {t('kassaApp.checkout')}
                   </button>
@@ -3167,7 +3169,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       exchangeIssueBusy
                     }
                     onClick={() => void issueExchangeStoreCredit()}
-                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-lg font-bold sm:text-xl ${retailSidebarFooterPrimaryMinH} ${KASSA_POS_CHECKOUT_BTN}`}
+                    className={`flex min-w-0 flex-1 items-center justify-center py-3.5 text-lg font-bold sm:text-xl ${retailSidebarFooterPrimaryMinH} ${kassaPosCheckoutButtonClass(posChrome)}`}
                   >
                     {exchangeIssueBusy
                       ? t('retailKassaPage.exchangeIssuing')
