@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-import { kassaUiLayoutIsDark, parseKassaUiLayout } from '@/lib/kassa-ui-layout'
+import {
+  isMissingKassaUiLayoutColumn,
+  kassaUiLayoutIsDark,
+  parseKassaUiLayout,
+} from '@/lib/kassa-ui-layout'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,11 +47,6 @@ function rowToJson(row: PosStateRow | null) {
   }
 }
 
-function missingLayoutColumn(error: { message?: string } | null): boolean {
-  const msg = error?.message ?? ''
-  return msg.includes('kassa_ui_layout')
-}
-
 export async function GET(request: NextRequest) {
   const supabase = getServerSupabaseClient()
   if (!supabase) {
@@ -64,26 +63,28 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: access.error || 'unauthorized' }, { status: 403 })
   }
 
-  let data: PosStateRow | null
-  let error: { message?: string } | null
-  {
-    const first = await supabase
-      .from('kassa_pos_state')
-      .select(SELECT_WITH_LAYOUT)
-      .eq('tenant_slug', tenant_slug)
-      .maybeSingle()
-    data = first.data as PosStateRow | null
-    error = first.error
-  }
+  const first = await supabase
+    .from('kassa_pos_state')
+    .select(SELECT_WITH_LAYOUT)
+    .eq('tenant_slug', tenant_slug)
+    .maybeSingle()
 
-  if (error && missingLayoutColumn(error)) {
+  let data = first.data as PosStateRow | null
+  let error = first.error
+
+  if (error) {
     const retry = await supabase
       .from('kassa_pos_state')
       .select(SELECT_WITHOUT_LAYOUT)
       .eq('tenant_slug', tenant_slug)
       .maybeSingle()
-    data = retry.data as PosStateRow | null
-    error = retry.error
+    if (!retry.error) {
+      data = retry.data as PosStateRow | null
+      error = null
+    } else if (isMissingKassaUiLayoutColumn(first.error)) {
+      data = retry.data as PosStateRow | null
+      error = retry.error
+    }
   }
 
   if (error) {
@@ -91,7 +92,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, state: rowToJson(data as PosStateRow | null) })
+  return NextResponse.json({ ok: true, state: rowToJson(data) })
 }
 
 export async function PATCH(request: NextRequest) {
@@ -141,19 +142,19 @@ export async function PATCH(request: NextRequest) {
     patch.bar_bon_watermarks = body.bar_bon_watermarks
   }
 
-  let data: PosStateRow | null
-  let error: { message?: string } | null
-  {
-    const first = await supabase
-      .from('kassa_pos_state')
-      .upsert(patch, { onConflict: 'tenant_slug' })
-      .select(SELECT_WITH_LAYOUT)
-      .single()
-    data = first.data as PosStateRow | null
-    error = first.error
-  }
+  const writesLayout = 'kassa_ui_layout' in patch
+  const select = writesLayout ? SELECT_WITH_LAYOUT : SELECT_WITHOUT_LAYOUT
 
-  if (error && missingLayoutColumn(error)) {
+  const first = await supabase
+    .from('kassa_pos_state')
+    .upsert(patch, { onConflict: 'tenant_slug' })
+    .select(select)
+    .single()
+
+  let data = first.data as PosStateRow | null
+  let error = first.error
+
+  if (error) {
     const fallback = { ...patch }
     delete fallback.kassa_ui_layout
     const retry = await supabase
@@ -161,8 +162,13 @@ export async function PATCH(request: NextRequest) {
       .upsert(fallback, { onConflict: 'tenant_slug' })
       .select(SELECT_WITHOUT_LAYOUT)
       .single()
-    data = retry.data as PosStateRow | null
-    error = retry.error
+    if (!retry.error) {
+      data = retry.data as PosStateRow | null
+      error = null
+    } else if (isMissingKassaUiLayoutColumn(first.error)) {
+      data = retry.data as PosStateRow | null
+      error = retry.error
+    }
   }
 
   if (error) {
@@ -170,5 +176,5 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, state: rowToJson(data as PosStateRow | null) })
+  return NextResponse.json({ ok: true, state: rowToJson(data) })
 }

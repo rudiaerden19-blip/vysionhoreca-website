@@ -38,3 +38,20 @@ export function kassaUiLayoutIsDark(layout: KassaUiLayoutId): boolean {
 export function kassaUiLayoutUsesPosLuxury(layout: KassaUiLayoutId): boolean {
   return layout === 'luxe' || layout === 'speels'
 }
+
+/** Kolom nog niet in productie-DB — staff/bon mogen niet meevallen. */
+export function isMissingKassaUiLayoutColumn(error: {
+  message?: string
+  code?: string
+  details?: string
+  hint?: string
+} | null): boolean {
+  if (!error) return false
+  const blob = [error.message, error.code, error.details, error.hint]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+  if (blob.includes('kassa_ui_layout')) return true
+  if (error.code === 'PGRST204' || error.code === '42703') return true
+  return false
+}

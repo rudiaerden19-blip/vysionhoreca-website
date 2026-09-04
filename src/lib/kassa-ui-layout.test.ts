@@ -1,4 +1,5 @@
 import {
+  isMissingKassaUiLayoutColumn,
   kassaUiLayoutIsDark,
   kassaUiLayoutUsesPosLuxury,
   parseKassaUiLayout,
@@ -35,5 +36,20 @@ describe('kassaUiLayout flags', () => {
     expect(kassaUiLayoutUsesPosLuxury('speels')).toBe(true)
     expect(kassaUiLayoutUsesPosLuxury('dark')).toBe(false)
     expect(kassaUiLayoutUsesPosLuxury('light')).toBe(false)
+  })
+})
+
+describe('isMissingKassaUiLayoutColumn', () => {
+  it('herkent PostgREST/Postgres kolomfouten', () => {
+    expect(
+      isMissingKassaUiLayoutColumn({
+        message: "Could not find the 'kassa_ui_layout' column of 'kassa_pos_state' in the schema cache",
+        code: 'PGRST204',
+      }),
+    ).toBe(true)
+    expect(isMissingKassaUiLayoutColumn({ code: '42703', message: 'undefined_column' })).toBe(true)
+    expect(isMissingKassaUiLayoutColumn({ message: 'permission denied for table kassa_pos_state' })).toBe(
+      false,
+    )
   })
 })
