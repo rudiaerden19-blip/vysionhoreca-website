@@ -104,7 +104,7 @@ export function KassaProductOptionsModal({
                   <span
                     className={
                       dark
-                        ? `text-xs px-2 py-0.5 font-semibold text-[#5a9fd4] ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
+                        ? `text-xs px-2 py-0.5 font-semibold text-[#d4b483] ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
                         : 'text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full'
                     }
                   >
@@ -132,11 +132,11 @@ export function KassaProductOptionsModal({
                         <div
                           className={
                             dark
-                              ? 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-md border border-[#3d3d3d] bg-[#1c1c1c] text-[10px] font-bold text-[#5a9fd4]'
+                              ? 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-md border border-[#3d3d3d] bg-[#1c1c1c] text-[10px] font-bold text-[#d4b483]'
                               : 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3C4D6B] text-xs font-bold text-white'
                           }
                         >
-                          <KassaIconCheck className={dark ? 'h-3 w-3 text-[#5a9fd4]' : 'h-3.5 w-3.5'} />
+                          <KassaIconCheck className={dark ? 'h-3 w-3 text-[#d4b483]' : 'h-3.5 w-3.5'} />
                         </div>
                       )}
                       <span
@@ -150,7 +150,7 @@ export function KassaProductOptionsModal({
                         className={`text-xs font-bold mt-1 ${
                           choice.price > 0
                             ? dark
-                              ? 'text-[#5a9fd4]'
+                              ? 'text-[#d4b483]'
                               : 'text-amber-500'
                             : dark
                               ? 'text-green-400'
