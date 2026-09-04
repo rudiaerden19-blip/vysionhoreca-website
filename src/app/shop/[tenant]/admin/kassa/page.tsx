@@ -423,13 +423,13 @@ const KASSA_CLASSIC_ACTION_BTN_FACE_ON =
 const KASSA_CLASSIC_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5 ${KASSA_CLASSIC_BTN_FACE}`
 const KASSA_CLASSIC_TILE_NAME =
-  'm-0 line-clamp-3 text-center text-xl font-bold leading-tight tracking-tight text-white sm:text-2xl md:text-[1.75rem]'
+  'm-0 line-clamp-3 text-center text-base font-bold leading-tight tracking-tight text-white sm:text-lg md:text-[1.2rem]'
 const KASSA_CLASSIC_TILE_NAME_SXGA =
-  'm-0 line-clamp-3 text-center text-lg font-bold leading-tight tracking-tight text-white sm:text-xl'
+  'm-0 line-clamp-3 text-center text-sm font-bold leading-tight tracking-tight text-white sm:text-base'
 const KASSA_CLASSIC_TILE_PRICE =
-  'mt-2 text-lg font-bold tabular-nums text-white sm:text-xl'
+  'mt-1.5 text-sm font-bold tabular-nums text-white sm:text-base'
 const KASSA_CLASSIC_TILE_PRICE_SXGA =
-  'mt-1.5 text-base font-bold tabular-nums text-white sm:text-lg'
+  'mt-1 text-xs font-bold tabular-nums text-white sm:text-sm'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
