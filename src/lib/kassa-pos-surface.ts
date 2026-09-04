@@ -27,7 +27,7 @@ export const KASSA_POS_SELECTED_ACCENT_TEXT = 'text-[#1a1612]'
 
 export const KASSA_POS_SELECTED_TOP_RIM = 'border-t-[#f0d9a8]/55'
 
-const KASSA_BTN_FACE =
+export const KASSA_BTN_FACE =
   'bg-[linear-gradient(180deg,#1a1612_0%,#3a3228_46%,#1c1814_100%)]'
 
 const KASSA_BTN_FACE_CHAMPAGNE =
@@ -304,6 +304,13 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   'pointer-events-none shrink-0 w-full border-t border-black bg-black px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0'
+
+/** Speels: titelstrook dezelfde bruine knopkleur als snelmenu (afb. 2). */
+export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
+  `pointer-events-none shrink-0 w-full border-t border-[#3d352c] ${KASSA_BTN_FACE} px-2 pb-2 pt-1.5 sm:px-3`
+
+export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA =
+  `pointer-events-none shrink-0 w-full border-t border-[#3d352c] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-white sm:text-[15px] md:text-base'

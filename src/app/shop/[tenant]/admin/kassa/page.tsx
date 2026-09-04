@@ -111,6 +111,8 @@ import {
   KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA,
   KASSA_POS_MENU_TILE_LABEL_WRAP,
   KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA,
+  KASSA_SPEELS_MENU_TILE_LABEL_WRAP,
+  KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA,
   KASSA_POS_MENU_TILE_OPTS_BADGE,
   KASSA_POS_MENU_TILE_PLACEHOLDER_WELL,
   KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
@@ -727,7 +729,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
           ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
           : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap =
-    luxuryChrome
+    look === 'speels'
+      ? sxgaDenseTileLayout
+        ? KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA
+        : KASSA_SPEELS_MENU_TILE_LABEL_WRAP
+      : luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_POS_MENU_TILE_LABEL_WRAP
@@ -876,7 +882,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
           : KASSA_MENU_TILE_IMAGE_WELL
   const labelWrap =
-    luxuryChrome
+    look === 'speels'
+      ? sxgaDenseTileLayout
+        ? KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA
+        : KASSA_SPEELS_MENU_TILE_LABEL_WRAP
+      : luxuryChrome
       ? sxgaDenseTileLayout
         ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_POS_MENU_TILE_LABEL_WRAP
