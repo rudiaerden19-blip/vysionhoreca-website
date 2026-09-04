@@ -938,7 +938,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [personeelSubOpen, setPersoneelSubOpen] = useState<string | null>(null)
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
-  const [quickMenuPanelOpen, setQuickMenuPanelOpen] = useState(false)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
   // ── Geluid activatie scherm ──────────────────────────────────────────────
   // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
@@ -2769,7 +2768,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const toggleKassaQuickMenu = useCallback(() => {
     playClick()
-    setQuickMenuPanelOpen((open) => !open)
+    if (typeof document === 'undefined') return
+    document.querySelector('[data-testid="kassa-quick-menu-panel"]')?.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth',
+    })
   }, [])
 
   /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
@@ -4523,7 +4526,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaQuickMenuPanelBtnClass = useCallback(
     (enabled: boolean) =>
       [
-        `flex min-h-[7.25rem] min-w-0 items-center justify-center px-1 py-2 text-center sm:min-h-[7.75rem] sm:px-1.5 leading-tight ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`,
+        'flex min-h-[3.1rem] min-w-0 items-center justify-center px-1 py-1.5 text-center text-[11px] font-medium leading-tight tracking-[0.02em] sm:min-h-[3.35rem] sm:px-1.5 sm:text-xs',
         kassaAppearanceDark
           ? kassaPosQuickMenuPanelButtonClass()
           : `rounded-xl bg-[#161616] text-[#f0f0f0] ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
@@ -5214,11 +5217,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }`}
           >
             {menuLoading ? (
-              <div data-testid="kassa-menu-loading" className={`flex items-center justify-center h-full text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
+              <div data-testid="kassa-menu-loading" className={`flex items-center justify-center min-h-[12rem] text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>
             ) : !selectedCategory ? (
               /* Categorieën: responsief raster; rijhoogte vult viewport; gap-4 = KASSA_MENU_GRID_GAP_PX */
               categories.length === 0 ? (
-                <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
+                <div className={`flex flex-col items-center justify-center min-h-[12rem] ${ui.menuEmptyMuted}`}>
                   <span className="text-5xl mb-3"></span>
                   <p className="font-semibold">{t('kassaApp.noCategoriesTitle')}</p>
                   <p className="text-sm mt-1">{t('kassaApp.noCategoriesHint')}</p>
@@ -5232,7 +5235,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
                   onClick={handleCategoryGridClick}
-                  className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5': 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
+                  className={`grid min-h-0 w-full grid-cols-2 pb-1 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5': 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
                       { gridAutoRows: 'max-content'}
@@ -5256,7 +5259,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             ) : (
               /* Producten: zelfde raster als categorieën */
               productsInSelectedCategory.length === 0 ? (
-                  <div className={`flex flex-col items-center justify-center h-full ${ui.menuEmptyMuted}`}>
+                  <div className={`flex flex-col items-center justify-center min-h-[12rem] ${ui.menuEmptyMuted}`}>
                     <span className="text-5xl mb-3"></span>
                     <p className="font-semibold">{t('kassaApp.noProductsInCategory')}</p>
                   </div>
@@ -5269,7 +5272,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
                     onClick={handleProductGridClick}
-                    className={`grid min-h-0 w-full grid-cols-2 pb-8 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5': 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
+                    className={`grid min-h-0 w-full grid-cols-2 pb-1 touch-manipulation select-none ${kassaSxgaDenseTiles ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5': 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'} [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
                         { gridAutoRows: 'max-content'}
@@ -5296,72 +5299,64 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )
             )}
           </div>
-            </div>
-          </div>
-
-          {quickMenuPanelOpen ? (
-            <div
-              data-testid="kassa-quick-menu-panel"
-              className="pointer-events-auto absolute inset-x-0 bottom-0 z-[60] px-3 pb-3 pt-6"
-              style={{
-                background: kassaAppearanceDark
-                  ? 'linear-gradient(to top, rgba(12,12,12,0.97) 72%, transparent)'
-                  : 'linear-gradient(to top, rgba(0,0,0,0.88) 72%, transparent)',
-              }}
-            >
-              <div className="grid w-full grid-cols-8 gap-1.5 sm:gap-2">
-                {kassaQuickMenuActions.map((action) => {
-                  const enabled = isKassaQuickMenuActionEnabled(action)
-                  const label = t(action.labelKey)
-                  if (action.kind === 'clock') {
-                    return (
-                      <button
-                        key={action.key}
-                        type="button"
-                        disabled={!enabled}
-                        aria-disabled={!enabled}
-                        className={kassaQuickMenuPanelBtnClass(enabled)}
-                        onClick={() => {
-                          if (!enabled) return
-                          setQuickMenuPanelOpen(false)
-                          openStaffClockModal()
-                        }}
-                      >
-                        {label}
-                      </button>
-                    )
-                  }
-                  if (!enabled || !action.href) {
-                    return (
-                      <button
-                        key={action.key}
-                        type="button"
-                        disabled
-                        aria-disabled
-                        className={kassaQuickMenuPanelBtnClass(false)}
-                      >
-                        {label}
-                      </button>
-                    )
-                  }
+          <div
+            data-testid="kassa-quick-menu-panel"
+            className={`shrink-0 border-t px-2 py-1.5 ${
+              kassaAppearanceDark ? KASSA_POS_RULE_BLACK : 'border-gray-300'
+            }`}
+          >
+            <div className="grid w-full grid-cols-8 gap-1 sm:gap-1.5">
+              {kassaQuickMenuActions.map((action) => {
+                const enabled = isKassaQuickMenuActionEnabled(action)
+                const label = t(action.labelKey)
+                if (action.kind === 'clock') {
                   return (
-                    <Link
+                    <button
                       key={action.key}
-                      href={action.href}
-                      prefetch={false}
-                      className={kassaQuickMenuPanelBtnClass(true)}
+                      type="button"
+                      disabled={!enabled}
+                      aria-disabled={!enabled}
+                      className={kassaQuickMenuPanelBtnClass(enabled)}
                       onClick={() => {
-                        playClick()
-                        setQuickMenuPanelOpen(false)
+                        if (!enabled) return
+                        openStaffClockModal()
                       }}
                     >
                       {label}
-                    </Link>
+                    </button>
                   )
-                })}
-              </div>
+                }
+                if (!enabled || !action.href) {
+                  return (
+                    <button
+                      key={action.key}
+                      type="button"
+                      disabled
+                      aria-disabled
+                      className={kassaQuickMenuPanelBtnClass(false)}
+                    >
+                      {label}
+                    </button>
+                  )
+                }
+                return (
+                  <Link
+                    key={action.key}
+                    href={action.href}
+                    prefetch={false}
+                    className={kassaQuickMenuPanelBtnClass(true)}
+                    onClick={() => {
+                      playClick()
+                    }}
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
             </div>
-          ) : null}
+          </div>
+            </div>
+          </div>
         </div>
 
         {/* ── Rechts: numpad / cart ── */}
@@ -5889,9 +5884,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 data-testid="kassa-quick-menu"
-                aria-pressed={quickMenuPanelOpen}
+                aria-pressed={true}
                 onClick={toggleKassaQuickMenu}
-                className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(quickMenuPanelOpen)}`}
+                className={`flex items-center justify-center px-3 ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${kassaPosButtonClass(false)}`}
                 title={t('kassaApp.quickMenu')}
               >
                 <span className={`leading-tight ${kassaSidebarActionLabelClass}`}>{t('kassaApp.quickMenu')}</span>
@@ -6030,11 +6025,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 data-testid="kassa-quick-menu"
-                aria-pressed={quickMenuPanelOpen}
+                aria-pressed={true}
                 onClick={toggleKassaQuickMenu}
-                className={`flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold leading-tight text-white ${KASSA_SIDEBAR_FOOTER_LEFT_COL} ${
-                  quickMenuPanelOpen ? 'bg-[#2D3A52] ring-2 ring-[#58CCFF]/60': 'bg-[#3C4D6B] hover:bg-[#2D3A52]'
-                }`}
+                className={`flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold leading-tight text-white ${KASSA_SIDEBAR_FOOTER_LEFT_COL} bg-[#3C4D6B] hover:bg-[#2D3A52]`}
                 title={t('kassaApp.quickMenu')}
               >
                 {t('kassaApp.quickMenu')}
