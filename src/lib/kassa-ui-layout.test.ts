@@ -55,8 +55,6 @@ describe('isMissingKassaUiLayoutColumn', () => {
   })
 })
 
-import { kassaPosButtonClass, kassaPosCheckoutButtonClass } from './kassa-pos-surface'
-
 describe('Speels bruine knoppen', () => {
   it('laat ongeselecteerde knoppen ongewijzigd', () => {
     expect(kassaPosButtonClass(false, 'speels')).toBe(kassaPosButtonClass(false))
