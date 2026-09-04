@@ -7,6 +7,7 @@ export type KassaPosState = {
   active_staff_id: string | null
   active_staff_name: string | null
   kassa_ui_dark: boolean | null
+  kassa_ui_layout: string | null
   bar_bon_watermarks: BarBonWatermarkStore
 }
 
@@ -14,6 +15,7 @@ const emptyState = (): KassaPosState => ({
   active_staff_id: null,
   active_staff_name: null,
   kassa_ui_dark: null,
+  kassa_ui_layout: null,
   bar_bon_watermarks: {},
 })
 
@@ -29,6 +31,7 @@ export async function fetchKassaPosState(tenantSlug: string): Promise<KassaPosSt
       active_staff_id: data.state.active_staff_id ?? null,
       active_staff_name: data.state.active_staff_name ?? null,
       kassa_ui_dark: data.state.kassa_ui_dark ?? null,
+      kassa_ui_layout: data.state.kassa_ui_layout ?? null,
       bar_bon_watermarks:
         data.state.bar_bon_watermarks && typeof data.state.bar_bon_watermarks === 'object'
           ? (data.state.bar_bon_watermarks as BarBonWatermarkStore)
@@ -45,6 +48,7 @@ export async function patchKassaPosState(
     active_staff_id: string | null
     active_staff_name: string | null
     kassa_ui_dark: boolean | null
+    kassa_ui_layout: string | null
     bar_bon_watermarks: BarBonWatermarkStore
   }>,
 ): Promise<KassaPosState | null> {
@@ -59,6 +63,7 @@ export async function patchKassaPosState(
       active_staff_id: data.state.active_staff_id ?? null,
       active_staff_name: data.state.active_staff_name ?? null,
       kassa_ui_dark: data.state.kassa_ui_dark ?? null,
+      kassa_ui_layout: data.state.kassa_ui_layout ?? null,
       bar_bon_watermarks:
         data.state.bar_bon_watermarks && typeof data.state.bar_bon_watermarks === 'object'
           ? (data.state.bar_bon_watermarks as BarBonWatermarkStore)

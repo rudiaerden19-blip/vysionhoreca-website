@@ -80,11 +80,16 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { cache, cacheKey } from '@/lib/cache'
-import { createKassaRegisterUiTheme, type KassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
-import { createKassaPosRegisterUiTheme } from '@/lib/kassa-pos-register-ui-theme'
+import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
+import { KassaModePicker } from '@/components/kassa/KassaModePicker'
+import {
+  kassaUiLayoutUsesPosLuxury,
+} from '@/lib/kassa-ui-layout'
 import {
   KASSA_POS_BTN_SHAPE,
   KASSA_POS_CHECKOUT_BTN,
+  KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_NAVY_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_RULE_BLACK,
@@ -166,7 +171,7 @@ import {
 import { fetchKassaPosState, purgeLegacyKassaLocalStorage } from '@/lib/kassa-pos-state-client'
 import {
   KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
-  useKassaUiDarkSync,
+  useKassaUiLayoutSync,
 } from '@/lib/kassa-register-ui-dark-preference'
 import {
   flushOfflineOrdersToSupabase,
@@ -881,7 +886,23 @@ const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 450
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
-  const { dark: kassaAppearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
+  const { layout: kassaLayout, dark: kassaAppearanceDark, setLayout: setKassaLayout } =
+    useKassaUiLayoutSync(tenant)
+  const kassaPosLuxury = kassaUiLayoutUsesPosLuxury(kassaLayout)
+  const kassaPlateBgClass =
+    kassaLayout === 'navy'
+      ? KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS
+      : kassaLayout === 'luxe'
+        ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
+        : kassaAppearanceDark
+          ? 'bg-[#0b0f14]'
+          : 'bg-[#e3e3e3]'
+  const kassaRecessTrayClass =
+    kassaLayout === 'navy'
+      ? KASSA_NAVY_MENU_RECESS_TRAY_CLASS
+      : kassaLayout === 'luxe'
+        ? KASSA_POS_MENU_RECESS_TRAY_CLASS
+        : ''
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -892,13 +913,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setDemoFromMarketingSession(publicDemoSessionMatchesTenant(tenant))
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
-  const ui = useMemo(
-    () =>
-      kassaAppearanceDark
-        ? createKassaPosRegisterUiTheme(true)
-        : createKassaRegisterUiTheme(false),
-    [kassaAppearanceDark],
-  )
+  const ui = useMemo(() => createKassaThemeForLayout(kassaLayout), [kassaLayout])
 
   useEffect(() => {
     const html = document.documentElement
@@ -4574,12 +4589,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaDarkHeaderBtnShell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
 
-  const headerQuickLinkBtnClass = kassaAppearanceDark
+  const headerQuickLinkBtnClass = kassaPosLuxury
     ? `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false)}`
     : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
-    kassaAppearanceDark ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`: ''
+    kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected)}`: ''
 
   const cartLineQtyBtnCompact = kassaSxgaDenseTiles && kassaSidebarFooterTier === 'dense'
 
@@ -4802,8 +4817,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div
         className={`relative z-30 flex min-h-[56px] w-full min-w-0 shrink-0 items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3 ${
-          kassaAppearanceDark
-            ? `pb-3 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+          kassaPosLuxury
+            ? `pb-3 ${kassaPlateBgClass}`
             : 'bg-black'
         }`}
       >
@@ -4824,7 +4839,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div className="relative z-20 flex shrink-0 items-center gap-2">
           <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
             className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors sm:gap-2 sm:px-3 ${
-              kassaAppearanceDark
+              kassaPosLuxury
                 ? kassaPosButtonClass(true)
                 : hamburgerOpen
                   ? 'rounded-xl bg-[#47c6fe] text-[#063042]'
@@ -4846,7 +4861,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh'}}>
                   <div
                     className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${
-                      kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#1e293b]'
+                      kassaPosLuxury ? kassaPlateBgClass : 'bg-[#1e293b]'
                     }`}
                   >
                     {t('adminLayout.menu')}
@@ -4877,7 +4892,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh'}}>
                     <div
                       className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${
-                        kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#1e293b]'
+                        kassaPosLuxury ? kassaPlateBgClass : 'bg-[#1e293b]'
                       }`}
                     >
                       {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}
@@ -4997,16 +5012,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
 
           {KASSA_UI_APPEARANCE_TOGGLE_ENABLED ? (
-            <button
-              type="button"
-              onClick={toggleKassaAppearance}
-              className={headerQuickLinkBtnClass}
-              title={kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
-            >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
-                {kassaAppearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
-              </span>
-            </button>
+            <KassaModePicker
+              layout={kassaLayout}
+              onSelect={setKassaLayout}
+              t={t}
+              triggerClassName={`${headerQuickLinkBtnClass} gap-0.5 sm:gap-1`}
+              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              panelClassName={`overflow-hidden rounded-xl border shadow-xl ${ui.flyMenuBorder} ${kassaPosLuxury ? kassaPlateBgClass : kassaAppearanceDark ? 'bg-[#151a21]' : 'bg-white'}`}
+              rowHoverClassName={ui.langRowHover}
+              rowActiveClassName={ui.langRowActive}
+              rowInactiveClassName={ui.langRowInactive}
+            />
           ) : null}
 
           <button
@@ -5027,7 +5043,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOnline !== null && (
             <div
               className={`inline-flex max-w-[6.5rem] shrink-0 items-center justify-center gap-0.5 leading-tight min-h-[2.35rem] sm:min-h-[2.6rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
-                kassaAppearanceDark
+                kassaPosLuxury
                   ? isOnline
                     ? headerQuickLinkBtnClass
                     : `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false)} bg-red-600/95 text-white`
@@ -5062,7 +5078,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
               onClick={() => setLangOpen(o => !o)}
               className={
-                kassaAppearanceDark
+                kassaPosLuxury
                   ? headerUtilityBtnClass(langOpen)
                   : 'inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg bg-white/10 px-1.5 py-1.5 font-medium text-white transition-colors hover:bg-white/20 sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3'
               }
@@ -5090,12 +5106,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onClick={() => setLogoutSoftwareConfirmOpen(true)}
           title={t('kassaApp.logout')}
           className={
-            kassaAppearanceDark
+            kassaPosLuxury
               ? `relative z-20 ${headerUtilityBtnClass(true)}`
               : 'relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg bg-[#58CCFF] px-1.5 py-1 text-[11px] font-bold text-black transition-colors hover:bg-[#47c6fe] sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm'
           }
         >
-          <span className={kassaAppearanceDark ? KASSA_HEADER_QUICK_LINK_LABEL : 'leading-snug'}>
+          <span className={kassaPosLuxury ? KASSA_HEADER_QUICK_LINK_LABEL : 'leading-snug'}>
             {t('kassaApp.logout')}
           </span>
         </button>
@@ -5126,7 +5142,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Midden: categorieën / producten ── */}
         <div
           className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${
-            kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-[#e3e3e3]'
+            kassaPlateBgClass
           }`}
         >
 
@@ -5186,7 +5202,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           ? 'px-3 py-1.5 text-sm'
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
                       } ${
-                        kassaAppearanceDark
+                        kassaPosLuxury
                           ? kassaPosButtonClass(active)
                           : active
                             ? 'rounded-lg border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
@@ -5205,7 +5221,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className={`flex min-h-0 flex-1 flex-col ${kassaAppearanceDark ? 'px-3 pb-3 pt-1.5': ''}`}>
             <div
               className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
-                kassaAppearanceDark ? `${KASSA_POS_MENU_RECESS_TRAY_CLASS} ${KASSA_POS_BTN_SHAPE}`: ''
+                kassaRecessTrayClass ? `${kassaRecessTrayClass} ${KASSA_POS_BTN_SHAPE}`: ''
               }`}
             >
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
@@ -5250,7 +5266,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         category={cat}
                         imageUrl={tile?.url}
                         sxgaDenseTileLayout={kassaSxgaDenseTiles}
-                        posLuxuryAppearance={kassaAppearanceDark}
+                        posLuxuryAppearance={kassaPosLuxury}
                       />
                     )
                   })}
@@ -5291,7 +5307,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           inCart={inCart}
                           hasOpts={hasOpts}
                           sxgaDenseTileLayout={kassaSxgaDenseTiles}
-                          posLuxuryAppearance={kassaAppearanceDark}
+                          posLuxuryAppearance={kassaPosLuxury}
                         />
                       )
                     })}
@@ -5366,8 +5382,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
-            kassaAppearanceDark
-              ? `border-l ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+            kassaPosLuxury
+              ? `border-l ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
               : ui.sidebarBg
           }`}
         >
@@ -5396,7 +5412,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex min-w-0 flex-1 items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
-                  kassaAppearanceDark
+                  kassaPosLuxury
                     ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'sales')}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'sales'
@@ -5427,7 +5443,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
-                  kassaAppearanceDark
+                  kassaPosLuxury
                     ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'inside')}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'inside'
@@ -5462,7 +5478,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
                 )} ${
-                  kassaAppearanceDark
+                  kassaPosLuxury
                     ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace')}`
                     : `rounded-xl font-bold ${
                         kassaZoneTab === 'terrace'
@@ -5500,7 +5516,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
               className={
-                kassaAppearanceDark
+                kassaPosLuxury
                   ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DINE_IN')}`
                   : kassaLightOrderTypeButtonClass(orderType === 'DINE_IN')
               }
@@ -5520,7 +5536,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
               className={
-                kassaAppearanceDark
+                kassaPosLuxury
                   ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'TAKEAWAY')}`
                   : kassaLightOrderTypeButtonClass(orderType === 'TAKEAWAY')
               }
@@ -5532,7 +5548,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
               className={
-                kassaAppearanceDark
+                kassaPosLuxury
                   ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaSxgaDenseTiles)} ${kassaPosButtonClass(orderType === 'DELIVERY')}`
                   : kassaLightOrderTypeButtonClass(orderType === 'DELIVERY')
               }
@@ -5869,9 +5885,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {/* Totaal + knoppen — zelfde flow/labels als vóór UI-pass; donker = alleen POS-styling */}
-        {kassaAppearanceDark ? (
+        {kassaPosLuxury ? (
           <div
-            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} ${
+            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass} ${
               kassaSxgaDenseTiles ? 'px-2.5 py-2 space-y-2': 'px-3 py-2.5 space-y-2.5'
             }`}
           >
@@ -6297,7 +6313,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           />
           <div
             className={`relative z-10 flex w-full max-w-3xl max-h-[min(88vh,780px)] min-h-0 flex-col overflow-hidden rounded-2xl border shadow-2xl ${ui.tablePickerBorder} ${
-              kassaAppearanceDark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : 'bg-white'
+              kassaPosLuxury ? kassaPlateBgClass : kassaAppearanceDark ? 'bg-[#151a21]' : 'bg-white'
             }`}
           >
             <div className={`flex shrink-0 items-center gap-3 border-b px-4 py-3 ${ui.tablePickerHeader}`}>

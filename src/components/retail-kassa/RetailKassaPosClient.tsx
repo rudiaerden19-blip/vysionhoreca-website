@@ -9,11 +9,11 @@ import {
   filterHamburgerModulesForAccess,
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
-import { createKassaPosRegisterUiTheme } from '@/lib/kassa-pos-register-ui-theme'
-import { createKassaRegisterUiTheme } from '@/lib/kassa-register-ui-theme'
+import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
+import { KassaModePicker } from '@/components/kassa/KassaModePicker'
 import {
   KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
-  useKassaUiDarkSync,
+  useKassaUiLayoutSync,
 } from '@/lib/kassa-register-ui-dark-preference'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import { KassaCartIconTrash } from '@/lib/kassa-ui-icons'
@@ -184,14 +184,9 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
 export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
-  const { dark: appearanceDark, toggle: toggleKassaAppearance } = useKassaUiDarkSync(tenant)
-  const ui = useMemo(
-    () =>
-      appearanceDark
-        ? createKassaPosRegisterUiTheme(true)
-        : createKassaRegisterUiTheme(false),
-    [appearanceDark],
-  )
+  const { layout: kassaLayout, dark: appearanceDark, setLayout: setKassaLayout } =
+    useKassaUiLayoutSync(tenant)
+  const ui = useMemo(() => createKassaThemeForLayout(kassaLayout), [kassaLayout])
 
   const { soundActivated, activateSound } = useKassaSoundActivationGate(tenant)
 
@@ -2395,16 +2390,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           </div>
 
           {KASSA_UI_APPEARANCE_TOGGLE_ENABLED ? (
-            <button
-              type="button"
-              onClick={toggleKassaAppearance}
-              className={headerQuickLinkBtnClass}
-              title={appearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
-            >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
-                {appearanceDark ? t('kassaApp.lightMode') : t('kassaApp.darkMode')}
-              </span>
-            </button>
+            <KassaModePicker
+              layout={kassaLayout}
+              onSelect={setKassaLayout}
+              t={t}
+              triggerClassName={`${headerQuickLinkBtnClass} gap-0.5 sm:gap-1`}
+              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              panelClassName={`overflow-hidden rounded-xl border shadow-xl ${ui.flyMenuBorder} ${ui.shellBg}`}
+              rowHoverClassName={ui.langRowHover}
+              rowActiveClassName={ui.langRowActive}
+              rowInactiveClassName={ui.langRowInactive}
+            />
           ) : null}
 
           <div ref={langRef} className="relative z-[40] shrink-0">
