@@ -273,7 +273,7 @@ export const KASSA_POS_MENU_TILE_IMAGE_FILM =
 
 /** Speels: zelfde tegel, veel minder cream-shimmer. */
 const KASSA_SPEELS_MENU_TILE_STUDIO_BG =
-  'bg-[radial-gradient(ellipse_at_50%_42%,#9c9c9c_0%,#787878_45%,#565656_78%,#444444_100%)]'
+  'bg-[radial-gradient(ellipse_at_50%_42%,#aeaeae_0%,#888888_45%,#666666_78%,#525252_100%)]'
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_WELL =
   `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
