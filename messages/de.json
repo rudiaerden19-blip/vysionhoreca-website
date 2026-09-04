@@ -2807,6 +2807,7 @@
     "modeLight": "Light",
     "modeDark": "Dark",
     "modeSpeels": "Verspielt",
+    "modeClassic": "Klassisch",
     "logout": "Abmelden",
     "offlineBanner": "Offline – Menü aus dem Cache. Bestellungen werden gespeichert und bei Verbindung gesendet.",
     "offlineModeActive": "Offline-Modus aktiv",

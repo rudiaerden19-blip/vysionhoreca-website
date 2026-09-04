@@ -3853,6 +3853,7 @@
     "modeLight": "Light",
     "modeDark": "Dark",
     "modeSpeels": "Speels",
+    "modeClassic": "Klassiek",
     "logout": "Uitloggen",
     "offlineBanner": "Offline – menu geladen uit cache. Bestellingen worden bewaard en verstuurd bij reconnect.",
     "offlineModeActive": "Offline modus actief",

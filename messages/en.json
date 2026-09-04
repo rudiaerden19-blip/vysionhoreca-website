@@ -3853,6 +3853,7 @@
     "modeLight": "Light",
     "modeDark": "Dark",
     "modeSpeels": "Playful",
+    "modeClassic": "Classic",
     "logout": "Log out",
     "offlineBanner": "Offline – menu loaded from cache. Orders are saved and sent when you reconnect.",
     "offlineModeActive": "Offline mode active",

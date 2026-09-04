@@ -6,9 +6,9 @@ export type KassaUiLayoutId = (typeof KASSA_UI_LAYOUT_IDS)[number]
 
 export const KASSA_UI_LAYOUT_OPTIONS: { id: KassaUiLayoutId; labelKey: string }[] = [
   { id: 'light', labelKey: 'kassaApp.modeLight' },
-  { id: 'dark', labelKey: 'kassaApp.modeDark' },
+  { id: 'speels', labelKey: 'kassaApp.modeDark' },
   { id: 'luxe', labelKey: 'kassaApp.modeLuxe' },
-  { id: 'speels', labelKey: 'kassaApp.modeSpeels' },
+  { id: 'dark', labelKey: 'kassaApp.modeClassic' },
 ]
 
 const LEGACY_LAYOUT_MAP: Record<string, KassaUiLayoutId> = {
@@ -34,7 +34,7 @@ export function kassaUiLayoutIsDark(layout: KassaUiLayoutId): boolean {
   return layout !== 'light'
 }
 
-/** Luxe- en Speels-POS-chrome. Dark is de oude gunmetal-kassa. */
+/** Luxe-POS-chrome. Speels is de huidige Dark-look; `dark` is de oude gunmetal-kassa. */
 export function kassaUiLayoutUsesPosLuxury(layout: KassaUiLayoutId): boolean {
   return layout === 'luxe' || layout === 'speels'
 }

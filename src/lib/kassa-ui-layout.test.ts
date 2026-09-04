@@ -1,5 +1,6 @@
 import {
   isMissingKassaUiLayoutColumn,
+  KASSA_UI_LAYOUT_OPTIONS,
   kassaUiLayoutIsDark,
   kassaUiLayoutUsesPosLuxury,
   parseKassaUiLayout,
@@ -21,6 +22,13 @@ describe('parseKassaUiLayout', () => {
     expect(parseKassaUiLayout(null, true)).toBe('luxe')
     expect(parseKassaUiLayout(undefined, null)).toBe('luxe')
     expect(parseKassaUiLayout('nope', false)).toBe('light')
+  })
+})
+
+describe('KASSA_UI_LAYOUT_OPTIONS', () => {
+  it('zet de huidige Speels-look als Dark onder Light', () => {
+    expect(KASSA_UI_LAYOUT_OPTIONS.map((o) => o.id)).toEqual(['light', 'speels', 'luxe', 'dark'])
+    expect(KASSA_UI_LAYOUT_OPTIONS[1]?.labelKey).toBe('kassaApp.modeDark')
   })
 })
 

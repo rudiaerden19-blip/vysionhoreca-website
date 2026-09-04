@@ -3307,6 +3307,7 @@
     "modeLight": "Light",
     "modeDark": "Dark",
     "modeSpeels": "Juguetón",
+    "modeClassic": "Clásico",
     "logout": "Cerrar sesión",
     "offlineBanner": "Sin conexión: menú en caché. Los pedidos se guardan y se envían al reconectar.",
     "offlineModeActive": "Modo sin conexión activo",

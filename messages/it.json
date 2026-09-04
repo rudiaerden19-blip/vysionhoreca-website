@@ -3307,6 +3307,7 @@
     "modeLight": "Light",
     "modeDark": "Dark",
     "modeSpeels": "Giocoso",
+    "modeClassic": "Classico",
     "logout": "Esci",
     "offlineBanner": "Offline – menu dalla cache. Gli ordini vengono salvati e inviati alla riconnessione.",
     "offlineModeActive": "Modalità offline attiva",

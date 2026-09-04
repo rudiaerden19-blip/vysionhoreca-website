@@ -2807,6 +2807,7 @@
     "modeLight": "Light",
     "modeDark": "Dark",
     "modeSpeels": "Ludique",
+    "modeClassic": "Classique",
     "logout": "Déconnexion",
     "offlineBanner": "Hors ligne – menu en cache. Les commandes sont enregistrées et envoyées à la reconnexion.",
     "offlineModeActive": "Mode hors ligne actif",
