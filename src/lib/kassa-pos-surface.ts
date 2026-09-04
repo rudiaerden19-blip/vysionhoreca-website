@@ -213,7 +213,7 @@ export const KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA =
   `pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden ${KASSA_POS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_POS_MENU_TILE_IMG_CLASS =
-  'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
+  'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-cover object-center mix-blend-multiply'
 
 export const KASSA_POS_MENU_TILE_IMG_FRAME =
   `pointer-events-none relative z-0 h-full w-full min-h-0 min-w-0 overflow-hidden ${KASSA_POS_MENU_TILE_STUDIO_BG}`
