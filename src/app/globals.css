@@ -500,16 +500,20 @@ input[type="number"] {
 /* Luxe: één doek-vlak achter het hele kassascherm (nooit tegelen). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
-  background-color: #c4a46a !important;
-  background-image: none !important;
+  background-color: #c4b08a !important;
+  background-image: url('/images/kassa-luxe-doek.jpg') !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-attachment: fixed !important;
 }
 
 .kassa-luxe-leather-plane {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: #c4a46a;
+  background-color: #c4b08a;
   background-image: url('/images/kassa-luxe-doek.jpg');
   background-size: cover;
   background-repeat: no-repeat;

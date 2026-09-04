@@ -5427,11 +5427,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className={`flex min-h-0 flex-1 flex-col ${kassaAppearanceDark ? 'px-3 pb-3 pt-1.5': ''}`}>
             <div
               className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
-                kassaLayout === 'luxe'
-                  ? KASSA_LUXE_CART_GRAIN_CLASS
-                  : kassaRecessTrayClass
-                    ? `${kassaRecessTrayClass} ${KASSA_POS_BTN_SHAPE}`
-                    : ''
+                kassaRecessTrayClass ? `${kassaRecessTrayClass} ${KASSA_POS_BTN_SHAPE}`: ''
               }`}
             >
           {/* Grid — min-h-0 nodig: anders groeit de flex-child mee met alle tegels en wordt onderaan afgekapt zonder scroll */}
