@@ -724,7 +724,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       <button
         type="button"
         data-kassa-category-id={category.id != null ? String(category.id) : undefined}
-        className={`touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left shadow-[0_8px_22px_rgba(0,0,0,0.35)] active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+        className={`touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
       >
         <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {category.name}
@@ -876,7 +876,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       <button
         type="button"
         data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-        className={`touch-manipulation select-none relative flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left shadow-[0_8px_22px_rgba(0,0,0,0.35)] active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+        className={`touch-manipulation select-none relative flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
       >
         <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {product.name}
