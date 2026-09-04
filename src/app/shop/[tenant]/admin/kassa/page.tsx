@@ -432,6 +432,11 @@ const KASSA_CLASSIC_TILE_PRICE =
 const KASSA_CLASSIC_TILE_PRICE_SXGA =
   'mt-1 text-xs font-bold tabular-nums text-white sm:text-sm'
 
+const KASSA_TERRACE_BTN_FACE = 'bg-emerald-600 text-white hover:bg-emerald-500'
+const KASSA_TERRACE_BTN_FACE_ON = 'bg-emerald-600 text-white ring-2 ring-white/80'
+const KASSA_REMOVE_BTN_FACE =
+  'bg-red-600 text-white hover:bg-red-500 disabled:opacity-100 disabled:pointer-events-none'
+
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5': 'min-h-[2.75rem] py-2'
@@ -5675,15 +5680,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setKassaZoneTab('terrace')
                   setShowTablePicker(true)
                 }}
-                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 rounded-xl font-bold ${kassaFloorZoneButtonTouchClass(
                   kassaSxgaDenseTiles,
-                )} ${
-                  kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace', posChrome)}`
-                    : kassaLight
-                      ? `rounded-xl font-bold ${kassaZoneTab === 'terrace' ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
-                    : `rounded-xl font-bold ${kassaZoneTab === 'terrace' ? KASSA_CLASSIC_ACTION_BTN_FACE_ON : KASSA_CLASSIC_ACTION_BTN_FACE}`
-                }`}
+                )} ${kassaZoneTab === 'terrace' ? KASSA_TERRACE_BTN_FACE_ON : KASSA_TERRACE_BTN_FACE}`}
               >
                 <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneTerrace')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
@@ -6157,7 +6156,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 type="button"
                 onClick={clearCart}
                 disabled={billLines.length === 0}
-                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                className={`flex items-center justify-center px-1 rounded-xl ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
@@ -6310,11 +6309,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 type="button"
                 onClick={clearCart}
                 disabled={billLines.length === 0}
-                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
-                  kassaLight
-                    ? `${KASSA_LIGHT_BTN_FACE} disabled:opacity-100 disabled:pointer-events-none`
-                    : `${KASSA_CLASSIC_ACTION_BTN_FACE} disabled:opacity-100 disabled:pointer-events-none`
-                } ${kassaFooterActionTouchMinHClass(
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
