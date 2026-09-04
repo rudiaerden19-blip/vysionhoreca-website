@@ -416,10 +416,10 @@ const KASSA_LIGHT_HEADER_QUICK_LINK_BTN =
 
 const KASSA_CLASSIC_BTN_FACE = 'bg-[#1e3a5f] text-white hover:bg-[#254a75]'
 const KASSA_CLASSIC_BTN_FACE_ON = 'bg-[#2b6cb0] text-white'
-/** Zones, besteltype, footer — helderblauw; tegelkleuren blijven rij-blauw. */
-const KASSA_CLASSIC_ACTION_BTN_FACE = 'bg-[#188ec6] text-white hover:brightness-110'
+/** Zones, besteltype, footer en snelmenu — donkergrijs #2d2d2d. Tegelkleuren blijven. */
+const KASSA_CLASSIC_ACTION_BTN_FACE = 'bg-[#2d2d2d] text-white hover:bg-[#3a3a3a]'
 const KASSA_CLASSIC_ACTION_BTN_FACE_ON =
-  'bg-[#188ec6] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]'
+  'bg-[#2d2d2d] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]'
 const KASSA_CLASSIC_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5 ${KASSA_CLASSIC_BTN_FACE}`
 const KASSA_CLASSIC_TILE_NAME =
@@ -4708,7 +4708,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         kassaPosLuxury
           ? kassaPosQuickMenuPanelButtonClass(posChrome)
           : kassaClassicDark
-            ? `rounded-xl ${KASSA_CLASSIC_BTN_FACE} active:brightness-95`
+            ? `rounded-xl ${KASSA_CLASSIC_ACTION_BTN_FACE} active:brightness-95`
             : `rounded-xl ${KASSA_LIGHT_BTN_FACE} ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
         !enabled
           ? kassaLight
