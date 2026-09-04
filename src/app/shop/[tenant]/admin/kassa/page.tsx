@@ -6251,7 +6251,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 onClick={() => { void openCashDrawer() }}
-                className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe] active:brightness-95 ${kassaFooterActionTouchMinHClass(
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
+                  kassaLight
+                    ? KASSA_LIGHT_BTN_FACE
+                    : 'bg-[#58CCFF] text-[#063042] hover:bg-[#47c6fe]'
+                } ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
@@ -6263,7 +6267,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 type="button"
                 onClick={() => { void printDraftBonFromCart({ draftCopies: 1 }) }}
                 disabled={draftBonLineItems.length === 0 || draftBonPrinting}
-                className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-yellow-400 text-yellow-950 hover:bg-yellow-300 active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${kassaFooterActionTouchMinHClass(
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${
+                  kassaLight
+                    ? KASSA_LIGHT_BTN_FACE
+                    : 'bg-yellow-400 text-yellow-950 hover:bg-yellow-300'
+                } ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
@@ -6274,7 +6282,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 type="button"
                 onClick={clearCart}
                 disabled={billLines.length === 0}
-                className={`flex flex-col items-center justify-center gap-1 rounded-xl bg-rose-500 text-white hover:bg-rose-600 active:brightness-95 disabled:bg-rose-900/50 ${kassaFooterActionTouchMinHClass(
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 disabled:opacity-45 ${
+                  kassaLight
+                    ? KASSA_LIGHT_BTN_FACE
+                    : 'bg-rose-500 text-white hover:bg-rose-600 disabled:bg-rose-900/50'
+                } ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
