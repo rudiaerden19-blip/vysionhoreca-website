@@ -6,8 +6,11 @@
 /** Korrelgrijs — header, zijbalk, kader (zie `globals.css`). */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
-/** Luxe-kassa: Chesterfield-leer (alleen deluxe mode). */
-export const KASSA_LUXE_LEATHER_BG_CLASS = 'kassa-luxe-leather-bg'
+/** Luxe-kassa: html/body-klasse — geen leer op innerlijke vakken. */
+export const KASSA_LUXE_HTML_CLASS = 'kassa-luxe-leather'
+
+/** Luxe-kassa: één vast viewport-vlak (niet herhalen, niet per paneel). */
+export const KASSA_LUXE_LEATHER_PLANE_CLASS = 'kassa-luxe-leather-plane'
 
 export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 

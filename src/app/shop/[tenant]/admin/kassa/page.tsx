@@ -91,6 +91,8 @@ import {
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
+  KASSA_LUXE_HTML_CLASS,
+  KASSA_LUXE_LEATHER_PLANE_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
@@ -1145,11 +1147,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const body = document.body
     html.classList.add('vysion-kassa-root')
     body.classList.add('vysion-kassa-root')
+    if (kassaLayout === 'luxe') {
+      html.classList.add(KASSA_LUXE_HTML_CLASS)
+      body.classList.add(KASSA_LUXE_HTML_CLASS)
+    } else {
+      html.classList.remove(KASSA_LUXE_HTML_CLASS)
+      body.classList.remove(KASSA_LUXE_HTML_CLASS)
+    }
     return () => {
       html.classList.remove('vysion-kassa-root')
       body.classList.remove('vysion-kassa-root')
+      html.classList.remove(KASSA_LUXE_HTML_CLASS)
+      body.classList.remove(KASSA_LUXE_HTML_CLASS)
     }
-  }, [])
+  }, [kassaLayout])
 
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
   const audioUnlockOnceRef = useRef(false)
@@ -4982,9 +4993,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   return (
     <div
-      className="flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
+      className="relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
       data-testid="kassa-app"
     >
+      {kassaLayout === 'luxe' ? (
+        <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
+      ) : null}
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
@@ -4993,7 +5007,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           performLogout()
         }}
       />
-      <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
+      <div className={`relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden ${ui.shellBg}`}>
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div

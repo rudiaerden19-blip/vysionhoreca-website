@@ -12,7 +12,6 @@ import {
   KASSA_POS_NUMPAD_KEY,
   KASSA_POS_CART_ROW,
   KASSA_POS_CART_THUMB_SHELL,
-  KASSA_LUXE_LEATHER_BG_CLASS,
   KASSA_POS_MENU_TRANSPARENT_CLASS,
 } from '@/lib/kassa-pos-surface'
 import type { KassaUiLayoutId } from '@/lib/kassa-ui-layout'
@@ -24,7 +23,7 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
 
   return {
     ...base,
-    shellBg: KASSA_LUXE_LEATHER_BG_CLASS,
+    shellBg: 'bg-transparent',
     soundBackdrop: 'bg-[#161310]',
     flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] bg-[#161310]`,
     flyMenuBorder: 'border-[#3d352c]',
