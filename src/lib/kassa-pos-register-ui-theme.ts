@@ -47,7 +47,7 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
     numpadBarBg: KASSA_POS_MENU_TRANSPARENT_CLASS,
     clockTileBg: `${KASSA_CLOCK_TILE_ON_BAR} p-1`,
     clockTileHover: 'hover:brightness-105',
-    numpadKeyNum: `${KASSA_POS_NUMPAD_KEY} border-[#d4b483]`,
+    numpadKeyNum: KASSA_POS_NUMPAD_KEY,
     cartRowBg: KASSA_POS_CART_ROW,
     cartThumbPlaceholder: KASSA_POS_CART_THUMB_SHELL,
     modalConfirmBg: `${KASSA_POS_BTN_SHAPE} w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#2a241e] border border-[#14110e]`,

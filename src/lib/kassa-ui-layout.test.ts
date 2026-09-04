@@ -5,7 +5,11 @@ import {
   kassaUiLayoutUsesPosLuxury,
   parseKassaUiLayout,
 } from './kassa-ui-layout'
-import { kassaPosButtonClass, kassaPosCheckoutButtonClass } from './kassa-pos-surface'
+import {
+  kassaPosButtonClass,
+  kassaPosCheckoutButtonClass,
+  kassaPosQuickMenuPanelButtonClass,
+} from './kassa-pos-surface'
 
 describe('parseKassaUiLayout', () => {
   it('houdt een geldige id', () => {
@@ -64,9 +68,14 @@ describe('isMissingKassaUiLayoutColumn', () => {
 })
 
 describe('Speels bruine knoppen', () => {
-  it('laat ongeselecteerde Speels-knoppen zonder beige rand', () => {
+  it('laat ongeselecteerde Speels- en Luxe-knoppen zonder beige rand', () => {
     expect(kassaPosButtonClass(false, 'speels')).not.toContain('#d4b483')
-    expect(kassaPosButtonClass(false, 'luxe')).toContain('#d4b483')
+    expect(kassaPosButtonClass(false, 'luxe')).not.toContain('#d4b483')
+  })
+
+  it('houdt de gele kader alleen op Luxe-snelmenu-knoppen', () => {
+    expect(kassaPosQuickMenuPanelButtonClass('luxe')).toContain('#d4b483')
+    expect(kassaPosQuickMenuPanelButtonClass('speels')).not.toContain('#d4b483')
   })
 
   it('maakt geselecteerde knoppen zwart met zilveren rand', () => {

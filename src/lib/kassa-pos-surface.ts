@@ -41,8 +41,6 @@ export const KASSA_POS_SELECTED_LIFT_SHADOW =
 
 const KASSA_BTN_EDGE = `border border-[#3d352c] ${KASSA_POS_SUBTLE_LIFT_SHADOW}`
 
-const KASSA_LUXE_BTN_EDGE = `border border-[#d4b483] ${KASSA_POS_SUBTLE_LIFT_SHADOW}`
-
 const KASSA_LUXE_BTN_PRESS = [
   'transition-[transform,box-shadow,filter,background] duration-100 ease-out',
   'active:translate-y-[2px]',
@@ -78,8 +76,8 @@ export const KASSA_POS_BTN = [
 
 export const KASSA_POS_BTN_LUXE = [
   KASSA_BTN_FACE,
-  KASSA_LUXE_BTN_EDGE,
-  KASSA_LUXE_BTN_PRESS,
+  KASSA_BTN_EDGE,
+  KASSA_POS_BTN_PRESS,
   KASSA_BTN_PRESS_FACE,
   KASSA_POS_BTN_DISABLED_SAME_LOOK,
   'text-[#f0f0f0] disabled:text-[#f0f0f0]',
