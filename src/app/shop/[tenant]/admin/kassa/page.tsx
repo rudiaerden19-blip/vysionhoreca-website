@@ -5411,7 +5411,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           : kassaClassicDark
                             ? `rounded-lg border-transparent ${active ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                           : active
-                            ? 'rounded-lg border-[#58CCFF] bg-[#58CCFF] text-black shadow-sm'
+                            ? `rounded-lg border-transparent ${KASSA_LIGHT_BTN_FACE_ON}`
                             : `rounded-lg border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
                       }`}
                     >
