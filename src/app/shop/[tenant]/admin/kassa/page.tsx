@@ -5602,9 +5602,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
-            kassaPosLuxury
-              ? `border-l ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
-              : ui.sidebarBg
+            kassaLayout === 'luxe'
+              ? kassaPlateBgClass
+              : kassaPosLuxury
+                ? `border-l ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
+                : ui.sidebarBg
           }`}
         >
 
@@ -6097,7 +6099,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Totaal + knoppen — zelfde flow/labels als vóór UI-pass; donker = alleen POS-styling */}
         {kassaPosLuxury ? (
           <div
-            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass} ${
+            className={`sticky bottom-0 z-10 shrink-0 ${kassaLayout === 'luxe' ? '' : `border-t ${KASSA_POS_RULE_BLACK}`} ${kassaPlateBgClass} ${
               kassaSxgaDenseTiles ? 'px-2.5 py-2 space-y-2': 'px-3 py-2.5 space-y-2.5'
             }`}
           >
