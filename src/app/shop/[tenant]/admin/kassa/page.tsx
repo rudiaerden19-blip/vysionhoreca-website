@@ -418,6 +418,14 @@ const KASSA_CLASSIC_BTN_FACE = 'bg-[#1e3a5f] text-white hover:bg-[#254a75]'
 const KASSA_CLASSIC_BTN_FACE_ON = 'bg-[#2b6cb0] text-white'
 const KASSA_CLASSIC_HEADER_QUICK_LINK_BTN =
   `inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl font-bold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5 ${KASSA_CLASSIC_BTN_FACE}`
+const KASSA_CLASSIC_TILE_NAME =
+  'm-0 line-clamp-3 text-center text-lg font-bold leading-tight tracking-tight text-white sm:text-xl md:text-[1.35rem]'
+const KASSA_CLASSIC_TILE_NAME_SXGA =
+  'm-0 line-clamp-3 text-center text-base font-bold leading-tight tracking-tight text-white sm:text-lg'
+const KASSA_CLASSIC_TILE_PRICE =
+  'mt-1.5 text-base font-bold tabular-nums text-white sm:text-lg'
+const KASSA_CLASSIC_TILE_PRICE_SXGA =
+  'mt-1.5 text-sm font-bold tabular-nums text-white sm:text-base'
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(sxga: boolean): string {
@@ -707,7 +715,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
         data-kassa-category-id={category.id != null ? String(category.id) : undefined}
         className={`touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left shadow-[0_8px_22px_rgba(0,0,0,0.35)] active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
       >
-        <p className="m-0 line-clamp-3 text-center text-sm font-bold leading-tight tracking-tight text-white sm:text-[15px] md:text-base">
+        <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {category.name}
         </p>
       </button>
@@ -859,10 +867,10 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
         data-kassa-product-id={product.id != null ? String(product.id) : undefined}
         className={`touch-manipulation select-none relative flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left shadow-[0_8px_22px_rgba(0,0,0,0.35)] active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
       >
-        <p className="m-0 line-clamp-3 text-center text-sm font-bold leading-tight tracking-tight text-white sm:text-[15px] md:text-base">
+        <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {product.name}
         </p>
-        <span className="mt-1 text-xs font-bold tabular-nums text-white/90">
+        <span className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_PRICE_SXGA : KASSA_CLASSIC_TILE_PRICE}>
           €{Number(product.price ?? 0).toFixed(2)}
         </span>
         {inCart > 0 ? (
