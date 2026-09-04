@@ -517,11 +517,13 @@ html.kassa-luxe-leather body {
 }
 
 .kassa-luxe-cart-grain {
-  background-color: #d0c4b0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
-  background-size: 64px 64px;
-  background-repeat: repeat;
-  background-blend-mode: multiply;
+  background-color: #c4a46a;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #e0c48a 0%, #c4a46a 48%, #a8884e 100%);
+  background-size: 64px 64px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+  background-blend-mode: overlay, normal;
   border-radius: 0.75rem;
 }
 
