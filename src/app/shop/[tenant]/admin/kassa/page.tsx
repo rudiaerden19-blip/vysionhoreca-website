@@ -647,11 +647,40 @@ const KASSA_MENU_TILE_LABEL_CLASS =
 const KASSA_MENU_TILE_LABEL_CLASS_SXGA =
   'm-0 line-clamp-1 text-center text-xs font-black leading-tight tracking-tight text-black sm:text-[13px]'
 
+/** Oude dark mode (gunmetal) — geen witte kaarten, geen espresso-studio. */
+const KASSA_DARK_TILE_BUTTON_CLASS_BASE =
+  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-zinc-600 bg-[#1a2230] text-left shadow-[0_8px_30px_rgba(0,0,0,0.45)] active:brightness-95'
+const KASSA_DARK_TILE_IMAGE_WELL =
+  'pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden bg-[#151a21]'
+const KASSA_DARK_TILE_IMAGE_WELL_SXGA =
+  'pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden bg-[#151a21]'
+const KASSA_DARK_TILE_PLACEHOLDER =
+  'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-[#151a21] px-2'
+const KASSA_DARK_TILE_PLACEHOLDER_SXGA =
+  'pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden bg-[#151a21] px-2 aspect-square'
+const KASSA_DARK_TILE_LABEL_WRAP =
+  'pointer-events-none shrink-0 w-full border-t border-zinc-600 bg-[#151a21] px-2 pb-2 pt-1.5 sm:px-3'
+const KASSA_DARK_TILE_LABEL_WRAP_SXGA =
+  'pointer-events-none shrink-0 w-full border-t border-zinc-600 bg-[#151a21] px-2 pb-1.5 pt-0 mt-1.5 sm:px-3 sm:pb-2 sm:mt-1.5 sm:pt-0'
+const KASSA_DARK_TILE_LABEL_CLASS =
+  'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-tight text-zinc-50 sm:text-[15px] md:text-base'
+const KASSA_DARK_TILE_LABEL_CLASS_SXGA =
+  'm-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-tight text-zinc-50 sm:text-[13px]'
+
+type KassaTileLook = 'light' | 'dark' | 'luxury'
+
+function kassaTileLook(posLuxury: boolean, classicDark: boolean): KassaTileLook {
+  if (posLuxury) return 'luxury'
+  if (classicDark) return 'dark'
+  return 'light'
+}
+
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
   sxgaDenseTileLayout?: boolean
   posLuxuryAppearance?: boolean
+  classicDarkAppearance?: boolean
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
@@ -659,47 +688,73 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   imageUrl,
   sxgaDenseTileLayout,
   posLuxuryAppearance = false,
+  classicDarkAppearance = false,
 }: KassaCategoryTileButtonProps) {
-  const btnClass = posLuxuryAppearance
-    ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
-      : KASSA_MENU_TILE_BUTTON_CLASS
-  const imgWell = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
-      : KASSA_POS_MENU_TILE_IMAGE_WELL
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
-      : KASSA_MENU_TILE_IMAGE_WELL
-  const labelWrap = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
-      : KASSA_POS_MENU_TILE_LABEL_WRAP
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
-      : KASSA_MENU_TILE_LABEL_WRAP
-  const labelClass = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
-      : KASSA_POS_MENU_TILE_LABEL_CLASS
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
-      : KASSA_MENU_TILE_LABEL_CLASS
+  const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance)
+  const btnClass =
+    look === 'luxury'
+      ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
+      : look === 'dark'
+        ? `${KASSA_DARK_TILE_BUTTON_CLASS_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
+          : KASSA_MENU_TILE_BUTTON_CLASS
+  const imgWell =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
+        : KASSA_POS_MENU_TILE_IMAGE_WELL
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_IMAGE_WELL_SXGA
+          : KASSA_DARK_TILE_IMAGE_WELL
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
+          : KASSA_MENU_TILE_IMAGE_WELL
+  const labelWrap =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
+        : KASSA_POS_MENU_TILE_LABEL_WRAP
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_LABEL_WRAP_SXGA
+          : KASSA_DARK_TILE_LABEL_WRAP
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
+          : KASSA_MENU_TILE_LABEL_WRAP
+  const labelClass =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
+        : KASSA_POS_MENU_TILE_LABEL_CLASS
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_LABEL_CLASS_SXGA
+          : KASSA_DARK_TILE_LABEL_CLASS
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
+          : KASSA_MENU_TILE_LABEL_CLASS
 
-  const noImgTop = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA
-      : KASSA_POS_MENU_TILE_PLACEHOLDER_WELL
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
-      : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
+  const noImgTop =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA
+        : KASSA_POS_MENU_TILE_PLACEHOLDER_WELL
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_PLACEHOLDER_SXGA
+          : KASSA_DARK_TILE_PLACEHOLDER
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
+          : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
-  const imgClass = posLuxuryAppearance
-    ? KASSA_POS_MENU_TILE_IMG_CLASS
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
-      : KASSA_MENU_TILE_IMG_CLASS
+  const imgClass =
+    look === 'luxury'
+      ? KASSA_POS_MENU_TILE_IMG_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
+        : KASSA_MENU_TILE_IMG_CLASS
 
   return (
     <button
@@ -750,6 +805,7 @@ type KassaProductTileButtonProps = {
   hasOpts: boolean
   sxgaDenseTileLayout?: boolean
   posLuxuryAppearance?: boolean
+  classicDarkAppearance?: boolean
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
@@ -758,48 +814,74 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   hasOpts,
   sxgaDenseTileLayout,
   posLuxuryAppearance = false,
+  classicDarkAppearance = false,
 }: KassaProductTileButtonProps) {
   const { t } = useLanguage()
-  const btnClass = posLuxuryAppearance
-    ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
-      : KASSA_MENU_TILE_BUTTON_CLASS
-  const imgWell = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
-      : KASSA_POS_MENU_TILE_IMAGE_WELL
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
-      : KASSA_MENU_TILE_IMAGE_WELL
-  const labelWrap = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
-      : KASSA_POS_MENU_TILE_LABEL_WRAP
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
-      : KASSA_MENU_TILE_LABEL_WRAP
-  const labelClass = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
-      : KASSA_POS_MENU_TILE_LABEL_CLASS
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
-      : KASSA_MENU_TILE_LABEL_CLASS
+  const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance)
+  const btnClass =
+    look === 'luxury'
+      ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
+      : look === 'dark'
+        ? `${KASSA_DARK_TILE_BUTTON_CLASS_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
+          : KASSA_MENU_TILE_BUTTON_CLASS
+  const imgWell =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA
+        : KASSA_POS_MENU_TILE_IMAGE_WELL
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_IMAGE_WELL_SXGA
+          : KASSA_DARK_TILE_IMAGE_WELL
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_IMAGE_WELL_SXGA
+          : KASSA_MENU_TILE_IMAGE_WELL
+  const labelWrap =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA
+        : KASSA_POS_MENU_TILE_LABEL_WRAP
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_LABEL_WRAP_SXGA
+          : KASSA_DARK_TILE_LABEL_WRAP
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
+          : KASSA_MENU_TILE_LABEL_WRAP
+  const labelClass =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
+        : KASSA_POS_MENU_TILE_LABEL_CLASS
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? KASSA_DARK_TILE_LABEL_CLASS_SXGA
+          : KASSA_DARK_TILE_LABEL_CLASS
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
+          : KASSA_MENU_TILE_LABEL_CLASS
 
-  const noImgTop = posLuxuryAppearance
-    ? sxgaDenseTileLayout
-      ? `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA} pt-2`
-      : `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL} pt-4`
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
-      : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
+  const noImgTop =
+    look === 'luxury'
+      ? sxgaDenseTileLayout
+        ? `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL_SXGA} pt-2`
+        : `${KASSA_POS_MENU_TILE_PLACEHOLDER_WELL} pt-4`
+      : look === 'dark'
+        ? sxgaDenseTileLayout
+          ? `${KASSA_DARK_TILE_PLACEHOLDER_SXGA} pt-2`
+          : `${KASSA_DARK_TILE_PLACEHOLDER} pt-4`
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_PLACEHOLDER_WELL_SXGA
+          : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
-  const imgClass = posLuxuryAppearance
-    ? KASSA_POS_MENU_TILE_IMG_CLASS
-    : sxgaDenseTileLayout
-      ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
-      : KASSA_MENU_TILE_IMG_CLASS
+  const imgClass =
+    look === 'luxury'
+      ? KASSA_POS_MENU_TILE_IMG_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
+        : KASSA_MENU_TILE_IMG_CLASS
 
   return (
     <button
@@ -889,6 +971,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const { layout: kassaLayout, dark: kassaAppearanceDark, setLayout: setKassaLayout } =
     useKassaUiLayoutSync(tenant)
   const kassaPosLuxury = kassaUiLayoutUsesPosLuxury(kassaLayout)
+  const kassaClassicDark = kassaLayout === 'dark'
   const kassaPlateBgClass =
     kassaLayout === 'speels'
       ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
@@ -4542,12 +4625,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     (enabled: boolean) =>
       [
         'flex min-h-[3.1rem] min-w-0 items-center justify-center px-1 py-1.5 text-center text-[11px] font-medium leading-tight tracking-[0.02em] sm:min-h-[3.35rem] sm:px-1.5 sm:text-xs',
-        kassaAppearanceDark
+        kassaPosLuxury
           ? kassaPosQuickMenuPanelButtonClass()
-          : `rounded-xl bg-[#161616] text-[#f0f0f0] ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
+          : kassaClassicDark
+            ? 'rounded-xl border border-zinc-600 bg-[#263043] text-zinc-50 hover:bg-[#2f3b52] active:brightness-95'
+            : `rounded-xl bg-[#161616] text-[#f0f0f0] ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
         !enabled ? 'pointer-events-none opacity-40': '',
       ].join(' '),
-    [kassaAppearanceDark],
+    [kassaPosLuxury, kassaClassicDark],
   )
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
@@ -5267,6 +5352,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         imageUrl={tile?.url}
                         sxgaDenseTileLayout={kassaSxgaDenseTiles}
                         posLuxuryAppearance={kassaPosLuxury}
+                        classicDarkAppearance={kassaClassicDark}
                       />
                     )
                   })}
@@ -5308,6 +5394,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           hasOpts={hasOpts}
                           sxgaDenseTileLayout={kassaSxgaDenseTiles}
                           posLuxuryAppearance={kassaPosLuxury}
+                          classicDarkAppearance={kassaClassicDark}
                         />
                       )
                     })}
@@ -5318,7 +5405,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             data-testid="kassa-quick-menu-panel"
             className={`shrink-0 border-t px-2 py-1.5 ${
-              kassaAppearanceDark ? KASSA_POS_RULE_BLACK : 'border-gray-300'
+              kassaPosLuxury
+                ? KASSA_POS_RULE_BLACK
+                : kassaClassicDark
+                  ? 'border-zinc-600'
+                  : 'border-gray-300'
             }`}
           >
             <div className="grid w-full grid-cols-8 gap-1 sm:gap-1.5">
