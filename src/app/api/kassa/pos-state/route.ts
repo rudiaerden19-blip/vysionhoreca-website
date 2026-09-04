@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-import { isKassaUiLayoutId, kassaUiLayoutIsDark, parseKassaUiLayout } from '@/lib/kassa-ui-layout'
+import { kassaUiLayoutIsDark, parseKassaUiLayout } from '@/lib/kassa-ui-layout'
 
 export const dynamic = 'force-dynamic'
 
@@ -127,9 +127,10 @@ export async function PATCH(request: NextRequest) {
   const patch: Record<string, unknown> = { tenant_slug, updated_at: new Date().toISOString() }
   if ('active_staff_id' in body) patch.active_staff_id = body.active_staff_id ?? null
   if ('active_staff_name' in body) patch.active_staff_name = body.active_staff_name?.trim() || null
-  if ('kassa_ui_layout' in body && isKassaUiLayoutId(body.kassa_ui_layout)) {
-    patch.kassa_ui_layout = body.kassa_ui_layout
-    patch.kassa_ui_dark = kassaUiLayoutIsDark(body.kassa_ui_layout)
+  if ('kassa_ui_layout' in body && body.kassa_ui_layout != null) {
+    const layout = parseKassaUiLayout(body.kassa_ui_layout, body.kassa_ui_dark)
+    patch.kassa_ui_layout = layout
+    patch.kassa_ui_dark = kassaUiLayoutIsDark(layout)
   } else if ('kassa_ui_dark' in body) {
     patch.kassa_ui_dark = body.kassa_ui_dark ?? null
     if (typeof body.kassa_ui_dark === 'boolean') {

@@ -88,8 +88,8 @@ import {
 import {
   KASSA_POS_BTN_SHAPE,
   KASSA_POS_CHECKOUT_BTN,
-  KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS,
-  KASSA_NAVY_MENU_RECESS_TRAY_CLASS,
+  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_RULE_BLACK,
@@ -890,16 +890,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     useKassaUiLayoutSync(tenant)
   const kassaPosLuxury = kassaUiLayoutUsesPosLuxury(kassaLayout)
   const kassaPlateBgClass =
-    kassaLayout === 'navy'
-      ? KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS
+    kassaLayout === 'speels'
+      ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
       : kassaLayout === 'luxe'
         ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
         : kassaAppearanceDark
           ? 'bg-[#0b0f14]'
           : 'bg-[#e3e3e3]'
   const kassaRecessTrayClass =
-    kassaLayout === 'navy'
-      ? KASSA_NAVY_MENU_RECESS_TRAY_CLASS
+    kassaLayout === 'speels'
+      ? KASSA_SPEELS_MENU_RECESS_TRAY_CLASS
       : kassaLayout === 'luxe'
         ? KASSA_POS_MENU_RECESS_TRAY_CLASS
         : ''

@@ -6,9 +6,9 @@
 /** Korrelgrijs — header, zijbalk, kader (zie `globals.css`). */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
-export const KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS = 'kassa-navy-plate-grain'
+export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 
-export const KASSA_NAVY_MENU_RECESS_TRAY_CLASS = 'kassa-navy-recess-tray'
+export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
 export const KASSA_FLOOR_TERRACE_GRAIN_CLASS = 'gks-floor-terrace-grain'

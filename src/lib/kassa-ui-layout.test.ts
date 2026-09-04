@@ -6,8 +6,13 @@ import {
 
 describe('parseKassaUiLayout', () => {
   it('houdt een geldige id', () => {
-    expect(parseKassaUiLayout('slate', true)).toBe('slate')
-    expect(parseKassaUiLayout('navy', false)).toBe('navy')
+    expect(parseKassaUiLayout('dark', true)).toBe('dark')
+    expect(parseKassaUiLayout('speels', false)).toBe('speels')
+  })
+
+  it('mapt oude ids', () => {
+    expect(parseKassaUiLayout('slate', true)).toBe('dark')
+    expect(parseKassaUiLayout('navy', false)).toBe('speels')
   })
 
   it('valt terug op luxe als donker, light als licht', () => {
@@ -21,14 +26,14 @@ describe('kassaUiLayout flags', () => {
   it('alleen light is niet-donker', () => {
     expect(kassaUiLayoutIsDark('light')).toBe(false)
     expect(kassaUiLayoutIsDark('luxe')).toBe(true)
-    expect(kassaUiLayoutIsDark('slate')).toBe(true)
-    expect(kassaUiLayoutIsDark('navy')).toBe(true)
+    expect(kassaUiLayoutIsDark('dark')).toBe(true)
+    expect(kassaUiLayoutIsDark('speels')).toBe(true)
   })
 
-  it('POS-luxe alleen voor luxe en navy', () => {
+  it('POS-luxe alleen voor luxe en speels', () => {
     expect(kassaUiLayoutUsesPosLuxury('luxe')).toBe(true)
-    expect(kassaUiLayoutUsesPosLuxury('navy')).toBe(true)
-    expect(kassaUiLayoutUsesPosLuxury('slate')).toBe(false)
+    expect(kassaUiLayoutUsesPosLuxury('speels')).toBe(true)
+    expect(kassaUiLayoutUsesPosLuxury('dark')).toBe(false)
     expect(kassaUiLayoutUsesPosLuxury('light')).toBe(false)
   })
 })

@@ -4,7 +4,7 @@ import {
 } from '@/lib/kassa-register-ui-theme'
 import {
   KASSA_CLOCK_TILE_ON_BAR,
-  KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_BTN,
   KASSA_POS_BTN_SHAPE,
   KASSA_POS_FIELD,
@@ -57,36 +57,37 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
   }
 }
 
-/** Hotel-navy POS — zelfde knopvorm als luxe, koel donkerblauw. */
-export function createKassaNavyRegisterUiTheme(): KassaRegisterUiTheme {
+/** Speels — teal + koraal, zelfde knopvorm als luxe. */
+export function createKassaSpeelsRegisterUiTheme(): KassaRegisterUiTheme {
   const base = createKassaPosRegisterUiTheme(true)
   return {
     ...base,
-    shellBg: KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS,
-    soundBackdrop: 'bg-[#101820]',
-    flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#0c1218] ${KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS}`,
-    flyMenuBorder: 'border-[#2a3644]',
-    flyMenuDivider: 'border-[#2a3644]',
-    flyMenuRowHover: 'hover:bg-[#1c2836]',
-    flyMenuRowActive: 'bg-[#1c2836]',
-    langPanel: `absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden ${KASSA_POS_BTN_SHAPE} border border-[#0c1218] bg-[#1a2430] shadow-lg`,
-    langRowActive: 'bg-[#1c2836] font-semibold text-[#d4b483]',
-    categoryStripBorder: 'border-[#1a2430]',
-    productTileSolidBg: 'bg-[#1a2430]',
-    productTileSolidBorder: 'border-[#0c1218]',
-    productTileFooterBar: `border-[#0c1218] ${KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS}`,
-    ringOffset: 'ring-offset-[#101820]',
-    tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#0c1218] ${KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS} overflow-hidden`,
-    tablePickerHeader: `border-b border-[#0c1218] ${KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS}`,
-    tablePickerFooterBar: `p-2 border-t border-[#0c1218] ${KASSA_NAVY_MENU_PLATE_SHELL_BG_CLASS} flex gap-2`,
-    modalConfirmBg: `${KASSA_POS_BTN_SHAPE} w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#1a2430] border border-[#0c1218]`,
-    printFallbackPanel: `w-full max-w-md ${KASSA_POS_BTN_SHAPE} border border-[#0c1218] bg-[#1a2430] p-5 shadow-lg sm:p-6`,
+    shellBg: KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
+    soundBackdrop: 'bg-[#12241f]',
+    flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS}`,
+    flyMenuBorder: 'border-[#2a4a42]',
+    flyMenuDivider: 'border-[#2a4a42]',
+    flyMenuRowHover: 'hover:bg-[#1c3832]',
+    flyMenuRowActive: 'bg-[#1c3832]',
+    langPanel: `absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden ${KASSA_POS_BTN_SHAPE} border border-[#0c1c18] bg-[#1a332c] shadow-lg`,
+    langRowActive: 'bg-[#1c3832] font-semibold text-[#ff8a5b]',
+    categoryStripBorder: 'border-[#1a332c]',
+    productTileSolidBg: 'bg-[#1a332c]',
+    productTileSolidBorder: 'border-[#0c1c18]',
+    productTileFooterBar: `border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS}`,
+    ringOffset: 'ring-offset-[#12241f]',
+    tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} overflow-hidden`,
+    tablePickerHeader: `border-b border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS}`,
+    tablePickerFooterBar: `p-2 border-t border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} flex gap-2`,
+    modalConfirmBg: `${KASSA_POS_BTN_SHAPE} w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#1a332c] border border-[#0c1c18]`,
+    printFallbackPanel: `w-full max-w-md ${KASSA_POS_BTN_SHAPE} border border-[#0c1c18] bg-[#1a332c] p-5 shadow-lg sm:p-6`,
+    priceAccentClass: 'text-[#58CCFF]',
   }
 }
 
 export function createKassaThemeForLayout(layout: KassaUiLayoutId): KassaRegisterUiTheme {
   if (layout === 'light') return createKassaRegisterUiTheme(false)
-  if (layout === 'slate') return createKassaRegisterUiTheme(true)
-  if (layout === 'navy') return createKassaNavyRegisterUiTheme()
+  if (layout === 'dark') return createKassaRegisterUiTheme(true)
+  if (layout === 'speels') return createKassaSpeelsRegisterUiTheme()
   return createKassaPosRegisterUiTheme(true)
 }
