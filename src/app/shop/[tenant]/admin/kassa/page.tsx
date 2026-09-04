@@ -91,7 +91,7 @@ import {
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
-  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_LUXE_LEATHER_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
@@ -1062,7 +1062,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     kassaLayout === 'speels'
       ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
       : kassaLayout === 'luxe'
-        ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
+        ? KASSA_LUXE_LEATHER_BG_CLASS
         : kassaAppearanceDark
           ? 'bg-[#0b0f14]'
           : 'bg-[#e3e3e3]'

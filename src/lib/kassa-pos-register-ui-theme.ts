@@ -12,7 +12,7 @@ import {
   KASSA_POS_NUMPAD_KEY,
   KASSA_POS_CART_ROW,
   KASSA_POS_CART_THUMB_SHELL,
-  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_LUXE_LEATHER_BG_CLASS,
   KASSA_POS_MENU_TRANSPARENT_CLASS,
 } from '@/lib/kassa-pos-surface'
 import type { KassaUiLayoutId } from '@/lib/kassa-ui-layout'
@@ -24,9 +24,9 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
 
   return {
     ...base,
-    shellBg: KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+    shellBg: KASSA_LUXE_LEATHER_BG_CLASS,
     soundBackdrop: 'bg-[#161310]',
-    flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
+    flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] ${KASSA_LUXE_LEATHER_BG_CLASS}`,
     flyMenuBorder: 'border-[#3d352c]',
     flyMenuDivider: 'border-[#3d352c]',
     flyMenuRowHover: 'hover:bg-[#3a3228]',
@@ -38,12 +38,12 @@ export function createKassaPosRegisterUiTheme(dark: boolean): KassaRegisterUiThe
     categoryStripHover: 'hover:brightness-105',
     productTileSolidBg: 'bg-[#2a241c]',
     productTileSolidBorder: 'border-[#14110e]',
-    productTileFooterBar: `border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
+    productTileFooterBar: `border-[#14110e] ${KASSA_LUXE_LEATHER_BG_CLASS}`,
     sidebarBg: KASSA_POS_MENU_TRANSPARENT_CLASS,
     ringOffset: 'ring-offset-[#161310]',
-    tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} overflow-hidden`,
-    tablePickerHeader: `border-b border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`,
-    tablePickerFooterBar: `p-2 border-t border-[#14110e] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS} flex gap-2`,
+    tablePickerPanel: `absolute left-0 right-0 top-full mt-1 z-50 ${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#14110e] ${KASSA_LUXE_LEATHER_BG_CLASS} overflow-hidden`,
+    tablePickerHeader: `border-b border-[#14110e] ${KASSA_LUXE_LEATHER_BG_CLASS}`,
+    tablePickerFooterBar: `p-2 border-t border-[#14110e] ${KASSA_LUXE_LEATHER_BG_CLASS} flex gap-2`,
     numpadBarBg: KASSA_POS_MENU_TRANSPARENT_CLASS,
     clockTileBg: `${KASSA_CLOCK_TILE_ON_BAR} p-1`,
     clockTileHover: 'hover:brightness-105',
