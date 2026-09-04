@@ -93,6 +93,7 @@ import {
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_LUXE_HTML_CLASS,
   KASSA_LUXE_LEATHER_PLANE_CLASS,
+  KASSA_LUXE_CART_GRAIN_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
@@ -5784,7 +5785,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
             kassaAppearanceDark ? 'px-3 pt-1': 'px-2.5 pt-1.5'
-          }`}
+          } ${kassaLayout === 'luxe' ? KASSA_LUXE_CART_GRAIN_CLASS : ''}`}
         >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {sidebarShowsLegacyParkedHeader ? (

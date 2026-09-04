@@ -12,6 +12,9 @@ export const KASSA_LUXE_HTML_CLASS = 'kassa-luxe-leather'
 /** Luxe-kassa: één vast viewport-vlak (niet herhalen, niet per paneel). */
 export const KASSA_LUXE_LEATHER_PLANE_CLASS = 'kassa-luxe-leather-plane'
 
+/** Luxe-kassa: donkergrijze spikkel onder mandregels (tussen de zijbalkknoppen). */
+export const KASSA_LUXE_CART_GRAIN_CLASS = 'kassa-luxe-cart-grain'
+
 export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 
 export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
