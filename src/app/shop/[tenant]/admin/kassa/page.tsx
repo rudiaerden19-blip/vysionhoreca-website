@@ -91,8 +91,6 @@ import {
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
-  KASSA_LUXE_LEATHER_BG_CLASS,
-  KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
@@ -1062,16 +1060,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     kassaLayout === 'speels'
       ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
       : kassaLayout === 'luxe'
-        ? KASSA_LUXE_LEATHER_BG_CLASS
+        ? 'bg-transparent'
         : kassaAppearanceDark
           ? 'bg-[#0b0f14]'
           : 'bg-[#e3e3e3]'
   const kassaRecessTrayClass =
     kassaLayout === 'speels'
       ? KASSA_SPEELS_MENU_RECESS_TRAY_CLASS
-      : kassaLayout === 'luxe'
-        ? KASSA_POS_MENU_RECESS_TRAY_CLASS
-        : ''
+      : ''
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -5424,7 +5420,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
             className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
-              kassaAppearanceDark ? 'gks-menu-vignette': ''
+              kassaAppearanceDark && kassaLayout !== 'luxe' ? 'gks-menu-vignette': ''
             }`}
           >
             {menuLoading ? (

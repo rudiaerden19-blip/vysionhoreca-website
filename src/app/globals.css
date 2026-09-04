@@ -498,11 +498,11 @@ input[type="number"] {
 }
 
 .kassa-luxe-leather-bg {
-  background-color: #0a0a0a;
+  background-color: #050505;
   background-image: url('/images/kassa-luxe-chesterfield.jpg');
-  background-size: 480px auto;
+  background-size: 420px auto;
   background-repeat: repeat;
-  background-position: center;
+  background-position: top left;
 }
 
 /** Terras-plattegrond: gedempt groen met dezelfde korrel (niet fel). */
