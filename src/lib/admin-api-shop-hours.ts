@@ -6,6 +6,13 @@ import {
   getBelgiumTimeHM,
   getBelgiumWeekdayMon0,
 } from './belgium-date-bounds'
+import {
+  formatTimeShort,
+  isInOpenWindow,
+  isOvernightRange,
+  leftoverOvernightClose,
+  minutesSinceOpen,
+} from './opening-hours-window'
 import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api-internal'
 import { getExceptionalClosings } from './admin-api-exceptional-closings'
 import { adminDb } from './admin-db-client'
@@ -79,41 +86,12 @@ export interface ShopStatus {
   nextOpenDay?: string
 }
 
-function formatTimeShort(time: string): string {
-  if (!time) return ''
-  return time.slice(0, 5)
-}
-
 function subtractMinutes(timeStr: string, minutes: number): string {
   const [hours, mins] = timeStr.split(':').map(Number)
   const date = new Date()
   date.setHours(hours, mins, 0, 0)
   date.setMinutes(date.getMinutes() - minutes)
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-}
-
-function toMinutes(time: string): number {
-  const [h, m] = formatTimeShort(time || '00:00').split(':').map(Number)
-  return (Number.isFinite(h) ? h : 0) * 60 + (Number.isFinite(m) ? m : 0)
-}
-
-/** Sluiting 01:00 bij opening 17:00 = over middernacht. */
-function isOvernightRange(open: string, close: string): boolean {
-  return toMinutes(close) <= toMinutes(open)
-}
-
-function isInOpenWindow(now: string, open: string, close: string): boolean {
-  const n = toMinutes(now)
-  const o = toMinutes(open)
-  const c = toMinutes(close)
-  if (c <= o) return n >= o || n < c
-  return n >= o && n < c
-}
-
-function minutesSinceOpen(now: string, open: string): number {
-  const n = toMinutes(now)
-  const o = toMinutes(open)
-  return n >= o ? n - o : n + 24 * 60 - o
 }
 
 function resolveLastOrderTime(hours: OpeningHour, closeTime: string): string {
@@ -131,20 +109,14 @@ function leftoverFromPreviousDay(
   hours: OpeningHour | undefined,
   now: string,
 ): { hours: OpeningHour; open: string; close: string } | null {
-  if (!hours?.is_open) return null
-  if (isOvernightRange(hours.open_time, hours.close_time) && toMinutes(now) < toMinutes(hours.close_time)) {
-    return { hours, open: hours.open_time, close: hours.close_time }
+  if (!hours) return null
+  const close = leftoverOvernightClose(now, hours)
+  if (!close) return null
+  const close2 = hours.close_time_2 ? formatTimeShort(hours.close_time_2) : ''
+  if (hours.has_shift2 && close2 && close === close2) {
+    return { hours, open: hours.open_time_2 || hours.open_time, close: hours.close_time_2 || hours.close_time }
   }
-  if (
-    hours.has_shift2 &&
-    hours.open_time_2 &&
-    hours.close_time_2 &&
-    isOvernightRange(hours.open_time_2, hours.close_time_2) &&
-    toMinutes(now) < toMinutes(hours.close_time_2)
-  ) {
-    return { hours, open: hours.open_time_2, close: hours.close_time_2 }
-  }
-  return null
+  return { hours, open: hours.open_time, close: hours.close_time }
 }
 
 function openStatusForWindow(

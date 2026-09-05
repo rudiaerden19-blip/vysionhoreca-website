@@ -305,15 +305,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
     const [openHour, openMin] = openTime.split(':').map(Number)
     const [closeHour, closeMin] = closeTime.split(':').map(Number)
-    
-    let currentHour = openHour
-    let currentMin = openMin
+    const openTotal = openHour * 60 + openMin
+    const closeTotal = closeHour * 60 + closeMin
+    const overnight = closeTotal <= openTotal
+    const lastReservationTotal = (overnight ? closeTotal + 24 * 60 : closeTotal) - 60
 
-    // Stop 1 hour before closing (for reservations)
-    const lastReservationHour = closeHour - 1
-    const lastReservationMin = closeMin
+    let currentTotal = openTotal
 
-    while (currentHour < lastReservationHour || (currentHour === lastReservationHour && currentMin <= lastReservationMin)) {
+    while (currentTotal <= lastReservationTotal) {
+      const clock = ((currentTotal % (24 * 60)) + 24 * 60) % (24 * 60)
+      const currentHour = Math.floor(clock / 60)
+      const currentMin = clock % 60
       const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`
       
       // Skip break times
@@ -325,23 +327,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         const breakEndMinutes = breakEndHour * 60 + breakEndMin
         
         if (currentMinutes >= breakStartMinutes && currentMinutes < breakEndMinutes) {
-          // Skip this time, it's during break
-          currentMin += 30
-          if (currentMin >= 60) {
-            currentMin = 0
-            currentHour++
-          }
+          currentTotal += 30
           continue
         }
       }
       
       times.push(timeStr)
-      
-      currentMin += 30
-      if (currentMin >= 60) {
-        currentMin = 0
-        currentHour++
-      }
+      currentTotal += 30
     }
 
     setAvailableTimes(times)
@@ -807,71 +799,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   }, [business, params.tenant, onlineOrderingEnabled, t])
 
-  const DAY_KEYS = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'] as const
-
-  const getDayName = (offset = 0) => {
-    const jsDay = new Date().getDay()
-    return DAY_KEYS[(jsDay + offset + 7) % 7]
-  }
-
-  const parseMinutes = (t: string) => {
-    const [h, m] = t.split(':').map(Number)
-    return h * 60 + m
-  }
-
-  const inOpenWindow = (nowMin: number, open: string, close: string) => {
-    const o = parseMinutes(open)
-    const c = parseMinutes(close)
-    if (c <= o) return nowMin >= o || nowMin < c
-    return nowMin >= o && nowMin < c
-  }
-
-  const leftoverClose = (
-    hours: { open?: string; close?: string; closed?: boolean; hasShift2?: boolean; open2?: string; close2?: string } | undefined,
-    nowMin: number,
-  ) => {
-    if (!hours || hours.closed) return null
-    if (hours.open && hours.close && parseMinutes(hours.close) <= parseMinutes(hours.open) && nowMin < parseMinutes(hours.close)) {
-      return hours.close
-    }
-    if (hours.hasShift2 && hours.open2 && hours.close2 && parseMinutes(hours.close2) <= parseMinutes(hours.open2) && nowMin < parseMinutes(hours.close2)) {
-      return hours.close2
-    }
-    return null
-  }
-
-  const isCurrentlyOpen = () => {
-    const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
-    if (leftoverClose(business?.opening_hours[getDayName(-1)], nowMin)) return true
-
-    const hours = business?.opening_hours[getDayName()]
-    if (!hours || hours.closed || !hours.open || !hours.close) return false
-    if (inOpenWindow(nowMin, hours.open, hours.close)) return true
-    if (hours.hasShift2 && hours.open2 && hours.close2 && inOpenWindow(nowMin, hours.open2, hours.close2)) return true
-    return false
-  }
-
-  const getCurrentCloseTime = () => {
-    const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
-    const leftover = leftoverClose(business?.opening_hours[getDayName(-1)], nowMin)
-    if (leftover) return leftover
-
-    const hours = business?.opening_hours[getDayName()]
-    if (!hours || hours.closed) return hours?.close
-    if (hours.hasShift2 && hours.open2 && hours.close2 && inOpenWindow(nowMin, hours.open2, hours.close2)) return hours.close2
-    return hours.close
-  }
-
-  const getNextOpenTime = () => {
-    const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
-    const hours = business?.opening_hours[getDayName()]
-    if (!hours || hours.closed) return hours?.open
-    if (hours.hasShift2 && hours.open2 && hours.close2 && hours.close) {
-      const closeTime = parseMinutes(hours.close)
-      const open2 = parseMinutes(hours.open2)
-      if (nowMin >= closeTime && nowMin < open2) return hours.open2
-    }
-    return hours.open
+  const getDayName = () => {
+    const days = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
+    return days[new Date().getDay()]
   }
 
   if (loading) {
@@ -918,8 +848,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </div>
     )
   }
-
-  const todayHours = business.opening_hours[getDayName()]
 
   return (
     <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}} className="min-h-screen bg-white">
@@ -1110,22 +1038,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                    manualOffline.offline_reason === 'eigen'? ((manualOffline as any).offline_message || t('shopOffline.bannerEigen')) :
                    t('shopOffline.bannerSluiting')}
                 </span>
-              ) : isCurrentlyOpen() ? (
+              ) : shopStatus?.isOpen ? (
                 <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  {t('shopPage.openNow')} · {t('shopPage.closesAt')} {getCurrentCloseTime()?.slice(0, 5)}
+                  {t('shopPage.openNow')} · {t('shopPage.closesAt')} {shopStatus.closesAt}
                 </span>
-              ) : todayHours?.closed ? (
-                <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
-                  <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                  {t('shopPage.closedToday')}
-                </span>
-              ) : (
+              ) : shopStatus ? (
                 <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
                   <span className="w-2 h-2 bg-orange-400 rounded-full"></span>
-                  {t('shopPage.closedNow')} · {t('shopPage.opensAt')} {getNextOpenTime()?.slice(0, 5)}
+                  {t('shopPage.closedNow')}
+                  {shopStatus.opensAt ? ` · ${t('shopPage.opensAt')} ${shopStatus.opensAt}` : ''}
                 </span>
-              )}
+              ) : null}
             </div>
 
 
