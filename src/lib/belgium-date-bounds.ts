@@ -32,6 +32,27 @@ export function getBelgiumDateString(date: Date = new Date()): string {
   return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels'})
 }
 
+/** Huidige klok in België als HH:MM (24u). */
+export function getBelgiumTimeHM(date: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Brussels',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const hour = parts.find((p) => p.type === 'hour')?.value ?? '00'
+  const minute = parts.find((p) => p.type === 'minute')?.value ?? '00'
+  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`
+}
+
+/** Maandag = 0 … zondag = 6, kalender Europe/Brussels. */
+export function getBelgiumWeekdayMon0(date: Date = new Date()): number {
+  const ymd = getBelgiumDateString(date)
+  const [y, m, d] = ymd.split('-').map(Number)
+  const jsDay = new Date(Date.UTC(y, m - 1, d, 12, 0, 0)).getUTCDay()
+  return jsDay === 0 ? 6 : jsDay - 1
+}
+
 /** Voeg dagen toe aan een YYYY-MM-DD (kalender in Europe/Brussels). */
 export function addDaysToBelgiumYMD(ymd: string, days: number): string {
   const [y, m, d] = ymd.split('-').map(Number)
