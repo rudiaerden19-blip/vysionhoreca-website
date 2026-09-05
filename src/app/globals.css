@@ -497,14 +497,14 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Luxe: één doek-vlak achter het hele kassascherm (nooit tegelen). */
+/* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
-  background-color: #c4b08a !important;
-  background-image: url('/images/kassa-luxe-doek.jpg') !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  background-position: center center !important;
+  background-color: #d0c4b0 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E") !important;
+  background-size: 64px 64px !important;
+  background-repeat: repeat !important;
+  background-blend-mode: multiply !important;
   background-attachment: fixed !important;
 }
 
@@ -513,11 +513,11 @@ html.kassa-luxe-leather body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: #c4b08a;
-  background-image: url('/images/kassa-luxe-doek.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
+  background-color: #d0c4b0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
+  background-size: 64px 64px;
+  background-repeat: repeat;
+  background-blend-mode: multiply;
 }
 
 .kassa-luxe-cart-grain {
