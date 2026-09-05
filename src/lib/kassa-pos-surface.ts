@@ -348,12 +348,11 @@ export const KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA =
   'm-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-[0.02em] text-white sm:text-[13px]'
 
 export const KASSA_POS_MENU_TILE_QTY_BADGE = [
-  'absolute top-1.5 right-1.5 z-20 flex h-7 w-7 items-center justify-center text-xs font-bold',
+  'absolute top-1.5 right-1.5 z-20 flex h-7 w-7 items-center justify-center text-xs font-bold text-white',
   KASSA_POS_BTN_SHAPE,
   KASSA_BTN_FACE,
   'border border-[#3d352c]',
   KASSA_POS_SUBTLE_LIFT_SHADOW,
-  KASSA_POS_SELECTED_ACCENT_TEXT,
 ].join(' ')
 
 export const KASSA_POS_MENU_TILE_OPTS_BADGE = [
