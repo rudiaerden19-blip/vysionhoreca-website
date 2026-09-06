@@ -161,6 +161,125 @@ export function resolveVatPercentForCategoryAndOrderType(
   return orderType === 'DINE_IN' ? dineIn : offPremise
 }
 
+export type VatServiceMode = 'DINE_IN' | 'TAKEAWAY'
+
+function normalizeVatChoiceLabel(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+const TAKEAWAY_VAT_CHOICE_LABELS = new Set([
+  'meenemen',
+  'mee nemen',
+  'mee te nemen',
+  'takeaway',
+  'take away',
+  'to go',
+  'afhalen',
+  'afhaal',
+])
+
+const DINE_IN_VAT_CHOICE_LABELS = new Set([
+  'ter plaatse',
+  'terplaatse',
+  'dine in',
+  'dinein',
+  'opeten',
+  'op eten',
+  'hier eten',
+])
+
+/** Optiekeuze Meenemen / Ter plaatse → BTW-modus. Geen match → null (tenant zonder deze optie). */
+export function vatServiceModeFromLabels(labels: Iterable<string>): VatServiceMode | null {
+  let found: VatServiceMode | null = null
+  for (const raw of labels) {
+    const n = normalizeVatChoiceLabel(String(raw || ''))
+    if (!n) continue
+    if (TAKEAWAY_VAT_CHOICE_LABELS.has(n)) found = 'TAKEAWAY'
+    else if (DINE_IN_VAT_CHOICE_LABELS.has(n)) found = 'DINE_IN'
+  }
+  return found
+}
+
+export function vatServiceModeFromCartChoices(
+  choices?: ReadonlyArray<{ choiceName?: string; optionName?: string; name?: string } | null> | null,
+): VatServiceMode | null {
+  if (!choices?.length) return null
+  const labels: string[] = []
+  for (const c of choices) {
+    if (!c) continue
+    if (c.choiceName) labels.push(c.choiceName)
+    if (c.name) labels.push(c.name)
+    if (c.optionName) labels.push(c.optionName)
+  }
+  return vatServiceModeFromLabels(labels)
+}
+
+export function vatServiceModeFromOrderItemOptions(options: unknown): VatServiceMode | null {
+  if (!Array.isArray(options)) return null
+  const labels: string[] = []
+  for (const o of options) {
+    if (typeof o === 'string') {
+      labels.push(o)
+      continue
+    }
+    if (o && typeof o === 'object') {
+      const r = o as Record<string, unknown>
+      if (r.name != null) labels.push(String(r.name))
+      if (r.choiceName != null) labels.push(String(r.choiceName))
+    }
+  }
+  return vatServiceModeFromLabels(labels)
+}
+
+/**
+ * Optie Meenemen/Ter plaatse wint voor eten (BE 6/12). Drank 21% en vast 9% blijven.
+ * Geen zo'n keuze → bestaande categorie/besteltype-logica.
+ */
+export function resolveVatPercentWithOptionalServiceMode(
+  categoryOverride: number | null | undefined,
+  tenantDefaultPct: number,
+  orderType: OrderTypeForVat,
+  country: string | null | undefined,
+  serviceMode: VatServiceMode | null,
+): CategoryVatPercent {
+  if (categoryOverride !== null && categoryOverride !== undefined) {
+    const locked = normalizeCategoryVatPercent(categoryOverride, tenantDefaultPct)
+    if (locked === 21 || locked === 9) return locked
+  }
+  if (serviceMode) {
+    const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct, country)
+    return serviceMode === 'DINE_IN' ? dineIn : offPremise
+  }
+  return resolveVatPercentForCategoryAndOrderType(categoryOverride, tenantDefaultPct, orderType, country)
+}
+
+/** Kassa-regel: popup Meenemen/Ter plaatse wijzigt BTW; anders besteltype. */
+export function resolveVatPercentForCartLine(
+  product: Pick<MenuProduct, 'id' | 'category_id'>,
+  categoryById: Map<string, number | null | undefined>,
+  tenantDefaultPct: number,
+  orderType: OrderTypeForVat,
+  productCategoryById?: Map<string, string | null>,
+  country?: string | null,
+  choices?: ReadonlyArray<{ choiceName?: string; optionName?: string; name?: string } | null> | null,
+): CategoryVatPercent {
+  const categoryId = resolveCategoryIdForVatProduct(product, productCategoryById)
+  const override = categoryId != null ? categoryById.get(categoryId) : undefined
+  return resolveVatPercentWithOptionalServiceMode(
+    override,
+    tenantDefaultPct,
+    orderType,
+    country,
+    vatServiceModeFromCartChoices(choices),
+  )
+}
+
 export interface VatSplitLine {
   rate: CategoryVatPercent
   baseExcl: number
@@ -264,10 +383,17 @@ function resolveLineVatRate(
   const fb = normalizeCategoryVatPercent(tenantDefaultPct, 21)
 
   const country = ctx?.tenantCountry
+  const serviceMode = vatServiceModeFromOrderItemOptions(line.options)
   const resolveFromCategoryId = (categoryId: unknown): CategoryVatPercent | null => {
     if (!categoryId || !ctx?.categoryById) return null
     const override = ctx.categoryById.get(String(categoryId))
-    return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
+    return resolveVatPercentWithOptionalServiceMode(
+      override,
+      tenantDefaultPct,
+      orderType,
+      country,
+      serviceMode,
+    )
   }
 
   const productId = line.product_id ?? line.productId
@@ -298,7 +424,13 @@ function resolveLineVatRate(
 
   if (itemHasExplicitBtw(line)) return lineVatRate(line, fb)
 
-  return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType, country)
+  return resolveVatPercentWithOptionalServiceMode(
+    undefined,
+    tenantDefaultPct,
+    orderType,
+    country,
+    serviceMode,
+  )
 }
 
 /** BTW-tarief voor één orderregel (Z-rapport artikelenlijst, scherm/mail/print). */

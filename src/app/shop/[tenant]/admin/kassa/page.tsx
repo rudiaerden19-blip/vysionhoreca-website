@@ -237,7 +237,7 @@ import {
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
   resolveTenantCountryForVat,
-  resolveVatPercentForProductAndOrderType,
+  resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import {
@@ -1793,13 +1793,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
-      resolveVatPercentForProductAndOrderType(
+      resolveVatPercentForCartLine(
         line.product,
         categoryVatLookup,
         tenantDefaultBtw,
         orderType,
         productCategoryById,
         tenantCountry,
+        line.choices,
       ),
     [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
   )
@@ -3714,13 +3715,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      resolveVatPercentForProductAndOrderType(
+      resolveVatPercentForCartLine(
         line.product,
         freshVatLookup,
         tenantDefaultBtw,
         orderType,
         freshProductCategoryById,
         tenantCountry,
+        line.choices,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
@@ -6480,6 +6482,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onToggleChoice={toggleChoice}
           onConfirm={confirmOptions}
           appearance={kassaAppearanceDark ? 'dark': 'light'}
+          tenantDefaultBtw={tenantDefaultBtw}
+          tenantCountry={tenantCountry}
         />
       ) : null}
 

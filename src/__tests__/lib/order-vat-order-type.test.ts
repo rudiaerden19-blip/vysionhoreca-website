@@ -2,8 +2,10 @@ import {
   buildProductCategoryLookup,
   dineInAndOffPremiseVatRates,
   resolveTenantCountryForVat,
+  resolveVatPercentForCartLine,
   resolveVatPercentForCategoryAndOrderType,
   resolveVatPercentForProductAndOrderType,
+  vatServiceModeFromLabels,
 } from '@/lib/order-vat'
 
 describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
@@ -152,5 +154,61 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         productCategoryById,
       ),
     ).toBe(21)
+  })
+
+  it('optie Meenemen → 6% ook als kassa op ter plaatse staat (BE)', () => {
+    expect(vatServiceModeFromLabels(['Meenemen'])).toBe('TAKEAWAY')
+    expect(vatServiceModeFromLabels(['Ter plaatse'])).toBe('DINE_IN')
+    expect(vatServiceModeFromLabels(['mayo'])).toBeNull()
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'BE',
+        [{ choiceName: 'Meenemen' }],
+      ),
+    ).toBe(6)
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        6,
+        'TAKEAWAY',
+        undefined,
+        'BE',
+        [{ choiceName: 'Ter plaatse' }],
+      ),
+    ).toBe(12)
+  })
+
+  it('optie Meenemen laat drank 21% ongemoeid', () => {
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: drinkCat },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'BE',
+        [{ choiceName: 'Meenemen' }],
+      ),
+    ).toBe(21)
+  })
+
+  it('zonder Meenemen/Ter plaatse-optie blijft besteltype gelden', () => {
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'BE',
+        [{ choiceName: 'Mayonaise' }],
+      ),
+    ).toBe(12)
   })
 })
