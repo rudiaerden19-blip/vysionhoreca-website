@@ -198,6 +198,7 @@ import { useKassaCloudTerminals } from '@/lib/kassa-payment-terminal-client'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
+import { KassaCheckoutVatModal } from '@/components/kassa/KassaCheckoutVatModal'
 import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/kassa/KassaStaffClockUi'
 import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
@@ -237,8 +238,10 @@ import {
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
   resolveTenantCountryForVat,
-  resolveVatPercentForCartLine,
+  dineInAndOffPremiseVatRates,
+  resolveVatPercentForProductAndOrderType,
 } from '@/lib/order-vat'
+import { normalizeKassaCheckoutVatMode } from '@/lib/kassa-checkout-vat-mode'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import {
   computeKassaReceiptVatFromCartLines,
@@ -1791,16 +1794,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [tenantInfo?.btw_percentage],
   )
   const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
+  const checkoutVatMode = normalizeKassaCheckoutVatMode(tenantInfo?.kassa_checkout_vat_mode)
+  const checkoutVatRates = useMemo(
+    () => dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry),
+    [tenantDefaultBtw, tenantCountry],
+  )
+  const requestCheckout = useCallback(() => {
+    scheduleKassaTapSound(playCheckout)
+    if (checkoutVatMode === 'dine_in') {
+      setOrderType('DINE_IN')
+      setShowPaymentModal(true)
+      return
+    }
+    if (checkoutVatMode === 'takeaway') {
+      setOrderType('TAKEAWAY')
+      setShowPaymentModal(true)
+      return
+    }
+    if (checkoutVatMode === 'choose' && checkoutVatRates.dineIn !== checkoutVatRates.offPremise) {
+      setShowCheckoutVatModal(true)
+      return
+    }
+    setShowPaymentModal(true)
+  }, [checkoutVatMode, checkoutVatRates, playCheckout])
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
-      resolveVatPercentForCartLine(
+      resolveVatPercentForProductAndOrderType(
         line.product,
         categoryVatLookup,
         tenantDefaultBtw,
         orderType,
         productCategoryById,
         tenantCountry,
-        line.choices,
       ),
     [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
   )
@@ -2516,7 +2541,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (openPaymentAfterFloorPlanSwitchRef.current) {
       openPaymentAfterFloorPlanSwitchRef.current = false
       setShowFloorPlan(false)
-      setShowPaymentModal(true)
+      requestCheckout()
     }
   }
 
@@ -2538,6 +2563,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showTerminalPayModal, setShowTerminalPayModal] = useState(false)
   const [terminalPayMethod, setTerminalPayMethod] = useState<'CARD' | 'BANCONTACT'>('CARD')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showCheckoutVatModal, setShowCheckoutVatModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showSplitModal, setShowSplitModal] = useState(false)
   /** BroadcastChannel-sessie voor tweede scherm (klant); optioneel — geen impact zonder token */
@@ -3715,14 +3741,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      resolveVatPercentForCartLine(
+      resolveVatPercentForProductAndOrderType(
         line.product,
         freshVatLookup,
         tenantDefaultBtw,
         orderType,
         freshProductCategoryById,
         tenantCountry,
-        line.choices,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
@@ -6232,8 +6257,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-checkout"
                 onClick={() => {
                   if (billLines.length === 0) return
-                  scheduleKassaTapSound(playCheckout)
-                  setShowPaymentModal(true)
+                  requestCheckout()
                 }}
                 disabled={billLines.length === 0}
                 className={`flex min-w-0 flex-1 items-center justify-center ${kassaPosCheckoutButtonClass(posChrome)} ${
@@ -6395,8 +6419,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-checkout"
                 onClick={() => {
                   if (billLines.length === 0) return
-                  scheduleKassaTapSound(playCheckout)
-                  setShowPaymentModal(true)
+                  requestCheckout()
                 }}
                 disabled={billLines.length === 0}
                 className="flex min-w-0 flex-1 items-center justify-center rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 min-h-[3.5rem] py-3 text-lg"
@@ -6482,8 +6505,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onToggleChoice={toggleChoice}
           onConfirm={confirmOptions}
           appearance={kassaAppearanceDark ? 'dark': 'light'}
-          tenantDefaultBtw={tenantDefaultBtw}
-          tenantCountry={tenantCountry}
         />
       ) : null}
 
@@ -6652,6 +6673,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
         </div>
       )}
+
+      <KassaCheckoutVatModal
+        open={showCheckoutVatModal}
+        dineInPct={checkoutVatRates.dineIn}
+        takeawayPct={checkoutVatRates.offPremise}
+        appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        onClose={() => setShowCheckoutVatModal(false)}
+        onPickDineIn={() => {
+          setOrderType('DINE_IN')
+          setShowCheckoutVatModal(false)
+          setShowPaymentModal(true)
+        }}
+        onPickTakeaway={() => {
+          setOrderType('TAKEAWAY')
+          setShowCheckoutVatModal(false)
+          setShowPaymentModal(true)
+        }}
+      />
 
       {/* ── Betaalmodal / split / succes ── */}
       <KassaPaymentModal

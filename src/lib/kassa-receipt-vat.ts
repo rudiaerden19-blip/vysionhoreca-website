@@ -6,7 +6,7 @@ import {
   computeInclusiveVatSplitFromCart,
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
-  resolveVatPercentForCartLine,
+  resolveVatPercentForProductAndOrderType,
   type CategoryVatPercent,
   type VatSplitLine,
 } from '@/lib/order-vat'
@@ -93,14 +93,13 @@ export function computeKassaReceiptVatFromCartLines(
   const productCategoryById = buildProductCategoryLookup(products)
   const orderTypeForVat = normalizeOrderTypeForVat(orderType)
   const split = computeInclusiveVatSplitFromCart(lines, (line) =>
-    resolveVatPercentForCartLine(
+    resolveVatPercentForProductAndOrderType(
       line.product,
       categoryVatLookup,
       tenantDefaultBtw,
       orderTypeForVat,
       productCategoryById,
       tenantCountry,
-      line.choices,
     ),
   )
   return {

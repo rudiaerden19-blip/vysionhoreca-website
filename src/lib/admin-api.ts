@@ -212,6 +212,8 @@ export interface TenantSettings {
   kassa_staff_clock_enabled?: boolean
   /** Plattegrond op het verkoopscherm — realtime/polls naar floor_plan_* (aanbevolen aan; uit voor zwakkere terminals) */
   kassa_floor_plan_enabled?: boolean
+  /** off | choose | dine_in | takeaway — popup 12%/6% bij afrekenen (standaard off) */
+  kassa_checkout_vat_mode?: string
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null
@@ -343,6 +345,13 @@ export async function saveTenantSettings(settings: Partial<TenantSettings> & { t
     tenantSlug: settings.tenant_slug,
   })
   if (!r.ok) {
+    if (
+      'kassa_checkout_vat_mode' in settings &&
+      /kassa_checkout_vat_mode|column .* does not exist|schema cache/i.test(r.error || '')
+    ) {
+      const { kassa_checkout_vat_mode: _ignored, ...rest } = settings
+      return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
+    }
     console.error('Error saving tenant settings:', r.error)
     return false
   }

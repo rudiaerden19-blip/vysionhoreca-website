@@ -2,7 +2,6 @@
 
 import type { MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 import type { KassaSelectedChoice } from '@/lib/kassa-cart-types'
-import { dineInAndOffPremiseVatRates, vatServiceModeFromLabels } from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import {
@@ -25,26 +24,15 @@ export function KassaProductOptionsModal({
   onToggleChoice,
   onConfirm,
   appearance = 'light',
-  tenantDefaultBtw = 6,
-  tenantCountry = null,
 }: {
   model: KassaProductOptionsModalModel
   onClose: () => void
   onToggleChoice: (option: ProductOption, choice: ProductOptionChoice) => void
   onConfirm: () => void
   appearance?: 'light' |  'dark'
-  tenantDefaultBtw?: number
-  tenantCountry?: string | null
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
-  const serviceRates = dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry)
-  const vatLabelForChoice = (choiceName: string): string | null => {
-    const mode = vatServiceModeFromLabels([choiceName])
-    if (!mode) return null
-    const pct = mode === 'DINE_IN' ? serviceRates.dineIn : serviceRates.offPremise
-    return `BTW ${pct}%`
-  }
 
   return (
     <div
@@ -167,15 +155,6 @@ export function KassaProductOptionsModal({
                           {`+€${choice.price.toFixed(2)}`}
                         </span>
                       ) : null}
-                      {vatLabelForChoice(choice.name) && (
-                        <span
-                          className={`text-[10px] font-semibold mt-0.5 ${
-                            dark ? 'text-zinc-400' : 'text-gray-500'
-                          }`}
-                        >
-                          {vatLabelForChoice(choice.name)}
-                        </span>
-                      )}
                     </button>
                   )
                 })}
