@@ -1104,9 +1104,11 @@ export default function MenuPageClient({
                                   />
                                   <span className={`font-medium ${theme.text}`}>{choice.name}</span>
                                 </div>
-                                <span style={choice.price > 0 && !darkMode ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400': darkMode ? 'text-white': ''}`}>
-                                  {choice.price > 0 ? `+€${choice.price.toFixed(2)}`: t('menuPage.free')}
+                                {choice.price > 0 ? (
+                                <span style={!darkMode ? { color: primaryColor } : {}} className={`font-medium ${darkMode ? 'text-white': ''}`}>
+                                  {`+€${choice.price.toFixed(2)}`}
                                 </span>
+                                ) : null}
                               </label>
                             )
                           })}

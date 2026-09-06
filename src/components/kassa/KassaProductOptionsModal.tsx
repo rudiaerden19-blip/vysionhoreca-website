@@ -158,19 +158,15 @@ export function KassaProductOptionsModal({
                       >
                         {choice.name}
                       </span>
-                      <span
-                        className={`text-xs font-bold mt-1 ${
-                          choice.price > 0
-                            ? dark
-                              ? 'text-[#d4b483]'
-                              : 'text-amber-500'
-                            : dark
-                              ? 'text-green-400'
-                              : 'text-green-500'
-                        }`}
-                      >
-                        {choice.price > 0 ? `+€${choice.price.toFixed(2)}`: t('kassaApp.optionFree')}
-                      </span>
+                      {choice.price > 0 ? (
+                        <span
+                          className={`text-xs font-bold mt-1 ${
+                            dark ? 'text-[#d4b483]' : 'text-amber-500'
+                          }`}
+                        >
+                          {`+€${choice.price.toFixed(2)}`}
+                        </span>
+                      ) : null}
                       {vatLabelForChoice(choice.name) && (
                         <span
                           className={`text-[10px] font-semibold mt-0.5 ${

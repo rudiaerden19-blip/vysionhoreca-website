@@ -395,9 +395,11 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
                 >
                   <span className="text-gray-700">{choice.name}</span>
-                  <span className={`font-medium ${choice.price > 0 ? 'text-blue-600': 'text-gray-400'}`}>
-                    {choice.price > 0 ? `+€${choice.price.toFixed(2)}`: t('adminPages.opties.free')}
+                  {choice.price > 0 ? (
+                  <span className="font-medium text-blue-600">
+                    {`+€${choice.price.toFixed(2)}`}
                   </span>
+                  ) : null}
                 </div>
               ))}
             </div>
