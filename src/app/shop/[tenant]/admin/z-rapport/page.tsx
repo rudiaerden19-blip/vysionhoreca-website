@@ -7,11 +7,17 @@ import { adminDb } from '@/lib/admin-db-client'
 import { authFetch } from '@/lib/auth-headers'
 import {
   fetchAllTenantOrdersInCreatedAtRange,
+  getOpeningHours,
   getTenantSettings,
-  getZRapportDateBounds,
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
+import {
+  businessDayForOrder,
+  formatTenantBusinessDayPeriod,
+  getTenantBusinessDayBounds,
+  type TenantHourRow,
+} from '@/lib/tenant-business-day'
 import {
   aggregateZReportArticleLines,
   type ZReportArticleLine,
@@ -135,6 +141,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   const [selectedDate, setSelectedDate] = useState(getLocalDateString())
   const [stats, setStats] = useState<DailyStats | null>(null)
+  const [hoursForDay, setHoursForDay] = useState<TenantHourRow[]>([])
   const [businessInfo, setBusinessInfo] = useState<any>(null)
   const [btwPercentage, setBtwPercentage] = useState(6)
   const [savedReports, setSavedReports] = useState<SavedReport[]>([])
@@ -207,8 +214,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       setMonthAccountantEmail(settings.accountant_email || '')
     }
 
-    // KRITIEK: Fiscale daggrens = 00:00 tot 12:00 de VOLGENDE dag (GKS compliant)
-    const { startUTC, endUTC } = getZRapportDateBounds(selectedDate)
+    const hours = await getOpeningHours(params.tenant)
+    const { startUTC, endUTC } = getTenantBusinessDayBounds(selectedDate, hours)
 
     const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
       params.tenant,
@@ -218,15 +225,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     )
 
     const vatContext = await fetchZReportVatContextForTenant(params.tenant)
-    const counted = ordersRaw.filter((o) =>
+    const dayOrders = (ordersRaw as unknown as Order[]).filter(
+      (o) => businessDayForOrder(String(o.created_at || ''), hours) === selectedDate,
+    )
+    const counted = dayOrders.filter((o) =>
       orderCountsTowardRevenueAndZReport(
         o as Pick<Order, 'order_type' | 'status' | 'payment_status'>,
       ),
-    ) as unknown as Order[]
+    )
     setArticleLines(aggregateZReportArticleLines(counted, settingsBtw, vatContext))
+    setHoursForDay(hours)
 
     const amounts = buildZReportDayAmountsFromOrders(
-      ordersRaw as unknown as Order[],
+      dayOrders,
       settingsBtw,
       vatContext,
     )
@@ -292,7 +303,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       const today = getLocalDateString()
       const monthEnd = getLastDayOfMonthYmd(yearMonth)
       const capYmd = today < monthEnd ? today : monthEnd
-      const { startUTC, endUTC } = monthBoundsUtc(yearMonth, capYmd)
+      const hours = hoursForDay.length ? hoursForDay : await getOpeningHours(params.tenant)
+      const { startUTC, endUTC } = monthBoundsUtc(yearMonth, capYmd, hours)
 
       const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
         params.tenant,
@@ -308,6 +320,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         btwPercentage,
         vatContext,
         buildManualByDateForMonth(yearMonth),
+        hours,
       )
       setMonthDayRows(days)
       setMonthAmounts(days.length ? sumZReportMonthAmounts(days) : null)
@@ -769,7 +782,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           ${paymentRows}
         </div>${articlesBlock}
         <div class="footer">
-          <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m +1dag 12:00</p>
+          <p>Dagperiode: ${formatShortDate(selectedDate)} · ${formatTenantBusinessDayPeriod(selectedDate, hoursForDay)}</p>
           <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
           ${currentSavedReport?.closed_at ? `<p>Afgesloten: ${new Date(currentSavedReport.closed_at).toLocaleString('nl-BE')}</p>`: ''}
           <p>Hash: ${currentSavedReport?.report_hash?.substring(0, 16) || 'n.v.t.'}...</p>
@@ -879,7 +892,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       const monthEnd = getLastDayOfMonthYmd(yearMonth)
       const capYmd = today < monthEnd ? today : monthEnd
 
-      const { startUTC, endUTC } = monthBoundsUtc(yearMonth, capYmd)
+      const hours = hoursForDay.length ? hoursForDay : await getOpeningHours(params.tenant)
+      const { startUTC, endUTC } = monthBoundsUtc(yearMonth, capYmd, hours)
       const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
         params.tenant,
         startUTC,
@@ -896,6 +910,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         btwPercentage,
         vatContext,
         buildManualByDateForMonth(yearMonth),
+        hours,
       )
 
       if (days.length === 0) {
@@ -1135,7 +1150,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8 print:hidden">
         <div>
           <h1 className="text-2xl font-bold text-gray-900"> {t('zReport.title')}</h1>
-          <p className="text-gray-500 text-sm">{t('zReport.subtitle')} · Fiscale dag: 00:00 t/m +1dag 12:00u</p>
+          <p className="text-gray-500 text-sm">{t('zReport.subtitle')} · Werkdag: {formatTenantBusinessDayPeriod(selectedDate, hoursForDay)}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -1329,7 +1344,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <p className="text-gray-500 mt-2 capitalize">
                 {reportViewMode === 'month' ? selectedMonthLabel : formatDate(selectedDate)}
               </p>
-              <p className="text-xs text-gray-400 mt-1">{t('zReport.fiscalPeriodNote')}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {reportViewMode === 'month'
+                  ? t('zReport.fiscalPeriodNote')
+                  : `Werkdag: ${formatTenantBusinessDayPeriod(selectedDate, hoursForDay)}`}
+              </p>
               <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
                    {t('zReport.autoUpdated')}
@@ -1444,7 +1463,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <li>5. Klik op <strong>"Dag afsluiten"</strong> na je shift om de fiscale dag te vergrendelen</li>
             </ol>
             <p className="text-blue-600 text-xs mt-4">
-               Fiscale dag = 00:00u tot 12:00u de volgende dag · {t('zReport.retention')}
+               Werkdag = openingsuren van deze zaak · {t('zReport.retention')}
             </p>
           </div>
           )}

@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
-import { lastCompletedFiscalReportDate } from '@/lib/belgium-date-bounds'
+import { fetchOpeningHoursForTenant, lastCompletedBusinessDay } from '@/lib/tenant-business-day'
 import { regenerateZReportForDate } from '@/lib/admin-api-order-operations'
 
-// Vercel Cron — archiveert laatste afgesloten fiscale werkdag (niet kalenderdag).
-// Fiscale dag D sluit om D+1 12:00 Brussels; om 00:00 is de vorige fiscale dag nog open.
+// Vercel Cron — archiveert laatste afgesloten werkdag per tenant (openingsuren).
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -25,9 +24,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
     }
 
-    const fiscalDate = lastCompletedFiscalReportDate()
-    logger.info('Z-report fiscal archive cron', { requestId, fiscalDate })
-
     const { data: tenantRows, error: tenantError } = await supabase
       .from('tenant_settings')
       .select('tenant_slug')
@@ -44,16 +40,20 @@ export async function GET(request: NextRequest) {
     let archived = 0
     let failed = 0
 
+    const archivedDates: string[] = []
+
     for (const tenantSlug of tenantSlugs) {
       try {
+        const hours = await fetchOpeningHoursForTenant(supabase, tenantSlug)
+        const fiscalDate = lastCompletedBusinessDay(new Date(), hours)
         await regenerateZReportForDate(supabase, tenantSlug, fiscalDate)
         archived += 1
+        archivedDates.push(`${tenantSlug}:${fiscalDate}`)
       } catch (error) {
         failed += 1
         logger.error('Fiscal Z-report archive failed', {
           requestId,
           tenantSlug,
-          fiscalDate,
           error: error instanceof Error ? error.message : String(error),
         })
       }
@@ -62,7 +62,6 @@ export async function GET(request: NextRequest) {
     const duration = Date.now() - startTime
     logger.info('Fiscal Z-report cron completed', {
       requestId,
-      fiscalDate,
       tenantsProcessed: tenantSlugs.length,
       archived,
       failed,
@@ -71,10 +70,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      fiscalDate,
       tenantsProcessed: tenantSlugs.length,
       archived,
       failed,
+      archivedDates,
       duration,
     })
   } catch (error) {

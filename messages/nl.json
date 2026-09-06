@@ -3279,7 +3279,7 @@
     "subtitle": "Dagelijks overzicht voor witte kassa (GKS)",
     "reportTitle": "Z-RAPPORT",
     "onlineSales": "Omzet kassa & bestellingen",
-    "fiscalPeriodNote": "Fiscale periode: 00:00u — +1dag 12:00u",
+    "fiscalPeriodNote": "Fiscale periode: volgens openingsuren van de zaak",
     "history": "Archief",
     "print": "Afdrukken",
     "refresh": "Vernieuwen",

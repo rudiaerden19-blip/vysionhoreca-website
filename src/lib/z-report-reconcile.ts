@@ -3,10 +3,11 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import {
-  fiscalReportDateForOrderCreatedAt,
-  getBelgiumDateString,
-} from '@/lib/belgium-date-bounds'
+  businessDayForOrder,
+  fetchOpeningHoursForTenant,
+} from '@/lib/tenant-business-day'
 import { orderCountsTowardRevenueAndZReport, type Order } from '@/lib/admin-api-order-helpers'
 import {
   fetchAllOrdersInCreatedAtRange,
@@ -65,11 +66,12 @@ export async function collectFiscalDatesWithOrders(
 ): Promise<string[]> {
   const dates = new Set<string>()
   const today = getBelgiumDateString()
+  const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
 
   for (const ym of yearMonths) {
     const monthEnd = getLastDayOfMonthYmd(ym)
     const capYmd = today < monthEnd ? today : monthEnd
-    const { startUTC, endUTC } = monthBoundsUtc(ym, capYmd)
+    const { startUTC, endUTC } = monthBoundsUtc(ym, capYmd, hours)
 
     const ordersRaw = await fetchAllOrdersInCreatedAtRange(
       client,
@@ -83,7 +85,7 @@ export async function collectFiscalDatesWithOrders(
       const o = raw as unknown as Order
       if (!orderCountsTowardRevenueAndZReport(o)) continue
       const created = String(o.created_at || '')
-      const fiscal = fiscalReportDateForOrderCreatedAt(created)
+      const fiscal = businessDayForOrder(created, hours)
       if (fiscal && fiscal.startsWith(ym)) dates.add(fiscal)
     }
   }

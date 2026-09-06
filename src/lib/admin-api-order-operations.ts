@@ -1,6 +1,11 @@
 import { supabase } from './supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { getBelgiumDateString, getZRapportDateBounds, fiscalReportDateForOrderCreatedAt } from './belgium-date-bounds'
+import { getBelgiumDateString } from './belgium-date-bounds'
+import {
+  businessDayForOrder,
+  fetchOpeningHoursForTenant,
+  getTenantBusinessDayBounds,
+} from './tenant-business-day'
 import {
   distributeOrderPaymentForZRaport,
   isWebshopOrder,
@@ -257,18 +262,21 @@ export async function regenerateZReportForDate(
   console.log(`regenerateZReportForDate: Start voor ${tenantSlug} op ${date}`)
 
   try {
-    const { startUTC, endUTC } = getZRapportDateBounds(date)
-    console.log(`regenerateZReportForDate: Query van ${startUTC} tot ${endUTC}`)
+    const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
+    const { startUTC, endUTC } = getTenantBusinessDayBounds(date, hours)
+    console.log(`regenerateZReportForDate: Query van ${startUTC} tot ${endUTC} (openingsuren)`)
 
     const ordersRaw = await fetchAllOrdersInCreatedAtRange(
       client,
       tenantSlug,
       startUTC,
       endUTC,
-      'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status, items'
+      'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status, items, created_at'
     )
 
-    const orders = ordersRaw as unknown as Order[]
+    const orders = (ordersRaw as unknown as Order[]).filter(
+      (o) => businessDayForOrder(String(o.created_at || ''), hours) === date,
+    )
 
     console.log(`regenerateZReportForDate: ${ordersRaw?.length || 0} orders in venster`)
 
@@ -362,7 +370,8 @@ export async function moveFiscalDaySales(
     throw new Error('Bron- en doeldatum moeten verschillen')
   }
 
-  const fromBounds = getZRapportDateBounds(fromDate)
+  const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
+  const fromBounds = getTenantBusinessDayBounds(fromDate, hours)
   const offsetMs = ymdToUtcMs(toDate) - ymdToUtcMs(fromDate)
   const fromStartMs = new Date(fromBounds.startUTC).getTime()
   const fromEndMs = new Date(fromBounds.endUTC).getTime()
@@ -411,8 +420,13 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
 
 /** Herbereken opgeslagen Z-rapportdag (fiscale werkdag) na order — kassa, bevestiging, weigeren, … */
 export async function syncZReportAfterOrder(tenantSlug: string, orderCreatedAt: string): Promise<void> {
+  if (!supabase) {
+    await autoUpdateZReport(tenantSlug, getBelgiumDateString(new Date(orderCreatedAt)))
+    return
+  }
+  const hours = await fetchOpeningHoursForTenant(supabase, tenantSlug)
   const dayYmd =
-    fiscalReportDateForOrderCreatedAt(orderCreatedAt) ?? getBelgiumDateString(new Date(orderCreatedAt))
+    businessDayForOrder(orderCreatedAt, hours) ?? getBelgiumDateString(new Date(orderCreatedAt))
   await autoUpdateZReport(tenantSlug, dayYmd)
 }
 

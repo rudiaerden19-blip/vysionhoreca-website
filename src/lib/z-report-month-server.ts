@@ -6,6 +6,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Order } from '@/lib/admin-api-order-helpers'
 import { fetchAllOrdersInCreatedAtRange } from '@/lib/admin-api-order-operations'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { fetchOpeningHoursForTenant } from '@/lib/tenant-business-day'
 import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
 import {
   buildZReportMonthDayRows,
@@ -66,7 +67,8 @@ export async function buildZReportMonthFromSupabase(
 
   const btwPercentage = Number(settings?.btw_percentage) || 6
 
-  const { startUTC, endUTC } = monthBoundsUtc(yearMonth, cap)
+  const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
+  const { startUTC, endUTC } = monthBoundsUtc(yearMonth, cap, hours)
 
   const ordersRaw = await fetchAllOrdersInCreatedAtRange(
     client,
@@ -86,6 +88,7 @@ export async function buildZReportMonthFromSupabase(
     btwPercentage,
     vatContext,
     manualByDate,
+    hours,
   )
 
   return {

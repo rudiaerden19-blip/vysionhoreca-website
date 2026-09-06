@@ -6,11 +6,13 @@ import { adminDb } from '@/lib/admin-db-client'
 import {
   distributeOrderPaymentForZRaport,
   fetchAllOrdersForRapporten,
+  getOpeningHours,
   getTenantSettings,
   orderCountsTowardRevenueAndZReport,
   saveTenantSettings,
   type TenantSettings,
 } from '@/lib/admin-api'
+import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt } from '@/lib/tenant-business-day'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
 import { authFetch } from '@/lib/auth-headers'
@@ -154,6 +156,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const tenant = params.tenant
   const [tab, setTab] = useState<Tab>('overzicht')
   const [orders, setOrders] = useState<Order[]>([])
+  const [openingHours, setOpeningHours] = useState<Awaited<ReturnType<typeof getOpeningHours>>>([])
   const [zReports, setZReports] = useState<ZReport[]>([])
   const [loading, setLoading] = useState(true)
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
@@ -213,14 +216,16 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     setLoading(true)
     // z_reports gaat via /api/admin/db/read (na Phase 2-lockdown heeft de
     // anon-key geen SELECT meer op die tabel).
-    const [ordersData, zResult, info] = await Promise.all([
+    const [ordersData, zResult, info, hours] = await Promise.all([
       fetchAllOrdersForRapporten(tenant),
       adminDb.select<Array<Record<string, unknown>>>('z_reports', {
         tenantSlug: tenant,
         order: { column: 'report_date', ascending: false },
       }),
       getTenantSettings(tenant),
+      getOpeningHours(tenant),
     ])
+    setOpeningHours(hours || [])
     const zData = zResult.ok && Array.isArray(zResult.data) ? zResult.data : null
     setOrders(
       (ordersData || []).map((o) => {
@@ -309,22 +314,27 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const kassaOrders = useMemo(() => validOrders.filter(isKassaOrder), [validOrders])
   const onlineOrders = useMemo(() => validOrders.filter(isOnlineOrder), [validOrders])
 
-  // ── Revenue helpers ──
+  const orderDay = (o: Order) => businessDayForOrder(o.created_at, openingHours)
   const revenueInPeriod = (list: Order[], from: Date) =>
     list.filter(o => new Date(o.created_at) >= from).reduce((s,o)=>s+o.total,0)
   const ordersInPeriod = (list: Order[], from: Date) =>
     list.filter(o => new Date(o.created_at) >= from)
 
   const now = new Date()
+  const todayYmd = getCurrentBusinessDay(now, openingHours)
   const todayStart = startOfDay(now)
   const weekStart = startOfWeek(now)
   const monthStart = startOfMonth(now)
+  const weekDays = new Set(listBusinessDaysEndingAt(todayYmd, 7))
+  const monthPrefix = todayYmd.slice(0, 7)
 
-  // Omzet vandaag/week/maand (kassa + online)
-  const todayRevenue = revenueInPeriod(validOrders, todayStart)
-  const weekRevenue = revenueInPeriod(validOrders, weekStart)
-  const monthRevenue = revenueInPeriod(validOrders, monthStart)
-  const todayOrders = ordersInPeriod(validOrders, todayStart)
+  const todayOrders = validOrders.filter((o) => orderDay(o) === todayYmd)
+  const todayRevenue = todayOrders.reduce((s, o) => s + o.total, 0)
+  const weekRevenue = validOrders.filter((o) => {
+    const d = orderDay(o)
+    return d && weekDays.has(d)
+  }).reduce((s, o) => s + o.total, 0)
+  const monthRevenue = validOrders.filter((o) => orderDay(o)?.startsWith(monthPrefix)).reduce((s, o) => s + o.total, 0)
   const avgOrder = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0
   /** Week start (maandag) kan vóór de 1e van deze maand vallen → weekomzet > maandomzet is dan logisch. */
   const weekStartsBeforeThisMonth = weekStart.getTime() < monthStart.getTime()

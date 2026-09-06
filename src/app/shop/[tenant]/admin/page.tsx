@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import {
   fetchAllTenantOrdersForDashboard,
+  getOpeningHours,
   getTenantSettings,
   isActiveTenantOrderStatus,
   orderCountsTowardRevenueAndZReport,
@@ -145,8 +146,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       const allOrdersList = (await fetchAllTenantOrdersForDashboard(
         params.tenant,
       )) as unknown as Order[]
+      const hours = await getOpeningHours(params.tenant)
 
-      const fiscalStats = getDashboardFiscalPeriodStats(allOrdersList, today)
+      const fiscalStats = getDashboardFiscalPeriodStats(allOrdersList, today, hours)
       todayOrdersCount = fiscalStats.todayOrders
       todayRevenue = fiscalStats.todayRevenue
       yesterdayOrdersCount = fiscalStats.yesterdayOrders

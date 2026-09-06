@@ -32,6 +32,14 @@ export function getBelgiumDateString(date: Date = new Date()): string {
   return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels'})
 }
 
+/** Lokaal België YYYY-MM-DD + HH:MM → UTC ISO. */
+export function belgiumLocalToUtcIso(ymd: string, hm: string): string {
+  const [year, month, day] = ymd.split('-').map(Number)
+  const [hh, mm] = (hm || '00:00').slice(0, 5).split(':').map(Number)
+  const offset = isBelgiumDST(year, month, day) ? 2 : 1
+  return new Date(Date.UTC(year, month - 1, day, (hh || 0) - offset, mm || 0, 0, 0)).toISOString()
+}
+
 /** Huidige klok in België als HH:MM (24u). */
 export function getBelgiumTimeHM(date: Date = new Date()): string {
   const parts = new Intl.DateTimeFormat('en-GB', {

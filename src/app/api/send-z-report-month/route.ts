@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
       card: label('card', 'Kaart/PIN'),
       online: label('online', 'Online'),
       dayTotalCol: label('dayTotalCol', 'Totaal incl.'),
-      fiscalNote: label('fiscalNote', 'Fiscale periode per dag: 00:00u — +1dag 12:00u'),
+      fiscalNote: label('fiscalNote', 'Fiscale periode per dag: volgens openingsuren van de zaak'),
       footerAuto: label('footerAuto', 'Automatisch maandoverzicht Z-Rapport'),
       footerGenerated: label('footerGenerated', 'Gegenereerd op:'),
       footerPowered: label('footerPowered', "Vysion kassa's - ordervysion.com"),

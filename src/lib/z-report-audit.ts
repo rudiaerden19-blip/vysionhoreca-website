@@ -4,11 +4,12 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import {
-  fiscalReportDateForOrderCreatedAt,
-  getBelgiumDateString,
-  getZRapportDateBounds,
-} from '@/lib/belgium-date-bounds'
+  businessDayForOrder,
+  fetchOpeningHoursForTenant,
+  getTenantBusinessDayBounds,
+} from '@/lib/tenant-business-day'
 import {
   isKassaPosOrder,
   orderCountsTowardRevenueAndZReport,
@@ -129,6 +130,7 @@ export async function auditTenantZReports(
 
   const btw = Number(settings?.btw_percentage) || 6
   const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
+  const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
 
   let bonnenKassaPaid = 0
   let zCountedOrders = 0
@@ -137,7 +139,7 @@ export async function auditTenantZReports(
     const today = getBelgiumDateString()
     const monthEnd = getLastDayOfMonthYmd(ym)
     const capYmd = today < monthEnd ? today : monthEnd
-    const { startUTC, endUTC } = monthBoundsUtc(ym, capYmd)
+    const { startUTC, endUTC } = monthBoundsUtc(ym, capYmd, hours)
 
     const ordersRaw = await fetchAllOrdersInCreatedAtRange(
       client,
@@ -174,7 +176,7 @@ export async function auditTenantZReports(
     for (const o of orders) {
       const created = String(o.created_at || '')
       if (!created) continue
-      const fiscal = fiscalReportDateForOrderCreatedAt(created)
+      const fiscal = businessDayForOrder(created, hours)
       if (!fiscal || !fiscal.startsWith(ym)) continue
       if (!orderCountsTowardRevenueAndZReport(o)) continue
       const list = byFiscal.get(fiscal) || []
@@ -195,7 +197,7 @@ export async function auditTenantZReports(
       zByDate.set(String(row.report_date), row as ZReportRow)
     }
 
-    const monthRows = buildZReportMonthDayRows(orders, ym, capYmd, btw, vatContext)
+    const monthRows = buildZReportMonthDayRows(orders, ym, capYmd, btw, vatContext, undefined, hours)
     const monthSum = monthRows.length ? sumZReportMonthAmounts(monthRows) : null
 
     let computedMonthTotal = 0
@@ -248,11 +250,11 @@ export async function auditTenantZReports(
         )
       }
 
-      const bounds = getZRapportDateBounds(fiscalDate)
+      const bounds = getTenantBusinessDayBounds(fiscalDate, hours)
       for (const o of dayOrders) {
         const created = String(o.created_at || '')
         const t = new Date(created)
-        const fiscal = fiscalReportDateForOrderCreatedAt(created)
+        const fiscal = businessDayForOrder(created, hours)
         if (
           t >= new Date(bounds.startUTC) &&
           t <= new Date(bounds.endUTC) &&

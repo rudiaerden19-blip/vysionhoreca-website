@@ -16,8 +16,10 @@ import {
   isWebshopOrder,
   isActiveTenantOrderStatus,
   regenerateZReportForDate,
+  getOpeningHours,
 } from '@/lib/admin-api'
-import { fiscalReportDateForOrderCreatedAt, getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { businessDayForOrder } from '@/lib/tenant-business-day'
 import { appIntlLocaleTag, formatKlantschermWaitingClock } from '@/lib/format-kassa-header-date'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { supabase } from '@/lib/supabase'
@@ -395,6 +397,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
 
     try {
+      const hours = await getOpeningHours(params.tenant)
       let done = 0
       for (const order of list) {
         if (!order.id) continue
@@ -405,7 +408,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               succeededWebshopIds.add(order.id)
               if (order.created_at) {
                 const fiscalDay =
-                  fiscalReportDateForOrderCreatedAt(order.created_at) ??
+                  businessDayForOrder(order.created_at, hours) ??
                   getBelgiumDateString(new Date(order.created_at))
                 affectedBelgiumDays.add(fiscalDay)
               }
@@ -418,7 +421,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               succeededPosIds.add(order.id)
               if (order.created_at) {
                 const fiscalDay =
-                  fiscalReportDateForOrderCreatedAt(order.created_at) ??
+                  businessDayForOrder(order.created_at, hours) ??
                   getBelgiumDateString(new Date(order.created_at))
                 affectedBelgiumDays.add(fiscalDay)
               }

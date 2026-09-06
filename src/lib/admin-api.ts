@@ -10,7 +10,6 @@ import { adminDb } from './admin-db-client'
 // (light routes import that module directly to avoid pulling in admin-api).
 import {
   addDaysToBelgiumYMD,
-  fiscalReportDateForOrderCreatedAt,
   getBelgiumDateString,
   getDateBoundsForBelgium,
   getZRapportDateBounds,
@@ -111,6 +110,11 @@ import {
   listFiscalDaysEndingAt,
   monthBoundsUtcForYearMonth,
 } from './revenue-fiscal-stats'
+import {
+  businessDayForOrder,
+  fetchOpeningHoursForTenant,
+  getTenantBusinessDayBounds,
+} from './tenant-business-day'
 
 export {
   fetchAllOrdersInCreatedAtRange,
@@ -1232,34 +1236,35 @@ export interface SalesStats {
 
 export async function getSalesStats(tenantSlug: string, period: 'today' |  'week' |  'month' |  'year'): Promise<SalesStats> {
   const now = new Date()
+  const hours = supabase ? await fetchOpeningHoursForTenant(supabase, tenantSlug) : []
   let startUTC: string
   let endUTC: string
 
   switch (period) {
     case 'today': {
-      const fiscal = getCurrentFiscalReportDate(now)
-      const bounds = getZRapportDateBounds(fiscal)
+      const fiscal = getCurrentFiscalReportDate(now, hours)
+      const bounds = getTenantBusinessDayBounds(fiscal, hours)
       startUTC = bounds.startUTC
       endUTC = bounds.endUTC
       break
     }
     case 'week': {
-      const fiscalDays = listFiscalDaysEndingAt(getCurrentFiscalReportDate(now), 7)
-      const range = fetchRangeUtcForFiscalDays(fiscalDays)
+      const fiscalDays = listFiscalDaysEndingAt(getCurrentFiscalReportDate(now, hours), 7)
+      const range = fetchRangeUtcForFiscalDays(fiscalDays, hours)
       startUTC = range.startUTC
       endUTC = range.endUTC
       break
     }
     case 'month': {
-      const bounds = monthBoundsUtcForYearMonth(now.getFullYear(), now.getMonth() + 1)
+      const bounds = monthBoundsUtcForYearMonth(now.getFullYear(), now.getMonth() + 1, undefined, hours)
       startUTC = bounds.startUTC
       endUTC = bounds.endUTC
       break
     }
     case 'year': {
       const y = now.getFullYear()
-      const bounds = monthBoundsUtcForYearMonth(y, 12)
-      const jan = getZRapportDateBounds(`${y}-01-01`)
+      const bounds = monthBoundsUtcForYearMonth(y, 12, undefined, hours)
+      const jan = getTenantBusinessDayBounds(`${y}-01-01`, hours)
       startUTC = jan.startUTC
       endUTC = bounds.endUTC
       break
@@ -1282,26 +1287,26 @@ export async function getSalesStats(tenantSlug: string, period: 'today' |  'week
 
   let data = counted
   if (period === 'today') {
-    const fiscal = getCurrentFiscalReportDate(now)
+    const fiscal = getCurrentFiscalReportDate(now, hours)
     data = counted.filter(
-      (o) => fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || '')) === fiscal,
+      (o) => businessDayForOrder(String((o as { created_at?: string }).created_at || ''), hours) === fiscal,
     )
   } else if (period === 'week') {
-    const fiscalSet = new Set(listFiscalDaysEndingAt(getCurrentFiscalReportDate(now), 7))
+    const fiscalSet = new Set(listFiscalDaysEndingAt(getCurrentFiscalReportDate(now, hours), 7))
     data = counted.filter((o) => {
-      const fd = fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || ''))
+      const fd = businessDayForOrder(String((o as { created_at?: string }).created_at || ''), hours)
       return fd && fiscalSet.has(fd)
     })
   } else if (period === 'month') {
     const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
     data = counted.filter((o) => {
-      const fd = fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || ''))
+      const fd = businessDayForOrder(String((o as { created_at?: string }).created_at || ''), hours)
       return fd?.startsWith(ym)
     })
   } else {
     const y = String(now.getFullYear())
     data = counted.filter((o) => {
-      const fd = fiscalReportDateForOrderCreatedAt(String((o as { created_at?: string }).created_at || ''))
+      const fd = businessDayForOrder(String((o as { created_at?: string }).created_at || ''), hours)
       return fd?.startsWith(y)
     })
   }
@@ -1321,8 +1326,9 @@ export async function getSalesStats(tenantSlug: string, period: 'today' |  'week
 
 export async function getDailyRevenue(tenantSlug: string, days: number = 7): Promise<{ date: string; revenue: number; orders: number }[]> {
   const now = new Date()
-  const fiscalDays = listFiscalDaysEndingAt(getCurrentFiscalReportDate(now), days)
-  const { startUTC, endUTC } = fetchRangeUtcForFiscalDays(fiscalDays)
+  const hours = supabase ? await fetchOpeningHoursForTenant(supabase, tenantSlug) : []
+  const fiscalDays = listFiscalDaysEndingAt(getCurrentFiscalReportDate(now, hours), days)
+  const { startUTC, endUTC } = fetchRangeUtcForFiscalDays(fiscalDays, hours)
 
   const raw = await fetchAllOrdersInCreatedAtRange(
     supabase,
@@ -1332,7 +1338,7 @@ export async function getDailyRevenue(tenantSlug: string, days: number = 7): Pro
     'total, created_at, status, order_type, payment_status'
   )
 
-  const byDay = aggregateRevenueByFiscalDay(raw)
+  const byDay = aggregateRevenueByFiscalDay(raw, undefined, hours)
 
   return fiscalDays.map((date) => {
     const stats = byDay.get(date) ?? { revenue: 0, orders: 0 }
@@ -2072,7 +2078,8 @@ export async function calculateMonthlyReport(
   year: number, 
   month: number
 ): Promise<MonthlyReport> {
-  const { startUTC, endUTC, yearMonth } = monthBoundsUtcForYearMonth(year, month)
+  const hours = supabase ? await fetchOpeningHoursForTenant(supabase, tenantSlug) : []
+  const { startUTC, endUTC, yearMonth } = monthBoundsUtcForYearMonth(year, month, undefined, hours)
 
   const ordersDataRaw = await fetchAllOrdersInCreatedAtRange(
     supabase,
@@ -2097,7 +2104,7 @@ export async function calculateMonthlyReport(
   const kassaOrderRevenueByFiscalDay = new Map<string, number>()
   const kassaOrderCountByFiscalDay = new Map<string, number>()
   for (const o of kassaOrderRows) {
-    const fiscal = fiscalReportDateForOrderCreatedAt(String(o.created_at || ''))
+    const fiscal = businessDayForOrder(String(o.created_at || ''), hours)
     if (!fiscal) continue
     const total = Number(o.total) || 0
     kassaOrderRevenueByFiscalDay.set(fiscal, (kassaOrderRevenueByFiscalDay.get(fiscal) ?? 0) + total)

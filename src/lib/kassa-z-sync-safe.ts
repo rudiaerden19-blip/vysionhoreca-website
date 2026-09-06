@@ -1,5 +1,7 @@
 import { authFetch } from '@/lib/auth-headers'
-import { fiscalReportDateForOrderCreatedAt, getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
+import { getOpeningHours } from '@/lib/admin-api-shop-hours'
+import { businessDayForOrder } from '@/lib/tenant-business-day'
 
 /**
  * Z-rapport refresh na order — fire-and-forget naar de server.
@@ -9,23 +11,21 @@ import { fiscalReportDateForOrderCreatedAt, getBelgiumDateString } from '@/lib/b
  * server-side met service-role het rapport opnieuw berekent.
  */
 export function syncZReportAfterOrderSafe(tenantSlug: string, orderCreatedAt: string): void {
-  try {
-    const date =
-      fiscalReportDateForOrderCreatedAt(orderCreatedAt) ?? getBelgiumDateString(new Date(orderCreatedAt))
-    void authFetch('/api/kassa/sync-z-report', {
-      method: 'POST',
-      body: JSON.stringify({ tenantSlug, date }),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const json = await res.json().catch(() => ({}))
-          console.warn('[kassa] syncZReport failed:', res.status, json?.error)
-        }
+  void (async () => {
+    try {
+      const hours = await getOpeningHours(tenantSlug)
+      const date =
+        businessDayForOrder(orderCreatedAt, hours) ?? getBelgiumDateString(new Date(orderCreatedAt))
+      const res = await authFetch('/api/kassa/sync-z-report', {
+        method: 'POST',
+        body: JSON.stringify({ tenantSlug, date }),
       })
-      .catch((err) => {
-        console.warn('[kassa] syncZReport network error:', err)
-      })
-  } catch (err) {
-    console.warn('[kassa] syncZReport setup error:', err)
-  }
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        console.warn('[kassa] syncZReport failed:', res.status, json?.error)
+      }
+    } catch (err) {
+      console.warn('[kassa] syncZReport error:', err)
+    }
+  })()
 }

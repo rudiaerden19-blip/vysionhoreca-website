@@ -1,20 +1,23 @@
 /**
- * Omzetstatistieken op fiscale werkdag — gelijk aan Z-rapport / bonnen.
+ * Omzetstatistieken op tenant-werkdag (openingsuren) — gelijk aan Z-rapport.
  */
 
 import {
   addDaysToBelgiumYMD,
-  fiscalReportDateForOrderCreatedAt,
   getBelgiumDateString,
-  getCurrentFiscalReportDate,
-  getZRapportDateBounds,
 } from '@/lib/belgium-date-bounds'
+import {
+  businessDayForOrder,
+  getCurrentBusinessDay,
+  getTenantBusinessDayBounds,
+  type TenantHourRow,
+} from '@/lib/tenant-business-day'
 import {
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api-order-helpers'
 
-export { getCurrentFiscalReportDate }
+export { getCurrentBusinessDay as getCurrentFiscalReportDate }
 
 export type FiscalDayTotals = { orders: number; revenue: number }
 
@@ -35,6 +38,7 @@ export function listFiscalDaysEndingAt(endFiscalYmd: string, count: number): str
 export function aggregateRevenueByFiscalDay(
   orders: unknown[],
   filter?: (o: Order) => boolean,
+  hours: TenantHourRow[] = [],
 ): Map<string, FiscalDayTotals> {
   const byDay = new Map<string, FiscalDayTotals>()
   const countFilter = filter ?? orderCountsTowardRevenueAndZReport
@@ -43,7 +47,7 @@ export function aggregateRevenueByFiscalDay(
     const o = raw as Order
     if (!countFilter(o)) continue
     const created = String(o.created_at || '')
-    const fiscal = fiscalReportDateForOrderCreatedAt(created)
+    const fiscal = businessDayForOrder(created, hours)
     if (!fiscal) continue
     const total = Number(o.total) || 0
     const cur = byDay.get(fiscal) ?? { orders: 0, revenue: 0 }
@@ -71,11 +75,15 @@ export function sumFiscalDays(
   return { orders, revenue: round2(revenue) }
 }
 
-export function getDashboardFiscalPeriodStats(orders: unknown[], now = new Date()) {
-  const todayFiscal = getCurrentFiscalReportDate(now)
+export function getDashboardFiscalPeriodStats(
+  orders: unknown[],
+  now = new Date(),
+  hours: TenantHourRow[] = [],
+) {
+  const todayFiscal = getCurrentBusinessDay(now, hours)
   const yesterdayFiscal = addDaysToBelgiumYMD(todayFiscal, -1)
   const weekFiscalDays = listFiscalDaysEndingAt(todayFiscal, 7)
-  const byDay = aggregateRevenueByFiscalDay(orders)
+  const byDay = aggregateRevenueByFiscalDay(orders, undefined, hours)
 
   const today = sumFiscalDays(byDay, [todayFiscal])
   const yesterday = sumFiscalDays(byDay, [yesterdayFiscal])
@@ -93,7 +101,10 @@ export function getDashboardFiscalPeriodStats(orders: unknown[], now = new Date(
   }
 }
 
-export function fetchRangeUtcForFiscalDays(fiscalYmdList: string[]): {
+export function fetchRangeUtcForFiscalDays(
+  fiscalYmdList: string[],
+  hours: TenantHourRow[] = [],
+): {
   startUTC: string
   endUTC: string
 } {
@@ -102,24 +113,25 @@ export function fetchRangeUtcForFiscalDays(fiscalYmdList: string[]): {
     return { startUTC: iso, endUTC: iso }
   }
   const sorted = [...fiscalYmdList].sort()
-  const { startUTC } = getZRapportDateBounds(sorted[0])
-  const { endUTC } = getZRapportDateBounds(sorted[sorted.length - 1])
+  const { startUTC } = getTenantBusinessDayBounds(sorted[0], hours)
+  const { endUTC } = getTenantBusinessDayBounds(sorted[sorted.length - 1], hours)
   return { startUTC, endUTC }
 }
 
-/** Z-rapport maandgrenzen (fiscale dagen) voor jaar/maand — geen import uit z-report-month (circular). */
+/** Maandgrenzen op tenant-werkdag. */
 export function monthBoundsUtcForYearMonth(
   year: number,
   month: number,
   capYmd?: string,
+  hours: TenantHourRow[] = [],
 ): { startUTC: string; endUTC: string; yearMonth: string; capYmd: string } {
   const yearMonth = `${year}-${String(month).padStart(2, '0')}`
   const lastDay = new Date(year, month, 0).getDate()
   const monthEnd = `${yearMonth}-${String(lastDay).padStart(2, '0')}`
   const today = getBelgiumDateString()
   const cap = capYmd ?? (today < monthEnd ? today : monthEnd)
-  const { startUTC } = getZRapportDateBounds(`${yearMonth}-01`)
-  const { endUTC } = getZRapportDateBounds(cap)
+  const { startUTC } = getTenantBusinessDayBounds(`${yearMonth}-01`, hours)
+  const { endUTC } = getTenantBusinessDayBounds(cap, hours)
   return { startUTC, endUTC, yearMonth, capYmd: cap }
 }
 
@@ -127,13 +139,14 @@ export function filterOrdersInFiscalMonth(
   orders: unknown[],
   yearMonth: string,
   filter?: (o: Order) => boolean,
+  hours: TenantHourRow[] = [],
 ): Order[] {
   const countFilter = filter ?? orderCountsTowardRevenueAndZReport
   const out: Order[] = []
   for (const raw of orders) {
     const o = raw as Order
     if (!countFilter(o)) continue
-    const fiscal = fiscalReportDateForOrderCreatedAt(String(o.created_at || ''))
+    const fiscal = businessDayForOrder(String(o.created_at || ''), hours)
     if (!fiscal || !fiscal.startsWith(yearMonth)) continue
     out.push(o)
   }

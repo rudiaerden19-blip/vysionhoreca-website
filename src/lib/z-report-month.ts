@@ -10,8 +10,8 @@ import {
   addDaysToBelgiumYMD,
   fiscalReportDateForOrderCreatedAt,
   getBelgiumDateString,
-  getZRapportDateBounds,
 } from '@/lib/belgium-date-bounds'
+import { businessDayForOrder, getTenantBusinessDayBounds, type TenantHourRow } from '@/lib/tenant-business-day'
 
 export { fiscalReportDateForOrderCreatedAt }
 import type { CategoryVatPercent } from '@/lib/order-vat'
@@ -135,6 +135,7 @@ export function buildZReportMonthDayRows(
   tenantDefaultBtw: number,
   vatContext: ZReportVatContext,
   manualByDate?: Record<string, ManualDayExtras>,
+  hours: TenantHourRow[] = [],
 ): ZReportMonthDayRow[] {
   const counted = orders.filter((o) =>
     orderCountsTowardRevenueAndZReport(
@@ -145,7 +146,7 @@ export function buildZReportMonthDayRows(
   const byDate = new Map<string, Order[]>()
   for (const o of counted) {
     const created = String(o.created_at || '')
-    const fiscal = fiscalReportDateForOrderCreatedAt(created)
+    const fiscal = businessDayForOrder(created, hours)
     if (!fiscal || !fiscal.startsWith(yearMonth)) continue
     const list = byDate.get(fiscal) || []
     list.push(o)
@@ -165,12 +166,12 @@ export function buildZReportMonthDayRows(
   return rows
 }
 
-export function monthBoundsUtc(yearMonth: string, capYmd: string): { startUTC: string; endUTC: string } {
+export function monthBoundsUtc(yearMonth: string, capYmd: string, hours: TenantHourRow[] = []): { startUTC: string; endUTC: string } {
   const first = `${yearMonth}-01`
   const listed = listMonthDaysUpTo(yearMonth, capYmd)
   const last = listed.length ? listed[listed.length - 1] : first
-  const { startUTC } = getZRapportDateBounds(first)
-  const { endUTC } = getZRapportDateBounds(last)
+  const { startUTC } = getTenantBusinessDayBounds(first, hours)
+  const { endUTC } = getTenantBusinessDayBounds(last, hours)
   return { startUTC, endUTC }
 }
 
