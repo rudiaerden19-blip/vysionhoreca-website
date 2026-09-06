@@ -139,7 +139,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         6,
         'DINE_IN',
         undefined,
-        'NL',
+        'BE',
         [{ choiceName: 'Ter plaatse ' }],
       ),
     ).toBe(12)
@@ -226,7 +226,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         6,
         'TAKEAWAY',
         undefined,
-        'NL',
+        'BE',
         [{ choiceName: 'Ter plaatse' }],
       ),
     ).toBe(12)
@@ -237,10 +237,24 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         6,
         'DINE_IN',
         undefined,
-        'NL',
+        'BE',
         [{ choiceName: 'Meenemen' }],
       ),
     ).toBe(6)
+  })
+
+  it('NL-zaak: optie Ter plaatse wijzigt het tarief niet', () => {
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        9,
+        'TAKEAWAY',
+        undefined,
+        'NL',
+        [{ choiceName: 'Ter plaatse' }],
+      ),
+    ).toBe(9)
   })
 
   it('zonder Meenemen/Ter plaatse-optie blijft besteltype gelden', () => {

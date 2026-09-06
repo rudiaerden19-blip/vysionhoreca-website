@@ -259,7 +259,8 @@ export function resolveVatPercentWithOptionalServiceMode(
     if (locked === 21 || locked === 9) return locked
   }
   if (serviceMode) {
-    return serviceMode === 'DINE_IN' ? 12 : 6
+    const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct, country)
+    return serviceMode === 'DINE_IN' ? dineIn : offPremise
   }
   return resolveVatPercentForCategoryAndOrderType(categoryOverride, tenantDefaultPct, orderType, country)
 }
