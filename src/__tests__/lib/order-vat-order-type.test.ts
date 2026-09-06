@@ -125,6 +125,26 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
     ).toBe(6)
   })
 
+  it('BE-btw wint van fout land NL in instellingen', () => {
+    expect(resolveTenantCountryForVat('NL', 'BE1001.849.652')).toBe('BE')
+    expect(resolveTenantCountryForVat('BE', 'NL123456789B01')).toBe('NL')
+  })
+
+  it('Ter plaatse met spatie is 12%', () => {
+    expect(vatServiceModeFromLabels(['Ter plaatse '])).toBe('DINE_IN')
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'NL',
+        [{ choiceName: 'Ter plaatse ' }],
+      ),
+    ).toBe(12)
+  })
+
   it('categorie met vast 9% blijft 9% (niet order-type split)', () => {
     const cat9 = 'cat-nine'
     const map = new Map<string, number | null | undefined>([[cat9, 9]])

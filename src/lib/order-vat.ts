@@ -32,13 +32,13 @@ export function resolveTenantCountryForVat(
   country?: string | null,
   btwNumber?: string | null,
 ): string | null {
-  if (String(country ?? '').trim()) return String(country).trim()
   const vat = String(btwNumber ?? '')
     .trim()
     .toUpperCase()
     .replace(/[\s.]/g, '')
   if (vat.startsWith('NL')) return 'NL'
   if (vat.startsWith('BE')) return 'BE'
+  if (String(country ?? '').trim()) return String(country).trim()
   return null
 }
 
@@ -200,8 +200,15 @@ export function vatServiceModeFromLabels(labels: Iterable<string>): VatServiceMo
   for (const raw of labels) {
     const n = normalizeVatChoiceLabel(String(raw || ''))
     if (!n) continue
-    if (TAKEAWAY_VAT_CHOICE_LABELS.has(n)) found = 'TAKEAWAY'
-    else if (DINE_IN_VAT_CHOICE_LABELS.has(n)) found = 'DINE_IN'
+    if (TAKEAWAY_VAT_CHOICE_LABELS.has(n) || n.includes('meenemen') || n.includes('mee te nemen')) {
+      found = 'TAKEAWAY'
+    } else if (
+      DINE_IN_VAT_CHOICE_LABELS.has(n) ||
+      n.includes('ter plaatse') ||
+      n.includes('terplaatse')
+    ) {
+      found = 'DINE_IN'
+    }
   }
   return found
 }
@@ -215,7 +222,6 @@ export function vatServiceModeFromCartChoices(
     if (!c) continue
     if (c.choiceName) labels.push(c.choiceName)
     if (c.name) labels.push(c.name)
-    if (c.optionName) labels.push(c.optionName)
   }
   return vatServiceModeFromLabels(labels)
 }
