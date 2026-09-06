@@ -198,6 +198,31 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
     ).toBe(21)
   })
 
+  it('optie Ter plaatse is altijd 12%, ook als zaak-default 6% is', () => {
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        6,
+        'TAKEAWAY',
+        undefined,
+        'NL',
+        [{ choiceName: 'Ter plaatse' }],
+      ),
+    ).toBe(12)
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: foodCat },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'NL',
+        [{ choiceName: 'Meenemen' }],
+      ),
+    ).toBe(6)
+  })
+
   it('zonder Meenemen/Ter plaatse-optie blijft besteltype gelden', () => {
     expect(
       resolveVatPercentForCartLine(

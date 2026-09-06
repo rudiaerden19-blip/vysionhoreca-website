@@ -2,7 +2,7 @@
 
 import type { MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 import type { KassaSelectedChoice } from '@/lib/kassa-cart-types'
-import { dineInAndOffPremiseVatRates, vatServiceModeFromLabels } from '@/lib/order-vat'
+import { vatServiceModeFromLabels } from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import {
@@ -25,8 +25,6 @@ export function KassaProductOptionsModal({
   onToggleChoice,
   onConfirm,
   appearance = 'light',
-  tenantDefaultBtw = 6,
-  tenantCountry = null,
 }: {
   model: KassaProductOptionsModalModel
   onClose: () => void
@@ -38,12 +36,10 @@ export function KassaProductOptionsModal({
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
-  const serviceRates = dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry)
   const vatLabelForChoice = (choiceName: string): string | null => {
     const mode = vatServiceModeFromLabels([choiceName])
     if (!mode) return null
-    const pct = mode === 'DINE_IN' ? serviceRates.dineIn : serviceRates.offPremise
-    return `BTW ${pct}%`
+    return mode === 'DINE_IN' ? 'BTW 12%' : 'BTW 6%'
   }
 
   return (
