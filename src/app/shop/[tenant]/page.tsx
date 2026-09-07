@@ -1703,7 +1703,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Opening Hours & Contact Section */}
-      <section className="py-12 sm:py-20 bg-gray-900 text-white">
+      <section className="py-12 sm:py-20 text-white" style={{ backgroundColor: business.primary_color }}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
             {/* Opening Hours */}
@@ -1721,15 +1721,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   return (
                     <div 
                       key={day}
-                      className={`flex justify-between items-center py-3 border-b border-white/10 ${
+                      className={`flex justify-between items-center py-3 border-b border-white/20 text-white ${
                         day === getDayName() ? 'font-bold': ''
                       }`}
-                    style={day === getDayName() ? { color: business.primary_color } : {}}
                     >
                       <span className="capitalize">{translatedDay}</span>
                       <span>
                         {hours.closed 
-                          ? <span className="text-red-400">{t('shopPage.closed')}</span>
+                          ? t('shopPage.closed')
                           : hours.hasShift2 && hours.open2 && hours.close2
                             ? `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)} & ${hours.open2?.slice(0, 5)} - ${hours.close2?.slice(0, 5)}`
                             : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
@@ -1961,7 +1960,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-950 text-white py-12">
+      <footer className="text-white py-12" style={{ backgroundColor: business.primary_color }}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
