@@ -138,7 +138,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const shopLangRef = useRef<HTMLDivElement>(null)
   const [business, setBusiness] = useState<Business | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
-  const [showClosedBanner, setShowClosedBanner] = useState(true)
   const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null; offline_message?: string | null } | null>(null)
   
   // Formateer review datum met vertalingen
@@ -487,17 +486,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     }, 30000)
     return () => clearInterval(interval)
   }, [params.tenant])
-
-  // Auto-hide closed banner after 5 seconds (only for opening hours, not manual offline)
-  useEffect(() => {
-    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && !manualOffline?.is_offline) {
-      setShowClosedBanner(true)
-      const timer = setTimeout(() => {
-        setShowClosedBanner(false)
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [shopStatus, manualOffline])
 
   useEffect(() => {
     const ac = new AbortController()
@@ -969,24 +957,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               </div>
               <p className="text-white/90 text-sm sm:text-base">
                 {t('shopOffline.bannerSubtitle')}
-              </p>
-            </div>
-          </div>
-        )}
-
-      {/* Closed Shop Warning Banner - Show when shop is closed based on opening hours */}
-        {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && showClosedBanner && !manualOffline?.is_offline && (
-          <div className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <span className="text-3xl"></span>
-                <h2 className="text-xl sm:text-2xl font-bold">
-                  {t('shopPage.shopClosedTitle')}
-                </h2>
-                <span className="text-3xl"></span>
-              </div>
-              <p className="text-white/90 text-sm sm:text-base">
-                {shopStatus.message || t('shopPage.shopClosedMessage')}
               </p>
             </div>
           </div>
