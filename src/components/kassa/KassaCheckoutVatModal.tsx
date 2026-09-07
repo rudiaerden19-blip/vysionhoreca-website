@@ -10,16 +10,20 @@ export function KassaCheckoutVatModal({
   open,
   dineInPct,
   takeawayPct,
+  alcoholPct,
   onPickDineIn,
   onPickTakeaway,
+  onPickAlcohol,
   onClose,
   appearance = 'light',
 }: {
   open: boolean
   dineInPct: number
   takeawayPct: number
+  alcoholPct: number
   onPickDineIn: () => void
   onPickTakeaway: () => void
+  onPickAlcohol: () => void
   onClose: () => void
   appearance?: 'light' | 'dark'
 }) {
@@ -80,6 +84,21 @@ export function KassaCheckoutVatModal({
             </span>
             <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
               BTW {takeawayPct}%
+            </span>
+          </button>
+          <button
+            type="button"
+            data-testid="kassa-checkout-vat-alcohol"
+            onClick={onPickAlcohol}
+            className={`col-span-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 px-3 py-4 text-center ${
+              dark ? kassaPosButtonClass(false) : 'rounded-xl border-2 border-gray-200 bg-white font-semibold hover:border-[#3C4D6B]'
+            }`}
+          >
+            <span className={dark ? 'text-base font-bold text-zinc-50' : 'text-base font-bold text-gray-900'}>
+              Alcoholische dranken
+            </span>
+            <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
+              BTW {alcoholPct}%
             </span>
           </button>
         </div>
