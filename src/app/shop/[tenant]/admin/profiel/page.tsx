@@ -797,7 +797,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                   <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldPhoto')}</label>
                   <ImageZoomPicker
                     tenantSlug={params.tenant}
-                    objectFit="cover"
+                    objectFit="contain"
                     value={parseImageZoomSettings(formData.specialty_1_image)}
                     onChange={(settings) => {
                       setFormData(prev => ({ ...prev, specialty_1_image: stringifyImageZoomSettings(settings) }))
@@ -829,7 +829,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                   <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldPhoto')}</label>
                   <ImageZoomPicker
                     tenantSlug={params.tenant}
-                    objectFit="cover"
+                    objectFit="contain"
                     value={parseImageZoomSettings(formData.specialty_2_image)}
                     onChange={(settings) => {
                       setFormData(prev => ({ ...prev, specialty_2_image: stringifyImageZoomSettings(settings) }))
@@ -861,7 +861,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                   <label className="block text-xs text-gray-500 mb-1">{t('adminPages.profiel.fieldPhoto')}</label>
                   <ImageZoomPicker
                     tenantSlug={params.tenant}
-                    objectFit="cover"
+                    objectFit="contain"
                     value={parseImageZoomSettings(formData.specialty_3_image)}
                     onChange={(settings) => {
                       setFormData(prev => ({ ...prev, specialty_3_image: stringifyImageZoomSettings(settings) }))

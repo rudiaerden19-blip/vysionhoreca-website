@@ -1144,17 +1144,31 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.ourSpecialties')}</h2>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
               {/* Specialty 1 */}
               {(() => {
                 const img = parseImageZoomSettings(business.specialty_1_image)
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
-                      <ShopFitPhoto
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
+                      <Image 
                         src={img.url}
                         alt={business.specialty_1_title || t('shopPage.specialty')}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={62}
+                        loading="lazy"
+                        className="object-contain object-center"
+                        style={{
+                          objectPosition: `${img.positionX}% ${img.positionY}%`,
+                          ...(img.zoom < 1
+                            ? {
+                                transform: `scale(${img.zoom})`,
+                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                              }
+                            : {}),
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -1171,10 +1185,24 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
-                      <ShopFitPhoto
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
+                      <Image 
                         src={img.url}
                         alt={business.specialty_2_title || t('shopPage.specialty')}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={62}
+                        loading="lazy"
+                        className="object-contain object-center"
+                        style={{
+                          objectPosition: `${img.positionX}% ${img.positionY}%`,
+                          ...(img.zoom < 1
+                            ? {
+                                transform: `scale(${img.zoom})`,
+                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                              }
+                            : {}),
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -1191,10 +1219,24 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
-                      <ShopFitPhoto
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
+                      <Image 
                         src={img.url}
                         alt={business.specialty_3_title || t('shopPage.specialty')}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={62}
+                        loading="lazy"
+                        className="object-contain object-center"
+                        style={{
+                          objectPosition: `${img.positionX}% ${img.positionY}%`,
+                          ...(img.zoom < 1
+                            ? {
+                                transform: `scale(${img.zoom})`,
+                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                              }
+                            : {}),
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6">
