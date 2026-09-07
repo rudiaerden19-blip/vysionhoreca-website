@@ -446,8 +446,26 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   async function handleReject(order: Order) {
-    await updateOrderStatus(params.tenant, order.id, 'rejected', rejectReason, rejectNotes)
-    await sendOrderStatusEmail(order, 'rejected', rejectReason, rejectNotes)
+    if (!rejectReason) return
+    try {
+      const response = await fetch('/api/orders/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({
+          orderId: order.id,
+          tenantSlug: params.tenant,
+          rejectionReason: rejectReason,
+          rejectionNotes: rejectNotes,
+        }),
+      })
+      if (!response.ok) {
+        await updateOrderStatus(params.tenant, order.id, 'rejected', rejectReason, rejectNotes)
+        await sendOrderStatusEmail(order, 'rejected', rejectReason, rejectNotes)
+      }
+    } catch {
+      await updateOrderStatus(params.tenant, order.id, 'rejected', rejectReason, rejectNotes)
+      await sendOrderStatusEmail(order, 'rejected', rejectReason, rejectNotes)
+    }
     setNewOrderIds(prev => {
       const next = new Set(prev)
       next.delete(order.id)
@@ -457,7 +475,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setSelectedOrder(null)
     setRejectReason('')
     setRejectNotes('')
-    // Force refresh orders
     loadData()
   }
 

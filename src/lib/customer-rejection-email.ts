@@ -1,6 +1,7 @@
-import nodemailer from 'nodemailer'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { tenantSlugLookupVariants } from '@/lib/tenant-slug-resolve'
+import { resolveZohoEmail } from '@/lib/vysion-contact'
+import { assertZohoSmtpConfigured, createZohoMailTransport } from '@/lib/zoho-smtp'
 
 const REJECTION_LABELS: Record<string, string> = {
   too_busy: 'We zijn op dit moment te druk',
@@ -103,24 +104,21 @@ export async function sendCustomerRejectionEmail(
   if (!customerEmail) {
     return { sent: false, error: 'Geen klant-e-mail op de bestelling'}
   }
-  if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
-    return { sent: false, error: 'ZOHO_EMAIL / ZOHO_PASSWORD niet geconfigureerd'}
+  const smtpError = assertZohoSmtpConfigured()
+  if (smtpError) {
+    return { sent: false, error: smtpError }
   }
 
   const settings = await loadSettingsForTenant(supabase, tenantSlug)
   const tenantCore = await loadTenantCore(supabase, tenantSlug)
 
-  if (!tenantCore?.slug) {
-    return { sent: false, error: 'Onbekende tenant (geen rij in tenants)'}
-  }
-
   const businessName =
     (settings?.business_name && String(settings.business_name).trim()) ||
-    (tenantCore.name && String(tenantCore.name).trim()) ||
+    (tenantCore?.name && String(tenantCore.name).trim()) ||
     'Restaurant'
 
-  const contactEmail = (settings?.email && String(settings.email).trim()) || tenantCore.email || null
-  const contactPhone = (settings?.phone && String(settings.phone).trim()) || tenantCore.phone || null
+  const contactEmail = (settings?.email && String(settings.email).trim()) || tenantCore?.email || null
+  const contactPhone = (settings?.phone && String(settings.phone).trim()) || tenantCore?.phone || null
   const btwRate =
     typeof settings?.btw_percentage === 'number' && !Number.isNaN(settings.btw_percentage)
       ? settings.btw_percentage
@@ -136,18 +134,8 @@ export async function sendCustomerRejectionEmail(
     notesHtml = `<p style="color: #666; font-style: italic;">${String(rejectionNotes).replace(/</g, '&lt;')}</p>`
   }
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.zoho.eu',
-    port: 465,
-    secure: true,
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 15_000,
-    auth: {
-      user: process.env.ZOHO_EMAIL,
-      pass: process.env.ZOHO_PASSWORD,
-    },
-  })
+  const transporter = createZohoMailTransport()
+  const zohoFrom = resolveZohoEmail()
 
   const businessInfoHtml = `
       <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e5e5e5;">
@@ -162,9 +150,9 @@ export async function sendCustomerRejectionEmail(
     `
 
   await transporter.sendMail({
-    from: `"${businessName}" <${process.env.ZOHO_EMAIL}>`,
+    from: `"${businessName}" <${zohoFrom}>`,
     to: customerEmail,
-    replyTo: contactEmail || process.env.ZOHO_EMAIL,
+    replyTo: contactEmail || zohoFrom,
     subject: `Bestelling #${order.order_number} geannuleerd - ${businessName}`,
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
