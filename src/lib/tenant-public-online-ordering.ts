@@ -18,20 +18,36 @@ export type TenantModuleFlagsPayload = {
   } | null
 }
 
-/** Publieke tenant-site: webshop/menu alleen als module online-bestellingen aan staat. */
-export function resolvePublicOnlineOrderingEnabled(
+function resolvePublicModuleAccess(
   tenantSlug: string,
   payload: TenantModuleFlagsPayload | null | undefined,
-): boolean {
-  if (!payload?.tenant) return false
+) {
+  if (!payload?.tenant) return null
   const enabledJson = parseEnabledModulesJson(payload.tenant.enabled_modules)
-  const access = resolveTenantModules({
+  return resolveTenantModules({
     tenantSlug,
     enabledModulesJson: enabledJson,
     subscription: payload.subscription ?? null,
     tenantRow: payload.tenant,
   })
-  return !!access['online-bestellingen']
+}
+
+/** Publieke tenant-site: webshop/menu alleen als module online-bestellingen aan staat. */
+export function resolvePublicOnlineOrderingEnabled(
+  tenantSlug: string,
+  payload: TenantModuleFlagsPayload | null | undefined,
+): boolean {
+  const access = resolvePublicModuleAccess(tenantSlug, payload)
+  return !!access?.['online-bestellingen']
+}
+
+/** Publieke tenant-site: reserveringsformulier alleen als module reservaties aan staat. */
+export function resolvePublicReservationsEnabled(
+  tenantSlug: string,
+  payload: TenantModuleFlagsPayload | null | undefined,
+): boolean {
+  const access = resolvePublicModuleAccess(tenantSlug, payload)
+  return !!access?.reservaties
 }
 
 export async function fetchPublicOnlineOrderingEnabled(tenantSlug: string): Promise<boolean> {

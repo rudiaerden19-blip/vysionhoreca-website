@@ -17,6 +17,7 @@ import { patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/
 import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoji'
 import {
   resolvePublicOnlineOrderingEnabled,
+  resolvePublicReservationsEnabled,
   type TenantModuleFlagsPayload,
 } from '@/lib/tenant-public-online-ordering'
 import {
@@ -186,6 +187,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [giftCardLoading, setGiftCardLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [onlineOrderingEnabled, setOnlineOrderingEnabled] = useState(false)
+  const [reservationsModuleEnabled, setReservationsModuleEnabled] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isBlocked, setIsBlocked] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
@@ -270,6 +272,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     minAdvanceHours: 2,
     maxAdvanceDays: 60,
   })
+  const showPublicReservations = reservationsModuleEnabled && !!business?.reservations_enabled
 
   // Generate time slots based on opening hours for selected date
   const generateTimeSlots = (date: string, openingHours: Record<string, { open?: string; close?: string; closed?: boolean; hasBreak?: boolean; breakStart?: string; breakEnd?: string }>) => {
@@ -340,6 +343,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   }
 
   const handleReservationSubmit = async () => {
+    if (!showPublicReservations) {
+      setReservationError(t('shopPage.reservationError'))
+      return
+    }
     if (!reservationForm.firstName || !reservationForm.lastName || !reservationForm.phone || !reservationForm.email || !reservationForm.date || !reservationForm.time || !reservationForm.partySize) {
       setReservationError(t('shopPage.fillAllFields'))
       return
@@ -536,6 +543,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         setShopStatus(statusData)
         if (!signal.aborted) {
           setOnlineOrderingEnabled(resolvePublicOnlineOrderingEnabled(params.tenant, moduleFlagsJson))
+          setReservationsModuleEnabled(resolvePublicReservationsEnabled(params.tenant, moduleFlagsJson))
         }
 
         // Check of tenant bestaat - als tenantData null is, bestaat de tenant niet
@@ -720,7 +728,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     // Document title
     const seoTitle =
       business.seo_title ||
-      `${business.name} | ${business.tagline || (onlineOrderingEnabled ? 'Bestel Online' : t('shopPage.reserveTable'))}`
+      `${business.name} | ${business.tagline || (onlineOrderingEnabled ? 'Bestel Online' : showPublicReservations ? t('shopPage.reserveTable') : business.name)}`
     document.title = seoTitle
 
     // Meta description
@@ -797,7 +805,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       updateTwitterTag('twitter:image', business.seo_og_image || business.logo_url)
     }
 
-  }, [business, params.tenant, onlineOrderingEnabled, t])
+  }, [business, params.tenant, onlineOrderingEnabled, showPublicReservations, t])
 
   const getDayName = () => {
     const days = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
@@ -1094,7 +1102,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span>{t('shopPage.startYourOrder')}</span>
                 </Link>
               )}
-              {business.reservations_enabled && (
+              {showPublicReservations && (
                 <Link
                   href={`/shop/${params.tenant}/reserveren`}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-bold text-sm sm:text-base hover:bg-white/30 transition-colors border border-white/30"
@@ -1273,7 +1281,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Table Reservation Section */}
-      {business.reservations_enabled && (
+      {showPublicReservations && (
       <section className="py-12 sm:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12">

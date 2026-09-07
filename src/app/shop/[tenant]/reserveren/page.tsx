@@ -20,6 +20,7 @@ import {
   type ReservationTableBlocker,
 } from '@/lib/reservation-table-availability'
 import { CalendarDays, Clock, Users, Phone, Mail, MessageSquare, CheckCircle2, ChevronLeft, ChevronRight, MapPin } from 'lucide-react'
+import { resolvePublicReservationsEnabled } from '@/lib/tenant-public-online-ordering'
 
 interface TenantInfo {
   name: string
@@ -67,6 +68,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const { tenant } = params
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
   const [settings, setSettings] = useState<BookingSettings>(DEFAULT_SETTINGS)
+  const [moduleAllowed, setModuleAllowed] = useState<boolean | null>(null)
   const [step, setStep] = useState<'form' |  'success'>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -90,6 +92,11 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const [loadingDayReservations, setLoadingDayReservations] = useState(false)
 
   useEffect(() => {
+    fetch(`/api/tenant/module-flags?tenant=${encodeURIComponent(tenant)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => setModuleAllowed(resolvePublicReservationsEnabled(tenant, json)))
+      .catch(() => setModuleAllowed(false))
+
     // Laad tenant info (basis: naam, telefoon, logo)
     supabase.from('tenants').select('name,phone,email,logo_url').eq('slug', tenant).single()
       .then(({ data }) => { if (data) setTenantInfo(prev => ({ ...prev, ...data })) })
@@ -247,6 +254,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const getMaxDate = () => maxReservationDateYmd(settings.maxAdvanceDays || 60)
 
   const handleSubmit = async () => {
+    if (!moduleAllowed) { setError('Online reserveren is niet beschikbaar.'); return }
     if (!formData.guest_name.trim()) { setError('Naam is verplicht'); return }
     if (!formData.reservation_date) { setError('Datum is verplicht'); return }
     if (!formData.reservation_time) { setError('Tijd is verplicht'); return }
@@ -400,7 +408,11 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const primaryColor = tenantInfo?.primary_color || '#22c55e'
   const timeSlots = generateTimeSlots()
 
-  if (!settings.isEnabled) {
+  if (moduleAllowed === null) {
+    return <div className="min-h-screen bg-gray-50" />
+  }
+
+  if (!moduleAllowed || !settings.isEnabled) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center max-w-md bg-white rounded-2xl p-8 shadow-lg">
