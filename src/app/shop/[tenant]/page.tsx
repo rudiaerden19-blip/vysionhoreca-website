@@ -1611,7 +1611,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 .map((img, index) => (
                   <div
                     key={index}
-                    className="overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[4/5]"
+                    className="overflow-hidden rounded-2xl bg-gray-100 shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[4/3]"
                   >
                     <Image
                       src={img.url}
@@ -1620,10 +1620,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={62}
                       loading="lazy"
-                      className="object-contain object-center"
+                      className="object-cover object-center"
                       style={{
                         objectPosition: `${img.positionX}% ${img.positionY}%`,
-                        ...(img.zoom < 1
+                        ...(img.zoom > 1
                           ? {
                               transform: `scale(${img.zoom})`,
                               transformOrigin: `${img.positionX}% ${img.positionY}%`,
