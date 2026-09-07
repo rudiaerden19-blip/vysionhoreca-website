@@ -1611,7 +1611,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 .map((img, index) => (
                   <div
                     key={index}
-                    className="overflow-hidden rounded-2xl bg-gray-100 shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[4/3]"
+                    className="overflow-hidden rounded-2xl bg-gray-100 shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[16/10]"
                   >
                     <Image
                       src={img.url}
