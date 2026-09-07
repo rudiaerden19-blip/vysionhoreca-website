@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, getShopStatus, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion, ShopStatus } from '@/lib/admin-api'
 import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
+import { ShopFitPhoto } from '@/components/ShopFitPhoto'
 import { supabase } from '@/lib/supabase'
 import {
   isPublicReservationSlotTooSoon,
@@ -1173,31 +1174,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.ourSpecialties')}</h2>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 items-start">
               {/* Specialty 1 */}
               {(() => {
                 const img = parseImageZoomSettings(business.specialty_1_image)
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg aspect-[4/5]">
-                      <Image 
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
+                      <ShopFitPhoto
                         src={img.url}
                         alt={business.specialty_1_title || t('shopPage.specialty')}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={62}
-                        loading="lazy"
-                        className="object-cover object-center"
-                        style={{
-                          objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom > 1
-                            ? {
-                                transform: `scale(${img.zoom})`,
-                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
-                              }
-                            : {}),
-                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -1214,24 +1201,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg aspect-[4/5]">
-                      <Image 
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
+                      <ShopFitPhoto
                         src={img.url}
                         alt={business.specialty_2_title || t('shopPage.specialty')}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={62}
-                        loading="lazy"
-                        className="object-cover object-center"
-                        style={{
-                          objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom > 1
-                            ? {
-                                transform: `scale(${img.zoom})`,
-                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
-                              }
-                            : {}),
-                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -1248,24 +1221,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg aspect-[4/5]">
-                      <Image 
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
+                      <ShopFitPhoto
                         src={img.url}
                         alt={business.specialty_3_title || t('shopPage.specialty')}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={62}
-                        loading="lazy"
-                        className="object-cover object-center"
-                        style={{
-                          objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom > 1
-                            ? {
-                                transform: `scale(${img.zoom})`,
-                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
-                              }
-                            : {}),
-                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -1604,7 +1563,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 justify-items-center">
+            <div className="grid md:grid-cols-3 gap-8 items-start justify-items-center">
               {[business.top_seller_1, business.top_seller_2, business.top_seller_3]
                 .map(s => parseImageZoomSettings(s))
                 .filter(img => img.url)
@@ -1613,15 +1572,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     key={index}
                     className="overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-xl transition-shadow w-full"
                   >
-                    <Image
+                    <ShopFitPhoto
                       src={img.url}
                       alt={`${t('shopPage.topSeller')} ${index + 1}`}
-                      width={1200}
-                      height={800}
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      quality={62}
-                      loading="lazy"
-                      className="h-auto w-full"
                     />
                   </div>
                 ))
