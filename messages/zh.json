@@ -4227,6 +4227,7 @@
     "cartEmpty": "购物车为空",
     "fillName": "请输入您的姓名",
     "fillPhone": "请输入您的电话",
+    "fillEmail": "请输入您的电子邮件地址",
     "fillAddress": "请输入您的地址",
     "fillPostalCode": "请输入您的邮编",
     "fillCity": "请输入您的城市",

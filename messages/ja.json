@@ -4227,6 +4227,7 @@
     "cartEmpty": "カートが空です",
     "fillName": "お名前を入力してください",
     "fillPhone": "電話番号を入力してください",
+    "fillEmail": "メールアドレスを入力してください",
     "fillAddress": "住所を入力してください",
     "fillPostalCode": "郵便番号を入力してください",
     "fillCity": "市区町村を入力してください",

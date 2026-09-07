@@ -3727,6 +3727,7 @@
     "cartEmpty": "Panier vide",
     "fillName": "Veuillez entrer votre nom",
     "fillPhone": "Veuillez entrer votre téléphone",
+    "fillEmail": "Veuillez entrer votre adresse e-mail",
     "fillAddress": "Veuillez entrer votre adresse",
     "fillPostalCode": "Veuillez entrer votre code postal",
     "fillCity": "Veuillez entrer votre ville",

@@ -263,7 +263,7 @@ export default function CheckoutPageClient({
   const total = subtotal + deliveryFee - discount
 
   const canSubmit = () => {
-    if (!customerInfo.name || !customerInfo.phone) return false
+    if (!customerInfo.name || !customerInfo.phone || !customerInfo.email.trim() || !customerInfo.email.includes('@')) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
     if (!scheduledDate) return false
@@ -282,6 +282,7 @@ export default function CheckoutPageClient({
       return t('checkoutPage.dateInClosingPeriod')
     if (!customerInfo.name) return t('checkoutPage.fillName')
     if (!customerInfo.phone) return t('checkoutPage.fillPhone')
+    if (!customerInfo.email.trim() || !customerInfo.email.includes('@')) return t('checkoutPage.fillEmail')
     if (orderType === 'delivery') {
       if (!customerInfo.address) return t('checkoutPage.fillAddress')
       if (!customerInfo.postal_code) return t('checkoutPage.fillPostalCode')
@@ -359,7 +360,7 @@ export default function CheckoutPageClient({
           tenant_slug: params.tenant,
           order_number: 0,
           customer_name: customerInfo.name,
-          customer_email: customerInfo.email || null,
+          customer_email: customerInfo.email.trim(),
           customer_phone: customerInfo.phone,
           customer_address: orderType === 'delivery'? `${customerInfo.address}, ${customerInfo.postal_code} ${customerInfo.city}`: null,
           customer_notes: customerInfo.notes || null,
@@ -440,42 +441,11 @@ export default function CheckoutPageClient({
       
       void patchWebshopBrowserSession(params.tenant, { cart: [] })
       
-      // Send WhatsApp confirmation and redirect back to WhatsApp
-      if (customerInfo.phone) {
-        try {
-          // First send the confirmation message.
-          // Server valideert orderId+tenantSlug+customerPhone tegen DB en
-          // weigert oude orders (>15 min) — voorkomt spam via dit endpoint.
-          await fetch('/api/whatsapp/send-confirmation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              orderId: order.id,
-              tenantSlug: params.tenant,
-              customerPhone: customerInfo.phone,
-              orderNumber: order.order_number,
-              orderType: orderType,
-              total: total,
-              items: cart.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                total_price: item.totalPrice * item.quantity,
-              })),
-              scheduledDate: scheduledDate,
-              scheduledTime: scheduledTime,
-            })
-          })
-          console.log('WhatsApp confirmation sent')
-          
-          // If user came from WhatsApp, redirect back after short delay
-          if (whatsappPhone && businessWhatsApp) {
-            setTimeout(() => {
-              window.location.href = `https://wa.me/${businessWhatsApp}`
-            }, 2000) // 2 second delay so user sees the confirmation
-          }
-        } catch (waError) {
-          console.error('WhatsApp confirmation failed:', waError)
-        }
+      // Geen WhatsApp bij plaatsen: klantmail gaat pas ná goedkeuring door de zaak.
+      if (whatsappPhone && businessWhatsApp) {
+        setTimeout(() => {
+          window.location.href = `https://wa.me/${businessWhatsApp}`
+        }, 2000)
       }
       
       // Scroll to top for mobile
@@ -765,13 +735,14 @@ export default function CheckoutPageClient({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.email')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.email')} <span className="text-red-500">*</span></label>
                     <input
                       type="email"
                       name="email"
+                      required
                       value={customerInfo.email}
                       onChange={handleInputChange}
-                      placeholder={t('checkoutPage.optional')}
+                      placeholder="naam@email.com"
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                     />
                   </div>

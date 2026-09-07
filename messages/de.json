@@ -3727,6 +3727,7 @@
     "cartEmpty": "Warenkorb ist leer",
     "fillName": "Bitte gib deinen Namen ein",
     "fillPhone": "Bitte gib deine Telefonnummer ein",
+    "fillEmail": "Bitte gib deine E-Mail-Adresse ein",
     "fillAddress": "Bitte gib deine Adresse ein",
     "fillPostalCode": "Bitte gib deine Postleitzahl ein",
     "fillCity": "Bitte gib deine Stadt ein",

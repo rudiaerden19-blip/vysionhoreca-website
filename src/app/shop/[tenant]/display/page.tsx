@@ -354,11 +354,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info
   async function sendOrderStatusEmail(order: Order, status: string, rejectionReason?: string, rejectionNotes?: string) {
-    // Skip if no email
-    if (!order.customer_email) {
-      console.log('No customer email - skipping notification')
-      return
-    }
     
     // Prevent duplicate emails using sessionStorage
     const emailKey = `${order.id}-${status}`
@@ -388,6 +383,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           tenantSlug: params.tenant,
+          orderId: order.id,
           // Customer info
           customerEmail: order.customer_email,
           customerName: order.customer_name,

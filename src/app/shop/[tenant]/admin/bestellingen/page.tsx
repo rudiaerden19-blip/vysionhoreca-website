@@ -498,60 +498,41 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           : o
       ))
       
-      // Send WhatsApp confirmation to customer
-      if (order.customer_phone) {
-        try {
-          await authFetch('/api/whatsapp/send-status', {
-            method: 'POST',
-            body: JSON.stringify({
-              tenantSlug: params.tenant,
-              customerPhone: order.customer_phone,
-              orderNumber: order.order_number,
-              status: 'confirmed',
-            }),
-          })
-        } catch (e) {
-          console.error('Failed to send WhatsApp confirmation:', e)
+      // Klant krijgt altijd een bevestigingsmail (server laadt e-mail uit de bestelling).
+      try {
+        const mailRes = await fetch('/api/send-order-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({
+            tenantSlug: params.tenant,
+            orderId: order.id,
+            status: 'confirmed',
+            customerEmail: order.customer_email,
+            customerName: order.customer_name,
+            customerPhone: order.customer_phone,
+            customerAddress: order.customer_address || order.delivery_address,
+            orderNumber: order.order_number,
+            orderType: order.order_type,
+            businessName: tenantSettings?.business_name || 'Restaurant',
+            businessEmail: tenantSettings?.email,
+            businessPhone: tenantSettings?.phone,
+            businessAddress: tenantSettings?.address,
+            businessPostalCode: tenantSettings?.postal_code,
+            businessCity: tenantSettings?.city,
+            businessBtwNumber: tenantSettings?.btw_number,
+            items: order.items,
+            subtotal: order.subtotal,
+            deliveryFee: order.delivery_fee,
+            discount: order.discount_amount,
+            total: order.total,
+            btwPercentage: tenantSettings?.btw_percentage || 6,
+          }),
+        })
+        if (!mailRes.ok) {
+          console.error('Failed to send confirmation email:', mailRes.status, await mailRes.text())
         }
-      }
-      
-      // Send confirmation email to customer with full order details
-      if (order.customer_email) {
-        try {
-          await fetch('/api/send-order-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-            body: JSON.stringify({
-              tenantSlug: params.tenant,
-              // Customer info
-              customerEmail: order.customer_email,
-              customerName: order.customer_name,
-              customerPhone: order.customer_phone,
-              customerAddress: order.customer_address || order.delivery_address,
-              // Order info
-              orderNumber: order.order_number,
-              orderType: order.order_type,
-              status: 'confirmed',
-              // Business info (verplicht voor Belgische wetgeving)
-              businessName: tenantSettings?.business_name || 'Restaurant',
-              businessEmail: tenantSettings?.email,
-              businessPhone: tenantSettings?.phone,
-              businessAddress: tenantSettings?.address,
-              businessPostalCode: tenantSettings?.postal_code,
-              businessCity: tenantSettings?.city,
-              businessBtwNumber: tenantSettings?.btw_number,
-              // Order details
-              items: order.items,
-              subtotal: order.subtotal,
-              deliveryFee: order.delivery_fee,
-              discount: order.discount_amount,
-              total: order.total,
-              btwPercentage: tenantSettings?.btw_percentage || 6,
-            }),
-          })
-        } catch (e) {
-          console.error('Failed to send confirmation email:', e)
-        }
+      } catch (e) {
+        console.error('Failed to send confirmation email:', e)
       }
       
       // Add loyalty points NOW (after approval) - 1 point per euro

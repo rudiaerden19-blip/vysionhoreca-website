@@ -4227,6 +4227,7 @@
     "cartEmpty": "Carrito vacío",
     "fillName": "Introduce tu nombre",
     "fillPhone": "Introduce tu teléfono",
+    "fillEmail": "Introduce tu correo electrónico",
     "fillAddress": "Introduce tu dirección",
     "fillPostalCode": "Introduce tu código postal",
     "fillCity": "Introduce tu ciudad",

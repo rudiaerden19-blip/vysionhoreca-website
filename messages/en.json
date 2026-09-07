@@ -4738,6 +4738,7 @@
     "cartEmpty": "Cart is empty",
     "fillName": "Please enter your name",
     "fillPhone": "Please enter your phone number",
+    "fillEmail": "Please enter your email address",
     "fillAddress": "Please enter your address",
     "fillPostalCode": "Please enter your postal code",
     "fillCity": "Please enter your city",

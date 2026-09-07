@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import nodemailer from 'nodemailer'
+import { loadOrderStatusEmailPayload } from '@/lib/load-order-status-email-payload'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { resolveZohoEmail } from '@/lib/vysion-contact'
+import { createZohoMailTransport } from '@/lib/zoho-smtp'
 
 interface OrderItem {
   name?: string
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: access.error || 'Forbidden'}, { status: st })
     }
 
-    const { 
+    let { 
       customerEmail, 
       customerName,
       customerPhone,
@@ -57,19 +59,42 @@ export async function POST(request: NextRequest) {
       rejectionNotes,
     } = body
 
+    const orderId = typeof body.orderId === 'string' ? body.orderId.trim() : ''
+    if (orderId) {
+      const loaded = await loadOrderStatusEmailPayload(tenantSlug, orderId)
+      if (!loaded) {
+        return NextResponse.json(
+          { error: 'Bestelling niet gevonden of geen e-mailadres van de klant' },
+          { status: 422 },
+        )
+      }
+      customerEmail = loaded.customerEmail
+      customerName = loaded.customerName
+      customerPhone = loaded.customerPhone
+      customerAddress = loaded.customerAddress
+      orderNumber = loaded.orderNumber
+      orderType = loaded.orderType
+      businessName = loaded.businessName
+      businessEmail = loaded.businessEmail
+      businessPhone = loaded.businessPhone
+      businessAddress = loaded.businessAddress
+      businessPostalCode = loaded.businessPostalCode
+      businessCity = loaded.businessCity
+      businessBtwNumber = loaded.businessBtwNumber
+      items = loaded.items
+      subtotal = loaded.subtotal
+      deliveryFee = loaded.deliveryFee
+      discount = loaded.discount
+      total = loaded.total
+      btwPercentage = loaded.btwPercentage
+    }
+
     if (!customerEmail || !orderNumber || !status || !businessName) {
       return NextResponse.json({ error: 'Missing required fields'}, { status: 400 })
     }
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.zoho.eu',
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
-      },
-    })
+    const transporter = createZohoMailTransport()
+    const zohoFrom = resolveZohoEmail()
 
     let subject = ''
     let statusText = ''
@@ -241,9 +266,9 @@ export async function POST(request: NextRequest) {
     `
 
     const mailOptions = {
-      from: `"${businessName}" <${process.env.ZOHO_EMAIL}>`,
+      from: `"${businessName}" <${zohoFrom}>`,
       to: customerEmail,
-      replyTo: businessEmail || process.env.ZOHO_EMAIL,
+      replyTo: businessEmail || zohoFrom,
       subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
