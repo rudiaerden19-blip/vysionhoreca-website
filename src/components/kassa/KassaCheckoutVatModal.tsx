@@ -52,7 +52,8 @@ export function KassaCheckoutVatModal({
             Ter plaatse of meenemen?
           </h2>
           <p className={dark ? 'mt-1 text-sm text-zinc-400' : 'mt-1 text-sm text-gray-500'}>
-            Kies hoe de BTW op deze bon moet. Verplicht vóór afrekenen.
+            Eten en koffie volgen 6% of 12%. Alcohol (categorie {alcoholPct}%) blijft {alcoholPct}% op
+            dezelfde bon.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 p-5">
@@ -98,7 +99,7 @@ export function KassaCheckoutVatModal({
               Alcoholische dranken
             </span>
             <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
-              BTW {alcoholPct}%
+              BTW {alcoholPct}% alleen op alcohol — koffie en eten niet
             </span>
           </button>
         </div>

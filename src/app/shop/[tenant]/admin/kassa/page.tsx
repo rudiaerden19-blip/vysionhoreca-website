@@ -244,13 +244,8 @@ import {
   resolveTenantCountryForVat,
   dineInAndOffPremiseVatRates,
   resolveVatPercentForProductAndOrderType,
-  type CategoryVatPercent,
 } from '@/lib/order-vat'
-import {
-  applyKassaCheckoutVatForce,
-  KASSA_CHECKOUT_ALCOHOL_VAT_PCT,
-  normalizeKassaCheckoutVatMode,
-} from '@/lib/kassa-checkout-vat-mode'
+import { normalizeKassaCheckoutVatMode } from '@/lib/kassa-checkout-vat-mode'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import {
   computeKassaReceiptVatFromCartLines,
@@ -1809,7 +1804,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () => dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry),
     [tenantDefaultBtw, tenantCountry],
   )
-  const [checkoutVatForcePct, setCheckoutVatForcePct] = useState<CategoryVatPercent | null>(null)
   const requestCheckout = useCallback(() => {
     scheduleKassaTapSound(playCheckout)
     if (checkoutVatMode === 'dine_in') {
@@ -1823,7 +1817,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     if (checkoutVatMode === 'choose' && checkoutVatRates.dineIn !== checkoutVatRates.offPremise) {
-      setCheckoutVatForcePct(null)
       setShowCheckoutVatModal(true)
       return
     }
@@ -1831,18 +1824,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [checkoutVatMode, checkoutVatRates, playCheckout])
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
-      applyKassaCheckoutVatForce(
-        resolveVatPercentForProductAndOrderType(
-          line.product,
-          categoryVatLookup,
-          tenantDefaultBtw,
-          orderType,
-          productCategoryById,
-          tenantCountry,
-        ),
-        checkoutVatForcePct,
+      resolveVatPercentForProductAndOrderType(
+        line.product,
+        categoryVatLookup,
+        tenantDefaultBtw,
+        orderType,
+        productCategoryById,
+        tenantCountry,
       ),
-    [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry, checkoutVatForcePct],
+    [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
   )
 
   useEffect(() => {
@@ -3756,16 +3746,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      applyKassaCheckoutVatForce(
-        resolveVatPercentForProductAndOrderType(
-          line.product,
-          freshVatLookup,
-          tenantDefaultBtw,
-          orderType,
-          freshProductCategoryById,
-          tenantCountry,
-        ),
-        checkoutVatForcePct,
+      resolveVatPercentForProductAndOrderType(
+        line.product,
+        freshVatLookup,
+        tenantDefaultBtw,
+        orderType,
+        freshProductCategoryById,
+        tenantCountry,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
@@ -3960,7 +3947,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
     setShowPaymentModal(false)
-    setCheckoutVatForcePct(null)
     setShowSplitModal(false)
     setShowSuccessModal(true)
   }
@@ -6697,23 +6683,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         open={showCheckoutVatModal}
         dineInPct={checkoutVatRates.dineIn}
         takeawayPct={checkoutVatRates.offPremise}
-        alcoholPct={KASSA_CHECKOUT_ALCOHOL_VAT_PCT}
+        alcoholPct={21}
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
         onClose={() => setShowCheckoutVatModal(false)}
         onPickDineIn={() => {
-          setCheckoutVatForcePct(null)
           setOrderType('DINE_IN')
           setShowCheckoutVatModal(false)
           setShowPaymentModal(true)
         }}
         onPickTakeaway={() => {
-          setCheckoutVatForcePct(null)
           setOrderType('TAKEAWAY')
           setShowCheckoutVatModal(false)
           setShowPaymentModal(true)
         }}
         onPickAlcohol={() => {
-          setCheckoutVatForcePct(KASSA_CHECKOUT_ALCOHOL_VAT_PCT)
           setShowCheckoutVatModal(false)
           setShowPaymentModal(true)
         }}
