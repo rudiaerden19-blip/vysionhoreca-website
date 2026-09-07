@@ -1159,10 +1159,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
                         loading="lazy"
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom < 1
+                          ...(img.zoom > 1
                             ? {
                                 transform: `scale(${img.zoom})`,
                                 transformOrigin: `${img.positionX}% ${img.positionY}%`,
@@ -1193,10 +1193,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
                         loading="lazy"
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom < 1
+                          ...(img.zoom > 1
                             ? {
                                 transform: `scale(${img.zoom})`,
                                 transformOrigin: `${img.positionX}% ${img.positionY}%`,
@@ -1227,10 +1227,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
                         loading="lazy"
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom < 1
+                          ...(img.zoom > 1
                             ? {
                                 transform: `scale(${img.zoom})`,
                                 transformOrigin: `${img.positionX}% ${img.positionY}%`,
