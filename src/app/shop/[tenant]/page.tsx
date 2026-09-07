@@ -1180,7 +1180,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
+                    <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg aspect-[4/5]">
                       <Image 
                         src={img.url}
                         alt={business.specialty_1_title || t('shopPage.specialty')}
@@ -1188,10 +1188,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
                         loading="lazy"
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom < 1
+                          ...(img.zoom > 1
                             ? {
                                 transform: `scale(${img.zoom})`,
                                 transformOrigin: `${img.positionX}% ${img.positionY}%`,
@@ -1214,7 +1214,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
+                    <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg aspect-[4/5]">
                       <Image 
                         src={img.url}
                         alt={business.specialty_2_title || t('shopPage.specialty')}
@@ -1222,10 +1222,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
                         loading="lazy"
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom < 1
+                          ...(img.zoom > 1
                             ? {
                                 transform: `scale(${img.zoom})`,
                                 transformOrigin: `${img.positionX}% ${img.positionY}%`,
@@ -1248,7 +1248,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 if (!img.url) return null
                 return (
                   <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
+                    <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg aspect-[4/5]">
                       <Image 
                         src={img.url}
                         alt={business.specialty_3_title || t('shopPage.specialty')}
@@ -1256,10 +1256,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
                         loading="lazy"
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         style={{
                           objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom < 1
+                          ...(img.zoom > 1
                             ? {
                                 transform: `scale(${img.zoom})`,
                                 transformOrigin: `${img.positionX}% ${img.positionY}%`,
