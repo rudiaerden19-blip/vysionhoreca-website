@@ -10,20 +10,16 @@ export function KassaCheckoutVatModal({
   open,
   dineInPct,
   takeawayPct,
-  alcoholPct,
   onPickDineIn,
   onPickTakeaway,
-  onPickAlcohol,
   onClose,
   appearance = 'light',
 }: {
   open: boolean
   dineInPct: number
   takeawayPct: number
-  alcoholPct: number
   onPickDineIn: () => void
   onPickTakeaway: () => void
-  onPickAlcohol: () => void
   onClose: () => void
   appearance?: 'light' | 'dark'
 }) {
@@ -52,8 +48,8 @@ export function KassaCheckoutVatModal({
             Ter plaatse of meenemen?
           </h2>
           <p className={dark ? 'mt-1 text-sm text-zinc-400' : 'mt-1 text-sm text-gray-500'}>
-            Eten en koffie volgen 6% of 12%. Alcohol (categorie {alcoholPct}%) blijft {alcoholPct}% op
-            dezelfde bon.
+            Kies hoe de BTW op eten en koffie moet. Alcohol (categorie 21%) blijft 21% op dezelfde
+            bon.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 p-5">
@@ -85,21 +81,6 @@ export function KassaCheckoutVatModal({
             </span>
             <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
               BTW {takeawayPct}%
-            </span>
-          </button>
-          <button
-            type="button"
-            data-testid="kassa-checkout-vat-alcohol"
-            onClick={onPickAlcohol}
-            className={`col-span-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 px-3 py-4 text-center ${
-              dark ? kassaPosButtonClass(false) : 'rounded-xl border-2 border-gray-200 bg-white font-semibold hover:border-[#3C4D6B]'
-            }`}
-          >
-            <span className={dark ? 'text-base font-bold text-zinc-50' : 'text-base font-bold text-gray-900'}>
-              Alcoholische dranken
-            </span>
-            <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
-              BTW {alcoholPct}% alleen op alcohol — koffie en eten niet
             </span>
           </button>
         </div>

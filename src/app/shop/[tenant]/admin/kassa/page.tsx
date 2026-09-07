@@ -6683,7 +6683,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         open={showCheckoutVatModal}
         dineInPct={checkoutVatRates.dineIn}
         takeawayPct={checkoutVatRates.offPremise}
-        alcoholPct={21}
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
         onClose={() => setShowCheckoutVatModal(false)}
         onPickDineIn={() => {
@@ -6693,10 +6692,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onPickTakeaway={() => {
           setOrderType('TAKEAWAY')
-          setShowCheckoutVatModal(false)
-          setShowPaymentModal(true)
-        }}
-        onPickAlcohol={() => {
           setShowCheckoutVatModal(false)
           setShowPaymentModal(true)
         }}
