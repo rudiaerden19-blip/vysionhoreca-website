@@ -51,6 +51,10 @@ import {
   tenantShouldPollWebshopNewOrders,
 } from '@/lib/tenant-module-runtime'
 import {
+  buildKassaNewOrderAlert,
+  resolveKassaStartupOrderAlert,
+} from '@/lib/kassa-webshop-new-order-alert'
+import {
   normalizeReservationStatus,
   reservationStatusNeedsOwnerAlert,
 } from '@/lib/reservation-owner-alert'
@@ -1463,17 +1467,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             } catch {
               /* ignore */
             }
-            const alert = {
-              id: newOrderOnes[0].id,
-              orderNumber: newOrderOnes[0].order_number,
-              total: newOrderOnes[0].total || 0,
-            }
+            const alert = buildKassaNewOrderAlert(newOrderOnes[0])
             newOrderAlertRef.current = alert
             setNewOrderAlert(alert)
           }
         } else if (pollOrders) {
           isFirstOrderCheck = false
-          if (webshopNewList.length > 0) startAlarm()
+          const startupAlert = resolveKassaStartupOrderAlert(webshopNewList)
+          if (startupAlert) {
+            startAlarm()
+            newOrderAlertRef.current = startupAlert
+            setNewOrderAlert(startupAlert)
+          }
         }
 
         if (pollOrders) previousOrderIdsRef.current = currentOrderIds
