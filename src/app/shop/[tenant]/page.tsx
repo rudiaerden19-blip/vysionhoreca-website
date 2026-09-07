@@ -1969,7 +1969,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </div>
             <div className="text-center md:text-right">
               <p className="text-white/40 text-sm">
-                {t('shopPage.poweredBy')} <span style={{ color: business.primary_color }} className="font-semibold">Vysion</span>
+                {t('shopPage.poweredBy')} <span className="font-semibold text-red-500">Vysion</span>
               </p>
               <p className="text-white/40 text-sm mt-1">
                 © {new Date().getFullYear()} {t('shopPage.allRightsReserved')}
