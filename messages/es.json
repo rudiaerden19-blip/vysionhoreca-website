@@ -3373,7 +3373,7 @@
     "btwBonTitle": "Ticket IVA del último cobro",
     "btwBonNoOrder": "Cobre primero. Después puede imprimir un ticket IVA.",
     "btwBonModalTitle": "Ticket IVA",
-    "btwBonModalHint": "Introduzca nombre, dirección e IVA del cliente. Irán en la factura.",
+    "btwBonModalHint": "Rellene lo que quiera. Nada es obligatorio.",
     "btwBonCountry": "País",
     "btwBonCustomerName": "Nombre de la empresa",
     "btwBonAddress": "Dirección",

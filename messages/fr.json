@@ -2873,7 +2873,7 @@
     "btwBonTitle": "Ticket TVA du dernier encaissement",
     "btwBonNoOrder": "Encaissez d’abord. Ensuite vous pouvez imprimer un ticket TVA.",
     "btwBonModalTitle": "Ticket TVA",
-    "btwBonModalHint": "Saisissez le nom, l’adresse et le n° TVA du client. Ils figureront sur la facture.",
+    "btwBonModalHint": "Remplissez ce que vous voulez. Rien n’est obligatoire.",
     "btwBonCountry": "Pays",
     "btwBonCustomerName": "Nom de l’entreprise",
     "btwBonAddress": "Adresse",

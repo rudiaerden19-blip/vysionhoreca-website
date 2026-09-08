@@ -3919,7 +3919,7 @@
     "btwBonTitle": "BTW-bon van de laatste afrekening",
     "btwBonNoOrder": "Eerst afrekenen. Daarna kun je een BTW-bon printen.",
     "btwBonModalTitle": "BTW-bon",
-    "btwBonModalHint": "Vul naam, adres en BTW-nummer van de klant in. Die gegevens komen op de factuur.",
+    "btwBonModalHint": "Vul in wat je wilt. Niets is verplicht.",
     "btwBonCountry": "Land",
     "btwBonCustomerName": "Bedrijfsnaam",
     "btwBonAddress": "Adres",

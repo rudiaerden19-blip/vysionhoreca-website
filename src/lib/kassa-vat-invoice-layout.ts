@@ -86,7 +86,7 @@ export function buildKassaVatInvoiceThermalLines(input: {
   sellerAddress?: string
   sellerPostalCity?: string
   sellerVat?: string
-  customer: KassaVatInvoiceCustomer
+  customer?: KassaVatInvoiceCustomer | null
   invoiceNumber: string
   deliveryDate: string
   orderMeta: string
@@ -108,13 +108,24 @@ export function buildKassaVatInvoiceThermalLines(input: {
   lines.push(`${L.invoiceNo}${input.invoiceNumber}`)
   lines.push(L.deliveryDate.replace('{date}', input.deliveryDate))
   if (input.orderMeta) lines.push(input.orderMeta)
-  lines.push('--------------------------------')
-  lines.push(L.customerHeading)
-  lines.push(input.customer.name)
-  lines.push(input.customer.addressLine)
-  const postalCity = `${input.customer.postalCode} ${input.customer.city}`.trim()
-  if (postalCity) lines.push(postalCity)
-  lines.push(L.customerVat.replace('{vatNumber}', input.customer.vatNumber))
+  const customer = input.customer
+  const postalCity = `${customer?.postalCode ?? ''} ${customer?.city ?? ''}`.trim()
+  const hasCustomer = Boolean(
+    customer?.name?.trim() ||
+      customer?.addressLine?.trim() ||
+      postalCity ||
+      customer?.vatNumber?.trim(),
+  )
+  if (hasCustomer && customer) {
+    lines.push('--------------------------------')
+    lines.push(L.customerHeading)
+    if (customer.name.trim()) lines.push(customer.name.trim())
+    if (customer.addressLine.trim()) lines.push(customer.addressLine.trim())
+    if (postalCity) lines.push(postalCity)
+    if (customer.vatNumber.trim()) {
+      lines.push(L.customerVat.replace('{vatNumber}', customer.vatNumber.trim()))
+    }
+  }
   lines.push('--------------------------------')
   for (const item of input.items) {
     lines.push(`${item.quantity}x ${item.name}`)

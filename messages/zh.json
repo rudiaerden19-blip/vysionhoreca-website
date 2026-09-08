@@ -3373,7 +3373,7 @@
     "btwBonTitle": "上一笔结账的增值税小票",
     "btwBonNoOrder": "请先结账，然后再打印增值税小票。",
     "btwBonModalTitle": "增值税小票",
-    "btwBonModalHint": "填写客户名称、地址和税号，这些信息会印在发票上。",
+    "btwBonModalHint": "想填什么就填什么，没有必填项。",
     "btwBonCountry": "国家",
     "btwBonCustomerName": "公司名称",
     "btwBonAddress": "地址",

@@ -84,4 +84,22 @@ describe('kassa-vat-invoice-layout', () => {
     expect(text).toContain('Totaal incl.')
     expect(text).toContain('BTW 6%  excl 4.72  btw 0.28')
   })
+
+  it('laat klantregels weg als niets is ingevuld', () => {
+    const text = buildKassaVatInvoiceThermalLines({
+      labels,
+      sellerName: 'Frituur De Korst',
+      invoiceNumber: '2026-000001',
+      deliveryDate: '08/09/2026',
+      orderMeta: 'Ter plaatse',
+      items: [],
+      rates: [],
+      totalExcl: 0,
+      totalVat: 0,
+      totalIncl: 0,
+      paidWith: 'Betaald met: CASH',
+    }).join('\n')
+    expect(text).not.toContain('Klant')
+    expect(text).toContain('Factuur #2026-000001')
+  })
 })

@@ -3373,7 +3373,7 @@
     "btwBonTitle": "直前の会計のVAT伝票",
     "btwBonNoOrder": "先に会計してください。その後VAT伝票を印刷できます。",
     "btwBonModalTitle": "VAT伝票",
-    "btwBonModalHint": "お客様の氏名・住所・VAT番号を入力してください。請求書に印字されます。",
+    "btwBonModalHint": "入力は任意です。必須項目はありません。",
     "btwBonCountry": "国",
     "btwBonCustomerName": "会社名",
     "btwBonAddress": "住所",

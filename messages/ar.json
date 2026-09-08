@@ -3373,7 +3373,7 @@
     "btwBonTitle": "إيصال الضريبة لآخر عملية دفع",
     "btwBonNoOrder": "ادفع أولاً. بعدها يمكنك طباعة إيصال الضريبة.",
     "btwBonModalTitle": "إيصال ضريبة",
-    "btwBonModalHint": "أدخل اسم العميل وعنوانه ورقمه الضريبي. ستظهر على الفاتورة.",
+    "btwBonModalHint": "املأ ما تريد. لا شيء إلزامي.",
     "btwBonCountry": "البلد",
     "btwBonCustomerName": "اسم الشركة",
     "btwBonAddress": "العنوان",

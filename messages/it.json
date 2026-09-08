@@ -3373,7 +3373,7 @@
     "btwBonTitle": "Scontrino IVA dell’ultimo pagamento",
     "btwBonNoOrder": "Prima incassa. Poi puoi stampare uno scontrino IVA.",
     "btwBonModalTitle": "Scontrino IVA",
-    "btwBonModalHint": "Inserisci nome, indirizzo e P. IVA del cliente. Compariranno in fattura.",
+    "btwBonModalHint": "Compila ciò che vuoi. Niente è obbligatorio.",
     "btwBonCountry": "Paese",
     "btwBonCustomerName": "Ragione sociale",
     "btwBonAddress": "Indirizzo",

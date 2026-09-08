@@ -5,8 +5,7 @@ import { useLanguage } from '@/i18n'
 import {
   type KassaCustomerVatCountry,
   formatKassaCustomerVatDisplay,
-  isKassaCustomerVatComplete,
-  parseKassaCustomerVatInput,
+  formatKassaCustomerVatReceipt,
 } from '@/lib/kassa-customer-vat'
 import type { KassaVatInvoiceCustomer } from '@/lib/kassa-vat-invoice-layout'
 import {
@@ -51,14 +50,11 @@ export function KassaBtwBonModal({
 
   if (!open) return null
 
-  const vatComplete = isKassaCustomerVatComplete(country, vatDisplay)
   const nameTrim = name.trim()
   const addressTrim = addressLine.trim()
   const postalTrim = postalCode.trim()
   const cityTrim = city.trim()
-  const missing =
-    !nameTrim || !addressTrim || !postalTrim || !cityTrim || !vatComplete
-  const canPrint = !printing && !missing
+  const canPrint = !printing
 
   const fieldCls = dark
     ? 'w-full rounded-xl border border-zinc-600 bg-[#0b0f14] px-3 py-3 text-base text-zinc-50 outline-none focus:border-zinc-400'
@@ -196,9 +192,6 @@ export function KassaBtwBonModal({
             </div>
           </label>
 
-          {missing && (nameTrim || addressTrim || postalTrim || cityTrim || vatDisplay) ? (
-            <p className="text-sm font-semibold text-red-500">{t('kassaApp.btwBonCustomerRequired')}</p>
-          ) : null}
         </div>
 
         <div className={`flex shrink-0 gap-3 border-t px-5 py-3 ${dark ? 'border-[#1a1a1a]' : 'border-gray-100'}`}>
@@ -220,10 +213,12 @@ export function KassaBtwBonModal({
             disabled={!canPrint}
             onClick={() => {
               if (!canPrint) return
-              const parsed = parseKassaCustomerVatInput(country, vatDisplay)
+              const vatNumber = vatDisplay.trim()
+                ? formatKassaCustomerVatReceipt(country, vatDisplay)
+                : ''
               onPrint({
                 name: nameTrim,
-                vatNumber: parsed.receipt,
+                vatNumber,
                 addressLine: addressTrim,
                 postalCode: postalTrim,
                 city: cityTrim,

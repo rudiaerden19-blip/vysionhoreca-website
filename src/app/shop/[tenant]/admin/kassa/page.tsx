@@ -2681,6 +2681,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
   const [showBtwBonModal, setShowBtwBonModal] = useState(false)
   const [btwBonPrinting, setBtwBonPrinting] = useState(false)
+  const [btwBonPrintedOrderKey, setBtwBonPrintedOrderKey] = useState<string | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
   const [staffSalesPickOpen, setStaffSalesPickOpen] = useState(false)
@@ -4119,19 +4120,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const sellerPostalCity = `${tenantInfo?.postal_code ?? ''} ${tenantInfo?.city ?? ''}`.trim()
     if (isVatInvoice) {
       const customer = opts?.customerInvoice
-      if (
-        !customer?.name?.trim() ||
-        !customer.vatNumber?.trim() ||
-        !customer.addressLine?.trim() ||
-        !customer.postalCode?.trim() ||
-        !customer.city?.trim()
-      ) {
-        setThermalPrintBanner({
-          variant: 'error',
-          message: t('kassaApp.btwBonCustomerRequired'),
-        })
-        return
-      }
       const invoiceNumber = formatKassaVatInvoiceNumber(
         order.orderNumber,
         order.createdAt,
@@ -4370,7 +4358,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     })
     if (printResult.ok) {
       if (isVatInvoice) {
-        return
+        return true
       }
       if (!isDraft) {
         paidReceiptPrintGuardRef.current.printedOkOnce = true
@@ -6285,9 +6273,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 data-testid="kassa-btw-bon"
-                disabled={!lastOrder || btwBonPrinting}
+                disabled={
+                  !lastOrder ||
+                  btwBonPrinting ||
+                  (lastOrder != null && btwBonPrintedOrderKey === kassaPaidReceiptGuardKey(lastOrder))
+                }
                 onClick={() => {
-                  if (!lastOrder) {
+                  if (
+                    !lastOrder ||
+                    (btwBonPrintedOrderKey === kassaPaidReceiptGuardKey(lastOrder))
+                  ) {
                     setThermalPrintBanner({
                       variant: 'error',
                       message: t('kassaApp.btwBonNoOrder'),
@@ -6444,9 +6439,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <button
                 type="button"
                 data-testid="kassa-btw-bon-classic"
-                disabled={!lastOrder || btwBonPrinting}
+                disabled={
+                  !lastOrder ||
+                  btwBonPrinting ||
+                  (lastOrder != null && btwBonPrintedOrderKey === kassaPaidReceiptGuardKey(lastOrder))
+                }
                 onClick={() => {
-                  if (!lastOrder) {
+                  if (
+                    !lastOrder ||
+                    (btwBonPrintedOrderKey === kassaPaidReceiptGuardKey(lastOrder))
+                  ) {
                     setThermalPrintBanner({
                       variant: 'error',
                       message: t('kassaApp.btwBonNoOrder'),
@@ -6822,14 +6824,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onPrint={(customer) => {
           if (!lastOrder) return
+          const printedKey = kassaPaidReceiptGuardKey(lastOrder)
           setBtwBonPrinting(true)
           void printReceipt(lastOrder, {
             vatInvoice: true,
             customerInvoice: customer,
-          }).finally(() => {
-            setBtwBonPrinting(false)
-            setShowBtwBonModal(false)
           })
+            .then((ok) => {
+              if (ok === true) setBtwBonPrintedOrderKey(printedKey)
+            })
+            .finally(() => {
+              setBtwBonPrinting(false)
+              setShowBtwBonModal(false)
+            })
         }}
       />
 

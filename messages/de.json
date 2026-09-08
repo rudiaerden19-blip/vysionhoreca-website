@@ -2873,7 +2873,7 @@
     "btwBonTitle": "MwSt-Beleg der letzten Abrechnung",
     "btwBonNoOrder": "Zuerst kassieren. Danach können Sie einen MwSt-Beleg drucken.",
     "btwBonModalTitle": "MwSt-Beleg",
-    "btwBonModalHint": "Name, Adresse und USt-IdNr. des Kunden eingeben. Diese Daten stehen auf der Rechnung.",
+    "btwBonModalHint": "Füllen Sie aus, was Sie wollen. Nichts ist Pflicht.",
     "btwBonCountry": "Land",
     "btwBonCustomerName": "Firmenname",
     "btwBonAddress": "Adresse",
