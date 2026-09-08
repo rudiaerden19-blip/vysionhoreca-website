@@ -8,16 +8,14 @@ import {
   isKassaCustomerVatComplete,
   parseKassaCustomerVatInput,
 } from '@/lib/kassa-customer-vat'
+import type { KassaVatInvoiceCustomer } from '@/lib/kassa-vat-invoice-layout'
 import {
   KASSA_POS_BTN_SHAPE,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   kassaPosButtonClass,
 } from '@/lib/kassa-pos-surface'
 
-export type KassaBtwBonCustomer = {
-  name: string
-  vatNumber: string
-}
+export type KassaBtwBonCustomer = KassaVatInvoiceCustomer
 
 export function KassaBtwBonModal({
   open,
@@ -29,34 +27,45 @@ export function KassaBtwBonModal({
   open: boolean
   printing?: boolean
   onClose: () => void
-  onPrint: (customer: KassaBtwBonCustomer | null) => void
+  onPrint: (customer: KassaBtwBonCustomer) => void
   appearance?: 'light' | 'dark'
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
   const [country, setCountry] = useState<KassaCustomerVatCountry>('BE')
   const [name, setName] = useState('')
+  const [addressLine, setAddressLine] = useState('')
+  const [postalCode, setPostalCode] = useState('')
+  const [city, setCity] = useState('')
   const [vatDisplay, setVatDisplay] = useState('')
 
   useEffect(() => {
     if (!open) return
     setCountry('BE')
     setName('')
+    setAddressLine('')
+    setPostalCode('')
+    setCity('')
     setVatDisplay('')
   }, [open])
 
   if (!open) return null
 
-  const vatStarted = vatDisplay.replace(/\D/g, '').length > 0
   const vatComplete = isKassaCustomerVatComplete(country, vatDisplay)
   const nameTrim = name.trim()
-  const nameMissing = vatStarted && !nameTrim
-  const vatInvalid = vatStarted && !vatComplete
-  const canPrint = !printing && !nameMissing && !vatInvalid
+  const addressTrim = addressLine.trim()
+  const postalTrim = postalCode.trim()
+  const cityTrim = city.trim()
+  const missing =
+    !nameTrim || !addressTrim || !postalTrim || !cityTrim || !vatComplete
+  const canPrint = !printing && !missing
 
   const fieldCls = dark
     ? 'w-full rounded-xl border border-zinc-600 bg-[#0b0f14] px-3 py-3 text-base text-zinc-50 outline-none focus:border-zinc-400'
     : 'w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-base text-gray-900 outline-none focus:border-[#3C4D6B]'
+  const labelCls = dark
+    ? 'mb-1.5 block text-sm font-semibold text-zinc-300'
+    : 'mb-1.5 block text-sm font-semibold text-gray-600'
 
   return (
     <div
@@ -68,11 +77,11 @@ export function KassaBtwBonModal({
       <div
         className={
           dark
-            ? `${KASSA_POS_BTN_SHAPE} w-full max-w-md overflow-hidden border border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
-            : 'w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl'
+            ? `${KASSA_POS_BTN_SHAPE} flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden border border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+            : 'flex max-h-[92vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl'
         }
       >
-        <div className={`border-b px-5 py-4 ${dark ? 'border-[#1a1a1a]' : 'border-gray-200'}`}>
+        <div className={`shrink-0 border-b px-5 py-4 ${dark ? 'border-[#1a1a1a]' : 'border-gray-200'}`}>
           <h2
             id="kassa-btw-bon-title"
             className={dark ? 'text-lg font-bold text-zinc-50' : 'text-lg font-bold text-gray-900'}
@@ -84,7 +93,7 @@ export function KassaBtwBonModal({
           </p>
         </div>
 
-        <div className="space-y-4 p-5">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-5">
           <div>
             <p className={dark ? 'mb-2 text-sm font-semibold text-zinc-300' : 'mb-2 text-sm font-semibold text-gray-600'}>
               {t('kassaApp.btwBonCountry')}
@@ -115,9 +124,7 @@ export function KassaBtwBonModal({
           </div>
 
           <label className="block">
-            <span className={dark ? 'mb-1.5 block text-sm font-semibold text-zinc-300' : 'mb-1.5 block text-sm font-semibold text-gray-600'}>
-              {t('kassaApp.btwBonCustomerName')}
-            </span>
+            <span className={labelCls}>{t('kassaApp.btwBonCustomerName')}</span>
             <input
               type="text"
               autoComplete="off"
@@ -129,9 +136,44 @@ export function KassaBtwBonModal({
           </label>
 
           <label className="block">
-            <span className={dark ? 'mb-1.5 block text-sm font-semibold text-zinc-300' : 'mb-1.5 block text-sm font-semibold text-gray-600'}>
-              {t('kassaApp.btwBonVatNumber')}
-            </span>
+            <span className={labelCls}>{t('kassaApp.btwBonAddress')}</span>
+            <input
+              type="text"
+              autoComplete="off"
+              value={addressLine}
+              onChange={(e) => setAddressLine(e.target.value)}
+              className={fieldCls}
+              data-testid="kassa-btw-bon-address"
+            />
+          </label>
+
+          <div className="grid grid-cols-5 gap-2">
+            <label className="col-span-2 block">
+              <span className={labelCls}>{t('kassaApp.btwBonPostal')}</span>
+              <input
+                type="text"
+                autoComplete="off"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                className={fieldCls}
+                data-testid="kassa-btw-bon-postal"
+              />
+            </label>
+            <label className="col-span-3 block">
+              <span className={labelCls}>{t('kassaApp.btwBonCity')}</span>
+              <input
+                type="text"
+                autoComplete="off"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className={fieldCls}
+                data-testid="kassa-btw-bon-city"
+              />
+            </label>
+          </div>
+
+          <label className="block">
+            <span className={labelCls}>{t('kassaApp.btwBonVatNumber')}</span>
             <div className="flex gap-2">
               <span
                 className={`flex min-w-[3.25rem] items-center justify-center rounded-xl px-3 text-lg font-bold tracking-wide ${
@@ -154,14 +196,12 @@ export function KassaBtwBonModal({
             </div>
           </label>
 
-          {nameMissing ? (
-            <p className="text-sm font-semibold text-red-500">{t('kassaApp.btwBonNameRequired')}</p>
-          ) : vatInvalid ? (
-            <p className="text-sm font-semibold text-red-500">{t('kassaApp.btwBonVatInvalid')}</p>
+          {missing && (nameTrim || addressTrim || postalTrim || cityTrim || vatDisplay) ? (
+            <p className="text-sm font-semibold text-red-500">{t('kassaApp.btwBonCustomerRequired')}</p>
           ) : null}
         </div>
 
-        <div className={`flex gap-3 border-t px-5 py-3 ${dark ? 'border-[#1a1a1a]' : 'border-gray-100'}`}>
+        <div className={`flex shrink-0 gap-3 border-t px-5 py-3 ${dark ? 'border-[#1a1a1a]' : 'border-gray-100'}`}>
           <button
             type="button"
             onClick={onClose}
@@ -180,12 +220,14 @@ export function KassaBtwBonModal({
             disabled={!canPrint}
             onClick={() => {
               if (!canPrint) return
-              if (!vatStarted) {
-                onPrint(null)
-                return
-              }
               const parsed = parseKassaCustomerVatInput(country, vatDisplay)
-              onPrint({ name: nameTrim, vatNumber: parsed.receipt })
+              onPrint({
+                name: nameTrim,
+                vatNumber: parsed.receipt,
+                addressLine: addressTrim,
+                postalCode: postalTrim,
+                city: cityTrim,
+              })
             }}
             className={
               dark

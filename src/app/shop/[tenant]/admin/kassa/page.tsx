@@ -252,6 +252,11 @@ import {
   hydrateKassaCartItemsFromCatalog,
   kassaReceiptVatFromPersistedOrder,
 } from '@/lib/kassa-receipt-vat'
+import {
+  buildKassaVatInvoiceItemRows,
+  buildKassaVatInvoiceThermalLines,
+  formatKassaVatInvoiceNumber,
+} from '@/lib/kassa-vat-invoice-layout'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -3973,7 +3978,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
        * Draft/toog/keuken blijven het bestaande pad.
        */
       vatInvoice?: boolean
-      customerInvoice?: { name: string; vatNumber: string }
+      customerInvoice?: {
+        name: string
+        vatNumber: string
+        addressLine: string
+        postalCode: string
+        city: string
+      }
     },
   ) => {
     if (!order) {
@@ -4104,17 +4115,94 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : ''
 
     const bonLines: string[] = []
+    const receiptLines = sortKassaCartLinesByMenuCategory(order.items, categories)
+    const sellerPostalCity = `${tenantInfo?.postal_code ?? ''} ${tenantInfo?.city ?? ''}`.trim()
+    if (isVatInvoice) {
+      const customer = opts?.customerInvoice
+      if (
+        !customer?.name?.trim() ||
+        !customer.vatNumber?.trim() ||
+        !customer.addressLine?.trim() ||
+        !customer.postalCode?.trim() ||
+        !customer.city?.trim()
+      ) {
+        setThermalPrintBanner({
+          variant: 'error',
+          message: t('kassaApp.btwBonCustomerRequired'),
+        })
+        return
+      }
+      const invoiceNumber = formatKassaVatInvoiceNumber(
+        order.orderNumber,
+        order.createdAt,
+        order.checkoutReference,
+      )
+      const deliveryDate = order.createdAt.toLocaleDateString(appLocaleToBcp47(locale), {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+      const orderMeta = receiptTableNr
+        ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${receiptTableNr}${terraceSuffix}`
+        : orderTypePlain
+      const invoiceItems = buildKassaVatInvoiceItemRows(receiptLines, (line) =>
+        resolveVatPercentForProductAndOrderType(
+          line.product,
+          buildCategoryVatLookup(categories),
+          tenantDefaultBtw,
+          order.orderType,
+          buildProductCategoryLookup(products),
+          tenantCountry,
+        ),
+      )
+      bonLines.push(
+        ...buildKassaVatInvoiceThermalLines({
+          labels: {
+            title: t('kassaReceipt.invoiceTitle'),
+            deliveryDate: t('kassaReceipt.deliveryDate'),
+            invoiceNo: t('kassaReceipt.invoiceNo'),
+            sellerVat: t('kassaReceipt.sellerVatLabel'),
+            customerHeading: t('kassaReceipt.customerHeading'),
+            customerVat: t('kassaReceipt.customerVatLabel'),
+            lineAmounts: t('kassaReceipt.vatLineAmounts'),
+            totalExcl: t('kassaReceipt.totalExcl'),
+            totalVat: t('kassaReceipt.totalVatAmount'),
+            totalIncl: t('kassaReceipt.totalIncl'),
+            vatRateSplit: t('kassaReceipt.vatRateDetail'),
+          },
+          sellerName: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
+          sellerAddress: tenantInfo?.address || undefined,
+          sellerPostalCity: sellerPostalCity || undefined,
+          sellerVat: tenantInfo?.btw_number || undefined,
+          customer,
+          invoiceNumber,
+          deliveryDate,
+          orderMeta,
+          items: invoiceItems,
+          rates: receiptVatRows.map((row) => ({
+            rate: row.rate,
+            baseExcl: row.baseExcl,
+            tax: row.tax,
+          })),
+          totalExcl: subtotal,
+          totalVat: tax,
+          totalIncl: order.total,
+          paidWith: `${t('kassaReceipt.paidWith')} ${payLabel}`,
+        }),
+      )
+      if (order.helpedByStaffName) {
+        bonLines.push(t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName))
+      }
+      if (tenantInfo?.website) bonLines.push(tenantInfo.website)
+    } else {
     bonLines.push(tenantInfo?.business_name || t('kassaApp.defaultBusinessName'))
     if (tenantInfo?.address) bonLines.push(tenantInfo.address)
-    if (tenantInfo?.postal_code || tenantInfo?.city) {
-      bonLines.push(`${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}`.trim())
+    if (sellerPostalCity) {
+      bonLines.push(sellerPostalCity)
     }
     if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
     bonLines.push('--------------------------------')
-    if (isVatInvoice) {
-      bonLines.push(t('kassaReceipt.vatInvoiceBanner'))
-      bonLines.push('--------------------------------')
-    } else if (isDraft) {
+    if (isDraft) {
       if (barKitchenDelta) {
         bonLines.push(t('kassaReceipt.barToogBanner'))
         bonLines.push(t('kassaReceipt.barToogHint'))
@@ -4130,7 +4218,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
-    const receiptLines = sortKassaCartLinesByMenuCategory(order.items, categories)
     for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
@@ -4141,16 +4228,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push('--------------------------------')
     bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
-    if (isVatInvoice && receiptVatRows.length >= 1) {
-      for (const row of receiptVatRows) {
-        bonLines.push(
-          t('kassaReceipt.vatRateDetail')
-            .replace('{rate}', String(row.rate))
-            .replace('{excl}', row.baseExcl.toFixed(2))
-            .replace('{tax}', row.tax.toFixed(2)),
-        )
-      }
-    } else if (receiptVatRows.length >= 1) {
+    if (receiptVatRows.length >= 1) {
       for (const row of receiptVatRows) {
         bonLines.push(
           `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
@@ -4167,18 +4245,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tenantInfo?.btw_number) {
       bonLines.push(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))
     }
-    if (isVatInvoice && opts?.customerInvoice?.vatNumber) {
-      if (opts.customerInvoice.name) {
-        bonLines.push(t('kassaReceipt.customerNameLabel').replace('{name}', opts.customerInvoice.name))
-      }
-      bonLines.push(t('kassaReceipt.customerVatLabel').replace('{vatNumber}', opts.customerInvoice.vatNumber))
-    }
     bonLines.push(
       isDraft
         ? barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')
         : t('kassaReceipt.thanks'),
     )
     if (tenantInfo?.website) bonLines.push(tenantInfo.website)
+    }
 
     /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. Voorlopige bon: nooit. */
     const isCash =
@@ -4232,7 +4305,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     /** Alleen bij Print-Agent-fout op PC: HTML voor noodafdruk. Tablet/kiosk: géén browser-print (Chrome → alleen PDF, kiosk valt om). */
     const receiptHtml = !printResult.ok
-      ? `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+      ? isVatInvoice
+        ? `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
+      ${bonLines.map((line) => `<div class="row"><span>${escapeReceiptHtml(line)}</span></div>`).join('')}
+    </body></html>`
+        : `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${escapeReceiptHtml(docTitle)}</title><style>${KASSA_PRINT_RECEIPT_STYLES}</style></head><body>
       <div class="center">
         <div class="bold big">${bizName}</div>
         ${tenantInfo?.address ? `<div class="small">${escapeReceiptHtml(tenantInfo.address)}</div>`: ''}
@@ -4240,7 +4317,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>`: ''}
       </div>
       <div class="divider"></div>
-      ${isVatInvoice ? `<div class="center bold">${escapeReceiptHtml(t('kassaReceipt.vatInvoiceBanner'))}</div><div class="divider-solid"></div>`: ''}
       ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>`: ''}<div class="divider-solid"></div>`: ''}
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${receiptTableNr ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(receiptTableNr)}${escapeReceiptHtml(terraceSuffix)}`: ''}</div>
       <div class="row small">
@@ -4257,26 +4333,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider-solid"></div>
       <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
       ${
-        isVatInvoice && receiptVatRows.length >= 1
+        receiptVatRows.length >= 1
           ? receiptVatRows
               .map(
                 (l) =>
-                  `<div class="row"><span>${escapeReceiptHtml(
-                    t('kassaReceipt.vatRateDetail')
-                      .replace('{rate}', String(l.rate))
-                      .replace('{excl}', l.baseExcl.toFixed(2))
-                      .replace('{tax}', l.tax.toFixed(2)),
-                  )}</span></div>`,
+                  `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(l.rate)))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
               )
               .join('')
-          : receiptVatRows.length >= 1
-            ? receiptVatRows
-                .map(
-                  (l) =>
-                    `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(l.rate)))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
-                )
-                .join('')
-            : `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)))}</span><span>€${tax.toFixed(2)}</span></div>`
+          : `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)))}</span><span>€${tax.toFixed(2)}</span></div>`
       }
       <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
@@ -4285,8 +4349,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>`: ''}
-        ${isVatInvoice && opts?.customerInvoice?.name ? `${escapeReceiptHtml(t('kassaReceipt.customerNameLabel').replace('{name}', opts.customerInvoice.name))}<br/>`: ''}
-        ${isVatInvoice && opts?.customerInvoice?.vatNumber ? `${escapeReceiptHtml(t('kassaReceipt.customerVatLabel').replace('{vatNumber}', opts.customerInvoice.vatNumber))}<br/>`: ''}
         ${escapeReceiptHtml(isDraft ? (barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')) : t('kassaReceipt.thanks'))}
         ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}`: ''}
       </div>
@@ -6763,7 +6825,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setBtwBonPrinting(true)
           void printReceipt(lastOrder, {
             vatInvoice: true,
-            customerInvoice: customer ?? undefined,
+            customerInvoice: customer,
           }).finally(() => {
             setBtwBonPrinting(false)
             setShowBtwBonModal(false)
