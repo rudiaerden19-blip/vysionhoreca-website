@@ -252,7 +252,7 @@ export function kassaClockBarClass(): string {
   return `${kassaPosButtonClass(false)} relative z-0`
 }
 
-/** Zijbalk-footer — Lade/Bon/Verwijder, besteltype, Num pad (niet Afrekenen). */
+/** Zijbalk-footer — BTW-bon/Bon/Verwijder, besteltype, Num pad (niet Afrekenen). */
 export const KASSA_SIDEBAR_FOOTER_BTN_LABEL =
   'text-sm font-medium leading-tight tracking-[0.03em] sm:text-[15px]'
 

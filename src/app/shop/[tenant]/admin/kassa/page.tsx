@@ -67,7 +67,6 @@ import {
 } from '@/lib/print-receipt-html'
 import {
   sendToVysionPrintAgent,
-  openCashDrawer,
   isAndroidTabletPrintClient,
   fetchPrintAgentHealth,
   printAgentHasDedicatedKitchenPrinter,
@@ -203,6 +202,7 @@ import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModa
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
 import { KassaCheckoutVatModal } from '@/components/kassa/KassaCheckoutVatModal'
+import { KassaBtwBonModal } from '@/components/kassa/KassaBtwBonModal'
 import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/kassa/KassaStaffClockUi'
 import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
@@ -454,7 +454,7 @@ function kassaOrderTypeButtonTouchClass(sxga: boolean): string {
   return sxga ? 'min-h-[3.25rem] py-2.5': 'min-h-[3rem] py-2.5'
 }
 
-/** Sidebar-footer: touch-vriendelijke hoogte (Lade / Bon / Verwijder). */
+/** Sidebar-footer: touch-vriendelijke hoogte (BTW-bon / Bon / Verwijder). */
 function kassaFooterActionTouchMinHClass(sxga: boolean, denseBill: boolean): string {
   if (sxga) return 'min-h-[4.75rem] py-2.5'
   if (denseBill) return 'min-h-[4rem] py-2'
@@ -2674,6 +2674,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [splitCash, setSplitCash] = useState(0)
   const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<KassaLastOrderReceipt | null>(null)
+  const [showBtwBonModal, setShowBtwBonModal] = useState(false)
+  const [btwBonPrinting, setBtwBonPrinting] = useState(false)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
   const [staffSalesPickOpen, setStaffSalesPickOpen] = useState(false)
@@ -3966,6 +3968,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       draftCopies?: 1 | 2
       /** Standaard kassa; keuken bij «naar tafel»-delta. */
       receiptMode?: 'kassa' |  'keuken'
+      /**
+       * Extra BTW-bon na afrekenen. Raakt de paid-dedupe en lade niet.
+       * Draft/toog/keuken blijven het bestaande pad.
+       */
+      vatInvoice?: boolean
+      customerInvoice?: { name: string; vatNumber: string }
     },
   ) => {
     if (!order) {
@@ -3975,12 +3983,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       return
     }
-    const isDraft = !!opts?.draft
+    const isVatInvoice = !!opts?.vatInvoice
+    const isDraft = !!opts?.draft && !isVatInvoice
     const barKitchenDelta = !!opts?.barTableDelta
     const receiptMode = opts?.receiptMode ?? 'kassa'
     const receiptTableNr = kassaReceiptTableNumber(order.orderType, order.tableNumber)
 
-    if (!isDraft) {
+    if (!isDraft && !isVatInvoice) {
       try {
         if (typeof window !== 'undefined') {
           const sk = kassaPaidReceiptDedupeStorageKey(tenant, order)
@@ -3999,7 +4008,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
       if (g.printedOkOnce || g.inFlight) return
       g.inFlight = true
-    } else {
+    } else if (isDraft) {
       if (!barKitchenDelta) {
         const g = draftReceiptPrintGuardRef.current
         const now = Date.now()
@@ -4102,7 +4111,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (tenantInfo?.phone) bonLines.push(`${t('kassaReceipt.telPrefix')} ${tenantInfo.phone}`)
     bonLines.push('--------------------------------')
-    if (isDraft) {
+    if (isVatInvoice) {
+      bonLines.push(t('kassaReceipt.vatInvoiceBanner'))
+      bonLines.push('--------------------------------')
+    } else if (isDraft) {
       if (barKitchenDelta) {
         bonLines.push(t('kassaReceipt.barToogBanner'))
         bonLines.push(t('kassaReceipt.barToogHint'))
@@ -4129,7 +4141,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push('--------------------------------')
     bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
-    if (receiptVatRows.length >= 1) {
+    if (isVatInvoice && receiptVatRows.length >= 1) {
+      for (const row of receiptVatRows) {
+        bonLines.push(
+          t('kassaReceipt.vatRateDetail')
+            .replace('{rate}', String(row.rate))
+            .replace('{excl}', row.baseExcl.toFixed(2))
+            .replace('{tax}', row.tax.toFixed(2)),
+        )
+      }
+    } else if (receiptVatRows.length >= 1) {
       for (const row of receiptVatRows) {
         bonLines.push(
           `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
@@ -4146,6 +4167,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (tenantInfo?.btw_number) {
       bonLines.push(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))
     }
+    if (isVatInvoice && opts?.customerInvoice?.vatNumber) {
+      if (opts.customerInvoice.name) {
+        bonLines.push(t('kassaReceipt.customerNameLabel').replace('{name}', opts.customerInvoice.name))
+      }
+      bonLines.push(t('kassaReceipt.customerVatLabel').replace('{vatNumber}', opts.customerInvoice.vatNumber))
+    }
     bonLines.push(
       isDraft
         ? barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')
@@ -4155,7 +4182,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     /** Kassa-lade alleen openen bij contante betaling — PIN/online hebben dat niet nodig. Voorlopige bon: nooit. */
     const isCash =
-      !isDraft && ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
+      !isDraft &&
+      !isVatInvoice &&
+      ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
@@ -4163,7 +4192,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
       /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
-      copies: isDraft ? draftCopies : paidCopies,
+      copies: isVatInvoice ? 1 : isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
       orderData: {
@@ -4211,6 +4240,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ${tenantInfo?.phone ? `<div class="small">${escapeReceiptHtml(t('kassaReceipt.telPrefix'))} ${escapeReceiptHtml(tenantInfo.phone)}</div>`: ''}
       </div>
       <div class="divider"></div>
+      ${isVatInvoice ? `<div class="center bold">${escapeReceiptHtml(t('kassaReceipt.vatInvoiceBanner'))}</div><div class="divider-solid"></div>`: ''}
       ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>`: ''}<div class="divider-solid"></div>`: ''}
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${receiptTableNr ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(receiptTableNr)}${escapeReceiptHtml(terraceSuffix)}`: ''}</div>
       <div class="row small">
@@ -4227,14 +4257,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider-solid"></div>
       <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
       ${
-        receiptVatRows.length >= 1
+        isVatInvoice && receiptVatRows.length >= 1
           ? receiptVatRows
               .map(
                 (l) =>
-                  `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(l.rate)))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
+                  `<div class="row"><span>${escapeReceiptHtml(
+                    t('kassaReceipt.vatRateDetail')
+                      .replace('{rate}', String(l.rate))
+                      .replace('{excl}', l.baseExcl.toFixed(2))
+                      .replace('{tax}', l.tax.toFixed(2)),
+                  )}</span></div>`,
               )
               .join('')
-          : `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)))}</span><span>€${tax.toFixed(2)}</span></div>`
+          : receiptVatRows.length >= 1
+            ? receiptVatRows
+                .map(
+                  (l) =>
+                    `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(l.rate)))}</span><span>€${l.tax.toFixed(2)}</span></div>`,
+                )
+                .join('')
+            : `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)))}</span><span>€${tax.toFixed(2)}</span></div>`
       }
       <div class="row total"><span>${escapeReceiptHtml(t('kassaReceipt.total'))}</span><span>€${order.total.toFixed(2)}</span></div>
       <div class="divider"></div>
@@ -4243,6 +4285,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       <div class="center small">
         ${tenantInfo?.btw_number ? `${escapeReceiptHtml(t('kassaReceipt.businessVatLabel').replace('{vatNumber}', tenantInfo.btw_number))}<br/>`: ''}
+        ${isVatInvoice && opts?.customerInvoice?.name ? `${escapeReceiptHtml(t('kassaReceipt.customerNameLabel').replace('{name}', opts.customerInvoice.name))}<br/>`: ''}
+        ${isVatInvoice && opts?.customerInvoice?.vatNumber ? `${escapeReceiptHtml(t('kassaReceipt.customerVatLabel').replace('{vatNumber}', opts.customerInvoice.vatNumber))}<br/>`: ''}
         ${escapeReceiptHtml(isDraft ? (barKitchenDelta ? t('kassaReceipt.barToogFooter') : t('kassaReceipt.draftFooter')) : t('kassaReceipt.thanks'))}
         ${tenantInfo?.website ? `<br/>${escapeReceiptHtml(tenantInfo.website)}`: ''}
       </div>
@@ -4263,6 +4307,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     })
     if (printResult.ok) {
+      if (isVatInvoice) {
+        return
+      }
       if (!isDraft) {
         paidReceiptPrintGuardRef.current.printedOkOnce = true
         try {
@@ -4296,7 +4343,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         message: `Bonafdruk fout:\n\n${msg}`,
       })
     } finally {
-      if (!isDraft) paidReceiptPrintGuardRef.current.inFlight = false
+      if (isVatInvoice) {
+        /* BTW-bon: geen paid/draft-guard */
+      } else if (!isDraft) paidReceiptPrintGuardRef.current.inFlight = false
       else if (!barKitchenDelta) draftReceiptPrintGuardRef.current.inFlight = false
     }
   }
@@ -6173,14 +6222,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               <button
                 type="button"
-                onClick={() => { void openCashDrawer() }}
-                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                data-testid="kassa-btw-bon"
+                disabled={!lastOrder || btwBonPrinting}
+                onClick={() => {
+                  if (!lastOrder) {
+                    setThermalPrintBanner({
+                      variant: 'error',
+                      message: t('kassaApp.btwBonNoOrder'),
+                    })
+                    return
+                  }
+                  setShowBtwBonModal(true)
+                }}
+                className={`flex items-center justify-center px-1 disabled:pointer-events-none disabled:opacity-45 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
-                title={t('kassaApp.drawerOpen')}
+                title={t('kassaApp.btwBonTitle')}
               >
-                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.drawerOpen')}</span>
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.btwBon')}</span>
               </button>
               <button
                 type="button"
@@ -6321,8 +6381,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <div className="grid grid-cols-3 gap-2 touch-manipulation select-none">
               <button
                 type="button"
-                onClick={() => { void openCashDrawer() }}
-                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
+                data-testid="kassa-btw-bon-classic"
+                disabled={!lastOrder || btwBonPrinting}
+                onClick={() => {
+                  if (!lastOrder) {
+                    setThermalPrintBanner({
+                      variant: 'error',
+                      message: t('kassaApp.btwBonNoOrder'),
+                    })
+                    return
+                  }
+                  setShowBtwBonModal(true)
+                }}
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 disabled:pointer-events-none disabled:opacity-45 ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE
                     : KASSA_CLASSIC_ACTION_BTN_FACE
@@ -6330,9 +6401,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   kassaSxgaDenseTiles,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
-                title={t('kassaApp.drawerOpen')}
+                title={t('kassaApp.btwBonTitle')}
               >
-                <span className="text-center text-xs font-bold">{t('kassaApp.drawerOpen')}</span>
+                <span className="text-center text-xs font-bold">{t('kassaApp.btwBon')}</span>
               </button>
               <button
                 type="button"
@@ -6678,6 +6749,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
         </div>
       )}
+
+      <KassaBtwBonModal
+        open={showBtwBonModal}
+        printing={btwBonPrinting}
+        appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        onClose={() => {
+          if (btwBonPrinting) return
+          setShowBtwBonModal(false)
+        }}
+        onPrint={(customer) => {
+          if (!lastOrder) return
+          setBtwBonPrinting(true)
+          void printReceipt(lastOrder, {
+            vatInvoice: true,
+            customerInvoice: customer ?? undefined,
+          }).finally(() => {
+            setBtwBonPrinting(false)
+            setShowBtwBonModal(false)
+          })
+        }}
+      />
 
       <KassaCheckoutVatModal
         open={showCheckoutVatModal}
