@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { isAdminTenant, donorAdminDisplaySubscription } from '@/lib/protected-tenants'
+import { isInternalPlatformTenant, donorAdminDisplaySubscription } from '@/lib/protected-tenants'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 interface SubscriptionWithTenant {
@@ -84,11 +84,11 @@ export default function AbonnementenPage() {
     const now = new Date()
     const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
-    const activeSubs = enrichedSubs.filter(s => s.status === 'active')
-    const trialSubs = enrichedSubs.filter(s => s.status === 'trial')
+    const customerSubs = enrichedSubs.filter((s) => !isInternalPlatformTenant(s.tenant_slug))
+    const activeSubs = customerSubs.filter(s => s.status === 'active')
+    const trialSubs = customerSubs.filter(s => s.status === 'trial')
     // Tel ook actieve abonnementen die bijna verlopen
-    const expiringSoon = enrichedSubs.filter((s) => {
-      if (isAdminTenant(s.tenant_slug)) return false
+    const expiringSoon = customerSubs.filter((s) => {
       if (s.status === 'trial' && s.trial_ends_at) {
         return new Date(s.trial_ends_at) <= weekFromNow
       }
@@ -130,7 +130,7 @@ export default function AbonnementenPage() {
   const filteredSubs = subscriptions.filter((sub) => {
     if (filter === 'all') return true
     if (filter === 'expiring') {
-      if (isAdminTenant(sub.tenant_slug)) return false
+      if (isInternalPlatformTenant(sub.tenant_slug)) return false
       const now = new Date()
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
       if (sub.status === 'trial' && sub.trial_ends_at) {

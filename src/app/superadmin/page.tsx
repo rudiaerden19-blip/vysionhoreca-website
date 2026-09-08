@@ -10,6 +10,7 @@ import {
   isProtectedTenant,
   isAdminTenant,
   isDemoTenant,
+  isInternalPlatformTenant,
   donorAdminDisplaySubscription,
 } from '@/lib/protected-tenants'
 import { clearSuperadminSessionCookies, mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
@@ -161,15 +162,17 @@ export default function SuperAdminDashboard() {
     const totalOrders = ordersData?.length || 0
     const totalRevenue = ordersData?.reduce((sum, o) => sum + (o.total || 0), 0) || 0
 
-    // Calculate stats (donor-platformtenants tellen nooit als trial)
-    const activeSubs =
-      subsData?.filter((s) => s.status === 'active' || isAdminTenant(s.tenant_slug)) || []
-    const trialSubs =
-      subsData?.filter((s) => s.status === 'trial' && !isAdminTenant(s.tenant_slug)) || []
+    // Calculate stats — eigen demos/MAIN/admin nooit als klantzaak
+    const customerTenants =
+      tenantsData?.filter((t) => !isInternalPlatformTenant(t.tenant_slug)) || []
+    const customerSubs =
+      subsData?.filter((s) => !isInternalPlatformTenant(s.tenant_slug)) || []
+    const activeSubs = customerSubs.filter((s) => s.status === 'active')
+    const trialSubs = customerSubs.filter((s) => s.status === 'trial')
     const monthlyRecurring = activeSubs.reduce((sum, s) => sum + (s.price_monthly || 0), 0)
 
     setStats({
-      totalTenants: tenantsData?.length || 0,
+      totalTenants: customerTenants.length,
       activeTenants: activeSubs.length,
       trialTenants: trialSubs.length,
       totalOrders,
@@ -525,7 +528,7 @@ export default function SuperAdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl p-6 border border-orange-400/60 shadow-lg shadow-orange-950/25"
           >
-            <p className="text-white/85 text-sm">Totaal Tenants</p>
+            <p className="text-white/85 text-sm">Zaken</p>
             <p className="text-3xl font-bold text-white mt-1">{stats.totalTenants}</p>
           </motion.div>
 
@@ -687,7 +690,7 @@ export default function SuperAdminDashboard() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          {isAdminTenant(tenant.tenant_slug) ? (
+                          {isInternalPlatformTenant(tenant.tenant_slug) ? (
                             <span className={`px-3 py-1 rounded-lg text-xs font-medium ${isDemoTenant(tenant.tenant_slug) ? 'bg-blue-500 text-white': 'bg-purple-500 text-white'}`}>
                               {isDemoTenant(tenant.tenant_slug) ? 'Demo': 'Admin'}
                             </span>

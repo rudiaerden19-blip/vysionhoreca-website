@@ -18,8 +18,11 @@ export const ADMIN_TENANTS = [
   'restaurantdekorf',
 ] as const
 
-// Demo accounts - publiek zichtbaar als live demo
-export const DEMO_TENANTS = [] as const
+// Demo / test accounts — geen betalende zaak, niet meetellen in superadmin-totalen
+export const DEMO_TENANTS = [
+  'demo-frituur',
+  'gkstest',
+] as const
 
 export function isAdminTenant(slug: string | null | undefined): boolean {
   if (!slug) return false
@@ -53,6 +56,11 @@ export function isDemoTenant(slug: string | null | undefined): boolean {
   if (!slug) return false
   const normalizedSlug = slug.toLowerCase().trim()
   return DEMO_TENANTS.some((d) => normalizedSlug === d)
+}
+
+/** Eigen demos, MAIN/admin-zaken — niet meetellen als klantzaak. */
+export function isInternalPlatformTenant(slug: string | null | undefined): boolean {
+  return isAdminTenant(slug) || isDemoTenant(slug)
 }
 
 export function getProtectionError(slug: string): string {
