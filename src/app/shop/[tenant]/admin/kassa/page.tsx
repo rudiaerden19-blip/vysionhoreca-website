@@ -4256,29 +4256,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isVatInvoice ? 1 : isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      orderData: {
-        orderNumber: order.orderNumber,
-        orderType: order.orderType,
-        tableNumber: receiptTableNr || null,
-        items: order.items.map(i => ({
-          quantity: i.quantity,
-          name: i.product.name,
-          price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-          choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-        })),
-        subtotal,
-        tax,
-        total: order.total,
-        paymentMethod: order.paymentMethod,
-        ...(receiptVatRows.length > 0
-          ? {
-              vatLines: receiptVatRows.map((row) => ({
-                rate: row.rate,
-                tax: row.tax,
-              })),
-            }
-          : {}),
-      },
+      /**
+       * BTW-bon: géén orderData — anders bouwt de Print Agent een gewone kassabon
+       * en verdwijnt de factuurtekst. Alleen bonInhoud (zelfde regels als de preview).
+       */
+      orderData: isVatInvoice
+        ? undefined
+        : {
+            orderNumber: order.orderNumber,
+            orderType: order.orderType,
+            tableNumber: receiptTableNr || null,
+            items: order.items.map(i => ({
+              quantity: i.quantity,
+              name: i.product.name,
+              price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+              choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
+            })),
+            subtotal,
+            tax,
+            total: order.total,
+            paymentMethod: order.paymentMethod,
+            ...(receiptVatRows.length > 0
+              ? {
+                  vatLines: receiptVatRows.map((row) => ({
+                    rate: row.rate,
+                    tax: row.tax,
+                  })),
+                }
+              : {}),
+          },
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,
