@@ -5104,6 +5104,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     <div
       className="relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
       data-testid="kassa-app"
+      data-kassa-vp={kassaChromeDensity}
     >
       {kassaLayout === 'luxe' ? (
         <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
@@ -5739,6 +5740,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : kassaCompactChrome
                 ? 'w-[332px] max-w-[38vw]'
                 : 'w-80 sm:w-96 lg:w-[380px]'
+          } data-kassa-sidebar="1"
           } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${

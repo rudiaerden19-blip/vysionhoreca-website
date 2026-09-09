@@ -1,4 +1,5 @@
 import {
+  isIpadDisguisedAsMac,
   isSxga17CssViewport,
   isWide15CssViewport,
   resolveKassaViewportProfile,
@@ -19,7 +20,17 @@ describe('kassa-viewport-profile', () => {
     expect(resolveKassaViewportProfile({ cssW: 1024, cssH: 768 })).toBe('wide15')
     expect(resolveKassaViewportProfile({ cssW: 1440, cssH: 900 })).toBe('wide15')
     expect(resolveKassaViewportProfile({ cssW: 1440, cssH: 932 })).toBe('wide15')
+    expect(resolveKassaViewportProfile({ cssW: 1710, cssH: 1107 })).toBe('wide15')
     expect(isSxga17CssViewport(1366, 768)).toBe(false)
+  })
+
+  it('zet een MacBook niet als iPad (21″-layout)', () => {
+    expect(
+      isIpadDisguisedAsMac({ platform: 'MacIntel', maxTouchPoints: 5, pointerCoarse: false }),
+    ).toBe(false)
+    expect(
+      isIpadDisguisedAsMac({ platform: 'MacIntel', maxTouchPoints: 5, pointerCoarse: true }),
+    ).toBe(true)
   })
 
   it('laat 21–22″ en volle HD met rust', () => {

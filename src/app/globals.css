@@ -823,4 +823,17 @@ html.kassa-luxe-leather body {
   }
 }
 
+/* 15″ landschap: snelmenu + zijbalk ook zonder JS-profiel (Safari/Mac). Niet 21″ 1080p, niet 17″ SXGA. */
+@media (orientation: landscape) and (min-width: 980px) and (max-width: 1760px) and (max-height: 990px) {
+  [data-testid='kassa-app']:not([data-kassa-vp='sxga17']) [data-testid='kassa-quick-menu-panel'] > div {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0.25rem !important;
+  }
+
+  [data-testid='kassa-app']:not([data-kassa-vp='sxga17']) [data-kassa-sidebar='1'] {
+    width: 268px !important;
+    max-width: 30vw !important;
+  }
+}
+
 

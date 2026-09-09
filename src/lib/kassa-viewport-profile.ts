@@ -18,17 +18,31 @@ export function isSxga17PhysicalPair(a: number, b: number): boolean {
 }
 
 /**
- * 15–16″ landschap: 1366×768, 1280×800, 1024×768, 1440×900, 15″ Mac (1440×932).
+ * 15–16″ landschap: 1366×768, 1440×900, 15″ Mac (1440×932 / 1710×1107).
  * Geen 17″ 4∶3 en geen volle 1920×1080 / 21″.
  */
 export function isWide15CssViewport(wCss: number, hCss: number): boolean {
   if (!(wCss > 0 && hCss > 0) || wCss <= hCss) return false
   if (isSxga17CssViewport(wCss, hCss)) return false
-  if (hCss < 640 || hCss > 990) return false
-  if (wCss < 980 || wCss > 1720) return false
-  if (wCss >= 1800 || hCss >= 1000) return false
+  if (wCss >= 1800 && hCss >= 1000) return false
+  if (wCss >= 1640 && wCss <= 1720 && hCss >= 1020 && hCss <= 1080) return false
+  if (hCss < 600 || hCss > 1140) return false
+  if (wCss < 980 || wCss > 1760) return false
   const r = wCss / hCss
   return r >= 1.28 && r <= 1.95
+}
+
+/** iPad als desktop-Safari — niet een MacBook (die ook MacIntel + touchpoints kan hebben). */
+export function isIpadDisguisedAsMac(input: {
+  platform?: string
+  maxTouchPoints?: number
+  pointerCoarse?: boolean
+}): boolean {
+  return (
+    input.platform === 'MacIntel' &&
+    (input.maxTouchPoints ?? 0) > 1 &&
+    input.pointerCoarse === true
+  )
 }
 
 export function resolveKassaViewportProfile(input: {
@@ -75,7 +89,16 @@ export function readKassaViewportProfileFromWindow(): KassaViewportProfile {
 
   const ua = navigator.userAgent
   if (/\biPhone\b|\biPod\b/.test(ua)) return 'default'
-  if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return 'default'
+  if (
+    isIpadDisguisedAsMac({
+      platform: navigator.platform,
+      maxTouchPoints: navigator.maxTouchPoints,
+      pointerCoarse:
+        typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches,
+    })
+  ) {
+    return 'default'
+  }
 
   const vv = window.visualViewport
   const wSrc = vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth
