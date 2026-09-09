@@ -18,14 +18,14 @@ export function isSxga17PhysicalPair(a: number, b: number): boolean {
 }
 
 /**
- * 15–16″ landschap (1366×768, 1280×800, 1024×768, 1080p met schaal).
- * Geen 17″ 4∶3 en geen volle 1920×1080.
+ * 15–16″ landschap (1366×768, 1280×800, 1024×768, 1536×864).
+ * Geen 17″ 4∶3, geen 19–20″ (1440×900 / 1600×900) en geen volle 1920×1080.
  */
 export function isWide15CssViewport(wCss: number, hCss: number): boolean {
   if (!(wCss > 0 && hCss > 0) || wCss <= hCss) return false
   if (isSxga17CssViewport(wCss, hCss)) return false
-  if (hCss < 680 || hCss > 900) return false
-  if (wCss < 1000 || wCss > 1680) return false
+  if (hCss < 680 || hCss > 864) return false
+  if (wCss < 1000 || wCss > 1540) return false
   const r = wCss / hCss
   return r >= 1.28 && r <= 1.95
 }
