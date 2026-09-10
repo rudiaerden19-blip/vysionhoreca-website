@@ -2607,7 +2607,11 @@
       "statusOn": "フロアプランはオンです。",
       "statusOff": "フロアプランはオフです。",
       "savedFlash": "保存しました — レジ画面を更新すると反映されます。",
-      "dbHint": "Supabase で tenant_settings_kassa_floor_plan_enabled.sql を実行してください（supabase フォルダ）。"
+      "dbHint": "Supabase で該当する SQL を実行してください（supabase フォルダ）：tenant_settings_kassa_floor_plan_enabled.sql または tenant_settings_kassa_footer_drawer_button.sql。",
+      "drawerInsteadOfBtwLabel": "VAT請求の代わりにドロワーを開く",
+      "drawerInsteadOfBtwHint": "オン＝ドロワー開ボタン。オフ＝VAT請求ボタン。現金会計ではVATボタン表示中でもドロワーは開きます。",
+      "drawerInsteadOfBtwOn": "ドロワーボタンがオンです（VAT請求ボタンなし）。",
+      "drawerInsteadOfBtwOff": "VAT請求ボタンがオンです。"
     },
     "bestellingen": {
       "title": "注文",

@@ -70,7 +70,9 @@ import {
   isAndroidTabletPrintClient,
   fetchPrintAgentHealth,
   printAgentHasDedicatedKitchenPrinter,
+  openCashDrawer,
 } from '@/lib/vysion-print-agent-client'
+import { kassaShowsDrawerInsteadOfBtwBon } from '@/lib/kassa-footer-drawer'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -1740,6 +1742,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined`= aan (backward compatible). */
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
+  /** Standaard BTW-bon. Alleen aan via tenant_settings.kassa_footer_drawer_button. */
+  const kassaFooterDrawerButton = kassaShowsDrawerInsteadOfBtwBon(tenantInfo)
 
   const categoryVatLookup = useMemo(() => buildCategoryVatLookup(categories), [categories])
   const productCategoryById = useMemo(() => buildProductCategoryLookup(products), [products])
@@ -6287,6 +6291,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <div
               className={`grid grid-cols-3 touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-3'}`}
             >
+              {kassaFooterDrawerButton ? (
+              <button
+                type="button"
+                data-testid="kassa-open-drawer"
+                onClick={() => {
+                  playClick()
+                  void openCashDrawer()
+                }}
+                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                  kassaChromeDensity,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+                title={t('kassaApp.drawerOpen')}
+              >
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.drawerOpen')}</span>
+              </button>
+              ) : (
               <button
                 type="button"
                 data-testid="kassa-btw-bon"
@@ -6316,6 +6337,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.btwBon')}</span>
               </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -6455,6 +6477,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 touch-manipulation select-none">
+              {kassaFooterDrawerButton ? (
+              <button
+                type="button"
+                data-testid="kassa-open-drawer-classic"
+                onClick={() => {
+                  playClick()
+                  void openCashDrawer()
+                }}
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
+                  kassaLight
+                    ? KASSA_LIGHT_BTN_FACE
+                    : KASSA_CLASSIC_ACTION_BTN_FACE
+                } ${kassaFooterActionTouchMinHClass(
+                  kassaChromeDensity,
+                  kassaSidebarFooterTier === 'dense',
+                )}`}
+                title={t('kassaApp.drawerOpen')}
+              >
+                <span className="text-center text-xs font-bold">{t('kassaApp.drawerOpen')}</span>
+              </button>
+              ) : (
               <button
                 type="button"
                 data-testid="kassa-btw-bon-classic"
@@ -6488,6 +6531,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className="text-center text-xs font-bold">{t('kassaApp.btwBon')}</span>
               </button>
+              )}
               <button
                 type="button"
                 onClick={() => { void printDraftBonFromCart({ draftCopies: 1 }) }}

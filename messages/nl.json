@@ -2943,7 +2943,11 @@
       "statusOn": "Plattegrond staat aan.",
       "statusOff": "Plattegrond staat uit.",
       "savedFlash": "Opgeslagen — vernieuw het verkoopscherm om dit direct toe te passen.",
-      "dbHint": "Voer het script tenant_settings_kassa_floor_plan_enabled.sql uit in Supabase (map supabase)."
+      "dbHint": "Voer het bijhorende SQL-script uit in Supabase (map supabase): tenant_settings_kassa_floor_plan_enabled.sql of tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "Lade open i.p.v. BTW-bon",
+      "drawerInsteadOfBtwHint": "Aan = knop Lade open. Uit = knop BTW-bon. Contant afrekenen opent de lade altijd, ook als de BTW-bon-knop zichtbaar is.",
+      "drawerInsteadOfBtwOn": "Lade-knop staat aan (geen BTW-bon-knop).",
+      "drawerInsteadOfBtwOff": "BTW-bon-knop staat aan."
     },
     "bestellingen": {
       "title": "Bestellingen",

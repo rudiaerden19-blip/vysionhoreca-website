@@ -2607,7 +2607,11 @@
       "statusOn": "Plano activado.",
       "statusOff": "Plano desactivado.",
       "savedFlash": "Guardado — actualice la pantalla de ventas para aplicar.",
-      "dbHint": "Ejecute el script SQL tenant_settings_kassa_floor_plan_enabled.sql en Supabase (carpeta supabase)."
+      "dbHint": "Ejecute el script SQL correspondiente en Supabase (carpeta supabase): tenant_settings_kassa_floor_plan_enabled.sql o tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "Cajón en lugar de factura IVA",
+      "drawerInsteadOfBtwHint": "Activado = botón Abrir cajón. Desactivado = botón factura IVA. El pago en efectivo abre el cajón siempre, también con el botón IVA visible.",
+      "drawerInsteadOfBtwOn": "Botón de cajón activado (sin botón de factura IVA).",
+      "drawerInsteadOfBtwOff": "Botón de factura IVA activado."
     },
     "bestellingen": {
       "title": "Pedidos",

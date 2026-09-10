@@ -2607,7 +2607,11 @@
       "statusOn": "平面图已开启。",
       "statusOff": "平面图已关闭。",
       "savedFlash": "已保存 — 请刷新收银界面以生效。",
-      "dbHint": "请在 Supabase 中执行 SQL 脚本 tenant_settings_kassa_floor_plan_enabled.sql（supabase 目录）。"
+      "dbHint": "请在 Supabase 中执行对应 SQL（supabase 目录）：tenant_settings_kassa_floor_plan_enabled.sql 或 tenant_settings_kassa_footer_drawer_button.sql。",
+      "drawerInsteadOfBtwLabel": "用开钱箱代替增值税发票",
+      "drawerInsteadOfBtwHint": "开＝开钱箱按钮。关＝增值税发票按钮。现金结账仍会开箱，即使显示发票按钮。",
+      "drawerInsteadOfBtwOn": "已启用开钱箱按钮（无增值税发票按钮）。",
+      "drawerInsteadOfBtwOff": "已启用增值税发票按钮。"
     },
     "bestellingen": {
       "title": "订单",

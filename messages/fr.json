@@ -2107,7 +2107,11 @@
       "statusOn": "Plan de salle activé.",
       "statusOff": "Plan de salle désactivé.",
       "savedFlash": "Enregistré — actualisez l'écran de vente pour appliquer.",
-      "dbHint": "Exécutez le script SQL tenant_settings_kassa_floor_plan_enabled.sql dans Supabase (dossier supabase)."
+      "dbHint": "Exécutez le script SQL correspondant dans Supabase (dossier supabase) : tenant_settings_kassa_floor_plan_enabled.sql ou tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "Tiroir-caisse à la place de la facture TVA",
+      "drawerInsteadOfBtwHint": "Activé = bouton Ouvrir le tiroir. Désactivé = bouton facture TVA. Un paiement en espèces ouvre toujours le tiroir, même si le bouton TVA est visible.",
+      "drawerInsteadOfBtwOn": "Bouton tiroir activé (pas de bouton facture TVA).",
+      "drawerInsteadOfBtwOff": "Bouton facture TVA activé."
     },
     "bestellingen": {
       "title": "Commandes",

@@ -2943,7 +2943,11 @@
       "statusOn": "Floor plan is on.",
       "statusOff": "Floor plan is off.",
       "savedFlash": "Saved — refresh the register screen to apply.",
-      "dbHint": "Run the SQL script tenant_settings_kassa_floor_plan_enabled.sql in Supabase (supabase folder)."
+      "dbHint": "Run the matching SQL script in Supabase (supabase folder): tenant_settings_kassa_floor_plan_enabled.sql or tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "Cash drawer instead of VAT invoice",
+      "drawerInsteadOfBtwHint": "On = Open drawer button. Off = VAT invoice button. Cash checkout still opens the drawer even when the VAT invoice button is shown.",
+      "drawerInsteadOfBtwOn": "Drawer button is on (no VAT invoice button).",
+      "drawerInsteadOfBtwOff": "VAT invoice button is on."
     },
     "bestellingen": {
       "title": "Orders",

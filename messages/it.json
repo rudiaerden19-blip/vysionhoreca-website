@@ -2607,7 +2607,11 @@
       "statusOn": "Pianta attiva.",
       "statusOff": "Pianta disattivata.",
       "savedFlash": "Salvato — aggiorna la schermata di vendita per applicare.",
-      "dbHint": "Esegui lo script SQL tenant_settings_kassa_floor_plan_enabled.sql in Supabase (cartella supabase)."
+      "dbHint": "Esegui lo script SQL corrispondente in Supabase (cartella supabase): tenant_settings_kassa_floor_plan_enabled.sql o tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "Cassetto al posto della fattura IVA",
+      "drawerInsteadOfBtwHint": "On = pulsante Apri cassetto. Off = pulsante fattura IVA. Il pagamento in contanti apre sempre il cassetto, anche con il pulsante IVA visibile.",
+      "drawerInsteadOfBtwOn": "Pulsante cassetto attivo (niente pulsante fattura IVA).",
+      "drawerInsteadOfBtwOff": "Pulsante fattura IVA attivo."
     },
     "bestellingen": {
       "title": "Ordini",

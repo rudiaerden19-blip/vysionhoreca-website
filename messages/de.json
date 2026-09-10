@@ -2107,7 +2107,11 @@
       "statusOn": "Raumplan ist aktiv.",
       "statusOff": "Raumplan ist aus.",
       "savedFlash": "Gespeichert — Verkaufsdisplay aktualisieren, um es zu übernehmen.",
-      "dbHint": "SQL-Skript tenant_settings_kassa_floor_plan_enabled.sql in Supabase ausführen (Ordner supabase)."
+      "dbHint": "Passendes SQL-Skript in Supabase ausführen (Ordner supabase): tenant_settings_kassa_floor_plan_enabled.sql oder tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "Kassenschublade statt MwSt.-Beleg",
+      "drawerInsteadOfBtwHint": "An = Schublade öffnen. Aus = MwSt.-Beleg. Barzahlung öffnet die Schublade immer, auch wenn der MwSt.-Knopf sichtbar ist.",
+      "drawerInsteadOfBtwOn": "Schubladen-Knopf ist an (kein MwSt.-Beleg-Knopf).",
+      "drawerInsteadOfBtwOff": "MwSt.-Beleg-Knopf ist an."
     },
     "bestellingen": {
       "title": "Bestellungen",

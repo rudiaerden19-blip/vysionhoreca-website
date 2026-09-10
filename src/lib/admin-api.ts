@@ -212,6 +212,8 @@ export interface TenantSettings {
   kassa_staff_clock_enabled?: boolean
   /** Plattegrond op het verkoopscherm — realtime/polls naar floor_plan_* (aanbevolen aan; uit voor zwakkere terminals) */
   kassa_floor_plan_enabled?: boolean
+  /** true = horeca-kassa toont Lade open i.p.v. BTW-bon (standaard false) */
+  kassa_footer_drawer_button?: boolean
   /** off | choose | dine_in | takeaway — popup 12%/6% bij afrekenen (standaard off) */
   kassa_checkout_vat_mode?: string
   /** Beginsaldo handmatig kasboek (optioneel) */
@@ -330,6 +332,32 @@ export async function saveTenantKassaFloorPlanEnabled(
       ok: false,
       error:
         'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_floor_plan_enabled.sql uit.',
+    }
+  }
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** Horeca-kassa: Lade open i.p.v. BTW-bon. */
+export async function saveTenantKassaFooterDrawerButton(
+  tenantSlug: string,
+  enabled: boolean
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_footer_drawer_button: enabled })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantKassaFooterDrawerButton:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_footer_drawer_button.sql uit.',
     }
   }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))

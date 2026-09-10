@@ -2607,7 +2607,11 @@
       "statusOn": "مخطط القاعة مفعّل.",
       "statusOff": "مخطط القاعة معطّل.",
       "savedFlash": "تم الحفظ — حدّث شاشة البيع لتطبيق التغيير.",
-      "dbHint": "نفّذ سكربت SQL tenant_settings_kassa_floor_plan_enabled.sql في Supabase (مجلد supabase)."
+      "dbHint": "نفّذ سكربت SQL المناسب في Supabase (مجلد supabase): tenant_settings_kassa_floor_plan_enabled.sql أو tenant_settings_kassa_footer_drawer_button.sql.",
+      "drawerInsteadOfBtwLabel": "درج النقد بدل فاتورة الضريبة",
+      "drawerInsteadOfBtwHint": "تشغيل = زر فتح الدرج. إيقاف = زر فاتورة الضريبة. الدفع نقداً يفتح الدرج دائماً حتى مع ظهور زر الضريبة.",
+      "drawerInsteadOfBtwOn": "زر الدرج قيد التشغيل (بدون زر فاتورة الضريبة).",
+      "drawerInsteadOfBtwOff": "زر فاتورة الضريبة قيد التشغيل."
     },
     "bestellingen": {
       "title": "الطلبات",
