@@ -4771,11 +4771,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           submenuId: 'sm_online_status',
         },
         {
-          key: 'openingHours',
-          labelKey: 'kassaApp.quickMenuOpeningHours',
+          key: 'onAccount',
+          labelKey: 'kassaOnAccount.title',
           kind: 'nav'as const,
-          href: `${baseUrl}/openingstijden`,
-          submenuId: 'sm_inst_opening',
+          href: `${baseUrl}/op-rekening`,
+          submenuId: 'sm_kassa_op_rekening',
         },
         {
           key: 'shopProfile',
