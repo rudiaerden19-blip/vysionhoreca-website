@@ -87,6 +87,33 @@ export function summarizeOnAccountOpenByName(
   return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, 'nl'))
 }
 
+export type OnAccountOpenDay = {
+  id: string
+  date: string
+  remaining: number
+}
+
+export function formatOnAccountDayShort(ymd: string): string {
+  if (!isOnAccountEntryDate(ymd)) return ymd
+  const [, m, d] = ymd.split('-')
+  return `${d}/${m}`
+}
+
+/** Openstaande dagen van één klant, plus het opgetelde restant. */
+export function onAccountOpenDaysForCustomer(
+  rows: readonly KassaOnAccountEntry[],
+  name: string,
+): { days: OnAccountOpenDay[]; total: number } {
+  const key = onAccountCustomerKey(name)
+  const days = rows
+    .filter((r) => onAccountCustomerKey(r.customer_name) === key)
+    .map((r) => ({ id: r.id, date: r.entry_date, remaining: onAccountRemaining(r) }))
+    .filter((d) => d.remaining > 0)
+    .sort((a, b) => a.date.localeCompare(b.date))
+  const total = Math.round(days.reduce((s, d) => s + d.remaining, 0) * 100) / 100
+  return { days, total }
+}
+
 export function groupOnAccountEntriesByDate(
   rows: readonly KassaOnAccountEntry[],
 ): { date: string; entries: KassaOnAccountEntry[] }[] {

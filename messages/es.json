@@ -3316,6 +3316,10 @@
     "openTotal": "Pendiente",
     "quickList": "Pendiente",
     "quickListEmpty": "Nadie tiene saldo pendiente.",
+    "thisDay": "Este día",
+    "allDaysOpen": "Total pendiente",
+    "alreadyOpen": "Ya pendiente",
+    "extraDayNote": "El importe nuevo se añade como un día extra.",
     "invalidForm": "Indica nombre, fecha e importe.",
     "saveFailed": "No se pudo guardar. ¿Existe la tabla en Supabase?",
     "loadFailed": "No se pudo cargar. ¿Existe la tabla en Supabase?"

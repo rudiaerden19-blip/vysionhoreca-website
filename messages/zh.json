@@ -3316,6 +3316,10 @@
     "openTotal": "仍待支付",
     "quickList": "尚欠",
     "quickListEmpty": "没有未结余额。",
+    "thisDay": "当天",
+    "allDaysOpen": "合计尚欠",
+    "alreadyOpen": "已有欠款",
+    "extraDayNote": "新金额会作为新的一天加入。",
     "invalidForm": "请填写姓名、日期和金额。",
     "saveFailed": "保存失败。Supabase 中有该表吗？",
     "loadFailed": "加载失败。Supabase 中有该表吗？"

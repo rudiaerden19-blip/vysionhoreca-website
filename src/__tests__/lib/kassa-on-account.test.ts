@@ -9,6 +9,8 @@ import {
   onAccountRemaining,
   parseOnAccountAmount,
   summarizeOnAccountOpenByName,
+  onAccountOpenDaysForCustomer,
+  formatOnAccountDayShort,
   type KassaOnAccountEntry,
 } from '@/lib/kassa-on-account'
 
@@ -64,6 +66,23 @@ describe('kassa on-account lijst', () => {
     expect(list).toEqual([
       { name: 'Bart', remaining: 31 },
       { name: 'Jerry', remaining: 13.4 },
+    ])
+  })
+
+  it('telt extra dag bij dezelfde klant op in het vak', () => {
+    const days = onAccountOpenDaysForCustomer(
+      [
+        row({ id: 'a', customer_name: 'Danny Grens', entry_date: '2026-09-12', amount: 62 }),
+        row({ id: 'b', customer_name: 'Danny Grens', entry_date: '2026-09-13', amount: 22 }),
+        row({ id: 'c', customer_name: 'Jerry', entry_date: '2026-09-13', amount: 10 }),
+      ],
+      'danny grens',
+    )
+    expect(formatOnAccountDayShort('2026-09-12')).toBe('12/09')
+    expect(days.total).toBe(84)
+    expect(days.days.map((d) => [d.date, d.remaining])).toEqual([
+      ['2026-09-12', 62],
+      ['2026-09-13', 22],
     ])
   })
 })

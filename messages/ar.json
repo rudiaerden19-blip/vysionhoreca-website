@@ -3316,6 +3316,10 @@
     "openTotal": "المتبقي",
     "quickList": "المتبقي",
     "quickListEmpty": "لا يوجد رصيد مفتوح.",
+    "thisDay": "هذا اليوم",
+    "allDaysOpen": "الإجمالي المفتوح",
+    "alreadyOpen": "مفتوح مسبقاً",
+    "extraDayNote": "المبلغ الجديد يُضاف كيوم إضافي.",
     "invalidForm": "أدخل الاسم والتاريخ والمبلغ.",
     "saveFailed": "تعذّر الحفظ. هل الجدول موجود في Supabase؟",
     "loadFailed": "تعذّر التحميل. هل الجدول موجود في Supabase؟"

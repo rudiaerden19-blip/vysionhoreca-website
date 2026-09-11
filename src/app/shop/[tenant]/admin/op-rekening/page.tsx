@@ -35,26 +35,33 @@ import { adminDb } from '@/lib/admin-db-client'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import {
   clampOnAccountPaid,
+  formatOnAccountDayShort,
   groupOnAccountEntriesByDate,
   isOnAccountEntryDate,
   normalizeOnAccountCustomerName,
   onAccountCustomerKey,
   onAccountIsSettled,
   onAccountMonthKey,
+  onAccountOpenDaysForCustomer,
   onAccountPaidSoFar,
   onAccountRemaining,
   parseOnAccountAmount,
   parseOnAccountMoney,
   summarizeOnAccountOpenByName,
   type KassaOnAccountEntry,
+  type OnAccountOpenDay,
 } from '@/lib/kassa-on-account'
 
 function OnAccountRowEdit({
   row,
+  openDays,
+  openTotal,
   onSavePaid,
   onRemove,
 }: {
   row: KassaOnAccountEntry
+  openDays: OnAccountOpenDay[]
+  openTotal: number
   onSavePaid: (row: KassaOnAccountEntry, paid: number) => void
   onRemove: (row: KassaOnAccountEntry) => void
 }) {
@@ -92,9 +99,29 @@ function OnAccountRowEdit({
         <div>
           <p className="text-lg font-semibold text-gray-900">{row.customer_name}</p>
           <p className="mt-1 text-sm text-gray-500">
-            {t('kassaOnAccount.amount')}
-            <span className="ml-2 font-medium text-gray-800">{money(total)}</span>
+            {t('kassaOnAccount.thisDay')}
+            <span className="ml-2 font-medium text-gray-800">{money(onAccountRemaining(row))}</span>
+            <span className="ml-1 text-gray-400">/ {money(total)}</span>
           </p>
+          {openDays.length > 1 ? (
+            <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
+              <ul className="space-y-1">
+                {openDays.map((day) => (
+                  <li key={day.id} className="flex justify-between gap-4">
+                    <span>
+                      {formatOnAccountDayShort(day.date)}
+                      {day.id === row.id ? ` · ${t('kassaOnAccount.thisDay')}` : ''}
+                    </span>
+                    <span className="tabular-nums font-medium">{money(day.remaining)}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 flex justify-between gap-4 border-t border-amber-200 pt-2 font-semibold">
+                <span>{t('kassaOnAccount.allDaysOpen')}</span>
+                <span className="tabular-nums">{money(openTotal)}</span>
+              </p>
+            </div>
+          ) : null}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           <span
@@ -218,6 +245,11 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   const groups = useMemo(() => groupOnAccountEntriesByDate(monthRows), [monthRows])
   const openNames = useMemo(() => summarizeOnAccountOpenByName(monthRows), [monthRows])
   const openTotal = monthRows.reduce((s, r) => s + onAccountRemaining(r), 0)
+  const existingOpen = useMemo(
+    () => onAccountOpenDaysForCustomer(monthRows, name),
+    [monthRows, name],
+  )
+  const addAmount = parseOnAccountAmount(amount)
 
   const euro = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
@@ -358,6 +390,25 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
               onFocus={onAccountFieldFocus}
             />
           </label>
+          {existingOpen.total > 0 && normalizeOnAccountCustomerName(name) ? (
+            <p className="rounded-xl bg-amber-50 px-3 py-3 text-sm text-amber-950">
+              <span className="font-semibold">{normalizeOnAccountCustomerName(name)}</span>
+              {' — '}
+              {t('kassaOnAccount.alreadyOpen')}
+              {': '}
+              {euro(existingOpen.total)}
+              <br />
+              {t('kassaOnAccount.extraDayNote')}
+              {addAmount > 0 ? (
+                <>
+                  {' '}
+                  {t('kassaOnAccount.allDaysOpen')}
+                  {': '}
+                  {euro(Math.round((existingOpen.total + addAmount) * 100) / 100)}
+                </>
+              ) : null}
+            </p>
+          ) : null}
           <div className="flex items-end">
             <button
               type="button"
@@ -400,14 +451,19 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
               {formatDay(group.date)}
             </h2>
             <ul>
-              {group.entries.map((row) => (
-                <OnAccountRowEdit
-                  key={row.id}
-                  row={row}
-                  onSavePaid={(r, paid) => void savePaid(r, paid)}
-                  onRemove={(r) => void removeRow(r)}
-                />
-              ))}
+              {group.entries.map((row) => {
+                const open = onAccountOpenDaysForCustomer(monthRows, row.customer_name)
+                return (
+                  <OnAccountRowEdit
+                    key={row.id}
+                    row={row}
+                    openDays={open.days}
+                    openTotal={open.total}
+                    onSavePaid={(r, paid) => void savePaid(r, paid)}
+                    onRemove={(r) => void removeRow(r)}
+                  />
+                )
+              })}
             </ul>
           </section>
         ))

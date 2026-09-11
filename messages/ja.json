@@ -3316,6 +3316,10 @@
     "openTotal": "未払い合計",
     "quickList": "未払い",
     "quickListEmpty": "未払いはありません。",
+    "thisDay": "この日",
+    "allDaysOpen": "未払い合計",
+    "alreadyOpen": "既に未払いあり",
+    "extraDayNote": "新しい金額は別の日として追加されます。",
     "invalidForm": "名前・日付・金額を入力してください。",
     "saveFailed": "保存できません。Supabaseにテーブルがありますか？",
     "loadFailed": "読み込めません。Supabaseにテーブルがありますか？"

@@ -3862,6 +3862,10 @@
     "openTotal": "Still to pay",
     "quickList": "Still open",
     "quickListEmpty": "Nobody still owes anything.",
+    "thisDay": "This day",
+    "allDaysOpen": "Total open",
+    "alreadyOpen": "Already open",
+    "extraDayNote": "The new amount is added as an extra day.",
     "invalidForm": "Enter a name, date and amount.",
     "saveFailed": "Could not save. Is the table in Supabase?",
     "loadFailed": "Could not load the list. Is the table in Supabase?"

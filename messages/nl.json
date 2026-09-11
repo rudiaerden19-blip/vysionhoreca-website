@@ -3862,6 +3862,10 @@
     "openTotal": "Nog te betalen",
     "quickList": "Nog open",
     "quickListEmpty": "Niemand staat nog open.",
+    "thisDay": "Deze dag",
+    "allDaysOpen": "Totaal open",
+    "alreadyOpen": "Staat al open",
+    "extraDayNote": "Nieuw bedrag wordt een extra dag.",
     "invalidForm": "Vul naam, datum en een bedrag in.",
     "saveFailed": "Opslaan mislukt. Staat de tabel in Supabase?",
     "loadFailed": "Lijst laden mislukt. Staat de tabel in Supabase?"
