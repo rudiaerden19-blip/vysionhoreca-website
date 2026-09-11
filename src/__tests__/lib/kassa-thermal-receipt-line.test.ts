@@ -10,6 +10,7 @@ describe('formatKassaThermalPriceRow', () => {
     expect(line.endsWith('EUR 2.00')).toBe(true)
     expect(line).toHaveLength(KASSA_THERMAL_LINE_WIDTH)
     expect(line.indexOf('EUR 2.00')).toBe(KASSA_THERMAL_LINE_WIDTH - 'EUR 2.00'.length)
+    expect(line).toContain('...')
   })
 
   it('kapt een te lange naam af zodat de prijs op de regel blijft', () => {
