@@ -455,7 +455,11 @@ export default function CheckoutPageClient({
             .update({ payment_status: 'failed' })
             .eq('id', order.id)
             .eq('tenant_slug', params.tenant)
-          alert(t('checkoutPage.onlinePayFailed'))
+          alert(
+            stripeData.error
+              ? `${t('checkoutPage.onlinePayFailed')}\n\n${String(stripeData.error)}`
+              : t('checkoutPage.onlinePayFailed'),
+          )
           setSubmitting(false)
           return
         } catch {

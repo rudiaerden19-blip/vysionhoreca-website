@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Bestelling is al betaald.'}, { status: 409 })
     }
 
-    const stripe = new Stripe(settings.stripe_secret_key)
+    const stripe = new Stripe(String(settings.stripe_secret_key).trim())
 
     // ── Hergebruik bestaande sessie als die jong genoeg is ─────────────────
     // Dit dekt: dubbele klikken, browser-back, F5 op de checkout, of de
@@ -151,27 +151,38 @@ export async function POST(request: NextRequest) {
     // wegens connection-resets in mobiele netwerken). Versie-suffix maakt
     // dat we een nieuwe sessie kunnen forceren als de body bewust verandert
     // (bv. nieuwe successUrl). Voor échte dedupe vertrouwen we op de DB-cache.
-    const session = await stripe.checkout.sessions.create(
-      {
-        payment_method_types: ['bancontact', 'card'],
-        line_items: lineItems,
-        mode: 'payment',
-        success_url:
-          successUrl ||
-          `${request.nextUrl.origin}/shop/${tenantSlug}?payment=success&order=${order.order_number ?? ''}`,
-        cancel_url:
-          cancelUrl || `${request.nextUrl.origin}/shop/${tenantSlug}/checkout?payment=cancelled`,
-        customer_email: order.customer_email || undefined,
-        metadata: {
-          order_id: orderId,
-          tenant_slug: tenantSlug,
-          order_number: String(order.order_number ?? ''),
-        },
+    const checkoutBody = {
+      line_items: lineItems,
+      mode: 'payment' as const,
+      success_url:
+        successUrl ||
+        `${request.nextUrl.origin}/shop/${tenantSlug}?payment=success&order=${order.order_number ?? ''}`,
+      cancel_url:
+        cancelUrl || `${request.nextUrl.origin}/shop/${tenantSlug}/checkout?payment=cancelled`,
+      customer_email: order.customer_email || undefined,
+      metadata: {
+        order_id: orderId,
+        tenant_slug: tenantSlug,
+        order_number: String(order.order_number ?? ''),
       },
-      {
-        idempotencyKey: `checkout-${orderId}-${Math.floor(Date.now() / (60 * 60 * 1000))}`,
+    }
+    const idempotencyKey = `checkout-${orderId}-${Math.floor(Date.now() / (60 * 60 * 1000))}`
+    let session: Stripe.Checkout.Session
+    try {
+      session = await stripe.checkout.sessions.create(
+        { ...checkoutBody, payment_method_types: ['bancontact', 'card'] },
+        { idempotencyKey },
+      )
+    } catch (bancontactErr) {
+      try {
+        session = await stripe.checkout.sessions.create(
+          { ...checkoutBody, payment_method_types: ['card'] },
+          { idempotencyKey: `${idempotencyKey}-card` },
+        )
+      } catch {
+        throw bancontactErr
       }
-    )
+    }
 
     // Cache in orders zodat een retry binnen 23h dezelfde URL terugkrijgt.
     if (session.id && session.url) {
