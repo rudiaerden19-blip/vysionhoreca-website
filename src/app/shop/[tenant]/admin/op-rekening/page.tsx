@@ -1,6 +1,35 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FocusEvent } from 'react'
+
+const ADMIN_SCROLL = '[data-vysion-admin-scroll]'
+
+/** Kassa-toetsenbord ligt vaak over het scherm; schuif het veld daarboven. */
+function scrollInputAboveKeyboard(input: HTMLElement) {
+  const scroller =
+    input.closest(ADMIN_SCROLL) ?? document.querySelector(ADMIN_SCROLL)
+  requestAnimationFrame(() => {
+    if (!(scroller instanceof HTMLElement)) {
+      input.scrollIntoView({ block: 'center', inline: 'nearest' })
+      return
+    }
+    const box = input.getBoundingClientRect()
+    const pane = scroller.getBoundingClientRect()
+    const vv = window.visualViewport
+    const visibleBottom = vv ? vv.offsetTop + vv.height : window.innerHeight
+    const oskCover = Math.max(0, window.innerHeight - visibleBottom)
+    const reserve = Math.max(oskCover, Math.round(window.innerHeight * 0.42), 280)
+    const targetTop = pane.top + 72
+    const targetBottom = window.innerHeight - reserve - 12
+    if (box.top < targetTop || box.bottom > targetBottom) {
+      scroller.scrollTop += box.top - targetTop
+    }
+  })
+}
+
+function onAccountFieldFocus(e: FocusEvent<HTMLInputElement>) {
+  scrollInputAboveKeyboard(e.currentTarget)
+}
 import { useLanguage } from '@/i18n'
 import { adminDb } from '@/lib/admin-db-client'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
@@ -76,7 +105,7 @@ function OnAccountRowEdit({
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4">
         <label className="block text-sm font-medium text-gray-700">
           {t('kassaOnAccount.alreadyPaid')}
           <input
@@ -91,6 +120,7 @@ function OnAccountRowEdit({
                 setRemainDraft(clampOnAccountPaid(total, total - parsed).toFixed(2))
               }
             }}
+            onFocus={onAccountFieldFocus}
             onBlur={commitPaidDraft}
             onKeyDown={(e) => {
               if (e.key === 'Enter') commitPaidDraft()
@@ -111,6 +141,7 @@ function OnAccountRowEdit({
                 setPaidDraft(clampOnAccountPaid(total, total - parsed).toFixed(2))
               }
             }}
+            onFocus={onAccountFieldFocus}
             onBlur={commitPaidDraft}
             onKeyDown={(e) => {
               if (e.key === 'Enter') commitPaidDraft()
@@ -161,6 +192,19 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   useEffect(() => {
     void load()
   }, [load])
+
+  useEffect(() => {
+    const onViewport = () => {
+      const el = document.activeElement
+      if (el instanceof HTMLInputElement) scrollInputAboveKeyboard(el)
+    }
+    window.visualViewport?.addEventListener('resize', onViewport)
+    window.visualViewport?.addEventListener('scroll', onViewport)
+    return () => {
+      window.visualViewport?.removeEventListener('resize', onViewport)
+      window.visualViewport?.removeEventListener('scroll', onViewport)
+    }
+  }, [])
 
   const monthRows = useMemo(
     () => rows.filter((r) => onAccountMonthKey(r.entry_date) === month),
@@ -228,20 +272,21 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-4 sm:p-6">
+    <div className="mx-auto max-w-2xl space-y-8 p-4 pb-[50vh] sm:p-6 sm:pb-[50vh]">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('kassaOnAccount.title')}</h1>
         <p className="mt-1 text-sm text-gray-600">{t('kassaOnAccount.subtitle')}</p>
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5">
           <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.name')}
             <input
-              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2"
+              className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onFocus={onAccountFieldFocus}
               autoComplete="off"
             />
           </label>
@@ -249,18 +294,20 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
             {t('kassaOnAccount.date')}
             <input
               type="date"
-              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2"
+              className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
               value={entryDate}
               onChange={(e) => setEntryDate(e.target.value)}
+              onFocus={onAccountFieldFocus}
             />
           </label>
           <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.amount')}
             <input
-              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2"
+              className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
               inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              onFocus={onAccountFieldFocus}
             />
           </label>
           <div className="flex items-end">
@@ -268,7 +315,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
               type="button"
               disabled={saving}
               onClick={() => void addRow()}
-              className="w-full rounded-xl bg-[#3C4D6B] py-2.5 font-semibold text-white disabled:opacity-50"
+              className="w-full rounded-xl bg-[#3C4D6B] py-3 font-semibold text-white disabled:opacity-50"
             >
               {t('kassaOnAccount.add')}
             </button>
@@ -285,6 +332,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
             className="ml-2 rounded-xl border border-gray-300 px-3 py-2"
             value={month}
             onChange={(e) => setMonth(e.target.value)}
+            onFocus={onAccountFieldFocus}
           />
         </label>
         <p className="text-sm font-semibold text-gray-800">
