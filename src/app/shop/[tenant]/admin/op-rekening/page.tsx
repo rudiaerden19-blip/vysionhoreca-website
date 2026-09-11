@@ -40,54 +40,54 @@ import {
   isOnAccountEntryDate,
   normalizeOnAccountCustomerName,
   onAccountCustomerKey,
-  onAccountIsSettled,
   onAccountMonthKey,
   onAccountOpenDaysForCustomer,
-  onAccountPaidSoFar,
   onAccountRemaining,
   parseOnAccountAmount,
   parseOnAccountMoney,
   summarizeOnAccountOpenByName,
   filterOnAccountNamesByQuery,
   uniqueOnAccountNames,
+  allocateOnAccountPayment,
+  onAccountCustomerTotals,
+  rowsForOnAccountCustomer,
   type KassaOnAccountEntry,
   type OnAccountOpenDay,
 } from '@/lib/kassa-on-account'
 
 function OnAccountRowEdit({
   row,
+  customerRows,
   openDays,
   openTotal,
   onSavePaid,
   onRemove,
 }: {
   row: KassaOnAccountEntry
+  customerRows: KassaOnAccountEntry[]
   openDays: OnAccountOpenDay[]
   openTotal: number
-  onSavePaid: (row: KassaOnAccountEntry, paid: number) => void
+  onSavePaid: (paid: number) => void
   onRemove: (row: KassaOnAccountEntry) => void
 }) {
   const { t } = useLanguage()
-  const total = Number(row.amount) || 0
-  const [paidDraft, setPaidDraft] = useState(() => onAccountPaidSoFar(row).toFixed(2))
-  const [remainDraft, setRemainDraft] = useState(() => onAccountRemaining(row).toFixed(2))
+  const dayTotal = Number(row.amount) || 0
+  const totals = onAccountCustomerTotals(customerRows)
+  const [paidDraft, setPaidDraft] = useState(() => totals.paid.toFixed(2))
+  const [remainDraft, setRemainDraft] = useState(() => totals.remaining.toFixed(2))
   useEffect(() => {
-    setPaidDraft(onAccountPaidSoFar(row).toFixed(2))
-    setRemainDraft(onAccountRemaining(row).toFixed(2))
-  }, [row.amount, row.amount_paid, row.is_paid, row.id])
+    setPaidDraft(totals.paid.toFixed(2))
+    setRemainDraft(totals.remaining.toFixed(2))
+  }, [totals.paid, totals.remaining])
 
-  const settled = onAccountIsSettled(row)
-
-  const savePaidAmount = (paid: number) => {
-    onSavePaid(row, clampOnAccountPaid(total, paid))
-  }
+  const settled = totals.remaining <= 0
 
   const commitPaidDraft = () => {
     const parsed = parseOnAccountMoney(paidDraft)
     if (parsed == null) return
-    const next = clampOnAccountPaid(total, parsed)
-    if (next === onAccountPaidSoFar(row)) return
-    savePaidAmount(next)
+    const next = clampOnAccountPaid(totals.total, parsed)
+    if (next === totals.paid) return
+    onSavePaid(next)
   }
 
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
@@ -103,7 +103,7 @@ function OnAccountRowEdit({
           <p className="mt-1 text-sm text-gray-500">
             {t('kassaOnAccount.thisDay')}
             <span className="ml-2 font-medium text-gray-800">{money(onAccountRemaining(row))}</span>
-            <span className="ml-1 text-gray-400">/ {money(total)}</span>
+            <span className="ml-1 text-gray-400">/ {money(dayTotal)}</span>
           </p>
           {openDays.length > 1 ? (
             <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
@@ -148,7 +148,7 @@ function OnAccountRowEdit({
               setPaidDraft(next)
               const parsed = parseOnAccountMoney(next)
               if (parsed != null) {
-                setRemainDraft(clampOnAccountPaid(total, total - parsed).toFixed(2))
+                setRemainDraft(clampOnAccountPaid(totals.total, totals.total - parsed).toFixed(2))
               }
             }}
             onFocus={onAccountFieldFocus}
@@ -169,7 +169,7 @@ function OnAccountRowEdit({
               setRemainDraft(next)
               const parsed = parseOnAccountMoney(next)
               if (parsed != null) {
-                setPaidDraft(clampOnAccountPaid(total, total - parsed).toFixed(2))
+                setPaidDraft(clampOnAccountPaid(totals.total, totals.total - parsed).toFixed(2))
               }
             }}
             onFocus={onAccountFieldFocus}
@@ -333,16 +333,27 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     await load()
   }
 
-  const savePaid = async (row: KassaOnAccountEntry, paid: number) => {
-    const amount_paid = clampOnAccountPaid(Number(row.amount), paid)
-    const is_paid = amount_paid >= Number(row.amount) - 0.001
-    const result = await adminDb.update(
-      'kassa_on_account',
-      { amount_paid, is_paid, updated_at: new Date().toISOString() },
-      { id: row.id, tenant_slug: tenant },
+  const savePaid = async (customerName: string, paid: number) => {
+    const customerRows = rowsForOnAccountCustomer(monthRows, customerName)
+    const allocations = allocateOnAccountPayment(customerRows, paid)
+    const now = new Date().toISOString()
+    const results = await Promise.all(
+      allocations.map((a) =>
+        adminDb.update(
+          'kassa_on_account',
+          { amount_paid: a.amount_paid, is_paid: a.is_paid, updated_at: now },
+          { id: a.id, tenant_slug: tenant },
+        ),
+      ),
     )
-    if (result.ok) {
-      setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, amount_paid, is_paid } : r)))
+    if (results.every((r) => r.ok)) {
+      const byId = new Map(allocations.map((a) => [a.id, a]))
+      setRows((prev) =>
+        prev.map((r) => {
+          const a = byId.get(r.id)
+          return a ? { ...r, amount_paid: a.amount_paid, is_paid: a.is_paid } : r
+        }),
+      )
     }
   }
 
@@ -512,14 +523,16 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
             </h2>
             <ul>
               {group.entries.map((row) => {
-                const open = onAccountOpenDaysForCustomer(monthRows, row.customer_name)
+                const customerRows = rowsForOnAccountCustomer(monthRows, row.customer_name)
+                const open = onAccountOpenDaysForCustomer(customerRows, row.customer_name)
                 return (
                   <OnAccountRowEdit
                     key={row.id}
                     row={row}
+                    customerRows={customerRows}
                     openDays={open.days}
                     openTotal={open.total}
-                    onSavePaid={(r, paid) => void savePaid(r, paid)}
+                    onSavePaid={(paid) => void savePaid(row.customer_name, paid)}
                     onRemove={(r) => void removeRow(r)}
                   />
                 )

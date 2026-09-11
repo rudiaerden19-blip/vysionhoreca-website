@@ -100,6 +100,46 @@ export function formatOnAccountDayShort(ymd: string): string {
 }
 
 /** Openstaande dagen van één klant, plus het opgetelde restant. */
+function roundOnAccountMoney(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+export function rowsForOnAccountCustomer(
+  rows: readonly KassaOnAccountEntry[],
+  name: string,
+): KassaOnAccountEntry[] {
+  const key = onAccountCustomerKey(name)
+  return rows.filter((r) => onAccountCustomerKey(r.customer_name) === key)
+}
+
+export function onAccountCustomerTotals(rows: readonly KassaOnAccountEntry[]): {
+  total: number
+  paid: number
+  remaining: number
+} {
+  const total = roundOnAccountMoney(rows.reduce((s, r) => s + (Number(r.amount) || 0), 0))
+  const paid = roundOnAccountMoney(rows.reduce((s, r) => s + onAccountPaidSoFar(r), 0))
+  return { total, paid, remaining: roundOnAccountMoney(Math.max(0, total - paid)) }
+}
+
+/** Betaling over alle dagen van de klant, oudste dag eerst. */
+export function allocateOnAccountPayment(
+  rows: readonly Pick<KassaOnAccountEntry, 'id' | 'entry_date' | 'amount'>[],
+  paidTotal: number,
+): { id: string; amount_paid: number; is_paid: boolean }[] {
+  const sorted = [...rows].sort(
+    (a, b) => a.entry_date.localeCompare(b.entry_date) || a.id.localeCompare(b.id),
+  )
+  const cap = roundOnAccountMoney(sorted.reduce((s, r) => s + Math.max(0, Number(r.amount) || 0), 0))
+  let left = clampOnAccountPaid(cap, paidTotal)
+  return sorted.map((r) => {
+    const amount = Math.max(0, Number(r.amount) || 0)
+    const amount_paid = clampOnAccountPaid(amount, left)
+    left = roundOnAccountMoney(Math.max(0, left - amount_paid))
+    return { id: r.id, amount_paid, is_paid: amount_paid >= amount - 0.001 }
+  })
+}
+
 export function onAccountOpenDaysForCustomer(
   rows: readonly KassaOnAccountEntry[],
   name: string,

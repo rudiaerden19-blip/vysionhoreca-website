@@ -13,6 +13,8 @@ import {
   formatOnAccountDayShort,
   filterOnAccountNamesByQuery,
   uniqueOnAccountNames,
+  allocateOnAccountPayment,
+  onAccountCustomerTotals,
   type KassaOnAccountEntry,
 } from '@/lib/kassa-on-account'
 
@@ -96,5 +98,21 @@ describe('kassa on-account lijst', () => {
     ])
     expect(filterOnAccountNamesByQuery(names, 'jerry')).toEqual(['Jerry Aerden'])
     expect(filterOnAccountNamesByQuery(names, 'aer')).toEqual(['Jerry Aerden'])
+  })
+
+  it('toont nog open als totaal van alle dagen van Danny', () => {
+    const danny = [
+      row({ id: 'a', customer_name: 'Danny Grens', entry_date: '2026-09-11', amount: 22 }),
+      row({ id: 'b', customer_name: 'Danny Grens', entry_date: '2026-09-12', amount: 62 }),
+    ]
+    expect(onAccountCustomerTotals(danny)).toEqual({ total: 84, paid: 0, remaining: 84 })
+    expect(allocateOnAccountPayment(danny, 20)).toEqual([
+      { id: 'a', amount_paid: 20, is_paid: false },
+      { id: 'b', amount_paid: 0, is_paid: false },
+    ])
+    expect(allocateOnAccountPayment(danny, 30)).toEqual([
+      { id: 'a', amount_paid: 22, is_paid: true },
+      { id: 'b', amount_paid: 8, is_paid: false },
+    ])
   })
 })
