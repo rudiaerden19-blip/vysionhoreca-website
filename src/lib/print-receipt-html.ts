@@ -22,8 +22,9 @@ export const KASSA_PRINT_RECEIPT_STYLES = `
       .small { font-size:9px; }
       .divider { border-top:1px dashed #000;margin:6px 0; }
       .divider-solid { border-top:1px solid #000;margin:6px 0; }
-      .row { display:flex;justify-content:space-between;margin:1px 0; }
-      .total { font-size:12px;font-weight:bold;margin-top:6px; }
+      .row { display:flex;justify-content:space-between;margin:1px 0;font-weight:400; }
+      .row span:last-child { text-align:right;min-width:4.5em; }
+      .total { font-size:13px;font-weight:700;margin-top:6px; }
       .order-type { font-size:12px;font-weight:bold;margin:6px 0;padding:6px;border:1px solid #000; }
       @media print { body { width:auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 `.trim()

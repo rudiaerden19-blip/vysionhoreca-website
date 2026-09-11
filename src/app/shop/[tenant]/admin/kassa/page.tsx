@@ -254,6 +254,7 @@ import {
   hydrateKassaCartItemsFromCatalog,
   kassaReceiptVatFromPersistedOrder,
 } from '@/lib/kassa-receipt-vat'
+import { formatKassaThermalPriceRow } from '@/lib/kassa-thermal-receipt-line'
 import {
   buildKassaVatInvoiceItemRows,
   buildKassaVatInvoiceThermalLines,
@@ -4159,23 +4160,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
-      bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
+      bonLines.push(formatKassaThermalPriceRow(`${i.quantity}x ${i.product.name}`, lineTotal))
       for (const c of i.choices || []) {
-        bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
+        bonLines.push(
+          c.price > 0
+            ? formatKassaThermalPriceRow(` + ${c.choiceName}`, c.price)
+            : ` + ${c.choiceName}`,
+        )
       }
     }
     bonLines.push('--------------------------------')
-    bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
+    bonLines.push(formatKassaThermalPriceRow(t('kassaReceipt.subtotal'), subtotal))
     if (receiptVatRows.length >= 1) {
       for (const row of receiptVatRows) {
         bonLines.push(
-          `${t('kassaReceipt.vat').replace('{rate}', String(row.rate))}  EUR ${row.tax.toFixed(2)}`,
+          formatKassaThermalPriceRow(t('kassaReceipt.vat').replace('{rate}', String(row.rate)), row.tax),
         )
       }
     } else {
-      bonLines.push(`${t('kassaReceipt.vat').replace('{rate}', String(fbVatRate))}  EUR ${tax.toFixed(2)}`)
+      bonLines.push(formatKassaThermalPriceRow(t('kassaReceipt.vat').replace('{rate}', String(fbVatRate)), tax))
     }
-    bonLines.push(`${t('kassaReceipt.total')}  EUR ${order.total.toFixed(2)}`)
+    bonLines.push(formatKassaThermalPriceRow(t('kassaReceipt.total'), order.total))
     bonLines.push(`${t('kassaReceipt.paidWith')} ${payLabel}`)
     if (order.helpedByStaffName) {
       bonLines.push(t('kassaReceipt.helpedBy').replace('{name}', order.helpedByStaffName))
