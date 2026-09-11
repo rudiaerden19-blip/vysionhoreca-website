@@ -5,13 +5,121 @@ import { useLanguage } from '@/i18n'
 import { adminDb } from '@/lib/admin-db-client'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import {
+  clampOnAccountPaid,
   groupOnAccountEntriesByDate,
   isOnAccountEntryDate,
   normalizeOnAccountCustomerName,
+  onAccountIsSettled,
   onAccountMonthKey,
+  onAccountPaidSoFar,
+  onAccountRemaining,
   parseOnAccountAmount,
+  parseOnAccountMoney,
   type KassaOnAccountEntry,
 } from '@/lib/kassa-on-account'
+
+function OnAccountRowEdit({
+  row,
+  onSavePaid,
+  onRemove,
+}: {
+  row: KassaOnAccountEntry
+  onSavePaid: (row: KassaOnAccountEntry, paid: number) => void
+  onRemove: (row: KassaOnAccountEntry) => void
+}) {
+  const { t } = useLanguage()
+  const total = Number(row.amount) || 0
+  const [paidDraft, setPaidDraft] = useState(() => String(onAccountPaidSoFar(row)))
+  const [remainDraft, setRemainDraft] = useState(() => String(onAccountRemaining(row)))
+  useEffect(() => {
+    setPaidDraft(String(onAccountPaidSoFar(row)))
+    setRemainDraft(String(onAccountRemaining(row)))
+  }, [row.amount, row.amount_paid, row.is_paid, row.id])
+
+  const settled = onAccountIsSettled(row)
+
+  const savePaidAmount = (paid: number) => {
+    onSavePaid(row, clampOnAccountPaid(total, paid))
+  }
+
+  const commitPaidDraft = () => {
+    const parsed = parseOnAccountMoney(paidDraft)
+    if (parsed == null) return
+    const next = clampOnAccountPaid(total, parsed)
+    if (next === onAccountPaidSoFar(row)) return
+    savePaidAmount(next)
+  }
+
+  return (
+    <li className="flex flex-wrap items-end justify-between gap-3 border-b border-gray-100 px-4 py-3 last:border-0">
+      <div className="min-w-[8rem]">
+        <p className="font-medium text-gray-900">{row.customer_name}</p>
+        <p className="text-sm text-gray-600">
+          {t('kassaOnAccount.amount')}: €{total.toFixed(2)}
+        </p>
+      </div>
+      <div className="flex flex-wrap items-end gap-2">
+        <label className="text-xs font-medium text-gray-600">
+          {t('kassaOnAccount.alreadyPaid')}
+          <input
+            className="mt-1 w-28 rounded-xl border border-gray-300 px-3 py-2 text-sm"
+            inputMode="decimal"
+            value={paidDraft}
+            onChange={(e) => {
+              const next = e.target.value
+              setPaidDraft(next)
+              const parsed = parseOnAccountMoney(next)
+              if (parsed != null) {
+                setRemainDraft(String(clampOnAccountPaid(total, total - parsed)))
+              }
+            }}
+            onBlur={commitPaidDraft}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commitPaidDraft()
+            }}
+          />
+        </label>
+        <label className="text-xs font-medium text-gray-600">
+          {t('kassaOnAccount.remaining')}
+          <input
+            className="mt-1 w-28 rounded-xl border border-gray-300 px-3 py-2 text-sm"
+            inputMode="decimal"
+            value={remainDraft}
+            onChange={(e) => {
+              const next = e.target.value
+              setRemainDraft(next)
+              const parsed = parseOnAccountMoney(next)
+              if (parsed != null) {
+                setPaidDraft(String(clampOnAccountPaid(total, total - parsed)))
+              }
+            }}
+            onBlur={commitPaidDraft}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') commitPaidDraft()
+            }}
+          />
+        </label>
+        <button
+          type="button"
+          onClick={commitPaidDraft}
+          className="rounded-xl bg-[#3C4D6B] px-3 py-2 text-xs font-semibold text-white"
+        >
+          {t('kassaOnAccount.savePaid')}
+        </button>
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            settled ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
+          }`}
+        >
+          {settled ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
+        </span>
+        <button type="button" onClick={() => onRemove(row)} className="text-xs text-gray-500 underline">
+          {t('kassaOnAccount.remove')}
+        </button>
+      </div>
+    </li>
+  )
+}
 
 export default function OpRekeningPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -50,7 +158,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     [month, rows],
   )
   const groups = useMemo(() => groupOnAccountEntriesByDate(monthRows), [monthRows])
-  const openTotal = monthRows.filter((r) => !r.is_paid).reduce((s, r) => s + Number(r.amount || 0), 0)
+  const openTotal = monthRows.reduce((s, r) => s + onAccountRemaining(r), 0)
 
   const addRow = async () => {
     const customer_name = normalizeOnAccountCustomerName(name)
@@ -67,6 +175,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
         customer_name,
         entry_date: entryDate,
         amount: parsed,
+        amount_paid: 0,
         is_paid: false,
       },
       { tenantSlug: tenant },
@@ -82,14 +191,16 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     await load()
   }
 
-  const setPaid = async (row: KassaOnAccountEntry, is_paid: boolean) => {
+  const savePaid = async (row: KassaOnAccountEntry, paid: number) => {
+    const amount_paid = clampOnAccountPaid(Number(row.amount), paid)
+    const is_paid = amount_paid >= Number(row.amount) - 0.001
     const result = await adminDb.update(
       'kassa_on_account',
-      { is_paid, updated_at: new Date().toISOString() },
+      { amount_paid, is_paid, updated_at: new Date().toISOString() },
       { id: row.id, tenant_slug: tenant },
     )
     if (result.ok) {
-      setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, is_paid } : r)))
+      setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, amount_paid, is_paid } : r)))
     }
   }
 
@@ -184,33 +295,12 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
             </h2>
             <ul>
               {group.entries.map((row) => (
-                <li
+                <OnAccountRowEdit
                   key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 px-4 py-3 last:border-0"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{row.customer_name}</p>
-                    <p className="text-sm text-gray-600">€{Number(row.amount).toFixed(2)}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void setPaid(row, !row.is_paid)}
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        row.is_paid ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
-                      }`}
-                    >
-                      {row.is_paid ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void removeRow(row)}
-                      className="text-xs text-gray-500 underline"
-                    >
-                      {t('kassaOnAccount.remove')}
-                    </button>
-                  </div>
-                </li>
+                  row={row}
+                  onSavePaid={(r, paid) => void savePaid(r, paid)}
+                  onRemove={(r) => void removeRow(r)}
+                />
               ))}
             </ul>
           </section>

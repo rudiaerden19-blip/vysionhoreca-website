@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS kassa_on_account (
   customer_name TEXT NOT NULL,
   entry_date DATE NOT NULL,
   amount NUMERIC(12, 2) NOT NULL,
+  amount_paid NUMERIC(12, 2) NOT NULL DEFAULT 0,
   is_paid BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
