@@ -27,6 +27,10 @@ import {
   patchWebshopBrowserSession,
 } from '@/lib/webshop-browser-session'
 import { fetchPublicOnlineOrderingEnabled } from '@/lib/tenant-public-online-ordering'
+import {
+  isWebshopOnlinePaymentMethodId,
+  webshopPaymentMethodsOffered,
+} from '@/lib/webshop-online-payment'
 
 interface CartItem {
   id: string
@@ -90,6 +94,7 @@ export default function CheckoutPageClient({
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [exceptionalClosings, setExceptionalClosings] = useState<ExceptionalClosing[]>([])
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
+  const [stripeOnlineReady, setStripeOnlineReady] = useState(false)
   const [scheduledDate, setScheduledDate] = useState<string>('') // YYYY-MM-DD
   const [scheduledDateDisplay, setScheduledDateDisplay] = useState<string>('') // DD/MM/YYYY
   const [scheduledTime, setScheduledTime] = useState<string>('') // HH:MM
@@ -189,16 +194,21 @@ export default function CheckoutPageClient({
     // Eerste beschikbare dag (Brussels) die niet in een uitzonderlijke sluiting valt
     setScheduledDate(firstAvailableScheduledDate(status, closings || []))
     
-    // Load enabled payment methods
-    if (tenant?.payment_methods && Array.isArray(tenant.payment_methods) && tenant.payment_methods.length > 0) {
-      setEnabledPaymentMethods(tenant.payment_methods)
-      // Set default payment method to first enabled one
-      if (tenant.payment_methods.includes('cash')) {
-        setPaymentMethod('cash')
-      } else {
-        setPaymentMethod('online')
-      }
+    let stripeReady = false
+    try {
+      const stripeRes = await fetch(
+        `/api/stripe/online-checkout-ready?tenant=${encodeURIComponent(params.tenant)}`,
+      )
+      const stripeJson = (await stripeRes.json()) as { ready?: boolean }
+      stripeReady = stripeJson.ready === true
+    } catch {
+      stripeReady = false
     }
+    setStripeOnlineReady(stripeReady)
+
+    const offered = webshopPaymentMethodsOffered(tenant?.payment_methods, stripeReady)
+    setEnabledPaymentMethods(offered)
+    setPaymentMethod(offered.includes('cash') || !stripeReady ? 'cash' : 'online')
     
     // Default to pickup if delivery is not enabled
     if (!delivery?.delivery_enabled) {
@@ -350,6 +360,17 @@ export default function CheckoutPageClient({
     setSubmitting(true)
     
     try {
+      if (paymentMethod !== 'cash') {
+        const stripeRes = await fetch(
+          `/api/stripe/online-checkout-ready?tenant=${encodeURIComponent(params.tenant)}`,
+        )
+        const stripeJson = (await stripeRes.json().catch(() => null)) as { ready?: boolean } | null
+        if (stripeJson?.ready !== true) {
+          alert(t('checkoutPage.onlinePayUnavailable'))
+          setSubmitting(false)
+          return
+        }
+      }
       // Ordernummer wordt server-side atomair toegekend door
       // `orders_assign_webshop_order_number`(BEFORE INSERT trigger). De trigger
       // overschrijft `order_number = 0`met een per-tenant volgnummer
@@ -429,9 +450,23 @@ export default function CheckoutPageClient({
             window.location.href = stripeData.url
             return
           }
-          // Als Stripe niet geconfigureerd is, gewoon doorgaan als cash
+          await supabase
+            .from('orders')
+            .update({ payment_status: 'failed' })
+            .eq('id', order.id)
+            .eq('tenant_slug', params.tenant)
+          alert(t('checkoutPage.onlinePayFailed'))
+          setSubmitting(false)
+          return
         } catch {
-          // Stripe niet beschikbaar, doorgaan zonder
+          await supabase
+            .from('orders')
+            .update({ payment_status: 'failed' })
+            .eq('id', order.id)
+            .eq('tenant_slug', params.tenant)
+          alert(t('checkoutPage.onlinePayFailed'))
+          setSubmitting(false)
+          return
         }
       }
 
@@ -893,11 +928,16 @@ export default function CheckoutPageClient({
                 )}
               </div>
               
-              {paymentMethod === 'online' && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-sm">
-                  ℹ {t('checkoutPage.onlineComingSoon')}
+              {!stripeOnlineReady &&
+              (tenantSettings?.payment_methods || []).some(isWebshopOnlinePaymentMethodId) ? (
+                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm">
+                  {t('checkoutPage.onlinePayNotActiveHint')}
                 </div>
-              )}
+              ) : stripeOnlineReady && paymentMethod === 'online' ? (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-sm">
+                  {t('checkoutPage.onlineRedirectHint')}
+                </div>
+              ) : null}
             </div>
           </div>
 
