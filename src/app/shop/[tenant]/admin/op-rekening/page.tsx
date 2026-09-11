@@ -116,7 +116,7 @@ function OnAccountRowEdit({
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 flex justify-between gap-4 border-t border-amber-200 pt-2 font-semibold">
+              <p className="mt-2 flex justify-between gap-4 border-t border-red-200 pt-2 font-bold text-red-700">
                 <span>{t('kassaOnAccount.allDaysOpen')}</span>
                 <span className="tabular-nums">{money(openTotal)}</span>
               </p>
@@ -321,15 +321,15 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   }
 
   const quickList = (
-    <aside className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:sticky md:top-4">
+    <aside className="rounded-2xl border-2 border-red-500 bg-red-50 p-4 shadow-sm md:sticky md:top-4">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-base font-semibold text-gray-900">{t('kassaOnAccount.quickList')}</h2>
-        <p className="text-sm font-semibold text-gray-800">{euro(openTotal)}</p>
+        <h2 className="text-lg font-bold uppercase tracking-wide text-red-700">{t('kassaOnAccount.quickList')}</h2>
+        <p className="text-lg font-bold tabular-nums text-red-700">{euro(openTotal)}</p>
       </div>
       {openNames.length === 0 ? (
-        <p className="mt-3 text-sm text-gray-500">{t('kassaOnAccount.quickListEmpty')}</p>
+        <p className="mt-3 text-sm text-red-700/70">{t('kassaOnAccount.quickListEmpty')}</p>
       ) : (
-        <ul className="mt-3 divide-y divide-gray-100">
+        <ul className="mt-3 divide-y divide-red-200">
           {openNames.map((item) => (
             <li key={onAccountCustomerKey(item.name)}>
               <button
@@ -338,7 +338,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
                 className="flex w-full items-center justify-between gap-3 py-2.5 text-left"
               >
                 <span className="font-medium text-gray-900">{item.name}</span>
-                <span className="shrink-0 font-semibold tabular-nums text-gray-800">{euro(item.remaining)}</span>
+                <span className="shrink-0 text-base font-bold tabular-nums text-red-700">{euro(item.remaining)}</span>
               </button>
             </li>
           ))}
@@ -434,9 +434,9 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
             onFocus={onAccountFieldFocus}
           />
         </label>
-        <p className="text-sm font-semibold text-gray-800">
+        <p className="text-sm font-bold text-red-700">
           {t('kassaOnAccount.openTotal')}
-          <span className="ml-2">{euro(openTotal)}</span>
+          <span className="ml-2 tabular-nums">{euro(openTotal)}</span>
         </p>
       </div>
 
