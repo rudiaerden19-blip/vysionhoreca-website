@@ -1,5 +1,6 @@
 import {
   isStripeOnlineCheckoutSecretConfigured,
+  stripeCheckoutSessionIsPaid,
   stripeStatementDescriptorFromShop,
   webshopPaymentMethodsOffered,
 } from '@/lib/webshop-online-payment'
@@ -24,5 +25,10 @@ describe('webshop-online-payment', () => {
     expect(stripeStatementDescriptorFromShop('Pizza 2018', 'pizza2018')).toBe('PIZZA 2018')
     expect(stripeStatementDescriptorFromShop(null, 'pizza2018')).toBe('PIZZA2018')
     expect(stripeStatementDescriptorFromShop('Vysion', 'pizza2018')).toBe('PIZZA2018')
+  })
+
+  it('herkent een geslaagde Bancontact', () => {
+    expect(stripeCheckoutSessionIsPaid({ payment_status: 'paid' })).toBe(true)
+    expect(stripeCheckoutSessionIsPaid({ payment_status: 'unpaid' })).toBe(false)
   })
 })

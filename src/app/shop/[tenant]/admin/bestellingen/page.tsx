@@ -154,6 +154,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Refs
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  const stripePaymentSyncDoneRef = useRef(false)
   
   // Track which orders are "new" and need attention (alleen voor visuele indicators)
   const hasNewOrders = orders.some(o => o.status === 'new' || o.status === 'NEW')
@@ -236,6 +237,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   useEffect(() => {
     loadOrders()
   }, [loadOrders])
+
+  useEffect(() => {
+    if (stripePaymentSyncDoneRef.current) return
+    stripePaymentSyncDoneRef.current = true
+    void fetch('/api/stripe/sync-order-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tenantSlug: params.tenant }),
+    })
+      .then((res) => res.json())
+      .then((data: { updated?: number }) => {
+        if ((data.updated || 0) > 0) void loadOrders()
+      })
+      .catch(() => undefined)
+  }, [params.tenant, loadOrders])
 
   // POLLING - Check for new orders every 3 seconds (MOST RELIABLE)
   useEffect(() => {

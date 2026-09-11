@@ -34,6 +34,8 @@ import {
   ShopIconTikTok,
 } from '@/lib/shop-contact-icons'
 
+import { WebshopStripePaymentReturn } from '@/components/WebshopStripePaymentReturn'
+
 const MarketingDemoSessionPrime = dynamic(
   () => import('@/components/MarketingDemoSessionPrime').then((mod) => ({ default: mod.MarketingDemoSessionPrime })),
   { ssr: true }
@@ -849,6 +851,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   return (
     <div style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}} className="min-h-screen bg-white">
       <MarketingDemoSessionPrime tenant={params.tenant} />
+      <WebshopStripePaymentReturn tenant={params.tenant} />
       {/* Fixed Header - Clean & Compact */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">

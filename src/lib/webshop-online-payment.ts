@@ -28,6 +28,14 @@ export function isStripeOnlineCheckoutSecretConfigured(secret: string | null | u
   return typeof secret === 'string' && secret.trim().length > 10
 }
 
+export function stripeCheckoutSessionIsPaid(session: {
+  payment_status?: string | null
+  status?: string | null
+}): boolean {
+  const ps = String(session.payment_status || '').toLowerCase()
+  return ps === 'paid' || ps === 'no_payment_required'
+}
+
 function looksLikeVysionBrand(value: string): boolean {
   return /^VYSION(\s|$)/.test(value.trim())
 }
