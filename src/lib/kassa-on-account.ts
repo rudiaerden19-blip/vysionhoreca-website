@@ -171,6 +171,25 @@ export function filterOnAccountNamesByQuery(names: readonly string[], query: str
   return names.filter((n) => onAccountCustomerKey(n).includes(q))
 }
 
+export function groupOnAccountEntriesByCustomer(
+  rows: readonly KassaOnAccountEntry[],
+): { name: string; entries: KassaOnAccountEntry[] }[] {
+  const map = new Map<string, { name: string; entries: KassaOnAccountEntry[] }>()
+  for (const row of rows) {
+    const name = normalizeOnAccountCustomerName(row.customer_name)
+    const key = onAccountCustomerKey(name)
+    const prev = map.get(key)
+    if (prev) prev.entries.push(row)
+    else map.set(key, { name, entries: [row] })
+  }
+  return [...map.values()]
+    .map((group) => ({
+      ...group,
+      entries: [...group.entries].sort((a, b) => a.entry_date.localeCompare(b.entry_date) || a.id.localeCompare(b.id)),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'nl'))
+}
+
 export function groupOnAccountEntriesByDate(
   rows: readonly KassaOnAccountEntry[],
 ): { date: string; entries: KassaOnAccountEntry[] }[] {

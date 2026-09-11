@@ -36,7 +36,7 @@ import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import {
   clampOnAccountPaid,
   formatOnAccountDayShort,
-  groupOnAccountEntriesByDate,
+  groupOnAccountEntriesByCustomer,
   isOnAccountEntryDate,
   normalizeOnAccountCustomerName,
   onAccountCustomerKey,
@@ -52,26 +52,20 @@ import {
   onAccountCustomerTotals,
   rowsForOnAccountCustomer,
   type KassaOnAccountEntry,
-  type OnAccountOpenDay,
 } from '@/lib/kassa-on-account'
 
 function OnAccountRowEdit({
-  row,
+  name,
   customerRows,
-  openDays,
-  openTotal,
   onSavePaid,
   onRemove,
 }: {
-  row: KassaOnAccountEntry
+  name: string
   customerRows: KassaOnAccountEntry[]
-  openDays: OnAccountOpenDay[]
-  openTotal: number
   onSavePaid: (paid: number) => void
   onRemove: (row: KassaOnAccountEntry) => void
 }) {
   const { t } = useLanguage()
-  const dayTotal = Number(row.amount) || 0
   const totals = onAccountCustomerTotals(customerRows)
   const [paidDraft, setPaidDraft] = useState(() => totals.paid.toFixed(2))
   const [remainDraft, setRemainDraft] = useState(() => totals.remaining.toFixed(2))
@@ -81,6 +75,9 @@ function OnAccountRowEdit({
   }, [totals.paid, totals.remaining])
 
   const settled = totals.remaining <= 0
+  const days = [...customerRows].sort(
+    (a, b) => a.entry_date.localeCompare(b.entry_date) || a.id.localeCompare(b.id),
+  )
 
   const commitPaidDraft = () => {
     const parsed = parseOnAccountMoney(paidDraft)
@@ -93,47 +90,42 @@ function OnAccountRowEdit({
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
   return (
-    <li
-      id={`on-account-row-${row.id}`}
-      className="scroll-mt-20 border-b border-gray-100 px-4 py-5 last:border-0 sm:px-5"
+    <article
+      id={`on-account-name-${onAccountCustomerKey(name)}`}
+      className="scroll-mt-20 rounded-2xl border border-gray-200 bg-white px-4 py-5 shadow-sm sm:px-5"
     >
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-lg font-semibold text-gray-900">{row.customer_name}</p>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('kassaOnAccount.thisDay')}
-            <span className="ml-2 font-medium text-gray-800">{money(onAccountRemaining(row))}</span>
-            <span className="ml-1 text-gray-400">/ {money(dayTotal)}</span>
-          </p>
-          {openDays.length > 1 ? (
-            <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
-              <ul className="space-y-1">
-                {openDays.map((day) => (
-                  <li key={day.id} className="flex justify-between gap-4">
-                    <span>
-                      {formatOnAccountDayShort(day.date)}
-                      {day.id === row.id ? ` · ${t('kassaOnAccount.thisDay')}` : ''}
-                    </span>
-                    <span className="tabular-nums font-medium">{money(day.remaining)}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-2 flex justify-between gap-4 border-t border-red-200 pt-2 font-bold text-red-700">
-                <span>{t('kassaOnAccount.allDaysOpen')}</span>
-                <span className="tabular-nums">{money(openTotal)}</span>
-              </p>
-            </div>
-          ) : null}
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              settled ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
-            }`}
-          >
-            {settled ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
-          </span>
-        </div>
+        <p className="text-lg font-semibold text-gray-900">{name}</p>
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            settled ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
+          }`}
+        >
+          {settled ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
+        </span>
+      </div>
+      <div className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
+        <ul className="space-y-2">
+          {days.map((day) => (
+            <li key={day.id} className="flex items-center justify-between gap-3">
+              <span>
+                {formatOnAccountDayShort(day.entry_date)}
+                <span className="ml-2 tabular-nums font-medium">{money(onAccountRemaining(day))}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => onRemove(day)}
+                className="min-h-10 shrink-0 rounded-lg px-3 text-sm font-semibold text-gray-600 underline"
+              >
+                {t('kassaOnAccount.remove')}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 flex justify-between gap-4 border-t border-red-200 pt-2 font-bold text-red-700">
+          <span>{t('kassaOnAccount.allDaysOpen')}</span>
+          <span className="tabular-nums">{money(totals.remaining)}</span>
+        </p>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4">
@@ -189,15 +181,8 @@ function OnAccountRowEdit({
         >
           {t('kassaOnAccount.savePaid')}
         </button>
-        <button
-          type="button"
-          onClick={() => onRemove(row)}
-          className="min-h-14 w-full rounded-xl border-2 border-gray-300 px-8 text-base font-semibold text-gray-700 sm:w-auto"
-        >
-          {t('kassaOnAccount.remove')}
-        </button>
       </div>
-    </li>
+    </article>
   )
 }
 
@@ -251,7 +236,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     () => rows.filter((r) => onAccountMonthKey(r.entry_date) === month),
     [month, rows],
   )
-  const groups = useMemo(() => groupOnAccountEntriesByDate(monthRows), [monthRows])
+  const customers = useMemo(() => groupOnAccountEntriesByCustomer(monthRows), [monthRows])
   const openNames = useMemo(() => summarizeOnAccountOpenByName(monthRows), [monthRows])
   const openTotal = monthRows.reduce((s, r) => s + onAccountRemaining(r), 0)
   const existingOpen = useMemo(
@@ -272,20 +257,13 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
 
   const euro = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
-  const jumpToName = useCallback(
-    (customerName: string) => {
-      const key = onAccountCustomerKey(customerName)
-      const first =
-        monthRows.find((r) => onAccountCustomerKey(r.customer_name) === key && onAccountRemaining(r) > 0) ??
-        monthRows.find((r) => onAccountCustomerKey(r.customer_name) === key)
-      if (!first) return
-      lastJumpKey.current = key
-      window.setTimeout(() => {
-        document.getElementById(`on-account-row-${first.id}`)?.scrollIntoView({ block: 'start' })
-      }, 50)
-    },
-    [monthRows],
-  )
+  const jumpToName = useCallback((customerName: string) => {
+    const key = onAccountCustomerKey(customerName)
+    lastJumpKey.current = key
+    window.setTimeout(() => {
+      document.getElementById(`on-account-name-${key}`)?.scrollIntoView({ block: 'start' })
+    }, 50)
+  }, [])
 
   const pickName = (customerName: string) => {
     setName(customerName)
@@ -360,15 +338,6 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   const removeRow = async (row: KassaOnAccountEntry) => {
     const result = await adminDb.delete('kassa_on_account', { id: row.id, tenant_slug: tenant })
     if (result.ok) setRows((prev) => prev.filter((r) => r.id !== row.id))
-  }
-
-  const formatDay = (ymd: string) => {
-    const [y, m, d] = ymd.split('-').map(Number)
-    return new Date(y, m - 1, d).toLocaleDateString('nl-BE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    })
   }
 
   const quickList = (
@@ -513,33 +482,20 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
 
       {loading ? (
         <p className="text-sm text-gray-500">{t('kassaOnAccount.loading')}</p>
-      ) : groups.length === 0 ? (
+      ) : customers.length === 0 ? (
         <p className="text-sm text-gray-500">{t('kassaOnAccount.empty')}</p>
       ) : (
-        groups.map((group) => (
-          <section key={group.date} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <h2 className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-semibold capitalize text-gray-800 sm:px-5">
-              {formatDay(group.date)}
-            </h2>
-            <ul>
-              {group.entries.map((row) => {
-                const customerRows = rowsForOnAccountCustomer(monthRows, row.customer_name)
-                const open = onAccountOpenDaysForCustomer(customerRows, row.customer_name)
-                return (
-                  <OnAccountRowEdit
-                    key={row.id}
-                    row={row}
-                    customerRows={customerRows}
-                    openDays={open.days}
-                    openTotal={open.total}
-                    onSavePaid={(paid) => void savePaid(row.customer_name, paid)}
-                    onRemove={(r) => void removeRow(r)}
-                  />
-                )
-              })}
-            </ul>
-          </section>
-        ))
+        <div className="space-y-4">
+          {customers.map((person) => (
+            <OnAccountRowEdit
+              key={onAccountCustomerKey(person.name)}
+              name={person.name}
+              customerRows={person.entries}
+              onSavePaid={(paid) => void savePaid(person.name, paid)}
+              onRemove={(r) => void removeRow(r)}
+            />
+          ))}
+        </div>
       )}
       </div>
       </div>

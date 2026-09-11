@@ -1,5 +1,6 @@
 import {
   clampOnAccountPaid,
+  groupOnAccountEntriesByCustomer,
   groupOnAccountEntriesByDate,
   isOnAccountEntryDate,
   normalizeOnAccountCustomerName,
@@ -39,6 +40,16 @@ describe('kassa on-account lijst', () => {
     ])
     expect(groups.map((g) => g.date)).toEqual(['2026-09-12', '2026-09-11'])
     expect(groups[0].entries.map((e) => e.customer_name)).toEqual(['Jan', 'Piet'])
+  })
+
+  it('toont elke naam maar één keer met alle dagen', () => {
+    const people = groupOnAccountEntriesByCustomer([
+      row({ id: 'a', customer_name: 'Danny Grens', entry_date: '2026-09-12', amount: 62 }),
+      row({ id: 'b', customer_name: 'Jerry Aerden', entry_date: '2026-09-12', amount: 22 }),
+      row({ id: 'c', customer_name: 'Danny Grens', entry_date: '2026-09-11', amount: 22 }),
+    ])
+    expect(people.map((p) => p.name)).toEqual(['Danny Grens', 'Jerry Aerden'])
+    expect(people[0].entries.map((e) => e.entry_date)).toEqual(['2026-09-11', '2026-09-12'])
   })
 
   it('parst bedrag en maand', () => {
