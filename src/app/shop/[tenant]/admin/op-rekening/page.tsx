@@ -29,11 +29,11 @@ function OnAccountRowEdit({
 }) {
   const { t } = useLanguage()
   const total = Number(row.amount) || 0
-  const [paidDraft, setPaidDraft] = useState(() => String(onAccountPaidSoFar(row)))
-  const [remainDraft, setRemainDraft] = useState(() => String(onAccountRemaining(row)))
+  const [paidDraft, setPaidDraft] = useState(() => onAccountPaidSoFar(row).toFixed(2))
+  const [remainDraft, setRemainDraft] = useState(() => onAccountRemaining(row).toFixed(2))
   useEffect(() => {
-    setPaidDraft(String(onAccountPaidSoFar(row)))
-    setRemainDraft(String(onAccountRemaining(row)))
+    setPaidDraft(onAccountPaidSoFar(row).toFixed(2))
+    setRemainDraft(onAccountRemaining(row).toFixed(2))
   }, [row.amount, row.amount_paid, row.is_paid, row.id])
 
   const settled = onAccountIsSettled(row)
@@ -50,19 +50,37 @@ function OnAccountRowEdit({
     savePaidAmount(next)
   }
 
+  const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
+
   return (
-    <li className="flex flex-wrap items-end justify-between gap-3 border-b border-gray-100 px-4 py-3 last:border-0">
-      <div className="min-w-[8rem]">
-        <p className="font-medium text-gray-900">{row.customer_name}</p>
-        <p className="text-sm text-gray-600">
-          {t('kassaOnAccount.amount')}: €{total.toFixed(2)}
-        </p>
+    <li className="border-b border-gray-100 px-4 py-5 last:border-0 sm:px-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-lg font-semibold text-gray-900">{row.customer_name}</p>
+          <p className="mt-1 text-sm text-gray-500">
+            {t('kassaOnAccount.amount')}
+            <span className="ml-2 font-medium text-gray-800">{money(total)}</span>
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              settled ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
+            }`}
+          >
+            {settled ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
+          </span>
+          <button type="button" onClick={() => onRemove(row)} className="text-xs text-gray-400 underline">
+            {t('kassaOnAccount.remove')}
+          </button>
+        </div>
       </div>
-      <div className="flex flex-wrap items-end gap-2">
-        <label className="text-xs font-medium text-gray-600">
+
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <label className="block text-sm font-medium text-gray-700">
           {t('kassaOnAccount.alreadyPaid')}
           <input
-            className="mt-1 w-28 rounded-xl border border-gray-300 px-3 py-2 text-sm"
+            className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
             inputMode="decimal"
             value={paidDraft}
             onChange={(e) => {
@@ -70,7 +88,7 @@ function OnAccountRowEdit({
               setPaidDraft(next)
               const parsed = parseOnAccountMoney(next)
               if (parsed != null) {
-                setRemainDraft(String(clampOnAccountPaid(total, total - parsed)))
+                setRemainDraft(clampOnAccountPaid(total, total - parsed).toFixed(2))
               }
             }}
             onBlur={commitPaidDraft}
@@ -79,10 +97,10 @@ function OnAccountRowEdit({
             }}
           />
         </label>
-        <label className="text-xs font-medium text-gray-600">
+        <label className="block text-sm font-medium text-gray-700">
           {t('kassaOnAccount.remaining')}
           <input
-            className="mt-1 w-28 rounded-xl border border-gray-300 px-3 py-2 text-sm"
+            className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
             inputMode="decimal"
             value={remainDraft}
             onChange={(e) => {
@@ -90,7 +108,7 @@ function OnAccountRowEdit({
               setRemainDraft(next)
               const parsed = parseOnAccountMoney(next)
               if (parsed != null) {
-                setPaidDraft(String(clampOnAccountPaid(total, total - parsed)))
+                setPaidDraft(clampOnAccountPaid(total, total - parsed).toFixed(2))
               }
             }}
             onBlur={commitPaidDraft}
@@ -99,24 +117,15 @@ function OnAccountRowEdit({
             }}
           />
         </label>
-        <button
-          type="button"
-          onClick={commitPaidDraft}
-          className="rounded-xl bg-[#3C4D6B] px-3 py-2 text-xs font-semibold text-white"
-        >
-          {t('kassaOnAccount.savePaid')}
-        </button>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            settled ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
-          }`}
-        >
-          {settled ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
-        </span>
-        <button type="button" onClick={() => onRemove(row)} className="text-xs text-gray-500 underline">
-          {t('kassaOnAccount.remove')}
-        </button>
       </div>
+
+      <button
+        type="button"
+        onClick={commitPaidDraft}
+        className="mt-4 w-full rounded-xl bg-[#3C4D6B] py-3 text-sm font-semibold text-white sm:w-auto sm:px-8"
+      >
+        {t('kassaOnAccount.savePaid')}
+      </button>
     </li>
   )
 }
@@ -219,15 +228,15 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-6">
+    <div className="mx-auto max-w-2xl space-y-8 p-4 sm:p-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('kassaOnAccount.title')}</h1>
         <p className="mt-1 text-sm text-gray-600">{t('kassaOnAccount.subtitle')}</p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm font-medium text-gray-700">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.name')}
             <input
               className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2"
@@ -236,7 +245,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
               autoComplete="off"
             />
           </label>
-          <label className="text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.date')}
             <input
               type="date"
@@ -245,7 +254,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
               onChange={(e) => setEntryDate(e.target.value)}
             />
           </label>
-          <label className="text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.amount')}
             <input
               className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-2"
@@ -279,7 +288,8 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
           />
         </label>
         <p className="text-sm font-semibold text-gray-800">
-          {t('kassaOnAccount.openTotal')}: €{openTotal.toFixed(2)}
+          {t('kassaOnAccount.openTotal')}
+          <span className="ml-2">€ {openTotal.toFixed(2).replace('.', ',')}</span>
         </p>
       </div>
 
@@ -290,7 +300,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
       ) : (
         groups.map((group) => (
           <section key={group.date} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <h2 className="border-b border-gray-100 bg-gray-50 px-4 py-2 text-sm font-semibold capitalize text-gray-800">
+            <h2 className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-semibold capitalize text-gray-800 sm:px-5">
               {formatDay(group.date)}
             </h2>
             <ul>
