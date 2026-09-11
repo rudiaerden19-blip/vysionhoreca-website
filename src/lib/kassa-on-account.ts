@@ -114,6 +114,23 @@ export function onAccountOpenDaysForCustomer(
   return { days, total }
 }
 
+export function uniqueOnAccountNames(rows: readonly KassaOnAccountEntry[]): string[] {
+  const map = new Map<string, string>()
+  for (const row of rows) {
+    const name = normalizeOnAccountCustomerName(row.customer_name)
+    if (!name) continue
+    const key = onAccountCustomerKey(name)
+    if (!map.has(key)) map.set(key, name)
+  }
+  return [...map.values()].sort((a, b) => a.localeCompare(b, 'nl'))
+}
+
+export function filterOnAccountNamesByQuery(names: readonly string[], query: string): string[] {
+  const q = onAccountCustomerKey(query)
+  if (!q) return [...names]
+  return names.filter((n) => onAccountCustomerKey(n).includes(q))
+}
+
 export function groupOnAccountEntriesByDate(
   rows: readonly KassaOnAccountEntry[],
 ): { date: string; entries: KassaOnAccountEntry[] }[] {

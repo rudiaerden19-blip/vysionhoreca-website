@@ -3866,6 +3866,7 @@
     "allDaysOpen": "Total open",
     "alreadyOpen": "Already open",
     "extraDayNote": "The new amount is added as an extra day.",
+    "goToCard": "Go to card",
     "invalidForm": "Enter a name, date and amount.",
     "saveFailed": "Could not save. Is the table in Supabase?",
     "loadFailed": "Could not load the list. Is the table in Supabase?"

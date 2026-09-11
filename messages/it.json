@@ -3320,6 +3320,7 @@
     "allDaysOpen": "Totale aperto",
     "alreadyOpen": "Già aperto",
     "extraDayNote": "Il nuovo importo diventa un giorno in più.",
+    "goToCard": "Vai alla scheda",
     "invalidForm": "Inserisci nome, data e importo.",
     "saveFailed": "Salvataggio non riuscito. Tabella presente in Supabase?",
     "loadFailed": "Caricamento non riuscito. Tabella presente in Supabase?"

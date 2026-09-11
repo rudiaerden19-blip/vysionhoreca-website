@@ -2820,6 +2820,7 @@
     "allDaysOpen": "Total dû",
     "alreadyOpen": "Déjà ouvert",
     "extraDayNote": "Le nouveau montant devient un jour en plus.",
+    "goToCard": "Aller à la fiche",
     "invalidForm": "Indiquez un nom, une date et un montant.",
     "saveFailed": "Enregistrement impossible. Table présente dans Supabase ?",
     "loadFailed": "Chargement impossible. Table présente dans Supabase ?"

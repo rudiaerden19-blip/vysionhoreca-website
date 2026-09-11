@@ -11,6 +11,8 @@ import {
   summarizeOnAccountOpenByName,
   onAccountOpenDaysForCustomer,
   formatOnAccountDayShort,
+  filterOnAccountNamesByQuery,
+  uniqueOnAccountNames,
   type KassaOnAccountEntry,
 } from '@/lib/kassa-on-account'
 
@@ -84,5 +86,15 @@ describe('kassa on-account lijst', () => {
       ['2026-09-12', 62],
       ['2026-09-13', 22],
     ])
+  })
+
+  it('vindt Jerry bij zoeken in een lange namenlijst', () => {
+    const names = uniqueOnAccountNames([
+      row({ id: 'a', customer_name: 'Danny Grens' }),
+      row({ id: 'b', customer_name: 'Jerry Aerden' }),
+      row({ id: 'c', customer_name: 'Vivivo Vivivo' }),
+    ])
+    expect(filterOnAccountNamesByQuery(names, 'jerry')).toEqual(['Jerry Aerden'])
+    expect(filterOnAccountNamesByQuery(names, 'aer')).toEqual(['Jerry Aerden'])
   })
 })

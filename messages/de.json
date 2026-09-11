@@ -2820,6 +2820,7 @@
     "allDaysOpen": "Gesamt offen",
     "alreadyOpen": "Bereits offen",
     "extraDayNote": "Der neue Betrag wird ein Extra-Tag.",
+    "goToCard": "Zur Karte",
     "invalidForm": "Name, Datum und Betrag eingeben.",
     "saveFailed": "Speichern fehlgeschlagen. Tabelle in Supabase vorhanden?",
     "loadFailed": "Liste laden fehlgeschlagen. Tabelle in Supabase vorhanden?"

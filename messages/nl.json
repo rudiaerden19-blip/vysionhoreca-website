@@ -3866,6 +3866,7 @@
     "allDaysOpen": "Totaal open",
     "alreadyOpen": "Staat al open",
     "extraDayNote": "Nieuw bedrag wordt een extra dag.",
+    "goToCard": "Naar vak",
     "invalidForm": "Vul naam, datum en een bedrag in.",
     "saveFailed": "Opslaan mislukt. Staat de tabel in Supabase?",
     "loadFailed": "Lijst laden mislukt. Staat de tabel in Supabase?"

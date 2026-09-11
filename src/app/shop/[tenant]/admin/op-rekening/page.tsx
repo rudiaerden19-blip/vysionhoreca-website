@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, type FocusEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FocusEvent } from 'react'
 
 const ADMIN_SCROLL = '[data-vysion-admin-scroll]'
 
@@ -48,6 +48,8 @@ import {
   parseOnAccountAmount,
   parseOnAccountMoney,
   summarizeOnAccountOpenByName,
+  filterOnAccountNamesByQuery,
+  uniqueOnAccountNames,
   type KassaOnAccountEntry,
   type OnAccountOpenDay,
 } from '@/lib/kassa-on-account'
@@ -210,6 +212,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
   const [amount, setAmount] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const lastJumpKey = useRef('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -256,17 +259,48 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     [monthRows, name],
   )
   const addAmount = parseOnAccountAmount(amount)
+  const knownNames = useMemo(() => uniqueOnAccountNames(monthRows), [monthRows])
+  const nameMatches = useMemo(
+    () => filterOnAccountNamesByQuery(knownNames, name),
+    [knownNames, name],
+  )
+  const visibleOpenNames = useMemo(() => {
+    if (!onAccountCustomerKey(name)) return openNames
+    const allowed = new Set(nameMatches.map((n) => onAccountCustomerKey(n)))
+    return openNames.filter((item) => allowed.has(onAccountCustomerKey(item.name)))
+  }, [name, nameMatches, openNames])
 
   const euro = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
-  const jumpToName = (name: string) => {
-    const key = onAccountCustomerKey(name)
-    const first = monthRows.find(
-      (r) => onAccountCustomerKey(r.customer_name) === key && onAccountRemaining(r) > 0,
-    )
-    if (!first) return
-    document.getElementById(`on-account-row-${first.id}`)?.scrollIntoView({ block: 'start' })
+  const jumpToName = useCallback(
+    (customerName: string) => {
+      const key = onAccountCustomerKey(customerName)
+      const first =
+        monthRows.find((r) => onAccountCustomerKey(r.customer_name) === key && onAccountRemaining(r) > 0) ??
+        monthRows.find((r) => onAccountCustomerKey(r.customer_name) === key)
+      if (!first) return
+      lastJumpKey.current = key
+      window.setTimeout(() => {
+        document.getElementById(`on-account-row-${first.id}`)?.scrollIntoView({ block: 'start' })
+      }, 50)
+    },
+    [monthRows],
+  )
+
+  const pickName = (customerName: string) => {
+    setName(customerName)
+    jumpToName(customerName)
   }
+
+  useEffect(() => {
+    const q = onAccountCustomerKey(name)
+    if (q.length < 2 || nameMatches.length !== 1) return
+    const only = nameMatches[0]
+    const key = onAccountCustomerKey(only)
+    if (lastJumpKey.current === key) return
+    setName(only)
+    jumpToName(only)
+  }, [jumpToName, name, nameMatches])
 
   const addRow = async () => {
     const customer_name = normalizeOnAccountCustomerName(name)
@@ -334,13 +368,15 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
       </div>
       {openNames.length === 0 ? (
         <p className="mt-3 text-sm text-red-700/70">{t('kassaOnAccount.quickListEmpty')}</p>
+      ) : visibleOpenNames.length === 0 ? (
+        <p className="mt-3 text-sm text-red-700/70">{t('kassaOnAccount.quickListEmpty')}</p>
       ) : (
         <ul className="mt-3 divide-y divide-red-200">
-          {openNames.map((item) => (
+          {visibleOpenNames.map((item) => (
             <li key={onAccountCustomerKey(item.name)}>
               <button
                 type="button"
-                onClick={() => jumpToName(item.name)}
+                onClick={() => pickName(item.name)}
                 className="flex w-full items-center justify-between gap-3 py-2.5 text-left"
               >
                 <span className="font-medium text-gray-900">{item.name}</span>
@@ -371,11 +407,29 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
             <input
               className="mt-2 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                lastJumpKey.current = ''
+                setName(e.target.value)
+              }}
               onFocus={onAccountFieldFocus}
               autoComplete="off"
             />
           </label>
+          {onAccountCustomerKey(name) && nameMatches.length > 0 ? (
+            <div className="space-y-2">
+              {nameMatches.map((match) => (
+                <button
+                  key={onAccountCustomerKey(match)}
+                  type="button"
+                  onClick={() => pickName(match)}
+                  className="flex min-h-12 w-full items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-left"
+                >
+                  <span className="font-semibold text-gray-900">{match}</span>
+                  <span className="text-sm font-medium text-[#3C4D6B]">{t('kassaOnAccount.goToCard')}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
           <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.date')}
             <input

@@ -3320,6 +3320,7 @@
     "allDaysOpen": "Total pendiente",
     "alreadyOpen": "Ya pendiente",
     "extraDayNote": "El importe nuevo se añade como un día extra.",
+    "goToCard": "Ir a la ficha",
     "invalidForm": "Indica nombre, fecha e importe.",
     "saveFailed": "No se pudo guardar. ¿Existe la tabla en Supabase?",
     "loadFailed": "No se pudo cargar. ¿Existe la tabla en Supabase?"
