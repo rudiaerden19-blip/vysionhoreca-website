@@ -3314,6 +3314,8 @@
     "empty": "本月还没有记录。",
     "loading": "加载中…",
     "openTotal": "仍待支付",
+    "quickList": "尚欠",
+    "quickListEmpty": "没有未结余额。",
     "invalidForm": "请填写姓名、日期和金额。",
     "saveFailed": "保存失败。Supabase 中有该表吗？",
     "loadFailed": "加载失败。Supabase 中有该表吗？"

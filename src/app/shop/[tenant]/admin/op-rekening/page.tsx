@@ -38,12 +38,14 @@ import {
   groupOnAccountEntriesByDate,
   isOnAccountEntryDate,
   normalizeOnAccountCustomerName,
+  onAccountCustomerKey,
   onAccountIsSettled,
   onAccountMonthKey,
   onAccountPaidSoFar,
   onAccountRemaining,
   parseOnAccountAmount,
   parseOnAccountMoney,
+  summarizeOnAccountOpenByName,
   type KassaOnAccountEntry,
 } from '@/lib/kassa-on-account'
 
@@ -82,7 +84,10 @@ function OnAccountRowEdit({
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
   return (
-    <li className="border-b border-gray-100 px-4 py-5 last:border-0 sm:px-5">
+    <li
+      id={`on-account-row-${row.id}`}
+      className="scroll-mt-20 border-b border-gray-100 px-4 py-5 last:border-0 sm:px-5"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-lg font-semibold text-gray-900">{row.customer_name}</p>
@@ -211,7 +216,19 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     [month, rows],
   )
   const groups = useMemo(() => groupOnAccountEntriesByDate(monthRows), [monthRows])
+  const openNames = useMemo(() => summarizeOnAccountOpenByName(monthRows), [monthRows])
   const openTotal = monthRows.reduce((s, r) => s + onAccountRemaining(r), 0)
+
+  const euro = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
+
+  const jumpToName = (name: string) => {
+    const key = onAccountCustomerKey(name)
+    const first = monthRows.find(
+      (r) => onAccountCustomerKey(r.customer_name) === key && onAccountRemaining(r) > 0,
+    )
+    if (!first) return
+    document.getElementById(`on-account-row-${first.id}`)?.scrollIntoView({ block: 'start' })
+  }
 
   const addRow = async () => {
     const customer_name = normalizeOnAccountCustomerName(name)
@@ -271,12 +288,43 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
     })
   }
 
+  const quickList = (
+    <aside className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:sticky md:top-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-base font-semibold text-gray-900">{t('kassaOnAccount.quickList')}</h2>
+        <p className="text-sm font-semibold text-gray-800">{euro(openTotal)}</p>
+      </div>
+      {openNames.length === 0 ? (
+        <p className="mt-3 text-sm text-gray-500">{t('kassaOnAccount.quickListEmpty')}</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-gray-100">
+          {openNames.map((item) => (
+            <li key={onAccountCustomerKey(item.name)}>
+              <button
+                type="button"
+                onClick={() => jumpToName(item.name)}
+                className="flex w-full items-center justify-between gap-3 py-2.5 text-left"
+              >
+                <span className="font-medium text-gray-900">{item.name}</span>
+                <span className="shrink-0 font-semibold tabular-nums text-gray-800">{euro(item.remaining)}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </aside>
+  )
+
   return (
-    <div className="mx-auto max-w-2xl space-y-8 p-4 pb-[50vh] sm:p-6 sm:pb-[50vh]">
+    <div className="mx-auto max-w-5xl space-y-8 p-4 pb-[50vh] sm:p-6 sm:pb-[50vh]">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('kassaOnAccount.title')}</h1>
         <p className="mt-1 text-sm text-gray-600">{t('kassaOnAccount.subtitle')}</p>
       </div>
+
+      <div className="grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_17rem]">
+      <div className="md:col-start-2 md:row-start-1">{quickList}</div>
+      <div className="space-y-8 md:col-start-1 md:row-start-1">
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="grid grid-cols-1 gap-5">
@@ -337,7 +385,7 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
         </label>
         <p className="text-sm font-semibold text-gray-800">
           {t('kassaOnAccount.openTotal')}
-          <span className="ml-2">€ {openTotal.toFixed(2).replace('.', ',')}</span>
+          <span className="ml-2">{euro(openTotal)}</span>
         </p>
       </div>
 
@@ -364,6 +412,8 @@ export default function OpRekeningPage({ params }: { params: { tenant: string } 
           </section>
         ))
       )}
+      </div>
+      </div>
     </div>
   )
 }

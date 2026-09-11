@@ -3314,6 +3314,8 @@
     "empty": "この月の行はまだありません。",
     "loading": "読み込み中…",
     "openTotal": "未払い合計",
+    "quickList": "未払い",
+    "quickListEmpty": "未払いはありません。",
     "invalidForm": "名前・日付・金額を入力してください。",
     "saveFailed": "保存できません。Supabaseにテーブルがありますか？",
     "loadFailed": "読み込めません。Supabaseにテーブルがありますか？"

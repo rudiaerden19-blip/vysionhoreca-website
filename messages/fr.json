@@ -2814,6 +2814,8 @@
     "empty": "Pas encore de lignes ce mois-ci.",
     "loading": "Chargement…",
     "openTotal": "Encore dû",
+    "quickList": "Reste dû",
+    "quickListEmpty": "Plus personne n’a de reste.",
     "invalidForm": "Indiquez un nom, une date et un montant.",
     "saveFailed": "Enregistrement impossible. Table présente dans Supabase ?",
     "loadFailed": "Chargement impossible. Table présente dans Supabase ?"

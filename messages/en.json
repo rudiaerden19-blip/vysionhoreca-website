@@ -3860,6 +3860,8 @@
     "empty": "No lines in this month yet.",
     "loading": "Loading…",
     "openTotal": "Still to pay",
+    "quickList": "Still open",
+    "quickListEmpty": "Nobody still owes anything.",
     "invalidForm": "Enter a name, date and amount.",
     "saveFailed": "Could not save. Is the table in Supabase?",
     "loadFailed": "Could not load the list. Is the table in Supabase?"

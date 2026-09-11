@@ -3314,6 +3314,8 @@
     "empty": "Aún no hay líneas este mes.",
     "loading": "Cargando…",
     "openTotal": "Pendiente",
+    "quickList": "Pendiente",
+    "quickListEmpty": "Nadie tiene saldo pendiente.",
     "invalidForm": "Indica nombre, fecha e importe.",
     "saveFailed": "No se pudo guardar. ¿Existe la tabla en Supabase?",
     "loadFailed": "No se pudo cargar. ¿Existe la tabla en Supabase?"

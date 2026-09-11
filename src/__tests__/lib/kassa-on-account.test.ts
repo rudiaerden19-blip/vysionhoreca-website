@@ -8,6 +8,7 @@ import {
   onAccountPaidSoFar,
   onAccountRemaining,
   parseOnAccountAmount,
+  summarizeOnAccountOpenByName,
   type KassaOnAccountEntry,
 } from '@/lib/kassa-on-account'
 
@@ -51,5 +52,18 @@ describe('kassa on-account lijst', () => {
     expect(onAccountIsSettled(row({ amount: 22.5, amount_paid: 22.5 }))).toBe(true)
     expect(onAccountPaidSoFar(row({ amount: 33, is_paid: true }))).toBe(33)
     expect(onAccountRemaining(row({ amount: 22.5, amount_paid: 0 }))).toBe(22.5)
+  })
+
+  it('maakt een snelle namenlijst van wat nog open staat', () => {
+    const list = summarizeOnAccountOpenByName([
+      row({ id: 'a', customer_name: 'Bart', amount: 33, amount_paid: 10 }),
+      row({ id: 'b', customer_name: 'Jerry', amount: 13.4 }),
+      row({ id: 'c', customer_name: 'bart', amount: 8 }),
+      row({ id: 'd', customer_name: 'Piet', amount: 12, amount_paid: 12, is_paid: true }),
+    ])
+    expect(list).toEqual([
+      { name: 'Bart', remaining: 31 },
+      { name: 'Jerry', remaining: 13.4 },
+    ])
   })
 })

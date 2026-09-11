@@ -58,6 +58,35 @@ export function onAccountMonthKey(entryDate: string): string {
   return entryDate.slice(0, 7)
 }
 
+export function onAccountCustomerKey(name: string): string {
+  return normalizeOnAccountCustomerName(name).toLocaleLowerCase('nl')
+}
+
+export type OnAccountOpenName = {
+  name: string
+  remaining: number
+}
+
+/** Sneloverzicht: per naam het openstaande restant (alleen > 0). */
+export function summarizeOnAccountOpenByName(
+  rows: readonly KassaOnAccountEntry[],
+): OnAccountOpenName[] {
+  const map = new Map<string, OnAccountOpenName>()
+  for (const row of rows) {
+    const remaining = onAccountRemaining(row)
+    if (remaining <= 0) continue
+    const name = normalizeOnAccountCustomerName(row.customer_name)
+    const key = onAccountCustomerKey(name)
+    const prev = map.get(key)
+    if (prev) {
+      prev.remaining = Math.round((prev.remaining + remaining) * 100) / 100
+    } else {
+      map.set(key, { name, remaining })
+    }
+  }
+  return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, 'nl'))
+}
+
 export function groupOnAccountEntriesByDate(
   rows: readonly KassaOnAccountEntry[],
 ): { date: string; entries: KassaOnAccountEntry[] }[] {

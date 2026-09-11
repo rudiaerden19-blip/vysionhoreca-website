@@ -3314,6 +3314,8 @@
     "empty": "لا توجد بنود هذا الشهر.",
     "loading": "جارٍ التحميل…",
     "openTotal": "المتبقي",
+    "quickList": "المتبقي",
+    "quickListEmpty": "لا يوجد رصيد مفتوح.",
     "invalidForm": "أدخل الاسم والتاريخ والمبلغ.",
     "saveFailed": "تعذّر الحفظ. هل الجدول موجود في Supabase؟",
     "loadFailed": "تعذّر التحميل. هل الجدول موجود في Supabase؟"

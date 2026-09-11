@@ -2814,6 +2814,8 @@
     "empty": "Noch keine Zeilen in diesem Monat.",
     "loading": "Laden…",
     "openTotal": "Noch zu zahlen",
+    "quickList": "Noch offen",
+    "quickListEmpty": "Niemand hat noch etwas offen.",
     "invalidForm": "Name, Datum und Betrag eingeben.",
     "saveFailed": "Speichern fehlgeschlagen. Tabelle in Supabase vorhanden?",
     "loadFailed": "Liste laden fehlgeschlagen. Tabelle in Supabase vorhanden?"

@@ -3860,6 +3860,8 @@
     "empty": "Nog geen regels in deze maand.",
     "loading": "Laden…",
     "openTotal": "Nog te betalen",
+    "quickList": "Nog open",
+    "quickListEmpty": "Niemand staat nog open.",
     "invalidForm": "Vul naam, datum en een bedrag in.",
     "saveFailed": "Opslaan mislukt. Staat de tabel in Supabase?",
     "loadFailed": "Lijst laden mislukt. Staat de tabel in Supabase?"

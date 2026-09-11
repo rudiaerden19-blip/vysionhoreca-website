@@ -3314,6 +3314,8 @@
     "empty": "Nessuna riga in questo mese.",
     "loading": "Caricamento…",
     "openTotal": "Ancora da pagare",
+    "quickList": "Ancora aperto",
+    "quickListEmpty": "Nessun saldo aperto.",
     "invalidForm": "Inserisci nome, data e importo.",
     "saveFailed": "Salvataggio non riuscito. Tabella presente in Supabase?",
     "loadFailed": "Caricamento non riuscito. Tabella presente in Supabase?"
