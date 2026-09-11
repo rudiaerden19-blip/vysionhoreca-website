@@ -186,8 +186,9 @@ export function persistTenantSessionWithToday(tenant: Record<string, unknown>): 
 }
 
 const OWNER_LAST_LOGIN_EMAIL_KEY = 'vysion_last_owner_login_email'
+const OWNER_LAST_LOGIN_PASSWORD_KEY = 'vysion_last_owner_login_password'
 
-/** Laatste zaak-login e-mail op dit apparaat (geen wachtwoord). */
+/** Laatste zaak-login e-mail op dit apparaat. */
 export function rememberOwnerLoginEmail(email: string): void {
   if (typeof window === 'undefined') return
   const e = email.trim()
@@ -203,6 +204,27 @@ export function readRememberedOwnerLoginEmail(): string {
   if (typeof window === 'undefined') return ''
   try {
     return (localStorage.getItem(OWNER_LAST_LOGIN_EMAIL_KEY) || '').trim()
+  } catch {
+    return ''
+  }
+}
+
+/** Laatste zaak-wachtwoord op dit apparaat — blijft staan na uitloggen (kassa-pc). */
+export function rememberOwnerLoginPassword(password: string): void {
+  if (typeof window === 'undefined') return
+  const p = password
+  if (!p) return
+  try {
+    localStorage.setItem(OWNER_LAST_LOGIN_PASSWORD_KEY, p)
+  } catch {
+    /* private mode */
+  }
+}
+
+export function readRememberedOwnerLoginPassword(): string {
+  if (typeof window === 'undefined') return ''
+  try {
+    return localStorage.getItem(OWNER_LAST_LOGIN_PASSWORD_KEY) || ''
   } catch {
     return ''
   }

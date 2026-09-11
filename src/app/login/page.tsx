@@ -12,7 +12,9 @@ import {
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
   readRememberedOwnerLoginEmail,
+  readRememberedOwnerLoginPassword,
   rememberOwnerLoginEmail,
+  rememberOwnerLoginPassword,
 } from '@/lib/auth-headers'
 import { clearTerminalLogout, readTerminalLogout } from '@/lib/session-broadcast'
 import { getCurrentTenantSlug as tenantSlugFromLocation } from '@/lib/tenant-url'
@@ -172,11 +174,13 @@ export default function LoginPage() {
     }
   }, [setLocale, locales])
 
-  // E-mail van vorige login op dit apparaat; wachtwoord via browser-autofill (kassa).
+  // E-mail + wachtwoord van vorige login op dit apparaat (blijft na uitloggen).
   useEffect(() => {
     if (typeof window === 'undefined') return
     const remembered = readRememberedOwnerLoginEmail()
     if (remembered) setEmail(remembered)
+    const rememberedPw = readRememberedOwnerLoginPassword()
+    if (rememberedPw) setPassword(rememberedPw)
   }, [])
 
   // Geen programmatische e-mail/wachtwoord: alle tenants gebruiken /login; autofill alleen via browser
@@ -251,6 +255,7 @@ export default function LoginPage() {
 
       persistTenantSessionWithToday(tenant as Record<string, unknown>)
       rememberOwnerLoginEmail(email)
+      rememberOwnerLoginPassword(passwordValue)
       clearTerminalLogout()
 
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
