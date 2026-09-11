@@ -131,9 +131,6 @@ function OnAccountRowEdit({
           >
             {settled ? t('kassaOnAccount.paid') : t('kassaOnAccount.unpaid')}
           </span>
-          <button type="button" onClick={() => onRemove(row)} className="text-xs text-gray-400 underline">
-            {t('kassaOnAccount.remove')}
-          </button>
         </div>
       </div>
 
@@ -182,13 +179,22 @@ function OnAccountRowEdit({
         </label>
       </div>
 
-      <button
-        type="button"
-        onClick={commitPaidDraft}
-        className="mt-4 w-full rounded-xl bg-[#3C4D6B] py-3 text-sm font-semibold text-white sm:w-auto sm:px-8"
-      >
-        {t('kassaOnAccount.savePaid')}
-      </button>
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={commitPaidDraft}
+          className="min-h-14 w-full rounded-xl bg-[#3C4D6B] px-8 text-base font-semibold text-white sm:w-auto"
+        >
+          {t('kassaOnAccount.savePaid')}
+        </button>
+        <button
+          type="button"
+          onClick={() => onRemove(row)}
+          className="min-h-14 w-full rounded-xl border-2 border-gray-300 px-8 text-base font-semibold text-gray-700 sm:w-auto"
+        >
+          {t('kassaOnAccount.remove')}
+        </button>
+      </div>
     </li>
   )
 }
