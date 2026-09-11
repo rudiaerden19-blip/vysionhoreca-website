@@ -270,6 +270,11 @@ export function isTenantSubmenuEffectiveOn(
     if (enabledJson.sm_retail_kassa_producten === true) return true
     if (enabledJson['retail-kassa'] === true) return true
   }
+  /** Nieuwe openstaande rekeningen: bestaande tenants hebben de key nog niet. */
+  if (subId === 'sm_kassa_op_rekening') {
+    if (enabledJson.sm_kassa_op_rekening === false) return false
+    return parentModuleOn
+  }
   return false
 }
 
@@ -489,7 +494,8 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/producten') ||
     rest.startsWith('/opties') ||
     rest.startsWith('/allergenen') ||
-    rest.startsWith('/labels')
+    rest.startsWith('/labels') ||
+    rest.startsWith('/op-rekening')
   ) {
     return { kind: 'module', module: 'kassa'}
   }

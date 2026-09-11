@@ -3843,6 +3843,24 @@
     "interimDeltaFooter": "Enkel ter info — nog niet betaald. Alleen nieuwe regels.",
     "interimBonNothingNew": "Niets nieuws om af te drukken voor deze tafel — dat staat al op een eerdere bon."
   },
+  "kassaOnAccount": {
+    "title": "Op rekening",
+    "subtitle": "Klanten die niet meteen betalen. Per dag apart. De kassa en het Z-rapport blijven hetzelfde.",
+    "name": "Naam",
+    "date": "Datum",
+    "amount": "Bedrag",
+    "add": "Toevoegen",
+    "month": "Maand",
+    "paid": "Betaald",
+    "unpaid": "Niet betaald",
+    "remove": "Wissen",
+    "empty": "Nog geen regels in deze maand.",
+    "loading": "Laden…",
+    "openTotal": "Nog te betalen",
+    "invalidForm": "Vul naam, datum en een bedrag in.",
+    "saveFailed": "Opslaan mislukt. Staat de tabel in Supabase?",
+    "loadFailed": "Lijst laden mislukt. Staat de tabel in Supabase?"
+  },
   "kassaApp": {
     "soundTitle": "Activeer geluid",
     "soundBody": "Klik op de knop om geluid en meldingen te activeren voor nieuwe bestellingen.",
@@ -5916,6 +5934,7 @@
       "sm_kassa_bonnenprinter": "Bonnenprinter",
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "Kassa-terminal",
+      "sm_kassa_op_rekening": "Op rekening",
       "sm_online_status": "Online Aan/Uitzetten",
       "sm_online_klanten": "Klanten",
       "sm_online_beloningen": "Beloningen",

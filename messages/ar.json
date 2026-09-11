@@ -3297,6 +3297,24 @@
     "interimDeltaFooter": "للمعلومة فقط — لم يُسدَّد بعد. أسطر جديدة فقط.",
     "interimBonNothingNew": "لا يوجد جديد للطباعة لهذه الطاولة — موجود بالفعل في إيصال سابق."
   },
+  "kassaOnAccount": {
+    "title": "على الحساب",
+    "subtitle": "زبائن لا يدفعون فوراً. كل يوم على حدة. الصندوق وتقرير Z بدون تغيير.",
+    "name": "الاسم",
+    "date": "التاريخ",
+    "amount": "المبلغ",
+    "add": "إضافة",
+    "month": "الشهر",
+    "paid": "مدفوع",
+    "unpaid": "غير مدفوع",
+    "remove": "حذف",
+    "empty": "لا توجد بنود هذا الشهر.",
+    "loading": "جارٍ التحميل…",
+    "openTotal": "المتبقي",
+    "invalidForm": "أدخل الاسم والتاريخ والمبلغ.",
+    "saveFailed": "تعذّر الحفظ. هل الجدول موجود في Supabase؟",
+    "loadFailed": "تعذّر التحميل. هل الجدول موجود في Supabase؟"
+  },
   "kassaApp": {
     "soundTitle": "تفعيل الصوت",
     "soundBody": "اضغط الزر لتفعيل الصوت والإشعارات للطلبات الجديدة.",
@@ -5957,6 +5975,7 @@
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "طرفية نقطة البيع",
+      "sm_kassa_op_rekening": "على الحساب",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",

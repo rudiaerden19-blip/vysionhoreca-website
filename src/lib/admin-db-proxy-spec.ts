@@ -211,6 +211,12 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
     forbiddenColumns: ['id', 'created_at'],
     maxRows: 1,
   },
+  kassa_on_account: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert', 'delete'],
+    forbiddenColumns: ['id', 'created_at'],
+    maxRows: 200,
+  },
   guest_profiles: {
     tenantSlugColumn: 'tenant_slug',
     allowedOps: ['insert', 'update', 'upsert', 'delete'],

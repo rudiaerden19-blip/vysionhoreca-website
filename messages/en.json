@@ -3843,6 +3843,24 @@
     "interimDeltaFooter": "For information only — not paid yet. New lines only.",
     "interimBonNothingNew": "Nothing new to print for this table — it's already on an earlier slip."
   },
+  "kassaOnAccount": {
+    "title": "On account",
+    "subtitle": "Customers who do not pay immediately. Separate per day. The till and Z-report stay the same.",
+    "name": "Name",
+    "date": "Date",
+    "amount": "Amount",
+    "add": "Add",
+    "month": "Month",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "remove": "Delete",
+    "empty": "No lines in this month yet.",
+    "loading": "Loading…",
+    "openTotal": "Still to pay",
+    "invalidForm": "Enter a name, date and amount.",
+    "saveFailed": "Could not save. Is the table in Supabase?",
+    "loadFailed": "Could not load the list. Is the table in Supabase?"
+  },
   "kassaApp": {
     "soundTitle": "Enable sound",
     "soundBody": "Tap the button to enable sound and notifications for new orders.",
@@ -5916,6 +5934,7 @@
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "POS terminal",
+      "sm_kassa_op_rekening": "On account",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",

@@ -3297,6 +3297,24 @@
     "interimDeltaFooter": "Solo informativo — aún no pagado. Solo líneas nuevas.",
     "interimBonNothingNew": "No hay novedades para imprimir en esta mesa — ya figuran en un ticket anterior."
   },
+  "kassaOnAccount": {
+    "title": "A cuenta",
+    "subtitle": "Clientes que no pagan al momento. Cada día aparte. Caja e informe Z no cambian.",
+    "name": "Nombre",
+    "date": "Fecha",
+    "amount": "Importe",
+    "add": "Añadir",
+    "month": "Mes",
+    "paid": "Pagado",
+    "unpaid": "Sin pagar",
+    "remove": "Borrar",
+    "empty": "Aún no hay líneas este mes.",
+    "loading": "Cargando…",
+    "openTotal": "Pendiente",
+    "invalidForm": "Indica nombre, fecha e importe.",
+    "saveFailed": "No se pudo guardar. ¿Existe la tabla en Supabase?",
+    "loadFailed": "No se pudo cargar. ¿Existe la tabla en Supabase?"
+  },
   "kassaApp": {
     "soundTitle": "Activar sonido",
     "soundBody": "Pulsa el botón para activar sonido y avisos de nuevos pedidos.",
@@ -5957,6 +5975,7 @@
       "sm_kassa_bonnenprinter": "Impresora de tickets",
       "sm_kassa_labels": "Etiquetas",
       "sm_kassa_terminal": "Terminal TPV",
+      "sm_kassa_op_rekening": "A cuenta",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Clientes",
       "sm_online_beloningen": "Recompensas",

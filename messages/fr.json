@@ -2797,6 +2797,24 @@
     "interimDeltaFooter": "À titre indicatif — pas encore payé. Nouvelles lignes seulement.",
     "interimBonNothingNew": "Rien de nouveau à imprimer pour cette table — c’est déjà sur un ticket précédent."
   },
+  "kassaOnAccount": {
+    "title": "À crédit",
+    "subtitle": "Clients qui ne paient pas tout de suite. Un jour à la fois. Caisse et rapport Z inchangés.",
+    "name": "Nom",
+    "date": "Date",
+    "amount": "Montant",
+    "add": "Ajouter",
+    "month": "Mois",
+    "paid": "Payé",
+    "unpaid": "Non payé",
+    "remove": "Supprimer",
+    "empty": "Pas encore de lignes ce mois-ci.",
+    "loading": "Chargement…",
+    "openTotal": "Encore dû",
+    "invalidForm": "Indiquez un nom, une date et un montant.",
+    "saveFailed": "Enregistrement impossible. Table présente dans Supabase ?",
+    "loadFailed": "Chargement impossible. Table présente dans Supabase ?"
+  },
   "kassaApp": {
     "soundTitle": "Activer le son",
     "soundBody": "Appuyez sur le bouton pour activer le son et les notifications des nouvelles commandes.",
@@ -5980,6 +5998,7 @@
       "sm_kassa_bonnenprinter": "Imprimante de tickets",
       "sm_kassa_labels": "Étiquettes",
       "sm_kassa_terminal": "Terminal caisse",
+      "sm_kassa_op_rekening": "À crédit",
       "sm_online_status": "En ligne marche/arrêt",
       "sm_online_klanten": "Clients",
       "sm_online_beloningen": "Récompenses",

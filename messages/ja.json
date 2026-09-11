@@ -3297,6 +3297,24 @@
     "interimDeltaFooter": "参考用 — 未会計。新規行のみ。",
     "interimBonNothingNew": "このテーブルに印刷する新規はありません — すでに前の伝票に含まれています。"
   },
+  "kassaOnAccount": {
+    "title": "掛け売り",
+    "subtitle": "すぐ払わない客を日ごとに記録。レジとZレポートは変わりません。",
+    "name": "名前",
+    "date": "日付",
+    "amount": "金額",
+    "add": "追加",
+    "month": "月",
+    "paid": "支払済",
+    "unpaid": "未払い",
+    "remove": "削除",
+    "empty": "この月の行はまだありません。",
+    "loading": "読み込み中…",
+    "openTotal": "未払い合計",
+    "invalidForm": "名前・日付・金額を入力してください。",
+    "saveFailed": "保存できません。Supabaseにテーブルがありますか？",
+    "loadFailed": "読み込めません。Supabaseにテーブルがありますか？"
+  },
   "kassaApp": {
     "soundTitle": "音を有効にする",
     "soundBody": "ボタンを押して新規注文の音と通知を有効にします。",
@@ -5957,6 +5975,7 @@
       "sm_kassa_bonnenprinter": "Receipt printer",
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "レジ端末",
+      "sm_kassa_op_rekening": "掛け売り",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",

@@ -2797,6 +2797,24 @@
     "interimDeltaFooter": "Nur zur Info — noch nicht bezahlt. Nur neue Zeilen.",
     "interimBonNothingNew": "Nichts Neues zum Drucken für diesen Tisch — steht bereits auf einem früheren Bon."
   },
+  "kassaOnAccount": {
+    "title": "Auf Rechnung",
+    "subtitle": "Gäste, die nicht sofort zahlen. Pro Tag getrennt. Kasse und Z-Bericht bleiben unverändert.",
+    "name": "Name",
+    "date": "Datum",
+    "amount": "Betrag",
+    "add": "Hinzufügen",
+    "month": "Monat",
+    "paid": "Bezahlt",
+    "unpaid": "Offen",
+    "remove": "Löschen",
+    "empty": "Noch keine Zeilen in diesem Monat.",
+    "loading": "Laden…",
+    "openTotal": "Noch zu zahlen",
+    "invalidForm": "Name, Datum und Betrag eingeben.",
+    "saveFailed": "Speichern fehlgeschlagen. Tabelle in Supabase vorhanden?",
+    "loadFailed": "Liste laden fehlgeschlagen. Tabelle in Supabase vorhanden?"
+  },
   "kassaApp": {
     "soundTitle": "Ton aktivieren",
     "soundBody": "Tippen Sie auf die Schaltfläche, um Ton und Benachrichtigungen für neue Bestellungen zu aktivieren.",
@@ -5980,6 +5998,7 @@
       "sm_kassa_bonnenprinter": "Belegdrucker",
       "sm_kassa_labels": "Etiketten",
       "sm_kassa_terminal": "Kassen-Terminal",
+      "sm_kassa_op_rekening": "Auf Rechnung",
       "sm_online_status": "Online ein/aus",
       "sm_online_klanten": "Kunden",
       "sm_online_beloningen": "Prämien",

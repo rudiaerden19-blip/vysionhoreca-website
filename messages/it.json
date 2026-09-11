@@ -3297,6 +3297,24 @@
     "interimDeltaFooter": "Solo a titolo informativo — non ancora pagato. Solo righe nuove.",
     "interimBonNothingNew": "Niente di nuovo da stampare per questo tavolo — è già su uno scontrino precedente."
   },
+  "kassaOnAccount": {
+    "title": "In conto",
+    "subtitle": "Clienti che non pagano subito. Ogni giorno a parte. Cassa e rapporto Z invariati.",
+    "name": "Nome",
+    "date": "Data",
+    "amount": "Importo",
+    "add": "Aggiungi",
+    "month": "Mese",
+    "paid": "Pagato",
+    "unpaid": "Non pagato",
+    "remove": "Elimina",
+    "empty": "Nessuna riga in questo mese.",
+    "loading": "Caricamento…",
+    "openTotal": "Ancora da pagare",
+    "invalidForm": "Inserisci nome, data e importo.",
+    "saveFailed": "Salvataggio non riuscito. Tabella presente in Supabase?",
+    "loadFailed": "Caricamento non riuscito. Tabella presente in Supabase?"
+  },
   "kassaApp": {
     "soundTitle": "Attiva audio",
     "soundBody": "Tocca il pulsante per attivare suoni e notifiche per i nuovi ordini.",
@@ -5957,6 +5975,7 @@
       "sm_kassa_bonnenprinter": "Stampante scontrini",
       "sm_kassa_labels": "Etichette",
       "sm_kassa_terminal": "Terminale cassa",
+      "sm_kassa_op_rekening": "In conto",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Clienti",
       "sm_online_beloningen": "Premi",

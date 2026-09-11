@@ -250,6 +250,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_kassa_terminal'),
           href: `${baseUrl}/kassa-terminal`,
         },
+        {
+          id: 'sm_kassa_op_rekening',
+          icon: '',
+          label: 'Op rekening',
+          labelKey: itemLabelKey('sm_kassa_op_rekening'),
+          href: `${baseUrl}/op-rekening`,
+        },
       ],
     },
     {
@@ -777,6 +784,10 @@ export function isAdminSubmenuEnabled(
     ) {
       return true
     }
+    if (subId === 'sm_kassa_op_rekening') {
+      if (enabledJson.sm_kassa_op_rekening === false) return false
+      return isHorecaKassaPosScreenEnabled(moduleAccess)
+    }
     return false
   }
 
@@ -929,6 +940,10 @@ export function filterHamburgerModulesForAccess(
               enabledModulesJson['retail-kassa'] === true)
           ) {
             return true
+          }
+          if (item.id === 'sm_kassa_op_rekening') {
+            if (enabledModulesJson.sm_kassa_op_rekening === false) return false
+            return isHorecaKassaPosScreenEnabled(effectiveAccess)
           }
           return false
         }
