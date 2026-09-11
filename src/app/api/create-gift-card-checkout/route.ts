@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { stripeStatementDescriptorFromShop } from '@/lib/webshop-online-payment'
 
 export async function POST(request: NextRequest) {
   try {
@@ -119,9 +118,6 @@ export async function POST(request: NextRequest) {
       success_url: `${request.headers.get('origin')}/shop/${tenantSlug}?gift_card_success=true&gift_card_id=${giftCard.id}`,
       cancel_url: `${request.headers.get('origin')}/shop/${tenantSlug}?gift_card_cancelled=true`,
       customer_email: senderEmail,
-      payment_intent_data: {
-        statement_descriptor: stripeStatementDescriptorFromShop(tenant.business_name, tenantSlug),
-      },
       metadata: {
         gift_card_id: giftCard.id,
         tenant_slug: tenantSlug,
