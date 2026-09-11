@@ -1,5 +1,5 @@
-/** 80 mm thermische regel in normale/DOUBLE_HEIGHT ESC/POS (~42 tekens). */
-export const KASSA_THERMAL_LINE_WIDTH = 42
+/** 80 mm Font A ~48 tekens — iets ruimer dan 42 zodat naam en prijs meer lucht krijgen. */
+export const KASSA_THERMAL_LINE_WIDTH = 48
 
 /**
  * Product/label links, `EUR 0.00` tegen de rechterkant.
