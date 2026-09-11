@@ -388,7 +388,7 @@ export default function CheckoutPageClient({
           order_type: orderType,
           scheduled_date: scheduledDate || null,  // Date for pickup/delivery
           scheduled_time: scheduledTime || null,  // Time for pickup/delivery
-          status: 'new',
+          status: paymentMethod === 'cash' ? 'new' : 'awaiting_payment',
           items: cart.map(item => ({
             product_id: item.id,
             name: item.name,
@@ -452,7 +452,7 @@ export default function CheckoutPageClient({
           }
           await supabase
             .from('orders')
-            .update({ payment_status: 'failed' })
+            .update({ payment_status: 'failed', status: 'cancelled' })
             .eq('id', order.id)
             .eq('tenant_slug', params.tenant)
           alert(
@@ -465,7 +465,7 @@ export default function CheckoutPageClient({
         } catch {
           await supabase
             .from('orders')
-            .update({ payment_status: 'failed' })
+            .update({ payment_status: 'failed', status: 'cancelled' })
             .eq('id', order.id)
             .eq('tenant_slug', params.tenant)
           alert(t('checkoutPage.onlinePayFailed'))

@@ -29,6 +29,7 @@ import {
   isWebshopOrder,
   orderCountsTowardRevenueAndZReport,
   orderPaymentMethodBucket,
+  shopMustHideUnpaidOnlineWebshopOrder,
   type Order,
   type OrderItem,
   type OrderPaymentBucket,
@@ -42,6 +43,7 @@ export {
   isWebshopOrder,
   orderCountsTowardRevenueAndZReport,
   orderPaymentMethodBucket,
+  shopMustHideUnpaidOnlineWebshopOrder,
 }
 
 import {

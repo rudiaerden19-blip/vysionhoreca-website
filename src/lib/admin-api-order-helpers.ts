@@ -28,7 +28,7 @@ export interface Order {
   customer_address?: string
   customer_notes?: string
   order_type?: 'pickup' |  'delivery'| string
-  status: 'new' |  'confirmed' |  'preparing' |  'ready' |  'delivered' |  'completed' |  'cancelled' |  'rejected'| string
+  status: 'new' | 'awaiting_payment' |  'confirmed' |  'preparing' |  'ready' |  'delivered' |  'completed' |  'cancelled' |  'rejected'| string
   delivery_address?: string
   delivery_notes?: string
   subtotal: number
@@ -74,10 +74,29 @@ export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
   return !isKassaPosOrder(order)
 }
 
+export function isOnlineWebshopPaymentMethod(method: string | null | undefined): boolean {
+  const pm = (method || '').toLowerCase()
+  return pm === 'online' || pm === 'bancontact' || pm === 'ideal' || pm === 'visa' || pm === 'mastercard' || pm === 'paypal' || pm === 'card'
+}
+
+/** Online nog niet betaald: nooit tonen aan de zaak (geen belletje, geen keuken, geen bestellingen). */
+export function shopMustHideUnpaidOnlineWebshopOrder(order: {
+  order_type?: string | null
+  payment_method?: string | null
+  payment_status?: string | null
+  status?: string | null
+}): boolean {
+  if (!isWebshopOrder({ order_type: order.order_type ?? '' })) return false
+  const st = (order.status || '').toLowerCase()
+  if (st === 'awaiting_payment') return true
+  if (!isOnlineWebshopPaymentMethod(order.payment_method)) return false
+  return (order.payment_status || '').toLowerCase() !== 'paid'
+}
+
 /** Zelfde als tab «Actief» op admin/bestellingen (niet afgerond, geannuleerd of geweigerd). */
 export function isActiveTenantOrderStatus(status: string | null | undefined): boolean {
   const s = (status || '').toString().toLowerCase()
-  return !!s && !['completed', 'cancelled', 'rejected'].includes(s)
+  return !!s && !['completed', 'cancelled', 'rejected', 'awaiting_payment'].includes(s)
 }
 
 /**
@@ -85,7 +104,13 @@ export function isActiveTenantOrderStatus(status: string | null | undefined): bo
  * Kassa-POS schrijft bij verkoop direct `confirmed`— die horen dit alarm niet te triggeren.
  * Let op: `.toLowerCase()`alleen is onvoldoende (`DELIVERY`zou `delivery`worden); daarom eerst POS uitsluiten.
  */
-export function isWebshopChannelNewOrder(order: { order_type?: string | null | undefined }): boolean {
+export function isWebshopChannelNewOrder(order: {
+  order_type?: string | null | undefined
+  payment_method?: string | null
+  payment_status?: string | null
+  status?: string | null
+}): boolean {
+  if (shopMustHideUnpaidOnlineWebshopOrder(order)) return false
   if (isKassaPosOrder({ order_type: order.order_type ?? ''} as Pick<Order, 'order_type'>)) return false
   const ot = String(order.order_type ?? '').toLowerCase().trim()
   return ot === 'pickup' || ot === 'delivery' || ot === 'group'

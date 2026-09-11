@@ -102,12 +102,22 @@ export async function POST(request: NextRequest) {
 
       // ── Order betaling ────────────────────────────────────────────
       if (orderId && tenantSlug) {
+        const { data: unpaidOrder } = await supabase
+          .from('orders')
+          .select('status')
+          .eq('id', orderId)
+          .eq('tenant_slug', tenantSlug)
+          .maybeSingle()
+        const webhookUpdates: { payment_status: string; updated_at: string; status?: string } = {
+          payment_status: 'paid',
+          updated_at: new Date().toISOString(),
+        }
+        if (String((unpaidOrder as { status?: string } | null)?.status || '').toLowerCase() === 'awaiting_payment') {
+          webhookUpdates.status = 'new'
+        }
         await supabase
           .from('orders')
-          .update({
-            payment_status: 'paid',
-            updated_at: new Date().toISOString(),
-          })
+          .update(webhookUpdates)
           .eq('id', orderId)
           .eq('tenant_slug', tenantSlug)
 

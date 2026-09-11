@@ -11,6 +11,7 @@ import {
   getOpeningHours,
   getTenantSettings,
   isActiveTenantOrderStatus,
+  shopMustHideUnpaidOnlineWebshopOrder,
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api'
@@ -158,11 +159,15 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
       pendingOrders = allOrdersList.filter((o) => {
         if (!isActiveTenantOrderStatus(o.status)) return false
+        if (shopMustHideUnpaidOnlineWebshopOrder(o)) return false
         if (!o.created_at) return false
         return new Date(o.created_at) >= new Date(pendingSinceUtc)
       }).length
 
-      recentOrdersData = allOrdersList.slice(0, 5).map((o) => ({
+      recentOrdersData = allOrdersList
+        .filter((o) => !shopMustHideUnpaidOnlineWebshopOrder(o))
+        .slice(0, 5)
+        .map((o) => ({
         id: o.id!,
         order_number:
           o.order_number != null ? String(o.order_number) : `#${(o.id || '').slice(-4)}`,

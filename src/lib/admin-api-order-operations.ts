@@ -10,6 +10,7 @@ import {
   distributeOrderPaymentForZRaport,
   isWebshopOrder,
   orderCountsTowardRevenueAndZReport,
+  shopMustHideUnpaidOnlineWebshopOrder,
   type Order,
 } from './admin-api-order-helpers'
 import { fetchZReportVatContextFromSupabase } from './z-report-vat-context'
@@ -143,7 +144,7 @@ export async function getOrders(tenantSlug: string, status?: string, dateFrom?: 
     console.error('Error fetching orders:', error)
     return []
   }
-  return data || []
+  return (data || []).filter((o) => !shopMustHideUnpaidOnlineWebshopOrder(o))
 }
 
 export async function getOrderWithItems(tenantSlug: string, orderId: string): Promise<Order | null> {

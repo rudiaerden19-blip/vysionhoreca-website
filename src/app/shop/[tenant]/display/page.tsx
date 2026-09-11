@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, updateOrderStatus, TenantSettings, approveWebshopOrder, completeWebshopOrder, isWebshopOrder } from '@/lib/admin-api'
+import { getTenantSettings, updateOrderStatus, TenantSettings, approveWebshopOrder, completeWebshopOrder, isWebshopOrder, shopMustHideUnpaidOnlineWebshopOrder } from '@/lib/admin-api'
 import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
@@ -256,7 +256,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             ...order,
             items: typeof order.items === 'string'? JSON.parse(order.items) : order.items || []
           }))
-          const webshopOnly = parsed.filter((o) => isWebshopOrder(o))
+          const webshopOnly = parsed.filter((o) => isWebshopOrder(o) && !shopMustHideUnpaidOnlineWebshopOrder(o))
           
           // Find TRULY new orders (not in known set AND status is 'new')
           const trulyNewOrders = webshopOnly.filter(o => 
@@ -332,7 +332,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           ...order,
           items: typeof order.items === 'string'? JSON.parse(order.items) : order.items || []
         }))
-        const webshopOnly = parsed.filter((o) => isWebshopOrder(o))
+        const webshopOnly = parsed.filter((o) => isWebshopOrder(o) && !shopMustHideUnpaidOnlineWebshopOrder(o))
         setOrders(webshopOnly)
         
         // CRITICAL: Initialize known IDs with ALL current orders

@@ -13,6 +13,7 @@ type PendingOnlineOrder = {
   order_number: number | null
   stripe_session_id: string | null
   payment_status: string | null
+  status: string | null
   created_at: string | null
 }
 
@@ -46,12 +47,16 @@ async function markOrderPaid(
   tenantSlug: string,
   order: PendingOnlineOrder,
 ): Promise<void> {
+  const updates: { payment_status: string; updated_at: string; status?: string } = {
+    payment_status: 'paid',
+    updated_at: new Date().toISOString(),
+  }
+  if ((order.status || '').toLowerCase() === 'awaiting_payment') {
+    updates.status = 'new'
+  }
   await supabase
     .from('orders')
-    .update({
-      payment_status: 'paid',
-      updated_at: new Date().toISOString(),
-    })
+    .update(updates)
     .eq('id', order.id)
     .eq('tenant_slug', tenantSlug)
 
@@ -83,7 +88,7 @@ export async function syncTenantWebshopStripePayments(
   const since = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
   let query = supabase
     .from('orders')
-    .select('id, order_number, stripe_session_id, payment_status, created_at')
+    .select('id, order_number, stripe_session_id, payment_status, status, created_at')
     .eq('tenant_slug', tenantSlug)
     .eq('payment_method', 'online')
     .in('payment_status', ['pending', 'failed'])

@@ -2,6 +2,7 @@ import {
   distributeOrderPaymentForZRaport,
   orderCountsTowardRevenueAndZReport,
   isWebshopChannelNewOrder,
+  shopMustHideUnpaidOnlineWebshopOrder,
 } from '@/lib/admin-api-order-helpers'
 
 /** Kernlogica voor omzet/Z-rapport — stabiel houden bij statuswijzigingen. */
@@ -83,5 +84,53 @@ describe('isWebshopChannelNewOrder (kassa alarm alleen web)', () => {
     expect(isWebshopChannelNewOrder({ order_type: 'DINE_IN'})).toBe(false)
     expect(isWebshopChannelNewOrder({ order_type: 'TAKEAWAY'})).toBe(false)
     expect(isWebshopChannelNewOrder({ order_type: 'DELIVERY'})).toBe(false)
+  })
+
+  it('negeert online webshop tot Stripe betaald is', () => {
+    expect(
+      isWebshopChannelNewOrder({
+        order_type: 'pickup',
+        payment_method: 'online',
+        payment_status: 'pending',
+        status: 'awaiting_payment',
+      }),
+    ).toBe(false)
+    expect(
+      isWebshopChannelNewOrder({
+        order_type: 'pickup',
+        payment_method: 'online',
+        payment_status: 'paid',
+        status: 'new',
+      }),
+    ).toBe(true)
+  })
+})
+
+describe('shopMustHideUnpaidOnlineWebshopOrder', () => {
+  it('verbergt Bancontact tot paid; cash bij afhalen blijft zichtbaar', () => {
+    expect(
+      shopMustHideUnpaidOnlineWebshopOrder({
+        order_type: 'pickup',
+        payment_method: 'online',
+        payment_status: 'pending',
+        status: 'awaiting_payment',
+      }),
+    ).toBe(true)
+    expect(
+      shopMustHideUnpaidOnlineWebshopOrder({
+        order_type: 'pickup',
+        payment_method: 'cash',
+        payment_status: 'pending',
+        status: 'new',
+      }),
+    ).toBe(false)
+    expect(
+      shopMustHideUnpaidOnlineWebshopOrder({
+        order_type: 'pickup',
+        payment_method: 'online',
+        payment_status: 'paid',
+        status: 'new',
+      }),
+    ).toBe(false)
   })
 })

@@ -1339,7 +1339,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const ordersPromise = pollOrders
           ? supabase
               .from('orders')
-              .select('id,order_number,total,status,order_type')
+              .select('id,order_number,total,status,order_type,payment_method,payment_status')
               .eq('tenant_slug', tenant)
               .eq('status', 'new')
               .order('created_at', { ascending: false })
