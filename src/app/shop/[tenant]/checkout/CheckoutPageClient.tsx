@@ -74,7 +74,7 @@ export default function CheckoutPageClient({
   const [deliverySettings, setDeliverySettings] = useState<DeliverySettings | null>(null)
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<'pickup' |  'delivery'>('pickup')
-  const [paymentMethod, setPaymentMethod] = useState<'cash' |  'online'>('cash')
+  const [paymentMethod, setPaymentMethod] = useState('cash')
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     email: '',
@@ -208,7 +208,7 @@ export default function CheckoutPageClient({
 
     const offered = webshopPaymentMethodsOffered(tenant?.payment_methods, stripeReady)
     setEnabledPaymentMethods(offered)
-    setPaymentMethod(offered.includes('cash') || !stripeReady ? 'cash' : 'online')
+    setPaymentMethod(offered.includes('cash') || !stripeReady ? 'cash' : offered[0])
     
     // Default to pickup if delivery is not enabled
     if (!delivery?.delivery_enabled) {
@@ -859,10 +859,10 @@ export default function CheckoutPageClient({
                 {/* Online betaling opties */}
                 {enabledPaymentMethods.includes('bancontact') && (
                   <button
-                    onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
+                    onClick={() => setPaymentMethod('bancontact')}
+                    style={paymentMethod === 'bancontact'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'bancontact'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -873,10 +873,10 @@ export default function CheckoutPageClient({
                 
                 {enabledPaymentMethods.includes('visa') && (
                   <button
-                    onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
+                    onClick={() => setPaymentMethod('visa')}
+                    style={paymentMethod === 'visa'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'visa'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -887,10 +887,10 @@ export default function CheckoutPageClient({
                 
                 {enabledPaymentMethods.includes('mastercard') && (
                   <button
-                    onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
+                    onClick={() => setPaymentMethod('mastercard')}
+                    style={paymentMethod === 'mastercard'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'mastercard'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -901,10 +901,10 @@ export default function CheckoutPageClient({
                 
                 {enabledPaymentMethods.includes('paypal') && (
                   <button
-                    onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
+                    onClick={() => setPaymentMethod('paypal')}
+                    style={paymentMethod === 'paypal'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'paypal'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2">🅿</span>
@@ -915,10 +915,10 @@ export default function CheckoutPageClient({
                 
                 {enabledPaymentMethods.includes('ideal') && (
                   <button
-                    onClick={() => setPaymentMethod('online')}
-                    style={paymentMethod === 'online'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
+                    onClick={() => setPaymentMethod('ideal')}
+                    style={paymentMethod === 'ideal'? { borderColor: primaryColor, backgroundColor: `${primaryColor}10`} : {}}
                     className={`p-4 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'online'? '' : 'border-gray-200 hover:border-gray-300'
+                      paymentMethod === 'ideal'? '' : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-3xl block mb-2"></span>
@@ -933,7 +933,7 @@ export default function CheckoutPageClient({
                 <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm">
                   {t('checkoutPage.onlinePayNotActiveHint')}
                 </div>
-              ) : stripeOnlineReady && paymentMethod === 'online' ? (
+              ) : stripeOnlineReady && paymentMethod !== 'cash' ? (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-sm">
                   {t('checkoutPage.onlineRedirectHint')}
                 </div>
