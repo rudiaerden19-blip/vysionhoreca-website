@@ -1,5 +1,6 @@
 import {
   isStripeOnlineCheckoutSecretConfigured,
+  stripeStatementDescriptorFromShop,
   webshopPaymentMethodsOffered,
 } from '@/lib/webshop-online-payment'
 
@@ -17,5 +18,11 @@ describe('webshop-online-payment', () => {
     expect(isStripeOnlineCheckoutSecretConfigured(null)).toBe(false)
     expect(isStripeOnlineCheckoutSecretConfigured('sk_live_abcdefghijk')).toBe(true)
     expect(isStripeOnlineCheckoutSecretConfigured('sk_')).toBe(false)
+  })
+
+  it('zet zaaknaam op het afschrift, nooit Vysion', () => {
+    expect(stripeStatementDescriptorFromShop('Pizza 2018', 'pizza2018')).toBe('PIZZA 2018')
+    expect(stripeStatementDescriptorFromShop(null, 'pizza2018')).toBe('PIZZA2018')
+    expect(stripeStatementDescriptorFromShop('Vysion', 'pizza2018')).toBe('PIZZA2018')
   })
 })

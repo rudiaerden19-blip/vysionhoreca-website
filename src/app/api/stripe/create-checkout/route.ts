@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { stripeStatementDescriptorFromShop } from '@/lib/webshop-online-payment'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
 
@@ -162,6 +163,12 @@ export async function POST(request: NextRequest) {
         cancel_url:
           cancelUrl || `${request.nextUrl.origin}/shop/${tenantSlug}/checkout?payment=cancelled`,
         customer_email: order.customer_email || undefined,
+        payment_intent_data: {
+          statement_descriptor: stripeStatementDescriptorFromShop(
+            (settings as { business_name?: string | null }).business_name,
+            tenantSlug,
+          ),
+        },
         metadata: {
           order_id: orderId,
           tenant_slug: tenantSlug,

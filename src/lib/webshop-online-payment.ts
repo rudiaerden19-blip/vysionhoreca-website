@@ -27,3 +27,26 @@ export function webshopPaymentMethodsOffered(
 export function isStripeOnlineCheckoutSecretConfigured(secret: string | null | undefined): boolean {
   return typeof secret === 'string' && secret.trim().length > 10
 }
+
+function looksLikeVysionBrand(value: string): boolean {
+  return /^VYSION(\s|$)/.test(value.trim())
+}
+
+/** Tekst op het bankafschrift van de klant (niet Vysion). Stripe: 5–22 tekens. */
+export function stripeStatementDescriptorFromShop(
+  businessName: string | null | undefined,
+  tenantSlug: string,
+): string {
+  const name = (businessName || '').trim().toUpperCase()
+  const slug = (tenantSlug || '').trim().toUpperCase()
+  const source = name && !looksLikeVysionBrand(name) ? name : slug || 'WEBSHOP'
+  let cleaned = source.replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim()
+  if (looksLikeVysionBrand(cleaned)) {
+    cleaned = slug.replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim() || 'WEBSHOP'
+  }
+  if (cleaned.length < 5) {
+    cleaned = `${cleaned} SHOP`.replace(/\s+/g, ' ').trim()
+  }
+  const clipped = cleaned.slice(0, 22).trim()
+  return clipped.length >= 5 ? clipped : 'WEBSHOP'
+}
