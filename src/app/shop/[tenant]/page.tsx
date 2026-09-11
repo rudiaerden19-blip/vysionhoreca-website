@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, getShopStatus, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion, ShopStatus } from '@/lib/admin-api'
 import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
+import { hasShopHeroSlideUrl, nextShopHeroSlideIndex } from '@/lib/shop-hero-slides'
 import { ShopFitPhoto } from '@/components/ShopFitPhoto'
 import { supabase } from '@/lib/supabase'
 import {
@@ -583,7 +584,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           tenantData?.cover_image_3,
         ]
           .map(img => parseImageZoomSettings(img))
-          .filter(settings => settings.url && settings.url.trim() !== ''),
+          .filter(settings => hasShopHeroSlideUrl(settings.url)),
         description: tenantData?.description || '',
         story: tenantData?.description || '',
         address: tenantData?.address || '',
@@ -701,16 +702,25 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
     loadData()
 
-    // Image slider
-    const interval = setInterval(() => {
-      setCurrentImageIndex(prev => (prev + 1) % 3)
-    }, 5000)
     return () => {
       ac.abort()
-      clearInterval(interval)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
+
+  const heroSlideCount = business?.cover_images.length ?? 0
+
+  useEffect(() => {
+    if (heroSlideCount <= 1) {
+      setCurrentImageIndex(0)
+      return
+    }
+    setCurrentImageIndex((prev) => prev % heroSlideCount)
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => nextShopHeroSlideIndex(prev, heroSlideCount))
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [heroSlideCount])
 
   // SEO: Update document title en meta tags
   useEffect(() => {
@@ -974,6 +984,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           >
             {(() => {
               const imgSettings = business.cover_images[currentImageIndex]
+              if (!imgSettings || !hasShopHeroSlideUrl(imgSettings.url)) return null
               const zoom = imgSettings?.zoom || 1
               const posX = imgSettings?.positionX ?? 50
               // Default: 50% = midden, klant past aan via admin
@@ -982,7 +993,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               return (
                 <div className="absolute inset-0 overflow-hidden">
                   <Image
-                    src={imgSettings?.url || ''}
+                    src={imgSettings.url}
                     alt={business.name}
                     fill
                     priority={currentImageIndex === 0}
