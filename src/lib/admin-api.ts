@@ -220,6 +220,8 @@ export interface TenantSettings {
   kassa_checkout_vat_mode?: string
   /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
   z_report_send_articles_to_accountant?: boolean
+  /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */
+  z_report_owner_evening_close?: boolean
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null
@@ -389,6 +391,13 @@ export async function saveTenantSettings(settings: Partial<TenantSettings> & { t
       /z_report_send_articles_to_accountant|column .* does not exist|schema cache/i.test(r.error || '')
     ) {
       const { z_report_send_articles_to_accountant: _ignored, ...rest } = settings
+      return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
+    }
+    if (
+      'z_report_owner_evening_close' in settings &&
+      /z_report_owner_evening_close|column .* does not exist|schema cache/i.test(r.error || '')
+    ) {
+      const { z_report_owner_evening_close: _ignored, ...rest } = settings
       return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
     }
     console.error('Error saving tenant settings:', r.error)
@@ -1776,6 +1785,44 @@ export interface DailySales {
   updated_at?: string
 }
 
+export async function getOwnerCloseByDateForMonth(
+  tenantSlug: string,
+  year: number,
+  month: number,
+): Promise<Map<string, number>> {
+  const { ownerCloseDayTotal, ownerCloseFromSaved, zReportOwnerEveningCloseEnabled } = await import(
+    '@/lib/z-report-owner-close'
+  )
+  const settings = await getTenantSettings(tenantSlug)
+  if (!zReportOwnerEveningCloseEnabled(settings?.z_report_owner_evening_close)) {
+    return new Map()
+  }
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  const r = await adminDb.select<
+    Array<{
+      report_date: string
+      owner_cash?: number | null
+      owner_card?: number | null
+      owner_takeaway_incl?: number | null
+      owner_dinein_incl?: number | null
+    }>
+  >('z_reports', {
+    tenantSlug,
+    select: 'report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
+    gte: { report_date: startDate },
+    lte: { report_date: endDate },
+  })
+  const out = new Map<string, number>()
+  if (!r.ok || !r.data) return out
+  for (const row of r.data) {
+    if (!ownerCloseFromSaved(row)) continue
+    out.set(String(row.report_date), ownerCloseDayTotal(row))
+  }
+  return out
+}
+
 export async function getDailySales(tenantSlug: string, year: number, month: number): Promise<DailySales[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
   const lastDay = new Date(year, month, 0).getDate()
@@ -2145,9 +2192,6 @@ export async function calculateMonthlyReport(
   const onlineRevenue = onlineOrderRows.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
   const onlineOrders = onlineOrderRows.length
 
-  const kassaRevenueFromOrders = kassaOrderRows.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
-  const kassaOrdersFromOrders = kassaOrderRows.length
-
   /** Fiscale werkdag → POS (zelfde als Z-rapport; geen dubbeltelling met daily_sales). */
   const kassaOrderRevenueByFiscalDay = new Map<string, number>()
   const kassaOrderCountByFiscalDay = new Map<string, number>()
@@ -2160,10 +2204,27 @@ export async function calculateMonthlyReport(
   }
 
   const dailySales = await getDailySales(tenantSlug, year, month)
+  const ownerByDate = await getOwnerCloseByDateForMonth(tenantSlug, year, month)
+
+  let kassaRevenueFromOwner = 0
+  let kassaOrdersFromOwner = 0
+  for (const [day, total] of ownerByDate) {
+    kassaRevenueFromOwner += total
+    kassaOrdersFromOwner += 1
+    kassaOrderRevenueByFiscalDay.delete(day)
+    kassaOrderCountByFiscalDay.delete(day)
+  }
+
+  let kassaRevenueFromOrdersKept = 0
+  let kassaOrdersFromOrdersKept = 0
+  for (const [, rev] of kassaOrderRevenueByFiscalDay) kassaRevenueFromOrdersKept += rev
+  for (const [, cnt] of kassaOrderCountByFiscalDay) kassaOrdersFromOrdersKept += cnt
+
   let kassaRevenueFromManual = 0
   let kassaOrdersFromManual = 0
   for (const d of dailySales) {
     const day = d.date
+    if (ownerByDate.has(day)) continue
     const revDay = kassaOrderRevenueByFiscalDay.get(day) ?? 0
     const cntDay = kassaOrderCountByFiscalDay.get(day) ?? 0
     if (revDay > 0 || cntDay > 0) continue
@@ -2171,8 +2232,8 @@ export async function calculateMonthlyReport(
     kassaOrdersFromManual += Number(d.order_count) || 0
   }
 
-  const kassaRevenue = kassaRevenueFromOrders + kassaRevenueFromManual
-  const kassaOrders = kassaOrdersFromOrders + kassaOrdersFromManual
+  const kassaRevenue = kassaRevenueFromOrdersKept + kassaRevenueFromManual + kassaRevenueFromOwner
+  const kassaOrders = kassaOrdersFromOrdersKept + kassaOrdersFromManual + kassaOrdersFromOwner
   
   // 3. Get fixed costs
   const fixedCosts = await getFixedCosts(tenantSlug)

@@ -15,6 +15,15 @@ import {
 } from '@/lib/admin-api'
 import { zReportSendArticlesToAccountant } from '@/lib/z-report-accountant-articles'
 import {
+  hasOwnerCloseValues,
+  ownerCloseFromSaved,
+  ownerClosePaymentTotal,
+  ownerCloseToAmounts,
+  ownerCloseVatInclTotal,
+  parseOwnerCloseMoney,
+  zReportOwnerEveningCloseEnabled,
+} from '@/lib/z-report-owner-close'
+import {
   businessDayForOrder,
   formatTenantBusinessDayPeriod,
   getTenantBusinessDayBounds,
@@ -120,6 +129,10 @@ interface SavedReport {
   manual_online?: number | null
   manual_total?: number | null
   kassa_saved_at?: string | null
+  owner_cash?: number | null
+  owner_card?: number | null
+  owner_takeaway_incl?: number | null
+  owner_dinein_incl?: number | null
 }
 
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
@@ -132,6 +145,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showKassaModal, setShowKassaModal] = useState(false)
   const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: ''})
   const [savingKassa, setSavingKassa] = useState(false)
+  const [ownerForm, setOwnerForm] = useState({ cash: '', card: '', takeaway: '', dineIn: '' })
+  const [savingOwner, setSavingOwner] = useState(false)
   const [archivePeriod, setArchivePeriod] = useState<'dag' |  'week' |  'maand' |  'jaar'>('dag')
 
   const getLocalDateString = (date: Date = new Date()) => {
@@ -204,6 +219,44 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const found = savedReports.find(r => r.report_date === selectedDate) || null
     setCurrentSavedReport(found)
   }, [savedReports, selectedDate])
+
+  useEffect(() => {
+    const input = ownerCloseFromSaved(currentSavedReport)
+    if (!input) {
+      setOwnerForm({ cash: '', card: '', takeaway: '', dineIn: '' })
+      return
+    }
+    setOwnerForm({
+      cash: input.cash ? String(input.cash) : '',
+      card: input.card ? String(input.card) : '',
+      takeaway: input.takeawayIncl ? String(input.takeawayIncl) : '',
+      dineIn: input.dineInIncl ? String(input.dineInIncl) : '',
+    })
+  }, [currentSavedReport])
+
+  useEffect(() => {
+    if (!zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close)) return
+    const input = ownerCloseFromSaved(currentSavedReport)
+    if (!input || !stats) return
+    const overlay = ownerCloseToAmounts(input, stats.orderCount)
+    setStats((prev) =>
+      prev
+        ? {
+            ...prev,
+            subtotal: overlay.subtotalExcl,
+            taxByRate: overlay.taxByRate,
+            baseByRate: overlay.baseByRate,
+            taxLow: overlay.taxByRate[6],
+            taxMid: overlay.taxByRate[12],
+            taxHigh: overlay.taxByRate[21],
+            total: overlay.totalIncl,
+            cashPayments: overlay.cashPayments,
+            cardPayments: overlay.cardPayments,
+            onlinePayments: 0,
+          }
+        : prev,
+    )
+  }, [currentSavedReport, businessInfo?.z_report_owner_evening_close, selectedDate, stats?.date])
 
   const loadData = async () => {
     setLoading(true)
@@ -299,6 +352,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     return manualByDate
   }
 
+  const buildOwnerByDateForMonth = (yearMonth: string) => {
+    const ownerByDate: Record<string, NonNullable<ReturnType<typeof ownerCloseFromSaved>>> = {}
+    savedReports
+      .filter((r) => r.report_date.startsWith(yearMonth))
+      .forEach((r) => {
+        const input = ownerCloseFromSaved(r)
+        if (input) ownerByDate[r.report_date] = input
+      })
+    return ownerByDate
+  }
+
   const loadMonthReportData = async (yearMonth: string) => {
     setMonthLoading(true)
     try {
@@ -323,6 +387,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         vatContext,
         buildManualByDateForMonth(yearMonth),
         hours,
+        buildOwnerByDateForMonth(yearMonth),
       )
       setMonthDayRows(days)
       setMonthAmounts(days.length ? sumZReportMonthAmounts(days) : null)
@@ -337,7 +402,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const result = await adminDb.select<SavedReport[]>('z_reports', {
       tenantSlug: params.tenant,
       select:
-        'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at',
+        'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
       order: { column: 'report_date', ascending: false },
       limit: 400,
     })
@@ -534,6 +599,89 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       alert('Fout bij opslaan: '+ (r.error || ''))
     }
     setSavingKassa(false)
+  }
+
+  const saveOwnerClose = async () => {
+    if (currentSavedReport?.is_closed) {
+      alert(t('zReport.kassaEntryClosedBlocked'))
+      return
+    }
+    if (!zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close)) return
+
+    setSavingOwner(true)
+    const input = {
+      cash: parseOwnerCloseMoney(ownerForm.cash),
+      card: parseOwnerCloseMoney(ownerForm.card),
+      takeawayIncl: parseOwnerCloseMoney(ownerForm.takeaway),
+      dineInIncl: parseOwnerCloseMoney(ownerForm.dineIn),
+    }
+    const amounts = ownerCloseToAmounts(input, stats?.orderCount || 0)
+    const r = await adminDb.upsert(
+      'z_reports',
+      {
+        tenant_slug: params.tenant,
+        report_date: selectedDate,
+        order_count: Math.max(stats?.orderCount || 0, hasOwnerCloseValues(input) ? 1 : 0),
+        subtotal: amounts.subtotalExcl,
+        tax_low: amounts.taxByRate[6],
+        tax_mid: 0,
+        tax_high: amounts.taxByRate[21],
+        total: amounts.totalIncl,
+        cash_payments: amounts.cashPayments,
+        card_payments: amounts.cardPayments,
+        online_payments: 0,
+        btw_percentage: btwPercentage,
+        business_name: businessInfo?.business_name,
+        business_address: businessInfo?.address,
+        btw_number: businessInfo?.btw_number,
+        order_ids: stats?.orderIds || [],
+        generated_at: new Date().toISOString(),
+        owner_cash: input.cash || null,
+        owner_card: input.card || null,
+        owner_takeaway_incl: input.takeawayIncl || null,
+        owner_dinein_incl: input.dineInIncl || null,
+      },
+      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' },
+    )
+
+    if (r.ok) {
+      await loadSavedReports()
+      setStats((prev) =>
+        prev
+          ? {
+              ...prev,
+              subtotal: amounts.subtotalExcl,
+              taxByRate: amounts.taxByRate,
+              baseByRate: amounts.baseByRate,
+              taxLow: amounts.taxByRate[6],
+              taxMid: 0,
+              taxHigh: amounts.taxByRate[21],
+              total: amounts.totalIncl,
+              cashPayments: amounts.cashPayments,
+              cardPayments: amounts.cardPayments,
+              onlinePayments: 0,
+              orderCount: Math.max(prev.orderCount, hasOwnerCloseValues(input) ? 1 : 0),
+            }
+          : {
+              date: selectedDate,
+              orderCount: hasOwnerCloseValues(input) ? 1 : 0,
+              subtotal: amounts.subtotalExcl,
+              taxByRate: amounts.taxByRate,
+              baseByRate: amounts.baseByRate,
+              taxLow: amounts.taxByRate[6],
+              taxMid: 0,
+              taxHigh: amounts.taxByRate[21],
+              total: amounts.totalIncl,
+              cashPayments: amounts.cashPayments,
+              cardPayments: amounts.cardPayments,
+              onlinePayments: 0,
+              orderIds: [],
+            },
+      )
+    } else {
+      alert('Fout bij opslaan: ' + (r.error || ''))
+    }
+    setSavingOwner(false)
   }
 
   // Genereer kassa rapport HTML voor afdrukken
@@ -918,6 +1066,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         vatContext,
         buildManualByDateForMonth(yearMonth),
         hours,
+        buildOwnerByDateForMonth(yearMonth),
       )
 
       if (days.length === 0) {
@@ -1370,6 +1519,89 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             )}
           </div>
 
+          {reportViewMode === 'day' &&
+          zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close) ? (
+            <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 print:hidden">
+              <h3 className="text-lg font-bold text-amber-950">{t('zReport.ownerCloseTitle')}</h3>
+              <p className="mb-4 text-sm text-amber-800">{t('zReport.ownerCloseIntro')}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block text-sm font-medium text-amber-950">
+                  {t('zReport.ownerCloseCash')}
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={ownerForm.cash}
+                    disabled={isDayClosed}
+                    onChange={(e) => setOwnerForm((p) => ({ ...p, cash: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-lg"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-amber-950">
+                  {t('zReport.ownerCloseCard')}
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={ownerForm.card}
+                    disabled={isDayClosed}
+                    onChange={(e) => setOwnerForm((p) => ({ ...p, card: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-lg"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-amber-950">
+                  {t('zReport.ownerCloseTakeaway')}
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={ownerForm.takeaway}
+                    disabled={isDayClosed}
+                    onChange={(e) => setOwnerForm((p) => ({ ...p, takeaway: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-lg"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-amber-950">
+                  {t('zReport.ownerCloseDineIn')}
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={ownerForm.dineIn}
+                    disabled={isDayClosed}
+                    onChange={(e) => setOwnerForm((p) => ({ ...p, dineIn: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-lg"
+                  />
+                </label>
+              </div>
+              <p className="mt-3 text-sm text-amber-900">
+                {t('zReport.ownerClosePayTotal')}: €
+                {ownerClosePaymentTotal({
+                  cash: parseOwnerCloseMoney(ownerForm.cash),
+                  card: parseOwnerCloseMoney(ownerForm.card),
+                  takeawayIncl: parseOwnerCloseMoney(ownerForm.takeaway),
+                  dineInIncl: parseOwnerCloseMoney(ownerForm.dineIn),
+                }).toFixed(2)}
+                {' · '}
+                {t('zReport.ownerCloseVatTotal')}: €
+                {ownerCloseVatInclTotal({
+                  cash: parseOwnerCloseMoney(ownerForm.cash),
+                  card: parseOwnerCloseMoney(ownerForm.card),
+                  takeawayIncl: parseOwnerCloseMoney(ownerForm.takeaway),
+                  dineInIncl: parseOwnerCloseMoney(ownerForm.dineIn),
+                }).toFixed(2)}
+              </p>
+              <button
+                type="button"
+                onClick={() => void saveOwnerClose()}
+                disabled={savingOwner || isDayClosed}
+                className="mt-4 rounded-xl bg-amber-600 px-5 py-3 font-bold text-white hover:bg-amber-700 disabled:bg-gray-300"
+              >
+                {savingOwner ? t('zReport.kassaModalSaving') : t('zReport.ownerCloseSave')}
+              </button>
+            </div>
+          ) : null}
+
           {/* Z-Rapport */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1482,7 +1714,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   <p className="text-gray-500">{t('zReport.monthSendEmpty')}</p>
                 </div>
               )
-            ) : stats && stats.orderCount > 0 ? (
+            ) : stats &&
+              (stats.orderCount > 0 ||
+                (zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close) &&
+                  hasOwnerCloseValues(ownerCloseFromSaved(currentSavedReport)))) ? (
               <ZReportDocumentBody
                 amounts={statsToAmounts(stats)}
                 articleLines={articleLines}

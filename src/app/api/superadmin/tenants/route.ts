@@ -86,6 +86,12 @@ const UpdateZReportArticlesSchema = z.object({
   sendArticlesToAccountant: z.boolean(),
 })
 
+const UpdateZReportOwnerCloseSchema = z.object({
+  action: z.literal('update_z_report_owner_close'),
+  slug: z.string().min(1),
+  ownerEveningClose: z.boolean(),
+})
+
 const BodySchema = z.discriminatedUnion('action', [
   CreateSchema,
   DeleteSchema,
@@ -95,6 +101,7 @@ const BodySchema = z.discriminatedUnion('action', [
   CancelSubscriptionSchema,
   UpdateModulesSchema,
   UpdateZReportArticlesSchema,
+  UpdateZReportOwnerCloseSchema,
 ])
 
 const CASCADE_DELETE_TABLES = [
@@ -468,6 +475,25 @@ export async function POST(req: NextRequest) {
         tenantSlug: body.slug,
         actorType: 'superadmin', actorId, actorEmail,
         action: 'update_z_report_articles',
+        resourceType: 'tenant_settings',
+        resourceId: body.slug,
+        before: null, after: updates,
+        ip: meta.ip, userAgent: meta.userAgent, requestId,
+      })
+      return NextResponse.json({ ok: true })
+    }
+
+    if (body.action === 'update_z_report_owner_close') {
+      const updates = { z_report_owner_evening_close: body.ownerEveningClose }
+      const { error } = await supabase
+        .from('tenant_settings')
+        .update(updates)
+        .eq('tenant_slug', body.slug)
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      await recordAudit(supabase, {
+        tenantSlug: body.slug,
+        actorType: 'superadmin', actorId, actorEmail,
+        action: 'update_z_report_owner_close',
         resourceType: 'tenant_settings',
         resourceId: body.slug,
         before: null, after: updates,

@@ -12,6 +12,11 @@ import {
   saveTenantSettings,
   type TenantSettings,
 } from '@/lib/admin-api'
+import {
+  ownerCloseFromSaved,
+  ownerCloseToAmounts,
+  zReportOwnerEveningCloseEnabled,
+} from '@/lib/z-report-owner-close'
 import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt } from '@/lib/tenant-business-day'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
@@ -52,6 +57,10 @@ interface ZReport {
   generated_at: string
   business_name?: string
   is_closed?: boolean
+  owner_cash?: number | null
+  owner_card?: number | null
+  owner_takeaway_incl?: number | null
+  owner_dinein_incl?: number | null
 }
 
 interface TenantInfo {
@@ -63,6 +72,7 @@ interface TenantInfo {
   btw_number?: string
   btw_percentage?: number
   website?: string
+  z_report_owner_evening_close?: boolean
 }
 
 type Tab = 'overzicht' |  'xrapport' |  'zrapport' |  'boekhouding' |  'facturen'
@@ -220,6 +230,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       fetchAllOrdersForRapporten(tenant),
       adminDb.select<Array<Record<string, unknown>>>('z_reports', {
         tenantSlug: tenant,
+        select:
+          'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
         order: { column: 'report_date', ascending: false },
       }),
       getTenantSettings(tenant),
@@ -328,13 +340,39 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const weekDays = new Set(listBusinessDaysEndingAt(todayYmd, 7))
   const monthPrefix = todayYmd.slice(0, 7)
 
+  const ownerCloseOn = zReportOwnerEveningCloseEnabled(
+    (tenantInfo as TenantSettings | null)?.z_report_owner_evening_close,
+  )
+  const ownerTotalByDate = useMemo(() => {
+    const map = new Map<string, number>()
+    if (!ownerCloseOn) return map
+    for (const z of zReports) {
+      const input = ownerCloseFromSaved(z)
+      if (!input) continue
+      map.set(z.report_date, ownerCloseToAmounts(input).totalIncl)
+    }
+    return map
+  }, [ownerCloseOn, zReports])
+
+  const revenueForBusinessDay = (ymd: string | null) => {
+    if (!ymd) return 0
+    const owner = ownerTotalByDate.get(ymd)
+    if (owner != null) return owner
+    return validOrders.filter((o) => orderDay(o) === ymd).reduce((s, o) => s + o.total, 0)
+  }
+
   const todayOrders = validOrders.filter((o) => orderDay(o) === todayYmd)
-  const todayRevenue = todayOrders.reduce((s, o) => s + o.total, 0)
-  const weekRevenue = validOrders.filter((o) => {
-    const d = orderDay(o)
-    return d && weekDays.has(d)
-  }).reduce((s, o) => s + o.total, 0)
-  const monthRevenue = validOrders.filter((o) => orderDay(o)?.startsWith(monthPrefix)).reduce((s, o) => s + o.total, 0)
+  const todayRevenue = revenueForBusinessDay(todayYmd)
+  const weekRevenue = [...weekDays].reduce((s, d) => s + revenueForBusinessDay(d), 0)
+  const monthRevenue = validOrders
+    .map((o) => orderDay(o))
+    .filter((d): d is string => !!d && d.startsWith(monthPrefix))
+    .filter((d, i, arr) => arr.indexOf(d) === i)
+    .concat(
+      [...ownerTotalByDate.keys()].filter((d) => d.startsWith(monthPrefix)),
+    )
+    .filter((d, i, arr) => arr.indexOf(d) === i)
+    .reduce((s, d) => s + revenueForBusinessDay(d), 0)
   const avgOrder = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0
   /** Week start (maandag) kan vóór de 1e van deze maand vallen → weekomzet > maandomzet is dan logisch. */
   const weekStartsBeforeThisMonth = weekStart.getTime() < monthStart.getTime()
@@ -345,15 +383,33 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       const d = subDays(new Date(), 6-i)
       const dayStart = startOfDay(d)
       const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate()+1)
-      const rev = validOrders.filter(o => { const t=new Date(o.created_at); return t>=dayStart && t<dayEnd }).reduce((s,o)=>s+o.total,0)
+      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      const owner = ownerTotalByDate.get(ymd)
+      const rev =
+        owner != null
+          ? owner
+          : validOrders.filter(o => { const t=new Date(o.created_at); return t>=dayStart && t<dayEnd }).reduce((s,o)=>s+o.total,0)
       const cnt = validOrders.filter(o => { const t=new Date(o.created_at); return t>=dayStart && t<dayEnd }).length
       return { label: NL_DAYS[d.getDay()], revenue: rev, orders: cnt }
     })
-  }, [validOrders])
+  }, [validOrders, ownerTotalByDate])
   const maxRevenue = Math.max(...last7Days.map(d=>d.revenue), 1)
 
   // ── Betaalmethodes vandaag (case-insensitief: kassa=uppercase, online=lowercase) ──
   const paymentToday = useMemo(() => {
+    if (ownerCloseOn) {
+      const z = zReports.find((r) => r.report_date === todayYmd)
+      const input = ownerCloseFromSaved(z)
+      if (input) {
+        return {
+          CASH: input.cash,
+          CARD: input.card,
+          IDEAL: 0,
+          BANCONTACT: 0,
+          ONLINE: 0,
+        }
+      }
+    }
     const td = ordersInPeriod(validOrders, todayStart)
     const acc = {
       CASH: 0,
@@ -378,7 +434,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       else acc.ONLINE += o.total
     }
     return acc
-  }, [validOrders, todayStart])
+  }, [validOrders, todayStart, ownerCloseOn, zReports, todayYmd])
 
   // ── Besteltypen vandaag ──
   const orderTypesToday = useMemo(() => {

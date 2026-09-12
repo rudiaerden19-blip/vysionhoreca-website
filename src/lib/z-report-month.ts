@@ -18,6 +18,11 @@ import type { CategoryVatPercent } from '@/lib/order-vat'
 import type { ZReportAmounts } from '@/lib/z-report-document'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 import { buildZReportDayAmountsFromOrders, type ZReportManualExtras } from '@/lib/z-report-day-builder'
+import {
+  hasOwnerCloseValues,
+  ownerCloseToAmounts,
+  type ZReportOwnerCloseInput,
+} from '@/lib/z-report-owner-close'
 
 export type ZReportMonthDayRow = {
   date: string
@@ -108,7 +113,23 @@ function buildDayRowFromOrders(
   tenantDefaultBtw: number,
   vatContext: ZReportVatContext,
   manual?: ManualDayExtras | null,
+  owner?: ZReportOwnerCloseInput | null,
 ): ZReportMonthDayRow | null {
+  if (hasOwnerCloseValues(owner)) {
+    const o = ownerCloseToAmounts(owner!, dayOrders.length)
+    return {
+      date,
+      orderCount: Math.max(dayOrders.length, 1),
+      subtotalExcl: o.subtotalExcl,
+      totalIncl: o.totalIncl,
+      taxByRate: o.taxByRate,
+      baseByRate: o.baseByRate,
+      cashPayments: o.cashPayments,
+      cardPayments: o.cardPayments,
+      onlinePayments: o.onlinePayments,
+    }
+  }
+
   const amounts = buildZReportDayAmountsFromOrders(dayOrders, tenantDefaultBtw, vatContext, manual)
 
   if (amounts.orderCount === 0 && amounts.manualTotalIncl <= 0) return null
@@ -136,6 +157,7 @@ export function buildZReportMonthDayRows(
   vatContext: ZReportVatContext,
   manualByDate?: Record<string, ManualDayExtras>,
   hours: TenantHourRow[] = [],
+  ownerByDate?: Record<string, ZReportOwnerCloseInput>,
 ): ZReportMonthDayRow[] {
   const counted = orders.filter((o) =>
     orderCountsTowardRevenueAndZReport(
@@ -159,7 +181,8 @@ export function buildZReportMonthDayRows(
   for (const date of days) {
     const dayOrders = byDate.get(date) || []
     const manual = manualByDate?.[date]
-    const row = buildDayRowFromOrders(date, dayOrders, tenantDefaultBtw, vatContext, manual)
+    const owner = ownerByDate?.[date]
+    const row = buildDayRowFromOrders(date, dayOrders, tenantDefaultBtw, vatContext, manual, owner)
     if (row) rows.push(row)
   }
 

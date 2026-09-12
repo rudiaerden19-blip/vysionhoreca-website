@@ -16,6 +16,11 @@ import {
   type ZReportMonthDayRow,
 } from '@/lib/z-report-month'
 import type { ZReportAmounts } from '@/lib/z-report-document'
+import {
+  ownerCloseFromSaved,
+  zReportOwnerEveningCloseEnabled,
+  type ZReportOwnerCloseInput,
+} from '@/lib/z-report-owner-close'
 
 export type ZReportManualByDate = Record<
   string,
@@ -48,6 +53,26 @@ export async function fetchZReportManualByDateForMonth(
   return out
 }
 
+export async function fetchZReportOwnerCloseByDateForMonth(
+  client: SupabaseClient,
+  tenantSlug: string,
+  yearMonth: string,
+): Promise<Record<string, ZReportOwnerCloseInput>> {
+  const { data } = await client
+    .from('z_reports')
+    .select('report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl')
+    .eq('tenant_slug', tenantSlug)
+    .like('report_date', `${yearMonth}%`)
+
+  const out: Record<string, ZReportOwnerCloseInput> = {}
+  for (const row of data ?? []) {
+    const input = ownerCloseFromSaved(row)
+    if (!input) continue
+    out[String(row.report_date)] = input
+  }
+  return out
+}
+
 /** Herberekent maandrijen + totalen uit orders (fiscale dagen) — bron voor maandmail. */
 export async function buildZReportMonthFromSupabase(
   client: SupabaseClient,
@@ -61,7 +86,7 @@ export async function buildZReportMonthFromSupabase(
 
   const { data: settings } = await client
     .from('tenant_settings')
-    .select('btw_percentage')
+    .select('btw_percentage, z_report_owner_evening_close')
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
@@ -80,6 +105,9 @@ export async function buildZReportMonthFromSupabase(
 
   const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
   const manualByDate = await fetchZReportManualByDateForMonth(client, tenantSlug, yearMonth)
+  const ownerByDate = zReportOwnerEveningCloseEnabled(settings?.z_report_owner_evening_close)
+    ? await fetchZReportOwnerCloseByDateForMonth(client, tenantSlug, yearMonth)
+    : {}
 
   const days = buildZReportMonthDayRows(
     ordersRaw as unknown as Order[],
@@ -89,6 +117,7 @@ export async function buildZReportMonthFromSupabase(
     vatContext,
     manualByDate,
     hours,
+    ownerByDate,
   )
 
   return {

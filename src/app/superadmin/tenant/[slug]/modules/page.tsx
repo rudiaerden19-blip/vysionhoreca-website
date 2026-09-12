@@ -28,6 +28,7 @@ import {
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useLanguage } from '@/i18n'
 import { zReportSendArticlesToAccountant } from '@/lib/z-report-accountant-articles'
+import { zReportOwnerEveningCloseEnabled } from '@/lib/z-report-owner-close'
 
 interface TenantsCoreRow {
   slug: string
@@ -58,11 +59,13 @@ export default function SuperadminTenantModulesPage() {
   const [saveMsg, setSaveMsg] = useState<'ok' |  'err'| null>(null)
   const [sendArticlesToAccountant, setSendArticlesToAccountant] = useState(true)
   const [savingArticles, setSavingArticles] = useState(false)
+  const [ownerEveningClose, setOwnerEveningClose] = useState(false)
+  const [savingOwnerClose, setSavingOwnerClose] = useState(false)
 
   const loadData = useCallback(async () => {
     let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
-      .select('business_name, z_report_send_articles_to_accountant')
+      .select('business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close')
       .eq('tenant_slug', slug)
       .maybeSingle()
 
@@ -80,6 +83,12 @@ export default function SuperadminTenantModulesPage() {
       zReportSendArticlesToAccountant(
         (settings as { z_report_send_articles_to_accountant?: unknown } | null)
           ?.z_report_send_articles_to_accountant,
+      ),
+    )
+    setOwnerEveningClose(
+      zReportOwnerEveningCloseEnabled(
+        (settings as { z_report_owner_evening_close?: unknown } | null)
+          ?.z_report_owner_evening_close,
       ),
     )
 
@@ -211,6 +220,39 @@ export default function SuperadminTenantModulesPage() {
             hier bewaren wel vooraf in de database (bijv. voor tests).
           </p>
         )}
+
+        <div className="mb-6 rounded-2xl border border-amber-700/40 bg-amber-950/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">{t('zReport.ownerCloseModule')}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{t('zReport.ownerCloseModuleHint')}</p>
+            </div>
+            <ModuleSlider
+              checked={ownerEveningClose}
+              disabled={savingOwnerClose}
+              onChange={(on) => {
+                setOwnerEveningClose(on)
+                setSavingOwnerClose(true)
+                void authFetch('/api/superadmin/tenants', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    action: 'update_z_report_owner_close',
+                    slug,
+                    ownerEveningClose: on,
+                  }),
+                })
+                  .then(async (res) => {
+                    if (!res.ok) {
+                      const json = await res.json().catch(() => ({}))
+                      setOwnerEveningClose(!on)
+                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+                    }
+                  })
+                  .finally(() => setSavingOwnerClose(false))
+              }}
+            />
+          </div>
+        </div>
 
         <div className="mb-6 rounded-2xl border border-indigo-700/40 bg-indigo-950/30 p-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
