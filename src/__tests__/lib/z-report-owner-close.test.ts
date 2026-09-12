@@ -1,6 +1,8 @@
 import {
   applyOwnerCloseToDayTotals,
   hasOwnerCloseValues,
+  ownerCloseOrderTypeTotals,
+  ownerClosePaymentRow,
   ownerCloseToAmounts,
   shouldKeepOwnerEveningCloseTotals,
   splitInclVat,
@@ -82,5 +84,26 @@ describe('applyOwnerCloseToDayTotals', () => {
     expect(next.cashPayments).toBe(210)
     expect(next.cardPayments).toBe(350)
     expect(next.orderCount).toBe(1)
+  })
+})
+
+describe('ownerClosePaymentRow / order types', () => {
+  const input = { cash: 90, card: 60, takeawayIncl: 100, dineInIncl: 50 }
+
+  it('zet dagtelling op cash + Bancontact', () => {
+    expect(ownerClosePaymentRow(input)).toEqual({
+      receipts: 1,
+      cash: 90,
+      card: 60,
+      total: 150,
+    })
+  })
+
+  it('zet besteltypen op meenemen en daar eten', () => {
+    expect(ownerCloseOrderTypeTotals(input)).toEqual({
+      DINE_IN: 50,
+      TAKEAWAY: 100,
+      DELIVERY: 0,
+    })
   })
 })

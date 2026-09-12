@@ -14,8 +14,11 @@ import {
 } from '@/lib/admin-api'
 import {
   ownerCloseFromSaved,
+  ownerCloseOrderTypeTotals,
+  ownerClosePaymentRow,
   ownerCloseToAmounts,
   zReportOwnerEveningCloseEnabled,
+  type ZReportOwnerCloseInput,
 } from '@/lib/z-report-owner-close'
 import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt } from '@/lib/tenant-business-day'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
@@ -92,6 +95,9 @@ function subDays(d: Date, n: number) { const r = new Date(d); r.setDate(r.getDat
 function subMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getMonth()-n, 1) }
 function addMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getMonth()+n, 1) }
 function daysInMonth(y: number, m: number) { return new Date(y, m+1, 0).getDate() }
+function localYmd(y: number, m: number, day: number) {
+  return `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
 function fmt(n: number) { return `€${n.toFixed(2)}`}
 function fmtDate(s: string) { const d = new Date(s); return `${d.getDate()} ${NL_MONTHS[d.getMonth()]}`}
 /** Korte datum voor periode-onderregels (nl-BE → “2 apr.”) */
@@ -343,16 +349,23 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const ownerCloseOn = zReportOwnerEveningCloseEnabled(
     (tenantInfo as TenantSettings | null)?.z_report_owner_evening_close,
   )
-  const ownerTotalByDate = useMemo(() => {
-    const map = new Map<string, number>()
+  const ownerCloseByDate = useMemo(() => {
+    const map = new Map<string, ZReportOwnerCloseInput>()
     if (!ownerCloseOn) return map
     for (const z of zReports) {
       const input = ownerCloseFromSaved(z)
       if (!input) continue
-      map.set(z.report_date, ownerCloseToAmounts(input).totalIncl)
+      map.set(z.report_date, input)
     }
     return map
   }, [ownerCloseOn, zReports])
+  const ownerTotalByDate = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const [ymd, input] of ownerCloseByDate) {
+      map.set(ymd, ownerCloseToAmounts(input).totalIncl)
+    }
+    return map
+  }, [ownerCloseByDate])
 
   const revenueForBusinessDay = (ymd: string | null) => {
     if (!ymd) return 0
@@ -438,13 +451,17 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   // ── Besteltypen vandaag ──
   const orderTypesToday = useMemo(() => {
+    if (ownerCloseOn) {
+      const input = ownerCloseByDate.get(todayYmd)
+      if (input) return ownerCloseOrderTypeTotals(input)
+    }
     const td = ordersInPeriod(validOrders, todayStart)
     return {
       DINE_IN: td.filter(o=>o.order_type==='DINE_IN').reduce((s,o)=>s+o.total,0),
       TAKEAWAY: td.filter(o=>['TAKEAWAY','pickup'].includes(o.order_type)).reduce((s,o)=>s+o.total,0),
       DELIVERY: td.filter(o=>['DELIVERY','delivery'].includes(o.order_type)).reduce((s,o)=>s+o.total,0),
     }
-  }, [validOrders, todayStart])
+  }, [validOrders, todayStart, ownerCloseOn, ownerCloseByDate, todayYmd])
 
   // ── Klanten ──
   const klanten = useMemo(() => ({
@@ -489,41 +506,56 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }, [onlineOrders, todayStart])
 
   // ── Betalingen tabel ──
+  const paymentsForCalendarDay = (y: number, m: number, dayNum: number) => {
+    const ymd = localYmd(y, m, dayNum)
+    const owner = ownerCloseByDate.get(ymd)
+    if (owner) return ownerClosePaymentRow(owner)
+    const day = new Date(y, m, dayNum)
+    const dayStart = startOfDay(day)
+    const dayEnd = new Date(dayStart)
+    dayEnd.setDate(dayEnd.getDate() + 1)
+    const dayOrders = validOrders.filter((o) => {
+      const t = new Date(o.created_at)
+      return t >= dayStart && t < dayEnd
+    })
+    let cash = 0
+    let card = 0
+    for (const o of dayOrders) {
+      const d = distributeOrderPaymentForZRaport(o)
+      cash += d.cash
+      card += d.card + d.online
+    }
+    return { receipts: dayOrders.length, cash, card, total: cash + card }
+  }
+
   const paymentsData = useMemo(() => {
     if (paymentPeriod === 'month') {
       const y = selectedMonth.getFullYear(), m = selectedMonth.getMonth()
       const days = daysInMonth(y, m)
       return Array.from({length:days},(_,i)=>{
-        const day = new Date(y, m, days-i)
-        const dayStart = startOfDay(day)
-        const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate()+1)
-        const dayOrders = validOrders.filter(o => { const t=new Date(o.created_at); return t>=dayStart && t<dayEnd })
-        let cash = 0
-        let card = 0
-        for (const o of dayOrders) {
-          const d = distributeOrderPaymentForZRaport(o)
-          cash += d.cash
-          card += d.card + d.online
-        }
-        return { label:`${days-i} ${NL_MONTHS[m]}`, receipts:dayOrders.length, cash, card, total:cash+card }
+        const dayNum = days - i
+        const row = paymentsForCalendarDay(y, m, dayNum)
+        return { label:`${dayNum} ${NL_MONTHS[m]}`, ...row }
       })
     } else {
       return Array.from({length:12},(_,i)=>{
         const mIdx = 11-i
-        const mStart = new Date(selectedYear, mIdx, 1)
-        const mEnd = new Date(selectedYear, mIdx+1, 1)
-        const mOrders = validOrders.filter(o => { const t=new Date(o.created_at); return t>=mStart && t<mEnd })
+        const last = daysInMonth(selectedYear, mIdx)
         let mcash = 0
         let mcard = 0
-        for (const o of mOrders) {
-          const d = distributeOrderPaymentForZRaport(o)
-          mcash += d.cash
-          mcard += d.card + d.online
+        let mtotal = 0
+        let mreceipts = 0
+        for (let d = 1; d <= last; d++) {
+          const row = paymentsForCalendarDay(selectedYear, mIdx, d)
+          mcash += row.cash
+          mcard += row.card
+          mtotal += row.total
+          mreceipts += row.receipts
         }
-        return { label:`${NL_MONTHS[mIdx]} ${selectedYear}`, receipts:mOrders.length, cash: mcash, card: mcard, total: mcash + mcard }
+        return { label:`${NL_MONTHS[mIdx]} ${selectedYear}`, receipts:mreceipts, cash: mcash, card: mcard, total: mtotal }
       })
     }
-  }, [validOrders, paymentPeriod, selectedMonth, selectedYear])
+  }, [validOrders, paymentPeriod, selectedMonth, selectedYear, ownerCloseByDate])
 
   const periodTotals = useMemo(() => paymentsData.reduce((a,r)=>({
     receipts: a.receipts+r.receipts, cash:a.cash+r.cash, card:a.card+r.card, total:a.total+r.total

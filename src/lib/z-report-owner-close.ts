@@ -112,6 +112,32 @@ export function shouldKeepOwnerEveningCloseTotals(
   return zReportOwnerEveningCloseEnabled(setting) && ownerCloseFromSaved(row) != null
 }
 
+export function ownerClosePaymentRow(input: ZReportOwnerCloseInput): {
+  receipts: number
+  cash: number
+  card: number
+  total: number
+} {
+  return {
+    receipts: 1,
+    cash: input.cash,
+    card: input.card,
+    total: ownerCloseToAmounts(input).totalIncl,
+  }
+}
+
+export function ownerCloseOrderTypeTotals(input: ZReportOwnerCloseInput): {
+  DINE_IN: number
+  TAKEAWAY: number
+  DELIVERY: number
+} {
+  return {
+    DINE_IN: input.dineInIncl,
+    TAKEAWAY: input.takeawayIncl,
+    DELIVERY: 0,
+  }
+}
+
 export function applyOwnerCloseToDayTotals<
   T extends {
     orderCount?: number
