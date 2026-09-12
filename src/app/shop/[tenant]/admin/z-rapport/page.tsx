@@ -102,6 +102,14 @@ function emptyVatRecord(): Record<CategoryVatPercent, number> {
   return { 6: 0, 9: 0, 12: 0, 21: 0 }
 }
 
+const EMPTY_OWNER_FORM = {
+  cash: '',
+  card: '',
+  takeaway: '',
+  dineIn: '',
+  dineInDrinks: '',
+}
+
 function ownerCloseFromForm(form: {
   cash: string
   card: string
@@ -163,13 +171,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showKassaModal, setShowKassaModal] = useState(false)
   const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: ''})
   const [savingKassa, setSavingKassa] = useState(false)
-  const [ownerForm, setOwnerForm] = useState({
-    cash: '',
-    card: '',
-    takeaway: '',
-    dineIn: '',
-    dineInDrinks: '',
-  })
+  const [ownerForm, setOwnerForm] = useState(EMPTY_OWNER_FORM)
   const [savingOwner, setSavingOwner] = useState(false)
   const [archivePeriod, setArchivePeriod] = useState<'dag' |  'week' |  'maand' |  'jaar'>('dag')
 
@@ -248,13 +250,16 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }, [savedReports, selectedDate])
 
   useEffect(() => {
-    const input = ownerCloseFromSaved(currentSavedReport)
     const dateChanged = ownerFormDateRef.current !== selectedDate
     ownerFormDateRef.current = selectedDate
+    // Afgesloten dag: vakken leeg houden voor het volgende rapport (ook na refresh).
+    if (currentSavedReport?.is_closed) {
+      setOwnerForm(EMPTY_OWNER_FORM)
+      return
+    }
+    const input = ownerCloseFromSaved(currentSavedReport)
     if (!input) {
-      if (dateChanged) {
-        setOwnerForm({ cash: '', card: '', takeaway: '', dineIn: '', dineInDrinks: '' })
-      }
+      if (dateChanged) setOwnerForm(EMPTY_OWNER_FORM)
       return
     }
     setOwnerForm({
@@ -569,6 +574,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     })
 
     const closedAt = new Date().toISOString()
+    const ownerFromForm = ownerCloseFromForm(ownerForm)
+    const ownerKeep = hasOwnerCloseValues(ownerFromForm)
+      ? ownerFromForm
+      : ownerCloseFromSaved(currentSavedReport)
 
     const r = await adminDb.upsert(
       'z_reports',
@@ -593,11 +602,21 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         generated_at: closedAt,
         is_closed: true,   // KRITIEK: Dag definitief afgesloten
         closed_at: closedAt,
+        ...(ownerKeep
+          ? {
+              owner_cash: ownerKeep.cash,
+              owner_card: ownerKeep.card,
+              owner_takeaway_incl: ownerKeep.takeawayIncl,
+              owner_dinein_incl: ownerKeep.dineInIncl,
+              owner_dinein_drinks_incl: ownerKeep.dineInDrinksIncl,
+            }
+          : {}),
       },
       { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date'}
     )
 
     if (r.ok) {
+      setOwnerForm(EMPTY_OWNER_FORM)
       await loadSavedReports()
       setShowCloseConfirm(false)
     } else {
@@ -1655,21 +1674,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   />
                 </label>
               </div>
-              <p className="mt-3 text-sm text-amber-900">
-                {t('zReport.ownerClosePayTotal')}: €
-                {ownerClosePaymentTotal(ownerCloseFromForm(ownerForm)).toFixed(2)}
-                {' · '}
-                {t('zReport.ownerCloseVatTotal')}: €
-                {ownerCloseVatInclTotal(ownerCloseFromForm(ownerForm)).toFixed(2)}
-              </p>
-              <button
-                type="button"
-                onClick={() => void saveOwnerClose()}
-                disabled={savingOwner || isDayClosed}
-                className="mt-4 rounded-xl bg-amber-600 px-5 py-3 font-bold text-white hover:bg-amber-700 disabled:bg-gray-300"
-              >
-                {savingOwner ? t('zReport.kassaModalSaving') : t('zReport.ownerCloseSave')}
-              </button>
+              {isDayClosed ? null : (
+                <>
+                  <p className="mt-3 text-sm text-amber-900">
+                    {t('zReport.ownerClosePayTotal')}: €
+                    {ownerClosePaymentTotal(ownerCloseFromForm(ownerForm)).toFixed(2)}
+                    {' · '}
+                    {t('zReport.ownerCloseVatTotal')}: €
+                    {ownerCloseVatInclTotal(ownerCloseFromForm(ownerForm)).toFixed(2)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void saveOwnerClose()}
+                    disabled={savingOwner}
+                    className="mt-4 rounded-xl bg-amber-600 px-5 py-3 font-bold text-white hover:bg-amber-700 disabled:bg-gray-300"
+                  >
+                    {savingOwner ? t('zReport.kassaModalSaving') : t('zReport.ownerCloseSave')}
+                  </button>
+                </>
+              )}
             </div>
           ) : null}
 
