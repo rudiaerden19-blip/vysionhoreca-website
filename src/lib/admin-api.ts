@@ -186,6 +186,8 @@ export interface TenantSettings {
   specialty_2_title?: string
   specialty_3_image?: string
   specialty_3_title?: string
+  /** Kop boven de specialiteiten op de website. Leeg = standaardvertaling. */
+  specialties_heading?: string
   // QR-codes sectie aan/uit
   show_qr_codes?: boolean
   // Personeel/vacature sectie
@@ -398,6 +400,13 @@ export async function saveTenantSettings(settings: Partial<TenantSettings> & { t
       /z_report_owner_evening_close|column .* does not exist|schema cache/i.test(r.error || '')
     ) {
       const { z_report_owner_evening_close: _ignored, ...rest } = settings
+      return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
+    }
+    if (
+      'specialties_heading' in settings &&
+      /specialties_heading|column .* does not exist|schema cache/i.test(r.error || '')
+    ) {
+      const { specialties_heading: _ignored, ...rest } = settings
       return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
     }
     console.error('Error saving tenant settings:', r.error)

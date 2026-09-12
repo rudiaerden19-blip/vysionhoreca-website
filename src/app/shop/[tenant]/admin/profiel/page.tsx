@@ -81,6 +81,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     specialty_2_title: '',
     specialty_3_image: '',
     specialty_3_title: '',
+    specialties_heading: '',
   })
 
   useEffect(() => {
@@ -774,6 +775,21 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <span></span> {t('adminPages.profiel.specialtiesTitle')}
           </h2>
           <p className="text-gray-500 text-sm mb-6">{t('adminPages.profiel.specialtiesDesc')}</p>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="specialties-heading">
+              {t('adminPages.profiel.specialtiesHeadingLabel')}
+            </label>
+            <input
+              id="specialties-heading"
+              type="text"
+              name="specialties_heading"
+              value={formData.specialties_heading || ''}
+              onChange={handleChange}
+              placeholder={t('adminPages.profiel.specialtiesHeadingPlaceholder')}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            />
+          </div>
           
           <div className="space-y-6">
             {/* Specialty 1 */}

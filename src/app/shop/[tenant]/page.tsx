@@ -89,6 +89,7 @@ interface Business {
   specialty_2_title?: string
   specialty_3_image?: string
   specialty_3_title?: string
+  specialties_heading?: string
   show_qr_codes?: boolean
   hiring_enabled?: boolean
   hiring_title?: string
@@ -620,6 +621,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         specialty_2_title: tenantData?.specialty_2_title || '',
         specialty_3_image: tenantData?.specialty_3_image || '',
         specialty_3_title: tenantData?.specialty_3_title || '',
+        specialties_heading: tenantData?.specialties_heading || '',
         show_qr_codes: tenantData?.show_qr_codes ?? true,
         hiring_enabled: tenantData?.hiring_enabled ?? false,
         hiring_title: tenantData?.hiring_title || '',
@@ -1155,7 +1157,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <div className="text-center mb-8 sm:mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.ourKitchen')}</span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.ourSpecialties')}</h2>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">
+                {business.specialties_heading?.trim() || t('shopPage.ourSpecialties')}
+              </h2>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">

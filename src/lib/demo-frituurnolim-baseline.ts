@@ -46,6 +46,7 @@ const TENANT_SETTINGS_BRANDING = {
   specialty_2_title: null as string | null,
   specialty_3_image: null as string | null,
   specialty_3_title: null as string | null,
+  specialties_heading: null as string | null,
   show_qr_codes: true,
   hiring_enabled: false,
   hiring_title: null as string | null,
