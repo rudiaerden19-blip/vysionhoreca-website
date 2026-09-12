@@ -55,7 +55,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
   const handleDelete = async (id: string) => {
     if (!(await ask(t('websiteTeam.confirmDelete')))) return
 
-    const success = await deleteTeamMember(id)
+    const success = await deleteTeamMember(id, params.tenant)
     if (success) {
       setMembers(prev => prev.filter(m => m.id !== id))
     } else {

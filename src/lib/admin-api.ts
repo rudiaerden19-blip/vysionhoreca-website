@@ -2950,58 +2950,46 @@ export async function getTeamMembers(tenantSlug: string): Promise<TeamMember[]> 
 }
 
 export async function saveTeamMember(member: TeamMember): Promise<TeamMember | null> {
-  if (member.id) {
-    // Update
-    const { data, error } = await supabase
-      .from('team_members')
-      .update({
-        name: member.name,
-        role: member.role,
-        photo_url: member.photo_url,
-        display_order: member.display_order,
-        is_active: member.is_active,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', member.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating team member:', error)
-      return null
-    }
-    return data
-  } else {
-    // Insert
-    const { data, error } = await supabase
-      .from('team_members')
-      .insert({
-        tenant_slug: member.tenant_slug,
-        name: member.name,
-        role: member.role,
-        photo_url: member.photo_url,
-        display_order: member.display_order || 0,
-        is_active: true,
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating team member:', error)
-      return null
-    }
-    return data
+  const payload = {
+    name: member.name,
+    role: member.role || null,
+    photo_url: member.photo_url || null,
+    display_order: member.display_order ?? 0,
+    is_active: member.is_active ?? true,
   }
+  if (member.id) {
+    const r = await adminDb.update<TeamMember[]>(
+      'team_members',
+      { ...payload, updated_at: new Date().toISOString() },
+      { id: member.id, tenant_slug: member.tenant_slug },
+      { tenantSlug: member.tenant_slug, select: '*' },
+    )
+    if (!r.ok) {
+      console.error('Error updating team member:', r.error)
+      return null
+    }
+    return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
+  }
+  const r = await adminDb.insert<TeamMember[]>(
+    'team_members',
+    { ...payload, tenant_slug: member.tenant_slug, is_active: true },
+    { tenantSlug: member.tenant_slug, select: '*' },
+  )
+  if (!r.ok) {
+    console.error('Error creating team member:', r.error)
+    return null
+  }
+  return Array.isArray(r.data) ? r.data[0] || null : (r.data as any) || null
 }
 
-export async function deleteTeamMember(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('team_members')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting team member:', error)
+export async function deleteTeamMember(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete(
+    'team_members',
+    { id, tenant_slug: tenantSlug },
+    { tenantSlug },
+  )
+  if (!r.ok) {
+    console.error('Error deleting team member:', r.error)
     return false
   }
   return true
