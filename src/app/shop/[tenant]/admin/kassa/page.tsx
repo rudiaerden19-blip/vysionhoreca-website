@@ -238,14 +238,14 @@ import {
   applyCustomerDisplayWindowBounds,
 } from '@/lib/kassa-customer-display-window'
 import {
-  buildCategoryVatLookup,
+  buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
   computeInclusiveVatSplitFromCart,
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
   resolveTenantCountryForVat,
   dineInAndOffPremiseVatRates,
-  resolveVatPercentForProductAndOrderType,
+  resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
 import { normalizeKassaCheckoutVatMode } from '@/lib/kassa-checkout-vat-mode'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
@@ -1745,13 +1745,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Standaard BTW-bon. Alleen aan via tenant_settings.kassa_footer_drawer_button. */
   const kassaFooterDrawerButton = kassaShowsDrawerInsteadOfBtwBon(tenantInfo)
 
-  const categoryVatLookup = useMemo(() => buildCategoryVatLookup(categories), [categories])
+  const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
+  const categoryVatLookup = useMemo(
+    () => buildCategoryVatLookupForJurisdiction(categories, tenantCountry),
+    [categories, tenantCountry],
+  )
   const productCategoryById = useMemo(() => buildProductCategoryLookup(products), [products])
   const tenantDefaultBtw = useMemo(
     () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
     [tenantInfo?.btw_percentage],
   )
-  const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
   const checkoutVatMode = normalizeKassaCheckoutVatMode(tenantInfo?.kassa_checkout_vat_mode)
   const checkoutVatRates = useMemo(
     () => dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry),
@@ -1777,13 +1780,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [checkoutVatMode, checkoutVatRates, playCheckout])
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
-      resolveVatPercentForProductAndOrderType(
+      resolveVatPercentForCartLine(
         line.product,
         categoryVatLookup,
         tenantDefaultBtw,
         orderType,
         productCategoryById,
         tenantCountry,
+        line.choices,
       ),
     [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
   )
@@ -3695,7 +3699,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ])
       const freshCats = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
       freshProds = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
-      freshVatLookup = buildCategoryVatLookup(freshCats)
+      freshVatLookup = buildCategoryVatLookupForJurisdiction(freshCats, tenantCountry)
       freshProductCategoryById = buildProductCategoryLookup(freshProds)
       setCategories(freshCats)
       setProducts(freshProds)
@@ -3704,13 +3708,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
-      resolveVatPercentForProductAndOrderType(
+      resolveVatPercentForCartLine(
         line.product,
         freshVatLookup,
         tenantDefaultBtw,
         orderType,
         freshProductCategoryById,
         tenantCountry,
+        line.choices,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
@@ -4084,13 +4089,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${receiptTableNr}${terraceSuffix}`
         : orderTypePlain
       const invoiceItems = buildKassaVatInvoiceItemRows(receiptLines, (line) =>
-        resolveVatPercentForProductAndOrderType(
+        resolveVatPercentForCartLine(
           line.product,
-          buildCategoryVatLookup(categories),
+          buildCategoryVatLookupForJurisdiction(categories, tenantCountry),
           tenantDefaultBtw,
           order.orderType,
           buildProductCategoryLookup(products),
           tenantCountry,
+          line.choices,
         ),
       )
       bonLines.push(

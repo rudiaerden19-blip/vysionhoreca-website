@@ -509,9 +509,9 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value="off">Uit — zoals nu (geen extra scherm)</option>
-                <option value="choose">Bij afrekenen kiezen (12% ter plaatse / 6% meenemen; alcohol blijft 21%)</option>
-                <option value="dine_in">Alleen ter plaatse (altijd 12%, geen extra tik)</option>
-                <option value="takeaway">Alleen meenemen (altijd 6%, geen extra tik)</option>
+                <option value="choose">Bij afrekenen kiezen — ter plaatse eten 12% / drank 21%, meenemen alles 6%</option>
+                <option value="dine_in">Alleen ter plaatse (eten 12%, drank 21%, geen extra tik)</option>
+                <option value="takeaway">Alleen meenemen (alles 6%, geen extra tik)</option>
               </select>
               <p className="text-xs text-gray-400 mt-1">
                 Alleen voor Belgische zaken die 12% en 6% splitsen. NL-zaken: Uit laten.

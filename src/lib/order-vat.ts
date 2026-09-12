@@ -27,6 +27,83 @@ export function isNetherlandsVatJurisdiction(country?: string | null): boolean {
   return c === 'NL' || c === 'NEDERLAND' || c === 'NETHERLANDS' || c.startsWith('NL')
 }
 
+/** Alleen expliciet BE. NL (o.a. Blonkys eethuis / restaurant) nooit in deze tak. */
+export function isBelgiumVatJurisdiction(country?: string | null): boolean {
+  if (isNetherlandsVatJurisdiction(country)) return false
+  const c = String(country ?? '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s.]/g, '')
+  return c === 'BE' || c === 'BELGIE' || c === 'BELGIUM' || c.startsWith('BE')
+}
+
+function normalizeBelgiumVatLabel(raw?: string | null): string {
+  return String(raw ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+const BE_DRINK_NAME_RE =
+  /\b(cava|cavella|koffie|coffee|espresso|cappuccino|latte|macchiato|americano|ristretto|cortado|thee|tea|cola|fanta|sprite|pepsi|sinas|7up|bier|beer|wijn|wine|champagne|prosecco|jupiler|stella|duvel|frisdrank|limonade|limo|chocomelk|chocolademelk|chocomel|choco|milkshake|smoothie|ice[\s-]?tea|icetea|sap|juice|water|spa|bru|orangina|aperol|gin|rum|vodka|whisky|whiskey|jenever|cocktail|mocktail|red[\s-]?bull|energydrink)\b/i
+
+const BE_DRINK_CATEGORY_RE =
+  /^(drank|dranken|drinks?|alcohol|alcoholisch|frisdrank|frisdranken|koffie|koffies|thee|wijnen|bieren|aperitief|aperitieven|cocktails?|bar|drankenkaart)\b|\b(drank|dranken|alcohol|frisdrank)\b/
+
+export function looksLikeBelgiumDrinkName(name?: string | null): boolean {
+  const n = normalizeBelgiumVatLabel(name)
+  return n.length > 0 && BE_DRINK_NAME_RE.test(n)
+}
+
+/** Categorie “Dranken”, “Koffie”, “Alcohol”, … — ook als de zaak geen 21% op de categorie zette. */
+export function looksLikeBelgiumDrinkCategory(name?: string | null): boolean {
+  const n = normalizeBelgiumVatLabel(name)
+  if (!n) return false
+  return looksLikeBelgiumDrinkName(n) || BE_DRINK_CATEGORY_RE.test(n)
+}
+
+export type VatCategoryVatSource = {
+  id?: string | null
+  name?: string | null
+  default_btw_percentage?: number | null
+}
+
+/** BE: drankcategorieën tellen als 21% zodat ter plaatse/meenemen automatisch 21/6 wordt. NL ongewijzigd. */
+export function buildCategoryVatLookupForJurisdiction(
+  categories: ReadonlyArray<VatCategoryVatSource>,
+  country?: string | null,
+): Map<string, number | null | undefined> {
+  const m = buildCategoryVatLookup(categories as MenuCategory[])
+  if (!isBelgiumVatJurisdiction(country)) return m
+  for (const c of categories) {
+    if (!c.id) continue
+    if (looksLikeBelgiumDrinkCategory(c.name)) {
+      m.set(String(c.id), 21)
+    }
+  }
+  return m
+}
+
+function belgiumServiceMode(
+  orderType: OrderTypeForVat,
+  serviceMode?: VatServiceMode | null,
+): VatServiceMode {
+  if (serviceMode === 'DINE_IN' || serviceMode === 'TAKEAWAY') return serviceMode
+  return orderType === 'DINE_IN' ? 'DINE_IN' : 'TAKEAWAY'
+}
+
+/** BE-bon: ter plaatse eten 12% / drank 21%; meenemen eten én drank 6%. */
+export function resolveBelgiumBonVatPercent(
+  isDrink: boolean,
+  orderType: OrderTypeForVat,
+  serviceMode?: VatServiceMode | null,
+): CategoryVatPercent {
+  const mode = belgiumServiceMode(orderType, serviceMode)
+  if (isDrink) return mode === 'DINE_IN' ? 21 : 6
+  return mode === 'DINE_IN' ? 12 : 6
+}
+
 /** Land voor BTW-logica: expliciet `country`, anders afleiden uit BTW-nummer (NL… / BE…). */
 export function resolveTenantCountryForVat(
   country?: string | null,
@@ -130,10 +207,10 @@ export function resolveVatPercentForProduct(
 
 /**
  * BTW per product + besteltype (ter plaatse / afhalen / leveren).
- * Categorie met vast 21% (drank) wijzigt niet; eten volgt 6% afhaal vs 12% ter plaatse (BE).
+ * BE: eten 12/6, drank 21/6. NL (Blonkys e.d.): ongewijzigd — categorie 21/9 blijft vast.
  */
 export function resolveVatPercentForProductAndOrderType(
-  product: Pick<MenuProduct, 'id' | 'category_id'>,
+  product: Pick<MenuProduct, 'id' | 'category_id'> & { name?: string | null },
   categoryById: Map<string, number | null | undefined>,
   tenantDefaultPct: number,
   orderType: OrderTypeForVat,
@@ -142,6 +219,9 @@ export function resolveVatPercentForProductAndOrderType(
 ): CategoryVatPercent {
   const categoryId = resolveCategoryIdForVatProduct(product, productCategoryById)
   const override = categoryId != null ? categoryById.get(categoryId) : undefined
+  if (isBelgiumVatJurisdiction(country) && looksLikeBelgiumDrinkName(product.name)) {
+    return resolveBelgiumBonVatPercent(true, orderType, null)
+  }
   return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
 }
 
@@ -151,6 +231,13 @@ export function resolveVatPercentForCategoryAndOrderType(
   orderType: OrderTypeForVat,
   country?: string | null,
 ): CategoryVatPercent {
+  if (isBelgiumVatJurisdiction(country)) {
+    const isDrink =
+      categoryOverride != null &&
+      normalizeCategoryVatPercent(categoryOverride, tenantDefaultPct) === 21
+    return resolveBelgiumBonVatPercent(isDrink, orderType, null)
+  }
+
   const base = normalizeCategoryVatPercent(tenantDefaultPct, 21)
 
   if (categoryOverride !== null && categoryOverride !== undefined) {
@@ -244,8 +331,7 @@ export function vatServiceModeFromOrderItemOptions(options: unknown): VatService
 }
 
 /**
- * Optie Meenemen/Ter plaatse wint voor eten (BE 6/12). Drank 21% en vast 9% blijven.
- * Geen zo'n keuze → bestaande categorie/besteltype-logica.
+ * Optie Meenemen/Ter plaatse. BE: eten 12/6, drank 21/6. NL: 21/9 blijven locked.
  */
 export function resolveVatPercentWithOptionalServiceMode(
   categoryOverride: number | null | undefined,
@@ -254,6 +340,12 @@ export function resolveVatPercentWithOptionalServiceMode(
   country: string | null | undefined,
   serviceMode: VatServiceMode | null,
 ): CategoryVatPercent {
+  if (isBelgiumVatJurisdiction(country)) {
+    const isDrink =
+      categoryOverride != null &&
+      normalizeCategoryVatPercent(categoryOverride, tenantDefaultPct) === 21
+    return resolveBelgiumBonVatPercent(isDrink, orderType, serviceMode)
+  }
   if (categoryOverride !== null && categoryOverride !== undefined) {
     const locked = normalizeCategoryVatPercent(categoryOverride, tenantDefaultPct)
     if (locked === 21 || locked === 9) return locked
@@ -267,7 +359,7 @@ export function resolveVatPercentWithOptionalServiceMode(
 
 /** Kassa-regel: popup Meenemen/Ter plaatse wijzigt BTW; anders besteltype. */
 export function resolveVatPercentForCartLine(
-  product: Pick<MenuProduct, 'id' | 'category_id'>,
+  product: Pick<MenuProduct, 'id' | 'category_id'> & { name?: string | null },
   categoryById: Map<string, number | null | undefined>,
   tenantDefaultPct: number,
   orderType: OrderTypeForVat,
@@ -276,7 +368,10 @@ export function resolveVatPercentForCartLine(
   choices?: ReadonlyArray<{ choiceName?: string; optionName?: string; name?: string } | null> | null,
 ): CategoryVatPercent {
   const categoryId = resolveCategoryIdForVatProduct(product, productCategoryById)
-  const override = categoryId != null ? categoryById.get(categoryId) : undefined
+  let override = categoryId != null ? categoryById.get(categoryId) : undefined
+  if (isBelgiumVatJurisdiction(country) && looksLikeBelgiumDrinkName(product.name)) {
+    override = 21
+  }
   return resolveVatPercentWithOptionalServiceMode(
     override,
     tenantDefaultPct,
@@ -390,6 +485,9 @@ function resolveLineVatRate(
 
   const country = ctx?.tenantCountry
   const serviceMode = vatServiceModeFromOrderItemOptions(line.options)
+  if (isBelgiumVatJurisdiction(country) && looksLikeBelgiumDrinkName(lineDisplayNameForVat(line))) {
+    return resolveBelgiumBonVatPercent(true, orderType, serviceMode)
+  }
   const resolveFromCategoryId = (categoryId: unknown): CategoryVatPercent | null => {
     if (!categoryId || !ctx?.categoryById) return null
     const override = ctx.categoryById.get(String(categoryId))

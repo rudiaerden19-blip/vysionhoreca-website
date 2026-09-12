@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getMenuCategories, getMenuProducts, getTenantSettings } from '@/lib/admin-api'
-import { buildCategoryVatLookup, resolveTenantCountryForVat } from '@/lib/order-vat'
+import { buildCategoryVatLookupForJurisdiction, resolveTenantCountryForVat } from '@/lib/order-vat'
 
 function normalizeProductNameForVat(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ')
@@ -16,7 +16,11 @@ export type ZReportVatContext = {
 }
 
 export function buildZReportVatContext(
-  categories: ReadonlyArray<{ id?: string | null; default_btw_percentage?: number | null }>,
+  categories: ReadonlyArray<{
+    id?: string | null
+    name?: string | null
+    default_btw_percentage?: number | null
+  }>,
   products: ReadonlyArray<{ id?: string | null; category_id?: string | null; name?: string | null }>,
   tenantCountry?: string | null,
   tenantBtwNumber?: string | null,
@@ -30,17 +34,16 @@ export function buildZReportVatContext(
     }
   }
 
+  const country = resolveTenantCountryForVat(tenantCountry, tenantBtwNumber)
   return {
-    categoryById: buildCategoryVatLookup(
-      categories as Parameters<typeof buildCategoryVatLookup>[0],
-    ),
+    categoryById: buildCategoryVatLookupForJurisdiction(categories, country),
     productCategoryById: new Map(
       products
         .filter((p) => p.id)
         .map((p) => [String(p.id), p.category_id ? String(p.category_id) : null]),
     ),
     productCategoryByNormalizedName,
-    tenantCountry: resolveTenantCountryForVat(tenantCountry, tenantBtwNumber),
+    tenantCountry: country,
   }
 }
 
@@ -62,7 +65,7 @@ export async function fetchZReportVatContextFromSupabase(
   const [{ data: categories }, { data: products }, { data: settings }] = await Promise.all([
     client
       .from('menu_categories')
-      .select('id, default_btw_percentage')
+      .select('id, name, default_btw_percentage')
       .eq('tenant_slug', tenantSlug),
     client.from('menu_products').select('id, category_id, name').eq('tenant_slug', tenantSlug),
     client.from('tenant_settings').select('country, btw_number').eq('tenant_slug', tenantSlug).maybeSingle(),

@@ -1,12 +1,12 @@
 import type { MenuCategory, MenuProduct } from '@/lib/admin-api'
 import type { KassaCartItem, KassaLastOrderReceipt, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
 import {
-  buildCategoryVatLookup,
+  buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
   computeInclusiveVatSplitFromCart,
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
-  resolveVatPercentForProductAndOrderType,
+  resolveVatPercentForCartLine,
   type CategoryVatPercent,
   type VatSplitLine,
 } from '@/lib/order-vat'
@@ -89,17 +89,18 @@ export function computeKassaReceiptVatFromCartLines(
   orderType: KassaRegisterOrderType,
   tenantCountry: string | null,
 ): KassaReceiptVatComputed {
-  const categoryVatLookup = buildCategoryVatLookup(categories)
+  const categoryVatLookup = buildCategoryVatLookupForJurisdiction(categories, tenantCountry)
   const productCategoryById = buildProductCategoryLookup(products)
   const orderTypeForVat = normalizeOrderTypeForVat(orderType)
   const split = computeInclusiveVatSplitFromCart(lines, (line) =>
-    resolveVatPercentForProductAndOrderType(
+    resolveVatPercentForCartLine(
       line.product,
       categoryVatLookup,
       tenantDefaultBtw,
       orderTypeForVat,
       productCategoryById,
       tenantCountry,
+      line.choices,
     ),
   )
   return {

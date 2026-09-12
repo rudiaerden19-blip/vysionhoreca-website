@@ -8,8 +8,8 @@ import {
 
 export function KassaCheckoutVatModal({
   open,
-  dineInPct,
-  takeawayPct,
+  dineInPct: _dineInPct,
+  takeawayPct: _takeawayPct,
   onPickDineIn,
   onPickTakeaway,
   onClose,
@@ -23,6 +23,8 @@ export function KassaCheckoutVatModal({
   onClose: () => void
   appearance?: 'light' | 'dark'
 }) {
+  void _dineInPct
+  void _takeawayPct
   if (!open) return null
   const dark = appearance === 'dark'
 
@@ -48,8 +50,7 @@ export function KassaCheckoutVatModal({
             Ter plaatse of meenemen?
           </h2>
           <p className={dark ? 'mt-1 text-sm text-zinc-400' : 'mt-1 text-sm text-gray-500'}>
-            Kies hoe de BTW op eten en koffie moet. Alcohol (categorie 21%) blijft 21% op dezelfde
-            bon.
+            Eten ter plaatse 12%, meenemen 6%. Drank ter plaatse 21%, meenemen 6%.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 p-5">
@@ -65,7 +66,7 @@ export function KassaCheckoutVatModal({
               Ter plaatse
             </span>
             <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
-              BTW {dineInPct}%
+              Eten 12% · drank 21%
             </span>
           </button>
           <button
@@ -80,7 +81,7 @@ export function KassaCheckoutVatModal({
               Meenemen
             </span>
             <span className={dark ? 'text-sm font-semibold text-zinc-400' : 'text-sm font-semibold text-gray-500'}>
-              BTW {takeawayPct}%
+              Alles 6%
             </span>
           </button>
         </div>

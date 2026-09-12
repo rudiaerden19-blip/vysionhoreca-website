@@ -1,6 +1,10 @@
 import {
+  buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
+  computeInclusiveVatSplitFromCart,
   dineInAndOffPremiseVatRates,
+  looksLikeBelgiumDrinkCategory,
+  looksLikeBelgiumDrinkName,
   resolveTenantCountryForVat,
   resolveVatPercentForCartLine,
   resolveVatPercentForCategoryAndOrderType,
@@ -23,7 +27,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
     expect(resolveVatPercentForCategoryAndOrderType(null, 6, 'DELIVERY', 'BE')).toBe(6)
   })
 
-  it('drank blijft 21% ongeacht besteltype (BE)', () => {
+  it('BE-bon: drank ter plaatse 21%, meenemen 6%', () => {
     expect(
       resolveVatPercentForProductAndOrderType(
         { category_id: drinkCat },
@@ -43,7 +47,166 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         undefined,
         'BE',
       ),
+    ).toBe(6)
+  })
+
+  it('BE-bon: Cavella/koffie op naam zijn drank (21% ter plaatse, 6% meenemen)', () => {
+    expect(looksLikeBelgiumDrinkName('Cavella')).toBe(true)
+    expect(looksLikeBelgiumDrinkName('Koffie verkeerd')).toBe(true)
+    expect(looksLikeBelgiumDrinkName('Smos')).toBe(false)
+    expect(looksLikeBelgiumDrinkName('Ontbijthuisjeje')).toBe(false)
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: foodCat, name: 'Cavella' },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'BE',
+      ),
     ).toBe(21)
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: foodCat, name: 'Cavella' },
+        categoryById,
+        6,
+        'TAKEAWAY',
+        undefined,
+        'BE',
+      ),
+    ).toBe(6)
+  })
+
+  it('BE-bon: categorie Dranken zonder 21%-override is toch drank', () => {
+    expect(looksLikeBelgiumDrinkCategory('Dranken')).toBe(true)
+    expect(looksLikeBelgiumDrinkCategory('Ontbijt')).toBe(false)
+    const drinkNamed = 'cat-dranken-naam'
+    const lookup = buildCategoryVatLookupForJurisdiction(
+      [
+        { id: foodCat, name: 'Ontbijt', default_btw_percentage: null },
+        { id: drinkNamed, name: 'Dranken', default_btw_percentage: null },
+      ],
+      'BE',
+    )
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: drinkNamed, name: 'Huislimonade' },
+        lookup,
+        6,
+        'DINE_IN',
+        undefined,
+        'BE',
+      ),
+    ).toBe(21)
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: drinkNamed, name: 'Huislimonade' },
+        lookup,
+        6,
+        'TAKEAWAY',
+        undefined,
+        'BE',
+      ),
+    ).toBe(6)
+    const nlLookup = buildCategoryVatLookupForJurisdiction(
+      [{ id: drinkNamed, name: 'Dranken', default_btw_percentage: null }],
+      'NL',
+    )
+    expect(nlLookup.get(drinkNamed)).toBeNull()
+  })
+
+  it('BE-bon ter plaatse: eten 12% en Cavella 21% op dezelfde ticket', () => {
+    const split = computeInclusiveVatSplitFromCart(
+      [
+        {
+          cartKey: '1',
+          quantity: 1,
+          product: {
+            id: 'p-ontbijt',
+            tenant_slug: 't',
+            category_id: foodCat,
+            name: 'Ontbijthuisjeje',
+            description: '',
+            price: 14.9,
+            image_url: '',
+            is_active: true,
+            is_popular: false,
+            sort_order: 0,
+            allergens: [],
+          },
+        },
+        {
+          cartKey: '2',
+          quantity: 1,
+          product: {
+            id: 'p-cavella',
+            tenant_slug: 't',
+            category_id: foodCat,
+            name: 'Cavella',
+            description: '',
+            price: 6,
+            image_url: '',
+            is_active: true,
+            is_popular: false,
+            sort_order: 0,
+            allergens: [],
+          },
+        },
+        {
+          cartKey: '3',
+          quantity: 1,
+          product: {
+            id: 'p-smos',
+            tenant_slug: 't',
+            category_id: foodCat,
+            name: 'Smos',
+            description: '',
+            price: 7.2,
+            image_url: '',
+            is_active: true,
+            is_popular: false,
+            sort_order: 0,
+            allergens: [],
+          },
+        },
+      ],
+      (line) =>
+        resolveVatPercentForProductAndOrderType(
+          line.product,
+          categoryById,
+          6,
+          'DINE_IN',
+          undefined,
+          'BE',
+        ),
+    )
+    expect(split.grossTotal).toBe(28.1)
+    expect(split.byRate.map((r) => r.rate).sort((a, b) => a - b)).toEqual([12, 21])
+    expect(split.byRate.find((r) => r.rate === 12)?.baseExcl).toBeCloseTo(19.73, 1)
+    expect(split.byRate.find((r) => r.rate === 21)?.tax).toBeCloseTo(1.04, 1)
+  })
+
+  it('BE-bon: cava zonder 21%-categorie ter plaatse toch 21%', () => {
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: foodCat, name: 'Cava' },
+        categoryById,
+        6,
+        'DINE_IN',
+        undefined,
+        'BE',
+      ),
+    ).toBe(21)
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: foodCat, name: 'Cava' },
+        categoryById,
+        6,
+        'TAKEAWAY',
+        undefined,
+        'BE',
+      ),
+    ).toBe(6)
   })
 
   it('eten volgt besteltype (BE)', () => {
@@ -204,7 +367,7 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
     ).toBe(12)
   })
 
-  it('optie Meenemen laat drank 21% ongemoeid', () => {
+  it('optie Meenemen zet BE-drank op 6%', () => {
     expect(
       resolveVatPercentForCartLine(
         { category_id: drinkCat },
@@ -213,6 +376,30 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
         'DINE_IN',
         undefined,
         'BE',
+        [{ choiceName: 'Meenemen' }],
+      ),
+    ).toBe(6)
+  })
+
+  it('NL (Blonkys e.d.): drank blijft 21% bij meenemen', () => {
+    expect(
+      resolveVatPercentForProductAndOrderType(
+        { category_id: drinkCat },
+        categoryById,
+        9,
+        'TAKEAWAY',
+        undefined,
+        'NL',
+      ),
+    ).toBe(21)
+    expect(
+      resolveVatPercentForCartLine(
+        { category_id: drinkCat },
+        categoryById,
+        9,
+        'DINE_IN',
+        undefined,
+        'NL',
         [{ choiceName: 'Meenemen' }],
       ),
     ).toBe(21)
