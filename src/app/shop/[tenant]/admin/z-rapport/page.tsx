@@ -15,6 +15,7 @@ import {
 } from '@/lib/admin-api'
 import { zReportSendArticlesToAccountant } from '@/lib/z-report-accountant-articles'
 import {
+  applyOwnerCloseToDayTotals,
   hasOwnerCloseValues,
   ownerCloseFromSaved,
   ownerClosePaymentTotal,
@@ -178,24 +179,27 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
   const reconciledTenantRef = useRef(false)
+  const ownerFormDateRef = useRef(selectedDate)
 
   useEffect(() => {
     if (reconciledTenantRef.current) return
     reconciledTenantRef.current = true
-    void authFetch('/api/kassa/reconcile-z-report', {
-      method: 'POST',
-      body: JSON.stringify({ tenantSlug: params.tenant }),
-    })
-      .then(async (res) => {
-        if (!res.ok) return
-        await loadSavedReports()
-        if (reportViewMode === 'month') {
-          await loadMonthReportData(selectedMonthForEmail)
-        } else {
-          await loadData()
-        }
-      })
-      .catch(() => undefined)
+    void (async () => {
+      const settings = await getTenantSettings(params.tenant)
+      // Avondtelling-zaak: geen automatische herberekening uit bonnen (zet totalen terug op 0).
+      if (zReportOwnerEveningCloseEnabled(settings?.z_report_owner_evening_close)) return
+      const res = await authFetch('/api/kassa/reconcile-z-report', {
+        method: 'POST',
+        body: JSON.stringify({ tenantSlug: params.tenant }),
+      }).catch(() => null)
+      if (!res?.ok) return
+      await loadSavedReports()
+      if (reportViewMode === 'month') {
+        await loadMonthReportData(selectedMonthForEmail)
+      } else {
+        await loadData()
+      }
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
@@ -222,8 +226,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   useEffect(() => {
     const input = ownerCloseFromSaved(currentSavedReport)
+    const dateChanged = ownerFormDateRef.current !== selectedDate
+    ownerFormDateRef.current = selectedDate
     if (!input) {
-      setOwnerForm({ cash: '', card: '', takeaway: '', dineIn: '' })
+      if (dateChanged) {
+        setOwnerForm({ cash: '', card: '', takeaway: '', dineIn: '' })
+      }
       return
     }
     setOwnerForm({
@@ -232,31 +240,28 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       takeaway: input.takeawayIncl ? String(input.takeawayIncl) : '',
       dineIn: input.dineInIncl ? String(input.dineInIncl) : '',
     })
-  }, [currentSavedReport])
+  }, [currentSavedReport, selectedDate])
 
   useEffect(() => {
     if (!zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close)) return
     const input = ownerCloseFromSaved(currentSavedReport)
     if (!input || !stats) return
-    const overlay = ownerCloseToAmounts(input, stats.orderCount)
-    setStats((prev) =>
-      prev
-        ? {
-            ...prev,
-            subtotal: overlay.subtotalExcl,
-            taxByRate: overlay.taxByRate,
-            baseByRate: overlay.baseByRate,
-            taxLow: overlay.taxByRate[6],
-            taxMid: overlay.taxByRate[12],
-            taxHigh: overlay.taxByRate[21],
-            total: overlay.totalIncl,
-            cashPayments: overlay.cashPayments,
-            cardPayments: overlay.cardPayments,
-            onlinePayments: 0,
-          }
-        : prev,
-    )
-  }, [currentSavedReport, businessInfo?.z_report_owner_evening_close, selectedDate, stats?.date])
+    const overlay = applyOwnerCloseToDayTotals(stats, input)
+    if (
+      stats.total === overlay.total &&
+      stats.cashPayments === overlay.cashPayments &&
+      stats.cardPayments === overlay.cardPayments &&
+      stats.orderCount === overlay.orderCount
+    ) {
+      return
+    }
+    setStats((prev) => (prev ? applyOwnerCloseToDayTotals(prev, input) : prev))
+  }, [
+    currentSavedReport,
+    businessInfo?.z_report_owner_evening_close,
+    selectedDate,
+    stats,
+  ])
 
   const loadData = async () => {
     setLoading(true)
@@ -297,39 +302,54 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       vatContext,
     )
 
-    if (amounts.orderCount > 0) {
-      setStats({
-        date: selectedDate,
-        orderCount: amounts.orderCount,
-        subtotal: amounts.subtotalExcl,
-        taxByRate: amounts.taxByRate,
-        baseByRate: amounts.baseByRate,
-        taxLow: amounts.tax_low,
-        taxMid: amounts.tax_mid,
-        taxHigh: amounts.tax_high,
-        total: amounts.orderTotalIncl,
-        cashPayments: amounts.cashPayments,
-        onlinePayments: amounts.onlinePayments,
-        cardPayments: amounts.cardPayments,
-        orderIds: amounts.orderIds,
+    let nextStats: DailyStats =
+      amounts.orderCount > 0
+        ? {
+            date: selectedDate,
+            orderCount: amounts.orderCount,
+            subtotal: amounts.subtotalExcl,
+            taxByRate: amounts.taxByRate,
+            baseByRate: amounts.baseByRate,
+            taxLow: amounts.tax_low,
+            taxMid: amounts.tax_mid,
+            taxHigh: amounts.tax_high,
+            total: amounts.orderTotalIncl,
+            cashPayments: amounts.cashPayments,
+            onlinePayments: amounts.onlinePayments,
+            cardPayments: amounts.cardPayments,
+            orderIds: amounts.orderIds,
+          }
+        : {
+            date: selectedDate,
+            orderCount: 0,
+            subtotal: 0,
+            taxByRate: emptyVatRecord(),
+            baseByRate: emptyVatRecord(),
+            taxLow: 0,
+            taxMid: 0,
+            taxHigh: 0,
+            total: 0,
+            cashPayments: 0,
+            onlinePayments: 0,
+            cardPayments: 0,
+            orderIds: [],
+          }
+
+    if (zReportOwnerEveningCloseEnabled(settings?.z_report_owner_evening_close)) {
+      const ownerRow = await adminDb.select<SavedReport>('z_reports', {
+        tenantSlug: params.tenant,
+        select:
+          'id, report_date, order_count, total, generated_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
+        match: { report_date: selectedDate },
+        single: 'maybe',
       })
-    } else {
-      setStats({
-        date: selectedDate,
-        orderCount: 0,
-        subtotal: 0,
-        taxByRate: emptyVatRecord(),
-        baseByRate: emptyVatRecord(),
-        taxLow: 0,
-        taxMid: 0,
-        taxHigh: 0,
-        total: 0,
-        cashPayments: 0,
-        onlinePayments: 0,
-        cardPayments: 0,
-        orderIds: [],
-      })
+      const input = ownerCloseFromSaved(ownerRow.ok ? ownerRow.data : null)
+      if (input) {
+        nextStats = applyOwnerCloseToDayTotals(nextStats, input)
+      }
     }
+
+    setStats(nextStats)
 
     setLoading(false)
   }
@@ -647,36 +667,24 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (r.ok) {
       await loadSavedReports()
       setStats((prev) =>
-        prev
-          ? {
-              ...prev,
-              subtotal: amounts.subtotalExcl,
-              taxByRate: amounts.taxByRate,
-              baseByRate: amounts.baseByRate,
-              taxLow: amounts.taxByRate[6],
-              taxMid: 0,
-              taxHigh: amounts.taxByRate[21],
-              total: amounts.totalIncl,
-              cashPayments: amounts.cashPayments,
-              cardPayments: amounts.cardPayments,
-              onlinePayments: 0,
-              orderCount: Math.max(prev.orderCount, hasOwnerCloseValues(input) ? 1 : 0),
-            }
-          : {
-              date: selectedDate,
-              orderCount: hasOwnerCloseValues(input) ? 1 : 0,
-              subtotal: amounts.subtotalExcl,
-              taxByRate: amounts.taxByRate,
-              baseByRate: amounts.baseByRate,
-              taxLow: amounts.taxByRate[6],
-              taxMid: 0,
-              taxHigh: amounts.taxByRate[21],
-              total: amounts.totalIncl,
-              cashPayments: amounts.cashPayments,
-              cardPayments: amounts.cardPayments,
-              onlinePayments: 0,
-              orderIds: [],
-            },
+        applyOwnerCloseToDayTotals(
+          prev ?? {
+            date: selectedDate,
+            orderCount: 0,
+            subtotal: 0,
+            taxByRate: emptyVatRecord(),
+            baseByRate: emptyVatRecord(),
+            taxLow: 0,
+            taxMid: 0,
+            taxHigh: 0,
+            total: 0,
+            cashPayments: 0,
+            onlinePayments: 0,
+            cardPayments: 0,
+            orderIds: [],
+          },
+          input,
+        ),
       )
     } else {
       alert('Fout bij opslaan: ' + (r.error || ''))

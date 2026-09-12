@@ -1,6 +1,8 @@
 import {
+  applyOwnerCloseToDayTotals,
   hasOwnerCloseValues,
   ownerCloseToAmounts,
+  shouldKeepOwnerEveningCloseTotals,
   splitInclVat,
   zReportOwnerEveningCloseEnabled,
 } from '@/lib/z-report-owner-close'
@@ -36,5 +38,49 @@ describe('ownerCloseToAmounts', () => {
     expect(a.taxByRate[6]).toBeGreaterThan(0)
     expect(a.taxByRate[21]).toBeGreaterThan(0)
     expect(hasOwnerCloseValues({ cash: 213, card: 0, takeawayIncl: 0, dineInIncl: 0 })).toBe(true)
+  })
+})
+
+describe('shouldKeepOwnerEveningCloseTotals', () => {
+  it('blijft uit voor andere tenants', () => {
+    expect(
+      shouldKeepOwnerEveningCloseTotals(false, {
+        owner_cash: 210,
+        owner_card: 350,
+        owner_takeaway_incl: 500,
+        owner_dinein_incl: 60,
+      }),
+    ).toBe(false)
+  })
+
+  it('bewaart ingevulde avondtelling als de module aan staat', () => {
+    expect(
+      shouldKeepOwnerEveningCloseTotals(true, {
+        owner_cash: 210,
+        owner_card: 350,
+        owner_takeaway_incl: 500,
+        owner_dinein_incl: 60,
+      }),
+    ).toBe(true)
+  })
+})
+
+describe('applyOwnerCloseToDayTotals', () => {
+  it('zet een leeg kassa-totaal niet terug op 0', () => {
+    const next = applyOwnerCloseToDayTotals(
+      {
+        orderCount: 0,
+        subtotal: 0,
+        total: 0,
+        cashPayments: 0,
+        cardPayments: 0,
+        onlinePayments: 0,
+      },
+      { cash: 210, card: 350, takeawayIncl: 500, dineInIncl: 60 },
+    )
+    expect(next.total).toBe(560)
+    expect(next.cashPayments).toBe(210)
+    expect(next.cardPayments).toBe(350)
+    expect(next.orderCount).toBe(1)
   })
 })

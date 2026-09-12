@@ -98,3 +98,48 @@ export function ownerCloseDayTotal(row: {
   if (!input) return 0
   return ownerCloseToAmounts(input).totalIncl
 }
+
+/** Alleen deze module: cron/kassa mogen een ingevulde avondtelling niet wissen. */
+export function shouldKeepOwnerEveningCloseTotals(
+  setting: unknown,
+  row: {
+    owner_cash?: number | null
+    owner_card?: number | null
+    owner_takeaway_incl?: number | null
+    owner_dinein_incl?: number | null
+  } | null | undefined,
+): boolean {
+  return zReportOwnerEveningCloseEnabled(setting) && ownerCloseFromSaved(row) != null
+}
+
+export function applyOwnerCloseToDayTotals<
+  T extends {
+    orderCount?: number
+    subtotal?: number
+    taxByRate?: ReturnType<typeof ownerCloseToAmounts>['taxByRate']
+    baseByRate?: ReturnType<typeof ownerCloseToAmounts>['baseByRate']
+    taxLow?: number
+    taxMid?: number
+    taxHigh?: number
+    total?: number
+    cashPayments?: number
+    cardPayments?: number
+    onlinePayments?: number
+  },
+>(prev: T, input: ZReportOwnerCloseInput): T {
+  const overlay = ownerCloseToAmounts(input, prev.orderCount || 0)
+  return {
+    ...prev,
+    orderCount: Math.max(prev.orderCount || 0, hasOwnerCloseValues(input) ? 1 : 0),
+    subtotal: overlay.subtotalExcl,
+    taxByRate: overlay.taxByRate,
+    baseByRate: overlay.baseByRate,
+    taxLow: overlay.taxByRate[6],
+    taxMid: overlay.taxByRate[12],
+    taxHigh: overlay.taxByRate[21],
+    total: overlay.totalIncl,
+    cashPayments: overlay.cashPayments,
+    cardPayments: overlay.cardPayments,
+    onlinePayments: 0,
+  }
+}

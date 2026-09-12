@@ -18,6 +18,7 @@ import {
   buildZReportDayAmountsFromOrders,
   zReportDayHashPayload,
 } from './z-report-day-builder'
+import { shouldKeepOwnerEveningCloseTotals } from './z-report-owner-close'
 
 // =====================================================
 // ORDERS / BESTELLINGEN — types & pure helpers: `./admin-api-order-helpers`
@@ -286,6 +287,31 @@ export async function regenerateZReportForDate(
       .select('btw_percentage, business_name, address, btw_number')
       .eq('tenant_slug', tenantSlug)
       .single()
+
+    const { data: ownerSetting } = await client
+      .from('tenant_settings')
+      .select('z_report_owner_evening_close')
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+
+    const { data: existingOwnerRow } = await client
+      .from('z_reports')
+      .select('owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl')
+      .eq('tenant_slug', tenantSlug)
+      .eq('report_date', date)
+      .maybeSingle()
+
+    if (
+      shouldKeepOwnerEveningCloseTotals(
+        ownerSetting?.z_report_owner_evening_close,
+        existingOwnerRow,
+      )
+    ) {
+      console.log(
+        `regenerateZReportForDate: skip ${tenantSlug} ${date} — avondtelling van de zaak behouden`,
+      )
+      return
+    }
 
     const btwPercentage = settings?.btw_percentage || 6
     const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)

@@ -24,6 +24,10 @@ import {
   sumZReportMonthAmounts,
 } from '@/lib/z-report-month'
 import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
+import {
+  shouldKeepOwnerEveningCloseTotals,
+  zReportOwnerEveningCloseEnabled,
+} from '@/lib/z-report-owner-close'
 
 export type ZReportAuditIssueKind =
   | 'archive_missing'
@@ -128,6 +132,15 @@ export async function auditTenantZReports(
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
+  const { data: ownerSetting } = await client
+    .from('tenant_settings')
+    .select('z_report_owner_evening_close')
+    .eq('tenant_slug', tenantSlug)
+    .maybeSingle()
+  const ownerEveningOn = zReportOwnerEveningCloseEnabled(
+    ownerSetting?.z_report_owner_evening_close,
+  )
+
   const btw = Number(settings?.btw_percentage) || 6
   const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
   const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
@@ -195,6 +208,20 @@ export async function auditTenantZReports(
     const zByDate = new Map<string, ZReportRow>()
     for (const row of zReportsRaw ?? []) {
       zByDate.set(String(row.report_date), row as ZReportRow)
+    }
+
+    const ownerCloseDates = new Set<string>()
+    if (ownerEveningOn) {
+      const { data: ownerRows } = await client
+        .from('z_reports')
+        .select('report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl')
+        .eq('tenant_slug', tenantSlug)
+        .like('report_date', `${ym}%`)
+      for (const row of ownerRows ?? []) {
+        if (shouldKeepOwnerEveningCloseTotals(true, row)) {
+          ownerCloseDates.add(String(row.report_date))
+        }
+      }
     }
 
     const monthRows = buildZReportMonthDayRows(orders, ym, capYmd, btw, vatContext, undefined, hours)
@@ -277,6 +304,10 @@ export async function auditTenantZReports(
             byKind,
           )
         }
+      }
+
+      if (ownerCloseDates.has(fiscalDate)) {
+        continue
       }
 
       if (!z) {
@@ -407,6 +438,7 @@ export async function auditTenantZReports(
 
     for (const z of zReportsRaw ?? []) {
       const date = String(z.report_date)
+      if (ownerCloseDates.has(date)) continue
       if (!byFiscal.has(date) && round2(Number(z.total) || 0) > 0) {
         pushIssue(
           issues,
