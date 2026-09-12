@@ -35,6 +35,8 @@ type Props = {
   generatedAt?: string
   showFooter?: boolean
   showSoldArticles?: boolean
+  /** Artikelen op scherm, niet op Afdrukken (boekhouder). */
+  hideSoldArticlesOnPrint?: boolean
 }
 
 export function ZReportDocumentBody({
@@ -44,6 +46,7 @@ export function ZReportDocumentBody({
   generatedAt,
   showFooter = true,
   showSoldArticles = true,
+  hideSoldArticlesOnPrint = false,
 }: Props) {
   const vatRows = buildZReportVatRows(amounts)
   const totalTax = vatRows.reduce((s, r) => s + r.tax, 0)
@@ -125,7 +128,7 @@ export function ZReportDocumentBody({
       </div>
 
       {showSoldArticles ? (
-      <div className="space-y-2 pt-1">
+      <div className={`space-y-2 pt-1${hideSoldArticlesOnPrint ? ' print:hidden' : ''}`}>
         <h4 className="font-semibold text-gray-900">{labels.soldArticlesTitle}</h4>
         {articleLines.length === 0 ? (
           <p className="text-sm text-gray-500">{labels.soldArticlesEmpty}</p>

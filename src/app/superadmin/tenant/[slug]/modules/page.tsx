@@ -27,6 +27,7 @@ import {
 } from '@/lib/admin-hamburger-modules'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useLanguage } from '@/i18n'
+import { zReportSendArticlesToAccountant } from '@/lib/z-report-accountant-articles'
 
 interface TenantsCoreRow {
   slug: string
@@ -55,15 +56,32 @@ export default function SuperadminTenantModulesPage() {
   const [subToggles, setSubToggles] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState<'ok' |  'err'| null>(null)
+  const [sendArticlesToAccountant, setSendArticlesToAccountant] = useState(true)
+  const [savingArticles, setSavingArticles] = useState(false)
 
   const loadData = useCallback(async () => {
-    const { data: settings } = await supabase
+    let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
-      .select('business_name')
+      .select('business_name, z_report_send_articles_to_accountant')
       .eq('tenant_slug', slug)
       .maybeSingle()
 
+    if (settingsErr && /z_report_send_articles_to_accountant|column .* does not exist|schema cache/i.test(settingsErr.message)) {
+      const fallback = await supabase
+        .from('tenant_settings')
+        .select('business_name')
+        .eq('tenant_slug', slug)
+        .maybeSingle()
+      settings = fallback.data as typeof settings
+    }
+
     if (settings?.business_name) setBusinessName(settings.business_name)
+    setSendArticlesToAccountant(
+      zReportSendArticlesToAccountant(
+        (settings as { z_report_send_articles_to_accountant?: unknown } | null)
+          ?.z_report_send_articles_to_accountant,
+      ),
+    )
 
     let { data: coreRow, error: coreErr } = await supabase
       .from('tenants')
@@ -193,6 +211,39 @@ export default function SuperadminTenantModulesPage() {
             hier bewaren wel vooraf in de database (bijv. voor tests).
           </p>
         )}
+
+        <div className="mb-6 rounded-2xl border border-indigo-700/40 bg-indigo-950/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">{t('zReport.sendArticlesToAccountant')}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{t('zReport.sendArticlesToAccountantHint')}</p>
+            </div>
+            <ModuleSlider
+              checked={sendArticlesToAccountant}
+              disabled={savingArticles}
+              onChange={(on) => {
+                setSendArticlesToAccountant(on)
+                setSavingArticles(true)
+                void authFetch('/api/superadmin/tenants', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    action: 'update_z_report_articles',
+                    slug,
+                    sendArticlesToAccountant: on,
+                  }),
+                })
+                  .then(async (res) => {
+                    if (!res.ok) {
+                      const json = await res.json().catch(() => ({}))
+                      setSendArticlesToAccountant(!on)
+                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+                    }
+                  })
+                  .finally(() => setSavingArticles(false))
+              }}
+            />
+          </div>
+        </div>
 
         <div className="mb-6 rounded-2xl border border-slate-700 bg-slate-800 p-5">
           <div className="mb-2 flex items-center justify-between gap-4">

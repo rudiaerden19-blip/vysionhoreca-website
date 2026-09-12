@@ -4464,6 +4464,8 @@
     "soldArticlesAmountShort": "Importo",
     "monthSendTitle": "Invia mese al commercialista",
     "monthSendIntro": "Tutti gli Z-report del mese in un'e-mail — panoramica giornaliera, IVA per aliquota e totali.",
+    "sendArticlesToAccountant": "Includere gli articoli per il commercialista",
+    "sendArticlesToAccountantHint": "Se no: nessuna riga articolo in mail, stampa e PDF. A schermo restano visibili.",
     "monthSelectLabel": "Scegli mese",
     "monthSelectHint": "Scegli un mese qui o clicca un mese nell'archivio a destra (scheda Mese).",
     "monthAccountantEmail": "E-mail commercialista",

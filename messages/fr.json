@@ -4487,6 +4487,8 @@
     "soldArticlesAmountShort": "Montant",
     "monthSendTitle": "Envoyer le mois au comptable",
     "monthSendIntro": "Tous les Z-rapports du mois en un e-mail — aperçu journalier, TVA par taux et totaux.",
+    "sendArticlesToAccountant": "Joindre les articles pour le comptable",
+    "sendArticlesToAccountantHint": "Si non : pas de lignes articles dans le mail, l’impression et le PDF. L’écran les affiche encore.",
     "monthSelectLabel": "Choisir le mois",
     "monthSelectHint": "Choisissez un mois ici ou cliquez sur un mois dans l'archive à droite (onglet Mois).",
     "monthAccountantEmail": "E-mail comptable",

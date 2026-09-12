@@ -3310,6 +3310,8 @@
     "soldArticlesAmountShort": "Bedrag",
     "monthSendTitle": "Maand doorsturen naar boekhouder",
     "monthSendIntro": "Stuur alle Z-rapporten van de geselecteerde maand in één e-mail — met dagoverzicht, BTW per tarief en totalen.",
+    "sendArticlesToAccountant": "Artikelen meesturen naar boekhouder",
+    "sendArticlesToAccountantHint": "Bij Nee geen 10 cola / 20 koffie in mail, Afdrukken en PDF. Op dit scherm blijven de artikelen zichtbaar.",
     "monthSelectLabel": "Maand kiezen",
     "monthSelectHint": "Kies hier een maand, of klik een maand in het archief rechts (tab Maand).",
     "monthAccountantEmail": "E-mail boekhouder",

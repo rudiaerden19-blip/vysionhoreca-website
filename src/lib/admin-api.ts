@@ -218,6 +218,8 @@ export interface TenantSettings {
   kassa_footer_drawer_button?: boolean
   /** off | choose | dine_in | takeaway — popup 12%/6% bij afrekenen (standaard off) */
   kassa_checkout_vat_mode?: string
+  /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
+  z_report_send_articles_to_accountant?: boolean
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null
@@ -380,6 +382,13 @@ export async function saveTenantSettings(settings: Partial<TenantSettings> & { t
       /kassa_checkout_vat_mode|column .* does not exist|schema cache/i.test(r.error || '')
     ) {
       const { kassa_checkout_vat_mode: _ignored, ...rest } = settings
+      return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
+    }
+    if (
+      'z_report_send_articles_to_accountant' in settings &&
+      /z_report_send_articles_to_accountant|column .* does not exist|schema cache/i.test(r.error || '')
+    ) {
+      const { z_report_send_articles_to_accountant: _ignored, ...rest } = settings
       return saveTenantSettings(rest as Partial<TenantSettings> & { tenant_slug: string })
     }
     console.error('Error saving tenant settings:', r.error)

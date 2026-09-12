@@ -10,8 +10,10 @@ import {
   getOpeningHours,
   getTenantSettings,
   orderCountsTowardRevenueAndZReport,
+  saveTenantSettings,
   type Order,
 } from '@/lib/admin-api'
+import { zReportSendArticlesToAccountant } from '@/lib/z-report-accountant-articles'
 import {
   businessDayForOrder,
   formatTenantBusinessDayPeriod,
@@ -703,6 +705,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       .join('')
 
     const articlesBlock =
+      !zReportSendArticlesToAccountant(businessInfo?.z_report_send_articles_to_accountant) ||
       articleLines.length === 0
         ? ''
         : `
@@ -836,7 +839,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cashPayments: stats.cashPayments,
         cardPayments: stats.cardPayments,
         onlinePayments: stats.onlinePayments,
-        articleLines,
+        articleLines: zReportSendArticlesToAccountant(
+          businessInfo?.z_report_send_articles_to_accountant,
+        )
+          ? articleLines
+          : [],
         soldArticlesSectionTitle: t('zReport.soldArticlesTitle'),
         soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
         labels: {
@@ -1089,6 +1096,47 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       <div className="mb-6 p-5 bg-indigo-50 border border-indigo-200 rounded-2xl print:hidden">
         <h2 className="text-lg font-bold text-indigo-900 mb-1">{t('zReport.monthSendTitle')}</h2>
         <p className="text-sm text-indigo-800 mb-4">{t('zReport.monthSendIntro')}</p>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-white px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-indigo-950">{t('zReport.sendArticlesToAccountant')}</p>
+            <p className="mt-0.5 text-xs text-indigo-700">{t('zReport.sendArticlesToAccountantHint')}</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={zReportSendArticlesToAccountant(
+              businessInfo?.z_report_send_articles_to_accountant,
+            )}
+            onClick={async () => {
+              const next = !zReportSendArticlesToAccountant(
+                businessInfo?.z_report_send_articles_to_accountant,
+              )
+              const ok = await saveTenantSettings({
+                tenant_slug: params.tenant,
+                z_report_send_articles_to_accountant: next,
+              })
+              if (ok) {
+                setBusinessInfo((prev: Record<string, unknown> | null) =>
+                  prev ? { ...prev, z_report_send_articles_to_accountant: next } : prev,
+                )
+              }
+            }}
+            className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${
+              zReportSendArticlesToAccountant(businessInfo?.z_report_send_articles_to_accountant)
+                ? 'bg-emerald-500'
+                : 'bg-gray-300'
+            }`}
+          >
+            <span
+              aria-hidden
+              className={`pointer-events-none absolute left-1 top-1 block h-6 w-6 rounded-full bg-white shadow-md transition-transform ${
+                zReportSendArticlesToAccountant(businessInfo?.z_report_send_articles_to_accountant)
+                  ? 'translate-x-6'
+                  : 'translate-x-0'
+              }`}
+            />
+          </button>
+        </div>
         <div className="mb-3">
           <label className="block text-sm font-medium text-indigo-900 mb-2">
             {t('zReport.monthSelectLabel')}
@@ -1438,6 +1486,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <ZReportDocumentBody
                 amounts={statsToAmounts(stats)}
                 articleLines={articleLines}
+                hideSoldArticlesOnPrint={
+                  !zReportSendArticlesToAccountant(businessInfo?.z_report_send_articles_to_accountant)
+                }
                 generatedAt={new Date().toLocaleString('nl-BE')}
                 labels={zReportDocumentLabels}
               />

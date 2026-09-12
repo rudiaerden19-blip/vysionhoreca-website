@@ -4464,6 +4464,8 @@
     "soldArticlesAmountShort": "المبلغ",
     "monthSendTitle": "إرسال الشهر للمحاسب",
     "monthSendIntro": "كل تقارير Z للشهر في بريد واحد — نظرة يومية، ضريبة لكل معدل والمجاميع.",
+    "sendArticlesToAccountant": "إرسال الأصناف إلى المحاسب",
+    "sendArticlesToAccountantHint": "عند الإيقاف: لا تظهر بنود الأصناف في البريد أو الطباعة أو PDF. تبقى ظاهرة على الشاشة.",
     "monthSelectLabel": "اختر الشهر",
     "monthSelectHint": "اختر شهرًا هنا أو انقر على شهر في الأرشيف يمينًا (تبويب شهر).",
     "monthAccountantEmail": "بريد المحاسب",
