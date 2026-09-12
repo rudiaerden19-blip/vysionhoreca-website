@@ -1211,7 +1211,11 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   )
 
   const isDayClosed = currentSavedReport?.is_closed === true
+  const ownerEveningCloseOn = zReportOwnerEveningCloseEnabled(
+    businessInfo?.z_report_owner_evening_close,
+  )
   const archiveMismatch =
+    !ownerEveningCloseOn &&
     currentSavedReport &&
     stats &&
     stats.orderCount > 0 &&
