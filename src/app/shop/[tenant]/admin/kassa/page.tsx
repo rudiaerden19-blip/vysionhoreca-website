@@ -4211,8 +4211,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isVatInvoice ? 1 : isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
-      /** Zonder orderData is de keukenbon leeg bij alle tenants (agent-companion). */
-      orderData: isVatInvoice
+      /**
+       * Kassabon + BTW-bon: alleen bonInhoud. Met orderData bouwt de Print Agent
+       * een eigen Epson-bon en gooit onze uitlijning weg. Keuken blijft orderData.
+       */
+      orderData: isVatInvoice || receiptMode === 'kassa'
         ? undefined
         : {
             orderNumber: order.orderNumber,
