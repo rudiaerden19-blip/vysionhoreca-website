@@ -374,6 +374,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   const buildOwnerByDateForMonth = (yearMonth: string) => {
     const ownerByDate: Record<string, NonNullable<ReturnType<typeof ownerCloseFromSaved>>> = {}
+    if (!zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close)) {
+      return ownerByDate
+    }
     savedReports
       .filter((r) => r.report_date.startsWith(yearMonth))
       .forEach((r) => {
