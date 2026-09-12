@@ -22,6 +22,10 @@ import {
 } from '@/lib/z-report-owner-close'
 import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt } from '@/lib/tenant-business-day'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
+import {
+  fetchZReportVatContextForTenant,
+  type ZReportVatContext,
+} from '@/lib/z-report-vat-context'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
 import { authFetch } from '@/lib/auth-headers'
 import PinGate from '@/components/PinGate'
@@ -73,6 +77,7 @@ interface TenantInfo {
   postal_code?: string
   city?: string
   phone?: string
+  country?: string
   btw_number?: string
   btw_percentage?: number
   website?: string
@@ -139,6 +144,7 @@ function computeOmzetOverviewSnapshot(
   exportPeriod: ExportPeriod,
   validOrders: Order[],
   tenantInfo: TenantInfo | null,
+  vatContext?: ZReportVatContext | null,
 ) {
   const from = getPeriodStart(exportPeriod)
   const exp = validOrders.filter((o) => new Date(o.created_at) >= from)
@@ -152,8 +158,13 @@ function computeOmzetOverviewSnapshot(
   }
   const defaultBtwPdf = tenantInfo?.btw_percentage ?? 6
   const vatAggPdf = aggregateZReportVatFromOrderRows(
-    exp.map((o) => ({ total: o.total, items: (o as { items?: unknown }).items })),
+    exp.map((o) => ({
+      total: o.total,
+      items: (o as { items?: unknown }).items,
+      order_type: o.order_type,
+    })),
     defaultBtwPdf,
+    vatContext,
   )
   return { exp, totalRev, cash, card, vatAggPdf }
 }
@@ -177,6 +188,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const [zReports, setZReports] = useState<ZReport[]>([])
   const [loading, setLoading] = useState(true)
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
+  const [vatContext, setVatContext] = useState<ZReportVatContext | null>(null)
 
   // X/Z rapport state
   const [openingCash, setOpeningCash] = useState(0)
@@ -235,7 +247,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     // anon-key geen SELECT meer op die tabel).
     const zSelectBase =
       'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
-    const [ordersData, zResultRaw, info, hours] = await Promise.all([
+    const [ordersData, zResultRaw, info, hours, vatCtx] = await Promise.all([
       fetchAllOrdersForRapporten(tenant),
       adminDb.select<Array<Record<string, unknown>>>('z_reports', {
         tenantSlug: tenant,
@@ -244,6 +256,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       }),
       getTenantSettings(tenant),
       getOpeningHours(tenant),
+      fetchZReportVatContextForTenant(tenant).catch(() => null),
     ])
     let zResult = zResultRaw
     if (
@@ -273,6 +286,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     )
     setZReports((zData || []) as unknown as ZReport[])
     setTenantInfo(info as TenantInfo)
+    setVatContext(vatCtx)
 
     const settings = info as TenantSettings | null
     let opening = Number(settings?.report_register_opening_cash ?? 0)
@@ -608,8 +622,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       xOrders.map((o) => ({
         total: o.total,
         items: (o as { items?: unknown }).items,
+        order_type: o.order_type,
       })),
       defaultBtw,
+      vatContext,
     )
 
     const zRes = await adminDb.upsert('z_reports', {
@@ -659,7 +675,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }
 
   const sendOverviewEmailReport = async () => {
-    const snapshot = computeOmzetOverviewSnapshot(exportPeriod, validOrders, tenantInfo)
+    const snapshot = computeOmzetOverviewSnapshot(exportPeriod, validOrders, tenantInfo, vatContext)
     const { exp, totalRev, cash, card, vatAggPdf } = snapshot
     setOverviewEmailSending(true)
     setOverviewEmailError('')
@@ -733,6 +749,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       exportPeriod,
       validOrders,
       tenantInfo,
+      vatContext,
     )
     const vatDetailRows: string[] = []
     if (vatAggPdf.tax_low > 0) {

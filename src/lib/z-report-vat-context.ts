@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getMenuCategories, getMenuProducts, getTenantSettings } from '@/lib/admin-api'
-import { buildCategoryVatLookupForJurisdiction, resolveTenantCountryForVat } from '@/lib/order-vat'
+import { buildCategoryVatLookupForJurisdiction, inferVatJurisdictionCountry } from '@/lib/order-vat'
 
 function normalizeProductNameForVat(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ')
@@ -24,6 +24,7 @@ export function buildZReportVatContext(
   products: ReadonlyArray<{ id?: string | null; category_id?: string | null; name?: string | null }>,
   tenantCountry?: string | null,
   tenantBtwNumber?: string | null,
+  tenantDefaultPct?: number | null,
 ): ZReportVatContext {
   const productCategoryByNormalizedName = new Map<string, string | null>()
   for (const p of products) {
@@ -34,7 +35,7 @@ export function buildZReportVatContext(
     }
   }
 
-  const country = resolveTenantCountryForVat(tenantCountry, tenantBtwNumber)
+  const country = inferVatJurisdictionCountry(tenantCountry, tenantBtwNumber, tenantDefaultPct)
   return {
     categoryById: buildCategoryVatLookupForJurisdiction(categories, country),
     productCategoryById: new Map(
@@ -54,7 +55,13 @@ export async function fetchZReportVatContextForTenant(tenantSlug: string): Promi
     getMenuProducts(tenantSlug),
     getTenantSettings(tenantSlug),
   ])
-  return buildZReportVatContext(categories, products, settings?.country, settings?.btw_number)
+  return buildZReportVatContext(
+    categories,
+    products,
+    settings?.country,
+    settings?.btw_number,
+    settings?.btw_percentage,
+  )
 }
 
 /** Server-side (kassa sync, webhooks). */
@@ -68,12 +75,13 @@ export async function fetchZReportVatContextFromSupabase(
       .select('id, name, default_btw_percentage')
       .eq('tenant_slug', tenantSlug),
     client.from('menu_products').select('id, category_id, name').eq('tenant_slug', tenantSlug),
-    client.from('tenant_settings').select('country, btw_number').eq('tenant_slug', tenantSlug).maybeSingle(),
+    client.from('tenant_settings').select('country, btw_number, btw_percentage').eq('tenant_slug', tenantSlug).maybeSingle(),
   ])
   return buildZReportVatContext(
     categories ?? [],
     products ?? [],
     settings?.country,
     settings?.btw_number,
+    settings?.btw_percentage,
   )
 }

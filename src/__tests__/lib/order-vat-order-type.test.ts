@@ -3,12 +3,14 @@ import {
   buildProductCategoryLookup,
   computeInclusiveVatSplitFromCart,
   dineInAndOffPremiseVatRates,
+  inferVatJurisdictionCountry,
   looksLikeBelgiumDrinkCategory,
   looksLikeBelgiumDrinkName,
   resolveTenantCountryForVat,
   resolveVatPercentForCartLine,
   resolveVatPercentForCategoryAndOrderType,
   resolveVatPercentForProductAndOrderType,
+  shouldUnifyDineInAndOffPremiseVat,
   vatServiceModeFromLabels,
 } from '@/lib/order-vat'
 
@@ -291,6 +293,18 @@ describe('order type VAT (ter plaatse / afhalen / leveren)', () => {
   it('BE-btw wint van fout land NL in instellingen', () => {
     expect(resolveTenantCountryForVat('NL', 'BE1001.849.652')).toBe('BE')
     expect(resolveTenantCountryForVat('BE', 'NL123456789B01')).toBe('NL')
+    expect(resolveTenantCountryForVat('België', null)).toBe('BE')
+    expect(resolveTenantCountryForVat('Belgique', null)).toBe('BE')
+  })
+
+  it('elke BE-zaak zonder land: 6/12-default → BE, 9% of NL-btw blijft NL', () => {
+    expect(inferVatJurisdictionCountry(null, null, 6)).toBe('BE')
+    expect(inferVatJurisdictionCountry(null, null, 12)).toBe('BE')
+    expect(inferVatJurisdictionCountry(null, null, 9)).toBe('NL')
+    expect(inferVatJurisdictionCountry(null, 'NL123456789B01', 6)).toBe('NL')
+    expect(inferVatJurisdictionCountry('België', null, 9)).toBe('BE')
+    expect(shouldUnifyDineInAndOffPremiseVat(9, 'BE')).toBe(false)
+    expect(shouldUnifyDineInAndOffPremiseVat(9, 'NL')).toBe(true)
   })
 
   it('Ter plaatse met spatie is 12%', () => {

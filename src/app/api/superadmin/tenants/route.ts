@@ -234,6 +234,8 @@ export async function POST(req: NextRequest) {
           business_name: body.tenant.business_name,
           email: body.tenant.email || '',
           phone: body.tenant.phone || '',
+          country: 'BE',
+          btw_percentage: 6,
           primary_color: '#FF6B35',
           secondary_color: '#1a1a2e',
           allergens_config: DEFAULT_ENABLED_ALLERGEN_IDS,
@@ -246,6 +248,8 @@ export async function POST(req: NextRequest) {
             business_name: body.tenant.business_name,
             email: body.tenant.email || '',
             phone: body.tenant.phone || '',
+            country: 'BE',
+            btw_percentage: 6,
             primary_color: '#FF6B35',
             secondary_color: '#1a1a2e',
           })

@@ -93,4 +93,73 @@ describe('aggregateZReportVatFromOrderRows', () => {
     expect(agg.taxByRate[21]).toBeGreaterThan(0)
     expect(agg.taxByRate[6]).toBe(0)
   })
+
+  it('BE-zaak (6% default): meenemen-drank op Z is 6%, ter plaatse-drank 21%', () => {
+    const beCtx = buildCtx(
+      [
+        { id: foodCatId, name: 'Eten', default_btw_percentage: null },
+        { id: drinkCatId, name: 'Dranken', default_btw_percentage: 21 },
+      ],
+      [
+        { id: 'p-friet', name: 'Middelfriet', category_id: foodCatId },
+        { id: 'p-fanta', name: 'Fanta', category_id: drinkCatId },
+      ],
+      null,
+      null,
+      6,
+    )
+    expect(beCtx.tenantCountry).toBe('BE')
+    const takeaway = aggregateZReportVatFromOrderRows(
+      [
+        {
+          total: 2.4,
+          order_type: 'TAKEAWAY',
+          items: [{ name: 'Fanta', quantity: 1, price: 2.4, product_id: 'p-fanta' }],
+        },
+      ],
+      6,
+      beCtx,
+    )
+    const dineIn = aggregateZReportVatFromOrderRows(
+      [
+        {
+          total: 2.4,
+          order_type: 'DINE_IN',
+          items: [{ name: 'Fanta', quantity: 1, price: 2.4, product_id: 'p-fanta' }],
+        },
+      ],
+      6,
+      beCtx,
+    )
+    expect(takeaway.taxByRate[6]).toBeGreaterThan(0)
+    expect(takeaway.taxByRate[21] || 0).toBe(0)
+    expect(dineIn.taxByRate[21]).toBeGreaterThan(0)
+    expect(dineIn.taxByRate[6] || 0).toBe(0)
+  })
+
+  it('NL-zaak: meenemen-drank blijft 21%', () => {
+    const nlCtx = buildCtx(
+      [
+        { id: drinkCatId, name: 'Dranken', default_btw_percentage: 21 },
+      ],
+      [{ id: 'p-fanta', name: 'Fanta', category_id: drinkCatId }],
+      'NL',
+      'NL123456789B01',
+      9,
+    )
+    const agg = aggregateZReportVatFromOrderRows(
+      [
+        {
+          total: 2.4,
+          order_type: 'TAKEAWAY',
+          items: [{ name: 'Fanta', quantity: 1, price: 2.4, product_id: 'p-fanta' }],
+        },
+      ],
+      9,
+      nlCtx,
+    )
+    expect(nlCtx.tenantCountry).toBe('NL')
+    expect(agg.taxByRate[21]).toBeGreaterThan(0)
+    expect(agg.taxByRate[6] || 0).toBe(0)
+  })
 })

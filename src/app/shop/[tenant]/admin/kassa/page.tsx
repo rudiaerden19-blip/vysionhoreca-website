@@ -243,7 +243,7 @@ import {
   computeInclusiveVatSplitFromCart,
   normalizeCategoryVatPercent,
   normalizeOrderTypeForVat,
-  resolveTenantCountryForVat,
+  inferVatJurisdictionCountry,
   dineInAndOffPremiseVatRates,
   resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
@@ -1745,16 +1745,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Standaard BTW-bon. Alleen aan via tenant_settings.kassa_footer_drawer_button. */
   const kassaFooterDrawerButton = kassaShowsDrawerInsteadOfBtwBon(tenantInfo)
 
-  const tenantCountry = resolveTenantCountryForVat(tenantInfo?.country, tenantInfo?.btw_number)
+  const tenantDefaultBtw = useMemo(
+    () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
+    [tenantInfo?.btw_percentage],
+  )
+  const tenantCountry = inferVatJurisdictionCountry(
+    tenantInfo?.country,
+    tenantInfo?.btw_number,
+    tenantDefaultBtw,
+  )
   const categoryVatLookup = useMemo(
     () => buildCategoryVatLookupForJurisdiction(categories, tenantCountry),
     [categories, tenantCountry],
   )
   const productCategoryById = useMemo(() => buildProductCategoryLookup(products), [products])
-  const tenantDefaultBtw = useMemo(
-    () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
-    [tenantInfo?.btw_percentage],
-  )
   const checkoutVatMode = normalizeKassaCheckoutVatMode(tenantInfo?.kassa_checkout_vat_mode)
   const checkoutVatRates = useMemo(
     () => dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry),

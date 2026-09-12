@@ -18,23 +18,26 @@ export function normalizeOrderTypeForVat(raw: unknown): OrderTypeForVat {
   return 'TAKEAWAY'
 }
 
-/** België: 6% afhaal/levering, 12% ter plaatse. NL: geen verschil binnen/afhaal vs meenemen. */
-export function isNetherlandsVatJurisdiction(country?: string | null): boolean {
-  const c = String(country ?? '')
+function normalizeVatCountryToken(raw?: string | null): string {
+  return String(raw ?? '')
     .trim()
     .toUpperCase()
-    .replace(/\./g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\s.]/g, '')
+}
+
+/** België: 6% afhaal/levering, 12% ter plaatse. NL: geen verschil binnen/afhaal vs meenemen. */
+export function isNetherlandsVatJurisdiction(country?: string | null): boolean {
+  const c = normalizeVatCountryToken(country)
   return c === 'NL' || c === 'NEDERLAND' || c === 'NETHERLANDS' || c.startsWith('NL')
 }
 
-/** Alleen expliciet BE. NL (o.a. Blonkys eethuis / restaurant) nooit in deze tak. */
+/** Alleen BE. NL (o.a. Blonkys eethuis / restaurant) nooit in deze tak. */
 export function isBelgiumVatJurisdiction(country?: string | null): boolean {
   if (isNetherlandsVatJurisdiction(country)) return false
-  const c = String(country ?? '')
-    .trim()
-    .toUpperCase()
-    .replace(/[\s.]/g, '')
-  return c === 'BE' || c === 'BELGIE' || c === 'BELGIUM' || c.startsWith('BE')
+  const c = normalizeVatCountryToken(country)
+  return c === 'BE' || c === 'BELGIE' || c === 'BELGIUM' || c === 'BELGIQUE' || c.startsWith('BE')
 }
 
 function normalizeBelgiumVatLabel(raw?: string | null): string {
@@ -46,7 +49,7 @@ function normalizeBelgiumVatLabel(raw?: string | null): string {
 }
 
 const BE_DRINK_NAME_RE =
-  /\b(cava|cavella|koffie|coffee|espresso|cappuccino|latte|macchiato|americano|ristretto|cortado|thee|tea|cola|fanta|sprite|pepsi|sinas|7up|bier|beer|wijn|wine|champagne|prosecco|jupiler|stella|duvel|frisdrank|limonade|limo|chocomelk|chocolademelk|chocomel|choco|milkshake|smoothie|ice[\s-]?tea|icetea|sap|juice|water|spa|bru|orangina|aperol|gin|rum|vodka|whisky|whiskey|jenever|cocktail|mocktail|red[\s-]?bull|energydrink)\b/i
+  /\b(cava|cavella|decella|koffie|coffee|espresso|cappuccino|latte|macchiato|americano|ristretto|cortado|thee|tea|cola|fanta|sprite|pepsi|sinas|7up|bier|beer|wijn|wine|champagne|prosecco|jupiler|stella|duvel|desperados|leffe|hoegaarden|maes|chouffe|westmalle|karmeliet|kriek|geuze|frisdrank|limonade|limo|chocomelk|chocolademelk|chocomel|choco|milkshake|smoothie|ice[\s-]?tea|icetea|sap|juice|water|spa|bru|orangina|aperol|gin|rum|vodka|whisky|whiskey|jenever|cocktail|mocktail|red[\s-]?bull|energydrink)\b/i
 
 const BE_DRINK_CATEGORY_RE =
   /^(drank|dranken|drinks?|alcohol|alcoholisch|frisdrank|frisdranken|koffie|koffies|thee|wijnen|bieren|aperitief|aperitieven|cocktails?|bar|drankenkaart)\b|\b(drank|dranken|alcohol|frisdrank)\b/
@@ -104,7 +107,7 @@ export function resolveBelgiumBonVatPercent(
   return mode === 'DINE_IN' ? 12 : 6
 }
 
-/** Land voor BTW-logica: expliciet `country`, anders afleiden uit BTW-nummer (NL… / BE…). */
+/** Land voor BTW-logica: BTW-nummer (NL… / BE…) wint, daarna land (ook België). */
 export function resolveTenantCountryForVat(
   country?: string | null,
   btwNumber?: string | null,
@@ -115,16 +118,39 @@ export function resolveTenantCountryForVat(
     .replace(/[\s.]/g, '')
   if (vat.startsWith('NL')) return 'NL'
   if (vat.startsWith('BE')) return 'BE'
+  if (isNetherlandsVatJurisdiction(country)) return 'NL'
+  if (isBelgiumVatJurisdiction(country)) return 'BE'
   if (String(country ?? '').trim()) return String(country).trim()
   return null
 }
 
-/** NL of zaak met 9% default: zelfde tarief voor ter plaatse en afhalen/meenemen. */
+/**
+ * Elke Belgische zaak: BE-bonregels, ook zonder land in het profiel.
+ * NL (Blonkys e.d.) blijft NL via NL-btw of 9%-zaakdefault.
+ */
+export function inferVatJurisdictionCountry(
+  country?: string | null,
+  btwNumber?: string | null,
+  tenantDefaultPct?: number | null,
+): string | null {
+  const resolved = resolveTenantCountryForVat(country, btwNumber)
+  if (isNetherlandsVatJurisdiction(resolved)) return 'NL'
+  if (isBelgiumVatJurisdiction(resolved)) return 'BE'
+  if (resolved) return resolved
+  if (tenantDefaultPct == null) return null
+  const pct = normalizeCategoryVatPercent(tenantDefaultPct, 6)
+  if (pct === 9) return 'NL'
+  if (pct === 6 || pct === 12) return 'BE'
+  return null
+}
+
+/** NL: zelfde tarief ter plaatse en meenemen. BE: nooit unificeren (12/21 vs 6). */
 export function shouldUnifyDineInAndOffPremiseVat(
   tenantDefaultPct: number,
   country?: string | null,
 ): boolean {
   if (isNetherlandsVatJurisdiction(country)) return true
+  if (isBelgiumVatJurisdiction(country)) return false
   return normalizeCategoryVatPercent(tenantDefaultPct, 21) === 9
 }
 
@@ -308,6 +334,7 @@ export function vatServiceModeFromCartChoices(
   for (const c of choices) {
     if (!c) continue
     if (c.choiceName) labels.push(c.choiceName)
+    if (c.optionName) labels.push(c.optionName)
     if (c.name) labels.push(c.name)
   }
   return vatServiceModeFromLabels(labels)
@@ -325,6 +352,7 @@ export function vatServiceModeFromOrderItemOptions(options: unknown): VatService
       const r = o as Record<string, unknown>
       if (r.name != null) labels.push(String(r.name))
       if (r.choiceName != null) labels.push(String(r.choiceName))
+      if (r.optionName != null) labels.push(String(r.optionName))
     }
   }
   return vatServiceModeFromLabels(labels)

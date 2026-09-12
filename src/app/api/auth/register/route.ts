@@ -198,6 +198,8 @@ export async function POST(request: NextRequest) {
         business_name: businessName.trim(),
         email: emailLower,
         phone: phone.trim(),
+        country: 'BE',
+        btw_percentage: 6,
         primary_color: '#FF6B35',
         secondary_color: '#1a1a2e',
         allergens_config: DEFAULT_ENABLED_ALLERGEN_IDS,
@@ -214,6 +216,8 @@ export async function POST(request: NextRequest) {
           business_name: businessName.trim(),
           email: emailLower,
           phone: phone.trim(),
+          country: 'BE',
+          btw_percentage: 6,
           primary_color: '#FF6B35',
           secondary_color: '#1a1a2e',
         })
