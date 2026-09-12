@@ -60,7 +60,9 @@ export async function fetchZReportOwnerCloseByDateForMonth(
 ): Promise<Record<string, ZReportOwnerCloseInput>> {
   const { data } = await client
     .from('z_reports')
-    .select('report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl')
+    .select(
+      'report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl, owner_dinein_drinks_incl',
+    )
     .eq('tenant_slug', tenantSlug)
     .like('report_date', `${yearMonth}%`)
 

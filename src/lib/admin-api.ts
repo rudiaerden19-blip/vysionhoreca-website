@@ -1807,10 +1807,12 @@ export async function getOwnerCloseByDateForMonth(
       owner_card?: number | null
       owner_takeaway_incl?: number | null
       owner_dinein_incl?: number | null
+      owner_dinein_drinks_incl?: number | null
     }>
   >('z_reports', {
     tenantSlug,
-    select: 'report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
+    select:
+      'report_date, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl, owner_dinein_drinks_incl',
     gte: { report_date: startDate },
     lte: { report_date: endDate },
   })

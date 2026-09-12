@@ -102,6 +102,22 @@ function emptyVatRecord(): Record<CategoryVatPercent, number> {
   return { 6: 0, 9: 0, 12: 0, 21: 0 }
 }
 
+function ownerCloseFromForm(form: {
+  cash: string
+  card: string
+  takeaway: string
+  dineIn: string
+  dineInDrinks: string
+}) {
+  return {
+    cash: parseOwnerCloseMoney(form.cash),
+    card: parseOwnerCloseMoney(form.card),
+    takeawayIncl: parseOwnerCloseMoney(form.takeaway),
+    dineInIncl: parseOwnerCloseMoney(form.dineIn),
+    dineInDrinksIncl: parseOwnerCloseMoney(form.dineInDrinks),
+  }
+}
+
 function statsToAmounts(stats: DailyStats): ZReportAmounts {
   return {
     orderCount: stats.orderCount,
@@ -134,6 +150,7 @@ interface SavedReport {
   owner_card?: number | null
   owner_takeaway_incl?: number | null
   owner_dinein_incl?: number | null
+  owner_dinein_drinks_incl?: number | null
 }
 
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
@@ -146,7 +163,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showKassaModal, setShowKassaModal] = useState(false)
   const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: ''})
   const [savingKassa, setSavingKassa] = useState(false)
-  const [ownerForm, setOwnerForm] = useState({ cash: '', card: '', takeaway: '', dineIn: '' })
+  const [ownerForm, setOwnerForm] = useState({
+    cash: '',
+    card: '',
+    takeaway: '',
+    dineIn: '',
+    dineInDrinks: '',
+  })
   const [savingOwner, setSavingOwner] = useState(false)
   const [archivePeriod, setArchivePeriod] = useState<'dag' |  'week' |  'maand' |  'jaar'>('dag')
 
@@ -230,7 +253,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     ownerFormDateRef.current = selectedDate
     if (!input) {
       if (dateChanged) {
-        setOwnerForm({ cash: '', card: '', takeaway: '', dineIn: '' })
+        setOwnerForm({ cash: '', card: '', takeaway: '', dineIn: '', dineInDrinks: '' })
       }
       return
     }
@@ -239,6 +262,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       card: input.card ? String(input.card) : '',
       takeaway: input.takeawayIncl ? String(input.takeawayIncl) : '',
       dineIn: input.dineInIncl ? String(input.dineInIncl) : '',
+      dineInDrinks: input.dineInDrinksIncl ? String(input.dineInDrinksIncl) : '',
     })
   }, [currentSavedReport, selectedDate])
 
@@ -336,13 +360,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           }
 
     if (zReportOwnerEveningCloseEnabled(settings?.z_report_owner_evening_close)) {
-      const ownerRow = await adminDb.select<SavedReport>('z_reports', {
+      const ownerSelectBase =
+        'id, report_date, order_count, total, generated_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
+      let ownerRow = await adminDb.select<SavedReport>('z_reports', {
         tenantSlug: params.tenant,
-        select:
-          'id, report_date, order_count, total, generated_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
+        select: `${ownerSelectBase}, owner_dinein_drinks_incl`,
         match: { report_date: selectedDate },
         single: 'maybe',
       })
+      if (
+        !ownerRow.ok &&
+        /owner_dinein_drinks_incl|column .* does not exist|schema cache/i.test(ownerRow.error || '')
+      ) {
+        ownerRow = await adminDb.select<SavedReport>('z_reports', {
+          tenantSlug: params.tenant,
+          select: ownerSelectBase,
+          match: { report_date: selectedDate },
+          single: 'maybe',
+        })
+      }
       const input = ownerCloseFromSaved(ownerRow.ok ? ownerRow.data : null)
       if (input) {
         nextStats = applyOwnerCloseToDayTotals(nextStats, input)
@@ -422,13 +458,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const loadSavedReports = async () => {
     // Server-side gelezen via /api/admin/db/read (anon-key heeft geen
     // SELECT-rechten meer op z_reports na Phase 2-lockdown).
-    const result = await adminDb.select<SavedReport[]>('z_reports', {
+    const baseSelect =
+      'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
+    let result = await adminDb.select<SavedReport[]>('z_reports', {
       tenantSlug: params.tenant,
-      select:
-        'id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
+      select: `${baseSelect}, owner_dinein_drinks_incl`,
       order: { column: 'report_date', ascending: false },
       limit: 400,
     })
+    if (
+      !result.ok &&
+      /owner_dinein_drinks_incl|column .* does not exist|schema cache/i.test(result.error || '')
+    ) {
+      result = await adminDb.select<SavedReport[]>('z_reports', {
+        tenantSlug: params.tenant,
+        select: baseSelect,
+        order: { column: 'report_date', ascending: false },
+        limit: 400,
+      })
+    }
     if (result.ok && Array.isArray(result.data)) setSavedReports(result.data)
   }
 
@@ -632,40 +680,46 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (!zReportOwnerEveningCloseEnabled(businessInfo?.z_report_owner_evening_close)) return
 
     setSavingOwner(true)
-    const input = {
-      cash: parseOwnerCloseMoney(ownerForm.cash),
-      card: parseOwnerCloseMoney(ownerForm.card),
-      takeawayIncl: parseOwnerCloseMoney(ownerForm.takeaway),
-      dineInIncl: parseOwnerCloseMoney(ownerForm.dineIn),
-    }
+    const input = ownerCloseFromForm(ownerForm)
     const amounts = ownerCloseToAmounts(input, stats?.orderCount || 0)
-    const r = await adminDb.upsert(
-      'z_reports',
-      {
-        tenant_slug: params.tenant,
-        report_date: selectedDate,
-        order_count: Math.max(stats?.orderCount || 0, hasOwnerCloseValues(input) ? 1 : 0),
-        subtotal: amounts.subtotalExcl,
-        tax_low: amounts.taxByRate[6],
-        tax_mid: 0,
-        tax_high: amounts.taxByRate[21],
-        total: amounts.totalIncl,
-        cash_payments: amounts.cashPayments,
-        card_payments: amounts.cardPayments,
-        online_payments: 0,
-        btw_percentage: btwPercentage,
-        business_name: businessInfo?.business_name,
-        business_address: businessInfo?.address,
-        btw_number: businessInfo?.btw_number,
-        order_ids: stats?.orderIds || [],
-        generated_at: new Date().toISOString(),
-        owner_cash: input.cash || null,
-        owner_card: input.card || null,
-        owner_takeaway_incl: input.takeawayIncl || null,
-        owner_dinein_incl: input.dineInIncl || null,
-      },
-      { tenantSlug: params.tenant, onConflict: 'tenant_slug,report_date' },
-    )
+    const payload: Record<string, unknown> = {
+      tenant_slug: params.tenant,
+      report_date: selectedDate,
+      order_count: Math.max(stats?.orderCount || 0, hasOwnerCloseValues(input) ? 1 : 0),
+      subtotal: amounts.subtotalExcl,
+      tax_low: amounts.taxByRate[6],
+      tax_mid: amounts.taxByRate[12],
+      tax_high: amounts.taxByRate[21],
+      total: amounts.totalIncl,
+      cash_payments: amounts.cashPayments,
+      card_payments: amounts.cardPayments,
+      online_payments: 0,
+      btw_percentage: btwPercentage,
+      business_name: businessInfo?.business_name,
+      business_address: businessInfo?.address,
+      btw_number: businessInfo?.btw_number,
+      order_ids: stats?.orderIds || [],
+      generated_at: new Date().toISOString(),
+      owner_cash: input.cash || null,
+      owner_card: input.card || null,
+      owner_takeaway_incl: input.takeawayIncl || null,
+      owner_dinein_incl: input.dineInIncl || null,
+      owner_dinein_drinks_incl: input.dineInDrinksIncl || null,
+    }
+    let r = await adminDb.upsert('z_reports', payload, {
+      tenantSlug: params.tenant,
+      onConflict: 'tenant_slug,report_date',
+    })
+    if (
+      !r.ok &&
+      /owner_dinein_drinks_incl|column .* does not exist|schema cache/i.test(r.error || '')
+    ) {
+      const { owner_dinein_drinks_incl: _ignored, ...rest } = payload
+      r = await adminDb.upsert('z_reports', rest, {
+        tenantSlug: params.tenant,
+        onConflict: 'tenant_slug,report_date',
+      })
+    }
 
     if (r.ok) {
       await loadSavedReports()
@@ -1588,23 +1642,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                     className="mt-1 w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-lg"
                   />
                 </label>
+                <label className="block text-sm font-medium text-amber-950">
+                  {t('zReport.ownerCloseDineInDrinks')}
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={ownerForm.dineInDrinks}
+                    disabled={isDayClosed}
+                    onChange={(e) => setOwnerForm((p) => ({ ...p, dineInDrinks: e.target.value }))}
+                    className="mt-1 w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-lg"
+                  />
+                </label>
               </div>
               <p className="mt-3 text-sm text-amber-900">
                 {t('zReport.ownerClosePayTotal')}: €
-                {ownerClosePaymentTotal({
-                  cash: parseOwnerCloseMoney(ownerForm.cash),
-                  card: parseOwnerCloseMoney(ownerForm.card),
-                  takeawayIncl: parseOwnerCloseMoney(ownerForm.takeaway),
-                  dineInIncl: parseOwnerCloseMoney(ownerForm.dineIn),
-                }).toFixed(2)}
+                {ownerClosePaymentTotal(ownerCloseFromForm(ownerForm)).toFixed(2)}
                 {' · '}
                 {t('zReport.ownerCloseVatTotal')}: €
-                {ownerCloseVatInclTotal({
-                  cash: parseOwnerCloseMoney(ownerForm.cash),
-                  card: parseOwnerCloseMoney(ownerForm.card),
-                  takeawayIncl: parseOwnerCloseMoney(ownerForm.takeaway),
-                  dineInIncl: parseOwnerCloseMoney(ownerForm.dineIn),
-                }).toFixed(2)}
+                {ownerCloseVatInclTotal(ownerCloseFromForm(ownerForm)).toFixed(2)}
               </p>
               <button
                 type="button"

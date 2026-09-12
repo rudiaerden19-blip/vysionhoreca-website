@@ -64,6 +64,7 @@ interface ZReport {
   owner_card?: number | null
   owner_takeaway_incl?: number | null
   owner_dinein_incl?: number | null
+  owner_dinein_drinks_incl?: number | null
 }
 
 interface TenantInfo {
@@ -232,17 +233,29 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     setLoading(true)
     // z_reports gaat via /api/admin/db/read (na Phase 2-lockdown heeft de
     // anon-key geen SELECT meer op die tabel).
-    const [ordersData, zResult, info, hours] = await Promise.all([
+    const zSelectBase =
+      'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
+    const [ordersData, zResultRaw, info, hours] = await Promise.all([
       fetchAllOrdersForRapporten(tenant),
       adminDb.select<Array<Record<string, unknown>>>('z_reports', {
         tenantSlug: tenant,
-        select:
-          'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl',
+        select: `${zSelectBase}, owner_dinein_drinks_incl`,
         order: { column: 'report_date', ascending: false },
       }),
       getTenantSettings(tenant),
       getOpeningHours(tenant),
     ])
+    let zResult = zResultRaw
+    if (
+      !zResult.ok &&
+      /owner_dinein_drinks_incl|column .* does not exist|schema cache/i.test(zResult.error || '')
+    ) {
+      zResult = await adminDb.select<Array<Record<string, unknown>>>('z_reports', {
+        tenantSlug: tenant,
+        select: zSelectBase,
+        order: { column: 'report_date', ascending: false },
+      })
+    }
     setOpeningHours(hours || [])
     const zData = zResult.ok && Array.isArray(zResult.data) ? zResult.data : null
     setOrders(

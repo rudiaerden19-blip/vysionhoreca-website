@@ -300,7 +300,9 @@ export async function regenerateZReportForDate(
     if (zReportOwnerEveningCloseEnabled(ownerSetting?.z_report_owner_evening_close)) {
       const { data: existingOwnerRow } = await client
         .from('z_reports')
-        .select('owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl')
+        .select(
+          'owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl, owner_dinein_drinks_incl',
+        )
         .eq('tenant_slug', tenantSlug)
         .eq('report_date', date)
         .maybeSingle()

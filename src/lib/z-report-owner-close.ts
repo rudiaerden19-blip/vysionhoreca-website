@@ -9,13 +9,23 @@ export function zReportOwnerEveningCloseEnabled(raw: unknown): boolean {
 }
 
 export const OWNER_CLOSE_TAKEAWAY_VAT = 6 as const
-export const OWNER_CLOSE_DINE_IN_VAT = 21 as const
+export const OWNER_CLOSE_DINE_IN_FOOD_VAT = 12 as const
+export const OWNER_CLOSE_DINE_IN_DRINKS_VAT = 21 as const
 
 export type ZReportOwnerCloseInput = {
   cash: number
   card: number
   takeawayIncl: number
   dineInIncl: number
+  dineInDrinksIncl: number
+}
+
+export type ZReportOwnerCloseRow = {
+  owner_cash?: number | null
+  owner_card?: number | null
+  owner_takeaway_incl?: number | null
+  owner_dinein_incl?: number | null
+  owner_dinein_drinks_incl?: number | null
 }
 
 function round2(n: number): number {
@@ -39,18 +49,18 @@ export function parseOwnerCloseMoney(raw: unknown): number {
   return 0
 }
 
-export function ownerCloseFromSaved(row: {
-  owner_cash?: number | null
-  owner_card?: number | null
-  owner_takeaway_incl?: number | null
-  owner_dinein_incl?: number | null
-} | null | undefined): ZReportOwnerCloseInput | null {
+export function emptyOwnerCloseInput(): ZReportOwnerCloseInput {
+  return { cash: 0, card: 0, takeawayIncl: 0, dineInIncl: 0, dineInDrinksIncl: 0 }
+}
+
+export function ownerCloseFromSaved(row: ZReportOwnerCloseRow | null | undefined): ZReportOwnerCloseInput | null {
   if (!row) return null
   const input: ZReportOwnerCloseInput = {
     cash: parseOwnerCloseMoney(row.owner_cash),
     card: parseOwnerCloseMoney(row.owner_card),
     takeawayIncl: parseOwnerCloseMoney(row.owner_takeaway_incl),
     dineInIncl: parseOwnerCloseMoney(row.owner_dinein_incl),
+    dineInDrinksIncl: parseOwnerCloseMoney(row.owner_dinein_drinks_incl),
   }
   if (!hasOwnerCloseValues(input)) return null
   return input
@@ -58,7 +68,9 @@ export function ownerCloseFromSaved(row: {
 
 export function hasOwnerCloseValues(input: ZReportOwnerCloseInput | null | undefined): boolean {
   if (!input) return false
-  return input.cash + input.card + input.takeawayIncl + input.dineInIncl > 0
+  return (
+    input.cash + input.card + input.takeawayIncl + input.dineInIncl + input.dineInDrinksIncl > 0
+  )
 }
 
 export function ownerClosePaymentTotal(input: ZReportOwnerCloseInput): number {
@@ -66,21 +78,22 @@ export function ownerClosePaymentTotal(input: ZReportOwnerCloseInput): number {
 }
 
 export function ownerCloseVatInclTotal(input: ZReportOwnerCloseInput): number {
-  return round2(input.takeawayIncl + input.dineInIncl)
+  return round2(input.takeawayIncl + input.dineInIncl + input.dineInDrinksIncl)
 }
 
 export function ownerCloseToAmounts(input: ZReportOwnerCloseInput, orderCount = 0): ZReportAmounts {
   const take = splitInclVat(input.takeawayIncl, OWNER_CLOSE_TAKEAWAY_VAT)
-  const dine = splitInclVat(input.dineInIncl, OWNER_CLOSE_DINE_IN_VAT)
+  const dineFood = splitInclVat(input.dineInIncl, OWNER_CLOSE_DINE_IN_FOOD_VAT)
+  const dineDrinks = splitInclVat(input.dineInDrinksIncl, OWNER_CLOSE_DINE_IN_DRINKS_VAT)
   const pay = ownerClosePaymentTotal(input)
   const vatIncl = ownerCloseVatInclTotal(input)
   const totalIncl = pay > 0 ? pay : vatIncl
   return {
     orderCount,
-    subtotalExcl: round2(take.baseExcl + dine.baseExcl),
+    subtotalExcl: round2(take.baseExcl + dineFood.baseExcl + dineDrinks.baseExcl),
     totalIncl,
-    taxByRate: { 6: take.tax, 9: 0, 12: 0, 21: dine.tax },
-    baseByRate: { 6: take.baseExcl, 9: 0, 12: 0, 21: dine.baseExcl },
+    taxByRate: { 6: take.tax, 9: 0, 12: dineFood.tax, 21: dineDrinks.tax },
+    baseByRate: { 6: take.baseExcl, 9: 0, 12: dineFood.baseExcl, 21: dineDrinks.baseExcl },
     cashPayments: round2(input.cash),
     cardPayments: round2(input.card),
     onlinePayments: 0,
@@ -88,12 +101,7 @@ export function ownerCloseToAmounts(input: ZReportOwnerCloseInput, orderCount = 
 }
 
 /** Totaal incl. van een opgeslagen avondtelling (analyse / rapportages). */
-export function ownerCloseDayTotal(row: {
-  owner_cash?: number | null
-  owner_card?: number | null
-  owner_takeaway_incl?: number | null
-  owner_dinein_incl?: number | null
-} | null | undefined): number {
+export function ownerCloseDayTotal(row: ZReportOwnerCloseRow | null | undefined): number {
   const input = ownerCloseFromSaved(row)
   if (!input) return 0
   return ownerCloseToAmounts(input).totalIncl
@@ -102,12 +110,7 @@ export function ownerCloseDayTotal(row: {
 /** Alleen deze module: cron/kassa mogen een ingevulde avondtelling niet wissen. */
 export function shouldKeepOwnerEveningCloseTotals(
   setting: unknown,
-  row: {
-    owner_cash?: number | null
-    owner_card?: number | null
-    owner_takeaway_incl?: number | null
-    owner_dinein_incl?: number | null
-  } | null | undefined,
+  row: ZReportOwnerCloseRow | null | undefined,
 ): boolean {
   return zReportOwnerEveningCloseEnabled(setting) && ownerCloseFromSaved(row) != null
 }
@@ -132,7 +135,7 @@ export function ownerCloseOrderTypeTotals(input: ZReportOwnerCloseInput): {
   DELIVERY: number
 } {
   return {
-    DINE_IN: input.dineInIncl,
+    DINE_IN: round2(input.dineInIncl + input.dineInDrinksIncl),
     TAKEAWAY: input.takeawayIncl,
     DELIVERY: 0,
   }
