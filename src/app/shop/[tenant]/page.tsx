@@ -1619,11 +1619,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.ourTeam')}</h2>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div
+              className={
+                teamMembers.length === 1
+                  ? 'flex justify-center'
+                  : 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'
+              }
+            >
               {teamMembers.map((member) => (
                 <div
                   key={member.id}
-                  className="text-center"
+                  className={
+                    teamMembers.length === 1
+                      ? 'w-full max-w-[240px] text-center sm:max-w-[280px]'
+                      : 'text-center'
+                  }
                 >
                   <div className="aspect-square rounded-2xl bg-gray-200 overflow-hidden mb-4 shadow-lg">
                     {member.photo_url ? (
