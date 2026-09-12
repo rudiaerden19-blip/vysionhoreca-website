@@ -4212,10 +4212,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       openDrawer: isCash,
       receiptMode,
       /**
-       * Kassabon + BTW-bon: alleen bonInhoud. Met orderData bouwt de Print Agent
-       * een eigen Epson-bon en gooit onze uitlijning weg. Keuken blijft orderData.
+       * BTW-bon: géén orderData — anders bouwt de Print Agent een gewone kassabon
+       * en verdwijnt de factuurtekst. Alleen bonInhoud (zelfde regels als de preview).
        */
-      orderData: isVatInvoice || receiptMode === 'kassa'
+      orderData: isVatInvoice
         ? undefined
         : {
             orderNumber: order.orderNumber,
