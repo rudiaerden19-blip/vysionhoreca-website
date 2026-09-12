@@ -13,6 +13,14 @@ describe('formatKassaThermalPriceRow', () => {
     expect(line).toContain('...')
   })
 
+  it('houdt 2x Appeltaart en het bedrag op één regel van 42', () => {
+    const line = formatKassaThermalPriceRow('2x Appeltaart', 7)
+    expect(line).toHaveLength(42)
+    expect(line.startsWith('2x Appeltaart')).toBe(true)
+    expect(line.endsWith('EUR 7.00')).toBe(true)
+    expect(line.includes('\n')).toBe(false)
+  })
+
   it('kapt een te lange naam af zodat de prijs op de regel blijft', () => {
     const line = formatKassaThermalPriceRow('1x Superlange productnaam extra', 12.5)
     expect(line.endsWith('EUR 12.50')).toBe(true)

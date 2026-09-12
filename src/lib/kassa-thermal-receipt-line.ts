@@ -1,5 +1,5 @@
-/** 80 mm Font A ~48 tekens — iets ruimer dan 42 zodat naam en prijs meer lucht krijgen. */
-export const KASSA_THERMAL_LINE_WIDTH = 48
+/** 80 mm Font A: 42 tekens. Langer (48) laat EUR + bedrag op de T100 naar de volgende regel vallen. */
+export const KASSA_THERMAL_LINE_WIDTH = 42
 
 /**
  * Product/label links, `EUR 0.00` tegen de rechterkant.
