@@ -4206,7 +4206,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
-      bonInhoud: isVatInvoice ? bonLines.join('\n') : bonLines.join('\n\n'),
+      bonInhoud: bonLines.join('\n'),
       /** Draft: 1 = gele Bon / toog-delta; 2 = zaaknaam in header. Betaald (afrekenen): altijd 2. */
       copies: isVatInvoice ? 1 : isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
