@@ -1162,16 +1162,22 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
-              {/* Specialty 1 */}
-              {(() => {
-                const img = parseImageZoomSettings(business.specialty_1_image)
+              {(
+                [
+                  { image: business.specialty_1_image, title: business.specialty_1_title },
+                  { image: business.specialty_2_image, title: business.specialty_2_title },
+                  { image: business.specialty_3_image, title: business.specialty_3_title },
+                ] as const
+              ).map((item, index) => {
+                const img = parseImageZoomSettings(item.image)
                 if (!img.url) return null
+                const title = item.title?.trim() || ''
                 return (
-                  <div className="group cursor-pointer">
+                  <div key={index} className="group cursor-pointer">
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
-                      <Image 
+                      <Image
                         src={img.url}
-                        alt={business.specialty_1_title || t('shopPage.specialty')}
+                        alt={title || business.specialties_heading?.trim() || t('shopPage.ourSpecialties')}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
                         quality={62}
@@ -1187,82 +1193,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                             : {}),
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || t('shopPage.specialty')}</h3>
-                      </div>
+                      {title ? (
+                        <>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-6">
+                            <h3 className="text-2xl font-bold text-white">{title}</h3>
+                          </div>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 )
-              })()}
-
-              {/* Specialty 2 */}
-              {(() => {
-                const img = parseImageZoomSettings(business.specialty_2_image)
-                if (!img.url) return null
-                return (
-                  <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
-                      <Image 
-                        src={img.url}
-                        alt={business.specialty_2_title || t('shopPage.specialty')}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={62}
-                        loading="lazy"
-                        className="object-cover object-center"
-                        style={{
-                          objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom > 1
-                            ? {
-                                transform: `scale(${img.zoom})`,
-                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
-                              }
-                            : {}),
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || t('shopPage.specialty')}</h3>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })()}
-
-              {/* Specialty 3 */}
-              {(() => {
-                const img = parseImageZoomSettings(business.specialty_3_image)
-                if (!img.url) return null
-                return (
-                  <div className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg aspect-[4/5]">
-                      <Image 
-                        src={img.url}
-                        alt={business.specialty_3_title || t('shopPage.specialty')}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={62}
-                        loading="lazy"
-                        className="object-cover object-center"
-                        style={{
-                          objectPosition: `${img.positionX}% ${img.positionY}%`,
-                          ...(img.zoom > 1
-                            ? {
-                                transform: `scale(${img.zoom})`,
-                                transformOrigin: `${img.positionX}% ${img.positionY}%`,
-                              }
-                            : {}),
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || t('shopPage.specialty')}</h3>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })()}
+              })}
             </div>
           </div>
         </section>
