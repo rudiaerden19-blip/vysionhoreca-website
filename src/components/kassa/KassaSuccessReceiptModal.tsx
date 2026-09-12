@@ -119,8 +119,18 @@ export function KassaSuccessReceiptModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
-        <div className="p-4 bg-emerald-500 text-white text-center">
+      <div className="relative bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('kassaApp.successClose')}
+          className="absolute right-3 top-3 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-[#1a1612] text-white shadow-xl ring-4 ring-white hover:bg-black active:bg-black touch-manipulation"
+        >
+          <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" aria-hidden>
+            <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+          </svg>
+        </button>
+        <div className="p-4 bg-emerald-500 text-white text-center pr-16">
           <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl"></div>
           <h3 className="text-xl font-bold">{t('kassaApp.successTitle')}</h3>
           <p className="opacity-80">
@@ -285,7 +295,7 @@ export function KassaSuccessReceiptModal({
           )}
         </div>
 
-        <div className="p-4 border-t flex flex-col gap-2 sm:flex-row sm:gap-3">
+        <div className="flex flex-col items-center gap-2 border-t p-4">
           <button
             type="button"
             disabled={anyBusy}
@@ -293,12 +303,13 @@ export function KassaSuccessReceiptModal({
             onClick={() => {
               if (printBusy) return
               setOptimisticPrintBusy(true)
-              void onPrint().finally(() => setOptimisticPrintBusy(false))
+              onClose()
+              void onPrint()
             }}
-            className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2.5 touch-manipulation min-h-[44px] transition-[background-color,box-shadow,color] duration-200 disabled:pointer-events-none ${
+            className={`w-full max-w-[260px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 touch-manipulation min-h-[48px] transition-[background-color,box-shadow,color] duration-200 disabled:pointer-events-none ${
               printBusy
                 ? 'cursor-wait bg-emerald-50 text-emerald-900 shadow-[inset_0_0_0_2px_rgba(16,185,129,0.35)]'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800'
             }`}
           >
             {printBusy ? (
@@ -320,12 +331,7 @@ export function KassaSuccessReceiptModal({
                 <span className="tabular-nums">{t('kassaReceipt.printSending')}</span>
               </>
             ) : (
-              <>
-                <span aria-hidden className="select-none">
-                  
-                </span>
-                <span>{t('kassaReceipt.print')}</span>
-              </>
+              <span>{t('kassaReceipt.print')}</span>
             )}
           </button>
           {footerActions === 'print-email-close' && onEmail ? (
@@ -339,7 +345,7 @@ export function KassaSuccessReceiptModal({
                 setOptimisticEmailBusy(true)
                 void onEmail().finally(() => setOptimisticEmailBusy(false))
               }}
-              className={`flex-1 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 touch-manipulation min-h-[44px] transition-colors disabled:opacity-45 disabled:pointer-events-none ${
+              className={`w-full max-w-[260px] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 touch-manipulation min-h-[44px] transition-colors disabled:opacity-45 disabled:pointer-events-none ${
                 emailBusy
                   ? 'cursor-wait bg-blue-50 text-blue-900'
                   : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
@@ -355,14 +361,6 @@ export function KassaSuccessReceiptModal({
               )}
             </button>
           ) : null}
-          <button
-            type="button"
-            disabled={anyBusy}
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold disabled:opacity-45 disabled:pointer-events-none"
-          >
-            {t('kassaApp.successClose')}
-          </button>
         </div>
       </div>
     </div>

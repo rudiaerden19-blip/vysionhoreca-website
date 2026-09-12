@@ -7068,12 +7068,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onClose={() => setShowSuccessModal(false)}
           printDisabled={successReceiptPrintBusy}
           onPrint={async () => {
+            setShowSuccessModal(false)
             try {
               setSuccessReceiptPrintBusy(true)
               await printReceipt(lastOrder)
             } finally {
               setSuccessReceiptPrintBusy(false)
-              setShowSuccessModal(false)
             }
           }}
         />

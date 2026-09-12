@@ -2053,13 +2053,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           printDisabled={successReceiptPrintBusy}
           onPrint={async () => {
             if (!lastOrderReceipt) return
+            setShowSuccessModal(false)
             try {
               setSuccessReceiptPrintBusy(true)
               const ok = await printRetailReceipt(lastOrderReceipt)
-              if (ok) {
-                setShowSuccessModal(false)
-                focusBarcodeCapture()
-              }
+              if (ok) focusBarcodeCapture()
             } finally {
               setSuccessReceiptPrintBusy(false)
             }
