@@ -1156,8 +1156,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <div className="text-center mb-8 sm:mb-12">
-              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.ourKitchen')}</span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900">
                 {business.specialties_heading?.trim() || t('shopPage.ourSpecialties')}
               </h2>
             </div>
