@@ -31,6 +31,15 @@
   </p>
   <label for="pr">Printer</label>
   <select id="pr"></select>
+  <label for="printerProfile">Printertype (bon-layout)</label>
+  <select id="printerProfile">
+    <option value="epson">Epson / Star — niet wijzigen als de bon al goed is</option>
+    <option value="td80">Chinees TD80 — alleen als de bon te krap is</option>
+  </select>
+  <p style="margin-top:-8px;margin-bottom:16px;color:#9a3412;font-size:0.82rem;">
+    Epson- en Star-kassa’s: laat <strong>Epson / Star</strong> staan. Alleen op Chinese TD80
+    het tweede type kiezen. Verkeerde keuze = boze klanten.
+  </p>
   <label for="kassaUrl" style="margin-top:8px;">Kassa URL</label>
   <input type="url" id="kassaUrl" placeholder="https://www.vysionhoreca.com/shop/jouwtenant/admin/kassa"
     style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;font-size:0.9rem;margin-bottom:16px;box-sizing:border-box;" />
@@ -39,6 +48,7 @@
   <div class="err" id="err"></div>
   <script>
     const sel = document.getElementById('pr')
+    const profileSel = document.getElementById('printerProfile')
     const ok = document.getElementById('ok')
     const err = document.getElementById('err')
     const urlInput = document.getElementById('kassaUrl')
@@ -50,6 +60,7 @@
         window.vysionAgent.listPrinters(),
       ])
       if (cfg.kassaUrl) urlInput.value = cfg.kassaUrl
+      profileSel.value = cfg.printerProfile === 'td80' ? 'td80' : 'epson'
       const ver = document.getElementById('version')
       if (ver && cfg.agentVersion) ver.textContent = `v${cfg.agentVersion}`
       sel.innerHTML = ''
@@ -82,7 +93,11 @@
         err.style.display = 'block'
         return
       }
-      await window.vysionAgent.saveConfig({ printerName, kassaUrl })
+      await window.vysionAgent.saveConfig({
+        printerName,
+        kassaUrl,
+        printerProfile: profileSel.value === 'td80' ? 'td80' : 'epson',
+      })
       ok.style.display = 'block'
       setTimeout(() => window.vysionAgent.openKassa(), 800)
     }

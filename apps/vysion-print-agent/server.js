@@ -47,6 +47,65 @@ const EMPHASIZE_OFF   = Buffer.from([ESC, 0x47, 0x00])
 /** Meer ruimte tussen regels zodat tekst niet plakt. */
 const LINE_SPACING_W  = Buffer.from([ESC, 0x33, 0x3C])
 const LINE_SPACING_N  = Buffer.from([ESC, 0x33, 0x1E])
+
+/**
+ * Printerprofiel — ALLEEN lokaal in de agent.
+ * Default `epson` = bestaande layout (Epson én Star). Die bytes worden nooit herschreven.
+ * `td80` = naderhand extra regelafstand, alleen als de zaak dat expliciet kiest.
+ */
+const PRINTER_PROFILE_EPSON = 'epson'
+const PRINTER_PROFILE_TD80 = 'td80'
+
+function normalizePrinterProfile(value) {
+  const v = String(value || '').trim().toLowerCase()
+  if (v === 'td80' || v === 'chinese' || v === 'chinese-td80') return PRINTER_PROFILE_TD80
+  return PRINTER_PROFILE_EPSON
+}
+
+function isTd80Profile(value) {
+  return normalizePrinterProfile(value) === PRINTER_PROFILE_TD80
+}
+
+/** Lengte van ESC/GS-commando’s die deze agent zelf uitzet — tekst-0x0A niet aanraken. */
+function escPosCommandLength(buf, i) {
+  if (i >= buf.length) return 0
+  if (buf[i] === ESC && i + 1 < buf.length) {
+    const cmd = buf[i + 1]
+    if (cmd === 0x40) return 2
+    if (cmd === 0x70) return 5
+    return 3
+  }
+  if (buf[i] === GS && i + 1 < buf.length) return 3
+  return 0
+}
+
+/**
+ * Alleen TD80: ruimere ESC 3 n + extra lege regel na elke tekstregel.
+ * Input blijft ongewijzigd; we werken op een kopie. Epson/Star roepen dit nooit aan.
+ */
+function applyTd80Spacing(input) {
+  const src = Buffer.from(input)
+  for (let i = 0; i + 2 < src.length; i++) {
+    if (src[i] === ESC && src[i + 1] === 0x33) {
+      if (src[i + 2] === 0x3c) src[i + 2] = 0x54
+      else if (src[i + 2] === 0x1e) src[i + 2] = 0x2c
+    }
+  }
+  const out = []
+  let i = 0
+  while (i < src.length) {
+    const skip = escPosCommandLength(src, i)
+    if (skip > 0) {
+      const end = Math.min(src.length, i + skip)
+      while (i < end) out.push(src[i++])
+      continue
+    }
+    const b = src[i++]
+    out.push(b)
+    if (b === 0x0a) out.push(0x0a)
+  }
+  return Buffer.from(out)
+}
 /** PC437 (USA, ESC t 0) — pure ASCII-compatibele glyph-tabel op vrijwel alle ESC/POS‑printers.
  *  PC858 (ESC t 19) gaf op Chinese/Xprinter‑firmware nog verkeerde Han‑tekens naast bedragen,
  *  ook nadat we € door ASCII „EUR“ vervingen. We gebruiken geen hoge PC858‑tekens meer. */
@@ -485,7 +544,8 @@ function buildKitchenReceipt(body) {
   return Buffer.concat(c)
 }
 
-function buildEscPosPayload(body) {
+/** Originele Epson/Star-layout — geen spaties/commando’s hier wijzigen. */
+function buildEscPosPayloadUnchanged(body) {
   // Keuken-bon mode (geen prijzen, alleen items + notities)
   if (body && body.receiptMode === 'keuken') return buildKitchenReceipt(body)
   // Gebruik rijke bon als orderData aanwezig is — geeft mooiste resultaat
@@ -591,6 +651,16 @@ function buildEscPosPayload(body) {
 }
 
 /**
+ * Publieke builder. Zonder TD80-profiel = exact `buildEscPosPayloadUnchanged`
+ * (Epson + Star). Website-body kan dit niet overschrijven — alleen lokale agent-config.
+ */
+function buildEscPosPayload(body, opts) {
+  const unchanged = buildEscPosPayloadUnchanged(body)
+  if (!isTd80Profile(opts && opts.printerProfile)) return unchanged
+  return applyTd80Spacing(unchanged)
+}
+
+/**
  * Encode plaatetekst‑regels: €, EUR en korte **E** vóór bedrag → ASCII **"EUR "**
  * zodat Chinees/GBK‑firmware geen Han‑glyphe toont waar PC858 byte 0xD5 (=€) fout zou interpreteren.
  * Han‑regels: strengere **E**→EUR (alleen met ,xx/.xx).
@@ -652,6 +722,29 @@ function encWithEuro(line) {
     return true
   }
   assert(noEscJHighN(rich), 'Rich receipt: ESC J n altijd < 128 (GBK‑sync)')
+  const richBody = {
+    receiptMode: 'kassa',
+    winkelnaam: 'Testzaak',
+    orderData: {
+      orderNumber: 99,
+      orderType: 'TAKEAWAY',
+      items: [{ quantity: 2, name: 'Friet', price: 6.0 }],
+      subtotal: 4.96,
+      tax: 1.04,
+      total: 6,
+      paymentMethod: 'CARD',
+    },
+    businessInfo: { name: 'Testzaak', vatRate: 21 },
+  }
+  const epsonExplicit = buildEscPosPayload(richBody, { printerProfile: 'epson' })
+  const starAlias = buildEscPosPayload(richBody, { printerProfile: 'star' })
+  const unchanged = buildEscPosPayloadUnchanged(richBody)
+  assert(rich.equals(unchanged), 'Default payload === ongewijzigde Epson/Star-layout')
+  assert(epsonExplicit.equals(unchanged), 'Profiel epson === ongewijzigde layout')
+  assert(starAlias.equals(unchanged), 'Profiel star === Epson-layout (niet aanraken)')
+  const td80 = buildEscPosPayload(richBody, { printerProfile: 'td80' })
+  assert(td80.length > unchanged.length, 'TD80 voegt alleen extra spacing toe')
+  assert(!td80.equals(unchanged), 'TD80 mag Epson/Star-bytes niet gelijk houden')
   // eslint-disable-next-line no-console -- bewust bij selftest
   console.log('[print-agent] encWithEuro regression smoke: OK')
 })()
@@ -785,7 +878,7 @@ const INTER_RECEIPT_COPY_PAUSE_MS = 560
 /**
  * Eén ESC/POS-aanvraag: hoofdprinter (zaak/bar) + optioneel tweede keukenprinter.
  * @param {Record<string, unknown>} body - JSON zoals POST /print
- * @param {{ printerName?: string|null, kitchenPrinterName?: string|null }} cfg
+ * @param {{ printerName?: string|null, kitchenPrinterName?: string|null, printerProfile?: string }} cfg
  * @returns {{ ok: boolean, error?: string, printedCopies: number, buddyPrinted: boolean, kitchenFailOnly?: boolean, payload?: Buffer, copies?: number, orderLabel?: string }}
  */
 function executePrintRequest(body, cfg) {
@@ -813,7 +906,8 @@ function executePrintRequest(body, cfg) {
     kitchenPn !== '' &&
     kitchenPn !== primary
 
-  const payloadMain = buildEscPosPayload({ ...b, receiptMode })
+  const printOpts = { printerProfile: normalizePrinterProfile(cfg && cfg.printerProfile) }
+  const payloadMain = buildEscPosPayload({ ...b, receiptMode }, printOpts)
 
   const copies =
     typeof b.copies === 'number' && b.copies >= 1 ? Math.min(Math.max(Math.floor(b.copies), 1), 5) : 2
@@ -856,7 +950,7 @@ function executePrintRequest(body, cfg) {
   let buddyPrinted = false
   if (wantBuddyKitchen && printedCount === copies) {
     sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
-    const kitchenPayload = buildEscPosPayload({ ...b, receiptMode: 'keuken' })
+    const kitchenPayload = buildEscPosPayload({ ...b, receiptMode: 'keuken' }, printOpts)
     const kr = printRawWindows(kitchenPn, kitchenPayload)
     if (!kr.ok) {
       console.error('[print] companion keuken →', kr.error)
@@ -1005,8 +1099,9 @@ function createApp(
       const body = req.body || {}
       const wantDrawer = body.openDrawer === true
       const r = executePrintRequest(body, {
-        printerName: cfg.printerName,
+        printerName: cfg.printerName || (typeof cfg === 'string' ? cfg : null),
         kitchenPrinterName: cfg.kitchenPrinterName,
+        printerProfile: normalizePrinterProfile(cfg && cfg.printerProfile),
       })
       const copiesAsked =
         typeof body.copies === 'number' && body.copies >= 1
@@ -1071,6 +1166,9 @@ module.exports = {
   startServer,
   executePrintRequest,
   buildEscPosPayload,
+  buildEscPosPayloadUnchanged,
+  applyTd80Spacing,
+  normalizePrinterProfile,
   encInline,
   printRawWindows,
   openCashDrawerWindows,

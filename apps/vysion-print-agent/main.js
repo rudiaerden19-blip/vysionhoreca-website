@@ -24,6 +24,8 @@ const {
   startServer,
   listWindowsPrintersSync,
   buildEscPosPayload,
+  applyTd80Spacing,
+  normalizePrinterProfile,
   encInline,
   printRawWindows,
   openCashDrawerWindows,
@@ -84,6 +86,8 @@ function loadConfig() {
     port:        typeof j.port === 'number'        ? j.port : PORT,
     autoStart:   typeof j.autoStart === 'boolean'  ? j.autoStart : false,
     autoUpdate:  typeof j.autoUpdate === 'boolean' ? j.autoUpdate : true,
+    /** Ontbrekend = Epson/Star — bestaande kassa’s blijven op de huidige bon. */
+    printerProfile: normalizePrinterProfile(j.printerProfile),
   }
 }
 
@@ -96,6 +100,17 @@ let config = loadConfig()
 
 function getPrinterName() {
   return config.printerName?.trim() || null
+}
+
+function getPrinterProfile() {
+  return normalizePrinterProfile(config.printerProfile)
+}
+
+function getPrintConfig() {
+  return {
+    printerName: getPrinterName(),
+    printerProfile: getPrinterProfile(),
+  }
 }
 
 // ---- Tray-icoontjes (kleur per status) -----------------------------------
@@ -196,7 +211,7 @@ function openSettings() {
   }
   settingsWindow = new BrowserWindow({
     width: 520,
-    height: 760,
+    height: 860,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -408,7 +423,9 @@ function buildTestReceiptPayload() {
   c.push(Buffer.from('Bonprinter werkt!\n', 'latin1'))
   c.push(Buffer.from('\n\n\n\n', 'latin1'))
   c.push(Buffer.from([GS, 0x56, 0x01]))                // partial cut
-  return Buffer.concat(c)
+  const buf = Buffer.concat(c)
+  if (getPrinterProfile() === 'td80') return applyTd80Spacing(buf)
+  return buf
 }
 
 function doTestPrint() {
@@ -454,6 +471,7 @@ function buildDiagnoseText() {
   lines.push(`Time: ${new Date().toISOString()}`)
   lines.push('')
   lines.push(`Printer: ${getPrinterName() || '(geen)'}`)
+  lines.push(`Printertype: ${getPrinterProfile() === 'td80' ? 'Chinees TD80' : 'Epson/Star'}`)
   lines.push(`Kassa-URL: ${config.kassaUrl || '(geen)'}`)
   lines.push(`AutoStart: ${config.autoStart === true}`)
   lines.push(`AutoUpdate: ${config.autoUpdate !== false}`)
@@ -566,6 +584,9 @@ ipcMain.handle('config:save', (_evt, partial) => {
     port:        typeof partial.port === 'number'        ? partial.port        : config.port,
     autoStart:   typeof partial.autoStart === 'boolean'  ? partial.autoStart   : config.autoStart,
     autoUpdate:  typeof partial.autoUpdate === 'boolean' ? partial.autoUpdate  : config.autoUpdate,
+    printerProfile: typeof partial.printerProfile === 'string'
+      ? normalizePrinterProfile(partial.printerProfile)
+      : getPrinterProfile(),
   }
   saveConfig(config)
   syncWindowsStartup()
@@ -594,7 +615,7 @@ ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) =>
     const printerName = getPrinterName()
     if (!printerName) return { status: 400, body: { success: false, error: 'Geen printer geconfigureerd. Open Instellingen.' } }
     try {
-      const payload = buildEscPosPayload(body || {})
+      const payload = buildEscPosPayload(body || {}, { printerProfile: getPrinterProfile() })
       const copies = (body && typeof body.copies === 'number' && body.copies >= 1)
         ? Math.min(Math.max(body.copies, 1), 5) : 2
       const wantDrawer = !!(body && body.openDrawer === true)
@@ -680,7 +701,7 @@ if (!gotLock) {
     runIntegrityCheck()
     try {
       const port = config.port || PORT
-      serverHandle = startServer(getPrinterName, port)
+      serverHandle = startServer(getPrintConfig, port)
     } catch (e) {
       console.error('[server] start mislukt', e)
     }
