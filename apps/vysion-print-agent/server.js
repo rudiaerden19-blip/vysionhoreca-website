@@ -80,7 +80,7 @@ function escPosCommandLength(buf, i) {
 }
 
 /**
- * Alleen TD80: ruimere ESC 3 n + extra lege regel na elke tekstregel.
+ * Alleen TD80: iets ruimere ESC 3 n. Geen extra lege regels — dat maakt de bon te lang.
  * Input blijft ongewijzigd; we werken op een kopie. Epson/Star roepen dit nooit aan.
  */
 function reviewUrlFromKassaUrl(kassaUrl) {
@@ -148,24 +148,11 @@ function applyTd80Spacing(input) {
   const src = Buffer.from(input)
   for (let i = 0; i + 2 < src.length; i++) {
     if (src[i] === ESC && src[i + 1] === 0x33) {
-      if (src[i + 2] === 0x3c) src[i + 2] = 0x54
-      else if (src[i + 2] === 0x1e) src[i + 2] = 0x2c
+      if (src[i + 2] === 0x3c) src[i + 2] = 0x48
+      else if (src[i + 2] === 0x1e) src[i + 2] = 0x24
     }
   }
-  const out = []
-  let i = 0
-  while (i < src.length) {
-    const skip = escPosCommandLength(src, i)
-    if (skip > 0) {
-      const end = Math.min(src.length, i + skip)
-      while (i < end) out.push(src[i++])
-      continue
-    }
-    const b = src[i++]
-    out.push(b)
-    if (b === 0x0a) out.push(0x0a)
-  }
-  return Buffer.from(out)
+  return src
 }
 /** PC437 (USA, ESC t 0) — pure ASCII-compatibele glyph-tabel op vrijwel alle ESC/POS‑printers.
  *  PC858 (ESC t 19) gaf op Chinese/Xprinter‑firmware nog verkeerde Han‑tekens naast bedragen,
@@ -805,8 +792,10 @@ function encWithEuro(line) {
   assert(rich.equals(unchanged), 'Default payload === ongewijzigde Epson/Star-layout')
   assert(epsonExplicit.equals(unchanged), 'Profiel epson === ongewijzigde layout')
   assert(starAlias.equals(unchanged), 'Profiel star === Epson-layout (niet aanraken)')
+  const td80Spaced = applyTd80Spacing(unchanged)
+  assert(td80Spaced.length === unchanged.length, 'TD80 spacing: geen extra regels')
+  assert(td80Spaced.includes(Buffer.from([0x1b, 0x33, 0x48])), 'TD80: iets ruimere regelafstand')
   const td80 = buildEscPosPayload(richBody, { printerProfile: 'td80' })
-  assert(td80.length > unchanged.length, 'TD80 voegt alleen extra spacing toe')
   assert(!td80.equals(unchanged), 'TD80 mag Epson/Star-bytes niet gelijk houden')
   const review = 'https://www.vysion-kassa.com/shop/demo/review'
   assert(
