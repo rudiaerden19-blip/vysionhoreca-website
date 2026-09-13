@@ -50,6 +50,8 @@ export type VysionPrintAgentBody = {
   openDrawer?: boolean
   /** "kassa" (default, volledige bon) of "keuken" (compacte keukenbon). */
   receiptMode?: 'kassa' |  'keuken'
+  /** Alleen TD80-agent gebruikt dit (review-QR). Epson/Star negeren het veld. */
+  reviewUrl?: string
 }
 
 /** Zelfde JSON als POST /print — Android-app (PrintBridgeActivity) verwacht identieke structuur. */
@@ -64,6 +66,7 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     copies: body.copies,
     openDrawer: body.openDrawer === true,
     receiptMode: body.receiptMode || 'kassa',
+    reviewUrl: body.reviewUrl,
   }
 }
 

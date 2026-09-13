@@ -4216,6 +4216,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isVatInvoice ? 1 : isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
+      reviewUrl: `https://www.vysion-kassa.com/shop/${tenant}/review`,
       /**
        * BTW-bon: géén orderData — anders bouwt de Print Agent een gewone kassabon
        * en verdwijnt de factuurtekst. Alleen bonInhoud (zelfde regels als de preview).
