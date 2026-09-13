@@ -1,6 +1,6 @@
 {
   "name": "vysion-print-agent",
-  "version": "2.0.13",
+  "version": "2.0.14",
   "private": true,
   "author": "Vysion Horeca",
   "description": "Lokale USB/Windows bonprinter voor Ordervysion — dubbelklik installer, geen npm op de kassa.",
@@ -29,6 +29,8 @@
       "preload.js",
       "kassa-preload.js",
       "settings.html",
+      "td80-qr.js",
+      "vendor/**",
       "assets/**"
     ],
     "asarUnpack": [

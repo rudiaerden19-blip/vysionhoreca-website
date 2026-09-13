@@ -105,50 +105,24 @@ function resolveTd80ReviewUrl(body, opts) {
   return ''
 }
 
-/** Raster-QR (GS v 0) — TD80 negeert vaak native GS ( k. Epson/Star roepen dit nooit aan. */
-function buildTd80QrRaster(reviewUrl) {
-  let QRCode
-  try {
-    QRCode = require('qrcode')
-  } catch {
-    return Buffer.alloc(0)
-  }
-  const qr = QRCode.create(String(reviewUrl), { errorCorrectionLevel: 'M' })
-  const n = qr.modules.size
-  const quiet = 2
-  const scale = 5
-  const dim = (n + quiet * 2) * scale
-  const widthBytes = Math.ceil(dim / 8)
-  const rows = []
-  for (let y = 0; y < dim; y++) {
-    const row = Buffer.alloc(widthBytes)
-    const my = Math.floor(y / scale) - quiet
-    for (let x = 0; x < dim; x++) {
-      const mx = Math.floor(x / scale) - quiet
-      if (mx >= 0 && mx < n && my >= 0 && my < n && qr.modules.get(mx, my)) {
-        row[x >> 3] |= 0x80 >> (x & 7)
-      }
-    }
-    rows.push(row)
-  }
-  return Buffer.concat([
-    Buffer.from([GS, 0x76, 0x30, 0x00, widthBytes & 0xff, (widthBytes >> 8) & 0xff, dim & 0xff, (dim >> 8) & 0xff]),
-    ...rows,
-  ])
-}
-
 function buildTd80ReviewQr(reviewUrl) {
   const url = String(reviewUrl || '').trim()
-  if (!url) return Buffer.alloc(0)
   const parts = [
     Buffer.from('\n', 'latin1'),
     ALIGN_CENTER,
     NORMAL_SIZE,
-    buildTd80QrRaster(url),
-    Buffer.from('\n', 'latin1'),
-    enc('geef review'),
-    Buffer.from('\n', 'latin1'),
   ]
+  if (url) {
+    try {
+      const { buildTd80QrImage } = require('./td80-qr')
+      parts.push(buildTd80QrImage(url))
+    } catch (e) {
+      console.warn('[td80] QR-plaatje:', e && e.message ? e.message : e)
+    }
+  }
+  parts.push(Buffer.from('\n', 'latin1'))
+  parts.push(enc('geef review'))
+  parts.push(Buffer.from('\n', 'latin1'))
   return Buffer.concat(parts)
 }
 
@@ -846,7 +820,7 @@ function encWithEuro(line) {
   assert(starWithReview.equals(unchanged), 'Star negeert review-QR')
   const td80Qr = buildEscPosPayload(richBody, { printerProfile: 'td80', reviewUrl: review })
   assert(td80Qr.includes(Buffer.from('geef review', 'latin1')), 'TD80 kassabon: geef review')
-  assert(td80Qr.includes(Buffer.from([0x1d, 0x76, 0x30])), 'TD80 kassabon: raster-QR onderaan')
+  assert(td80Qr.includes(Buffer.from([0x1b, 0x2a, 0x21])), 'TD80 kassabon: ESC* QR onderaan')
   const cut = Buffer.from([0x1d, 0x56, 0x01])
   assert(td80Qr.lastIndexOf(Buffer.from('geef review', 'latin1')) < td80Qr.lastIndexOf(cut), 'QR-tekst vóór cutter')
   const td80Kitchen = buildEscPosPayload({ ...richBody, receiptMode: 'keuken' }, {

@@ -1,0 +1,5 @@
+{
+  "name": "dijkstrajs",
+  "version": "1.0.3",
+  "main": "dijkstra.js"
+}
