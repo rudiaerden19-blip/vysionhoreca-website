@@ -29,8 +29,10 @@
     Kies de bonprinter die Windows al ziet (USB/Ethernet maakt niet uit). De kassa stuurt bonnen naar
     <code>http://127.0.0.1:9742/print</code> op <strong>deze pc</strong>.
   </p>
-  <label for="pr">Printer</label>
+  <label for="pr">Bonprinter (kassa)</label>
   <select id="pr"></select>
+  <label for="kitchenPr">Keukenprinter (optioneel)</label>
+  <select id="kitchenPr"></select>
   <label for="printerProfile">Printertype (bon-layout)</label>
   <select id="printerProfile">
     <option value="epson">Epson / Star — niet wijzigen als de bon al goed is</option>
@@ -48,10 +50,29 @@
   <div class="err" id="err"></div>
   <script>
     const sel = document.getElementById('pr')
+    const kitchenSel = document.getElementById('kitchenPr')
     const profileSel = document.getElementById('printerProfile')
     const ok = document.getElementById('ok')
     const err = document.getElementById('err')
     const urlInput = document.getElementById('kassaUrl')
+
+    function fillPrinterSelect(selectEl, printers, selectedName, allowEmpty) {
+      selectEl.innerHTML = ''
+      if (allowEmpty) {
+        const none = document.createElement('option')
+        none.value = ''
+        none.textContent = '— Geen keukenprinter —'
+        if (!selectedName) none.selected = true
+        selectEl.appendChild(none)
+      }
+      for (const name of printers) {
+        const o = document.createElement('option')
+        o.value = name
+        o.textContent = name
+        if (selectedName === name) o.selected = true
+        selectEl.appendChild(o)
+      }
+    }
 
     async function load() {
       err.style.display = 'none'
@@ -63,19 +84,23 @@
       profileSel.value = cfg.printerProfile === 'td80' ? 'td80' : 'epson'
       const ver = document.getElementById('version')
       if (ver && cfg.agentVersion) ver.textContent = `v${cfg.agentVersion}`
-      sel.innerHTML = ''
-      if (!plist.ok || !plist.printers?.length) {
+      const sorted = []
+      const pushName = (n) => {
+        const t = String(n || '').trim()
+        if (t && !sorted.includes(t)) sorted.push(t)
+      }
+      if (plist.ok && Array.isArray(plist.printers)) {
+        for (const n of plist.printers) pushName(n)
+      }
+      pushName(cfg.printerName)
+      pushName(cfg.kitchenPrinterName)
+      sorted.sort((a, b) => a.localeCompare(b))
+      if (!sorted.length) {
         err.textContent = plist.error || 'Geen printers gevonden in Windows.'
         err.style.display = 'block'
-        return
       }
-      for (const name of plist.printers.sort((a, b) => a.localeCompare(b))) {
-        const o = document.createElement('option')
-        o.value = name
-        o.textContent = name
-        if (cfg.printerName === name) o.selected = true
-        sel.appendChild(o)
-      }
+      fillPrinterSelect(sel, sorted, cfg.printerName || '', false)
+      fillPrinterSelect(kitchenSel, sorted, cfg.kitchenPrinterName || '', true)
     }
 
     document.getElementById('save').onclick = async () => {
@@ -95,6 +120,7 @@
       }
       await window.vysionAgent.saveConfig({
         printerName,
+        kitchenPrinterName: kitchenSel.value || '',
         kassaUrl,
         printerProfile: profileSel.value === 'td80' ? 'td80' : 'epson',
       })

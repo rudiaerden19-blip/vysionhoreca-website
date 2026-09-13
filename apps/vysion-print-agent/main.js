@@ -23,15 +23,12 @@ const printQueue = require('./print-queue')
 const {
   startServer,
   listWindowsPrintersSync,
-  buildEscPosPayload,
+  executePrintRequest,
   applyTd80Spacing,
   normalizePrinterProfile,
   encInline,
   printRawWindows,
   openCashDrawerWindows,
-  kickCashDrawerWindowsParallel,
-  sleepSyncMs,
-  DRAWER_KICK,
 } = require('./server')
 
 // ---- Constants -----------------------------------------------------------
@@ -86,6 +83,7 @@ function loadConfig() {
     port:        typeof j.port === 'number'        ? j.port : PORT,
     autoStart:   typeof j.autoStart === 'boolean'  ? j.autoStart : false,
     autoUpdate:  typeof j.autoUpdate === 'boolean' ? j.autoUpdate : true,
+    kitchenPrinterName: typeof j.kitchenPrinterName === 'string' ? j.kitchenPrinterName : '',
     /** Ontbrekend = Epson/Star — bestaande kassa’s blijven op de huidige bon. */
     printerProfile: normalizePrinterProfile(j.printerProfile),
   }
@@ -106,10 +104,38 @@ function getPrinterProfile() {
   return normalizePrinterProfile(config.printerProfile)
 }
 
+function getKitchenPrinterName() {
+  return config.kitchenPrinterName?.trim() || null
+}
+
 function getPrintConfig() {
   return {
     printerName: getPrinterName(),
+    kitchenPrinterName: getKitchenPrinterName(),
     printerProfile: getPrinterProfile(),
+  }
+}
+
+function ensureDesktopShortcut() {
+  if (process.platform !== 'win32') return
+  try {
+    const desktop = app.getPath('desktop')
+    const lnk = path.join(desktop, 'Vysion Kassa.lnk')
+    const exe = process.execPath
+    const cwd = path.dirname(exe)
+    const ps = [
+      `$p = ${JSON.stringify(lnk)}`,
+      `$s = (New-Object -ComObject WScript.Shell).CreateShortcut($p)`,
+      `$s.TargetPath = ${JSON.stringify(exe)}`,
+      `$s.WorkingDirectory = ${JSON.stringify(cwd)}`,
+      `$s.Description = 'Vysion Kassa + Print Agent'`,
+      `$s.Save()`,
+    ].join('; ')
+    spawnSync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps], {
+      windowsHide: true,
+    })
+  } catch (e) {
+    console.warn('[desktop] snelkoppeling:', e?.message || e)
   }
 }
 
@@ -211,7 +237,7 @@ function openSettings() {
   }
   settingsWindow = new BrowserWindow({
     width: 520,
-    height: 860,
+    height: 920,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -471,6 +497,7 @@ function buildDiagnoseText() {
   lines.push(`Time: ${new Date().toISOString()}`)
   lines.push('')
   lines.push(`Printer: ${getPrinterName() || '(geen)'}`)
+  lines.push(`Keukenprinter: ${getKitchenPrinterName() || '(geen)'}`)
   lines.push(`Printertype: ${getPrinterProfile() === 'td80' ? 'Chinees TD80' : 'Epson/Star'}`)
   lines.push(`Kassa-URL: ${config.kassaUrl || '(geen)'}`)
   lines.push(`AutoStart: ${config.autoStart === true}`)
@@ -584,6 +611,9 @@ ipcMain.handle('config:save', (_evt, partial) => {
     port:        typeof partial.port === 'number'        ? partial.port        : config.port,
     autoStart:   typeof partial.autoStart === 'boolean'  ? partial.autoStart   : config.autoStart,
     autoUpdate:  typeof partial.autoUpdate === 'boolean' ? partial.autoUpdate  : config.autoUpdate,
+    kitchenPrinterName: typeof partial.kitchenPrinterName === 'string'
+      ? partial.kitchenPrinterName
+      : (config.kitchenPrinterName || ''),
     printerProfile: typeof partial.printerProfile === 'string'
       ? normalizePrinterProfile(partial.printerProfile)
       : getPrinterProfile(),
@@ -615,36 +645,20 @@ ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) =>
     const printerName = getPrinterName()
     if (!printerName) return { status: 400, body: { success: false, error: 'Geen printer geconfigureerd. Open Instellingen.' } }
     try {
-      const payload = buildEscPosPayload(body || {}, { printerProfile: getPrinterProfile() })
-      const copies = (body && typeof body.copies === 'number' && body.copies >= 1)
-        ? Math.min(Math.max(body.copies, 1), 5) : 2
-      const wantDrawer = !!(body && body.openDrawer === true)
-      const orderLabel = body?.orderData?.orderNumber
-        ? `bon #${body.orderData.orderNumber}`
-        : (body?.receiptMode === 'keuken' ? 'keukenbon' : 'kassabon')
-      /** Gelijk aan server.js INTER_RECEIPT_COPY_PAUSE_MS — kortere maar veilige tussenpauze voor tweede kopie. */
-      const INTER_RECEIPT_COPY_PAUSE_MS = 560
-      let result = { ok: false, error: 'no copies' }
-      for (let i = 0; i < copies; i++) {
-        if (wantDrawer && i === 0) {
-          kickCashDrawerWindowsParallel(printerName)
-        }
-        result = printRawWindows(printerName, payload)
-        if (!result.ok) {
-          console.error('[agent:print]', i + 1, '/', copies, '→', result.error)
-          // Eerste attempt mislukt → in de queue (geen bon verloren laten gaan).
-          if (i === 0) {
-            const remaining = copies - i
-            for (let q = 0; q < remaining; q++) printQueue.enqueue(payload, `${orderLabel} (${q+1}/${remaining})`)
-          }
-          break
-        }
-        if (i < copies - 1) sleepSyncMs(INTER_RECEIPT_COPY_PAUSE_MS)
+      const r = executePrintRequest(body || {}, getPrintConfig())
+      if (r.ok) {
+        return { status: 200, body: { success: true, drawer: !!(body && body.openDrawer), queued: 0, buddyPrinted: r.buddyPrinted } }
       }
-      if (result.ok) return { status: 200, body: { success: true, drawer: wantDrawer, queued: 0 } }
+      if (r.payload && r.printedCopies === 0) {
+        const remaining = typeof r.copies === 'number' ? r.copies : 1
+        for (let q = 0; q < remaining; q++) printQueue.enqueue(r.payload, `${r.orderLabel || 'bon'} (${q + 1}/${remaining})`)
+      }
+      if (r.kitchenFailOnly) {
+        return { status: 207, body: { success: false, kitchenFailOnly: true, error: r.error, queued: printQueue.size() } }
+      }
       return {
-        status: 202,                          // accepted (in queue, niet direct gelukt)
-        body: { success: false, error: result.error, queued: printQueue.size() },
+        status: 202,
+        body: { success: false, error: r.error, queued: printQueue.size() },
       }
     } catch (e) {
       console.error('[agent:print] exception', e)
@@ -713,6 +727,7 @@ if (!gotLock) {
       return printRawWindows(printerName, buf)
     }, () => buildTray())
     syncWindowsStartup()
+    ensureDesktopShortcut()
     startHealthLoop()
     buildTray()
     if (!getPrinterName() || !config.kassaUrl) openSettings()
