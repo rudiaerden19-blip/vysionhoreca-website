@@ -83,6 +83,54 @@ function escPosCommandLength(buf, i) {
  * Alleen TD80: ruimere ESC 3 n + extra lege regel na elke tekstregel.
  * Input blijft ongewijzigd; we werken op een kopie. Epson/Star roepen dit nooit aan.
  */
+function reviewUrlFromKassaUrl(kassaUrl) {
+  const raw = String(kassaUrl || '').trim()
+  const m = raw.match(/\/shop\/([^/?#]+)\/admin\/kassa/i)
+  if (!m) return ''
+  const slug = m[1]
+  try {
+    const u = new URL(raw)
+    if (u.protocol === 'http:' || u.protocol === 'https:') {
+      return `${u.origin}/shop/${slug}/review`
+    }
+  } catch { /* ignore */ }
+  return `https://www.vysion-kassa.com/shop/${slug}/review`
+}
+
+/**
+ * ESC/POS QR (GS ( k) — Chinese TD80/Xprinter. Alleen aanroepen op TD80-kassabon.
+ */
+function buildTd80ReviewQr(reviewUrl) {
+  const data = Buffer.from(String(reviewUrl), 'ascii')
+  if (!data.length || data.length > 256) return Buffer.alloc(0)
+  const storeLen = data.length + 3
+  const pL = storeLen & 0xff
+  const pH = (storeLen >> 8) & 0xff
+  return Buffer.concat([
+    Buffer.from('\n', 'latin1'),
+    ALIGN_CENTER,
+    NORMAL_SIZE,
+    Buffer.from([GS, 0x28, 0x6b, 0x04, 0x00, 0x31, 0x41, 0x32]),
+    Buffer.from([GS, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x43, 0x06]),
+    Buffer.from([GS, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x45, 0x31]),
+    Buffer.from([GS, 0x28, 0x6b, pL, pH, 0x31, 0x50, 0x30]),
+    data,
+    Buffer.from([GS, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x51, 0x30]),
+    Buffer.from('\n', 'latin1'),
+    enc('geef review'),
+    Buffer.from('\n', 'latin1'),
+  ])
+}
+
+function appendTd80ReviewQr(buf, reviewUrl) {
+  const qr = buildTd80ReviewQr(reviewUrl)
+  if (!qr.length) return buf
+  const cut = Buffer.from([GS, 0x56, 0x01])
+  const idx = buf.lastIndexOf(cut)
+  if (idx < 0) return Buffer.concat([buf, qr])
+  return Buffer.concat([buf.subarray(0, idx), qr, buf.subarray(idx)])
+}
+
 function applyTd80Spacing(input) {
   const src = Buffer.from(input)
   for (let i = 0; i + 2 < src.length; i++) {
@@ -657,7 +705,9 @@ function buildEscPosPayloadUnchanged(body) {
 function buildEscPosPayload(body, opts) {
   const unchanged = buildEscPosPayloadUnchanged(body)
   if (!isTd80Profile(opts && opts.printerProfile)) return unchanged
-  return applyTd80Spacing(unchanged)
+  const spaced = applyTd80Spacing(unchanged)
+  if (body && body.receiptMode === 'keuken') return spaced
+  return appendTd80ReviewQr(spaced, opts && opts.reviewUrl)
 }
 
 /**
@@ -745,6 +795,24 @@ function encWithEuro(line) {
   const td80 = buildEscPosPayload(richBody, { printerProfile: 'td80' })
   assert(td80.length > unchanged.length, 'TD80 voegt alleen extra spacing toe')
   assert(!td80.equals(unchanged), 'TD80 mag Epson/Star-bytes niet gelijk houden')
+  const review = 'https://www.vysion-kassa.com/shop/demo/review'
+  assert(
+    reviewUrlFromKassaUrl('https://www.vysionhoreca.com/shop/demo/admin/kassa') ===
+      'https://www.vysionhoreca.com/shop/demo/review',
+    'Review-URL uit kassa-URL',
+  )
+  const epsonWithReview = buildEscPosPayload(richBody, { printerProfile: 'epson', reviewUrl: review })
+  assert(epsonWithReview.equals(unchanged), 'Epson negeert review-QR')
+  const starWithReview = buildEscPosPayload(richBody, { printerProfile: 'star', reviewUrl: review })
+  assert(starWithReview.equals(unchanged), 'Star negeert review-QR')
+  const td80Qr = buildEscPosPayload(richBody, { printerProfile: 'td80', reviewUrl: review })
+  assert(td80Qr.includes(Buffer.from('geef review', 'latin1')), 'TD80 kassabon: geef review')
+  assert(td80Qr.includes(Buffer.from(review, 'ascii')), 'TD80 kassabon: review-URL in QR')
+  const td80Kitchen = buildEscPosPayload({ ...richBody, receiptMode: 'keuken' }, {
+    printerProfile: 'td80',
+    reviewUrl: review,
+  })
+  assert(!td80Kitchen.includes(Buffer.from('geef review', 'latin1')), 'TD80 keukenbon: geen QR')
   // eslint-disable-next-line no-console -- bewust bij selftest
   console.log('[print-agent] encWithEuro regression smoke: OK')
 })()
@@ -906,7 +974,10 @@ function executePrintRequest(body, cfg) {
     kitchenPn !== '' &&
     kitchenPn !== primary
 
-  const printOpts = { printerProfile: normalizePrinterProfile(cfg && cfg.printerProfile) }
+  const printOpts = {
+    printerProfile: normalizePrinterProfile(cfg && cfg.printerProfile),
+    reviewUrl: reviewUrlFromKassaUrl(cfg && cfg.kassaUrl) || String(cfg && cfg.reviewUrl || '').trim(),
+  }
   const payloadMain = buildEscPosPayload({ ...b, receiptMode }, printOpts)
 
   const copies =
@@ -1169,6 +1240,7 @@ module.exports = {
   buildEscPosPayloadUnchanged,
   applyTd80Spacing,
   normalizePrinterProfile,
+  reviewUrlFromKassaUrl,
   encInline,
   printRawWindows,
   openCashDrawerWindows,

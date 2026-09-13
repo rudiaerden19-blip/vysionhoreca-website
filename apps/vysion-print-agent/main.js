@@ -26,6 +26,7 @@ const {
   executePrintRequest,
   applyTd80Spacing,
   normalizePrinterProfile,
+  reviewUrlFromKassaUrl,
   encInline,
   printRawWindows,
   openCashDrawerWindows,
@@ -113,6 +114,8 @@ function getPrintConfig() {
     printerName: getPrinterName(),
     kitchenPrinterName: getKitchenPrinterName(),
     printerProfile: getPrinterProfile(),
+    kassaUrl: config.kassaUrl || '',
+    reviewUrl: reviewUrlFromKassaUrl(config.kassaUrl),
   }
 }
 
