@@ -3347,6 +3347,8 @@
     "amountTooHigh": "Importe mayor que el saldo abierto.",
     "payFailed": "No se pudo registrar el pago.",
     "tabAlreadySettled": "Esta cuenta ya está pagada — actualizando la lista.",
+    "receiptCustomer": "A cuenta — {name}",
+    "printFailed": "No se pudo imprimir el ticket. Compruebe el Print Agent.",
     "registerPayment": "Registrar pago"
   },
   "kassaApp": {

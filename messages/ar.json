@@ -3347,6 +3347,8 @@
     "amountTooHigh": "المبلغ أعلى من الرصيد المفتوح.",
     "payFailed": "تعذّر تسجيل الدفع.",
     "tabAlreadySettled": "تم سداد هذا الحساب — جارٍ تحديث القائمة.",
+    "receiptCustomer": "على الحساب — {name}",
+    "printFailed": "تعذّر طباعة الإيصال. تحقق من Print Agent.",
     "registerPayment": "تسجيل الدفع"
   },
   "kassaApp": {

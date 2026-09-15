@@ -2847,6 +2847,8 @@
     "amountTooHigh": "Montant supérieur au solde ouvert.",
     "payFailed": "Impossible d'enregistrer le paiement.",
     "tabAlreadySettled": "Cette note est déjà payée — actualisation de la liste.",
+    "receiptCustomer": "En compte — {name}",
+    "printFailed": "Impossible d'imprimer le ticket. Vérifiez le Print Agent.",
     "registerPayment": "Enregistrer le paiement"
   },
   "kassaApp": {

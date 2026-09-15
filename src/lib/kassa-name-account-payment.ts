@@ -1,4 +1,5 @@
-import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import { hydrateKassaCartItemsFromCatalog } from '@/lib/kassa-receipt-vat'
 import { getMenuCategories, getMenuProducts, getTenantSettings } from '@/lib/admin-api'
 import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
 import { adminDb } from '@/lib/admin-db-client'
@@ -13,8 +14,10 @@ import { insertKassaOrderForNameAccountPayment } from '@/lib/kassa-name-account-
 import {
   buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
+  computeInclusiveVatSplitFromCart,
   inferVatJurisdictionCountry,
   normalizeCategoryVatPercent,
+  resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
 
 /** Registreer betaling op open tab → betaalde order + tab bijwerken (Z/verkoop op betaaldatum). */
@@ -24,7 +27,7 @@ export async function registerKassaNameTabPayment(params: {
   amountEur: number
   paymentMethod: KassaPaymentMethod
   staffId?: string | null
-}): Promise<{ ok: boolean; error?: string; orderNumber?: number }> {
+}): Promise<{ ok: boolean; error?: string; orderNumber?: number; receipt?: KassaLastOrderReceipt }> {
   const { tenantSlug, tab, amountEur, paymentMethod, staffId } = params
   const selectedLines = normalizeNameTabLines((tab.items ?? []) as KassaNameTabLine[])
   const selectedOpen = tabOpenTotalIncl(selectedLines)
@@ -94,5 +97,35 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: 'tab_update_failed', orderNumber: orderRes.orderNumber }
   }
 
-  return { ok: true, orderNumber: orderRes.orderNumber }
+  const hydrated = hydrateKassaCartItemsFromCatalog(orderLines, prods)
+  const resolveLineVat = (line: (typeof hydrated)[number]) =>
+    resolveVatPercentForCartLine(
+      line.product,
+      vatLookup,
+      btw,
+      'TAKEAWAY',
+      productCategoryById,
+      tenantCountry,
+      line.choices,
+    )
+  const vatSplit = computeInclusiveVatSplitFromCart(hydrated, resolveLineVat)
+  const receipt: KassaLastOrderReceipt = {
+    orderNumber: orderRes.orderNumber ?? 0,
+    items: hydrated,
+    total: Math.round(vatSplit.grossTotal * 100) / 100,
+    vatSplit: vatSplit.byRate.map((r) => ({
+      rate: r.rate,
+      baseExcl: r.baseExcl,
+      tax: r.tax,
+    })),
+    subtotalExclVat: vatSplit.subtotalExcl,
+    totalTax: vatSplit.totalTax,
+    paymentMethod,
+    orderType: 'TAKEAWAY',
+    tableNumber: '',
+    createdAt: new Date(),
+    onAccountCustomerName: tab.customer_name.trim(),
+  }
+
+  return { ok: true, orderNumber: orderRes.orderNumber, receipt }
 }

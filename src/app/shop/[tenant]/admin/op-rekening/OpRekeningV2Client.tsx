@@ -11,26 +11,43 @@ import {
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
-import { getTenantSettings } from '@/lib/admin-api'
-import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import {
+  nameAccountPrintLabelsFromT,
+  printNameAccountPaymentReceipt,
+} from '@/lib/kassa-name-account-receipt'
+import { getMenuCategories, getTenantSettings, type MenuCategory, type TenantSettings } from '@/lib/admin-api'
+import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
+import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 
 export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const [tabs, setTabs] = useState<KassaNameTabRow[]>([])
+  const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
+  const [categories, setCategories] = useState<MenuCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [payAmount, setPayAmount] = useState('')
   const [payMethod, setPayMethod] = useState<KassaPaymentMethod>('CASH')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successReceipt, setSuccessReceipt] = useState<KassaLastOrderReceipt | null>(null)
+  const [printBusy, setPrintBusy] = useState(false)
+  const [printError, setPrintError] = useState<string | null>(null)
+
   const load = useCallback(async () => {
     setLoading(true)
-    const tabRes = await adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
-      tenantSlug: tenant,
-      match: { tenant_slug: tenant },
-      limit: 200,
-    })
-    await getTenantSettings(tenant)
+    const [tabRes, settings, catsRaw] = await Promise.all([
+      adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
+        tenantSlug: tenant,
+        match: { tenant_slug: tenant },
+        limit: 200,
+      }),
+      getTenantSettings(tenant),
+      getMenuCategories(tenant),
+    ])
+    setTenantInfo(settings)
+    setCategories(dedupeCatalogById(catsRaw.filter((c) => c.is_active)))
     if (tabRes.ok && Array.isArray(tabRes.data)) {
       setTabs(tabRes.data)
       setError(null)
@@ -64,6 +81,7 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
     const amount = parseFloat(payAmount.replace(',', '.'))
     setSaving(true)
     setError(null)
+    setPrintError(null)
     const res = await registerKassaNameTabPayment({
       tenantSlug: tenant,
       tab: selected,
@@ -80,7 +98,27 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
       return
     }
     setSelectedId(null)
+    if (res.receipt) setSuccessReceipt(res.receipt)
     void load()
+  }
+
+  const printSuccessReceipt = async () => {
+    if (!successReceipt) return
+    setPrintBusy(true)
+    setPrintError(null)
+    const labels = nameAccountPrintLabelsFromT(t)
+    const result = await printNameAccountPaymentReceipt({
+      tenantSlug: tenant,
+      tenantInfo,
+      order: successReceipt,
+      categories,
+      locale,
+      labels,
+    })
+    setPrintBusy(false)
+    if (!result.ok) {
+      setPrintError(result.error || t('kassaNameAccount.printFailed'))
+    }
   }
 
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
@@ -106,6 +144,7 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
       </div>
 
       {error ? <p className="mb-4 text-sm text-red-600">{error}</p> : null}
+      {printError ? <p className="mb-4 text-sm text-red-600">{printError}</p> : null}
 
       {loading ? (
         <p className="text-sm text-gray-500">{t('kassaOnAccount.loading')}</p>
@@ -177,6 +216,18 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
           })}
         </ul>
       )}
+
+      {successReceipt ? (
+        <KassaSuccessReceiptModal
+          open
+          order={successReceipt}
+          tenantInfo={tenantInfo}
+          locale={locale}
+          printDisabled={printBusy}
+          onClose={() => setSuccessReceipt(null)}
+          onPrint={printSuccessReceipt}
+        />
+      ) : null}
     </div>
   )
 }

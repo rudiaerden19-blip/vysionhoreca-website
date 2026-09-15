@@ -4174,6 +4174,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? `${orderTypePlain} | ${t('kassaReceipt.tablePrefix')} ${receiptTableNr}${terraceSuffix}`
         : orderTypePlain,
     )
+    if (order.onAccountCustomerName) {
+      bonLines.push(t('kassaNameAccount.receiptCustomer').replace('{name}', order.onAccountCustomerName))
+    }
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
     for (const i of receiptLines) {
@@ -4247,6 +4250,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             tax,
             total: order.total,
             paymentMethod: order.paymentMethod,
+            ...(order.onAccountCustomerName ? { customerName: order.onAccountCustomerName } : {}),
             ...(receiptVatRows.length > 0
               ? {
                   vatLines: receiptVatRows.map((row) => ({
@@ -6699,6 +6703,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onCommitted={() => {
             setCart([])
             setTableOrderLinesInSidebar(false)
+          }}
+          onPaymentSuccess={(receipt) => {
+            setLastOrder(receipt)
+            setShowSuccessModal(true)
           }}
         />
       ) : null}

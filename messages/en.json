@@ -3912,6 +3912,8 @@
     "amountTooHigh": "Amount is higher than the open balance.",
     "payFailed": "Could not register payment.",
     "tabAlreadySettled": "This tab is already paid — refreshing the list.",
+    "receiptCustomer": "On account — {name}",
+    "printFailed": "Could not print receipt. Check the Print Agent.",
     "registerPayment": "Register payment"
   },
   "kassaApp": {

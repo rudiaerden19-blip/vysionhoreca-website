@@ -13,7 +13,7 @@ import {
 } from '@/lib/kassa-name-account'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
 import { normalizeOnAccountCustomerName as normName } from '@/lib/kassa-on-account'
-import type { KassaCartItem, KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import type { KassaCartItem, KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
 
 type Props = {
   tenant: string
@@ -22,6 +22,8 @@ type Props = {
   staffId?: string | null
   onClose: () => void
   onCommitted: () => void
+  /** Na betaling: bon tonen/afdrukken via kassa (success-modal). */
+  onPaymentSuccess?: (receipt: KassaLastOrderReceipt) => void
 }
 
 export default function KassaNameAccountModal({
@@ -31,6 +33,7 @@ export default function KassaNameAccountModal({
   staffId,
   onClose,
   onCommitted,
+  onPaymentSuccess,
 }: Props) {
   const { t } = useLanguage()
   const [name, setName] = useState('')
@@ -191,6 +194,9 @@ export default function KassaNameAccountModal({
     setPayAmount('')
     await loadTabs()
     onCommitted()
+    if (res.receipt && onPaymentSuccess) {
+      onPaymentSuccess(res.receipt)
+    }
     onClose()
   }
 

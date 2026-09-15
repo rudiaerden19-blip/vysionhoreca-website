@@ -3347,6 +3347,8 @@
     "amountTooHigh": "Importo superiore al saldo aperto.",
     "payFailed": "Impossibile registrare il pagamento.",
     "tabAlreadySettled": "Questo conto è già saldato — aggiornamento elenco.",
+    "receiptCustomer": "In conto — {name}",
+    "printFailed": "Stampa scontrino non riuscita. Controllare il Print Agent.",
     "registerPayment": "Registra pagamento"
   },
   "kassaApp": {

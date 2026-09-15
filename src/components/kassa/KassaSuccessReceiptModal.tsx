@@ -167,6 +167,11 @@ export function KassaSuccessReceiptModal({
             <div className="border-t-2 border-dashed border-gray-400 my-3" />
             <div className="text-center mb-3">
               <p className="font-bold text-lg">{orderTypeLabel}</p>
+              {order.onAccountCustomerName ? (
+                <p className="font-semibold text-gray-800">
+                  {t('kassaNameAccount.receiptCustomer').replace('{name}', order.onAccountCustomerName)}
+                </p>
+              ) : null}
               {receiptTableNr ? (
                 <p className="font-bold">{t('kassaReceipt.tableLabel').replace(/\{number\}/g, receiptTableNr)}</p>
               ) : null}

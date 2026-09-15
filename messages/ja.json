@@ -3347,6 +3347,8 @@
     "amountTooHigh": "未払い残高を超えています。",
     "payFailed": "支払いを登録できませんでした。",
     "tabAlreadySettled": "この掛け勘定は既に支払済みです — 一覧を更新します。",
+    "receiptCustomer": "掛け — {name}",
+    "printFailed": "レシートを印刷できませんでした。Print Agentを確認してください。",
     "registerPayment": "支払いを登録"
   },
   "kassaApp": {

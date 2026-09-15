@@ -3912,6 +3912,8 @@
     "amountTooHigh": "Bedrag is hoger dan het openstaande saldo.",
     "payFailed": "Betaling registreren mislukt.",
     "tabAlreadySettled": "Deze rekening is al betaald — lijst wordt ververst.",
+    "receiptCustomer": "Op rekening — {name}",
+    "printFailed": "Bon afdrukken mislukt. Controleer de Print Agent.",
     "registerPayment": "Betaling registreren"
   },
   "kassaApp": {

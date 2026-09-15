@@ -72,4 +72,6 @@ export interface KassaLastOrderReceipt {
   retailLoyalty?: KassaReceiptRetailLoyalty
   /** Klant met BTW-nummer: bon wordt factuur op print/mail */
   retailCustomerInvoice?: KassaReceiptRetailCustomerInvoice
+  /** Op rekening v2: naam op bon bij tab-afrekening */
+  onAccountCustomerName?: string
 }
