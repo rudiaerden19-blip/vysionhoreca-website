@@ -3345,6 +3345,7 @@
     "payAmount": "收到金额（含 VAT）",
     "invalidAmount": "金额无效。",
     "amountTooHigh": "金额高于未结余额。",
+    "amountNotAllocatable": "无法按此金额分摊 — 请使用整分或付清全部余额。",
     "payFailed": "无法登记付款。",
     "tabAlreadySettled": "该挂账已结清 — 正在刷新列表。",
     "receiptCustomer": "挂账 — {name}",

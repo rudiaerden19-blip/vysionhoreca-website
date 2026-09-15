@@ -17,6 +17,14 @@ CREATE TABLE IF NOT EXISTS kassa_name_tabs (
   UNIQUE (tenant_slug, customer_key)
 );
 
+ALTER TABLE kassa_name_tabs
+  ADD COLUMN IF NOT EXISTS order_type TEXT NOT NULL DEFAULT 'DINE_IN',
+  ADD COLUMN IF NOT EXISTS table_number TEXT,
+  ADD COLUMN IF NOT EXISTS floor_plan_zone TEXT;
+
+COMMENT ON COLUMN kassa_name_tabs.order_type IS
+  'BTW-context van tab (zelfde als kassa bij «op rekening»): DINE_IN | TAKEAWAY | DELIVERY.';
+
 CREATE INDEX IF NOT EXISTS idx_kassa_name_tabs_tenant ON kassa_name_tabs (tenant_slug);
 
 ALTER TABLE kassa_name_tabs ENABLE ROW LEVEL SECURITY;

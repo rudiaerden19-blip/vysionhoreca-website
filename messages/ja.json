@@ -3345,6 +3345,7 @@
     "payAmount": "受取額（税込）",
     "invalidAmount": "無効な金額です。",
     "amountTooHigh": "未払い残高を超えています。",
+    "amountNotAllocatable": "この金額は割り当てできません — セント単位または全額をお支払いください。",
     "payFailed": "支払いを登録できませんでした。",
     "tabAlreadySettled": "この掛け勘定は既に支払済みです — 一覧を更新します。",
     "receiptCustomer": "掛け — {name}",

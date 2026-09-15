@@ -2845,6 +2845,7 @@
     "payAmount": "Erhaltener Betrag (inkl. MwSt.)",
     "invalidAmount": "Ungültiger Betrag.",
     "amountTooHigh": "Betrag höher als offener Saldo.",
+    "amountNotAllocatable": "Betrag lässt sich nicht auf offene Posten verteilen — volle Centbeträge oder vollständige Begleichung.",
     "payFailed": "Zahlung konnte nicht registriert werden.",
     "tabAlreadySettled": "Diese Rechnung ist bereits bezahlt — Liste wird aktualisiert.",
     "receiptCustomer": "Auf Rechnung — {name}",

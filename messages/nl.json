@@ -3910,6 +3910,7 @@
     "payAmount": "Ontvangen bedrag (incl. BTW)",
     "invalidAmount": "Ongeldig bedrag.",
     "amountTooHigh": "Bedrag is hoger dan het openstaande saldo.",
+    "amountNotAllocatable": "Dit bedrag past niet op de open regels — kies een bedrag in hele centen of betaal het volledige saldo.",
     "payFailed": "Betaling registreren mislukt.",
     "tabAlreadySettled": "Deze rekening is al betaald — lijst wordt ververst.",
     "receiptCustomer": "Op rekening — {name}",

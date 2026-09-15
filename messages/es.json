@@ -3345,6 +3345,7 @@
     "payAmount": "Importe recibido (IVA incl.)",
     "invalidAmount": "Importe no válido.",
     "amountTooHigh": "Importe mayor que el saldo abierto.",
+    "amountNotAllocatable": "No se puede repartir este importe — use céntimos enteros o pague el saldo completo.",
     "payFailed": "No se pudo registrar el pago.",
     "tabAlreadySettled": "Esta cuenta ya está pagada — actualizando la lista.",
     "receiptCustomer": "A cuenta — {name}",

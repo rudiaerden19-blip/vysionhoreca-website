@@ -1,5 +1,6 @@
-import type { KassaCartItem, KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import type { KassaCartItem, KassaPaymentMethod, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
 import type { MenuProduct } from '@/lib/admin-api'
+import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import {
   buildCategoryVatLookupForJurisdiction,
   computeInclusiveVatSplitFromCart,
@@ -8,12 +9,24 @@ import {
 import { hydrateKassaCartItemsFromCatalog } from '@/lib/kassa-receipt-vat'
 import { adminDb } from '@/lib/admin-db-client'
 
+export type NameAccountOrderInsertResult = {
+  ok: boolean
+  orderNumber?: number
+  error?: string
+  createdAtIso?: string
+  hydrated?: KassaCartItem[]
+  grossTotal?: number
+  subtotalExcl?: number
+  totalTax?: number
+  vatByRate?: { rate: number; baseExcl: number; tax: number }[]
+}
+
 export async function insertKassaOrderForNameAccountPayment(params: {
   tenantSlug: string
   customerName: string
   lines: KassaCartItem[]
   paymentMethod: KassaPaymentMethod
-  orderType: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
+  orderType: KassaRegisterOrderType
   products: MenuProduct[]
   categoryVatLookup: ReturnType<typeof buildCategoryVatLookupForJurisdiction>
   productCategoryById: Map<string, string | null>
@@ -22,7 +35,10 @@ export async function insertKassaOrderForNameAccountPayment(params: {
   staffId?: string | null
   splitCash?: number
   splitCard?: number
-}): Promise<{ ok: boolean; orderNumber?: number; error?: string }> {
+  createdAt?: Date
+  tableNumber?: string
+  floorPlanZone?: FloorPlanZone
+}): Promise<NameAccountOrderInsertResult> {
   const {
     tenantSlug,
     customerName,
@@ -37,6 +53,8 @@ export async function insertKassaOrderForNameAccountPayment(params: {
     staffId,
     splitCash,
     splitCard,
+    tableNumber,
+    floorPlanZone,
   } = params
 
   if (!lines.length) return { ok: false, error: 'Geen regels' }
@@ -53,8 +71,8 @@ export async function insertKassaOrderForNameAccountPayment(params: {
       line.choices,
     )
   const vatSplit = computeInclusiveVatSplitFromCart(hydrated, resolveLineVat)
-  const total = vatSplit.grossTotal
-  const createdAt = new Date()
+  const total = Math.round(vatSplit.grossTotal * 100) / 100
+  const createdAt = params.createdAt ?? new Date()
   const kassa_client_uuid =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
@@ -89,6 +107,13 @@ export async function insertKassaOrderForNameAccountPayment(params: {
     created_at: createdAt.toISOString(),
   }
 
+  if (orderType === 'DINE_IN' && tableNumber) {
+    orderPayload.table_number = tableNumber
+  }
+  if (orderType === 'DINE_IN' && floorPlanZone) {
+    orderPayload.floor_plan_zone = floorPlanZone
+  }
+
   if (method === 'SPLIT' && splitCash != null && splitCard != null) {
     orderPayload.payment_split_cash = Math.round(splitCash * 100) / 100
     orderPayload.payment_split_card = Math.round(splitCard * 100) / 100
@@ -103,5 +128,18 @@ export async function insertKassaOrderForNameAccountPayment(params: {
   }
   const raw = insRes.data as unknown
   const row = (Array.isArray(raw) ? raw[0] : raw) as { order_number?: number } | undefined
-  return { ok: true, orderNumber: row?.order_number ?? 0 }
+  return {
+    ok: true,
+    orderNumber: row?.order_number ?? 0,
+    createdAtIso: createdAt.toISOString(),
+    hydrated,
+    grossTotal: total,
+    subtotalExcl: Math.round(vatSplit.subtotalExcl * 100) / 100,
+    totalTax: Math.round(vatSplit.totalTax * 100) / 100,
+    vatByRate: vatSplit.byRate.map((r) => ({
+      rate: r.rate,
+      baseExcl: r.baseExcl,
+      tax: r.tax,
+    })),
+  }
 }

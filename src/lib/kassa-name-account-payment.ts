@@ -1,11 +1,16 @@
-import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
-import { hydrateKassaCartItemsFromCatalog } from '@/lib/kassa-receipt-vat'
+import {
+  kassaReceiptTableNumber,
+  type KassaLastOrderReceipt,
+  type KassaPaymentMethod,
+} from '@/lib/kassa-cart-types'
 import { getMenuCategories, getMenuProducts, getTenantSettings } from '@/lib/admin-api'
 import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
 import { adminDb } from '@/lib/admin-db-client'
 import {
   allocateNameTabPayment,
   normalizeNameTabLines,
+  orderLinesGrossIncl,
+  resolveNameTabOrderContext,
   tabOpenTotalIncl,
   type KassaNameTabLine,
   type KassaNameTabRow,
@@ -15,10 +20,8 @@ import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import {
   buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
-  computeInclusiveVatSplitFromCart,
   inferVatJurisdictionCountry,
   normalizeCategoryVatPercent,
-  resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
 
 /** Registreer betaling op open tab → betaalde order + tab bijwerken (Z/verkoop op betaaldatum). */
@@ -32,6 +35,7 @@ export async function registerKassaNameTabPayment(params: {
   const { tenantSlug, tab, amountEur, paymentMethod, staffId } = params
   const selectedLines = normalizeNameTabLines((tab.items ?? []) as KassaNameTabLine[])
   const selectedOpen = tabOpenTotalIncl(selectedLines)
+  const orderCtx = resolveNameTabOrderContext(tab)
 
   if (!Number.isFinite(amountEur) || amountEur <= 0) {
     return { ok: false, error: 'invalid_amount' }
@@ -50,6 +54,14 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: 'invalid_amount' }
   }
 
+  const grossFromLines = orderLinesGrossIncl(orderLines)
+  if (Math.abs(grossFromLines - appliedIncl) > 0.03) {
+    return { ok: false, error: 'allocation_mismatch' }
+  }
+  if (Math.abs(payIncl - appliedIncl) > 0.03) {
+    return { ok: false, error: 'amount_not_allocatable' }
+  }
+
   const [settings, catsRaw, prodsRaw] = await Promise.all([
     getTenantSettings(tenantSlug),
     getMenuCategories(tenantSlug),
@@ -62,28 +74,47 @@ export async function registerKassaNameTabPayment(params: {
   const vatLookup = buildCategoryVatLookupForJurisdiction(cats, tenantCountry)
   const productCategoryById = buildProductCategoryLookup(prods)
 
+  const paidAt = new Date()
+
   const orderRes = await insertKassaOrderForNameAccountPayment({
     tenantSlug,
     customerName: tab.customer_name,
     lines: orderLines,
     paymentMethod,
-    orderType: 'TAKEAWAY',
+    orderType: orderCtx.orderType,
     products: prods,
     categoryVatLookup: vatLookup,
     productCategoryById,
     tenantDefaultBtw: btw,
     tenantCountry,
     staffId,
+    createdAt: paidAt,
+    tableNumber: orderCtx.tableNumber,
+    floorPlanZone: orderCtx.floorPlanZone,
   })
 
   if (!orderRes.ok) {
     return { ok: false, error: orderRes.error || 'pay_failed' }
   }
 
-  const paidAtIso = new Date().toISOString()
-  syncZReportAfterOrderSafe(tenantSlug, paidAtIso)
+  const orderTotal = orderRes.grossTotal ?? 0
+  if (Math.abs(orderTotal - appliedIncl) > 0.03) {
+    return { ok: false, error: 'order_total_mismatch', orderNumber: orderRes.orderNumber }
+  }
+
+  syncZReportAfterOrderSafe(tenantSlug, paidAt.toISOString())
 
   const tabCleared = tabOpenTotalIncl(nextTabLines) <= 0.001
+  const tabUpdatePayload = tabCleared
+    ? null
+    : {
+        items: nextTabLines,
+        updated_at: paidAt.toISOString(),
+        order_type: orderCtx.orderType,
+        table_number: orderCtx.tableNumber || null,
+        floor_plan_zone: orderCtx.floorPlanZone ?? null,
+      }
+
   const dbRes = tabCleared
     ? await adminDb.delete(
         'kassa_name_tabs',
@@ -92,7 +123,7 @@ export async function registerKassaNameTabPayment(params: {
       )
     : await adminDb.update(
         'kassa_name_tabs',
-        { items: nextTabLines, updated_at: new Date().toISOString() },
+        tabUpdatePayload!,
         { id: tab.id, tenant_slug: tenantSlug },
         { tenantSlug },
       )
@@ -101,33 +132,22 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: 'tab_update_failed', orderNumber: orderRes.orderNumber }
   }
 
-  const hydrated = hydrateKassaCartItemsFromCatalog(orderLines, prods)
-  const resolveLineVat = (line: (typeof hydrated)[number]) =>
-    resolveVatPercentForCartLine(
-      line.product,
-      vatLookup,
-      btw,
-      'TAKEAWAY',
-      productCategoryById,
-      tenantCountry,
-      line.choices,
-    )
-  const vatSplit = computeInclusiveVatSplitFromCart(hydrated, resolveLineVat)
   const receipt: KassaLastOrderReceipt = {
     orderNumber: orderRes.orderNumber ?? 0,
-    items: hydrated,
-    total: Math.round(vatSplit.grossTotal * 100) / 100,
-    vatSplit: vatSplit.byRate.map((r) => ({
+    items: orderRes.hydrated ?? orderLines,
+    total: orderTotal,
+    vatSplit: orderRes.vatByRate?.map((r) => ({
       rate: r.rate,
       baseExcl: r.baseExcl,
       tax: r.tax,
     })),
-    subtotalExclVat: vatSplit.subtotalExcl,
-    totalTax: vatSplit.totalTax,
+    subtotalExclVat: orderRes.subtotalExcl,
+    totalTax: orderRes.totalTax,
     paymentMethod,
-    orderType: 'TAKEAWAY',
-    tableNumber: '',
-    createdAt: new Date(paidAtIso),
+    orderType: orderCtx.orderType,
+    tableNumber: kassaReceiptTableNumber(orderCtx.orderType, orderCtx.tableNumber),
+    floorPlanZone: orderCtx.floorPlanZone,
+    createdAt: paidAt,
     onAccountCustomerName: tab.customer_name.trim(),
   }
 

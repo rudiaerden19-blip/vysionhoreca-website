@@ -3910,6 +3910,7 @@
     "payAmount": "Amount received (incl. VAT)",
     "invalidAmount": "Invalid amount.",
     "amountTooHigh": "Amount is higher than the open balance.",
+    "amountNotAllocatable": "This amount cannot be allocated to open lines — use whole cents or pay the full balance.",
     "payFailed": "Could not register payment.",
     "tabAlreadySettled": "This tab is already paid — refreshing the list.",
     "receiptCustomer": "On account — {name}",

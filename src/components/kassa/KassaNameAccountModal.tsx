@@ -13,12 +13,21 @@ import {
 } from '@/lib/kassa-name-account'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
 import { normalizeOnAccountCustomerName as normName } from '@/lib/kassa-on-account'
-import type { KassaCartItem, KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
+import type {
+  KassaCartItem,
+  KassaLastOrderReceipt,
+  KassaPaymentMethod,
+  KassaRegisterOrderType,
+} from '@/lib/kassa-cart-types'
+import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 
 type Props = {
   tenant: string
   cart: KassaCartItem[]
   cartTotalIncl: number
+  orderType: KassaRegisterOrderType
+  tableNumber?: string
+  floorPlanZone?: FloorPlanZone
   staffId?: string | null
   onClose: () => void
   onCommitted: () => void
@@ -30,6 +39,9 @@ export default function KassaNameAccountModal({
   tenant,
   cart,
   cartTotalIncl,
+  orderType,
+  tableNumber = '',
+  floorPlanZone,
   staffId,
   onClose,
   onCommitted,
@@ -140,11 +152,14 @@ export default function KassaNameAccountModal({
     const prevItems = (existing?.items ?? []) as KassaNameTabLine[]
     const merged = mergeIntoTabLines(prevItems, cart)
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       tenant_slug: tenant,
       customer_name: displayName,
       customer_key: key,
       items: merged,
+      order_type: orderType,
+      table_number: orderType === 'DINE_IN' && tableNumber.trim() ? tableNumber.trim() : null,
+      floor_plan_zone: orderType === 'DINE_IN' && floorPlanZone ? floorPlanZone : null,
       updated_at: new Date().toISOString(),
     }
 
@@ -183,6 +198,7 @@ export default function KassaNameAccountModal({
       if (res.error === 'amount_too_high') setError(t('kassaNameAccount.amountTooHigh'))
       else if (res.error === 'invalid_amount') setError(t('kassaNameAccount.invalidAmount'))
       else if (res.error === 'tab_already_settled') setError(t('kassaNameAccount.tabAlreadySettled'))
+      else if (res.error === 'amount_not_allocatable') setError(t('kassaNameAccount.amountNotAllocatable'))
       else setError(res.error || t('kassaNameAccount.payFailed'))
       if (res.error === 'tab_already_settled') {
         setSelectedTabId(null)

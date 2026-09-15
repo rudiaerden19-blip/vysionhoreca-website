@@ -1,4 +1,5 @@
-import type { KassaCartItem } from '@/lib/kassa-cart-types'
+import type { KassaCartItem, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
+import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import { onAccountCustomerKey, normalizeOnAccountCustomerName } from '@/lib/kassa-on-account'
 
@@ -12,6 +13,30 @@ export type KassaNameTabRow = {
   customer_key: string
   items: KassaNameTabLine[]
   updated_at?: string
+  /** BTW-context van laatste mand op tab (kassa orderType bij «op rekening»). */
+  order_type?: KassaRegisterOrderType | string | null
+  table_number?: string | number | null
+  floor_plan_zone?: FloorPlanZone | string | null
+}
+
+export function resolveNameTabOrderContext(tab: KassaNameTabRow): {
+  orderType: KassaRegisterOrderType
+  tableNumber: string
+  floorPlanZone?: FloorPlanZone
+} {
+  const raw = (tab.order_type || 'DINE_IN').toString().toUpperCase()
+  const orderType: KassaRegisterOrderType =
+    raw === 'TAKEAWAY' || raw === 'DELIVERY' ? raw : 'DINE_IN'
+  const tableNumber = String(tab.table_number ?? '').trim()
+  const zoneRaw = tab.floor_plan_zone
+  const floorPlanZone =
+    zoneRaw === 'terrace' || zoneRaw === 'inside' ? (zoneRaw as FloorPlanZone) : undefined
+  return { orderType, tableNumber, floorPlanZone }
+}
+
+/** Bruto incl. BTW uit toegewezen orderregels (controle allocation ↔ order). */
+export function orderLinesGrossIncl(lines: KassaCartItem[]): number {
+  return Math.round(lines.reduce((s, l) => s + kassaCartLineTotalIncl(l), 0) * 100) / 100
 }
 
 export function kassaCartLineUnitIncl(line: KassaCartItem): number {
@@ -122,44 +147,65 @@ export function allocateNameTabPayment(
       continue
     }
 
-    const payCents = remainingCents
-    remainingCents = 0
-    const fullQty = Math.max(1, line.quantity)
-
-    if (payCents < unitCents) {
-      orderLines.push(lineWithGrossTotal(line, payCents / 100))
-      const left = unpaidCents - payCents
-      if (left > 0) {
-        nextTabLines.push({ ...line, unpaidIncl: Math.round(left) / 100 })
-      }
-      continue
-    }
-
-    const takeQty = Math.min(fullQty, Math.floor(payCents / unitCents))
-    const allocatedCents = takeQty * unitCents
-    orderLines.push(cloneCartLineForOrder(line, takeQty))
-    const leftUnpaidCents = unpaidCents - allocatedCents
-    if (leftUnpaidCents > 0) {
-      const leftQty = fullQty - takeQty
-      if (leftQty > 0) {
-        nextTabLines.push({
-          ...line,
-          quantity: leftQty,
-          unpaidIncl: Math.round(leftUnpaidCents) / 100,
-        })
-      } else {
-        nextTabLines.push({
-          ...line,
-          quantity: 1,
-          unpaidIncl: Math.round(leftUnpaidCents) / 100,
-        })
-      }
-    }
+    const spendCents = remainingCents
+    const { orderParts, nextLine, spentCents } = allocatePartialLinePayment(line, spendCents)
+    orderLines.push(...orderParts)
+    remainingCents -= spentCents
+    if (nextLine) nextTabLines.push(nextLine)
   }
 
   const appliedIncl = Math.round((paymentCents - remainingCents)) / 100
   const cleanedNext = normalizeNameTabLines(nextTabLines)
   return { orderLines, nextTabLines: cleanedNext, appliedIncl }
+}
+
+/** Deelbetaling op één tabregel — besteed exact `budgetCents` (≤ open op regel). */
+function allocatePartialLinePayment(
+  line: KassaNameTabLine,
+  budgetCents: number,
+): { orderParts: KassaCartItem[]; nextLine: KassaNameTabLine | null; spentCents: number } {
+  const unpaidCents = Math.round(effectiveLineUnpaidIncl(line) * 100)
+  if (budgetCents <= 0 || unpaidCents <= 0) {
+    return { orderParts: [], nextLine: line, spentCents: 0 }
+  }
+
+  const unitCents = Math.round(kassaCartLineUnitIncl(line) * 100)
+  if (unitCents <= 0) {
+    return { orderParts: [], nextLine: line, spentCents: 0 }
+  }
+
+  const spendCents = Math.min(budgetCents, unpaidCents)
+  const orderParts: KassaCartItem[] = []
+  let remainSpend = spendCents
+  const fullQty = Math.max(1, line.quantity)
+
+  if (remainSpend < unitCents) {
+    orderParts.push(lineWithGrossTotal(line, remainSpend / 100))
+    remainSpend = 0
+  } else {
+    const takeQty = Math.min(fullQty, Math.floor(remainSpend / unitCents))
+    if (takeQty > 0) {
+      orderParts.push(cloneCartLineForOrder(line, takeQty))
+      remainSpend -= takeQty * unitCents
+    }
+    if (remainSpend > 0) {
+      orderParts.push(lineWithGrossTotal(line, remainSpend / 100))
+      remainSpend = 0
+    }
+  }
+
+  const leftUnpaidCents = unpaidCents - spendCents
+  if (leftUnpaidCents <= 0) {
+    return { orderParts, nextLine: null, spentCents: spendCents }
+  }
+
+  const nextLine: KassaNameTabLine = {
+    ...line,
+    quantity: Math.max(1, fullQty - orderParts.reduce((s, p) => s + (p.quantity || 0), 0)),
+    unpaidIncl: Math.round(leftUnpaidCents) / 100,
+  }
+
+  return { orderParts, nextLine, spentCents: spendCents }
 }
 
 function cloneCartLineForOrder(line: KassaCartItem, quantity: number): KassaCartItem {

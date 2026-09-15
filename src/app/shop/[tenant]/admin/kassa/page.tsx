@@ -6698,6 +6698,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenant={tenant}
           cart={cart}
           cartTotalIncl={cartRoundTotalIncl}
+          orderType={orderType}
+          tableNumber={String(tableNumber ?? '')}
+          floorPlanZone={orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined}
           staffId={activeKassaStaff?.id ?? null}
           onClose={() => setShowNameAccountModal(false)}
           onCommitted={() => {

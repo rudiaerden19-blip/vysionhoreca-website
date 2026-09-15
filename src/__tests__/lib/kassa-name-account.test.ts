@@ -4,6 +4,7 @@ import {
   cartLinesToTabLines,
   kassaCartLineTotalIncl,
   mergeIntoTabLines,
+  orderLinesGrossIncl,
   tabOpenTotalIncl,
 } from '@/lib/kassa-name-account'
 
@@ -41,6 +42,15 @@ describe('kassa-name-account', () => {
     const { nextTabLines, appliedIncl } = allocateNameTabPayment(tab, 11.8)
     expect(appliedIncl).toBe(11.8)
     expect(tabOpenTotalIncl(nextTabLines)).toBe(0)
+  })
+
+  it('deelbetaling verdeelt exact betaald bedrag incl. rest centen', () => {
+    const tab = cartLinesToTabLines([line('a', 3.94, 3)])
+    tab[0].unpaidIncl = 11.8
+    const pay1 = allocateNameTabPayment(tab, 8)
+    expect(pay1.appliedIncl).toBe(8)
+    expect(orderLinesGrossIncl(pay1.orderLines)).toBe(8)
+    expect(tabOpenTotalIncl(pay1.nextTabLines)).toBe(3.8)
   })
 
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {
