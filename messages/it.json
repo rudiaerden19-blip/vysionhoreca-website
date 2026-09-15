@@ -3335,6 +3335,7 @@
     "paySectionTitle": "Pagamento di {name}",
     "pickPayer": "Scegli qualcuno con conto aperto.",
     "openListTitle": "Conti aperti",
+    "listRefreshing": "aggiornamento…",
     "addToAccountConfirm": "Aggiungere al conto di {name}?",
     "addToAccountButton": "Aggiungi in conto",
     "cartEmpty": "Aggiungi prima prodotti al carrello.",

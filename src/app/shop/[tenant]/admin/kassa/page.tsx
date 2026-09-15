@@ -207,6 +207,7 @@ import { KassaCheckoutVatModal } from '@/components/kassa/KassaCheckoutVatModal'
 import { KassaBtwBonModal } from '@/components/kassa/KassaBtwBonModal'
 import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/kassa/KassaStaffClockUi'
 import KassaNameAccountModal from '@/components/kassa/KassaNameAccountModal'
+import { prefetchKassaNameTabs } from '@/lib/kassa-name-tabs-cache'
 import { kassaCartLineTotalIncl } from '@/lib/kassa-name-account'
 import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
@@ -1747,6 +1748,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
+
+  useEffect(() => {
+    if (kassaNameAccountV2) prefetchKassaNameTabs(tenant)
+  }, [kassaNameAccountV2, tenant])
+
   /** Standaard BTW-bon. Alleen aan via tenant_settings.kassa_footer_drawer_button. */
   const kassaFooterDrawerButton = kassaShowsDrawerInsteadOfBtwBon(tenantInfo)
 
@@ -5735,6 +5741,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       disabled={!enabled}
                       aria-disabled={!enabled}
                       className={kassaQuickMenuPanelBtnClass(enabled)}
+                      onPointerDown={() => {
+                        if (!enabled) return
+                        prefetchKassaNameTabs(tenant)
+                      }}
                       onClick={() => {
                         if (!enabled) return
                         playClick()
@@ -6693,9 +6703,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onPickStaff={(s) => startStaffSales(s)}
       />
 
-      {showNameAccountModal && kassaNameAccountV2 ? (
+      {kassaNameAccountV2 ? (
         <KassaNameAccountModal
+          open={showNameAccountModal}
           tenant={tenant}
+          catalog={{ settings: tenantInfo, categories, products }}
           cart={cart}
           cartTotalIncl={cartRoundTotalIncl}
           orderType={orderType}

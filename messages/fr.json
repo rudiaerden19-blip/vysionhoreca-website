@@ -2835,6 +2835,7 @@
     "paySectionTitle": "Paiement de {name}",
     "pickPayer": "Choisissez une personne avec un compte ouvert.",
     "openListTitle": "Comptes ouverts",
+    "listRefreshing": "mise à jour…",
     "addToAccountConfirm": "Ajouter au compte de {name} ?",
     "addToAccountButton": "Ajouter au compte",
     "cartEmpty": "Ajoutez d'abord des produits au panier.",

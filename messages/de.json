@@ -2835,6 +2835,7 @@
     "paySectionTitle": "Zahlung von {name}",
     "pickPayer": "Wählen Sie jemanden mit offener Rechnung.",
     "openListTitle": "Offene Rechnungen",
+    "listRefreshing": "aktualisiert…",
     "addToAccountConfirm": "Auf Rechnung von {name} buchen?",
     "addToAccountButton": "Auf Rechnung buchen",
     "cartEmpty": "Zuerst Produkte in den Warenkorb legen.",

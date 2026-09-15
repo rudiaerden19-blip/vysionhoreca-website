@@ -3900,6 +3900,7 @@
     "paySectionTitle": "Payment for {name}",
     "pickPayer": "Select someone with an open account to pay.",
     "openListTitle": "Open accounts",
+    "listRefreshing": "updating…",
     "addToAccountConfirm": "Add to account for {name}?",
     "addToAccountButton": "Add to account",
     "cartEmpty": "Add products to the cart first.",

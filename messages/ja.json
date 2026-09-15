@@ -3335,6 +3335,7 @@
     "paySectionTitle": "{name} の支払い",
     "pickPayer": "未払いのある人を選んでください。",
     "openListTitle": "未払いアカウント",
+    "listRefreshing": "更新中…",
     "addToAccountConfirm": "{name} の掛けに追加しますか？",
     "addToAccountButton": "掛けに追加",
     "cartEmpty": "先にカートに商品を追加してください。",

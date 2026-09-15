@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
-import { adminDb } from '@/lib/admin-db-client'
 import {
   summarizeOpenNameTabs,
   tabOpenTotalIncl,
@@ -12,19 +11,33 @@ import {
 } from '@/lib/kassa-name-account'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
 import {
+  fetchKassaNameTabs,
+  getCachedKassaNameTabs,
+  invalidateKassaNameTabsCache,
+  prefetchKassaNameTabs,
+} from '@/lib/kassa-name-tabs-cache'
+import {
   nameAccountPrintLabelsFromT,
   printNameAccountPaymentReceipt,
 } from '@/lib/kassa-name-account-receipt'
-import { getMenuCategories, getTenantSettings, type MenuCategory, type TenantSettings } from '@/lib/admin-api'
+import {
+  getMenuCategories,
+  getMenuProducts,
+  getTenantSettings,
+  type MenuCategory,
+  type MenuProduct,
+  type TenantSettings,
+} from '@/lib/admin-api'
 import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
 import type { KassaLastOrderReceipt, KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 
 export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
   const { t, locale } = useLanguage()
-  const [tabs, setTabs] = useState<KassaNameTabRow[]>([])
+  const [tabs, setTabs] = useState<KassaNameTabRow[]>(() => getCachedKassaNameTabs(tenant) ?? [])
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
   const [categories, setCategories] = useState<MenuCategory[]>([])
+  const [products, setProducts] = useState<MenuProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [payAmount, setPayAmount] = useState('')
@@ -36,31 +49,31 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
   const [printError, setPrintError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    setLoading(true)
-    const [tabRes, settings, catsRaw] = await Promise.all([
-      adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
-        tenantSlug: tenant,
-        match: { tenant_slug: tenant },
-        limit: 200,
-      }),
+    const hadCache = getCachedKassaNameTabs(tenant) != null
+    if (!hadCache) setLoading(true)
+    const [tabRes, settings, catsRaw, prodsRaw] = await Promise.all([
+      fetchKassaNameTabs(tenant, { force: true }),
       getTenantSettings(tenant),
       getMenuCategories(tenant),
+      getMenuProducts(tenant),
     ])
     setTenantInfo(settings)
     setCategories(dedupeCatalogById(catsRaw.filter((c) => c.is_active)))
-    if (tabRes.ok && Array.isArray(tabRes.data)) {
-      setTabs(tabRes.data)
+    setProducts(dedupeCatalogById(prodsRaw.filter((p) => p.is_active)))
+    if (tabRes.ok) {
+      setTabs(tabRes.tabs)
       setError(null)
     } else {
-      setTabs([])
+      if (!hadCache) setTabs([])
       setError(tabRes.error || t('kassaNameAccount.loadFailed'))
     }
     setLoading(false)
   }, [tenant, t])
 
   useEffect(() => {
+    prefetchKassaNameTabs(tenant)
     void load()
-  }, [load])
+  }, [load, tenant])
 
   const openSummary = useMemo(() => summarizeOpenNameTabs(tabs), [tabs])
   const openTotal = useMemo(
@@ -87,6 +100,7 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
       tab: selected,
       amountEur: amount,
       paymentMethod: payMethod,
+      catalog: tenantInfo ? { settings: tenantInfo, categories, products } : undefined,
     })
     setSaving(false)
     if (!res.ok) {
@@ -98,6 +112,7 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
       if (res.error === 'tab_already_settled') void load()
       return
     }
+    invalidateKassaNameTabsCache(tenant)
     setSelectedId(null)
     if (res.receipt) setSuccessReceipt(res.receipt)
     void load()

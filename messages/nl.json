@@ -3900,6 +3900,7 @@
     "paySectionTitle": "Betaling van {name}",
     "pickPayer": "Kies iemand met een open rekening om te betalen.",
     "openListTitle": "Openstaande rekeningen",
+    "listRefreshing": "bijwerken…",
     "addToAccountConfirm": "Toevoegen op rekening van {name}?",
     "addToAccountButton": "Toevoegen op rekening",
     "cartEmpty": "Voeg eerst producten toe in de mand.",

@@ -12,6 +12,13 @@ import {
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
+import {
+  fetchKassaNameTabs,
+  getCachedKassaNameTabs,
+  invalidateKassaNameTabsCache,
+  prefetchKassaNameTabs,
+} from '@/lib/kassa-name-tabs-cache'
+import type { MenuCategory, MenuProduct, TenantSettings } from '@/lib/admin-api'
 import { normalizeOnAccountCustomerName as normName } from '@/lib/kassa-on-account'
 import type {
   KassaCartItem,
@@ -22,7 +29,13 @@ import type {
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 
 type Props = {
+  open: boolean
   tenant: string
+  catalog?: {
+    settings: TenantSettings | null
+    categories: MenuCategory[]
+    products: MenuProduct[]
+  }
   cart: KassaCartItem[]
   cartTotalIncl: number
   orderType: KassaRegisterOrderType
@@ -36,7 +49,9 @@ type Props = {
 }
 
 export default function KassaNameAccountModal({
+  open,
   tenant,
+  catalog,
   cart,
   cartTotalIncl,
   orderType,
@@ -49,8 +64,9 @@ export default function KassaNameAccountModal({
 }: Props) {
   const { t } = useLanguage()
   const [name, setName] = useState('')
-  const [tabs, setTabs] = useState<KassaNameTabRow[]>([])
-  const [loading, setLoading] = useState(true)
+  const [tabs, setTabs] = useState<KassaNameTabRow[]>(() => getCachedKassaNameTabs(tenant) ?? [])
+  const [loading, setLoading] = useState(() => getCachedKassaNameTabs(tenant) == null)
+  const [listRefreshing, setListRefreshing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmName, setConfirmName] = useState<string | null>(null)
@@ -71,29 +87,46 @@ export default function KassaNameAccountModal({
   }, [])
 
   useEffect(() => {
-    const id = window.setTimeout(() => focusNameInput(), 120)
-    return () => window.clearTimeout(id)
-  }, [focusNameInput])
-
-  const loadTabs = useCallback(async () => {
-    setLoading(true)
-    const res = await adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
-      tenantSlug: tenant,
-      match: { tenant_slug: tenant },
-      limit: 200,
-    })
-    setLoading(false)
-    if (!res.ok) {
-      setError(t('kassaNameAccount.loadFailed'))
-      setTabs([])
-      return
-    }
-    setTabs(Array.isArray(res.data) ? res.data : [])
-  }, [tenant, t])
+    prefetchKassaNameTabs(tenant)
+  }, [tenant])
 
   useEffect(() => {
-    void loadTabs()
-  }, [loadTabs])
+    if (!open) return
+    requestAnimationFrame(() => focusNameInput())
+  }, [open, focusNameInput])
+
+  const loadTabs = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      const hasCache = getCachedKassaNameTabs(tenant) != null
+      if (!opts?.silent && !hasCache) setLoading(true)
+      else setListRefreshing(true)
+      const res = await fetchKassaNameTabs(tenant, { force: true })
+      setLoading(false)
+      setListRefreshing(false)
+      if (!res.ok) {
+        if (!hasCache) {
+          setError(t('kassaNameAccount.loadFailed'))
+          setTabs([])
+        }
+        return
+      }
+      setTabs(res.tabs)
+      setError(null)
+    },
+    [tenant, t],
+  )
+
+  useEffect(() => {
+    if (!open) return
+    const cached = getCachedKassaNameTabs(tenant)
+    if (cached) {
+      setTabs(cached)
+      setLoading(false)
+      void loadTabs({ silent: true })
+    } else {
+      void loadTabs()
+    }
+  }, [open, tenant, loadTabs])
 
   const openList = useMemo(() => summarizeOpenNameTabs(tabs), [tabs])
 
@@ -172,9 +205,11 @@ export default function KassaNameAccountModal({
       setError(t('kassaNameAccount.saveFailed'))
       return
     }
+    invalidateKassaNameTabsCache(tenant)
     setConfirmName(null)
     onCommitted()
     onClose()
+    void fetchKassaNameTabs(tenant, { force: true })
   }
 
   const registerPayment = async () => {
@@ -192,6 +227,7 @@ export default function KassaNameAccountModal({
       amountEur: amount,
       paymentMethod: payMethod,
       staffId,
+      catalog,
     })
     setSaving(false)
     if (!res.ok) {
@@ -206,19 +242,26 @@ export default function KassaNameAccountModal({
       }
       return
     }
+    invalidateKassaNameTabsCache(tenant)
+    const paidFull = amount >= selectedOpen - 0.02
+    if (paidFull) {
+      setTabs((prev) => prev.filter((r) => r.id !== tab.id))
+    }
     setSelectedTabId(null)
     setPayAmount('')
-    await loadTabs()
     onCommitted()
     if (res.receipt && onPaymentSuccess) {
       onPaymentSuccess(res.receipt)
     }
     onClose()
+    void fetchKassaNameTabs(tenant, { force: true })
   }
 
   const cartHasItems = cart.length > 0
   const showPayPanel = selectedTab != null && selectedOpen > 0.001
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
+
+  if (!open) return null
 
   return (
     <div
@@ -273,7 +316,12 @@ export default function KassaNameAccountModal({
           </label>
 
           <div>
-            <p className="text-sm font-semibold text-gray-800">{t('kassaNameAccount.openListTitle')}</p>
+            <p className="text-sm font-semibold text-gray-800">
+              {t('kassaNameAccount.openListTitle')}
+              {listRefreshing ? (
+                <span className="ml-2 text-xs font-normal text-gray-400">{t('kassaNameAccount.listRefreshing')}</span>
+              ) : null}
+            </p>
             {loading ? (
               <p className="text-sm text-gray-500 mt-2">{t('kassaOnAccount.loading')}</p>
             ) : openList.length === 0 ? (

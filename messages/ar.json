@@ -3335,6 +3335,7 @@
     "paySectionTitle": "دفع {name}",
     "pickPayer": "اختر شخصًا له رصيد مفتوح.",
     "openListTitle": "حسابات مفتوحة",
+    "listRefreshing": "جارٍ التحديث…",
     "addToAccountConfirm": "إضافة إلى حساب {name}؟",
     "addToAccountButton": "إضافة إلى الحساب",
     "cartEmpty": "أضف منتجات إلى السلة أولاً.",

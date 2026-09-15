@@ -3,7 +3,7 @@ import {
   type KassaLastOrderReceipt,
   type KassaPaymentMethod,
 } from '@/lib/kassa-cart-types'
-import { getMenuCategories, getMenuProducts, getTenantSettings } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getTenantSettings, type MenuCategory, type MenuProduct, type TenantSettings } from '@/lib/admin-api'
 import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -31,8 +31,14 @@ export async function registerKassaNameTabPayment(params: {
   amountEur: number
   paymentMethod: KassaPaymentMethod
   staffId?: string | null
+  /** Kassa-catalogus al in geheugen — scheelt 3 netwerkcalls bij betalen. */
+  catalog?: {
+    settings: TenantSettings | null
+    categories: MenuCategory[]
+    products: MenuProduct[]
+  }
 }): Promise<{ ok: boolean; error?: string; orderNumber?: number; receipt?: KassaLastOrderReceipt }> {
-  const { tenantSlug, tab, amountEur, paymentMethod, staffId } = params
+  const { tenantSlug, tab, amountEur, paymentMethod, staffId, catalog } = params
   const selectedLines = normalizeNameTabLines((tab.items ?? []) as KassaNameTabLine[])
   const selectedOpen = tabOpenTotalIncl(selectedLines)
   const orderCtx = resolveNameTabOrderContext(tab)
@@ -62,11 +68,13 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: 'amount_not_allocatable' }
   }
 
-  const [settings, catsRaw, prodsRaw] = await Promise.all([
-    getTenantSettings(tenantSlug),
-    getMenuCategories(tenantSlug),
-    getMenuProducts(tenantSlug),
-  ])
+  const [settings, catsRaw, prodsRaw] = catalog
+    ? [catalog.settings, catalog.categories, catalog.products]
+    : await Promise.all([
+        getTenantSettings(tenantSlug),
+        getMenuCategories(tenantSlug),
+        getMenuProducts(tenantSlug),
+      ])
   const btw = normalizeCategoryVatPercent(settings?.btw_percentage ?? 6, 21)
   const tenantCountry = inferVatJurisdictionCountry(settings?.country, settings?.btw_number, btw) ?? 'BE'
   const cats = dedupeCatalogById(catsRaw.filter((c) => c.is_active))
