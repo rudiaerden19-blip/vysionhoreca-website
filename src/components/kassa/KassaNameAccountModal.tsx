@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -35,6 +35,23 @@ export default function KassaNameAccountModal({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmName, setConfirmName] = useState<string | null>(null)
+  const nameInputRef = useRef<HTMLInputElement>(null)
+
+  const focusNameInput = useCallback(() => {
+    const el = nameInputRef.current
+    if (!el) return
+    el.focus({ preventScroll: false })
+    try {
+      el.setSelectionRange(el.value.length, el.value.length)
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  useEffect(() => {
+    const id = window.setTimeout(() => focusNameInput(), 120)
+    return () => window.clearTimeout(id)
+  }, [focusNameInput])
 
   const loadTabs = useCallback(async () => {
     setLoading(true)
@@ -109,11 +126,17 @@ export default function KassaNameAccountModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-end justify-center bg-black/50 p-4 sm:items-center">
+    <div
+      className="fixed inset-0 z-[250] flex items-end justify-center bg-black/50 p-4 sm:items-center"
+      data-vysion-modal-overlay
+      onClick={onClose}
+    >
       <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl [color-scheme:light]"
+        data-vysion-light-form
         role="dialog"
         aria-labelledby="kassa-name-account-title"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-gray-100 px-5 py-4">
           <h2 id="kassa-name-account-title" className="text-lg font-bold text-gray-900">
@@ -128,14 +151,25 @@ export default function KassaNameAccountModal({
           <label className="block text-sm font-medium text-gray-700">
             {t('kassaOnAccount.name')}
             <input
+              ref={nameInputRef}
               type="text"
-              className="mt-1 w-full rounded-xl border border-gray-300 px-3 py-3 text-base"
+              inputMode="text"
+              enterKeyHint="done"
+              autoComplete="name"
+              autoCorrect="off"
+              autoCapitalize="words"
+              spellCheck={false}
+              className="vysion-light-form-field mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-base text-gray-900 placeholder:text-gray-400"
               value={name}
               onChange={(e) => {
                 setName(e.target.value)
                 setConfirmName(null)
               }}
-              autoComplete="off"
+              onFocus={focusNameInput}
+              onPointerDown={(e) => {
+                e.stopPropagation()
+                requestAnimationFrame(() => focusNameInput())
+              }}
             />
           </label>
 
