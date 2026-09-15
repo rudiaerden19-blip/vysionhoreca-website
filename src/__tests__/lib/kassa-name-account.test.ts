@@ -2,6 +2,7 @@ import type { KassaCartItem } from '@/lib/kassa-cart-types'
 import {
   allocateNameTabPayment,
   cartLinesToTabLines,
+  isNameTabContextColumnError,
   kassaCartLineTotalIncl,
   mergeIntoTabLines,
   orderLinesGrossIncl,
@@ -51,6 +52,11 @@ describe('kassa-name-account', () => {
     expect(pay1.appliedIncl).toBe(8)
     expect(orderLinesGrossIncl(pay1.orderLines)).toBe(8)
     expect(tabOpenTotalIncl(pay1.nextTabLines)).toBe(3.8)
+  })
+
+  it('herkent Supabase kolom-fout voor BTW-context fallback', () => {
+    expect(isNameTabContextColumnError('column kassa_name_tabs.order_type does not exist')).toBe(true)
+    expect(isNameTabContextColumnError('network')).toBe(false)
   })
 
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {

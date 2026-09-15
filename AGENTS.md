@@ -14,7 +14,9 @@ geen aparte `website/`-map. De enige losse app is de Print Agent onder `apps/vys
 - Dev server: `npm run dev` → http://localhost:3000
 - Lint: `npm run lint` · Types: `npx tsc --noEmit` · Tests: `npm test`
 - Vóór wijzigingen aan de kassa-flow verplicht (zie `.cursor/rules/kassa-park-to-table-sacred.mdc`):
-  `npm test -- --testPathPatterns=kassa-table-park-flow` en `npm test -- --testPathPatterns=controlled-number-input`.
+ `npm test -- --testPathPatterns=kassa-table-park-flow` en `npm test -- --testPathPatterns=controlled-number-input`.
+- Vóór wijzigingen aan **op rekening v2** (zie `.cursor/rules/kassa-name-account-v2-sacred.mdc`):
+ `npm test -- --testPathPatterns=kassa-name-account` en `npm test -- --testPathPatterns=kassa-name-tabs-cache` en `npm test -- --testPathPatterns=kassa-name-account-modal-ui`.
 
 ### Env / secrets (belangrijk, niet vanzelfsprekend)
 - De app **start prima zonder** `.env.local`; ontbrekende Supabase/Stripe/Zoho/Redis-config leidt

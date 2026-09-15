@@ -31,6 +31,10 @@ import type {
   KassaRegisterOrderType,
 } from '@/lib/kassa-cart-types'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
+import {
+  nameAccountModalSessionOnOpen,
+  nameAccountOpenListVisible,
+} from '@/lib/kassa-name-account-modal-ui'
 
 type Props = {
   open: boolean
@@ -96,11 +100,12 @@ export default function KassaNameAccountModal({
 
   useEffect(() => {
     if (!open) return
-    setName('')
-    setSelectedTabId(null)
-    setConfirmName(null)
-    setPayAmount('')
-    setError(null)
+    const fresh = nameAccountModalSessionOnOpen()
+    setName(fresh.name)
+    setSelectedTabId(fresh.selectedTabId)
+    setConfirmName(fresh.confirmName)
+    setPayAmount(fresh.payAmount)
+    setError(fresh.error)
     requestAnimationFrame(() => focusNameInput())
   }, [open, focusNameInput])
 
@@ -137,11 +142,10 @@ export default function KassaNameAccountModal({
 
   const openList = useMemo(() => summarizeOpenNameTabs(tabs), [tabs])
 
-  const nameMatches = useMemo(() => {
-    const q = nameTabCustomerKey(name)
-    if (!q) return openList
-    return openList.filter((x) => nameTabCustomerKey(x.name).includes(q))
-  }, [name, openList])
+  const visibleOpenList = useMemo(
+    () => nameAccountOpenListVisible(name, openList),
+    [name, openList],
+  )
 
   const selectedTab = useMemo(
     () => tabs.find((r) => r.id === selectedTabId) ?? null,
@@ -370,7 +374,7 @@ export default function KassaNameAccountModal({
               <p className="text-sm text-gray-500 mt-2">{t('kassaOnAccount.quickListEmpty')}</p>
             ) : (
               <ul className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-gray-200 divide-y">
-                {(name ? nameMatches : openList).map((item) => {
+                {visibleOpenList.map((item) => {
                   const active = item.id === selectedTabId
                   return (
                     <li key={item.id}>

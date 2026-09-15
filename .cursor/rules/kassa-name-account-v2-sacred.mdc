@@ -1,0 +1,68 @@
+---
+description: HEILIG — op rekening v2 (tabs op naam); nooit breken; omzet pas bij betaling
+alwaysApply: true
+---
+
+# Kassa — op rekening v2 (HEILIG)
+
+**Eigenaar:** inkomsten van de zaak. Deze flow is meerdere keren kapot gegaan door AI-wijzigingen. **Elke agent:** lees dit vóór je iets wijzigt onder:
+
+- `src/components/kassa/KassaNameAccountModal.tsx`
+- `src/lib/kassa-name-account*.ts`
+- `src/lib/kassa-name-tabs-cache.ts`
+- `src/app/shop/[tenant]/admin/op-rekening/OpRekeningV2Client.tsx`
+- kassa snelmenu `onAccount` / `showNameAccountModal` in `kassa/page.tsx`
+
+## Verplicht vóór commit
+
+```bash
+npm test -- --testPathPatterns=kassa-name-account
+npm test -- --testPathPatterns=kassa-name-tabs-cache
+npm test -- --testPathPatterns=kassa-name-account-modal-ui
+npx tsc --noEmit
+```
+
+Faalt een test → **geen** wijziging committen tot groen.
+
+## Businessregels (niet onderhandelbaar)
+
+1. **Omzet / Z** telt pas bij **betaling** op tab — open tab is geen omzet.
+2. **Volledige betaling** → tab **verwijderen** of leeg; klant verdwijnt uit openstaande lijst.
+3. **Deelbetaling** → FIFO op regels, **exact** centen; rest blijft op tab.
+4. **BTW-context** van tab = kassa-context bij parkeren; bij betaling order/bon/Z **zelfde** context.
+5. Alleen tenants met `tenant_settings.kassa_name_account_v2 = true`; **nooit** hardcoded slug.
+
+## UI-popup (kassa)
+
+- Bij **elke open** (`open === true`): formulier **reset** via `nameAccountModalSessionOnOpen()` — naam **leeg**, geen vorige klant.
+- **Lege naam** → volledige lijst **Openstaande rekeningen** (`nameAccountOpenListVisible`).
+- Klik op naam in lijst → selectie voor bijzetten of afrekenen (dan wél naam invullen).
+- Load-fout: **niet** cache-wipe als er al tabs in cache staan (lijst blijft zichtbaar).
+
+## Supabase / reads
+
+- **`kassa_name_tabs` laden:** geen smalle `select` met kolommen die niet overal gemigreerd zijn. Default = volledige rij (geen `select`-optie in cache-loader).
+- **Schrijven:** eerst payload met `order_type` / tafel; bij `isNameTabContextColumnError` → **fallback** alleen `items` + `updated_at`.
+- Migraties: `supabase/kassa_name_account_v2_migration.sql` + optioneel `kassa_name_tabs_order_context.sql`.
+
+## Verboden
+
+```typescript
+// NOOIT — kapotte lijst + Sentry 400
+adminDb.select('kassa_name_tabs', { select: 'id,customer_name,order_type,...' })
+
+// NOOIT — vorige klant blijft bij nieuwe mand
+// modal open zonder reset van name/selectedTabId
+
+// NOOIT — tenant zonder filter
+adminDb.select('kassa_name_tabs', { match: { id } }) // mist tenant_slug
+```
+
+## Multi-tenant
+
+Elke query/update/insert: **`tenant_slug`** in match of payload.
+
+## Scope
+
+- Productie-kassa op **`main`** — **geen** GKS-kassa flows kopiëren (`production-kassa-no-gks.mdc`).
+- **Geen** wijzigingen aan `apps/vysion-print-agent/`.
