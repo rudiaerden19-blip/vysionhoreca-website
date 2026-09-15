@@ -62,3 +62,17 @@ export function nameAccountOpenTotalDisplay(
   if (byTab != null && byTab > 0.001) return byTab
   return nameAccountOpenTotalForName(nameInput, openList, keyFn)
 }
+
+/** Totaal open — som van alle klanten in de lijst (zelfde bron als openstaande rekeningen). */
+export function nameAccountGrandOpenTotal(openList: readonly NameAccountOpenListItem[]): number {
+  const sum = openList.reduce((s, x) => s + x.remaining, 0)
+  return Math.round(sum * 100) / 100
+}
+
+export function formatOpenAmountForInput(eur: number): string {
+  return eur.toFixed(2).replace('.', ',')
+}
+
+export function parseOpenAmountInput(raw: string): number {
+  return parseFloat(raw.replace(',', '.').trim())
+}

@@ -32,9 +32,12 @@ import type {
 } from '@/lib/kassa-cart-types'
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import {
+  formatOpenAmountForInput,
   nameAccountModalSessionOnOpen,
   nameAccountOpenListVisible,
+  nameAccountGrandOpenTotal,
   nameAccountOpenTotalDisplay,
+  parseOpenAmountInput,
 } from '@/lib/kassa-name-account-modal-ui'
 
 type Props = {
@@ -81,6 +84,7 @@ export default function KassaNameAccountModal({
   const [confirmName, setConfirmName] = useState<string | null>(null)
   const [selectedTabId, setSelectedTabId] = useState<string | null>(null)
   const [payAmount, setPayAmount] = useState('')
+  const [payAmountEdited, setPayAmountEdited] = useState(false)
   const [payMethod, setPayMethod] = useState<KassaPaymentMethod>('CASH')
   const nameInputRef = useRef<HTMLInputElement>(null)
 
@@ -107,7 +111,7 @@ export default function KassaNameAccountModal({
     setConfirmName(fresh.confirmName)
     setPayAmount(fresh.payAmount)
     setError(fresh.error)
-    requestAnimationFrame(() => focusNameInput())
+    setPayAmountEdited(false)
   }, [open, focusNameInput])
 
   const loadTabs = useCallback(
@@ -153,18 +157,12 @@ export default function KassaNameAccountModal({
     [tabs, selectedTabId],
   )
 
-  const openTotalForName = useMemo(
+  const payerOpenTotal = useMemo(
     () => nameAccountOpenTotalDisplay(name, selectedTabId, openList),
     [name, selectedTabId, openList],
   )
 
-  useEffect(() => {
-    if (openTotalForName > 0.001) {
-      setPayAmount(openTotalForName.toFixed(2))
-    } else {
-      setPayAmount('')
-    }
-  }, [name, selectedTabId, openTotalForName])
+  const grandOpenTotal = useMemo(() => nameAccountGrandOpenTotal(openList), [openList])
 
   const resolveTabForName = (personName: string) => {
     const key = nameTabCustomerKey(personName)
@@ -174,7 +172,8 @@ export default function KassaNameAccountModal({
   const pickExisting = (personName: string, tabId: string, remaining: number) => {
     setName(personName)
     setSelectedTabId(tabId)
-    setPayAmount(remaining > 0.001 ? remaining.toFixed(2) : '')
+    setPayAmountEdited(false)
+    setPayAmount(remaining > 0.001 ? formatOpenAmountForInput(remaining) : '')
     setError(null)
     if (cart.length > 0) {
       setConfirmName(personName)
@@ -268,9 +267,12 @@ export default function KassaNameAccountModal({
       setError(t('kassaNameAccount.pickPayer'))
       return
     }
-    const rawPay =
-      payAmount.trim() || (openTotalForName > 0.001 ? openTotalForName.toFixed(2) : '')
-    const amount = parseFloat(rawPay.replace(',', '.'))
+    const rawPay = payAmountEdited
+      ? payAmount
+      : payerOpenTotal > 0.001
+        ? formatOpenAmountForInput(payerOpenTotal)
+        : payAmount
+    const amount = parseOpenAmountInput(rawPay)
     setSaving(true)
     setError(null)
     const res = await registerKassaNameTabPayment({
@@ -295,23 +297,44 @@ export default function KassaNameAccountModal({
       return
     }
     invalidateKassaNameTabsCache(tenant)
-    const paidFull = amount >= openTotalForName - 0.02
-    if (paidFull) {
-      setTabs((prev) => prev.filter((r) => r.id !== tab.id))
-    }
-    setSelectedTabId(null)
-    setPayAmount('')
+    const paidFull = amount >= payerOpenTotal - 0.02
+    const fresh = await fetchKassaNameTabs(tenant, { force: true })
+    if (fresh.ok) setTabs(fresh.tabs)
+
     onCommitted()
     if (res.receipt && onPaymentSuccess) {
       onPaymentSuccess(res.receipt)
     }
-    onClose()
-    void fetchKassaNameTabs(tenant, { force: true })
+
+    if (paidFull) {
+      setSelectedTabId(null)
+      setName('')
+      setPayAmount('')
+      setPayAmountEdited(false)
+      onClose()
+    } else {
+      setPayAmountEdited(false)
+      const stillThere = fresh.ok ? fresh.tabs.find((r) => r.id === tab.id) : null
+      if (stillThere) {
+        const left = tabOpenTotalIncl((stillThere.items ?? []) as KassaNameTabLine[])
+        setPayAmount(left > 0.001 ? formatOpenAmountForInput(left) : '')
+      } else {
+        setSelectedTabId(null)
+        setName('')
+        setPayAmount('')
+      }
+    }
   }
 
   const cartHasItems = cart.length > 0
-  const showPayPanel = !cartHasItems && openTotalForName > 0.001 && !!normName(name)
+  const showPayPanel = !cartHasItems && payerOpenTotal > 0.001 && !!normName(name)
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
+  const hasPayerSelected = payerOpenTotal > 0.001 && !!normName(name)
+  const payerPayFieldValue = payAmountEdited
+    ? payAmount
+    : payerOpenTotal > 0.001
+      ? formatOpenAmountForInput(payerOpenTotal)
+      : ''
 
   if (!open) return null
 
@@ -358,11 +381,12 @@ export default function KassaNameAccountModal({
                   const next = e.target.value
                   setName(next)
                   setConfirmName(null)
+                  setPayAmountEdited(false)
                   const row = resolveTabForName(next)
                   const tabId = row?.id ?? null
                   setSelectedTabId(tabId)
                   const total = nameAccountOpenTotalDisplay(next, tabId, openList)
-                  setPayAmount(total > 0.001 ? total.toFixed(2) : '')
+                  setPayAmount(total > 0.001 ? formatOpenAmountForInput(total) : '')
                 }}
                 onFocus={focusNameInput}
                 onPointerDown={(e) => {
@@ -375,32 +399,16 @@ export default function KassaNameAccountModal({
               {t('kassaNameAccount.openBalanceLabel')}
               <input
                 type="text"
-                inputMode="decimal"
-                enterKeyHint="done"
-                autoComplete="off"
-                readOnly={openTotalForName <= 0.001}
-                className={`vysion-light-form-field mt-1 w-full rounded-xl border px-3 py-3 text-base tabular-nums ${
-                  openTotalForName > 0.001
-                    ? 'border-red-200 bg-red-50/80 font-semibold text-red-800'
-                    : 'border-gray-200 bg-gray-50 text-gray-500'
-                }`}
-                value={
-                  payAmount ||
-                  (openTotalForName > 0.001 ? openTotalForName.toFixed(2).replace('.', ',') : '')
-                }
-                onChange={(e) => setPayAmount(e.target.value)}
-                onPointerDown={(e) => e.stopPropagation()}
-                placeholder={t('kassaNameAccount.openBalancePlaceholder')}
+                readOnly
+                tabIndex={-1}
+                className="vysion-light-form-field mt-1 w-full cursor-default rounded-xl border border-red-200 bg-red-50/80 px-3 py-3 text-base tabular-nums font-semibold text-red-800"
+                value={formatOpenAmountForInput(grandOpenTotal)}
                 aria-label={t('kassaNameAccount.openBalanceLabel')}
               />
             </label>
           </div>
 
-          {openTotalForName > 0.001 ? (
-            <p className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-950">
-              {t('kassaNameAccount.openBalanceNotice').replace('{amount}', money(openTotalForName))}
-            </p>
-          ) : null}
+          <p className="text-sm text-gray-600">{t('kassaNameAccount.openGrandTotalHint')}</p>
 
           <div>
             <p className="text-sm font-semibold text-gray-800">
@@ -436,11 +444,31 @@ export default function KassaNameAccountModal({
             )}
           </div>
 
+          {!hasPayerSelected && openList.length > 0 && !cartHasItems ? (
+            <p className="text-sm text-gray-500">{t('kassaNameAccount.openBalancePickHint')}</p>
+          ) : null}
+
           {showPayPanel ? (
             <div className="rounded-xl border border-teal-200 bg-teal-50/80 px-3 py-4 space-y-3">
               <p className="text-sm font-semibold text-teal-950">
                 {t('kassaNameAccount.paySectionTitle').replace('{name}', normName(name))}
+                {' — '}
+                <span className="tabular-nums">{money(payerOpenTotal)}</span>
               </p>
+              <label className="block text-sm font-medium text-gray-800">
+                {t('kassaNameAccount.payAmount')}
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className="vysion-light-form-field mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 tabular-nums"
+                  value={payerPayFieldValue}
+                  onChange={(e) => {
+                    setPayAmountEdited(true)
+                    setPayAmount(e.target.value)
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()}
+                />
+              </label>
               <p className="text-xs text-teal-900/90">{t('kassaNameAccount.openBalancePayHint')}</p>
               <div className="flex gap-2">
                 {(['CASH', 'CARD'] as const).map((m) => (
