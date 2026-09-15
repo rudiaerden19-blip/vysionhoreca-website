@@ -3336,6 +3336,7 @@
     "pickPayer": "اختر شخصًا له رصيد مفتوح.",
     "openListTitle": "حسابات مفتوحة",
     "openBalanceLabel": "المبلغ المفتوح",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "لا يزال {amount} مفتوحًا على هذا الاسم. غيّر المبلغ على اليمين عند دفع جزء منه.",
     "openBalancePayHint": "عدّل «المبلغ المفتوح» أعلاه إذا لم يدفع العميل كامل الرصيد.",
     "listRefreshing": "جارٍ التحديث…",

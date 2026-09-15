@@ -3901,6 +3901,7 @@
     "pickPayer": "Select someone with an open account to pay.",
     "openListTitle": "Open accounts",
     "openBalanceLabel": "Open balance",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "{amount} is still open on this name. Change the amount on the right for a partial payment.",
     "openBalancePayHint": "Edit «Open balance» above if the customer does not pay the full amount.",
     "listRefreshing": "updating…",

@@ -41,3 +41,24 @@ export function nameAccountOpenTotalForName(
   const sum = openList.filter((x) => keyFn(x.name) === key).reduce((s, x) => s + x.remaining, 0)
   return Math.round(sum * 100) / 100
 }
+
+export function nameAccountOpenRemainingForTabId(
+  tabId: string | null | undefined,
+  openList: readonly NameAccountOpenListItem[],
+): number | null {
+  if (!tabId) return null
+  const hit = openList.find((x) => x.id === tabId)
+  return hit != null ? hit.remaining : null
+}
+
+/** Zelfde bedrag als in de lijst «Openstaande rekeningen» (bron voor het veld Bedrag open). */
+export function nameAccountOpenTotalDisplay(
+  nameInput: string,
+  selectedTabId: string | null,
+  openList: readonly NameAccountOpenListItem[],
+  keyFn: (n: string) => string = nameTabCustomerKey,
+): number {
+  const byTab = nameAccountOpenRemainingForTabId(selectedTabId, openList)
+  if (byTab != null && byTab > 0.001) return byTab
+  return nameAccountOpenTotalForName(nameInput, openList, keyFn)
+}

@@ -3901,6 +3901,7 @@
     "pickPayer": "Kies iemand met een open rekening om te betalen.",
     "openListTitle": "Openstaande rekeningen",
     "openBalanceLabel": "Bedrag open",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "Er staat nog {amount} open op deze naam. Pas het bedrag rechts aan bij een (deel)betaling.",
     "openBalancePayHint": "Wijzig «Bedrag open» bovenaan als de klant niet het volledige saldo betaalt.",
     "listRefreshing": "bijwerken…",

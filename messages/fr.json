@@ -2836,6 +2836,7 @@
     "pickPayer": "Choisissez une personne avec un compte ouvert.",
     "openListTitle": "Comptes ouverts",
     "openBalanceLabel": "Montant ouvert",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "Il reste {amount} ouverts sur ce nom. Modifiez le montant à droite pour un paiement partiel.",
     "openBalancePayHint": "Modifiez « Montant ouvert » en haut si le client ne paie pas la totalité.",
     "listRefreshing": "mise à jour…",

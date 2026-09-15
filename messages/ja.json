@@ -3336,6 +3336,7 @@
     "pickPayer": "未払いのある人を選んでください。",
     "openListTitle": "未払いアカウント",
     "openBalanceLabel": "未払い額",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "この名前に {amount} の未払いがあります。一部払いの場合は右の金額を変更してください。",
     "openBalancePayHint": "全額でない場合は上の「未払い額」を編集してください。",
     "listRefreshing": "更新中…",

@@ -34,7 +34,7 @@ import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import {
   nameAccountModalSessionOnOpen,
   nameAccountOpenListVisible,
-  nameAccountOpenTotalForName,
+  nameAccountOpenTotalDisplay,
 } from '@/lib/kassa-name-account-modal-ui'
 
 type Props = {
@@ -153,12 +153,10 @@ export default function KassaNameAccountModal({
     [tabs, selectedTabId],
   )
 
-  const openTotalForName = useMemo(() => {
-    if (selectedTab) {
-      return tabOpenTotalIncl((selectedTab.items ?? []) as KassaNameTabLine[])
-    }
-    return nameAccountOpenTotalForName(name, openList)
-  }, [selectedTab, name, openList])
+  const openTotalForName = useMemo(
+    () => nameAccountOpenTotalDisplay(name, selectedTabId, openList),
+    [name, selectedTabId, openList],
+  )
 
   useEffect(() => {
     if (openTotalForName > 0.001) {
@@ -173,9 +171,10 @@ export default function KassaNameAccountModal({
     return tabs.find((r) => r.customer_key === key || nameTabCustomerKey(r.customer_name) === key) ?? null
   }
 
-  const pickExisting = (personName: string, tabId: string) => {
+  const pickExisting = (personName: string, tabId: string, remaining: number) => {
     setName(personName)
     setSelectedTabId(tabId)
+    setPayAmount(remaining > 0.001 ? remaining.toFixed(2) : '')
     setError(null)
     if (cart.length > 0) {
       setConfirmName(personName)
@@ -269,7 +268,9 @@ export default function KassaNameAccountModal({
       setError(t('kassaNameAccount.pickPayer'))
       return
     }
-    const amount = parseFloat(payAmount.replace(',', '.'))
+    const rawPay =
+      payAmount.trim() || (openTotalForName > 0.001 ? openTotalForName.toFixed(2) : '')
+    const amount = parseFloat(rawPay.replace(',', '.'))
     setSaving(true)
     setError(null)
     const res = await registerKassaNameTabPayment({
@@ -354,10 +355,14 @@ export default function KassaNameAccountModal({
                 className="vysion-light-form-field mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-base text-gray-900 placeholder:text-gray-400"
                 value={name}
                 onChange={(e) => {
-                  setName(e.target.value)
+                  const next = e.target.value
+                  setName(next)
                   setConfirmName(null)
-                  const row = resolveTabForName(e.target.value)
-                  setSelectedTabId(row?.id ?? null)
+                  const row = resolveTabForName(next)
+                  const tabId = row?.id ?? null
+                  setSelectedTabId(tabId)
+                  const total = nameAccountOpenTotalDisplay(next, tabId, openList)
+                  setPayAmount(total > 0.001 ? total.toFixed(2) : '')
                 }}
                 onFocus={focusNameInput}
                 onPointerDown={(e) => {
@@ -379,10 +384,13 @@ export default function KassaNameAccountModal({
                     ? 'border-red-200 bg-red-50/80 font-semibold text-red-800'
                     : 'border-gray-200 bg-gray-50 text-gray-500'
                 }`}
-                value={payAmount}
+                value={
+                  payAmount ||
+                  (openTotalForName > 0.001 ? openTotalForName.toFixed(2).replace('.', ',') : '')
+                }
                 onChange={(e) => setPayAmount(e.target.value)}
                 onPointerDown={(e) => e.stopPropagation()}
-                placeholder="0,00"
+                placeholder={t('kassaNameAccount.openBalancePlaceholder')}
                 aria-label={t('kassaNameAccount.openBalanceLabel')}
               />
             </label>
@@ -416,7 +424,7 @@ export default function KassaNameAccountModal({
                         className={`flex w-full items-center justify-between px-3 py-3 text-left ${
                           active ? 'bg-teal-50 ring-1 ring-inset ring-teal-200' : 'hover:bg-gray-50'
                         }`}
-                        onClick={() => pickExisting(item.name, item.id)}
+                        onClick={() => pickExisting(item.name, item.id, item.remaining)}
                       >
                         <span className="font-medium text-gray-900">{item.name}</span>
                         <span className="tabular-nums font-semibold text-red-700">{money(item.remaining)}</span>

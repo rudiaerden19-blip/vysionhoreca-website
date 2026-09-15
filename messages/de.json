@@ -2836,6 +2836,7 @@
     "pickPayer": "Wählen Sie jemanden mit offener Rechnung.",
     "openListTitle": "Offene Rechnungen",
     "openBalanceLabel": "Offener Betrag",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "Es stehen noch {amount} offen auf diesen Namen. Passen Sie den Betrag rechts bei einer Teilzahlung an.",
     "openBalancePayHint": "Ändern Sie «Offener Betrag» oben, wenn der Kunde nicht den vollen Betrag zahlt.",
     "listRefreshing": "aktualisiert…",

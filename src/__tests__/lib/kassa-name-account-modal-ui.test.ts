@@ -1,6 +1,7 @@
 import {
   nameAccountModalSessionOnOpen,
   nameAccountOpenListVisible,
+  nameAccountOpenTotalDisplay,
   nameAccountOpenTotalForName,
 } from '@/lib/kassa-name-account-modal-ui'
 
@@ -34,5 +35,10 @@ describe('kassa-name-account-modal-ui', () => {
   it('sommeert open saldo per klantnaam', () => {
     expect(nameAccountOpenTotalForName('Ronny', openList)).toBe(10.5)
     expect(nameAccountOpenTotalForName('Onbekend', openList)).toBe(0)
+  })
+
+  it('bedrag open volgt geselecteerde tab uit lijst', () => {
+    expect(nameAccountOpenTotalDisplay('', '2', openList)).toBe(8)
+    expect(nameAccountOpenTotalDisplay('Bart', '1', openList)).toBe(12)
   })
 })

@@ -3336,6 +3336,7 @@
     "pickPayer": "Elija alguien con cuenta abierta.",
     "openListTitle": "Cuentas abiertas",
     "openBalanceLabel": "Importe abierto",
+    "openBalancePlaceholder": "—",
     "openBalanceNotice": "Quedan {amount} abiertos a este nombre. Cambie el importe a la derecha si es un pago parcial.",
     "openBalancePayHint": "Edite «Importe abierto» arriba si el cliente no paga el saldo completo.",
     "listRefreshing": "actualizando…",
