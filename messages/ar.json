@@ -4578,6 +4578,11 @@
     "moveSalesDayError": "فشل النقل. حاول مرة أخرى.",
     "emailSendRetry": "فشل الإرسال. حاول مرة أخرى."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "على الحساب v2 (تبويبات عبر الكاشير)",
+    "kassaNameAccountV2Hint": "السلة → على الحساب في القائمة السريعة؛ الإيراد عند الدفع فقط. إيقاف = إدخال يدوي.",
+    "kassaNameAccountV2RequiresSub": "فعّل أيضًا « على الحساب » ضمن Kassa (أو الحزمة الكاملة)."
+  },
   "marketing": {
     "title": "التسويق عبر البريد الإلكتروني",
     "subtitle": "أرسل عروض ترويجية لعملائك",

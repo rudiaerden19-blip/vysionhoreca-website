@@ -4578,6 +4578,11 @@
     "moveSalesDayError": "Spostamento non riuscito. Riprova.",
     "emailSendRetry": "Errore durante l'invio. Riprova."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "In conto v2 (tab da cassa)",
+    "kassaNameAccountV2Hint": "Carrello → In conto nel menu rapido; vendite solo al pagamento. Off = importo manuale.",
+    "kassaNameAccountV2RequiresSub": "Attivare anche il sottomenu « In conto » sotto Kassa (o pacchetto completo)."
+  },
   "marketing": {
     "title": "Email Marketing",
     "subtitle": "Invia promozioni e offerte ai tuoi clienti",

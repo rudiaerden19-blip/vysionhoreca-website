@@ -4601,6 +4601,11 @@
     "moveSalesDayError": "Verschieben fehlgeschlagen. Bitte erneut versuchen.",
     "emailSendRetry": "Fehler beim Senden. Bitte erneut versuchen."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "Auf Rechnung v2 (Tabs über Kasse)",
+    "kassaNameAccountV2Hint": "Warenkorb → Auf Rechnung im Schnellmenü; Umsatz erst bei Zahlung. Aus = klassisches Betragsfeld.",
+    "kassaNameAccountV2RequiresSub": "Submenü «Auf Rechnung» unter Kassa aktivieren (oder Vollpaket)."
+  },
   "marketing": {
     "title": "E-Mail-Marketing",
     "subtitle": "Senden Sie Aktionen und Angebote an Ihre Kunden",

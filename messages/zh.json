@@ -4578,6 +4578,11 @@
     "moveSalesDayError": "移动失败，请重试。",
     "emailSendRetry": "发送失败，请重试。"
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "挂账 v2（经收银台）",
+    "kassaNameAccountV2Hint": "购物车 → 快捷菜单挂账；仅付款时计入销售。关 = 经典手动金额。",
+    "kassaNameAccountV2RequiresSub": "同时开启 Kassa 模块下的「挂账」子菜单（或完整套餐）。"
+  },
   "marketing": {
     "title": "电子邮件营销",
     "subtitle": "向客户发送促销和优惠",

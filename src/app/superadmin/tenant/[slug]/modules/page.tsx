@@ -61,18 +61,27 @@ export default function SuperadminTenantModulesPage() {
   const [savingArticles, setSavingArticles] = useState(false)
   const [ownerEveningClose, setOwnerEveningClose] = useState(false)
   const [savingOwnerClose, setSavingOwnerClose] = useState(false)
+  const [kassaNameAccountV2, setKassaNameAccountV2] = useState(false)
+  const [savingKassaNameAccountV2, setSavingKassaNameAccountV2] = useState(false)
 
   const loadData = useCallback(async () => {
     let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
-      .select('business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close')
+      .select(
+        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2',
+      )
       .eq('tenant_slug', slug)
       .maybeSingle()
 
-    if (settingsErr && /z_report_send_articles_to_accountant|column .* does not exist|schema cache/i.test(settingsErr.message)) {
+    if (
+      settingsErr &&
+      /z_report_send_articles_to_accountant|kassa_name_account_v2|column .* does not exist|schema cache/i.test(
+        settingsErr.message,
+      )
+    ) {
       const fallback = await supabase
         .from('tenant_settings')
-        .select('business_name')
+        .select('business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close')
         .eq('tenant_slug', slug)
         .maybeSingle()
       settings = fallback.data as typeof settings
@@ -90,6 +99,9 @@ export default function SuperadminTenantModulesPage() {
         (settings as { z_report_owner_evening_close?: unknown } | null)
           ?.z_report_owner_evening_close,
       ),
+    )
+    setKassaNameAccountV2(
+      (settings as { kassa_name_account_v2?: boolean } | null)?.kassa_name_account_v2 === true,
     )
 
     let { data: coreRow, error: coreErr } = await supabase
@@ -249,6 +261,40 @@ export default function SuperadminTenantModulesPage() {
                     }
                   })
                   .finally(() => setSavingOwnerClose(false))
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-teal-700/40 bg-teal-950/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">{t('superadminModules.kassaNameAccountV2')}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{t('superadminModules.kassaNameAccountV2Hint')}</p>
+              <p className="mt-2 text-xs text-teal-200/80">{t('superadminModules.kassaNameAccountV2RequiresSub')}</p>
+            </div>
+            <ModuleSlider
+              checked={kassaNameAccountV2}
+              disabled={savingKassaNameAccountV2}
+              onChange={(on) => {
+                setKassaNameAccountV2(on)
+                setSavingKassaNameAccountV2(true)
+                void authFetch('/api/superadmin/tenants', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    action: 'update_kassa_name_account_v2',
+                    slug,
+                    kassaNameAccountV2: on,
+                  }),
+                })
+                  .then(async (res) => {
+                    if (!res.ok) {
+                      const json = await res.json().catch(() => ({}))
+                      setKassaNameAccountV2(!on)
+                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+                    }
+                  })
+                  .finally(() => setSavingKassaNameAccountV2(false))
               }}
             />
           </div>

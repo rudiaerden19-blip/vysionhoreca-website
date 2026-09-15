@@ -3406,6 +3406,11 @@
     "moveSalesDayError": "Verplaatsen mislukt. Probeer opnieuw.",
     "emailSendRetry": "Fout bij verzenden. Probeer opnieuw."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "Op rekening v2 (tabs via kassa)",
+    "kassaNameAccountV2Hint": "Mand → Op rekening in snelmenu, namenlijst, omzet pas bij betaling. Uit = klassiek scherm (bedrag handmatig).",
+    "kassaNameAccountV2RequiresSub": "Zet ook submenu «Op rekening» aan onder module Kassa (of volledig pakket)."
+  },
   "marketing": {
     "title": "Email Marketing",
     "subtitle": "Stuur promoties en aanbiedingen naar je klanten",

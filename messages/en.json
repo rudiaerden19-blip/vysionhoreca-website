@@ -3406,6 +3406,11 @@
     "moveSalesDayError": "Move failed. Please try again.",
     "emailSendRetry": "Error sending. Please try again."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "On account v2 (tabs via till)",
+    "kassaNameAccountV2Hint": "Cart → On account in quick menu, name list, revenue only when paid. Off = classic manual amount screen.",
+    "kassaNameAccountV2RequiresSub": "Also enable submenu «On account» under Kassa module (or full package)."
+  },
   "marketing": {
     "title": "Email Marketing",
     "subtitle": "Send promotions and offers to your customers",

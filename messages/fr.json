@@ -4601,6 +4601,11 @@
     "moveSalesDayError": "Échec du déplacement. Veuillez réessayer.",
     "emailSendRetry": "Erreur lors de l'envoi. Veuillez réessayer."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "En compte v2 (tabs via caisse)",
+    "kassaNameAccountV2Hint": "Panier → En compte dans le menu rapide; CA seulement au paiement. Désactivé = saisie manuelle.",
+    "kassaNameAccountV2RequiresSub": "Activer aussi le sous-menu « En compte » sous Kassa (ou forfait complet)."
+  },
   "marketing": {
     "title": "Marketing par Email",
     "subtitle": "Envoyez des promotions et offres à vos clients",

@@ -4578,6 +4578,11 @@
     "moveSalesDayError": "移動に失敗しました。もう一度お試しください。",
     "emailSendRetry": "送信に失敗しました。もう一度お試しください。"
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "掛け v2（レジ経由タブ）",
+    "kassaNameAccountV2Hint": "カート → クイックメニューの掛け。売上は支払い時のみ。オフ = 従来の手入力。",
+    "kassaNameAccountV2RequiresSub": "Kassa モジュールの「掛け」サブメニューもオン（またはフルパッケージ）。"
+  },
   "marketing": {
     "title": "メールマーケティング",
     "subtitle": "お客様にプロモーションやオファーを送信",

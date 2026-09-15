@@ -4578,6 +4578,11 @@
     "moveSalesDayError": "Error al mover. Inténtelo de nuevo.",
     "emailSendRetry": "Error al enviar. Inténtelo de nuevo."
   },
+  "superadminModules": {
+    "kassaNameAccountV2": "A cuenta v2 (tabs vía caja)",
+    "kassaNameAccountV2Hint": "Carrito → A cuenta en menú rápido; ventas solo al pagar. Off = importe manual clásico.",
+    "kassaNameAccountV2RequiresSub": "Active también el submenú « A cuenta » en Kassa (o paquete completo)."
+  },
   "marketing": {
     "title": "Marketing por Email",
     "subtitle": "Envía promociones y ofertas a tus clientes",
