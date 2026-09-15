@@ -243,3 +243,33 @@ export function summarizeOpenNameTabs(rows: KassaNameTabRow[]): { name: string; 
 export function nameTabCustomerKey(name: string): string {
   return onAccountCustomerKey(name)
 }
+
+/** Supabase zonder order_type-kolommen (oude migratie) — fallback op items-only. */
+export function isNameTabContextColumnError(error?: string | null): boolean {
+  if (!error) return false
+  return /order_type|floor_plan_zone|table_number|column .* does not exist|schema cache/i.test(error)
+}
+
+export function nameTabItemsOnlyPayload(items: KassaNameTabLine[], updatedAt: string): Record<string, unknown> {
+  return { items, updated_at: updatedAt }
+}
+
+export function nameTabFullSavePayload(
+  items: KassaNameTabLine[],
+  ctx: ReturnType<typeof resolveNameTabOrderContext>,
+  updatedAt: string,
+  displayName: string,
+  key: string,
+  tenant: string,
+): Record<string, unknown> {
+  return {
+    tenant_slug: tenant,
+    customer_name: displayName,
+    customer_key: key,
+    items,
+    order_type: ctx.orderType,
+    table_number: ctx.orderType === 'DINE_IN' && ctx.tableNumber ? ctx.tableNumber : null,
+    floor_plan_zone: ctx.orderType === 'DINE_IN' && ctx.floorPlanZone ? ctx.floorPlanZone : null,
+    updated_at: updatedAt,
+  }
+}

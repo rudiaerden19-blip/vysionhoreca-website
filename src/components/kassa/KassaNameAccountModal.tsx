@@ -4,8 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { adminDb } from '@/lib/admin-db-client'
 import {
+  isNameTabContextColumnError,
   mergeIntoTabLines,
   nameTabCustomerKey,
+  nameTabFullSavePayload,
+  nameTabItemsOnlyPayload,
+  resolveNameTabOrderContext,
   summarizeOpenNameTabs,
   tabOpenTotalIncl,
   type KassaNameTabLine,
@@ -104,10 +108,8 @@ export default function KassaNameAccountModal({
       setLoading(false)
       setListRefreshing(false)
       if (!res.ok) {
-        if (!hasCache) {
-          setError(t('kassaNameAccount.loadFailed'))
-          setTabs([])
-        }
+        setError(t('kassaNameAccount.loadFailed'))
+        if (!hasCache) setTabs([])
         return
       }
       setTabs(res.tabs)
@@ -185,20 +187,55 @@ export default function KassaNameAccountModal({
     const prevItems = (existing?.items ?? []) as KassaNameTabLine[]
     const merged = mergeIntoTabLines(prevItems, cart)
 
-    const payload: Record<string, unknown> = {
+    const updatedAt = new Date().toISOString()
+    const ctx = resolveNameTabOrderContext({
+      id: existing?.id ?? '',
       tenant_slug: tenant,
       customer_name: displayName,
       customer_key: key,
       items: merged,
       order_type: orderType,
-      table_number: orderType === 'DINE_IN' && tableNumber.trim() ? tableNumber.trim() : null,
-      floor_plan_zone: orderType === 'DINE_IN' && floorPlanZone ? floorPlanZone : null,
-      updated_at: new Date().toISOString(),
+      table_number: tableNumber.trim() || null,
+      floor_plan_zone: floorPlanZone ?? null,
+    })
+    const fullPayload = nameTabFullSavePayload(merged, ctx, updatedAt, displayName, key, tenant)
+    const itemsOnly = nameTabItemsOnlyPayload(merged, updatedAt)
+
+    const writeTab = async () => {
+      if (existing?.id) {
+        let res = await adminDb.update(
+          'kassa_name_tabs',
+          fullPayload,
+          { id: existing.id, tenant_slug: tenant },
+          { tenantSlug: tenant },
+        )
+        if (!res.ok && isNameTabContextColumnError(res.error)) {
+          res = await adminDb.update(
+            'kassa_name_tabs',
+            itemsOnly,
+            { id: existing.id, tenant_slug: tenant },
+            { tenantSlug: tenant },
+          )
+        }
+        return res
+      }
+      let res = await adminDb.insert('kassa_name_tabs', fullPayload, { tenantSlug: tenant })
+      if (!res.ok && isNameTabContextColumnError(res.error)) {
+        res = await adminDb.insert(
+          'kassa_name_tabs',
+          {
+            tenant_slug: tenant,
+            customer_name: displayName,
+            customer_key: key,
+            ...itemsOnly,
+          },
+          { tenantSlug: tenant },
+        )
+      }
+      return res
     }
 
-    const res = existing?.id
-      ? await adminDb.update('kassa_name_tabs', payload, { id: existing.id, tenant_slug: tenant }, { tenantSlug: tenant })
-      : await adminDb.insert('kassa_name_tabs', payload, { tenantSlug: tenant })
+    const res = await writeTab()
 
     setSaving(false)
     if (!res.ok) {

@@ -10,6 +10,8 @@ import {
   allocateNameTabPayment,
   normalizeNameTabLines,
   orderLinesGrossIncl,
+  isNameTabContextColumnError,
+  nameTabItemsOnlyPayload,
   resolveNameTabOrderContext,
   tabOpenTotalIncl,
   type KassaNameTabLine,
@@ -113,28 +115,37 @@ export async function registerKassaNameTabPayment(params: {
   syncZReportAfterOrderSafe(tenantSlug, paidAt.toISOString())
 
   const tabCleared = tabOpenTotalIncl(nextTabLines) <= 0.001
-  const tabUpdatePayload = tabCleared
-    ? null
-    : {
-        items: nextTabLines,
-        updated_at: paidAt.toISOString(),
-        order_type: orderCtx.orderType,
-        table_number: orderCtx.tableNumber || null,
-        floor_plan_zone: orderCtx.floorPlanZone ?? null,
-      }
-
   const dbRes = tabCleared
     ? await adminDb.delete(
         'kassa_name_tabs',
         { id: tab.id, tenant_slug: tenantSlug },
         { tenantSlug },
       )
-    : await adminDb.update(
-        'kassa_name_tabs',
-        tabUpdatePayload!,
-        { id: tab.id, tenant_slug: tenantSlug },
-        { tenantSlug },
-      )
+    : await (async () => {
+        const updatedAt = paidAt.toISOString()
+        const fullPayload = {
+          items: nextTabLines,
+          updated_at: updatedAt,
+          order_type: orderCtx.orderType,
+          table_number: orderCtx.tableNumber || null,
+          floor_plan_zone: orderCtx.floorPlanZone ?? null,
+        }
+        let res = await adminDb.update(
+          'kassa_name_tabs',
+          fullPayload,
+          { id: tab.id, tenant_slug: tenantSlug },
+          { tenantSlug },
+        )
+        if (!res.ok && isNameTabContextColumnError(res.error)) {
+          res = await adminDb.update(
+            'kassa_name_tabs',
+            nameTabItemsOnlyPayload(nextTabLines, updatedAt),
+            { id: tab.id, tenant_slug: tenantSlug },
+            { tenantSlug },
+          )
+        }
+        return res
+      })()
 
   if (!dbRes.ok) {
     return { ok: false, error: 'tab_update_failed', orderNumber: orderRes.orderNumber }

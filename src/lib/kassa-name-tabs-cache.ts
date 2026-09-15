@@ -25,6 +25,28 @@ export function invalidateKassaNameTabsCache(tenant: string): void {
   byTenant.delete(tenant)
 }
 
+async function loadTabsFromDb(tenant: string): Promise<KassaNameTabRow[]> {
+  const res = await adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
+    tenantSlug: tenant,
+    match: { tenant_slug: tenant },
+    limit: 200,
+  })
+  if (!res.ok) {
+    throw new Error(res.error || 'load_failed')
+  }
+  return Array.isArray(res.data) ? res.data : []
+}
+
+function failResult(
+  cached: CacheEntry | undefined,
+  msg: string,
+): { ok: boolean; tabs: KassaNameTabRow[]; fromCache: boolean; error?: string } {
+  if (cached) {
+    return { ok: true, tabs: cached.tabs, fromCache: true, error: msg }
+  }
+  return { ok: false, tabs: [], fromCache: false, error: msg }
+}
+
 /** Laad tabs; hergebruik cache + dedupe parallelle requests. */
 export async function fetchKassaNameTabs(
   tenant: string,
@@ -38,24 +60,19 @@ export async function fetchKassaNameTabs(
 
   const pending = inflight.get(tenant)
   if (pending) {
-    const tabs = await pending
-    return { ok: true, tabs, fromCache: false }
+    try {
+      const tabs = await pending
+      return { ok: true, tabs, fromCache: false }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return failResult(cached, msg)
+    }
   }
 
-  const promise = (async () => {
-    const res = await adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
-      tenantSlug: tenant,
-      match: { tenant_slug: tenant },
-      select: 'id,tenant_slug,customer_name,customer_key,items,order_type,table_number,floor_plan_zone,updated_at',
-      limit: 200,
-    })
-    if (!res.ok) {
-      throw new Error(res.error || 'load_failed')
-    }
-    const tabs = Array.isArray(res.data) ? res.data : []
+  const promise = loadTabsFromDb(tenant).then((tabs) => {
     setCachedKassaNameTabs(tenant, tabs)
     return tabs
-  })()
+  })
 
   inflight.set(tenant, promise)
   try {
@@ -63,15 +80,14 @@ export async function fetchKassaNameTabs(
     return { ok: true, tabs, fromCache: false }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
-    if (cached) {
-      return { ok: true, tabs: cached.tabs, fromCache: true, error: msg }
-    }
-    return { ok: false, tabs: [], fromCache: false, error: msg }
+    return failResult(cached, msg)
   } finally {
     inflight.delete(tenant)
   }
 }
 
 export function prefetchKassaNameTabs(tenant: string): void {
-  void fetchKassaNameTabs(tenant)
+  void fetchKassaNameTabs(tenant).catch(() => {
+    /* UI toont fout via expliciete load */
+  })
 }
