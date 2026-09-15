@@ -96,6 +96,11 @@ export default function KassaNameAccountModal({
 
   useEffect(() => {
     if (!open) return
+    setName('')
+    setSelectedTabId(null)
+    setConfirmName(null)
+    setPayAmount('')
+    setError(null)
     requestAnimationFrame(() => focusNameInput())
   }, [open, focusNameInput])
 
