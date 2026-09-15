@@ -1,6 +1,7 @@
 import {
   nameAccountModalSessionOnOpen,
   nameAccountOpenListVisible,
+  nameAccountOpenTotalForName,
 } from '@/lib/kassa-name-account-modal-ui'
 
 const openList = [
@@ -28,5 +29,10 @@ describe('kassa-name-account-modal-ui', () => {
   it('ingetypte naam filtert lijst', () => {
     const filtered = nameAccountOpenListVisible('ron', openList)
     expect(filtered.map((x) => x.name)).toEqual(['Ronny'])
+  })
+
+  it('sommeert open saldo per klantnaam', () => {
+    expect(nameAccountOpenTotalForName('Ronny', openList)).toBe(10.5)
+    expect(nameAccountOpenTotalForName('Onbekend', openList)).toBe(0)
   })
 })

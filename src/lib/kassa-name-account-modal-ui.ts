@@ -29,3 +29,15 @@ export function nameAccountOpenListVisible(
   if (!q) return [...openList]
   return openList.filter((x) => keyFn(x.name).includes(q))
 }
+
+/** Som openstaand saldo voor alle tabs met dezelfde klantnaam (normalised key). */
+export function nameAccountOpenTotalForName(
+  nameInput: string,
+  openList: readonly NameAccountOpenListItem[],
+  keyFn: (n: string) => string = nameTabCustomerKey,
+): number {
+  const key = keyFn(nameInput)
+  if (!key) return 0
+  const sum = openList.filter((x) => keyFn(x.name) === key).reduce((s, x) => s + x.remaining, 0)
+  return Math.round(sum * 100) / 100
+}

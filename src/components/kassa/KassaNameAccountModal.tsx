@@ -34,6 +34,7 @@ import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import {
   nameAccountModalSessionOnOpen,
   nameAccountOpenListVisible,
+  nameAccountOpenTotalForName,
 } from '@/lib/kassa-name-account-modal-ui'
 
 type Props = {
@@ -152,16 +153,20 @@ export default function KassaNameAccountModal({
     [tabs, selectedTabId],
   )
 
-  const selectedOpen = useMemo(() => {
-    if (!selectedTab) return 0
-    return tabOpenTotalIncl((selectedTab.items ?? []) as KassaNameTabLine[])
-  }, [selectedTab])
+  const openTotalForName = useMemo(() => {
+    if (selectedTab) {
+      return tabOpenTotalIncl((selectedTab.items ?? []) as KassaNameTabLine[])
+    }
+    return nameAccountOpenTotalForName(name, openList)
+  }, [selectedTab, name, openList])
 
   useEffect(() => {
-    if (selectedTab && selectedOpen > 0) {
-      setPayAmount(selectedOpen.toFixed(2))
+    if (openTotalForName > 0.001) {
+      setPayAmount(openTotalForName.toFixed(2))
+    } else {
+      setPayAmount('')
     }
-  }, [selectedTab, selectedOpen])
+  }, [name, selectedTabId, openTotalForName])
 
   const resolveTabForName = (personName: string) => {
     const key = nameTabCustomerKey(personName)
@@ -289,7 +294,7 @@ export default function KassaNameAccountModal({
       return
     }
     invalidateKassaNameTabsCache(tenant)
-    const paidFull = amount >= selectedOpen - 0.02
+    const paidFull = amount >= openTotalForName - 0.02
     if (paidFull) {
       setTabs((prev) => prev.filter((r) => r.id !== tab.id))
     }
@@ -304,7 +309,7 @@ export default function KassaNameAccountModal({
   }
 
   const cartHasItems = cart.length > 0
-  const showPayPanel = selectedTab != null && selectedOpen > 0.001
+  const showPayPanel = !cartHasItems && openTotalForName > 0.001 && !!normName(name)
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
   if (!open) return null
@@ -334,32 +339,60 @@ export default function KassaNameAccountModal({
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          <label className="block text-sm font-medium text-gray-700">
-            {t('kassaOnAccount.name')}
-            <input
-              ref={nameInputRef}
-              type="text"
-              inputMode="text"
-              enterKeyHint="done"
-              autoComplete="name"
-              autoCorrect="off"
-              autoCapitalize="words"
-              spellCheck={false}
-              className="vysion-light-form-field mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-base text-gray-900 placeholder:text-gray-400"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-                setConfirmName(null)
-                const row = resolveTabForName(e.target.value)
-                setSelectedTabId(row?.id ?? null)
-              }}
-              onFocus={focusNameInput}
-              onPointerDown={(e) => {
-                e.stopPropagation()
-                requestAnimationFrame(() => focusNameInput())
-              }}
-            />
-          </label>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="block min-w-[12rem] flex-1 text-sm font-medium text-gray-700">
+              {t('kassaOnAccount.name')}
+              <input
+                ref={nameInputRef}
+                type="text"
+                inputMode="text"
+                enterKeyHint="done"
+                autoComplete="name"
+                autoCorrect="off"
+                autoCapitalize="words"
+                spellCheck={false}
+                className="vysion-light-form-field mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-base text-gray-900 placeholder:text-gray-400"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value)
+                  setConfirmName(null)
+                  const row = resolveTabForName(e.target.value)
+                  setSelectedTabId(row?.id ?? null)
+                }}
+                onFocus={focusNameInput}
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  requestAnimationFrame(() => focusNameInput())
+                }}
+              />
+            </label>
+            <label className="block w-32 shrink-0 text-sm font-medium text-gray-700 sm:w-36">
+              {t('kassaNameAccount.openBalanceLabel')}
+              <input
+                type="text"
+                inputMode="decimal"
+                enterKeyHint="done"
+                autoComplete="off"
+                readOnly={openTotalForName <= 0.001}
+                className={`vysion-light-form-field mt-1 w-full rounded-xl border px-3 py-3 text-base tabular-nums ${
+                  openTotalForName > 0.001
+                    ? 'border-red-200 bg-red-50/80 font-semibold text-red-800'
+                    : 'border-gray-200 bg-gray-50 text-gray-500'
+                }`}
+                value={payAmount}
+                onChange={(e) => setPayAmount(e.target.value)}
+                onPointerDown={(e) => e.stopPropagation()}
+                placeholder="0,00"
+                aria-label={t('kassaNameAccount.openBalanceLabel')}
+              />
+            </label>
+          </div>
+
+          {openTotalForName > 0.001 ? (
+            <p className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm text-amber-950">
+              {t('kassaNameAccount.openBalanceNotice').replace('{amount}', money(openTotalForName))}
+            </p>
+          ) : null}
 
           <div>
             <p className="text-sm font-semibold text-gray-800">
@@ -398,21 +431,9 @@ export default function KassaNameAccountModal({
           {showPayPanel ? (
             <div className="rounded-xl border border-teal-200 bg-teal-50/80 px-3 py-4 space-y-3">
               <p className="text-sm font-semibold text-teal-950">
-                {t('kassaNameAccount.paySectionTitle').replace('{name}', selectedTab!.customer_name)}
-                {' — '}
-                <span className="tabular-nums">{money(selectedOpen)}</span>
+                {t('kassaNameAccount.paySectionTitle').replace('{name}', normName(name))}
               </p>
-              <label className="block text-sm font-medium text-gray-800">
-                {t('kassaNameAccount.payAmount')}
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  className="vysion-light-form-field mt-1 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-base text-gray-900"
-                  value={payAmount}
-                  onChange={(e) => setPayAmount(e.target.value)}
-                  onPointerDown={(e) => e.stopPropagation()}
-                />
-              </label>
+              <p className="text-xs text-teal-900/90">{t('kassaNameAccount.openBalancePayHint')}</p>
               <div className="flex gap-2">
                 {(['CASH', 'CARD'] as const).map((m) => (
                   <button
