@@ -4796,16 +4796,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           href: `${baseUrl}/online-status`,
           submenuId: 'sm_online_status',
         },
-        ...(kassaNameAccountV2
-          ? [
-              {
-                key: 'onAccount' as const,
-                labelKey: 'kassaOnAccount.title' as const,
-                kind: 'onAccount' as const,
-                submenuId: 'sm_kassa_op_rekening' as const,
-              },
-            ]
-          : []),
+        {
+          key: 'onAccount',
+          labelKey: 'kassaOnAccount.title',
+          kind: (kassaNameAccountV2 ? 'onAccount' : 'nav') as 'nav' | 'clock' | 'onAccount',
+          href: kassaNameAccountV2 ? undefined : `${baseUrl}/op-rekening`,
+          submenuId: 'sm_kassa_op_rekening',
+        },
         {
           key: 'shopProfile',
           labelKey: 'kassaApp.quickMenuShopProfile',
@@ -5718,6 +5715,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               {kassaQuickMenuActions.map((action) => {
                 const enabled = isKassaQuickMenuActionEnabled(action)
+                if (!enabled) return null
                 const label = t(action.labelKey)
                 if (action.kind === 'clock') {
                   return (
@@ -5741,15 +5739,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <button
                       key={action.key}
                       type="button"
-                      disabled={!enabled}
-                      aria-disabled={!enabled}
-                      className={kassaQuickMenuPanelBtnClass(enabled)}
-                      onPointerDown={() => {
-                        if (!enabled) return
-                        prefetchKassaNameTabs(tenant)
-                      }}
+                      className={kassaQuickMenuPanelBtnClass(true)}
+                      onPointerDown={() => prefetchKassaNameTabs(tenant)}
                       onClick={() => {
-                        if (!enabled) return
                         playClick()
                         setShowNameAccountModal(true)
                       }}
@@ -5758,19 +5750,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     </button>
                   )
                 }
-                if (!enabled || !action.href) {
-                  return (
-                    <button
-                      key={action.key}
-                      type="button"
-                      disabled
-                      aria-disabled
-                      className={kassaQuickMenuPanelBtnClass(false)}
-                    >
-                      {label}
-                    </button>
-                  )
-                }
+                if (!action.href) return null
                 return (
                   <Link
                     key={action.key}

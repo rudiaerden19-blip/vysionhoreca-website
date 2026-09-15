@@ -270,10 +270,10 @@ export function isTenantSubmenuEffectiveOn(
     if (enabledJson.sm_retail_kassa_producten === true) return true
     if (enabledJson['retail-kassa'] === true) return true
   }
-  /** Nieuwe openstaande rekeningen: bestaande tenants hebben de key nog niet. */
+  /** Op rekening: alleen expliciet aan via admin-slider (geen default voor alle kassa-zaken). */
   if (subId === 'sm_kassa_op_rekening') {
-    if (enabledJson.sm_kassa_op_rekening === false) return false
-    return parentModuleOn
+    if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return false
+    return enabledJson.sm_kassa_op_rekening === true
   }
   return false
 }

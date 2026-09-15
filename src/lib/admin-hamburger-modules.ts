@@ -785,8 +785,7 @@ export function isAdminSubmenuEnabled(
       return true
     }
     if (subId === 'sm_kassa_op_rekening') {
-      if (enabledJson.sm_kassa_op_rekening === false) return false
-      return isHorecaKassaPosScreenEnabled(moduleAccess)
+      return enabledJson.sm_kassa_op_rekening === true
     }
     return false
   }
@@ -942,8 +941,7 @@ export function filterHamburgerModulesForAccess(
             return true
           }
           if (item.id === 'sm_kassa_op_rekening') {
-            if (enabledModulesJson.sm_kassa_op_rekening === false) return false
-            return isHorecaKassaPosScreenEnabled(effectiveAccess)
+            return enabledModulesJson.sm_kassa_op_rekening === true
           }
           return false
         }
