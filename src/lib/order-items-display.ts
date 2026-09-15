@@ -84,3 +84,13 @@ export function orderItemLineTotalEur(item: unknown): number {
   const unit = Number(o.unit_price ?? o.price ?? 0)
   return (unit + optFlat) * q
 }
+
+/** Stripe Checkout: bedrag per stuk in EUR (regeltotaal ÷ aantal, incl. opties/maat). */
+export function orderItemStripeUnitAmountEur(item: unknown): number {
+  const q = Number((item as Record<string, unknown>)?.quantity) || 1
+  const safeQ = q > 0 ? q : 1
+  const lineEur = orderItemLineTotalEur(item)
+  if (lineEur > 0) return lineEur / safeQ
+  const o = item as Record<string, unknown>
+  return Number(o.price ?? o.unit_price ?? 0) || 0
+}

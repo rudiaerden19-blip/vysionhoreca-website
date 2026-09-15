@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
+import { orderItemStripeUnitAmountEur } from '@/lib/order-items-display'
 
 // Stripe Checkout sessions verlopen automatisch na 24h.
 // Hergebruik wordt gestopt iets eerder (23h) zodat de klant nooit op een
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
             product_data: {
               name: item.name || 'Product',
             },
-            unit_amount: Math.round((item.price || 0) * 100),
+            unit_amount: Math.round(orderItemStripeUnitAmountEur(item) * 100),
           },
           quantity: item.quantity || 1,
         }))
