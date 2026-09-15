@@ -5,25 +5,14 @@ import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import { adminDb } from '@/lib/admin-db-client'
 import {
-  allocateNameTabPayment,
   summarizeOpenNameTabs,
   tabOpenTotalIncl,
   type KassaNameTabLine,
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
-import { insertKassaOrderForNameAccountPayment } from '@/lib/kassa-name-account-order'
-import {
-  getMenuCategories,
-  getMenuProducts,
-  getTenantSettings,
-} from '@/lib/admin-api'
-import {
-  buildCategoryVatLookupForJurisdiction,
-  buildProductCategoryLookup,
-} from '@/lib/order-vat'
+import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
+import { getTenantSettings } from '@/lib/admin-api'
 import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
-import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
-import { inferVatJurisdictionCountry, normalizeCategoryVatPercent } from '@/lib/order-vat'
 
 export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
   const { t } = useLanguage()
@@ -34,22 +23,14 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
   const [payMethod, setPayMethod] = useState<KassaPaymentMethod>('CASH')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [tenantCountry, setTenantCountry] = useState('BE')
-  const [tenantDefaultBtw, setTenantDefaultBtw] = useState(21 as number)
-
   const load = useCallback(async () => {
     setLoading(true)
-    const [tabRes, settings] = await Promise.all([
-      adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
-        tenantSlug: tenant,
-        match: { tenant_slug: tenant },
-        limit: 200,
-      }),
-      getTenantSettings(tenant),
-    ])
-    const btw = normalizeCategoryVatPercent(settings?.btw_percentage ?? 6, 21)
-    setTenantDefaultBtw(btw)
-    setTenantCountry(inferVatJurisdictionCountry(settings?.country, settings?.btw_number, btw) ?? 'BE')
+    const tabRes = await adminDb.select<KassaNameTabRow[]>('kassa_name_tabs', {
+      tenantSlug: tenant,
+      match: { tenant_slug: tenant },
+      limit: 200,
+    })
+    await getTenantSettings(tenant)
     if (tabRes.ok && Array.isArray(tabRes.data)) {
       setTabs(tabRes.data)
       setError(null)
@@ -81,64 +62,21 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
   const registerPayment = async () => {
     if (!selected) return
     const amount = parseFloat(payAmount.replace(',', '.'))
-    if (!Number.isFinite(amount) || amount <= 0) {
-      setError(t('kassaNameAccount.invalidAmount'))
-      return
-    }
-    if (amount > selectedOpen + 0.02) {
-      setError(t('kassaNameAccount.amountTooHigh'))
-      return
-    }
     setSaving(true)
     setError(null)
-
-    const { orderLines, nextTabLines, appliedIncl } = allocateNameTabPayment(selectedLines, amount)
-    if (appliedIncl <= 0 || !orderLines.length) {
-      setSaving(false)
-      setError(t('kassaNameAccount.invalidAmount'))
-      return
-    }
-
-    const [catsRaw, prodsRaw] = await Promise.all([
-      getMenuCategories(tenant),
-      getMenuProducts(tenant),
-    ])
-    const cats = dedupeCatalogById(catsRaw.filter((c) => c.is_active))
-    const prods = dedupeCatalogById(prodsRaw.filter((p) => p.is_active))
-    const vatLookup = buildCategoryVatLookupForJurisdiction(cats, tenantCountry)
-    const productCategoryById = buildProductCategoryLookup(prods)
-
-    const orderRes = await insertKassaOrderForNameAccountPayment({
+    const res = await registerKassaNameTabPayment({
       tenantSlug: tenant,
-      customerName: selected.customer_name,
-      lines: orderLines,
+      tab: selected,
+      amountEur: amount,
       paymentMethod: payMethod,
-      orderType: 'TAKEAWAY',
-      products: prods,
-      categoryVatLookup: vatLookup,
-      productCategoryById,
-      tenantDefaultBtw,
-      tenantCountry,
     })
-
-    if (!orderRes.ok) {
-      setSaving(false)
-      setError(orderRes.error || t('kassaNameAccount.payFailed'))
+    setSaving(false)
+    if (!res.ok) {
+      if (res.error === 'amount_too_high') setError(t('kassaNameAccount.amountTooHigh'))
+      else if (res.error === 'invalid_amount') setError(t('kassaNameAccount.invalidAmount'))
+      else setError(res.error || t('kassaNameAccount.payFailed'))
       return
     }
-
-    if (tabOpenTotalIncl(nextTabLines) <= 0.001) {
-      await adminDb.delete('kassa_name_tabs', { id: selected.id, tenant_slug: tenant })
-    } else {
-      await adminDb.update(
-        'kassa_name_tabs',
-        { items: nextTabLines, updated_at: new Date().toISOString() },
-        { id: selected.id, tenant_slug: tenant },
-        { tenantSlug: tenant },
-      )
-    }
-
-    setSaving(false)
     setSelectedId(null)
     void load()
   }

@@ -5728,11 +5728,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <button
                       key={action.key}
                       type="button"
-                      disabled={!enabled || cart.length === 0}
-                      aria-disabled={!enabled || cart.length === 0}
-                      className={kassaQuickMenuPanelBtnClass(enabled && cart.length > 0)}
+                      disabled={!enabled}
+                      aria-disabled={!enabled}
+                      className={kassaQuickMenuPanelBtnClass(enabled)}
                       onClick={() => {
-                        if (!enabled || cart.length === 0) return
+                        if (!enabled) return
                         playClick()
                         setShowNameAccountModal(true)
                       }}
@@ -6694,6 +6694,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenant={tenant}
           cart={cart}
           cartTotalIncl={cartRoundTotalIncl}
+          staffId={activeKassaStaff?.id ?? null}
           onClose={() => setShowNameAccountModal(false)}
           onCommitted={() => {
             setCart([])
