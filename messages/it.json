@@ -3346,6 +3346,7 @@
     "invalidAmount": "Importo non valido.",
     "amountTooHigh": "Importo superiore al saldo aperto.",
     "payFailed": "Impossibile registrare il pagamento.",
+    "tabAlreadySettled": "Questo conto è già saldato — aggiornamento elenco.",
     "registerPayment": "Registra pagamento"
   },
   "kassaApp": {

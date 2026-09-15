@@ -3911,6 +3911,7 @@
     "invalidAmount": "Invalid amount.",
     "amountTooHigh": "Amount is higher than the open balance.",
     "payFailed": "Could not register payment.",
+    "tabAlreadySettled": "This tab is already paid — refreshing the list.",
     "registerPayment": "Register payment"
   },
   "kassaApp": {

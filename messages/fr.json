@@ -2846,6 +2846,7 @@
     "invalidAmount": "Montant invalide.",
     "amountTooHigh": "Montant supérieur au solde ouvert.",
     "payFailed": "Impossible d'enregistrer le paiement.",
+    "tabAlreadySettled": "Cette note est déjà payée — actualisation de la liste.",
     "registerPayment": "Enregistrer le paiement"
   },
   "kassaApp": {

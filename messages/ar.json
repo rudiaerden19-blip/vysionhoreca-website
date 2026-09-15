@@ -3346,6 +3346,7 @@
     "invalidAmount": "مبلغ غير صالح.",
     "amountTooHigh": "المبلغ أعلى من الرصيد المفتوح.",
     "payFailed": "تعذّر تسجيل الدفع.",
+    "tabAlreadySettled": "تم سداد هذا الحساب — جارٍ تحديث القائمة.",
     "registerPayment": "تسجيل الدفع"
   },
   "kassaApp": {

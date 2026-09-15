@@ -4,6 +4,7 @@ import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
 import { adminDb } from '@/lib/admin-db-client'
 import {
   allocateNameTabPayment,
+  normalizeNameTabLines,
   tabOpenTotalIncl,
   type KassaNameTabLine,
   type KassaNameTabRow,
@@ -25,17 +26,22 @@ export async function registerKassaNameTabPayment(params: {
   staffId?: string | null
 }): Promise<{ ok: boolean; error?: string; orderNumber?: number }> {
   const { tenantSlug, tab, amountEur, paymentMethod, staffId } = params
-  const selectedLines = (tab.items ?? []) as KassaNameTabLine[]
+  const selectedLines = normalizeNameTabLines((tab.items ?? []) as KassaNameTabLine[])
   const selectedOpen = tabOpenTotalIncl(selectedLines)
 
   if (!Number.isFinite(amountEur) || amountEur <= 0) {
     return { ok: false, error: 'invalid_amount' }
   }
+  if (selectedOpen <= 0.001) {
+    return { ok: false, error: 'tab_already_settled' }
+  }
   if (amountEur > selectedOpen + 0.02) {
     return { ok: false, error: 'amount_too_high' }
   }
 
-  const { orderLines, nextTabLines, appliedIncl } = allocateNameTabPayment(selectedLines, amountEur)
+  const payIncl =
+    amountEur >= selectedOpen - 0.02 ? selectedOpen : Math.round(amountEur * 100) / 100
+  const { orderLines, nextTabLines, appliedIncl } = allocateNameTabPayment(selectedLines, payIncl)
   if (appliedIncl <= 0 || !orderLines.length) {
     return { ok: false, error: 'invalid_amount' }
   }
@@ -70,15 +76,22 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: orderRes.error || 'pay_failed' }
   }
 
-  if (tabOpenTotalIncl(nextTabLines) <= 0.001) {
-    await adminDb.delete('kassa_name_tabs', { id: tab.id, tenant_slug: tenantSlug })
-  } else {
-    await adminDb.update(
-      'kassa_name_tabs',
-      { items: nextTabLines, updated_at: new Date().toISOString() },
-      { id: tab.id, tenant_slug: tenantSlug },
-      { tenantSlug },
-    )
+  const tabCleared = tabOpenTotalIncl(nextTabLines) <= 0.001
+  const dbRes = tabCleared
+    ? await adminDb.delete(
+        'kassa_name_tabs',
+        { id: tab.id, tenant_slug: tenantSlug },
+        { tenantSlug },
+      )
+    : await adminDb.update(
+        'kassa_name_tabs',
+        { items: nextTabLines, updated_at: new Date().toISOString() },
+        { id: tab.id, tenant_slug: tenantSlug },
+        { tenantSlug },
+      )
+
+  if (!dbRes.ok) {
+    return { ok: false, error: 'tab_update_failed', orderNumber: orderRes.orderNumber }
   }
 
   return { ok: true, orderNumber: orderRes.orderNumber }

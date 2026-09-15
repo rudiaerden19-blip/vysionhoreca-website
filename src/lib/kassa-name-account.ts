@@ -55,8 +55,25 @@ export function mergeIntoTabLines(existing: KassaNameTabLine[], cartRound: Kassa
   }))
 }
 
+/** Openstaand per regel (fallback als unpaidIncl ontbreekt in JSON). */
+export function effectiveLineUnpaidIncl(line: KassaNameTabLine): number {
+  const lineTotal = kassaCartLineTotalIncl(line)
+  const raw = line.unpaidIncl
+  if (!Number.isFinite(raw) || raw <= 0) return lineTotal
+  return Math.min(Math.round(raw * 100) / 100, lineTotal)
+}
+
+export function normalizeNameTabLines(lines: KassaNameTabLine[]): KassaNameTabLine[] {
+  return lines
+    .map((line) => ({
+      ...line,
+      unpaidIncl: effectiveLineUnpaidIncl(line),
+    }))
+    .filter((l) => l.unpaidIncl > 0.001)
+}
+
 export function tabOpenTotalIncl(lines: KassaNameTabLine[]): number {
-  return Math.round(lines.reduce((s, l) => s + Math.max(0, l.unpaidIncl), 0) * 100) / 100
+  return Math.round(lines.reduce((s, l) => s + effectiveLineUnpaidIncl(l), 0) * 100) / 100
 }
 
 export type NameTabPaymentAllocation = {
@@ -70,16 +87,30 @@ export function allocateNameTabPayment(
   lines: KassaNameTabLine[],
   paymentIncl: number,
 ): NameTabPaymentAllocation {
-  let remainingCents = Math.round(Math.max(0, paymentIncl) * 100)
+  const normalized = normalizeNameTabLines(lines)
+  const openCents = Math.round(tabOpenTotalIncl(normalized) * 100)
+  const paymentCents = Math.round(Math.max(0, paymentIncl) * 100)
+
+  if (openCents <= 0 || paymentCents <= 0) {
+    return { orderLines: [], nextTabLines: normalized, appliedIncl: 0 }
+  }
+
+  /** Volledige afrekening: open bedrag in UI = tab leeg (geen cent-resten door qty/unpaid mismatch). */
+  if (paymentCents >= openCents) {
+    const orderLines = normalized.map((line) => cloneCartLineForOrder(line, line.quantity))
+    return { orderLines, nextTabLines: [], appliedIncl: openCents / 100 }
+  }
+
+  let remainingCents = paymentCents
   const orderLines: KassaCartItem[] = []
   const nextTabLines: KassaNameTabLine[] = []
 
-  for (const line of lines) {
+  for (const line of normalized) {
     if (remainingCents <= 0) {
-      if (line.unpaidIncl > 0.001) nextTabLines.push({ ...line })
+      if (effectiveLineUnpaidIncl(line) > 0.001) nextTabLines.push({ ...line })
       continue
     }
-    const unpaidCents = Math.round(Math.max(0, line.unpaidIncl) * 100)
+    const unpaidCents = Math.round(effectiveLineUnpaidIncl(line) * 100)
     if (unpaidCents <= 0) continue
 
     const unitCents = Math.round(kassaCartLineUnitIncl(line) * 100)
@@ -126,8 +157,9 @@ export function allocateNameTabPayment(
     }
   }
 
-  const appliedIncl = Math.round((Math.round(Math.max(0, paymentIncl) * 100) - remainingCents)) / 100
-  return { orderLines, nextTabLines, appliedIncl }
+  const appliedIncl = Math.round((paymentCents - remainingCents)) / 100
+  const cleanedNext = normalizeNameTabLines(nextTabLines)
+  return { orderLines, nextTabLines: cleanedNext, appliedIncl }
 }
 
 function cloneCartLineForOrder(line: KassaCartItem, quantity: number): KassaCartItem {

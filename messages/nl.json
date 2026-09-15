@@ -3911,6 +3911,7 @@
     "invalidAmount": "Ongeldig bedrag.",
     "amountTooHigh": "Bedrag is hoger dan het openstaande saldo.",
     "payFailed": "Betaling registreren mislukt.",
+    "tabAlreadySettled": "Deze rekening is al betaald — lijst wordt ververst.",
     "registerPayment": "Betaling registreren"
   },
   "kassaApp": {

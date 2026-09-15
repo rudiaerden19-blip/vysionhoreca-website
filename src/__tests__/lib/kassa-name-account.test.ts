@@ -35,6 +35,14 @@ describe('kassa-name-account', () => {
     expect(tabOpenTotalIncl(nextTabLines)).toBe(0)
   })
 
+  it('volledige betaling leegt tab bij unpaid vs unit×qty mismatch', () => {
+    const tab = cartLinesToTabLines([line('a', 3.94, 3)])
+    tab[0].unpaidIncl = 11.8
+    const { nextTabLines, appliedIncl } = allocateNameTabPayment(tab, 11.8)
+    expect(appliedIncl).toBe(11.8)
+    expect(tabOpenTotalIncl(nextTabLines)).toBe(0)
+  })
+
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {
     const tab = cartLinesToTabLines([line('a', 4, 1), line('b', 6, 1)])
     const pay1 = allocateNameTabPayment(tab, 4)

@@ -179,9 +179,17 @@ export default function KassaNameAccountModal({
     if (!res.ok) {
       if (res.error === 'amount_too_high') setError(t('kassaNameAccount.amountTooHigh'))
       else if (res.error === 'invalid_amount') setError(t('kassaNameAccount.invalidAmount'))
+      else if (res.error === 'tab_already_settled') setError(t('kassaNameAccount.tabAlreadySettled'))
       else setError(res.error || t('kassaNameAccount.payFailed'))
+      if (res.error === 'tab_already_settled') {
+        setSelectedTabId(null)
+        void loadTabs()
+      }
       return
     }
+    setSelectedTabId(null)
+    setPayAmount('')
+    await loadTabs()
     onCommitted()
     onClose()
   }

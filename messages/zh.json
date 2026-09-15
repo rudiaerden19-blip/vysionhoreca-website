@@ -3346,6 +3346,7 @@
     "invalidAmount": "金额无效。",
     "amountTooHigh": "金额高于未结余额。",
     "payFailed": "无法登记付款。",
+    "tabAlreadySettled": "该挂账已结清 — 正在刷新列表。",
     "registerPayment": "登记付款"
   },
   "kassaApp": {

@@ -3346,6 +3346,7 @@
     "invalidAmount": "無効な金額です。",
     "amountTooHigh": "未払い残高を超えています。",
     "payFailed": "支払いを登録できませんでした。",
+    "tabAlreadySettled": "この掛け勘定は既に支払済みです — 一覧を更新します。",
     "registerPayment": "支払いを登録"
   },
   "kassaApp": {
