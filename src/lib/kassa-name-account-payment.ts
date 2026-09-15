@@ -11,6 +11,7 @@ import {
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
 import { insertKassaOrderForNameAccountPayment } from '@/lib/kassa-name-account-order'
+import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import {
   buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
@@ -79,6 +80,9 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: orderRes.error || 'pay_failed' }
   }
 
+  const paidAtIso = new Date().toISOString()
+  syncZReportAfterOrderSafe(tenantSlug, paidAtIso)
+
   const tabCleared = tabOpenTotalIncl(nextTabLines) <= 0.001
   const dbRes = tabCleared
     ? await adminDb.delete(
@@ -123,7 +127,7 @@ export async function registerKassaNameTabPayment(params: {
     paymentMethod,
     orderType: 'TAKEAWAY',
     tableNumber: '',
-    createdAt: new Date(),
+    createdAt: new Date(paidAtIso),
     onAccountCustomerName: tab.customer_name.trim(),
   }
 
