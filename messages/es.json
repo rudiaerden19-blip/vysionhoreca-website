@@ -3327,6 +3327,24 @@
     "saveFailed": "No se pudo guardar. ¿Existe la tabla en Supabase?",
     "loadFailed": "No se pudo cargar. ¿Existe la tabla en Supabase?"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "Los artículos vienen de la caja. El saldo abierto cuenta en ventas e informe Z solo al pagar (IVA incl. por línea).",
+    "modalTitle": "A cuenta",
+    "modalHint": "Elige o escribe un nombre para este carrito",
+    "openListTitle": "Cuentas abiertas",
+    "addToAccountConfirm": "¿Añadir a la cuenta de {name}?",
+    "addToAccountButton": "Añadir a cuenta",
+    "cartEmpty": "Añade productos al carrito primero.",
+    "nameRequired": "Introduce un nombre.",
+    "loadFailed": "No se pudieron cargar las tabs. ¿Existe kassa_name_tabs en Supabase?",
+    "saveFailed": "No se pudo guardar.",
+    "backToKassa": "Volver a caja",
+    "payAmount": "Importe recibido (IVA incl.)",
+    "invalidAmount": "Importe no válido.",
+    "amountTooHigh": "Importe mayor que el saldo abierto.",
+    "payFailed": "No se pudo registrar el pago.",
+    "registerPayment": "Registrar pago"
+  },
   "kassaApp": {
     "soundTitle": "Activar sonido",
     "soundBody": "Pulsa el botón para activar sonido y avisos de nuevos pedidos.",

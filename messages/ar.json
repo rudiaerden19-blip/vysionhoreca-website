@@ -3327,6 +3327,24 @@
     "saveFailed": "تعذّر الحفظ. هل الجدول موجود في Supabase؟",
     "loadFailed": "تعذّر التحميل. هل الجدول موجود في Supabase؟"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "الأصناف من الكاشير. الرصيد المفتوح يُحسب في المبيعات وتقرير Z عند الدفع فقط (ض.م.ب. شامل لكل سطر).",
+    "modalTitle": "على الحساب",
+    "modalHint": "اختر أو اكتب اسمًا لهذه السلة",
+    "openListTitle": "حسابات مفتوحة",
+    "addToAccountConfirm": "إضافة إلى حساب {name}؟",
+    "addToAccountButton": "إضافة إلى الحساب",
+    "cartEmpty": "أضف منتجات إلى السلة أولاً.",
+    "nameRequired": "أدخل اسمًا.",
+    "loadFailed": "تعذّر تحميل التبويبات. هل kassa_name_tabs في Supabase؟",
+    "saveFailed": "تعذّر الحفظ.",
+    "backToKassa": "العودة إلى الكاشير",
+    "payAmount": "المبلغ المستلم (شامل الض.م.ب.)",
+    "invalidAmount": "مبلغ غير صالح.",
+    "amountTooHigh": "المبلغ أعلى من الرصيد المفتوح.",
+    "payFailed": "تعذّر تسجيل الدفع.",
+    "registerPayment": "تسجيل الدفع"
+  },
   "kassaApp": {
     "soundTitle": "تفعيل الصوت",
     "soundBody": "اضغط الزر لتفعيل الصوت والإشعارات للطلبات الجديدة.",

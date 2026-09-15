@@ -2827,6 +2827,24 @@
     "saveFailed": "Speichern fehlgeschlagen. Tabelle in Supabase vorhanden?",
     "loadFailed": "Liste laden fehlgeschlagen. Tabelle in Supabase vorhanden?"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "Artikel kommen von der Kasse. Offener Saldo zählt in Verkauf und Z-Bericht erst bei Zahlung (inkl. MwSt. pro Bonzeile).",
+    "modalTitle": "Auf Rechnung",
+    "modalHint": "Name wählen oder eingeben für diesen Warenkorb",
+    "openListTitle": "Offene Rechnungen",
+    "addToAccountConfirm": "Auf Rechnung von {name} buchen?",
+    "addToAccountButton": "Auf Rechnung buchen",
+    "cartEmpty": "Zuerst Produkte in den Warenkorb legen.",
+    "nameRequired": "Bitte einen Namen eingeben.",
+    "loadFailed": "Tabs laden fehlgeschlagen. Ist kassa_name_tabs in Supabase?",
+    "saveFailed": "Speichern fehlgeschlagen.",
+    "backToKassa": "Zurück zur Kasse",
+    "payAmount": "Erhaltener Betrag (inkl. MwSt.)",
+    "invalidAmount": "Ungültiger Betrag.",
+    "amountTooHigh": "Betrag höher als offener Saldo.",
+    "payFailed": "Zahlung konnte nicht registriert werden.",
+    "registerPayment": "Zahlung registrieren"
+  },
   "kassaApp": {
     "soundTitle": "Ton aktivieren",
     "soundBody": "Tippen Sie auf die Schaltfläche, um Ton und Benachrichtigungen für neue Bestellungen zu aktivieren.",

@@ -3887,6 +3887,24 @@
     "saveFailed": "Could not save. Is the table in Supabase?",
     "loadFailed": "Could not load the list. Is the table in Supabase?"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "Items come from the till. Open balance counts in sales and Z-report only when the customer pays (incl. VAT per receipt line).",
+    "modalTitle": "On account",
+    "modalHint": "Pick or type a name for this cart",
+    "openListTitle": "Open accounts",
+    "addToAccountConfirm": "Add to account for {name}?",
+    "addToAccountButton": "Add to account",
+    "cartEmpty": "Add products to the cart first.",
+    "nameRequired": "Enter a name.",
+    "loadFailed": "Could not load tabs. Is kassa_name_tabs in Supabase?",
+    "saveFailed": "Could not save.",
+    "backToKassa": "Back to till",
+    "payAmount": "Amount received (incl. VAT)",
+    "invalidAmount": "Invalid amount.",
+    "amountTooHigh": "Amount is higher than the open balance.",
+    "payFailed": "Could not register payment.",
+    "registerPayment": "Register payment"
+  },
   "kassaApp": {
     "soundTitle": "Enable sound",
     "soundBody": "Tap the button to enable sound and notifications for new orders.",

@@ -31,7 +31,9 @@ function onAccountFieldFocus(e: FocusEvent<HTMLInputElement>) {
   scrollInputAboveKeyboard(e.currentTarget)
 }
 import { useLanguage } from '@/i18n'
+import { getTenantSettings } from '@/lib/admin-api'
 import { adminDb } from '@/lib/admin-db-client'
+import OpRekeningV2Client from './OpRekeningV2Client'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import {
   clampOnAccountPaid,
@@ -187,8 +189,33 @@ function OnAccountRowEdit({
 }
 
 export default function OpRekeningPage({ params }: { params: { tenant: string } }) {
-  const { t } = useLanguage()
   const tenant = params.tenant
+  const [nameAccountV2, setNameAccountV2] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getTenantSettings(tenant).then((s) => {
+      if (!cancelled) setNameAccountV2(s?.kassa_name_account_v2 === true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [tenant])
+
+  const { t } = useLanguage()
+  if (nameAccountV2 === null) {
+    return <div className="p-8 text-sm text-gray-500">{t('kassaOnAccount.loading')}</div>
+  }
+
+  if (nameAccountV2) {
+    return <OpRekeningV2Client tenant={tenant} />
+  }
+
+  return <OpRekeningLegacyPage tenant={tenant} />
+}
+
+function OpRekeningLegacyPage({ tenant }: { tenant: string }) {
+  const { t } = useLanguage()
   const [rows, setRows] = useState<KassaOnAccountEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [month, setMonth] = useState(() => getBelgiumDateString().slice(0, 7))

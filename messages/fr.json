@@ -2827,6 +2827,24 @@
     "saveFailed": "Enregistrement impossible. Table présente dans Supabase ?",
     "loadFailed": "Chargement impossible. Table présente dans Supabase ?"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "Les articles viennent de la caisse. Le solde ouvert compte dans ventes et Z uniquement au paiement (TVA incl. par ligne).",
+    "modalTitle": "En compte",
+    "modalHint": "Choisir ou saisir un nom pour ce panier",
+    "openListTitle": "Comptes ouverts",
+    "addToAccountConfirm": "Ajouter au compte de {name} ?",
+    "addToAccountButton": "Ajouter au compte",
+    "cartEmpty": "Ajoutez d'abord des produits au panier.",
+    "nameRequired": "Saisissez un nom.",
+    "loadFailed": "Impossible de charger les tabs. Table kassa_name_tabs dans Supabase ?",
+    "saveFailed": "Enregistrement impossible.",
+    "backToKassa": "Retour caisse",
+    "payAmount": "Montant reçu (TVA incl.)",
+    "invalidAmount": "Montant invalide.",
+    "amountTooHigh": "Montant supérieur au solde ouvert.",
+    "payFailed": "Impossible d'enregistrer le paiement.",
+    "registerPayment": "Enregistrer le paiement"
+  },
   "kassaApp": {
     "soundTitle": "Activer le son",
     "soundBody": "Appuyez sur le bouton pour activer le son et les notifications des nouvelles commandes.",

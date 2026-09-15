@@ -206,6 +206,8 @@ import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptions
 import { KassaCheckoutVatModal } from '@/components/kassa/KassaCheckoutVatModal'
 import { KassaBtwBonModal } from '@/components/kassa/KassaBtwBonModal'
 import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/kassa/KassaStaffClockUi'
+import KassaNameAccountModal from '@/components/kassa/KassaNameAccountModal'
+import { kassaCartLineTotalIncl } from '@/lib/kassa-name-account'
 import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
@@ -1146,6 +1148,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   /** Snelmenu-balk onderaan: aan tot de knop wordt getikt. Alle modes. */
   const [kassaQuickMenuVisible, setKassaQuickMenuVisible] = useState(true)
+  const [showNameAccountModal, setShowNameAccountModal] = useState(false)
   useEffect(() => {
     if (cart.length > 0) setNumpadPanelVisible(false)
   }, [cart.length])
@@ -1742,6 +1745,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   /** Zie Admin › Kassa-terminal (`kassa_floor_plan_enabled`). `undefined`= aan (backward compatible). */
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
+  /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
+  const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
   /** Standaard BTW-bon. Alleen aan via tenant_settings.kassa_footer_drawer_button. */
   const kassaFooterDrawerButton = kassaShowsDrawerInsteadOfBtwBon(tenantInfo)
 
@@ -3127,6 +3132,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return sum + (i.product.price + choicesTotal) * i.quantity
       }, 0),
     [billLines],
+  )
+
+  const cartRoundTotalIncl = useMemo(
+    () => cart.reduce((sum, line) => sum + kassaCartLineTotalIncl(line), 0),
+    [cart],
   )
 
   const draftBonLineItems = billLines
@@ -4779,8 +4789,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {
           key: 'onAccount',
           labelKey: 'kassaOnAccount.title',
-          kind: 'nav'as const,
-          href: `${baseUrl}/op-rekening`,
+          kind: (kassaNameAccountV2 ? 'onAccount' : 'nav') as 'nav' | 'clock' | 'onAccount',
+          href: kassaNameAccountV2 ? undefined : `${baseUrl}/op-rekening`,
           submenuId: 'sm_kassa_op_rekening',
         },
         {
@@ -4797,8 +4807,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           href: `${baseUrl}/bestellingen`,
           submenuId: 'sm_orders_bestellingen',
         },
-      ] as const,
-    [baseUrl],
+      ],
+    [baseUrl, kassaNameAccountV2],
   )
 
   const isKassaQuickMenuActionEnabled = useCallback(
@@ -5707,6 +5717,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       onClick={() => {
                         if (!enabled) return
                         openStaffClockModal()
+                      }}
+                    >
+                      {label}
+                    </button>
+                  )
+                }
+                if (action.kind === 'onAccount') {
+                  return (
+                    <button
+                      key={action.key}
+                      type="button"
+                      disabled={!enabled || cart.length === 0}
+                      aria-disabled={!enabled || cart.length === 0}
+                      className={kassaQuickMenuPanelBtnClass(enabled && cart.length > 0)}
+                      onClick={() => {
+                        if (!enabled || cart.length === 0) return
+                        playClick()
+                        setShowNameAccountModal(true)
                       }}
                     >
                       {label}
@@ -6660,6 +6688,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onPickStaff={(s) => startStaffSales(s)}
       />
+
+      {showNameAccountModal && kassaNameAccountV2 ? (
+        <KassaNameAccountModal
+          tenant={tenant}
+          cart={cart}
+          cartTotalIncl={cartRoundTotalIncl}
+          onClose={() => setShowNameAccountModal(false)}
+          onCommitted={() => {
+            setCart([])
+            setTableOrderLinesInSidebar(false)
+          }}
+        />
+      ) : null}
 
       <KassaStaffClockModal
         open={staffClockOpen}

@@ -3887,6 +3887,24 @@
     "saveFailed": "Opslaan mislukt. Staat de tabel in Supabase?",
     "loadFailed": "Lijst laden mislukt. Staat de tabel in Supabase?"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "Producten komen van de kassa. Open saldo telt pas in verkoop en Z-rapport wanneer de klant betaalt (incl. BTW per bonregel).",
+    "modalTitle": "Op rekening",
+    "modalHint": "Kies of typ een naam voor deze mand",
+    "openListTitle": "Openstaande rekeningen",
+    "addToAccountConfirm": "Toevoegen op rekening van {name}?",
+    "addToAccountButton": "Toevoegen op rekening",
+    "cartEmpty": "Voeg eerst producten toe in de mand.",
+    "nameRequired": "Vul een naam in.",
+    "loadFailed": "Tabs laden mislukt. Staat kassa_name_tabs in Supabase?",
+    "saveFailed": "Opslaan mislukt.",
+    "backToKassa": "Terug naar kassa",
+    "payAmount": "Ontvangen bedrag (incl. BTW)",
+    "invalidAmount": "Ongeldig bedrag.",
+    "amountTooHigh": "Bedrag is hoger dan het openstaande saldo.",
+    "payFailed": "Betaling registreren mislukt.",
+    "registerPayment": "Betaling registreren"
+  },
   "kassaApp": {
     "soundTitle": "Activeer geluid",
     "soundBody": "Klik op de knop om geluid en meldingen te activeren voor nieuwe bestellingen.",

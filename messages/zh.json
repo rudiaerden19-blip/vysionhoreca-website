@@ -3327,6 +3327,24 @@
     "saveFailed": "保存失败。Supabase 中有该表吗？",
     "loadFailed": "加载失败。Supabase 中有该表吗？"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "商品来自收银台。未结余额仅在客户付款时计入销售与 Z 报表（含 VAT，按行）。",
+    "modalTitle": "挂账",
+    "modalHint": "选择或输入此购物车的客户姓名",
+    "openListTitle": "未结账户",
+    "addToAccountConfirm": "添加到 {name} 的挂账？",
+    "addToAccountButton": "添加到挂账",
+    "cartEmpty": "请先将商品加入购物车。",
+    "nameRequired": "请输入姓名。",
+    "loadFailed": "无法加载标签。Supabase 中是否有 kassa_name_tabs？",
+    "saveFailed": "保存失败。",
+    "backToKassa": "返回收银台",
+    "payAmount": "收到金额（含 VAT）",
+    "invalidAmount": "金额无效。",
+    "amountTooHigh": "金额高于未结余额。",
+    "payFailed": "无法登记付款。",
+    "registerPayment": "登记付款"
+  },
   "kassaApp": {
     "soundTitle": "启用声音",
     "soundBody": "点击按钮以启用新订单的声音和通知。",

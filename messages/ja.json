@@ -3327,6 +3327,24 @@
     "saveFailed": "保存できません。Supabaseにテーブルがありますか？",
     "loadFailed": "読み込めません。Supabaseにテーブルがありますか？"
   },
+  "kassaNameAccount": {
+    "subtitleV2": "商品はレジから。未払い残高は支払い時のみ売上・Zレポートに計上（行ごと税込）。",
+    "modalTitle": "掛け",
+    "modalHint": "このカートの名前を選択または入力",
+    "openListTitle": "未払いアカウント",
+    "addToAccountConfirm": "{name} の掛けに追加しますか？",
+    "addToAccountButton": "掛けに追加",
+    "cartEmpty": "先にカートに商品を追加してください。",
+    "nameRequired": "名前を入力してください。",
+    "loadFailed": "タブを読み込めません。kassa_name_tabs は Supabase にありますか？",
+    "saveFailed": "保存できませんでした。",
+    "backToKassa": "レジに戻る",
+    "payAmount": "受取額（税込）",
+    "invalidAmount": "無効な金額です。",
+    "amountTooHigh": "未払い残高を超えています。",
+    "payFailed": "支払いを登録できませんでした。",
+    "registerPayment": "支払いを登録"
+  },
   "kassaApp": {
     "soundTitle": "音を有効にする",
     "soundBody": "ボタンを押して新規注文の音と通知を有効にします。",

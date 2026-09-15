@@ -220,6 +220,8 @@ export interface TenantSettings {
   kassa_footer_drawer_button?: boolean
   /** off | choose | dine_in | takeaway — popup 12%/6% bij afrekenen (standaard off) */
   kassa_checkout_vat_mode?: string
+  /** true = tabs op naam + op rekening v2 (kassa popup; rapport pas bij betaling) */
+  kassa_name_account_v2?: boolean
   /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
   z_report_send_articles_to_accountant?: boolean
   /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */
@@ -314,6 +316,32 @@ export async function saveTenantKassaStaffClockEnabled(
       ok: false,
       error:
         'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_staff_clock.sql uit en controleer of deze tenant een instellingenrij heeft.',
+    }
+  }
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** Op rekening v2 (tabs op naam) — pilot per tenant. */
+export async function saveTenantKassaNameAccountV2(
+  tenantSlug: string,
+  enabled: boolean,
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_name_account_v2: enabled })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantKassaNameAccountV2:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/kassa_name_account_v2_migration.sql uit.',
     }
   }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))
