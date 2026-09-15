@@ -4796,13 +4796,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           href: `${baseUrl}/online-status`,
           submenuId: 'sm_online_status',
         },
-        {
-          key: 'onAccount',
-          labelKey: 'kassaOnAccount.title',
-          kind: (kassaNameAccountV2 ? 'onAccount' : 'nav') as 'nav' | 'clock' | 'onAccount',
-          href: kassaNameAccountV2 ? undefined : `${baseUrl}/op-rekening`,
-          submenuId: 'sm_kassa_op_rekening',
-        },
+        ...(kassaNameAccountV2
+          ? [
+              {
+                key: 'onAccount' as const,
+                labelKey: 'kassaOnAccount.title' as const,
+                kind: 'onAccount' as const,
+                submenuId: 'sm_kassa_op_rekening' as const,
+              },
+            ]
+          : []),
         {
           key: 'shopProfile',
           labelKey: 'kassaApp.quickMenuShopProfile',

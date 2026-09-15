@@ -31,6 +31,7 @@ Faalt een test → **geen** wijziging committen tot groen.
 3. **Deelbetaling** → FIFO op regels, **exact** centen; rest blijft op tab.
 4. **BTW-context** van tab = kassa-context bij parkeren; bij betaling order/bon/Z **zelfde** context.
 5. Alleen tenants met `tenant_settings.kassa_name_account_v2 = true`; **nooit** hardcoded slug.
+6. **Kassa snelmenu:** knop «Op rekening» **alleen** als `kassa_name_account_v2 === true` — andere tenants geen extra knop (legacy blijft via hamburger indien submodule aan).
 
 ## UI-popup (kassa)
 
