@@ -219,13 +219,12 @@ function cloneCartLineForOrder(line: KassaCartItem, quantity: number): KassaCart
 
 /** Eén regel waarvan het regeltotaal incl. BTW exact `grossIncl` is (deelbetaling). */
 function lineWithGrossTotal(line: KassaCartItem, grossIncl: number): KassaCartItem {
-  const extras = (line.choices ?? []).reduce((s, c) => s + c.price, 0)
-  const base = Math.round((grossIncl - extras) * 100) / 100
+  const total = Math.round(Math.max(0, grossIncl) * 100) / 100
   return {
     ...line,
-    product: { ...line.product, price: Math.max(0, base) },
+    product: { ...line.product, price: total },
     quantity: 1,
-    choices: line.choices?.map((c) => ({ ...c })),
+    choices: undefined,
   }
 }
 

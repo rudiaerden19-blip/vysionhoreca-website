@@ -59,6 +59,15 @@ describe('kassa-name-account', () => {
     expect(isNameTabContextColumnError('network')).toBe(false)
   })
 
+  it('deelbetaling €2 op €4,50 met opties — geen allocation mismatch', () => {
+    const tab = cartLinesToTabLines([line('a', 1.5, 1, 3)])
+    expect(tabOpenTotalIncl(tab)).toBe(4.5)
+    const pay = allocateNameTabPayment(tab, 2)
+    expect(pay.appliedIncl).toBe(2)
+    expect(orderLinesGrossIncl(pay.orderLines)).toBe(2)
+    expect(tabOpenTotalIncl(pay.nextTabLines)).toBe(2.5)
+  })
+
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {
     const tab = cartLinesToTabLines([line('a', 4, 1), line('b', 6, 1)])
     const pay1 = allocateNameTabPayment(tab, 4)

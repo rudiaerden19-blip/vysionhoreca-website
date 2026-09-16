@@ -289,7 +289,8 @@ export default function KassaNameAccountModal({
       if (res.error === 'amount_too_high') setError(t('kassaNameAccount.amountTooHigh'))
       else if (res.error === 'invalid_amount') setError(t('kassaNameAccount.invalidAmount'))
       else if (res.error === 'tab_already_settled') setError(t('kassaNameAccount.tabAlreadySettled'))
-      else if (res.error === 'amount_not_allocatable') setError(t('kassaNameAccount.amountNotAllocatable'))
+      else if (res.error === 'amount_not_allocatable' || res.error === 'allocation_mismatch')
+        setError(t('kassaNameAccount.amountNotAllocatable'))
       else setError(res.error || t('kassaNameAccount.payFailed'))
       if (res.error === 'tab_already_settled') {
         setSelectedTabId(null)
