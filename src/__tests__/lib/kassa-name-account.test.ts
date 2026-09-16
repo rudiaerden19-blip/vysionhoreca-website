@@ -6,6 +6,7 @@ import {
   kassaCartLineTotalIncl,
   mergeIntoTabLines,
   orderLinesGrossIncl,
+  reduceNameTabLinesAfterPayment,
   tabOpenTotalIncl,
 } from '@/lib/kassa-name-account'
 
@@ -86,6 +87,20 @@ describe('kassa-name-account', () => {
     expect(pay.appliedIncl).toBe(2)
     expect(orderLinesGrossIncl(pay.orderLines)).toBe(2)
     expect(tabOpenTotalIncl(pay.nextTabLines)).toBe(2.5)
+  })
+
+  it('deelbetaling €2 wanneer open saldo lager is dan regeltotaal (snapshot)', () => {
+    const tab = cartLinesToTabLines([line('a', 4.5, 1)])
+    tab[0].unpaidIncl = 2
+    const pay = allocateNameTabPayment(tab, 2)
+    expect(pay.appliedIncl).toBe(2)
+    expect(orderLinesGrossIncl(pay.orderLines)).toBe(2)
+    expect(tabOpenTotalIncl(pay.nextTabLines)).toBe(0)
+  })
+
+  it('deelbetaling €2 op €4,50 — reduce tab FIFO', () => {
+    const tab = cartLinesToTabLines([line('a', 4.5, 1)])
+    expect(tabOpenTotalIncl(reduceNameTabLinesAfterPayment(tab, 2))).toBe(2.5)
   })
 
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {

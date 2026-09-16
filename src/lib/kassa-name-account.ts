@@ -184,15 +184,52 @@ function applyOpenAmountToLine(
     return { orderParts, nextLine, spentCents: spendCents }
   }
 
-  if (spendCents >= unpaidCents && unpaidCents >= lineTotalCents - 1) {
-    return {
-      orderParts: [cloneCartLineForOrder(line, line.quantity)],
-      nextLine: null,
-      spentCents: spendCents,
+  if (spendCents >= unpaidCents) {
+    const cloned = cloneCartLineForOrder(line, line.quantity)
+    const clonedCents = Math.round(kassaCartLineTotalIncl(cloned) * 100)
+    if (Math.abs(clonedCents - spendCents) <= 1) {
+      return { orderParts: [cloned], nextLine: null, spentCents: spendCents }
     }
   }
 
   return allocatePartialLinePayment(line, spendCents)
+}
+
+/** Tab na betaling: open saldo verlagen (FIFO op unpaid, onafhankelijk van order-regels). */
+export function reduceNameTabLinesAfterPayment(
+  lines: KassaNameTabLine[],
+  paidIncl: number,
+): KassaNameTabLine[] {
+  const normalized = normalizeNameTabLines(lines)
+  let remainingCents = Math.round(Math.max(0, paidIncl) * 100)
+  if (remainingCents <= 0) return normalized
+
+  const next: KassaNameTabLine[] = []
+  for (const line of normalized) {
+    if (remainingCents <= 0) {
+      next.push({ ...line })
+      continue
+    }
+    const unpaidCents = Math.round(effectiveLineUnpaidIncl(line) * 100)
+    if (unpaidCents <= 0) continue
+    const take = Math.min(remainingCents, unpaidCents)
+    remainingCents -= take
+    const leftCents = unpaidCents - take
+    if (leftCents > 0) {
+      next.push({ ...line, unpaidIncl: Math.round(leftCents) / 100 })
+    }
+  }
+  return normalizeNameTabLines(next)
+}
+
+/** Eén orderregel met exact betaald bedrag (fallback bij stale menu-snapshot op tab). */
+export function nameTabPaymentOrderLineForAmount(
+  lines: KassaNameTabLine[],
+  paidIncl: number,
+): KassaCartItem | null {
+  const normalized = normalizeNameTabLines(lines)
+  if (!normalized.length || paidIncl <= 0) return null
+  return lineWithGrossTotal(normalized[0], paidIncl)
 }
 
 /** Deelbetaling op één tabregel — besteed exact `budgetCents` (≤ open op regel). */
