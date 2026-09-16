@@ -17,6 +17,8 @@ export type KassaNameTabRow = {
   order_type?: KassaRegisterOrderType | string | null
   table_number?: string | number | null
   floor_plan_zone?: FloorPlanZone | string | null
+  /** Wie zette laatste mand op tab (dagoverzicht bij betaling later op de dag). */
+  kassa_staff_id?: string | null
 }
 
 export function resolveNameTabOrderContext(tab: KassaNameTabRow): {
@@ -381,7 +383,18 @@ export function nameTabCustomerKey(name: string): string {
 /** Supabase zonder order_type-kolommen (oude migratie) — fallback op items-only. */
 export function isNameTabContextColumnError(error?: string | null): boolean {
   if (!error) return false
-  return /order_type|floor_plan_zone|table_number|column .* does not exist|schema cache/i.test(error)
+  return /order_type|floor_plan_zone|table_number|kassa_staff_id|column .* does not exist|schema cache/i.test(error)
+}
+
+/** Order krijgt verkoper van tab (Amber), niet alleen wie 's avonds incasseert. */
+export function resolveNameTabOrderStaffId(
+  tab: KassaNameTabRow,
+  paymentStaffId?: string | null,
+): string | null {
+  const tabStaff = String(tab.kassa_staff_id ?? '').trim()
+  if (tabStaff) return tabStaff
+  const payStaff = String(paymentStaffId ?? '').trim()
+  return payStaff || null
 }
 
 export function nameTabItemsOnlyPayload(items: KassaNameTabLine[], updatedAt: string): Record<string, unknown> {
@@ -395,7 +408,9 @@ export function nameTabFullSavePayload(
   displayName: string,
   key: string,
   tenant: string,
+  kassaStaffId?: string | null,
 ): Record<string, unknown> {
+  const staff = String(kassaStaffId ?? '').trim()
   return {
     tenant_slug: tenant,
     customer_name: displayName,
@@ -405,5 +420,6 @@ export function nameTabFullSavePayload(
     table_number: ctx.orderType === 'DINE_IN' && ctx.tableNumber ? ctx.tableNumber : null,
     floor_plan_zone: ctx.orderType === 'DINE_IN' && ctx.floorPlanZone ? ctx.floorPlanZone : null,
     updated_at: updatedAt,
+    ...(staff ? { kassa_staff_id: staff } : {}),
   }
 }

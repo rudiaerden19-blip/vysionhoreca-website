@@ -7,6 +7,7 @@ import {
   mergeIntoTabLines,
   orderLinesGrossIncl,
   reduceNameTabLinesAfterPayment,
+  resolveNameTabOrderStaffId,
   resolveNameTabPaymentOrderPlan,
   tabOpenTotalIncl,
   NAME_ACCOUNT_PARTIAL_PRODUCT_ID,
@@ -103,6 +104,19 @@ describe('kassa-name-account', () => {
   it('deelbetaling €2 op €4,50 — reduce tab FIFO', () => {
     const tab = cartLinesToTabLines([line('a', 4.5, 1)])
     expect(tabOpenTotalIncl(reduceNameTabLinesAfterPayment(tab, 2))).toBe(2.5)
+  })
+
+  it('resolveNameTabOrderStaffId — tab verkoper vóór incassant', () => {
+    const tab = {
+      id: '1',
+      tenant_slug: 'cafe',
+      customer_name: 'Bart',
+      customer_key: 'bart',
+      items: [],
+      kassa_staff_id: 'amber-id',
+    }
+    expect(resolveNameTabOrderStaffId(tab, 'owner-id')).toBe('amber-id')
+    expect(resolveNameTabOrderStaffId({ ...tab, kassa_staff_id: null }, 'owner-id')).toBe('owner-id')
   })
 
   it('deelbetaling plan: geen producten op bon, tab verlaagd', () => {

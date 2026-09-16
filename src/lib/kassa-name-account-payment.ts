@@ -12,6 +12,7 @@ import {
   isNameTabContextColumnError,
   nameTabItemsOnlyPayload,
   resolveNameTabOrderContext,
+  resolveNameTabOrderStaffId,
   resolveNameTabPaymentOrderPlan,
   tabOpenTotalIncl,
   type KassaNameTabLine,
@@ -105,6 +106,7 @@ export async function registerKassaNameTabPayment(params: {
   const productCategoryById = buildProductCategoryLookup(prods)
 
   const paidAt = new Date()
+  const orderStaffId = resolveNameTabOrderStaffId(tab, staffId)
 
   const orderRes = await insertKassaOrderForNameAccountPayment({
     tenantSlug,
@@ -117,7 +119,7 @@ export async function registerKassaNameTabPayment(params: {
     productCategoryById,
     tenantDefaultBtw: btw,
     tenantCountry,
-    staffId,
+    staffId: orderStaffId,
     createdAt: paidAt,
     tableNumber: orderCtx.tableNumber,
     floorPlanZone: orderCtx.floorPlanZone,

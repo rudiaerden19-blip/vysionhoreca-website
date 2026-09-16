@@ -217,7 +217,7 @@ export default function KassaNameAccountModal({
       table_number: tableNumber.trim() || null,
       floor_plan_zone: floorPlanZone ?? null,
     })
-    const fullPayload = nameTabFullSavePayload(merged, ctx, updatedAt, displayName, key, tenant)
+    const fullPayload = nameTabFullSavePayload(merged, ctx, updatedAt, displayName, key, tenant, staffId)
     const itemsOnly = nameTabItemsOnlyPayload(merged, updatedAt)
 
     const writeTab = async () => {
