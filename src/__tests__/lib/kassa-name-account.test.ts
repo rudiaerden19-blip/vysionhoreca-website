@@ -59,6 +59,16 @@ describe('kassa-name-account', () => {
     expect(isNameTabContextColumnError('network')).toBe(false)
   })
 
+  it('deelbetaling €2 op tab met alleen unpaid (prijs 0 in snapshot)', () => {
+    const tab = cartLinesToTabLines([line('a', 0, 1)])
+    tab[0].product.price = 0
+    tab[0].unpaidIncl = 4.5
+    const pay = allocateNameTabPayment(tab, 2)
+    expect(pay.appliedIncl).toBe(2)
+    expect(orderLinesGrossIncl(pay.orderLines)).toBe(2)
+    expect(tabOpenTotalIncl(pay.nextTabLines)).toBe(2.5)
+  })
+
   it('deelbetaling €2 op €4,50 met opties — geen allocation mismatch', () => {
     const tab = cartLinesToTabLines([line('a', 1.5, 1, 3)])
     expect(tabOpenTotalIncl(tab)).toBe(4.5)

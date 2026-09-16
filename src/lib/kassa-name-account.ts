@@ -85,7 +85,10 @@ export function effectiveLineUnpaidIncl(line: KassaNameTabLine): number {
   const lineTotal = kassaCartLineTotalIncl(line)
   const raw = line.unpaidIncl
   if (!Number.isFinite(raw) || raw <= 0) return lineTotal
-  return Math.min(Math.round(raw * 100) / 100, lineTotal)
+  const capped = Math.round(raw * 100) / 100
+  /** Tab-snapshot zonder prijs maar wél unpaid (Supabase JSON) — vertrouw unpaid. */
+  if (lineTotal <= 0.001) return capped
+  return Math.min(capped, lineTotal)
 }
 
 export function normalizeNameTabLines(lines: KassaNameTabLine[]): KassaNameTabLine[] {
@@ -139,7 +142,23 @@ export function allocateNameTabPayment(
     if (unpaidCents <= 0) continue
 
     const unitCents = Math.round(kassaCartLineUnitIncl(line) * 100)
-    if (unitCents <= 0) continue
+    if (unitCents <= 0) {
+      const spendCents = Math.min(remainingCents, unpaidCents)
+      if (spendCents > 0) {
+        orderLines.push(lineWithGrossTotal(line, spendCents / 100))
+        remainingCents -= spendCents
+        const leftCents = unpaidCents - spendCents
+        if (leftCents > 0) {
+          nextTabLines.push({
+            ...line,
+            unpaidIncl: Math.round(leftCents) / 100,
+          })
+        }
+      } else if (unpaidCents > 0) {
+        nextTabLines.push({ ...line })
+      }
+      continue
+    }
 
     if (remainingCents >= unpaidCents) {
       orderLines.push(cloneCartLineForOrder(line, line.quantity))
@@ -154,7 +173,23 @@ export function allocateNameTabPayment(
     if (nextLine) nextTabLines.push(nextLine)
   }
 
-  const appliedIncl = Math.round((paymentCents - remainingCents)) / 100
+  if (remainingCents > 0 && paymentCents < openCents) {
+    const donor =
+      nextTabLines.find((l) => effectiveLineUnpaidIncl(l) > 0.001) ??
+      normalized.find((l) => effectiveLineUnpaidIncl(l) > 0.001)
+    if (donor) {
+      const spendCents = Math.min(
+        remainingCents,
+        Math.round(effectiveLineUnpaidIncl(donor) * 100),
+      )
+      if (spendCents > 0) {
+        orderLines.push(lineWithGrossTotal(donor, spendCents / 100))
+        remainingCents -= spendCents
+      }
+    }
+  }
+
+  const appliedIncl = orderLinesGrossIncl(orderLines)
   const cleanedNext = normalizeNameTabLines(nextTabLines)
   return { orderLines, nextTabLines: cleanedNext, appliedIncl }
 }
@@ -170,11 +205,16 @@ function allocatePartialLinePayment(
   }
 
   const unitCents = Math.round(kassaCartLineUnitIncl(line) * 100)
+  const spendCents = Math.min(budgetCents, unpaidCents)
   if (unitCents <= 0) {
-    return { orderParts: [], nextLine: line, spentCents: 0 }
+    if (spendCents <= 0) return { orderParts: [], nextLine: line, spentCents: 0 }
+    const orderParts = [lineWithGrossTotal(line, spendCents / 100)]
+    const leftCents = unpaidCents - spendCents
+    const nextLine =
+      leftCents > 0 ? { ...line, unpaidIncl: Math.round(leftCents) / 100 } : null
+    return { orderParts, nextLine, spentCents: spendCents }
   }
 
-  const spendCents = Math.min(budgetCents, unpaidCents)
   const orderParts: KassaCartItem[] = []
   let remainSpend = spendCents
   const fullQty = Math.max(1, line.quantity)

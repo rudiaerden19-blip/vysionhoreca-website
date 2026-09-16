@@ -70,13 +70,15 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: 'invalid_amount' }
   }
 
-  const grossFromLines = orderLinesGrossIncl(orderLines)
-  if (Math.abs(grossFromLines - appliedIncl) > 0.03) {
+  const grossFromLines = Math.round(orderLinesGrossIncl(orderLines) * 100) / 100
+  const appliedCharge = Math.round(appliedIncl * 100) / 100
+  if (Math.abs(grossFromLines - appliedCharge) > 0.03) {
     return { ok: false, error: 'allocation_mismatch' }
   }
-  if (Math.abs(payIncl - appliedIncl) > 0.03) {
+  if (Math.abs(payIncl - grossFromLines) > 0.03) {
     return { ok: false, error: 'amount_not_allocatable' }
   }
+  const payInclResolved = grossFromLines
 
   const [settings, catsRaw, prodsRaw] = catalog
     ? [catalog.settings, catalog.categories, catalog.products]
@@ -116,7 +118,7 @@ export async function registerKassaNameTabPayment(params: {
   }
 
   const orderTotal = orderRes.grossTotal ?? 0
-  if (Math.abs(orderTotal - appliedIncl) > 0.03) {
+  if (Math.abs(orderTotal - payInclResolved) > 0.03) {
     return { ok: false, error: 'order_total_mismatch', orderNumber: orderRes.orderNumber }
   }
 
