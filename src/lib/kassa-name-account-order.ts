@@ -38,6 +38,7 @@ export async function insertKassaOrderForNameAccountPayment(params: {
   createdAt?: Date
   tableNumber?: string
   floorPlanZone?: FloorPlanZone
+  customerNotes?: string
 }): Promise<NameAccountOrderInsertResult> {
   const {
     tenantSlug,
@@ -87,7 +88,7 @@ export async function insertKassaOrderForNameAccountPayment(params: {
     payment_status: 'paid',
     payment_method: method,
     order_type: orderType,
-    customer_notes: 'Op rekening — betaling',
+    customer_notes: params.customerNotes?.trim() || 'Op rekening — betaling',
     subtotal: Math.round(vatSplit.subtotalExcl * 100) / 100,
     tax: Math.round(vatSplit.totalTax * 100) / 100,
     total,

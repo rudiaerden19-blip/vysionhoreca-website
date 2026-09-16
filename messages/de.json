@@ -2856,6 +2856,7 @@
     "payFailed": "Zahlung konnte nicht registriert werden.",
     "tabAlreadySettled": "Diese Rechnung ist bereits bezahlt — Liste wird aktualisiert.",
     "receiptCustomer": "Auf Rechnung — {name}",
+    "receiptPartialPaymentHint": "Teilzahlung auf Rechnung (Artikel bleiben auf dem Tab)",
     "printFailed": "Bon drucken fehlgeschlagen. Print Agent prüfen.",
     "registerPayment": "Zahlung registrieren"
   },

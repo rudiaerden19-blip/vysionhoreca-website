@@ -2856,6 +2856,7 @@
     "payFailed": "Impossible d'enregistrer le paiement.",
     "tabAlreadySettled": "Cette note est déjà payée — actualisation de la liste.",
     "receiptCustomer": "En compte — {name}",
+    "receiptPartialPaymentHint": "Paiement partiel en compte (articles sur l’onglet)",
     "printFailed": "Impossible d'imprimer le ticket. Vérifiez le Print Agent.",
     "registerPayment": "Enregistrer le paiement"
   },

@@ -2,6 +2,7 @@
 
 import type { TenantSettings } from '@/lib/admin-api'
 import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
+import { kassaNameAccountReceiptDisplayItems } from '@/lib/kassa-name-account-receipt'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { useLanguage } from '@/i18n'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
@@ -186,8 +187,11 @@ export function KassaSuccessReceiptModal({
               </div>
             </div>
             <div className="border-t border-gray-300 my-2" />
+            {order.onAccountReceiptShowProducts === false ? (
+              <p className="text-center text-xs text-gray-600 mb-2">{t('kassaNameAccount.receiptPartialPaymentHint')}</p>
+            ) : null}
             <div className="space-y-2">
-              {order.items.map((item, idx) => {
+              {kassaNameAccountReceiptDisplayItems(order).map((item, idx) => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 const lineTotal = (item.product.price + choicesTotal) * item.quantity
                 return (

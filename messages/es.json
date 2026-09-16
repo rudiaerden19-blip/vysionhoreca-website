@@ -3356,6 +3356,7 @@
     "payFailed": "No se pudo registrar el pago.",
     "tabAlreadySettled": "Esta cuenta ya está pagada — actualizando la lista.",
     "receiptCustomer": "A cuenta — {name}",
+    "receiptPartialPaymentHint": "Pago parcial a cuenta (artículos en la pestaña)",
     "printFailed": "No se pudo imprimir el ticket. Compruebe el Print Agent.",
     "registerPayment": "Registrar pago"
   },

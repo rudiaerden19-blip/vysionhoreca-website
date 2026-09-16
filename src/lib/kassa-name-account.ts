@@ -295,6 +295,56 @@ function cloneCartLineForOrder(line: KassaCartItem, quantity: number): KassaCart
   }
 }
 
+export const NAME_ACCOUNT_PARTIAL_PRODUCT_ID = 'custom-name-account-partial'
+
+export function isNameTabFullSettlement(payIncl: number, openIncl: number): boolean {
+  return payIncl >= openIncl - 0.02
+}
+
+/** Orderregel voor Z/BTW bij deelbetaling — niet tonen op kassabon. */
+export function nameTabPartialPaymentOrderLine(amountIncl: number): KassaCartItem {
+  const price = Math.round(Math.max(0, amountIncl) * 100) / 100
+  return {
+    cartKey: 'name-account-partial',
+    quantity: 1,
+    product: {
+      id: NAME_ACCOUNT_PARTIAL_PRODUCT_ID,
+      name: 'Op rekening deelbetaling',
+      price,
+    } as KassaCartItem['product'],
+  }
+}
+
+export type NameTabPaymentOrderPlan = {
+  orderLines: KassaCartItem[]
+  nextTabLines: KassaNameTabLine[]
+  showProductsOnReceipt: boolean
+}
+
+/** Deelbetaling: alleen bedrag op bon; volledige afrekening: tab-regels (catalogus op bon). */
+export function resolveNameTabPaymentOrderPlan(
+  lines: KassaNameTabLine[],
+  payIncl: number,
+): NameTabPaymentOrderPlan {
+  const normalized = normalizeNameTabLines(lines)
+  const open = tabOpenTotalIncl(normalized)
+  const pay = Math.round(payIncl * 100) / 100
+  const full = isNameTabFullSettlement(pay, open)
+
+  if (full) {
+    return {
+      orderLines: normalized.map((line) => cloneCartLineForOrder(line, line.quantity)),
+      nextTabLines: [],
+      showProductsOnReceipt: true,
+    }
+  }
+  return {
+    orderLines: [nameTabPartialPaymentOrderLine(pay)],
+    nextTabLines: reduceNameTabLinesAfterPayment(lines, pay),
+    showProductsOnReceipt: false,
+  }
+}
+
 /** Eén regel waarvan het regeltotaal incl. BTW exact `grossIncl` is (deelbetaling). */
 function lineWithGrossTotal(line: KassaCartItem, grossIncl: number): KassaCartItem {
   const total = Math.round(Math.max(0, grossIncl) * 100) / 100

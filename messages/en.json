@@ -3921,6 +3921,7 @@
     "payFailed": "Could not register payment.",
     "tabAlreadySettled": "This tab is already paid — refreshing the list.",
     "receiptCustomer": "On account — {name}",
+    "receiptPartialPaymentHint": "Partial on-account payment (items stay on tab)",
     "printFailed": "Could not print receipt. Check the Print Agent.",
     "registerPayment": "Register payment"
   },

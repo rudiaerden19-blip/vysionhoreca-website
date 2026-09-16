@@ -74,4 +74,6 @@ export interface KassaLastOrderReceipt {
   retailCustomerInvoice?: KassaReceiptRetailCustomerInvoice
   /** Op rekening v2: naam op bon bij tab-afrekening */
   onAccountCustomerName?: string
+  /** Op rekening: false = deelbetaling — geen artikelregels op bon (alleen totaal). */
+  onAccountReceiptShowProducts?: boolean
 }

@@ -1,5 +1,5 @@
 import type { TenantSettings } from '@/lib/admin-api'
-import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
+import type { KassaCartItem, KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import type { MenuCategory } from '@/lib/admin-api'
 import { kassaReceiptVatFromPersistedOrder } from '@/lib/kassa-receipt-vat'
@@ -21,11 +21,18 @@ export type KassaNameAccountPrintLabels = {
   businessVatLabel: (vatNumber: string) => string
   telPrefix: string
   receiptCustomer: (name: string) => string
+  receiptPartialPaymentHint: string
 }
 
 export type PrintNameAccountReceiptResult =
   | { ok: true }
   | { ok: false; error: string }
+
+/** Bon/preview: geen artikelen bij op-rekening deelbetaling. */
+export function kassaNameAccountReceiptDisplayItems(order: KassaLastOrderReceipt): KassaCartItem[] {
+  if (order.onAccountReceiptShowProducts === false) return []
+  return order.items
+}
 
 export function nameAccountPrintLabelsFromT(t: (key: string) => string): KassaNameAccountPrintLabels {
   return {
@@ -42,6 +49,7 @@ export function nameAccountPrintLabelsFromT(t: (key: string) => string): KassaNa
     businessVatLabel: (vat) => t('kassaReceipt.businessVatLabel').replace('{vatNumber}', vat),
     telPrefix: t('kassaReceipt.telPrefix'),
     receiptCustomer: (name) => t('kassaNameAccount.receiptCustomer').replace('{name}', name),
+    receiptPartialPaymentHint: t('kassaNameAccount.receiptPartialPaymentHint'),
   }
 }
 
@@ -95,7 +103,12 @@ export async function printNameAccountPaymentReceipt(opts: {
   bonLines.push(`${labels.receiptNo}${receiptRefDisplay}  ${dateStr}`)
   bonLines.push('--------------------------------')
 
-  for (const i of sortKassaCartLinesByMenuCategory(order.items, categories)) {
+  if (order.onAccountReceiptShowProducts === false) {
+    bonLines.push(labels.receiptPartialPaymentHint)
+    bonLines.push('--------------------------------')
+  }
+
+  for (const i of sortKassaCartLinesByMenuCategory(kassaNameAccountReceiptDisplayItems(order), categories)) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     const lineTotal = (i.product.price + choicesTotal) * i.quantity
     bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
@@ -134,7 +147,7 @@ export async function printNameAccountPaymentReceipt(opts: {
       orderNumber: order.orderNumber,
       orderType: order.orderType,
       tableNumber: null,
-      items: order.items.map((i) => ({
+      items: kassaNameAccountReceiptDisplayItems(order).map((i) => ({
         quantity: i.quantity,
         name: i.product.name,
         price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,

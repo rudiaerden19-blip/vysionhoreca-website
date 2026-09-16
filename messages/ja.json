@@ -3356,6 +3356,7 @@
     "payFailed": "支払いを登録できませんでした。",
     "tabAlreadySettled": "この掛け勘定は既に支払済みです — 一覧を更新します。",
     "receiptCustomer": "掛け — {name}",
+    "receiptPartialPaymentHint": "掛けの一部払い（商品はタブに残ります）",
     "printFailed": "レシートを印刷できませんでした。Print Agentを確認してください。",
     "registerPayment": "支払いを登録"
   },

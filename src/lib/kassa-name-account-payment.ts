@@ -7,14 +7,12 @@ import { getMenuCategories, getMenuProducts, getTenantSettings, type MenuCategor
 import { dedupeCatalogById } from '@/lib/admin-api-menu-catalog'
 import { adminDb } from '@/lib/admin-db-client'
 import {
-  allocateNameTabPayment,
-  nameTabPaymentOrderLineForAmount,
   normalizeNameTabLines,
   orderLinesGrossIncl,
-  reduceNameTabLinesAfterPayment,
   isNameTabContextColumnError,
   nameTabItemsOnlyPayload,
   resolveNameTabOrderContext,
+  resolveNameTabPaymentOrderPlan,
   tabOpenTotalIncl,
   type KassaNameTabLine,
   type KassaNameTabRow,
@@ -67,36 +65,19 @@ export async function registerKassaNameTabPayment(params: {
 
   const payIncl =
     amountEur >= selectedOpen - 0.02 ? selectedOpen : Math.round(amountEur * 100) / 100
-  let { orderLines, nextTabLines, appliedIncl } = allocateNameTabPayment(selectedLines, payIncl)
-  let grossFromLines = Math.round(orderLinesGrossIncl(orderLines) * 100) / 100
+  const plan = resolveNameTabPaymentOrderPlan(selectedLines, payIncl)
+  const { orderLines, nextTabLines, showProductsOnReceipt } = plan
 
-  if (
-    appliedIncl <= 0 ||
-    !orderLines.length ||
-    Math.abs(grossFromLines - payIncl) > 0.03 ||
-    Math.abs(Math.round(appliedIncl * 100) / 100 - payIncl) > 0.03
-  ) {
-    const fallbackLine = nameTabPaymentOrderLineForAmount(selectedLines, payIncl)
-    if (!fallbackLine) {
-      return { ok: false, error: 'invalid_amount' }
-    }
-    orderLines = [fallbackLine]
-    nextTabLines =
-      payIncl >= selectedOpen - 0.02
-        ? []
-        : reduceNameTabLinesAfterPayment(selectedLines, payIncl)
-    appliedIncl = payIncl
-    grossFromLines = payIncl
+  if (!orderLines.length) {
+    return { ok: false, error: 'invalid_amount' }
   }
 
-  const appliedCharge = Math.round(appliedIncl * 100) / 100
-  if (Math.abs(grossFromLines - appliedCharge) > 0.03) {
-    return { ok: false, error: 'allocation_mismatch' }
-  }
-  if (Math.abs(payIncl - grossFromLines) > 0.03) {
+  const grossFromLines = Math.round(orderLinesGrossIncl(orderLines) * 100) / 100
+  if (!showProductsOnReceipt && Math.abs(grossFromLines - payIncl) > 0.03) {
     return { ok: false, error: 'amount_not_allocatable' }
   }
-  const payInclResolved = grossFromLines
+
+  const payInclResolved = payIncl
 
   const [settings, catsRaw, prodsRaw] = catalog
     ? [catalog.settings, catalog.categories, catalog.products]
@@ -129,6 +110,9 @@ export async function registerKassaNameTabPayment(params: {
     createdAt: paidAt,
     tableNumber: orderCtx.tableNumber,
     floorPlanZone: orderCtx.floorPlanZone,
+    customerNotes: showProductsOnReceipt
+      ? 'Op rekening — afrekening'
+      : 'Op rekening — deelbetaling',
   })
 
   if (!orderRes.ok) {
@@ -179,9 +163,10 @@ export async function registerKassaNameTabPayment(params: {
     return { ok: false, error: 'tab_update_failed', orderNumber: orderRes.orderNumber }
   }
 
+  const hydratedItems = orderRes.hydrated ?? orderLines
   const receipt: KassaLastOrderReceipt = {
     orderNumber: orderRes.orderNumber ?? 0,
-    items: orderRes.hydrated ?? orderLines,
+    items: showProductsOnReceipt ? hydratedItems : [],
     total: orderTotal,
     vatSplit: orderRes.vatByRate?.map((r) => ({
       rate: r.rate,
@@ -196,6 +181,7 @@ export async function registerKassaNameTabPayment(params: {
     floorPlanZone: orderCtx.floorPlanZone,
     createdAt: paidAt,
     onAccountCustomerName: tab.customer_name.trim(),
+    onAccountReceiptShowProducts: showProductsOnReceipt,
   }
 
   return {

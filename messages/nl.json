@@ -3921,6 +3921,7 @@
     "payFailed": "Betaling registreren mislukt.",
     "tabAlreadySettled": "Deze rekening is al betaald — lijst wordt ververst.",
     "receiptCustomer": "Op rekening — {name}",
+    "receiptPartialPaymentHint": "Deelbetaling op rekening (artikelen staan op tab)",
     "printFailed": "Bon afdrukken mislukt. Controleer de Print Agent.",
     "registerPayment": "Betaling registreren"
   },

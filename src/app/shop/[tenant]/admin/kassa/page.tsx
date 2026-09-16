@@ -209,6 +209,7 @@ import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/
 import KassaNameAccountModal from '@/components/kassa/KassaNameAccountModal'
 import { prefetchKassaNameTabs } from '@/lib/kassa-name-tabs-cache'
 import { kassaCartLineTotalIncl } from '@/lib/kassa-name-account'
+import { kassaNameAccountReceiptDisplayItems } from '@/lib/kassa-name-account-receipt'
 import { KassaStaffSalesPickModal } from '@/components/kassa/KassaStaffSalesPickModal'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { parseFloorPlanTablesJson, sanitizeFloorPlanTables, type FloorPlanTable } from '@/lib/kassa-floor-plan-tables'
@@ -4091,7 +4092,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : ''
 
     const bonLines: string[] = []
-    const receiptLines = sortKassaCartLinesByMenuCategory(order.items, categories)
+    const receiptLines = sortKassaCartLinesByMenuCategory(
+      kassaNameAccountReceiptDisplayItems(order),
+      categories,
+    )
     const sellerPostalCity = `${tenantInfo?.postal_code ?? ''} ${tenantInfo?.city ?? ''}`.trim()
     if (isVatInvoice) {
       const customer = opts?.customerInvoice
@@ -4185,6 +4189,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
+    if (order.onAccountReceiptShowProducts === false) {
+      bonLines.push(t('kassaNameAccount.receiptPartialPaymentHint'))
+      bonLines.push('--------------------------------')
+    }
     for (const i of receiptLines) {
       const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
       const lineTotal = (i.product.price + choicesTotal) * i.quantity
@@ -4246,7 +4254,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             orderNumber: order.orderNumber,
             orderType: order.orderType,
             tableNumber: receiptTableNr || null,
-            items: order.items.map(i => ({
+            items: kassaNameAccountReceiptDisplayItems(order).map(i => ({
               quantity: i.quantity,
               name: i.product.name,
               price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,

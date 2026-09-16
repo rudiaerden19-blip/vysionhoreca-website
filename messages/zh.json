@@ -3356,6 +3356,7 @@
     "payFailed": "无法登记付款。",
     "tabAlreadySettled": "该挂账已结清 — 正在刷新列表。",
     "receiptCustomer": "挂账 — {name}",
+    "receiptPartialPaymentHint": "挂账部分付款（商品仍在账单上）",
     "printFailed": "无法打印小票。请检查 Print Agent。",
     "registerPayment": "登记付款"
   },

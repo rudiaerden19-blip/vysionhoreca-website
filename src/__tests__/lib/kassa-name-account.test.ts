@@ -7,7 +7,9 @@ import {
   mergeIntoTabLines,
   orderLinesGrossIncl,
   reduceNameTabLinesAfterPayment,
+  resolveNameTabPaymentOrderPlan,
   tabOpenTotalIncl,
+  NAME_ACCOUNT_PARTIAL_PRODUCT_ID,
 } from '@/lib/kassa-name-account'
 
 function line(id: string, price: number, qty: number, extra = 0): KassaCartItem {
@@ -101,6 +103,24 @@ describe('kassa-name-account', () => {
   it('deelbetaling €2 op €4,50 — reduce tab FIFO', () => {
     const tab = cartLinesToTabLines([line('a', 4.5, 1)])
     expect(tabOpenTotalIncl(reduceNameTabLinesAfterPayment(tab, 2))).toBe(2.5)
+  })
+
+  it('deelbetaling plan: geen producten op bon, tab verlaagd', () => {
+    const tab = cartLinesToTabLines([line('a', 4.5, 1)])
+    const plan = resolveNameTabPaymentOrderPlan(tab, 2)
+    expect(plan.showProductsOnReceipt).toBe(false)
+    expect(plan.orderLines).toHaveLength(1)
+    expect(plan.orderLines[0].product.id).toBe(NAME_ACCOUNT_PARTIAL_PRODUCT_ID)
+    expect(orderLinesGrossIncl(plan.orderLines)).toBe(2)
+    expect(tabOpenTotalIncl(plan.nextTabLines)).toBe(2.5)
+  })
+
+  it('volledige afrekening plan: tab-regels op bon', () => {
+    const tab = cartLinesToTabLines([line('a', 4.5, 1)])
+    const plan = resolveNameTabPaymentOrderPlan(tab, 4.5)
+    expect(plan.showProductsOnReceipt).toBe(true)
+    expect(plan.orderLines[0].product.name).toBe('a')
+    expect(tabOpenTotalIncl(plan.nextTabLines)).toBe(0)
   })
 
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {
