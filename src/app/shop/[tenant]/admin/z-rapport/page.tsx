@@ -937,8 +937,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       .join('')
 
     const articlesBlock =
-      !zReportSendArticlesToAccountant(businessInfo?.z_report_send_articles_to_accountant) ||
-      articleLines.length === 0
+      !zReportShowSoldArticles || articleLines.length === 0
         ? ''
         : `
         <div class="section">
@@ -1071,13 +1070,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cashPayments: stats.cashPayments,
         cardPayments: stats.cardPayments,
         onlinePayments: stats.onlinePayments,
-        articleLines: zReportSendArticlesToAccountant(
-          businessInfo?.z_report_send_articles_to_accountant,
-        )
-          ? articleLines
-          : [],
-        soldArticlesSectionTitle: t('zReport.soldArticlesTitle'),
-        soldArticlesPiecesShort: t('zReport.soldArticlesPiecesShort'),
+        articleLines: zReportShowSoldArticles ? articleLines : [],
+        soldArticlesSectionTitle: zReportShowSoldArticles
+          ? t('zReport.soldArticlesTitle')
+          : '',
+        soldArticlesPiecesShort: zReportShowSoldArticles
+          ? t('zReport.soldArticlesPiecesShort')
+          : '',
         labels: {
           revenue: 'OMZET',
           orderCount: t('zReport.orderCount'),
@@ -1289,6 +1288,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const isDayClosed = currentSavedReport?.is_closed === true
   const ownerEveningCloseOn = zReportOwnerEveningCloseEnabled(
     businessInfo?.z_report_owner_evening_close,
+  )
+  const zReportShowSoldArticles = zReportSendArticlesToAccountant(
+    businessInfo?.z_report_send_articles_to_accountant,
   )
   const archiveMismatch =
     !ownerEveningCloseOn &&
@@ -1814,10 +1816,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   hasOwnerCloseValues(ownerCloseFromSaved(currentSavedReport)))) ? (
               <ZReportDocumentBody
                 amounts={statsToAmounts(stats)}
-                articleLines={articleLines}
-                hideSoldArticlesOnPrint={
-                  !zReportSendArticlesToAccountant(businessInfo?.z_report_send_articles_to_accountant)
-                }
+                articleLines={zReportShowSoldArticles ? articleLines : []}
+                showSoldArticles={zReportShowSoldArticles}
                 generatedAt={new Date().toLocaleString('nl-BE')}
                 labels={zReportDocumentLabels}
               />

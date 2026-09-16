@@ -4503,7 +4503,7 @@
     "monthSendTitle": "Invia mese al commercialista",
     "monthSendIntro": "Tutti gli Z-report del mese in un'e-mail — panoramica giornaliera, IVA per aliquota e totali.",
     "sendArticlesToAccountant": "Includere gli articoli per il commercialista",
-    "sendArticlesToAccountantHint": "Se no: nessuna riga articolo in mail, stampa e PDF. A schermo restano visibili.",
+    "sendArticlesToAccountantHint": "Se no: nessuna riga a schermo, e-mail giornaliera, mail mensile, stampa o PDF — solo totali e IVA.",
     "ownerCloseModule": "Compilare lo Z a mano",
     "ownerCloseModuleHint": "Solo per questo locale. Gli altri restano sui scontrini.",
     "ownerCloseTitle": "Chiusura serale",

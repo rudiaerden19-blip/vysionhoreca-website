@@ -3313,7 +3313,7 @@
     "monthSendTitle": "Maand doorsturen naar boekhouder",
     "monthSendIntro": "Stuur alle Z-rapporten van de geselecteerde maand in één e-mail — met dagoverzicht, BTW per tarief en totalen.",
     "sendArticlesToAccountant": "Artikelen meesturen naar boekhouder",
-    "sendArticlesToAccountantHint": "Bij Nee geen 10 cola / 20 koffie in mail, Afdrukken en PDF. Op dit scherm blijven de artikelen zichtbaar.",
+    "sendArticlesToAccountantHint": "Bij Nee geen artikelregels (10 cola, 20 koffie, …) op scherm, bij E-mail (dagrapport), maandmail, Afdrukken en PDF — alleen omzet en BTW.",
     "ownerCloseModule": "Z-rapport zelf invullen",
     "ownerCloseModuleHint": "Alleen aanzetten voor deze zaak. Andere tenants blijven op kassabonnen.",
     "ownerCloseTitle": "Avondtelling",

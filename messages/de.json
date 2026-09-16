@@ -4526,7 +4526,7 @@
     "monthSendTitle": "Monat an Buchhalter senden",
     "monthSendIntro": "Alle Z-Berichte des Monats in einer E-Mail — Tagesübersicht, MwSt. pro Satz und Summen.",
     "sendArticlesToAccountant": "Artikel an den Buchhalter mitsenden",
-    "sendArticlesToAccountantHint": "Bei Aus: keine Artikelzeilen in Mail, Druck und PDF. Am Bildschirm bleiben sie sichtbar.",
+    "sendArticlesToAccountantHint": "Bei Aus: keine Artikelzeilen auf dem Bildschirm, Tages-E-Mail, Monatsmail, Druck oder PDF — nur Umsatz und MwSt.",
     "ownerCloseModule": "Z-Bericht selbst eintragen",
     "ownerCloseModuleHint": "Nur für dieses Geschäft. Andere Tenants bleiben bei Kassenbons.",
     "ownerCloseTitle": "Abendzählung",

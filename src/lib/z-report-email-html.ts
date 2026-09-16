@@ -17,7 +17,7 @@ export function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;')
 }
 
-function sanitizeArticleLines(
+export function sanitizeZReportEmailArticleLines(
   raw: unknown,
 ): Array<{ label: string; qty: number; total: number; vatRate: number }> {
   if (!Array.isArray(raw)) return []
@@ -136,7 +136,7 @@ function buildPaymentRows(
 
 export function buildZReportEmailHtml(p: ZReportEmailInput): string {
   const esc = escapeHtml
-  const articlesRows = sanitizeArticleLines(p.articleLines)
+  const articlesRows = sanitizeZReportEmailArticleLines(p.articleLines)
   const articlesSectionTitle = p.soldArticlesSectionTitle
     ? esc(p.soldArticlesSectionTitle.trim().slice(0, 120))
     : 'Verkochte artikelen'

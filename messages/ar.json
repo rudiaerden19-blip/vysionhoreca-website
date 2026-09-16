@@ -4503,7 +4503,7 @@
     "monthSendTitle": "إرسال الشهر للمحاسب",
     "monthSendIntro": "كل تقارير Z للشهر في بريد واحد — نظرة يومية، ضريبة لكل معدل والمجاميع.",
     "sendArticlesToAccountant": "إرسال الأصناف إلى المحاسب",
-    "sendArticlesToAccountantHint": "عند الإيقاف: لا تظهر بنود الأصناف في البريد أو الطباعة أو PDF. تبقى ظاهرة على الشاشة.",
+    "sendArticlesToAccountantHint": "عند الإيقاف: لا بنود على الشاشة أو بريد اليوم أو الشهر أو الطباعة أو PDF — المجاميع وضريبة القيمة المضافة فقط.",
     "ownerCloseModule": "تعبئة تقرير Z يدوياً",
     "ownerCloseModuleHint": "فعّل لهذا المحل فقط. الباقي يبقى على تذاكر الصندوق.",
     "ownerCloseTitle": "إقفال المساء",

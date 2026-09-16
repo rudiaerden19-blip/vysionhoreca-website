@@ -4503,7 +4503,7 @@
     "monthSendTitle": "月次を会計士に送信",
     "monthSendIntro": "選択月のZレポートを1通のメールで — 日別概要、税率別消費税と合計。",
     "sendArticlesToAccountant": "会計担当者に商品明細を送る",
-    "sendArticlesToAccountantHint": "オフの場合、メール・印刷・PDFに商品行は出ません。画面上では表示されます。",
+    "sendArticlesToAccountantHint": "オフの場合、画面・日次メール・月次メール・印刷・PDFに商品行は出ません。売上と VAT のみ。",
     "ownerCloseModule": "Zレポートを手入力",
     "ownerCloseModuleHint": "この店舗だけ有効。他テナントはレジ伝票のまま。",
     "ownerCloseTitle": "閉店時の集計",

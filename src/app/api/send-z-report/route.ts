@@ -7,7 +7,8 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { buildZReportEmailHtml, parseZReportEmailAmounts } from '@/lib/z-report-email-html'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { zReportSendArticlesToAccountant } from '@/lib/z-report-accountant-articles'
+import { fetchZReportIncludeSoldArticles } from '@/lib/z-report-accountant-articles'
+import { sanitizeZReportEmailArticleLines } from '@/lib/z-report-email-html'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -57,18 +58,11 @@ export async function POST(request: NextRequest) {
     }
     const transporter = createZohoMailTransport()
 
-    let includeArticles = true
     const supabase = getServerSupabaseClient()
-    if (supabase) {
-      const { data: settings } = await supabase
-        .from('tenant_settings')
-        .select('z_report_send_articles_to_accountant')
-        .eq('tenant_slug', tenantSlug)
-        .maybeSingle()
-      includeArticles = zReportSendArticlesToAccountant(
-        settings?.z_report_send_articles_to_accountant,
-      )
-    }
+    const includeArticles = await fetchZReportIncludeSoldArticles(supabase, tenantSlug)
+    const articleLinesForEmail = includeArticles
+      ? sanitizeZReportEmailArticleLines(rawArticleLines)
+      : []
 
     const parsed = parseZReportEmailAmounts(body as Record<string, unknown>)
     const labelsIn = rawLabels && typeof rawLabels === 'object' ? (rawLabels as Record<string, unknown>) : {}
@@ -81,7 +75,7 @@ export async function POST(request: NextRequest) {
       btwNumber: btwNumber || '',
       formattedDate: formattedDate || '',
       amounts: parsed.amounts,
-      articleLines: includeArticles ? rawArticleLines : [],
+      articleLines: articleLinesForEmail,
       soldArticlesSectionTitle,
       soldArticlesPiecesShort,
       labels: {

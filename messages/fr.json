@@ -4526,7 +4526,7 @@
     "monthSendTitle": "Envoyer le mois au comptable",
     "monthSendIntro": "Tous les Z-rapports du mois en un e-mail — aperçu journalier, TVA par taux et totaux.",
     "sendArticlesToAccountant": "Joindre les articles pour le comptable",
-    "sendArticlesToAccountantHint": "Si non : pas de lignes articles dans le mail, l’impression et le PDF. L’écran les affiche encore.",
+    "sendArticlesToAccountantHint": "Si non : pas de lignes articles à l’écran, e-mail jour, mail mensuel, impression ou PDF — seulement CA et TVA.",
     "ownerCloseModule": "Remplir le Z soi-même",
     "ownerCloseModuleHint": "Activer seulement pour ce commerce. Les autres restent sur les tickets caisse.",
     "ownerCloseTitle": "Totaux du soir",

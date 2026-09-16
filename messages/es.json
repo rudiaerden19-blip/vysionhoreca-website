@@ -4503,7 +4503,7 @@
     "monthSendTitle": "Enviar mes al contable",
     "monthSendIntro": "Todos los Z-informes del mes en un e-mail — resumen diario, IVA por tarifa y totales.",
     "sendArticlesToAccountant": "Incluir artículos para el contable",
-    "sendArticlesToAccountantHint": "Si no: sin líneas de artículos en correo, impresión y PDF. En pantalla siguen visibles.",
+    "sendArticlesToAccountantHint": "Si no: sin líneas en pantalla, correo diario, correo mensual, impresión ni PDF — solo totales e IVA.",
     "ownerCloseModule": "Rellenar el Z a mano",
     "ownerCloseModuleHint": "Solo para este local. Los demás siguen con tickets de caja.",
     "ownerCloseTitle": "Cierre de la noche",

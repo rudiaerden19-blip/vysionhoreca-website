@@ -4503,7 +4503,7 @@
     "monthSendTitle": "发送整月报表给会计",
     "monthSendIntro": "将所选月份的所有 Z 报表合并为一封邮件 — 每日概览、各税率增值税与合计。",
     "sendArticlesToAccountant": "向会计发送商品明细",
-    "sendArticlesToAccountantHint": "关闭后，邮件、打印和 PDF 不含商品行。屏幕上仍显示。",
+    "sendArticlesToAccountantHint": "关闭后，屏幕、日报邮件、月报邮件、打印和 PDF 均不含商品行，仅营业额和 VAT。",
     "ownerCloseModule": "手动填写 Z 报表",
     "ownerCloseModuleHint": "仅为此店开启。其他租户仍用收银小票。",
     "ownerCloseTitle": "晚间盘点",
