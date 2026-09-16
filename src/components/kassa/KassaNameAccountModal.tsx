@@ -332,6 +332,7 @@ export default function KassaNameAccountModal({
   const showPayPanel = !cartHasItems && payerOpenTotal > 0.001 && !!normName(name)
   const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
   const hasPayerSelected = payerOpenTotal > 0.001 && !!normName(name)
+  const showGrandOpenTotal = !cartHasItems && !showPayPanel
   const payerPayFieldValue = payAmountEdited
     ? payAmount
     : payerOpenTotal > 0.001
@@ -397,20 +398,24 @@ export default function KassaNameAccountModal({
                 }}
               />
             </label>
-            <label className="block w-32 shrink-0 text-sm font-medium text-gray-700 sm:w-36">
-              {t('kassaNameAccount.openBalanceLabel')}
-              <input
-                type="text"
-                readOnly
-                tabIndex={-1}
-                className="vysion-light-form-field mt-1 w-full cursor-default rounded-xl border border-red-200 bg-red-50/80 px-3 py-3 text-base tabular-nums font-semibold text-red-800"
-                value={formatOpenAmountForInput(grandOpenTotal)}
-                aria-label={t('kassaNameAccount.openBalanceLabel')}
-              />
-            </label>
+            {showGrandOpenTotal ? (
+              <label className="block w-32 shrink-0 text-sm font-medium text-gray-700 sm:w-36">
+                {t('kassaNameAccount.openBalanceLabel')}
+                <input
+                  type="text"
+                  readOnly
+                  tabIndex={-1}
+                  className="vysion-light-form-field mt-1 w-full cursor-default rounded-xl border border-red-200 bg-red-50/80 px-3 py-3 text-base tabular-nums font-semibold text-red-800"
+                  value={formatOpenAmountForInput(grandOpenTotal)}
+                  aria-label={t('kassaNameAccount.openBalanceLabel')}
+                />
+              </label>
+            ) : null}
           </div>
 
-          <p className="text-sm text-gray-600">{t('kassaNameAccount.openGrandTotalHint')}</p>
+          {showGrandOpenTotal ? (
+            <p className="text-sm text-gray-600">{t('kassaNameAccount.openGrandTotalHint')}</p>
+          ) : null}
 
           <div>
             <p className="text-sm font-semibold text-gray-800">
