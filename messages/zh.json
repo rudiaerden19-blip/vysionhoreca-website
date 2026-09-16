@@ -3354,6 +3354,7 @@
     "amountTooHigh": "金额高于未结余额。",
     "amountNotAllocatable": "无法按此金额分摊 — 请使用整分或付清全部余额。",
     "payFailed": "无法登记付款。",
+    "orderTotalMismatch": "金额与未结余额不符 — 请刷新列表后重试。",
     "tabAlreadySettled": "该挂账已结清 — 正在刷新列表。",
     "receiptCustomer": "挂账 — {name}",
     "receiptPartialPaymentHint": "挂账部分付款（商品仍在账单上）",

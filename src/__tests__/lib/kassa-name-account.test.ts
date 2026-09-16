@@ -120,7 +120,16 @@ describe('kassa-name-account', () => {
     const plan = resolveNameTabPaymentOrderPlan(tab, 4.5)
     expect(plan.showProductsOnReceipt).toBe(true)
     expect(plan.orderLines[0].product.name).toBe('a')
+    expect(orderLinesGrossIncl(plan.orderLines)).toBe(4.5)
     expect(tabOpenTotalIncl(plan.nextTabLines)).toBe(0)
+  })
+
+  it('volledige afrekening na deelbetaling — bruto = resterend open', () => {
+    const tab = cartLinesToTabLines([line('a', 4.5, 1)])
+    tab[0].unpaidIncl = 3.5
+    const plan = resolveNameTabPaymentOrderPlan(tab, 3.5)
+    expect(plan.showProductsOnReceipt).toBe(true)
+    expect(orderLinesGrossIncl(plan.orderLines)).toBe(3.5)
   })
 
   it('deelbetaling vandaag — rest morgen (FIFO)', () => {

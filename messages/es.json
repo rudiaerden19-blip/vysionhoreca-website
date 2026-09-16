@@ -3354,6 +3354,7 @@
     "amountTooHigh": "Importe mayor que el saldo abierto.",
     "amountNotAllocatable": "No se puede repartir este importe — use céntimos enteros o pague el saldo completo.",
     "payFailed": "No se pudo registrar el pago.",
+    "orderTotalMismatch": "El importe no coincide con el saldo abierto — actualice la lista e inténtelo de nuevo.",
     "tabAlreadySettled": "Esta cuenta ya está pagada — actualizando la lista.",
     "receiptCustomer": "A cuenta — {name}",
     "receiptPartialPaymentHint": "Pago parcial a cuenta (artículos en la pestaña)",

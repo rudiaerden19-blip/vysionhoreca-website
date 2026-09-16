@@ -1,0 +1,86 @@
+solid 01-ladeblok
+  facet normal 0.000000 0.000000 1.000000
+    outer loop
+      vertex 0.000 0.000 0.000
+      vertex 400.000 0.000 0.000
+      vertex 400.000 340.000 0.000
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 1.000000
+    outer loop
+      vertex 0.000 0.000 0.000
+      vertex 400.000 340.000 0.000
+      vertex 0.000 340.000 0.000
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 -1.000000
+    outer loop
+      vertex 0.000 0.000 100.000
+      vertex 0.000 340.000 100.000
+      vertex 400.000 340.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 -1.000000
+    outer loop
+      vertex 0.000 0.000 100.000
+      vertex 400.000 340.000 100.000
+      vertex 400.000 0.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 1.000000 0.000000
+    outer loop
+      vertex 0.000 0.000 0.000
+      vertex 0.000 0.000 100.000
+      vertex 400.000 0.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 1.000000 0.000000
+    outer loop
+      vertex 0.000 0.000 0.000
+      vertex 400.000 0.000 100.000
+      vertex 400.000 0.000 0.000
+    endloop
+  endfacet
+  facet normal 0.000000 -1.000000 0.000000
+    outer loop
+      vertex 0.000 340.000 0.000
+      vertex 400.000 340.000 0.000
+      vertex 400.000 340.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 -1.000000 0.000000
+    outer loop
+      vertex 0.000 340.000 0.000
+      vertex 400.000 340.000 100.000
+      vertex 0.000 340.000 100.000
+    endloop
+  endfacet
+  facet normal 1.000000 0.000000 0.000000
+    outer loop
+      vertex 0.000 0.000 0.000
+      vertex 0.000 340.000 0.000
+      vertex 0.000 340.000 100.000
+    endloop
+  endfacet
+  facet normal 1.000000 0.000000 0.000000
+    outer loop
+      vertex 0.000 0.000 0.000
+      vertex 0.000 340.000 100.000
+      vertex 0.000 0.000 100.000
+    endloop
+  endfacet
+  facet normal -1.000000 0.000000 0.000000
+    outer loop
+      vertex 400.000 0.000 0.000
+      vertex 400.000 0.000 100.000
+      vertex 400.000 340.000 100.000
+    endloop
+  endfacet
+  facet normal -1.000000 0.000000 0.000000
+    outer loop
+      vertex 400.000 0.000 0.000
+      vertex 400.000 340.000 100.000
+      vertex 400.000 340.000 0.000
+    endloop
+  endfacet
+endsolid 01-ladeblok

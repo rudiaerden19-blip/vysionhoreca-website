@@ -60,7 +60,7 @@ export async function insertKassaOrderForNameAccountPayment(params: {
 
   if (!lines.length) return { ok: false, error: 'Geen regels' }
 
-  const hydrated = hydrateKassaCartItemsFromCatalog(lines, products)
+  const hydrated = hydrateKassaCartItemsFromCatalog(lines, products, { preserveLinePrices: true })
   const resolveLineVat = (line: KassaCartItem) =>
     resolveVatPercentForCartLine(
       line.product,

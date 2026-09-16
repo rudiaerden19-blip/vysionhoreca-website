@@ -332,8 +332,15 @@ export function resolveNameTabPaymentOrderPlan(
   const full = isNameTabFullSettlement(pay, open)
 
   if (full) {
+    const orderLines: KassaCartItem[] = []
+    for (const line of normalized) {
+      const unpaidCents = Math.round(effectiveLineUnpaidIncl(line) * 100)
+      if (unpaidCents <= 0) continue
+      const { orderParts } = applyOpenAmountToLine(line, unpaidCents)
+      orderLines.push(...orderParts)
+    }
     return {
-      orderLines: normalized.map((line) => cloneCartLineForOrder(line, line.quantity)),
+      orderLines,
       nextTabLines: [],
       showProductsOnReceipt: true,
     }

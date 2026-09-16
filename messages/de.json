@@ -2854,6 +2854,7 @@
     "amountTooHigh": "Betrag höher als offener Saldo.",
     "amountNotAllocatable": "Betrag lässt sich nicht auf offene Posten verteilen — volle Centbeträge oder vollständige Begleichung.",
     "payFailed": "Zahlung konnte nicht registriert werden.",
+    "orderTotalMismatch": "Betrag passt nicht zum offenen Saldo — Liste aktualisieren und erneut versuchen.",
     "tabAlreadySettled": "Diese Rechnung ist bereits bezahlt — Liste wird aktualisiert.",
     "receiptCustomer": "Auf Rechnung — {name}",
     "receiptPartialPaymentHint": "Teilzahlung auf Rechnung (Artikel bleiben auf dem Tab)",

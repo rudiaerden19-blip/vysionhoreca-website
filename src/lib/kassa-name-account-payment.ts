@@ -73,7 +73,7 @@ export async function registerKassaNameTabPayment(params: {
   }
 
   const grossFromLines = Math.round(orderLinesGrossIncl(orderLines) * 100) / 100
-  if (!showProductsOnReceipt && Math.abs(grossFromLines - payIncl) > 0.03) {
+  if (Math.abs(grossFromLines - payIncl) > 0.03) {
     return { ok: false, error: 'amount_not_allocatable' }
   }
 

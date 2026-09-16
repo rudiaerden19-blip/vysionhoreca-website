@@ -3354,6 +3354,7 @@
     "amountTooHigh": "未払い残高を超えています。",
     "amountNotAllocatable": "この金額は割り当てできません — セント単位または全額をお支払いください。",
     "payFailed": "支払いを登録できませんでした。",
+    "orderTotalMismatch": "金額が未払い残高と一致しません — リストを更新して再度お試しください。",
     "tabAlreadySettled": "この掛け勘定は既に支払済みです — 一覧を更新します。",
     "receiptCustomer": "掛け — {name}",
     "receiptPartialPaymentHint": "掛けの一部払い（商品はタブに残ります）",

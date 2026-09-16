@@ -1,0 +1,86 @@
+solid 03-minipc-nis
+  facet normal 0.000000 0.000000 1.000000
+    outer loop
+      vertex 140.000 24.000 100.000
+      vertex 260.000 24.000 100.000
+      vertex 260.000 136.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 1.000000
+    outer loop
+      vertex 140.000 24.000 100.000
+      vertex 260.000 136.000 100.000
+      vertex 140.000 136.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 -1.000000
+    outer loop
+      vertex 140.000 24.000 152.000
+      vertex 140.000 136.000 152.000
+      vertex 260.000 136.000 152.000
+    endloop
+  endfacet
+  facet normal 0.000000 0.000000 -1.000000
+    outer loop
+      vertex 140.000 24.000 152.000
+      vertex 260.000 136.000 152.000
+      vertex 260.000 24.000 152.000
+    endloop
+  endfacet
+  facet normal 0.000000 1.000000 0.000000
+    outer loop
+      vertex 140.000 24.000 100.000
+      vertex 140.000 24.000 152.000
+      vertex 260.000 24.000 152.000
+    endloop
+  endfacet
+  facet normal 0.000000 1.000000 0.000000
+    outer loop
+      vertex 140.000 24.000 100.000
+      vertex 260.000 24.000 152.000
+      vertex 260.000 24.000 100.000
+    endloop
+  endfacet
+  facet normal 0.000000 -1.000000 0.000000
+    outer loop
+      vertex 140.000 136.000 100.000
+      vertex 260.000 136.000 100.000
+      vertex 260.000 136.000 152.000
+    endloop
+  endfacet
+  facet normal 0.000000 -1.000000 0.000000
+    outer loop
+      vertex 140.000 136.000 100.000
+      vertex 260.000 136.000 152.000
+      vertex 140.000 136.000 152.000
+    endloop
+  endfacet
+  facet normal 1.000000 0.000000 0.000000
+    outer loop
+      vertex 140.000 24.000 100.000
+      vertex 140.000 136.000 100.000
+      vertex 140.000 136.000 152.000
+    endloop
+  endfacet
+  facet normal 1.000000 0.000000 0.000000
+    outer loop
+      vertex 140.000 24.000 100.000
+      vertex 140.000 136.000 152.000
+      vertex 140.000 24.000 152.000
+    endloop
+  endfacet
+  facet normal -1.000000 0.000000 0.000000
+    outer loop
+      vertex 260.000 24.000 100.000
+      vertex 260.000 24.000 152.000
+      vertex 260.000 136.000 152.000
+    endloop
+  endfacet
+  facet normal -1.000000 0.000000 0.000000
+    outer loop
+      vertex 260.000 24.000 100.000
+      vertex 260.000 136.000 152.000
+      vertex 260.000 136.000 100.000
+    endloop
+  endfacet
+endsolid 03-minipc-nis

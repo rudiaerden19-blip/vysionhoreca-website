@@ -2854,6 +2854,7 @@
     "amountTooHigh": "Montant supérieur au solde ouvert.",
     "amountNotAllocatable": "Ce montant ne peut pas être réparti — utilisez des centimes entiers ou le solde complet.",
     "payFailed": "Impossible d'enregistrer le paiement.",
+    "orderTotalMismatch": "Le montant ne correspond pas au solde ouvert — actualisez la liste et réessayez.",
     "tabAlreadySettled": "Cette note est déjà payée — actualisation de la liste.",
     "receiptCustomer": "En compte — {name}",
     "receiptPartialPaymentHint": "Paiement partiel en compte (articles sur l’onglet)",

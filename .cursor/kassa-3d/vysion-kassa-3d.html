@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vysion kassa — 3D</title>
+  <style>
+    :root {
+      --bg: #111114;
+      --panel: #1a1a1e;
+      --line: #2a2a30;
+      --text: #ececec;
+      --muted: #9a9aa3;
+      --accent: #ff6b35;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    #view { position: absolute; inset: 0; }
+    header {
+      position: absolute; z-index: 2; left: 16px; top: 16px; right: 16px;
+      display: flex; gap: 10px; align-items: flex-start; justify-content: space-between;
+      pointer-events: none;
+    }
+    header > * { pointer-events: auto; }
+    h1 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+    .lead { color: var(--muted); font-size: 12px; margin: 0; }
+    .tools { display: flex; gap: 8px; flex-wrap: wrap; }
+    button {
+      background: var(--panel); color: var(--text); border: 1px solid var(--line);
+      padding: 7px 12px; font-size: 12px; cursor: pointer;
+    }
+    button.on { border-color: var(--accent); color: var(--accent); }
+    aside {
+      position: absolute; z-index: 2; right: 16px; bottom: 16px;
+      width: 280px; background: var(--panel); border: 1px solid var(--line);
+      padding: 12px 14px; font-size: 12px; line-height: 1.45;
+    }
+    aside h2 { font-size: 12px; margin: 0 0 8px; font-weight: 600; }
+    aside table { width: 100%; border-collapse: collapse; }
+    aside td { padding: 3px 0; color: var(--muted); }
+    aside td:last-child { text-align: right; color: var(--text); }
+    .hint { position: absolute; z-index: 2; left: 16px; bottom: 16px; color: var(--muted); font-size: 12px; }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="view"></div>
+  <header>
+    <div>
+      <h1>Vysion kassa — 3D concept</h1>
+      <p class="lead">mm · kassier = groot scherm + lade + printer · klant = klein scherm</p>
+    </div>
+    <div class="tools">
+      <button type="button" id="btn-assembled" class="on">In elkaar</button>
+      <button type="button" id="btn-exploded">Uit elkaar</button>
+      <button type="button" id="btn-front">Voor</button>
+      <button type="button" id="btn-side">Zij</button>
+      <button type="button" id="btn-top">Boven</button>
+    </div>
+  </header>
+  <p class="hint">Sleep om te draaien · scroll = zoom · OpenSCAD: vysion-kassa.scad</p>
+  <aside>
+    <h2>Maten (concept)</h2>
+    <table>
+      <tr><td>Ladeblok</td><td>400 × 340 × 100</td></tr>
+      <tr><td>Printerholte</td><td>148 × 180 × 90</td></tr>
+      <tr><td>Kassiersscherm Elo</td><td>346 × 220 × 28</td></tr>
+      <tr><td>Klantenscherm</td><td>220 × 140 × 16</td></tr>
+      <tr><td>Alu-nek</td><td>36 × 36 × 168</td></tr>
+      <tr><td>VESA</td><td>75 × 75</td></tr>
+      <tr><td>Mini-PC (NUC)</td><td>120 × 112 × 52 achterin</td></tr>
+      <tr><td>Printbed max</td><td>250 x 250 x 250</td></tr>
+    </table>
+  </aside>
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    const MM = 0.01;
+    const D = {
+      drawerW: 400, drawerD: 340, drawerH: 100,
+      printerW: 148, printerD: 180, printerH: 90,
+      eloW: 346, eloH: 220, eloT: 28,
+      cfdW: 220, cfdH: 140, cfdT: 16,
+      neckW: 36, neckD: 36, neckH: 168, vesa: 75,
+    };
+
+    const root = document.getElementById("view");
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x111114);
+
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 80);
+    const TARGET = [2.0, 1.35, 1.5];
+    camera.position.set(-0.6, 2.6, -5.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    root.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(...TARGET);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const key = new THREE.DirectionalLight(0xffffff, 1.1);
+    key.position.set(4, 8, 6);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x8899aa, 0.35);
+    fill.position.set(-5, 2, -3);
+    scene.add(fill);
+
+    const mat = {
+      body: new THREE.MeshStandardMaterial({ color: 0x2c2c30, roughness: 0.55, metalness: 0.15 }),
+      steel: new THREE.MeshStandardMaterial({ color: 0x8a9098, roughness: 0.35, metalness: 0.7 }),
+      alu: new THREE.MeshStandardMaterial({ color: 0xb8bcc4, roughness: 0.3, metalness: 0.75 }),
+      printer: new THREE.MeshStandardMaterial({ color: 0x1a1a1e, roughness: 0.45, metalness: 0.2 }),
+      glass: new THREE.MeshStandardMaterial({ color: 0x151518, roughness: 0.15, metalness: 0.4 }),
+      orange: new THREE.MeshStandardMaterial({ color: 0xff6b35, roughness: 0.4, metalness: 0.1 }),
+      paper: new THREE.MeshStandardMaterial({ color: 0xf3f1ea, roughness: 0.8, metalness: 0 }),
+    };
+
+    function meshBox(w, h, d, material) {
+      return new THREE.Mesh(new THREE.BoxGeometry(w * MM, h * MM, d * MM), material);
+    }
+
+    const group = new THREE.Group();
+    scene.add(group);
+    const cx = (D.drawerW * MM) / 2;
+    const cz = (D.drawerD * MM) / 2;
+
+    const drawer = meshBox(D.drawerW, D.drawerH, D.drawerD, mat.body);
+    drawer.position.set(cx, (D.drawerH * MM) / 2, cz);
+    group.add(drawer);
+
+    const fascia = meshBox(D.drawerW - 16, 54, 4, mat.steel);
+    fascia.position.set(cx, 0.48, 0.01);
+    group.add(fascia);
+
+    const stripe = meshBox(D.drawerW - 20, 3, 2, mat.orange);
+    stripe.position.set(cx, 0.14, -0.005);
+    group.add(stripe);
+
+    const lock = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 20), mat.steel);
+    lock.rotation.x = Math.PI / 2;
+    lock.position.set(cx, 0.48, -0.01);
+    group.add(lock);
+
+    const printer = new THREE.Group();
+    const pBody = meshBox(D.printerW, D.printerH, D.printerD, mat.printer);
+    printer.add(pBody);
+    const paper = meshBox(78, 2, 64, mat.paper);
+    paper.position.set(0, 0.28, -1.05);
+    printer.add(paper);
+    printer.position.set(
+      (D.drawerW - D.printerW / 2 - 12) * MM,
+      0.12 + (D.printerH * MM) / 2,
+      0.28
+    );
+    group.add(printer);
+
+    const slot = meshBox(88, 6, 10, mat.body);
+    slot.position.set((D.drawerW - 80) * MM, 0.84, 0.02);
+    group.add(slot);
+
+    const neck = meshBox(D.neckW, D.neckH, D.neckD, mat.alu);
+    neck.position.set(cx, D.drawerH * MM + (D.neckH * MM) / 2, cz);
+    group.add(neck);
+
+    function makeScreen(w, h, t, faceSign) {
+      const g = new THREE.Group();
+      const body = meshBox(w, h, t, mat.body);
+      const glass = meshBox(w - 14, h - 16, 2, mat.glass);
+      glass.position.z = faceSign * ((t * MM) / 2 + 0.012);
+      g.add(body);
+      g.add(glass);
+      return g;
+    }
+
+    const cashier = makeScreen(D.eloW, D.eloH, D.eloT, -1);
+    cashier.position.set(cx, D.drawerH * MM + D.neckH * MM - 0.05, cz - 0.32);
+    cashier.rotation.x = THREE.MathUtils.degToRad(-20);
+    group.add(cashier);
+
+    const customer = makeScreen(D.cfdW, D.cfdH, D.cfdT, 1);
+    customer.position.set(cx, D.drawerH * MM + D.neckH * MM + 0.12, cz + 0.28);
+    customer.rotation.x = THREE.MathUtils.degToRad(16);
+    group.add(customer);
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(12, 12),
+      new THREE.MeshStandardMaterial({ color: 0x1a1a1e, roughness: 0.9 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    scene.add(floor);
+
+    const grid = new THREE.GridHelper(8, 16, 0x2a2a30, 0x2a2a30);
+    scene.add(grid);
+
+    const rest = {
+      cashier: cashier.position.clone(),
+      customer: customer.position.clone(),
+      neck: neck.position.clone(),
+      printer: printer.position.clone(),
+    };
+
+    let exploded = false;
+    function applyExplode() {
+      const k = exploded ? 1 : 0;
+      cashier.position.copy(rest.cashier).add(new THREE.Vector3(0, 0.15 * k, -0.55 * k));
+      customer.position.copy(rest.customer).add(new THREE.Vector3(0, 0.15 * k, 0.55 * k));
+      neck.position.copy(rest.neck).add(new THREE.Vector3(0, 0.35 * k, 0));
+      printer.position.copy(rest.printer).add(new THREE.Vector3(0.35 * k, 0.2 * k, 0));
+    }
+
+    function look(pos, target) {
+      camera.position.set(pos[0], pos[1], pos[2]);
+      controls.target.set(target[0], target[1], target[2]);
+      controls.update();
+    }
+
+    document.getElementById("btn-assembled").onclick = () => {
+      exploded = false; applyExplode();
+      document.getElementById("btn-assembled").classList.add("on");
+      document.getElementById("btn-exploded").classList.remove("on");
+    };
+    document.getElementById("btn-exploded").onclick = () => {
+      exploded = true; applyExplode();
+      document.getElementById("btn-exploded").classList.add("on");
+      document.getElementById("btn-assembled").classList.remove("on");
+    };
+    document.getElementById("btn-front").onclick = () => look([-0.2, 1.7, -5.4], TARGET);
+    document.getElementById("btn-side").onclick = () => look([6.8, 1.9, 1.5], TARGET);
+    document.getElementById("btn-top").onclick = () => look([2.0, 7.4, 1.6], [2.0, 0.4, 1.6]);
+
+    function resize() {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    addEventListener("resize", resize);
+    resize();
+
+    function tick() {
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  </script>
+</body>
+</html>

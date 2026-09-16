@@ -3354,6 +3354,7 @@
     "amountTooHigh": "Importo superiore al saldo aperto.",
     "amountNotAllocatable": "Importo non allocabile — usare centesimi interi o saldare l'intero importo.",
     "payFailed": "Impossibile registrare il pagamento.",
+    "orderTotalMismatch": "L'importo non corrisponde al saldo aperto — aggiorna l'elenco e riprova.",
     "tabAlreadySettled": "Questo conto è già saldato — aggiornamento elenco.",
     "receiptCustomer": "In conto — {name}",
     "receiptPartialPaymentHint": "Pagamento parziale in conto (articoli sul tab)",

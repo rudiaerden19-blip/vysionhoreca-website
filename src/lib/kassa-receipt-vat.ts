@@ -24,7 +24,9 @@ export type KassaReceiptVatComputed = {
 export function hydrateKassaCartItemsFromCatalog(
   lines: KassaCartItem[],
   products: ReadonlyArray<MenuProduct>,
+  opts?: { preserveLinePrices?: boolean },
 ): KassaCartItem[] {
+  const preserveLinePrices = opts?.preserveLinePrices === true
   const byId = new Map<string, MenuProduct>()
   for (const p of products) {
     if (p.id) byId.set(String(p.id), p)
@@ -45,13 +47,18 @@ export function hydrateKassaCartItemsFromCatalog(
     ) {
       return line
     }
+    const snapshotPrice = line.product.price
+    const price =
+      preserveLinePrices && snapshotPrice != null && Number.isFinite(Number(snapshotPrice))
+        ? Number(snapshotPrice)
+        : (snapshotPrice ?? fromCatalog.price)
     return {
       ...line,
       product: {
         ...line.product,
         category_id,
         name: line.product.name || fromCatalog.name,
-        price: line.product.price ?? fromCatalog.price,
+        price,
       },
     }
   })
