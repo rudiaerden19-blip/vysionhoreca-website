@@ -3920,6 +3920,8 @@
     "amountNotAllocatable": "This amount cannot be allocated to open lines — use whole cents or pay the full balance.",
     "payFailed": "Could not register payment.",
     "orderTotalMismatch": "Amount does not match the open balance — refresh the list and try again.",
+    "scopeDenied": "This action is not allowed for this business.",
+    "tabStaleRefresh": "This account entry is outdated — refreshing the list. Please try again.",
     "tabAlreadySettled": "This tab is already paid — refreshing the list.",
     "receiptCustomer": "On account — {name}",
     "receiptPartialPaymentHint": "Partial on-account payment (items stay on tab)",

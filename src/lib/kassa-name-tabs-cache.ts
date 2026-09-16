@@ -1,5 +1,6 @@
 import { adminDb } from '@/lib/admin-db-client'
 import type { KassaNameTabRow } from '@/lib/kassa-name-account'
+import { filterKassaNameTabsForTenant } from '@/lib/kassa-name-account-guard'
 
 type CacheEntry = {
   tabs: KassaNameTabRow[]
@@ -34,7 +35,8 @@ async function loadTabsFromDb(tenant: string): Promise<KassaNameTabRow[]> {
   if (!res.ok) {
     throw new Error(res.error || 'load_failed')
   }
-  return Array.isArray(res.data) ? res.data : []
+  const rows = Array.isArray(res.data) ? res.data : []
+  return filterKassaNameTabsForTenant(rows, tenant)
 }
 
 function failResult(

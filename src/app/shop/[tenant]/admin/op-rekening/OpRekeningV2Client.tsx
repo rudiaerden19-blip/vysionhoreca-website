@@ -9,6 +9,7 @@ import {
   type KassaNameTabLine,
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
+import { validateNameTabPaymentRequest } from '@/lib/kassa-name-account-guard'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
 import {
   fetchKassaNameTabs,
@@ -92,13 +93,28 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
   const registerPayment = async () => {
     if (!selected) return
     const amount = parseFloat(payAmount.replace(',', '.'))
+    const guard = validateNameTabPaymentRequest({
+      tenantSlug: tenant,
+      tab: selected,
+      amountEur: amount,
+      paymentMethod: payMethod,
+      knownTabs: tabs,
+    })
+    if (!guard.ok) {
+      if (guard.error === 'invalid_amount') setError(t('kassaNameAccount.invalidAmount'))
+      else if (guard.error === 'tab_not_in_tenant') {
+        setError(t('kassaNameAccount.tabStaleRefresh'))
+        void load()
+      } else setError(t('kassaNameAccount.scopeDenied'))
+      return
+    }
     setSaving(true)
     setError(null)
     setPrintError(null)
     const res = await registerKassaNameTabPayment({
       tenantSlug: tenant,
       tab: selected,
-      amountEur: amount,
+      amountEur: guard.amountEur,
       paymentMethod: payMethod,
       catalog: tenantInfo ? { settings: tenantInfo, categories, products } : undefined,
     })
@@ -109,6 +125,7 @@ export default function OpRekeningV2Client({ tenant }: { tenant: string }) {
       else if (res.error === 'tab_already_settled') setError(t('kassaNameAccount.tabAlreadySettled'))
       else if (res.error === 'amount_not_allocatable') setError(t('kassaNameAccount.amountNotAllocatable'))
       else if (res.error === 'order_total_mismatch') setError(t('kassaNameAccount.orderTotalMismatch'))
+      else if (res.error === 'scope_denied') setError(t('kassaNameAccount.scopeDenied'))
       else setError(res.error || t('kassaNameAccount.payFailed'))
       if (res.error === 'tab_already_settled') void load()
       return

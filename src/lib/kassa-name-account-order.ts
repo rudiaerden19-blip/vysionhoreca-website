@@ -6,6 +6,7 @@ import {
   computeInclusiveVatSplitFromCart,
   resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
+import { normalizeNameAccountTenantSlug } from '@/lib/kassa-name-account-guard'
 import { hydrateKassaCartItemsFromCatalog } from '@/lib/kassa-receipt-vat'
 import { adminDb } from '@/lib/admin-db-client'
 
@@ -58,6 +59,9 @@ export async function insertKassaOrderForNameAccountPayment(params: {
     floorPlanZone,
   } = params
 
+  if (!normalizeNameAccountTenantSlug(tenantSlug)) {
+    return { ok: false, error: 'invalid_tenant' }
+  }
   if (!lines.length) return { ok: false, error: 'Geen regels' }
 
   const hydrated = hydrateKassaCartItemsFromCatalog(lines, products, { preserveLinePrices: true })

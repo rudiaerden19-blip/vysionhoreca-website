@@ -3355,6 +3355,8 @@
     "amountNotAllocatable": "Importo non allocabile — usare centesimi interi o saldare l'intero importo.",
     "payFailed": "Impossibile registrare il pagamento.",
     "orderTotalMismatch": "L'importo non corrisponde al saldo aperto — aggiorna l'elenco e riprova.",
+    "scopeDenied": "Questa azione non è consentita per questa attività.",
+    "tabStaleRefresh": "Questo conto non è aggiornato — aggiornamento elenco. Riprova.",
     "tabAlreadySettled": "Questo conto è già saldato — aggiornamento elenco.",
     "receiptCustomer": "In conto — {name}",
     "receiptPartialPaymentHint": "Pagamento parziale in conto (articoli sul tab)",

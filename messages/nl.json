@@ -3920,6 +3920,8 @@
     "amountNotAllocatable": "Dit bedrag past niet op de open regels — kies een bedrag in hele centen of betaal het volledige saldo.",
     "payFailed": "Betaling registreren mislukt.",
     "orderTotalMismatch": "Bedrag komt niet overeen met open saldo — ververs de lijst en probeer opnieuw.",
+    "scopeDenied": "Deze actie is niet toegestaan voor deze zaak.",
+    "tabStaleRefresh": "Deze rekening is verouderd — lijst wordt ververst. Probeer opnieuw.",
     "tabAlreadySettled": "Deze rekening is al betaald — lijst wordt ververst.",
     "receiptCustomer": "Op rekening — {name}",
     "receiptPartialPaymentHint": "Deelbetaling op rekening (artikelen staan op tab)",

@@ -15,6 +15,7 @@ import {
   type KassaNameTabLine,
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
+import { validateNameTabPaymentRequest } from '@/lib/kassa-name-account-guard'
 import { registerKassaNameTabPayment } from '@/lib/kassa-name-account-payment'
 import {
   fetchKassaNameTabs,
@@ -197,6 +198,11 @@ export default function KassaNameAccountModal({
     setError(null)
     const key = nameTabCustomerKey(displayName)
     const existing = tabs.find((r) => r.customer_key === key)
+    if (existing?.tenant_slug && String(existing.tenant_slug).trim() !== tenant) {
+      setSaving(false)
+      setError(t('kassaNameAccount.scopeDenied'))
+      return
+    }
     const prevItems = (existing?.items ?? []) as KassaNameTabLine[]
     const merged = mergeIntoTabLines(prevItems, cart)
 
@@ -274,12 +280,27 @@ export default function KassaNameAccountModal({
         ? formatOpenAmountForInput(payerOpenTotal)
         : payAmount
     const amount = parseOpenAmountInput(rawPay)
+    const guard = validateNameTabPaymentRequest({
+      tenantSlug: tenant,
+      tab,
+      amountEur: amount,
+      paymentMethod: payMethod,
+      knownTabs: tabs,
+    })
+    if (!guard.ok) {
+      if (guard.error === 'invalid_amount') setError(t('kassaNameAccount.invalidAmount'))
+      else if (guard.error === 'tab_not_in_tenant') {
+        setError(t('kassaNameAccount.tabStaleRefresh'))
+        void loadTabs()
+      } else setError(t('kassaNameAccount.scopeDenied'))
+      return
+    }
     setSaving(true)
     setError(null)
     const res = await registerKassaNameTabPayment({
       tenantSlug: tenant,
       tab,
-      amountEur: amount,
+      amountEur: guard.amountEur,
       paymentMethod: payMethod,
       staffId,
       catalog,
@@ -292,6 +313,7 @@ export default function KassaNameAccountModal({
       else if (res.error === 'amount_not_allocatable' || res.error === 'allocation_mismatch')
         setError(t('kassaNameAccount.amountNotAllocatable'))
       else if (res.error === 'order_total_mismatch') setError(t('kassaNameAccount.orderTotalMismatch'))
+      else if (res.error === 'scope_denied') setError(t('kassaNameAccount.scopeDenied'))
       else setError(res.error || t('kassaNameAccount.payFailed'))
       if (res.error === 'tab_already_settled') {
         setSelectedTabId(null)

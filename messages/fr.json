@@ -2855,6 +2855,8 @@
     "amountNotAllocatable": "Ce montant ne peut pas être réparti — utilisez des centimes entiers ou le solde complet.",
     "payFailed": "Impossible d'enregistrer le paiement.",
     "orderTotalMismatch": "Le montant ne correspond pas au solde ouvert — actualisez la liste et réessayez.",
+    "scopeDenied": "Cette action n'est pas autorisée pour cet établissement.",
+    "tabStaleRefresh": "Ce compte est obsolète — actualisation de la liste. Réessayez.",
     "tabAlreadySettled": "Cette note est déjà payée — actualisation de la liste.",
     "receiptCustomer": "En compte — {name}",
     "receiptPartialPaymentHint": "Paiement partiel en compte (articles sur l’onglet)",

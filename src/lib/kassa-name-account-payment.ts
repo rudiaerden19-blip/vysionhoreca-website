@@ -17,6 +17,7 @@ import {
   type KassaNameTabLine,
   type KassaNameTabRow,
 } from '@/lib/kassa-name-account'
+import { validateNameTabPaymentRequest } from '@/lib/kassa-name-account-guard'
 import { insertKassaOrderForNameAccountPayment } from '@/lib/kassa-name-account-order'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import {
@@ -49,22 +50,32 @@ export async function registerKassaNameTabPayment(params: {
   nextTabItems?: KassaNameTabLine[]
 }> {
   const { tenantSlug, tab, amountEur, paymentMethod, staffId, catalog } = params
+
+  const guard = validateNameTabPaymentRequest({
+    tenantSlug,
+    tab,
+    amountEur,
+    paymentMethod,
+  })
+  if (!guard.ok) {
+    if (guard.error === 'invalid_amount') return { ok: false, error: 'invalid_amount' }
+    if (guard.error === 'invalid_payment_method') return { ok: false, error: 'invalid_amount' }
+    return { ok: false, error: 'scope_denied' }
+  }
+  const amountResolved = guard.amountEur
+
   const selectedLines = normalizeNameTabLines((tab.items ?? []) as KassaNameTabLine[])
   const selectedOpen = tabOpenTotalIncl(selectedLines)
   const orderCtx = resolveNameTabOrderContext(tab)
-
-  if (!Number.isFinite(amountEur) || amountEur <= 0) {
-    return { ok: false, error: 'invalid_amount' }
-  }
   if (selectedOpen <= 0.001) {
     return { ok: false, error: 'tab_already_settled' }
   }
-  if (amountEur > selectedOpen + 0.02) {
+  if (amountResolved > selectedOpen + 0.02) {
     return { ok: false, error: 'amount_too_high' }
   }
 
   const payIncl =
-    amountEur >= selectedOpen - 0.02 ? selectedOpen : Math.round(amountEur * 100) / 100
+    amountResolved >= selectedOpen - 0.02 ? selectedOpen : amountResolved
   const plan = resolveNameTabPaymentOrderPlan(selectedLines, payIncl)
   const { orderLines, nextTabLines, showProductsOnReceipt } = plan
 
