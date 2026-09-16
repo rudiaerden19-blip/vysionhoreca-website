@@ -39,7 +39,15 @@ export async function registerKassaNameTabPayment(params: {
     categories: MenuCategory[]
     products: MenuProduct[]
   }
-}): Promise<{ ok: boolean; error?: string; orderNumber?: number; receipt?: KassaLastOrderReceipt }> {
+}): Promise<{
+  ok: boolean
+  error?: string
+  orderNumber?: number
+  receipt?: KassaLastOrderReceipt
+  tabId?: string
+  tabCleared?: boolean
+  nextTabItems?: KassaNameTabLine[]
+}> {
   const { tenantSlug, tab, amountEur, paymentMethod, staffId, catalog } = params
   const selectedLines = normalizeNameTabLines((tab.items ?? []) as KassaNameTabLine[])
   const selectedOpen = tabOpenTotalIncl(selectedLines)
@@ -170,5 +178,12 @@ export async function registerKassaNameTabPayment(params: {
     onAccountCustomerName: tab.customer_name.trim(),
   }
 
-  return { ok: true, orderNumber: orderRes.orderNumber, receipt }
+  return {
+    ok: true,
+    orderNumber: orderRes.orderNumber,
+    receipt,
+    tabId: tab.id,
+    tabCleared,
+    nextTabItems: tabCleared ? [] : nextTabLines,
+  }
 }

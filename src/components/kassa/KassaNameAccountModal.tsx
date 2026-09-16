@@ -21,6 +21,7 @@ import {
   getCachedKassaNameTabs,
   invalidateKassaNameTabsCache,
   prefetchKassaNameTabs,
+  setCachedKassaNameTabs,
 } from '@/lib/kassa-name-tabs-cache'
 import type { MenuCategory, MenuProduct, TenantSettings } from '@/lib/admin-api'
 import { normalizeOnAccountCustomerName as normName } from '@/lib/kassa-on-account'
@@ -297,33 +298,33 @@ export default function KassaNameAccountModal({
       return
     }
     invalidateKassaNameTabsCache(tenant)
-    const paidFull = amount >= payerOpenTotal - 0.02
-    const fresh = await fetchKassaNameTabs(tenant, { force: true })
-    if (fresh.ok) setTabs(fresh.tabs)
+    const tabId = res.tabId ?? tab.id
+    const tabCleared = res.tabCleared === true
+    const nextTabs = tabCleared
+      ? tabs.filter((r) => r.id !== tabId)
+      : tabs.map((r) =>
+          r.id === tabId
+            ? {
+                ...r,
+                items: (res.nextTabItems ?? r.items) as KassaNameTabLine[],
+                updated_at: new Date().toISOString(),
+              }
+            : r,
+        )
+    setTabs(nextTabs)
+    setCachedKassaNameTabs(tenant, nextTabs)
 
     onCommitted()
     if (res.receipt && onPaymentSuccess) {
       onPaymentSuccess(res.receipt)
     }
 
-    if (paidFull) {
-      setSelectedTabId(null)
-      setName('')
-      setPayAmount('')
-      setPayAmountEdited(false)
-      onClose()
-    } else {
-      setPayAmountEdited(false)
-      const stillThere = fresh.ok ? fresh.tabs.find((r) => r.id === tab.id) : null
-      if (stillThere) {
-        const left = tabOpenTotalIncl((stillThere.items ?? []) as KassaNameTabLine[])
-        setPayAmount(left > 0.001 ? formatOpenAmountForInput(left) : '')
-      } else {
-        setSelectedTabId(null)
-        setName('')
-        setPayAmount('')
-      }
-    }
+    setSelectedTabId(null)
+    setName('')
+    setPayAmount('')
+    setPayAmountEdited(false)
+    onClose()
+    void fetchKassaNameTabs(tenant, { force: true })
   }
 
   const cartHasItems = cart.length > 0
