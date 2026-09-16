@@ -123,13 +123,7 @@ export function allocateNameTabPayment(
     return { orderLines: [], nextTabLines: normalized, appliedIncl: 0 }
   }
 
-  /** Volledige afrekening: open bedrag in UI = tab leeg (geen cent-resten door qty/unpaid mismatch). */
-  if (paymentCents >= openCents) {
-    const orderLines = normalized.map((line) => cloneCartLineForOrder(line, line.quantity))
-    return { orderLines, nextTabLines: [], appliedIncl: openCents / 100 }
-  }
-
-  let remainingCents = paymentCents
+  let remainingCents = Math.min(paymentCents, openCents)
   const orderLines: KassaCartItem[] = []
   const nextTabLines: KassaNameTabLine[] = []
 
@@ -141,33 +135,8 @@ export function allocateNameTabPayment(
     const unpaidCents = Math.round(effectiveLineUnpaidIncl(line) * 100)
     if (unpaidCents <= 0) continue
 
-    const unitCents = Math.round(kassaCartLineUnitIncl(line) * 100)
-    if (unitCents <= 0) {
-      const spendCents = Math.min(remainingCents, unpaidCents)
-      if (spendCents > 0) {
-        orderLines.push(lineWithGrossTotal(line, spendCents / 100))
-        remainingCents -= spendCents
-        const leftCents = unpaidCents - spendCents
-        if (leftCents > 0) {
-          nextTabLines.push({
-            ...line,
-            unpaidIncl: Math.round(leftCents) / 100,
-          })
-        }
-      } else if (unpaidCents > 0) {
-        nextTabLines.push({ ...line })
-      }
-      continue
-    }
-
-    if (remainingCents >= unpaidCents) {
-      orderLines.push(cloneCartLineForOrder(line, line.quantity))
-      remainingCents -= unpaidCents
-      continue
-    }
-
-    const spendCents = remainingCents
-    const { orderParts, nextLine, spentCents } = allocatePartialLinePayment(line, spendCents)
+    const spendCents = Math.min(remainingCents, unpaidCents)
+    const { orderParts, nextLine, spentCents } = applyOpenAmountToLine(line, spendCents)
     orderLines.push(...orderParts)
     remainingCents -= spentCents
     if (nextLine) nextTabLines.push(nextLine)
@@ -192,6 +161,38 @@ export function allocateNameTabPayment(
   const appliedIncl = orderLinesGrossIncl(orderLines)
   const cleanedNext = normalizeNameTabLines(nextTabLines)
   return { orderLines, nextTabLines: cleanedNext, appliedIncl }
+}
+
+/** Besteed `budgetCents` op één tabregel; order-bruto = besteed bedrag. */
+function applyOpenAmountToLine(
+  line: KassaNameTabLine,
+  budgetCents: number,
+): { orderParts: KassaCartItem[]; nextLine: KassaNameTabLine | null; spentCents: number } {
+  const unpaidCents = Math.round(effectiveLineUnpaidIncl(line) * 100)
+  const spendCents = Math.min(Math.max(0, budgetCents), unpaidCents)
+  if (spendCents <= 0) {
+    return { orderParts: [], nextLine: line, spentCents: 0 }
+  }
+
+  const unitCents = Math.round(kassaCartLineUnitIncl(line) * 100)
+  const lineTotalCents = Math.round(kassaCartLineTotalIncl(line) * 100)
+  if (unitCents <= 0 || lineTotalCents <= 0) {
+    const orderParts = [lineWithGrossTotal(line, spendCents / 100)]
+    const leftCents = unpaidCents - spendCents
+    const nextLine =
+      leftCents > 0 ? { ...line, unpaidIncl: Math.round(leftCents) / 100 } : null
+    return { orderParts, nextLine, spentCents: spendCents }
+  }
+
+  if (spendCents >= unpaidCents && unpaidCents >= lineTotalCents - 1) {
+    return {
+      orderParts: [cloneCartLineForOrder(line, line.quantity)],
+      nextLine: null,
+      spentCents: spendCents,
+    }
+  }
+
+  return allocatePartialLinePayment(line, spendCents)
 }
 
 /** Deelbetaling op één tabregel — besteed exact `budgetCents` (≤ open op regel). */
