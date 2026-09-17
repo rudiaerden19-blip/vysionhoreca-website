@@ -4819,6 +4819,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           submenuId: 'sm_web_profiel',
         },
         {
+          key: 'openDrawer',
+          labelKey: 'kassaApp.quickMenuOpenDrawer',
+          kind: 'drawer' as const,
+        },
+        {
           key: 'orders',
           labelKey: 'kassaApp.quickMenuOrders',
           kind: 'nav'as const,
@@ -4831,12 +4836,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const isKassaQuickMenuActionEnabled = useCallback(
     (action: (typeof kassaQuickMenuActions)[number]) => {
+      if (action.kind === 'drawer') {
+        return !demoViewOnly
+      }
       if ('requireStaffClock'in action && action.requireStaffClock && !showKassaStaffClockButton) {
         return false
       }
+      if (!('submenuId' in action) || !action.submenuId) return false
       return quickMenuAllowedSubmenuIds.has(action.submenuId)
     },
-    [quickMenuAllowedSubmenuIds, showKassaStaffClockButton],
+    [quickMenuAllowedSubmenuIds, showKassaStaffClockButton, demoViewOnly],
   )
 
   const kassaQuickMenuPanelBtnClass = useCallback(
@@ -5752,6 +5761,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       onClick={() => {
                         playClick()
                         setShowNameAccountModal(true)
+                      }}
+                    >
+                      {label}
+                    </button>
+                  )
+                }
+                if (action.kind === 'drawer') {
+                  return (
+                    <button
+                      key={action.key}
+                      type="button"
+                      data-testid="kassa-quick-menu-open-drawer"
+                      className={kassaQuickMenuPanelBtnClass(true)}
+                      onClick={() => {
+                        playClick()
+                        void openCashDrawer()
                       }}
                     >
                       {label}
