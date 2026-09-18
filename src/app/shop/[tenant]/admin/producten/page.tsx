@@ -912,9 +912,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-full overflow-y-auto overscroll-contain touch-manipulation"
+              className="bg-white rounded-2xl w-full max-w-2xl max-h-full min-h-0 flex flex-col overflow-hidden overscroll-contain touch-manipulation"
             >
-              <div className="p-6 border-b sticky top-0 bg-white z-10">
+              <div className="p-6 border-b shrink-0 bg-white">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-gray-900">
                     {editingProduct ? t('adminPages.producten.editProduct') : t('adminPages.producten.newProduct')}
@@ -935,7 +935,11 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 ) : null}
               </div>
 
-              <div className="p-6 space-y-6">
+              <div
+                className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6 space-y-6 touch-manipulation"
+                data-osk-scroll
+                data-osk-next="true"
+              >
 
                 {/* ── SECTIE 1: Basis ── */}
                 <div className="space-y-4">
@@ -948,7 +952,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     <input
                       type="text"
                       inputMode="text"
-                      enterKeyHint="done"
+                      enterKeyHint="next"
                       autoComplete="off"
                       value={formData.name || ''}
                       onChange={(e) => {
@@ -970,12 +974,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                       onPointerDown={(e) => e.stopPropagation()}
                       rows={2}
+                      enterKeyHint="next"
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base touch-manipulation"
                       placeholder=""
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         {t('adminPages.producten.price')} <span className="text-red-500">*</span>
@@ -984,9 +989,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">€</span>
                         <input
                           type="text"
-                          inputMode="decimal"
-                          enterKeyHint="done"
+                          inputMode="text"
+                          enterKeyHint="next"
                           autoComplete="off"
+                          data-no-capitalize="true"
                           value={priceInputStr}
                           onChange={(e) => {
                             const raw = e.target.value
@@ -1005,16 +1011,31 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         {t('adminPages.producten.category')} <span className="text-red-500">*</span>
                       </label>
-                      <select
-                        value={formData.category_id || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="">{isRetailForm ? '' : t('adminPages.producten.selectCategory')}</option>
-                        {categories.map(cat => (
-                          <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                      </select>
+                      <div className="flex flex-wrap gap-2">
+                        {categories.length === 0 ? (
+                          <p className="text-sm text-gray-500">{t('adminPages.producten.selectCategory')}</p>
+                        ) : (
+                          categories.map((cat) => {
+                            const selected = formData.category_id === cat.id
+                            return (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() =>
+                                  setFormData((prev) => ({ ...prev, category_id: cat.id || null }))
+                                }
+                                className={`min-h-[44px] rounded-xl border-2 px-3 py-2 text-base font-medium touch-manipulation ${
+                                  selected
+                                    ? 'border-blue-500 bg-blue-50 text-blue-900'
+                                    : 'border-gray-200 bg-white text-gray-800'
+                                }`}
+                              >
+                                {cat.name}
+                              </button>
+                            )
+                          })
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1165,7 +1186,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-accent font-bold">€</span>
                         <input
                           type="text"
-                          inputMode="decimal"
+                          inputMode="text"
+                          enterKeyHint="done"
+                          autoComplete="off"
+                          data-no-capitalize="true"
                           value={promoPriceInputStr}
                           onChange={(e) => {
                             const raw = e.target.value
@@ -1273,8 +1297,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           <div className="flex flex-col sm:flex-row gap-2">
                             <input
                               type="text"
-                              inputMode="numeric"
+                              inputMode="text"
+                              enterKeyHint="next"
                               autoComplete="off"
+                              data-no-capitalize="true"
                               value={formData.barcode || ''}
                               onChange={(e) =>
                                 setFormData((prev) => ({
@@ -1282,7 +1308,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                                   barcode: normalizeProductBarcodeScan(e.target.value),
                                 }))
                               }
-                              className="flex-1 min-w-0 px-3 py-2.5 border border-gray-200 rounded-xl font-mono tabular-nums"
+                              className="flex-1 min-w-0 min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl font-mono tabular-nums text-base touch-manipulation"
                               placeholder=""
                             />
                             <button
@@ -1387,17 +1413,20 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             {t('adminPages.producten.retailUnitQuantityLabel')}
                           </label>
                           <input
-                            type="number"
-                            min={1}
-                            inputMode="numeric"
+                            type="text"
+                            inputMode="text"
+                            enterKeyHint="done"
+                            autoComplete="off"
+                            data-no-capitalize="true"
                             value={
                               formData.retail_unit_quantity != null &&
                               formData.retail_unit_quantity !== undefined
-                                ? formData.retail_unit_quantity
+                                ? String(formData.retail_unit_quantity)
                                 : ''
                             }
                             onChange={(e) => {
                               const raw = e.target.value.trim()
+                              if (raw !== '' && !/^\d*$/.test(raw)) return
                               setFormData((prev) => ({
                                 ...prev,
                                 retail_unit_quantity: raw
@@ -1405,7 +1434,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                                   : undefined,
                               }))
                             }}
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl bg-white"
+                            className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base touch-manipulation"
                             placeholder=""
                           />
                           <p className="mt-1 text-xs text-gray-500">
@@ -1443,6 +1472,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             </label>
                             <ControlledNumberInput
                               min={0}
+                              inputMode="text"
                               value={formData.stock_quantity ?? 0}
                               onChange={(stock_quantity) =>
                                 setFormData((prev) => ({
@@ -1451,7 +1481,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                                 }))
                               }
                               integer
-                              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                              className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl text-base touch-manipulation"
                             />
                           </div>
                           <div>
@@ -1460,6 +1490,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             </label>
                             <ControlledNumberInput
                               min={0}
+                              inputMode="text"
                               value={formData.low_stock_threshold ?? 0}
                               onChange={(low_stock_threshold) =>
                                 setFormData((prev) => ({
@@ -1468,7 +1499,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                                 }))
                               }
                               integer
-                              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl"
+                              className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl text-base touch-manipulation"
                             />
                           </div>
                         </div>
@@ -1505,7 +1536,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               </div>
 
               {/* Footer */}
-              <div className="p-6 border-t bg-gray-50 flex justify-end gap-4">
+              <div className="p-6 border-t bg-gray-50 flex justify-end gap-4 shrink-0">
                 <button
                   type="button"
                   onClick={closeModal}

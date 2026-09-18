@@ -41,7 +41,7 @@ export function keyboardBottomReservePx(input: {
   touchLike: boolean
 }): number {
   if (input.keyboardCoverPx > 24) return input.keyboardCoverPx
-  if (input.touchLike) return Math.max(Math.round(input.innerHeight * 0.38), 260)
+  if (input.touchLike) return Math.max(Math.round(input.innerHeight * 0.42), 320)
   return 0
 }
 
@@ -80,19 +80,61 @@ export function isEditableCatalogTextField(
   return true
 }
 
+/** Zet dit op de scrollbare formulier-body (niet op een wrapper zonder overflow). */
+export const OSK_SCROLL_SELECTOR = '[data-osk-scroll]'
+const OSK_PAD_ATTR = 'data-osk-pad-prev'
+
 export function findScrollParentForKeyboard(el: HTMLElement): HTMLElement | null {
+  const marked = el.closest(OSK_SCROLL_SELECTOR)
+  if (marked instanceof HTMLElement) return marked
+
   let node: HTMLElement | null = el.parentElement
   while (node && node !== document.body && node !== document.documentElement) {
-    const style = window.getComputedStyle(node)
-    const oy = style.overflowY
-    const canY =
-      (oy === 'auto' || oy === 'scroll' || oy === 'overlay') &&
-      node.scrollHeight > node.clientHeight + 1
-    if (canY) return node
+    const oy = window.getComputedStyle(node).overflowY
+    if (oy === 'auto' || oy === 'scroll' || oy === 'overlay') return node
     node = node.parentElement
   }
   const admin = document.querySelector(ADMIN_SCROLL_SELECTOR)
   return admin instanceof HTMLElement ? admin : null
+}
+
+export function ensureOskScrollPadding(scroller: HTMLElement, padPx: number): void {
+  if (!scroller.hasAttribute(OSK_PAD_ATTR)) {
+    scroller.setAttribute(OSK_PAD_ATTR, scroller.style.paddingBottom || '')
+  }
+  scroller.style.paddingBottom = `${Math.max(0, Math.round(padPx))}px`
+}
+
+export function releaseOskScrollPadding(scroller: HTMLElement): void {
+  if (!scroller.hasAttribute(OSK_PAD_ATTR)) return
+  scroller.style.paddingBottom = scroller.getAttribute(OSK_PAD_ATTR) || ''
+  scroller.removeAttribute(OSK_PAD_ATTR)
+}
+
+export function releaseAllOskScrollPadding(): void {
+  document.querySelectorAll(`[${OSK_PAD_ATTR}]`).forEach((node) => {
+    if (node instanceof HTMLElement) releaseOskScrollPadding(node)
+  })
+}
+
+/** Volgende vak in dezelfde popup (Enter / OSK-volgende). */
+export function focusNextCatalogField(current: HTMLElement): boolean {
+  const root = current.closest(OSK_SCROLL_SELECTOR)
+  if (!(root instanceof HTMLElement) || root.getAttribute('data-osk-next') !== 'true') {
+    return false
+  }
+  const fields = Array.from(root.querySelectorAll('input, textarea')).filter((el) =>
+    isEditableCatalogTextField(el),
+  )
+  const idx = fields.indexOf(current as HTMLInputElement | HTMLTextAreaElement)
+  if (idx < 0) return false
+  const next = fields[idx + 1]
+  if (next) {
+    next.focus()
+    return true
+  }
+  current.blur()
+  return true
 }
 
 function readTouchLikeFromWindow(): boolean {
@@ -106,24 +148,37 @@ function readTouchLikeFromWindow(): boolean {
   }
 }
 
-/** Schuif het gefocuste vak boven het schermtoetsenbord. */
-export function scrollInputAboveKeyboard(input: HTMLElement): void {
-  const scroller = findScrollParentForKeyboard(input)
+function readKeyboardBottomReservePx(): number {
   const vv = window.visualViewport
-  const visibleTop = vv?.offsetTop ?? 0
-  const visibleHeight = vv?.height ?? window.innerHeight
   const cover = keyboardCoverPxFromViewport({
     innerHeight: window.innerHeight,
     visualViewport: vv ? { offsetTop: vv.offsetTop, height: vv.height } : null,
   })
-  const reserve = keyboardBottomReservePx({
+  return keyboardBottomReservePx({
     keyboardCoverPx: cover,
     innerHeight: window.innerHeight,
     touchLike: readTouchLikeFromWindow(),
   })
+}
+
+/** Schuif het gefocuste vak boven het schermtoetsenbord. */
+export function scrollInputAboveKeyboard(input: HTMLElement): void {
+  const scroller = findScrollParentForKeyboard(input)
+  const reserve = readKeyboardBottomReservePx()
+  if (scroller) {
+    if (reserve >= 24) ensureOskScrollPadding(scroller, reserve + 28)
+    else releaseOskScrollPadding(scroller)
+  }
+
+  const vv = window.visualViewport
+  const visibleTop = vv?.offsetTop ?? 0
+  const visibleHeight = vv?.height ?? window.innerHeight
+  const visibleBottom = visibleTop + visibleHeight
   const box = input.getBoundingClientRect()
-  const safeTop = visibleTop + 64
-  const safeBottom = visibleTop + visibleHeight - reserve - 12
+  const pane = scroller?.getBoundingClientRect()
+  const safeTop = Math.max(visibleTop + 12, pane ? pane.top + 8 : visibleTop + 64)
+  const coveredBottom = visibleBottom - reserve - 12
+  const safeBottom = pane ? Math.min(pane.bottom - 8, coveredBottom) : coveredBottom
   const delta = scrollDeltaToRevealInput({
     inputTop: box.top,
     inputBottom: box.bottom,

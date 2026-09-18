@@ -1,4 +1,6 @@
 import {
+  findScrollParentForKeyboard,
+  focusNextCatalogField,
   isEditableCatalogTextField,
   isTouchLikePointer,
   keyboardBottomReservePx,
@@ -44,7 +46,7 @@ describe('keyboardBottomReservePx', () => {
   it('reserveert op touch als Windows de OSK niet in visualViewport zet', () => {
     expect(
       keyboardBottomReservePx({ keyboardCoverPx: 0, innerHeight: 1024, touchLike: true }),
-    ).toBe(Math.max(Math.round(1024 * 0.38), 260))
+    ).toBe(Math.max(Math.round(1024 * 0.42), 320))
   })
 
   it('reserveert niets op muis-desktop', () => {
@@ -99,5 +101,47 @@ describe('isEditableCatalogTextField', () => {
     ignore.type = 'text'
     ignore.setAttribute('data-osk-ignore', 'true')
     expect(isEditableCatalogTextField(ignore)).toBe(false)
+  })
+})
+
+describe('findScrollParentForKeyboard', () => {
+  it('kiest data-osk-scroll ook als die nog niet overflowt', () => {
+    const pane = document.createElement('div')
+    pane.setAttribute('data-osk-scroll', '')
+    pane.style.overflowY = 'auto'
+    const input = document.createElement('input')
+    pane.appendChild(input)
+    document.body.appendChild(pane)
+    expect(findScrollParentForKeyboard(input)).toBe(pane)
+    pane.remove()
+  })
+})
+
+describe('focusNextCatalogField', () => {
+  it('gaat naar het volgende vak in dezelfde popup', () => {
+    const root = document.createElement('div')
+    root.setAttribute('data-osk-scroll', '')
+    root.setAttribute('data-osk-next', 'true')
+    const a = document.createElement('input')
+    const b = document.createElement('input')
+    a.type = 'text'
+    b.type = 'text'
+    root.appendChild(a)
+    root.appendChild(b)
+    document.body.appendChild(root)
+    expect(focusNextCatalogField(a)).toBe(true)
+    expect(document.activeElement).toBe(b)
+    root.remove()
+  })
+
+  it('laat Enter op categorie-pagina met rust (geen data-osk-next)', () => {
+    const root = document.createElement('div')
+    root.setAttribute('data-osk-scroll', '')
+    const a = document.createElement('input')
+    a.type = 'text'
+    root.appendChild(a)
+    document.body.appendChild(root)
+    expect(focusNextCatalogField(a)).toBe(false)
+    root.remove()
   })
 })
