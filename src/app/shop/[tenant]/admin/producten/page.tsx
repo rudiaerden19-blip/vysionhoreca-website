@@ -44,6 +44,10 @@ import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import {
+  useScrollFocusedInputAboveKeyboard,
+  useVisualViewportBox,
+} from '@/hooks/useScrollFocusedInputAboveKeyboard'
 
 type ProductCatalogMode = 'horeca' |  'retail'
 
@@ -326,6 +330,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         : null
   const showCatalogSlider = horecaKassaOn && retailKassaOn
   const { ask, ConfirmModal } = useAdminConfirm(t)
+  const viewportBox = useVisualViewportBox()
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [availableOptions, setAvailableOptions] = useState<ProductOption[]>([])
@@ -361,6 +366,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   const [catalogMode, setCatalogMode] = useState<ProductCatalogMode>('horeca')
   const productBarcodeScanRef = useRef<HTMLInputElement>(null)
   const [productBarcodeScanActive, setProductBarcodeScanActive] = useState(false)
+  useScrollFocusedInputAboveKeyboard({
+    onEditableFocus: () => setProductBarcodeScanActive(false),
+  })
 
   const isRetailForm = catalogMode === 'retail'
 
@@ -802,7 +810,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('adminPages.producten.searchPlaceholder')}
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full min-h-[44px] pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation"
           />
         </div>
 
@@ -893,14 +901,18 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            className="fixed left-0 right-0 z-[130] flex items-start justify-center bg-black/60 p-4 pt-5"
+            style={{
+              top: viewportBox.offsetTop,
+              height: viewportBox.height,
+            }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl w-full max-w-2xl max-h-full overflow-y-auto overscroll-contain touch-manipulation"
             >
               <div className="p-6 border-b sticky top-0 bg-white z-10">
                 <div className="flex items-center justify-between">
@@ -935,12 +947,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     </label>
                     <input
                       type="text"
+                      inputMode="text"
+                      enterKeyHint="done"
+                      autoComplete="off"
                       value={formData.name || ''}
                       onChange={(e) => {
                         const val = e.target.value
                         setFormData(prev => ({ ...prev, name: val.charAt(0).toUpperCase() + val.slice(1) }))
                       }}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      className="w-full min-h-[44px] px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation"
                       placeholder=""
                     />
                   </div>
@@ -952,8 +968,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     <textarea
                       value={formData.description || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      onPointerDown={(e) => e.stopPropagation()}
                       rows={2}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base touch-manipulation"
                       placeholder=""
                     />
                   </div>
@@ -968,12 +985,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         <input
                           type="text"
                           inputMode="decimal"
+                          enterKeyHint="done"
+                          autoComplete="off"
                           value={priceInputStr}
                           onChange={(e) => {
                             const raw = e.target.value
                             if (isPartialMoneyInput(raw)) setPriceInputStr(raw)
                           }}
-                          className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-semibold"
+                          onPointerDown={(e) => e.stopPropagation()}
+                          className="w-full min-h-[44px] pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-semibold touch-manipulation"
                           placeholder="0,00"
                         />
                       </div>
@@ -1290,6 +1310,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             tabIndex={-1}
                             autoComplete="off"
                             aria-hidden
+                            data-osk-ignore="true"
                             onKeyDown={onProductBarcodeScanKeyDown}
                             onBlur={() => {
                               window.setTimeout(() => setProductBarcodeScanActive(false), 120)

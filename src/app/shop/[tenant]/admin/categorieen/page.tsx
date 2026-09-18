@@ -15,13 +15,12 @@ import { CATEGORY_VAT_PERCENT_OPTIONS } from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { useScrollFocusedInputAboveKeyboard } from '@/hooks/useScrollFocusedInputAboveKeyboard'
 import MediaPicker from '@/components/MediaPicker'
 
 type CategoryRowProps = {
   category: MenuCategory
   tenant: string
-  editingId: string | null
-  setEditingId: (id: string | null) => void
   productCounts: Record<string, number>
   updateName: (id: string, name: string) => void
   updateCategoryImage: (id: string, image_url: string) => void
@@ -35,8 +34,6 @@ type CategoryRowProps = {
 function CategoryReorderRow({
   category,
   tenant,
-  editingId,
-  setEditingId,
   productCounts,
   updateName,
   updateCategoryImage,
@@ -81,25 +78,19 @@ function CategoryReorderRow({
         </div>
 
         <div className="flex flex-1 min-w-[120px] flex-col gap-1">
-          {editingId === category.id ? (
-            <input
-              type="text"
-              value={category.name}
-              onChange={(e) => updateName(category.id!, e.target.value)}
-              onBlur={() => setEditingId(null)}
-              onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
-              autoFocus
-              className="w-full px-3 py-1.5 border-2 border-blue-500 rounded-lg focus:outline-none text-base font-medium"
-            />
-          ) : (
-            <span
-              className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-              onClick={() => category.id && setEditingId(category.id)}
-              title="Klik om naam te bewerken"
-            >
-              {category.name}
-            </span>
-          )}
+          <input
+            type="text"
+            inputMode="text"
+            enterKeyHint="done"
+            autoComplete="off"
+            value={category.name}
+            onChange={(e) => updateName(category.id!, e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur()
+            }}
+            className="w-full min-h-[44px] px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 text-base font-medium touch-manipulation"
+          />
           {cid ? (
             <button
               type="button"
@@ -167,8 +158,8 @@ function CategoryReorderRow({
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
+  useScrollFocusedInputAboveKeyboard()
   const [categories, setCategories] = useState<MenuCategory[]>([])
-  const [editingId, setEditingId] = useState<string | null>(null)
   const [newCategory, setNewCategory] = useState('')
   const [newCategoryImageUrl, setNewCategoryImageUrl] = useState('')
   const [saving, setSaving] = useState(false)
@@ -400,10 +391,14 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           <span className="text-2xl shrink-0 hidden sm:block"></span>
           <input
             type="text"
+            inputMode="text"
+            enterKeyHint="done"
+            autoComplete="off"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
+            onPointerDown={(e) => e.stopPropagation()}
             placeholder={t('adminPages.categorieen.newCategoryPlaceholder')}
-            className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+            className="flex-1 min-w-0 min-h-[44px] px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation"
             onKeyDown={(e) => e.key === 'Enter' && addCategory()}
           />
           <button
@@ -461,8 +456,6 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                 }
                 category={category}
                 tenant={params.tenant}
-                editingId={editingId}
-                setEditingId={setEditingId}
                 productCounts={productCounts}
                 updateName={updateName}
                 updateCategoryImage={updateCategoryImage}
