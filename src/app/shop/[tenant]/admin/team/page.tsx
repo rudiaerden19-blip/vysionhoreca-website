@@ -224,7 +224,9 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 w-full max-w-md"
+              className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+              data-osk-scroll
+              data-osk-next="true"
             >
               <h2 className="text-xl font-bold text-gray-900 mb-6">
                 {editingMember ? t('websiteTeam.editMember') : t('websiteTeam.newMember')}

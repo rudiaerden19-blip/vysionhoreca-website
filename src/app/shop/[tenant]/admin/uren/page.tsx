@@ -1146,7 +1146,7 @@ Met vriendelijke groeten`,
               <p className="text-gray-600">{selectedStaff?.name}</p>
             </div>
             
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto" data-osk-scroll data-osk-next="true">
               {/* Bestaande entries voor deze dag */}
               {!editingEntry && getEntriesForDate(new Date(selectedDate)).length > 0 && (
                 <div className="mb-4">

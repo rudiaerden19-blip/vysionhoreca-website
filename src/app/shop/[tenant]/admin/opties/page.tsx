@@ -445,13 +445,13 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[130] flex items-start justify-center bg-black/60 p-4 pt-8"
             data-vysion-modal-overlay
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col min-h-0 shadow-xl"
               data-vysion-modal-panel
@@ -474,8 +474,9 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
               </div>
 
               <div
-                className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 space-y-6"
-               
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-6 space-y-6 touch-manipulation"
+                data-osk-scroll
+                data-osk-next="true"
               >
                 {/* Error in Modal */}
                 {error && (

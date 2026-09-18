@@ -1173,7 +1173,8 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               </div>
               <div
                 className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
-               
+                data-osk-scroll
+                data-osk-next="true"
               >
 
                 <div>
@@ -1286,7 +1287,8 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               </div>
               <div
                 className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
-               
+                data-osk-scroll
+                data-osk-next="true"
               >
 
                 <div>

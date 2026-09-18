@@ -31,6 +31,7 @@ import {
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
+import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
 import {
   buildShopInternalReturnPath,
   clearTenantOwnerSession,
@@ -573,9 +574,11 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         </div>
       </div>
 
+      <AdminWindowsOskSupport />
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main
         data-vysion-admin-scroll
+        data-osk-scroll
         className="fixed inset-x-0 bottom-0 top-14 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]"
       >
         <div

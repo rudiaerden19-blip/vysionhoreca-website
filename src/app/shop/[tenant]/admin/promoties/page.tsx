@@ -385,6 +385,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
               className="bg-white rounded-xl sm:rounded-2xl max-w-lg w-full mx-2 sm:mx-0 overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+              data-osk-scroll
+              data-osk-next="true"
             >
               <div className="p-4 sm:p-6 border-b flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">

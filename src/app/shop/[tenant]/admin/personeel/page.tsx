@@ -390,7 +390,7 @@ export default function PersoneelPage() {
       {/* Add/Edit Staff Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-[130] flex items-start justify-center bg-black/50 p-4 pt-8"
           data-vysion-modal-overlay
           onPointerDown={(e) => {
             if (e.target !== e.currentTarget) return
@@ -413,8 +413,9 @@ export default function PersoneelPage() {
             </div>
 
             <div
-              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
-             
+              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6 touch-manipulation"
+              data-osk-scroll
+              data-osk-next="true"
             >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -422,9 +423,12 @@ export default function PersoneelPage() {
                 </label>
                 <input
                   type="text"
+                  inputMode="text"
+                  enterKeyHint="next"
+                  autoComplete="off"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                   placeholder={t('personeelPage.form.namePlaceholder')}
                 />
               </div>
@@ -433,9 +437,12 @@ export default function PersoneelPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.form.email')}</label>
                 <input
                   type="email"
+                  inputMode="email"
+                  enterKeyHint="next"
+                  autoComplete="off"
                   value={formData.email || ''}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                   placeholder={t('personeelPage.form.emailPlaceholder')}
                 />
               </div>
@@ -444,9 +451,12 @@ export default function PersoneelPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.form.phone')}</label>
                 <input
                   type="tel"
+                  inputMode="text"
+                  enterKeyHint="next"
+                  autoComplete="off"
                   value={formData.phone || ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                   placeholder={t('personeelPage.form.phonePlaceholder')}
                 />
               </div>
@@ -459,13 +469,15 @@ export default function PersoneelPage() {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    inputMode="numeric"
+                    inputMode="text"
+                    enterKeyHint="done"
                     pattern="[0-9]*"
                     autoComplete="off"
+                    data-no-capitalize="true"
                     name="staff-pin-code"
                     value={formData.pin || ''}
                     onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                    className="flex-1 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xl tracking-widest"
+                    className="flex-1 min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xl tracking-widest touch-manipulation"
                     placeholder={t('personeelPage.form.pinPlaceholder')}
                     maxLength={4}
                   />
@@ -483,15 +495,25 @@ export default function PersoneelPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.form.role')}</label>
-                <select
-                  value={formData.role || 'EMPLOYEE'}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {ROLES.map((role) => (
-                    <option key={role.id} value={role.id}>{role.label}</option>
-                  ))}
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {ROLES.map((role) => {
+                    const selected = (formData.role || 'EMPLOYEE') === role.id
+                    return (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, role: role.id })}
+                        className={`min-h-[44px] rounded-xl border-2 px-3 py-2 text-base font-medium touch-manipulation ${
+                          selected
+                            ? 'border-blue-500 bg-blue-50 text-blue-900'
+                            : 'border-gray-200 bg-white text-gray-800'
+                        }`}
+                      >
+                        {role.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               <div>
@@ -534,7 +556,7 @@ export default function PersoneelPage() {
       {/* Contract Modal */}
       {showContractModal && editingStaff && (
         <div
-          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-[130] flex items-start justify-center bg-black/50 p-4 pt-8"
           data-vysion-modal-overlay
           onPointerDown={(e) => {
             if (e.target !== e.currentTarget) return
@@ -557,43 +579,60 @@ export default function PersoneelPage() {
             </div>
 
             <div
-              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6"
-             
+              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-6 touch-manipulation"
+              data-osk-scroll
+              data-osk-next="true"
             >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.type')}</label>
-                <select
-                  value={contractData.contract_type || ''}
-                  onChange={(e) => setContractData({ ...contractData, contract_type: e.target.value as ContractType || undefined })}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">{t('personeelPage.contractForm.select')}</option>
-                  {LOCAL_CONTRACT_TYPES.map((type) => (
-                    <option key={type.id} value={type.id}>{type.label}</option>
-                  ))}
-                </select>
+                <div className="flex flex-wrap gap-2">
+                  {LOCAL_CONTRACT_TYPES.map((type) => {
+                    const selected = (contractData.contract_type || '') === type.id
+                    return (
+                      <button
+                        key={type.id}
+                        type="button"
+                        onClick={() =>
+                          setContractData({
+                            ...contractData,
+                            contract_type: type.id,
+                          })
+                        }
+                        className={`min-h-[44px] rounded-xl border-2 px-3 py-2 text-base font-medium touch-manipulation ${
+                          selected
+                            ? 'border-blue-500 bg-blue-50 text-blue-900'
+                            : 'border-gray-200 bg-white text-gray-800'
+                        }`}
+                      >
+                        {type.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.hoursPerWeek')}</label>
                   <ControlledOptionalNumberInput
+                    inputMode="text"
                     value={contractData.hours_per_week}
                     onChange={(hours_per_week) =>
                       setContractData({ ...contractData, hours_per_week })
                     }
-                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                     placeholder="38"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.hourlyRate')}</label>
                   <ControlledOptionalNumberInput
+                    inputMode="text"
                     value={contractData.hourly_rate}
                     onChange={(hourly_rate) =>
                       setContractData({ ...contractData, hourly_rate })
                     }
-                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                     placeholder="15.00"
                   />
                 </div>
@@ -628,6 +667,7 @@ export default function PersoneelPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.commuteDistance')}</label>
                     <div className="flex">
                       <ControlledOptionalNumberInput
+                        inputMode="text"
                         value={contractData.commute_distance_km}
                         onChange={(commute_distance_km) =>
                           setContractData({
@@ -635,7 +675,7 @@ export default function PersoneelPage() {
                             commute_distance_km,
                           })
                         }
-                        className="flex-1 px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-1 min-h-[44px] px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                         placeholder="25"
                       />
                       <span className="px-3 py-2 bg-gray-100 border border-l-0 rounded-r-lg text-gray-600">km</span>
@@ -647,6 +687,7 @@ export default function PersoneelPage() {
                     <div className="flex">
                       <span className="px-3 py-2 bg-gray-100 border border-r-0 rounded-l-lg text-gray-600">€</span>
                       <ControlledOptionalNumberInput
+                        inputMode="text"
                         value={contractData.km_rate}
                         onChange={(km_rate) =>
                           setContractData({
@@ -654,7 +695,7 @@ export default function PersoneelPage() {
                             km_rate: km_rate ?? 0.4297,
                           })
                         }
-                        className="flex-1 px-4 py-2 border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-1 min-h-[44px] px-4 py-2 border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                         placeholder="0.4297"
                       />
                     </div>
@@ -683,7 +724,8 @@ export default function PersoneelPage() {
                   value={contractData.contract_notes || ''}
                   onChange={(e) => setContractData({ ...contractData, contract_notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  enterKeyHint="done"
+                  className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base touch-manipulation"
                   placeholder={t('personeelPage.contractForm.notesPlaceholder')}
                 />
               </div>

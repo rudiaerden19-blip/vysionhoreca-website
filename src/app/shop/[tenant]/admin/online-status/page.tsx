@@ -258,6 +258,8 @@ ALTER TABLE shop_offline_status
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
               className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
+              data-osk-scroll
+              data-osk-next="true"
             >
               <h3 className="text-xl font-bold text-gray-900 mb-1">{t('shopOffline.popupTitle')}</h3>
               <p className="text-gray-500 text-sm mb-6">{t('shopOffline.popupSubtitle')}</p>

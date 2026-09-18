@@ -15,7 +15,6 @@ import { CATEGORY_VAT_PERCENT_OPTIONS } from '@/lib/order-vat'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
-import { useScrollFocusedInputAboveKeyboard } from '@/hooks/useScrollFocusedInputAboveKeyboard'
 import MediaPicker from '@/components/MediaPicker'
 
 type CategoryRowProps = {
@@ -158,7 +157,6 @@ function CategoryReorderRow({
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
-  useScrollFocusedInputAboveKeyboard()
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [newCategory, setNewCategory] = useState('')
   const [newCategoryImageUrl, setNewCategoryImageUrl] = useState('')

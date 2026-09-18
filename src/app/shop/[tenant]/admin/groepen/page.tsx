@@ -295,6 +295,8 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            data-osk-scroll
+            data-osk-next="true"
           >
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               {editGroup ? t('groupsModule.groups.editGroup') : t('groupsModule.groups.createGroup')}
@@ -330,7 +332,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('groupsModule.groups.maxMembers')}</label>
-                  <input type="number" value={formData.max_members} onChange={(e) => setFormData({ ...formData, max_members: parseInt(e.target.value) })} min={1} className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <input type="text" inputMode="text" value={formData.max_members} onChange={(e) => { const raw = e.target.value.trim(); if (raw !== '' && !/^\d*$/.test(raw)) return; setFormData({ ...formData, max_members: raw ? parseInt(raw, 10) || 1 : 1 }) }} min={1} className="w-full min-h-[44px] px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation" />
                 </div>
               </div>
 

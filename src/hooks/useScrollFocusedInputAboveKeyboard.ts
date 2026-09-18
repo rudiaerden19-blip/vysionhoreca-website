@@ -11,7 +11,7 @@ import {
 
 /**
  * Bij focus op een tekstvak: veld boven het OS-schermtoetsenbord houden.
- * Alleen mounten op admin catalogus-pagina's — niet op de kassa-POS.
+ * Alleen mounten op admin (niet op de kassa-POS).
  */
 export function useScrollFocusedInputAboveKeyboard(opts?: {
   onEditableFocus?: (el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => void
@@ -64,6 +64,12 @@ export function useScrollFocusedInputAboveKeyboard(opts?: {
       releaseAllOskScrollPadding()
     }
   }, [])
+}
+
+/** Zet in de admin-shell (niet op kassa-POS). */
+export function AdminWindowsOskSupport() {
+  useScrollFocusedInputAboveKeyboard()
+  return null
 }
 
 /** Overlay van een admin-modal in het zichtbare scherm (iOS krimpt visualViewport). */

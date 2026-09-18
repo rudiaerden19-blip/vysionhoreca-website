@@ -159,7 +159,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
 
       {showModal && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl p-6 max-w-lg w-full">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto" data-osk-scroll data-osk-next="true">
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t('groupsModule.sessions.modalTitle')}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

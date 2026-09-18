@@ -317,7 +317,9 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl"
+              className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+              data-osk-scroll
+              data-osk-next="true"
             >
               <div className="p-6 border-b flex items-center justify-between">
                 <div className="flex items-center gap-3">

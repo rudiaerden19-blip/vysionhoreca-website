@@ -44,10 +44,8 @@ import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
-import {
-  useScrollFocusedInputAboveKeyboard,
-  useVisualViewportBox,
-} from '@/hooks/useScrollFocusedInputAboveKeyboard'
+import { useVisualViewportBox } from '@/hooks/useScrollFocusedInputAboveKeyboard'
+import { isEditableCatalogTextField } from '@/lib/scroll-input-above-keyboard'
 
 type ProductCatalogMode = 'horeca' |  'retail'
 
@@ -366,9 +364,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   const [catalogMode, setCatalogMode] = useState<ProductCatalogMode>('horeca')
   const productBarcodeScanRef = useRef<HTMLInputElement>(null)
   const [productBarcodeScanActive, setProductBarcodeScanActive] = useState(false)
-  useScrollFocusedInputAboveKeyboard({
-    onEditableFocus: () => setProductBarcodeScanActive(false),
-  })
+  useEffect(() => {
+    const onFocusIn = (e: Event) => {
+      if (isEditableCatalogTextField(e.target)) setProductBarcodeScanActive(false)
+    }
+    document.addEventListener('focusin', onFocusIn)
+    return () => document.removeEventListener('focusin', onFocusIn)
+  }, [])
 
   const isRetailForm = catalogMode === 'retail'
 

@@ -350,6 +350,8 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-xl w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto"
+            data-osk-scroll
+            data-osk-next="true"
           >
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
