@@ -460,7 +460,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   // Laad voorschot instellingen — lees alle velden, check snake_case én camelCase
   useEffect(() => {
-    supabase.from('reservation_settings').select('*').eq('tenant_slug', params.tenant).single()
+    supabase.from('reservation_settings').select('*').eq('tenant_slug', params.tenant).maybeSingle()
       .then(({ data }) => {
         if (data) {
           const required = !!(data.deposit_required ?? data.depositRequired ?? false)
@@ -497,23 +497,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
     async function loadData() {
       try {
-        // Check of tenant geblokkeerd is
-        if (supabase) {
-          const blockReq = supabase
-            .from('tenant_settings')
-            .select('is_blocked')
-            .eq('tenant_slug', params.tenant)
-          const { data: blockCheck } = await (signal ? blockReq.abortSignal(signal) : blockReq).single()
-
-          if (blockCheck?.is_blocked) {
-            if (!signal.aborted) {
-              setIsBlocked(true)
-              setLoading(false)
-            }
-            return
-          }
-        }
-
         // Laad data uit Supabase (signal: bij wegnavigeren geen lege cache / geen ruis-errors)
         const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData, statusData, moduleFlagsJson] = await Promise.all([
           getTenantSettings(params.tenant, signal),
@@ -543,6 +526,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         if (!tenantData) {
           if (!signal.aborted) {
             setBusiness(null)
+            setLoading(false)
+          }
+          return
+        }
+
+        if (tenantData.is_blocked) {
+          if (!signal.aborted) {
+            setIsBlocked(true)
             setLoading(false)
           }
           return
