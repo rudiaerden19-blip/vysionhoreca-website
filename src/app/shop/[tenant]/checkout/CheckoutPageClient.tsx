@@ -502,7 +502,7 @@ export default function CheckoutPageClient({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center notranslate" translate="no">
         <div
           className="w-12 h-12 border-4 rounded-full animate-spin"
           style={{ borderColor: `${primaryColor}40`, borderTopColor: primaryColor }}
@@ -515,7 +515,7 @@ export default function CheckoutPageClient({
   // Success screen - Wacht op bevestiging (MOET VOOR empty cart check!)
   if (orderSuccess) {
     return (
-      <div style={{ minHeight: '100dvh'}} className="bg-gray-50 flex items-center justify-center p-4">
+      <div style={{ minHeight: '100dvh'}} className="bg-gray-50 flex items-center justify-center p-4 notranslate" translate="no">
         <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl">
           <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl bg-blue-100">
             
@@ -567,7 +567,7 @@ export default function CheckoutPageClient({
   // Empty cart
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 notranslate" translate="no">
         <div className="text-center">
           <span className="text-6xl mb-4 block"></span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('checkoutPage.emptyCart')}</h1>
@@ -591,7 +591,8 @@ export default function CheckoutPageClient({
   return (
     <div
       style={{ width: '100%', maxWidth: '100%', overflowX: 'clip'}}
-      className={`min-h-screen bg-gray-50${isKiosk ? 'kiosk-touch-ui': ''}`}
+      className={`min-h-screen bg-gray-50 notranslate${isKiosk ? ' kiosk-touch-ui': ''}`}
+      translate="no"
     >
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">

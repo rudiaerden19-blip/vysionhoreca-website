@@ -6,6 +6,14 @@ import { useParams } from 'next/navigation'
 
 import { trackError } from '@/lib/monitoring'
 
+function isReactRemoveChildNoise(error: Error) {
+  return (
+    (error.name === 'NotFoundError' || /NotFoundError/i.test(error.message)) &&
+    /removeChild/i.test(error.message) &&
+    /not a child of this node/i.test(error.message)
+  )
+}
+
 export default function ShopTenantError({
   error,
   reset,
@@ -15,16 +23,23 @@ export default function ShopTenantError({
 }) {
   const params = useParams()
   const tenant = typeof params?.tenant === 'string'? params.tenant : ''
+  const removeChildNoise = isReactRemoveChildNoise(error)
 
   useEffect(() => {
+    if (removeChildNoise) {
+      reset()
+      return
+    }
     const name = error?.name ?? ''
     const msg = error?.message ?? ''
     if (name === 'AbortError') return
     if (/the operation was aborted|signal is aborted|aborted a request/i.test(msg)) return
     trackError(error, { segment: 'shop/[tenant]', tenant: tenant || undefined })
-  }, [error, tenant])
+  }, [error, tenant, reset, removeChildNoise])
 
   const homeHref = tenant ? `/shop/${encodeURIComponent(tenant)}`: '/'
+
+  if (removeChildNoise) return null
 
   return (
     <div className="min-h-[50vh] flex flex-col items-center justify-center px-4 py-16 text-center">

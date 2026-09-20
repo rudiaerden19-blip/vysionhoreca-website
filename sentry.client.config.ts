@@ -101,6 +101,7 @@ Sentry.init({
     /signal is aborted without reason/i,
     /the user aborted a request/i,
     /SCDynamicBridge/i,
+    /Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node/i,
   ],
 
   beforeSend(event, hint) {
@@ -120,6 +121,14 @@ Sentry.init({
       return null;
     }
     if (val != null && isMatchingIdUpdateNoise(val)) {
+      return null;
+    }
+    if (
+      typ === "NotFoundError" &&
+      typeof val === "string" &&
+      /removeChild/i.test(val) &&
+      /not a child of this node/i.test(val)
+    ) {
       return null;
     }
     return event;
