@@ -1,0 +1,48 @@
+Vysion kassa in Shapr3D (mm)
+============================
+
+Shapr3D leest geen .scad. Wel STL / STEP / foto als referentie.
+
+1. Nieuw project, eenheden = millimeters.
+
+2. Import -> vysion-kassa-concept.stl (map stl/)
+   Zet op slot / lock. Dit is ALLEEN pasvorm, geen printstuk.
+
+3. Foto's uit deze map als Image / Reference op een vlak:
+   vysion-kassa-zicht-driekwart.png
+   vysion-kassa-zicht-voor.png
+   vysion-kassa-zicht-achter.png
+
+4. Bouwvolgorde (aparte bodies, niet 1 blok):
+
+   A. KOOP — als massieve "dummy" (later niet printen)
+      - Elo 15"   346 x 28 x 220   kantel 20 graden naar kassier
+      - Klant     220 x 16 x 140   kantel 16 graden naar klant, 180 graden
+      - Star BINNENWERK (geen plastic kast)
+                  dummy 110 x 165 x 72 + rol 84 mm
+                  rechts in het blok, NIET in het geldvak
+                  houden: kop, snijder, rolhouder, printplaat, voeding, USB
+                  weg: buitenste Star-kap
+                  printklep MOET open (papier wisselen)
+                  garantie van Star is dan weg
+      - Geldlade  staal, vooraan, schuift naar de kassier
+      - Mini-PC   120 x 112 x 52   NIS BOVEN de lade, onder de nek
+                  NIET in het geldvak
+      - Alu-nek   36 x 36 x 168 + VESA 75
+
+   B. PRINT — schaal 3 mm om de dummy, split <= 250 mm
+      1. Printerholte + klep om het Star-mechanisme (scharnier, gleuf vooraan)
+      2. Lade-front L + R (slot vrij)
+      3. Mini-PC-nis + klep (ventilatie)
+      4. Nek-kap 2 helften rond alu
+      5. Elo-kap 2 helften
+      6. Klantenscherm-kap 2 helften
+
+5. Export per printstuk: STL, 0.2 mm, geen assembly.
+
+6. ECHTE maten: Elo / Star / lade opmeten en dummy's vervangen.
+   Conceptmaten zijn schatting tot je hardware er ligt.
+
+Kant:
+  Kassier = voor = groot scherm + lade + printer + PC-nis
+  Klant   = achter = klein scherm
