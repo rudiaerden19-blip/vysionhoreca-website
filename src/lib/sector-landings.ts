@@ -72,8 +72,8 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
       'Eigen website of webshop in dezelfde licentie.',
     ],
     heroImage: {
-      src: '/images/winkel/winkel-kassasysteem-card.png',
-      alt: 'Touchscreenkassa op de toonbank van een bakkerij',
+      src: '/images/sectoren/bakkerij-hero.jpg',
+      alt: 'Bakker aan het werk: broodjes snijden en verse bollerig brood in de bakkerij',
     },
     extraImage: {
       src: '/images/winkel/winkel-eigen-website-card.png',
@@ -149,7 +149,7 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hubHref: '/winkel',
     hubLabel: 'Bekijk het complete kassasysteem voor winkels & retail',
     demoHref: '/winkel#contact',
-    ogImage: '/images/winkel/winkel-kassasysteem-card.png',
+    ogImage: '/images/sectoren/bakkerij-hero.jpg',
   },
   slagerij: {
     slug: 'slagerij',
