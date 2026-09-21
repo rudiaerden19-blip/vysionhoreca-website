@@ -102,19 +102,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "一套平台打理整店业务",
-    "subtitleLead": "收银硬件与软件包含在您的订阅中",
+    "subtitleLead": "收银硬件与软件均包含",
     "subtitle": "",
     "audienceLine": "无需预付款，无安装费用，无合同",
     "sites": {
       "winkel": {
         "title": "为您的店铺打造的收银与平台",
-        "subtitleLead": "收银硬件与软件均含在订阅中",
+        "subtitleLead": "收银硬件与软件均包含",
         "subtitle": "适用于面包店、肉铺、美发店、服装店和专卖店。",
         "audienceLine": "为街边店铺而建"
       },
       "retail": {
         "title": "为零售打造的收银与平台",
-        "subtitleLead": "收银硬件与软件均含在订阅中",
+        "subtitleLead": "收银硬件与软件均包含",
         "subtitle": "适用于精品店、电子、批发和零售。",
         "audienceLine": "为零售与批发而建"
       }
@@ -6623,7 +6623,7 @@
         "body": "上线和高峰时段。您来电，我们解决。"
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "收银硬件与软件均包含",
     "audienceLine": "无需预付款，无安装费用，无合同",
     "offline": {
       "title": "Works offline in the shop",
@@ -6712,7 +6712,7 @@
         "body": "上线、培训和高峰协助。请给我们打电话。"
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "收银硬件与软件均包含",
     "audienceLine": "Built for retail & wholesale",
     "offline": {
       "title": "Works offline in the store",

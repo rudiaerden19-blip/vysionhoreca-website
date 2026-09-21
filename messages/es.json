@@ -102,19 +102,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Una plataforma para todo tu negocio",
-    "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
+    "subtitleLead": "Hardware y software de caja incluidos",
     "subtitle": "",
     "audienceLine": "Sin anticipo, sin costes de instalación, sin contrato",
     "sites": {
       "winkel": {
         "title": "Caja y plataforma para tu tienda",
-        "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
+        "subtitleLead": "Hardware y software de caja incluidos",
         "subtitle": "Para panaderías, carnicerías, peluquerías, tiendas de ropa y comercios especializados.",
         "audienceLine": "Hecho para el comercio de barrio"
       },
       "retail": {
         "title": "Caja y plataforma retail para tu negocio",
-        "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
+        "subtitleLead": "Hardware y software de caja incluidos",
         "subtitle": "Para boutiques, electrónica, mayoristas y retail.",
         "audienceLine": "Hecho para retail y mayoristas"
       }
@@ -6623,7 +6623,7 @@
         "body": "En el arranque y en las horas punta. Llama, lo resolvemos."
       }
     },
-    "subtitleLead": "Hardware y software de caja incluidos en la suscripción",
+    "subtitleLead": "Hardware y software de caja incluidos",
     "audienceLine": "Sin anticipo, sin costes de instalación, sin contrato",
     "offline": {
       "title": "También offline en la tienda",
@@ -6712,7 +6712,7 @@
         "body": "Arranque, formación y ayuda en el rush. Nos llama."
       }
     },
-    "subtitleLead": "Hardware y software de caja incluidos en la suscripción",
+    "subtitleLead": "Hardware y software de caja incluidos",
     "audienceLine": "Hecho para retail y mayoristas",
     "offline": {
       "title": "También offline en el negocio",

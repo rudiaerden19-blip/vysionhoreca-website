@@ -184,19 +184,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "One platform for your entire business",
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "POS hardware & software included",
     "subtitle": "",
     "audienceLine": "No deposit, no installation costs, no contract",
     "sites": {
       "winkel": {
         "title": "POS & platform for your shop",
-        "subtitleLead": "POS hardware & software included in your subscription",
+        "subtitleLead": "POS hardware & software included",
         "subtitle": "For bakeries, butchers, hair salons, clothing stores and specialty shops.",
         "audienceLine": "Built for the high street"
       },
       "retail": {
         "title": "POS & retail platform for your business",
-        "subtitleLead": "POS hardware & software included in your subscription",
+        "subtitleLead": "POS hardware & software included",
         "subtitle": "For boutiques, electronics, wholesale and retail.",
         "audienceLine": "Built for retail & wholesale"
       }
@@ -6582,7 +6582,7 @@
         "body": "At launch and busy moments. You call, we fix it."
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "POS hardware & software included",
     "audienceLine": "No deposit, no installation costs, no contract",
     "offline": {
       "title": "Works offline in the shop",
@@ -6671,7 +6671,7 @@
         "body": "Onboarding, training and help during the rush. You call us."
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "POS hardware & software included",
     "audienceLine": "Built for retail & wholesale",
     "offline": {
       "title": "Works offline in the store",

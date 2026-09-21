@@ -184,19 +184,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Één platform voor je hele zaak",
-    "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+    "subtitleLead": "Kassa hardware & software inbegrepen",
     "subtitle": "",
     "audienceLine": "Zonder voorschot, zonder installatiekosten, zonder contract",
     "sites": {
       "winkel": {
         "title": "Kassa & platform voor uw winkel",
-        "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+        "subtitleLead": "Kassa hardware & software inbegrepen",
         "subtitle": "Voor bakkers, slagers, kappers, kledingzaken en speciaalzaken.",
         "audienceLine": "Gemaakt voor de winkelstraat"
       },
       "retail": {
         "title": "Kassa & retailplatform voor uw zaak",
-        "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+        "subtitleLead": "Kassa hardware & software inbegrepen",
         "subtitle": "Voor boetieks, elektronica, groothandel en retail.",
         "audienceLine": "Gemaakt voor retail & groothandel"
       }
@@ -6582,7 +6582,7 @@
         "body": "Bij opstart en drukke momenten. U belt, wij lossen het op."
       }
     },
-    "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+    "subtitleLead": "Kassa hardware & software inbegrepen",
     "audienceLine": "Zonder voorschot, zonder installatiekosten, zonder contract",
     "offline": {
       "title": "Ook offline in de winkel",
@@ -6671,7 +6671,7 @@
         "body": "Opstart, training en hulp tijdens de rush. U belt ons."
       }
     },
-    "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+    "subtitleLead": "Kassa hardware & software inbegrepen",
     "audienceLine": "Gemaakt voor retail & groothandel",
     "offline": {
       "title": "Ook offline in de zaak",

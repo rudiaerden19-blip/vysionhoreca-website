@@ -102,19 +102,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "منصة واحدة لعملك بالكامل",
-    "subtitleLead": "أجهزة وبرمجيات الكاشير مشمولة في اشتراكك",
+    "subtitleLead": "أجهزة وبرمجيات الصندوق مشمولة",
     "subtitle": "",
     "audienceLine": "بدون دفعة مقدمة، بدون تكاليف تركيب، بدون عقد",
     "sites": {
       "winkel": {
         "title": "صندوق وكاشير لمتجرك",
-        "subtitleLead": "أجهزة وبرمجيات الصندوق ضمن اشتراكك",
+        "subtitleLead": "أجهزة وبرمجيات الصندوق مشمولة",
         "subtitle": "للمخابز والجزارة وصالونات الحلاقة ومتاجر الملابس والمتاجر المتخصصة.",
         "audienceLine": "صُمم لمتاجر الشارع"
       },
       "retail": {
         "title": "صندوق ومنصة للتجزئة",
-        "subtitleLead": "أجهزة وبرمجيات الصندوق ضمن اشتراكك",
+        "subtitleLead": "أجهزة وبرمجيات الصندوق مشمولة",
         "subtitle": "للبوتيكات والإلكترونيات والجملة والتجزئة.",
         "audienceLine": "صُمم للتجزئة والجملة"
       }
@@ -6623,7 +6623,7 @@
         "body": "عند الإطلاق وفي أوقات الذروة. تتصل ونحلّها."
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "أجهزة وبرمجيات الصندوق مشمولة",
     "audienceLine": "بدون دفعة مقدمة، بدون تكاليف تركيب، بدون عقد",
     "offline": {
       "title": "Works offline in the shop",
@@ -6712,7 +6712,7 @@
         "body": "تشغيل وتدريب ومساعدة وقت الذروة. اتصل بنا."
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "أجهزة وبرمجيات الصندوق مشمولة",
     "audienceLine": "Built for retail & wholesale",
     "offline": {
       "title": "Works offline in the store",

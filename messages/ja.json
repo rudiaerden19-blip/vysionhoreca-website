@@ -102,19 +102,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "お店全体をひとつのプラットフォームで",
-    "subtitleLead": "レジのハードとソフトがサブスクに含まれます",
+    "subtitleLead": "レジのハードとソフト込み",
     "subtitle": "",
     "audienceLine": "前払いなし、導入費用なし、契約なし",
     "sites": {
       "winkel": {
         "title": "お店のためのレジ＆プラットフォーム",
-        "subtitleLead": "レジ機器とソフトがサブスクに含まれます",
+        "subtitleLead": "レジのハードとソフト込み",
         "subtitle": "パン屋、精肉店、美容室、衣料品店、専門店向け。",
         "audienceLine": "街のお店のために"
       },
       "retail": {
         "title": "小売のためのレジ＆プラットフォーム",
-        "subtitleLead": "レジ機器とソフトがサブスクに含まれます",
+        "subtitleLead": "レジのハードとソフト込み",
         "subtitle": "ブティック、家電、卸売、小売向け。",
         "audienceLine": "小売と卸売のために"
       }
@@ -6623,7 +6623,7 @@
         "body": "導入時も忙しい時間も。電話一本で対応します。"
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "レジのハードとソフト込み",
     "audienceLine": "前払いなし、導入費用なし、契約なし",
     "offline": {
       "title": "Works offline in the shop",
@@ -6712,7 +6712,7 @@
         "body": "導入、研修、ピーク時のサポート。お電話ください。"
       }
     },
-    "subtitleLead": "POS hardware & software included in your subscription",
+    "subtitleLead": "レジのハードとソフト込み",
     "audienceLine": "Built for retail & wholesale",
     "offline": {
       "title": "Works offline in the store",

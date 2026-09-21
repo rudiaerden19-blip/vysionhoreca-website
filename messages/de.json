@@ -102,19 +102,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Eine Plattform für Ihr gesamtes Unternehmen",
-    "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
+    "subtitleLead": "Kassen-Hardware & Software inbegriffen",
     "subtitle": "",
     "audienceLine": "Ohne Anzahlung, ohne Installationskosten, ohne Vertrag",
     "sites": {
       "winkel": {
         "title": "Kasse & Plattform für Ihr Geschäft",
-        "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
+        "subtitleLead": "Kassen-Hardware & Software inbegriffen",
         "subtitle": "Für Bäckereien, Metzgereien, Friseure, Modegeschäfte und Fachhandel.",
         "audienceLine": "Gemacht für die Einkaufsstraße"
       },
       "retail": {
         "title": "Kasse & Retail-Plattform für Ihr Unternehmen",
-        "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
+        "subtitleLead": "Kassen-Hardware & Software inbegriffen",
         "subtitle": "Für Boutiquen, Elektronik, Großhandel und Retail.",
         "audienceLine": "Gemacht für Retail & Großhandel"
       }
@@ -6646,7 +6646,7 @@
         "body": "Beim Start und in Stoßzeiten. Sie rufen an, wir lösen es."
       }
     },
-    "subtitleLead": "Kassen-Hardware und Software im Abo enthalten",
+    "subtitleLead": "Kassen-Hardware & Software inbegriffen",
     "audienceLine": "Ohne Anzahlung, ohne Installationskosten, ohne Vertrag",
     "offline": {
       "title": "Auch offline im Laden",
@@ -6735,7 +6735,7 @@
         "body": "Start, Schulung und Hilfe im Rush. Sie rufen uns."
       }
     },
-    "subtitleLead": "Kassen-Hardware und Software im Abo enthalten",
+    "subtitleLead": "Kassen-Hardware & Software inbegriffen",
     "audienceLine": "Gemacht für Retail & Großhandel",
     "offline": {
       "title": "Auch offline im Betrieb",

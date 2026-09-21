@@ -102,19 +102,19 @@
     "logoTitle": "Vysion kassa",
     "logoTagline": "",
     "title": "Un'unica piattaforma per tutta la tua attività",
-    "subtitleLead": "Hardware e software cassa inclusi nel tuo abbonamento",
+    "subtitleLead": "Hardware e software cassa inclusi",
     "subtitle": "",
     "audienceLine": "Senza acconto, senza costi di installazione, senza contratto",
     "sites": {
       "winkel": {
         "title": "Cassa e piattaforma per il tuo negozio",
-        "subtitleLead": "Hardware e software cassa inclusi nell'abbonamento",
+        "subtitleLead": "Hardware e software cassa inclusi",
         "subtitle": "Per panifici, macellerie, parrucchieri, abbigliamento e negozi specializzati.",
         "audienceLine": "Pensato per il negozio di vicinato"
       },
       "retail": {
         "title": "Cassa e piattaforma retail per la tua attività",
-        "subtitleLead": "Hardware e software cassa inclusi nell'abbonamento",
+        "subtitleLead": "Hardware e software cassa inclusi",
         "subtitle": "Per boutique, elettronica, ingrosso e retail.",
         "audienceLine": "Pensato per retail e ingrosso"
       }
@@ -6623,7 +6623,7 @@
         "body": "All’avvio e nei picchi. Chiami, risolviamo."
       }
     },
-    "subtitleLead": "Hardware e software cassa inclusi nell’abbonamento",
+    "subtitleLead": "Hardware e software cassa inclusi",
     "audienceLine": "Senza acconto, senza costi di installazione, senza contratto",
     "offline": {
       "title": "Funziona anche offline in negozio",
@@ -6712,7 +6712,7 @@
         "body": "Avvio, formazione e aiuto nel rush. Ci chiami."
       }
     },
-    "subtitleLead": "Hardware e software cassa inclusi nell’abbonamento",
+    "subtitleLead": "Hardware e software cassa inclusi",
     "audienceLine": "Fatto per retail e ingrosso",
     "offline": {
       "title": "Funziona anche offline",
