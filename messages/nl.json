@@ -22,11 +22,11 @@
     "sectors": "Sectoren",
     "services": "Onze diensten",
     "integrations": "Integraties",
-    "subscriptions": "Abonnementen"
+    "subscriptions": "Licenties"
   },
   "licensePurchasePage": {
     "title": "Aankoop licentie",
-    "subtitle": "Eenmalige levenslange licentie — alternatief voor maandelijk abonnement",
+    "subtitle": "Eenmalige levenslange licentie — alternatief voor maandelijkse licentie",
     "cardBadge": "Levenslange licentie",
     "priceAmount": "€1.499",
     "priceNote": "Eenmalig",
@@ -39,18 +39,18 @@
     "bullet2": "Levenslange softwarelicentie — geen maandelijkse kassasoftwarekosten",
     "bullet3": "Updates en ondersteuning volgens onze algemene voorwaarden",
     "bullet4": "Ideaal als je liever één investering doet dan maandelijk betalen",
-    "bullet5": "Alternatief naast ons Premium-abonnement van €99 per maand",
-    "compareTitle": "Abonnement of licentie?",
-    "compareBody": "Met het maandelijk abonnement betaal je geen grote eenmalige investering. Met de levenslange licentie betaal je één keer €1.499 voor hardware én software. Beide opties leveren een compleet kassapakket — inpluggen en verkopen, zonder extra installatiekosten.",
+    "bullet5": "Alternatief naast onze Premium-licentie van €99 per maand",
+    "compareTitle": "Maandelijkse of eenmalige licentie?",
+    "compareBody": "Met de maandelijkse licentie betaal je geen grote eenmalige investering. Met de levenslange licentie betaal je één keer €1.499 voor hardware én software. Beide opties leveren een compleet kassapakket — inpluggen en verkopen, zonder extra installatiekosten.",
     "ctaContact": "Vraag aankoop licentie",
-    "ctaSubscription": "Bekijk abonnement",
+    "ctaSubscription": "Bekijk licentie",
     "emailSubject": "Aankoop levenslange licentie Vysion",
     "footerNote": "Neem contact op voor een offerte op maat."
   },
   "subscriptionsPage": {
-    "title": "Abonnementen",
+    "title": "Licenties",
     "subtitle": "Eén platform voor uw zaak — transparant en maandelijks opzegbaar.",
-    "lead": "U kiest Pro of Premium en betaalt per maand of jaar. Updates en ondersteuning horen bij uw abonnement.",
+    "lead": "U kiest Pro of Premium en betaalt per maand of jaar. Updates en ondersteuning horen bij uw licentie.",
     "bullet1": "Geen langlopende contracten; op elk moment maandelijks opzegbaar.",
     "bullet2": "14 dagen gratis uitproberen, zonder creditcard.",
     "bullet3": "Kassa, reserveringen, online bestellen en meer in dezelfde omgeving.",
@@ -62,7 +62,7 @@
     "vysionProLargeTitle": "Online bestelplatform",
     "vysionPremiumLargeTitle": "Vysion Premium",
     "vysionProImageAlt": "Overzicht van het Online bestelplatform-pakket",
-    "vysionProRightP1": "Online bestellen, uw eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer zit in dit abonnement.",
+    "vysionProRightP1": "Online bestellen, uw eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer zit in deze licentie.",
     "vysionProRightP2": "Kies maandelijks of jaarlijks betalen; met jaarbetaling profiteert u van 10% korting. Alle vermelde voordelen zitten inbegrepen, inclusief gratis opleiding en support.",
     "vysionProModulesP1": "Jij kiest welke modules je in je hardware wilt; wat je niet wilt, betaal je ook niet voor.",
     "vysionProModulesP2": "Wil je je eigen module, zoals je die met een andere kassa gebruikte? Geen probleem: onze programmeurs bouwen dat voor jou in eigen huis.",
@@ -72,7 +72,7 @@
     "premiumStampCenter": "inbegrepen",
     "vysionProLifestyleAlt": "Restaurant: gedeelde schotel met Aziatische gerechten, geglazuurd vlees en gamba’s op een gedekte tafel in een restaurant.",
     "premiumShowcaseTitle": "Vysion premium onze software & hardware in jouw zaak",
-    "premiumCardShowcaseAlt": "Overzicht van het Vysion Premium-abonnement met functies en prijs",
+    "premiumCardShowcaseAlt": "Overzicht van de Vysion Premium-licentie met functies en prijs",
     "galleryHardwareAlt1": "Zwarte touchscreen-kassa met bonprinter op de toonbank",
     "galleryHardwareAlt2": "Witte touchscreen-kassa in een zaak-interieur",
     "galleryHardwareAlt3": "Digitaal menu-scherm op marmeren toonbank",
@@ -235,7 +235,7 @@
     "title": "Het platform dat geld oplevert.",
     "description": "Laat klanten bestellen hoe zij willen: online, aan tafel of voor afhalen. Alles komt automatisch binnen op één plek en jij hoeft alleen nog te bereiden.",
     "extras": "En dan… dit zit er ook gewoon bij:",
-    "extrasList": "• Volledige kassa\n• Kassa voor foodtrucks\n• Je eigen website (klaar in jouw huisstijl)\n• Kostencalculator per product\n• Inzicht in omzet, piekmomenten en prestaties\n• Personeels- & urenregistratie\n• Weet of je te hoog of te laag geprijsd bent\n• Eigen restaurant of bistro reserveringsplatform\n• Push berichten\n• QR-codes\n• Geen losse systemen. Geen extra abonnementen.",
+    "extrasList": "• Volledige kassa\n• Kassa voor foodtrucks\n• Je eigen website (klaar in jouw huisstijl)\n• Kostencalculator per product\n• Inzicht in omzet, piekmomenten en prestaties\n• Personeels- & urenregistratie\n• Weet of je te hoog of te laag geprijsd bent\n• Eigen restaurant of bistro reserveringsplatform\n• Push berichten\n• QR-codes\n• Geen losse systemen. Geen extra licenties.",
     "tagline": "Eén platform. Eén scherm. Volledige controle.",
     "ctaPrimary": "Start gratis proefperiode",
     "ctaSecondary": "Bekijk demo",
@@ -247,7 +247,7 @@
     "bottomArc": "voordeligste"
   },
   "hardware": {
-    "kicker": "Hardware inbegrepen in het premium abonnement",
+    "kicker": "Hardware inbegrepen in de premium licentie",
     "title": "Onze hardware",
     "subtitle": "Onze premium kassa's en randapparatuur zijn van topkwaliteit. Met de nieuwste chips aan boord ervaart u supersnelle handelingen.",
     "imageAlt": "Hardware voorbeeld",
@@ -411,7 +411,7 @@
     "subtitleVysionLine": "Met Vysion kan het allemaal vanuit één systeem en één scherm.",
     "subtitlePoint1": "Geen 5 verschillende systemen.",
     "subtitlePoint2": "Geen meerdere schermen op je balie.",
-    "subtitlePoint3": "Geen aparte abonnementen voor elke toepassing.",
+    "subtitlePoint3": "Geen aparte licenties voor elke toepassing.",
     "subtitleClosing": "Alles wat je zaak nodig heeft, verbonden in één compleet platform.",
     "subtitleModulesToggle": "Jij zet de modules aan en uit die je wil, zonder 1 euro meer te betalen.",
     "centerLabel": "Vysion",
@@ -430,7 +430,7 @@
   },
   "gratisWebsiteBanner": {
     "title": "Gratis website",
-    "body": "Bij je abonnement ontvang je een volledig gratis eigen website, mee inbegrepen, zonder extra kosten. Je kunt je site volledig aanpassen naar jouw smaak: kleuren, foto's, alles.",
+    "body": "Bij je licentie ontvang je een volledig gratis eigen website, mee inbegrepen, zonder extra kosten. Je kunt je site volledig aanpassen naar jouw smaak: kleuren, foto's, alles.",
     "cta": "Klik hier voor restaurantwebsite",
     "ctaFrituur": "Bekijk voorbeeld frituur"
   },
@@ -441,7 +441,7 @@
     "imageAlt3": "Complete kassa-opstelling: dubbel touchscreen, kassalade, toetsenbord en bonprinter",
     "eyebrow": "Het Vysionbeest",
     "headline": "Het Vysion \"Beest\": maximale kracht, professionele hardware",
-    "intro": "Kies voor hardware die je zaak versnelt: krachtige i9-kassa, inbegrepen in je abonnement. Geen verborgen kosten, heldere voorwaarden.",
+    "intro": "Kies voor hardware die je zaak versnelt: krachtige i9-kassa, inbegrepen in je licentie. Geen verborgen kosten, heldere voorwaarden.",
     "specsHeading": "Specificaties die het verschil maken",
     "specSpeed": "**Ongekende snelheid**: dankzij de **Intel Core i9-processor** en **16 GB RAM** verwerk je transacties razendsnel, zonder haperingen — of je nu 10 of 10.000 producten in je systeem hebt.",
     "specDualTitle": "Robuuste hardware",
@@ -450,13 +450,13 @@
     "specStorage": "**Betrouwbare opslag**: de **128 GB SSD** zorgt ervoor dat je kassa in seconden opstart en je data veilig en razendsnel beschikbaar is.",
     "worksHeading": "Waarom dit systeem voor iedereen werkt",
     "worksLead": "Dit is geen simpele tablet op een standaard, maar een professioneel, industrieel werkstation. Of je nu een bakkerij, kledingwinkel, café of online shop runt: de hardware past zich aan jouw tempo aan.",
-    "worksBullet1": "**Eerlijke deal**: geen verborgen kosten. Premium hardware inbegrepen in je abonnement, maandelijks opzegbaar.",
+    "worksBullet1": "**Eerlijke deal**: geen verborgen kosten. Premium hardware inbegrepen in je licentie, maandelijks opzegbaar.",
     "worksBullet2": "**Sector-vriendelijk**: het strakke design staat professioneel op elke toonbank.",
     "quote": "Kies voor de kracht van een i9-werkstation. Snel, betrouwbaar, klaar voor elke piek."
   },
   "platform": {
     "sectionTitle": "Wat je krijgt",
-    "sectionSubtitle1": "Deze modules en nog veel meer horen bij jouw abonnement. Wil je een eigen module erbij? Wij bouwen het gratis voor jou en zetten het in je systeem.",
+    "sectionSubtitle1": "Deze modules en nog veel meer horen bij jouw licentie. Wil je een eigen module erbij? Wij bouwen het gratis voor jou en zetten het in je systeem.",
     "gridTestCta": "Start gratis demo",
     "gridTrustLine": "Geen installatie nodig · Werkt direct in je browser · Zoals een echte zaak",
     "gridDemoCta": "Bekijk demo frituur",
@@ -726,7 +726,7 @@
     "chooseStandard": "Kies Standaard",
     "choosePro": "Kies Premium",
     "cancelAnytime": "Maandelijks opzegbaar",
-    "yearlySave": "Je bespaart 10% met een jaarabonnement.",
+    "yearlySave": "Je bespaart 10% met een jaarlicentie.",
     "billingMonthly": "Maandelijks",
     "billingYearly": "Jaarlijks",
     "hardwareWithout": "Zonder hardware",
@@ -832,7 +832,7 @@
     }
   },
   "industry": {
-    "sectionTitle": "Extra inbegrepen in uw abonnement",
+    "sectionTitle": "Extra inbegrepen in uw licentie",
     "imageAltPrefix": "Vysion kassa layout voor",
     "invoicing": {
       "tab": "Facturatie",
@@ -878,7 +878,7 @@
     "title": "Ondernemers vertrouwen op Vysion",
     "quotes": {
       "1": {
-        "quote": "Eindelijk eens een platform waar alles in elkaar zit. Ik heb mijn andere abonnementen allemaal opgezegd en heb nu alles in één voor een fractie van de prijs.",
+        "quote": "Eindelijk eens een platform waar alles in elkaar zit. Ik heb mijn andere licenties allemaal opgezegd en heb nu alles in één voor een fractie van de prijs.",
         "author": "Marc V.",
         "role": "Frituur eigenaar"
       },
@@ -971,7 +971,7 @@
     "navProductAria": "Product: snel naar functies, prijzen en nieuws",
     "navCompanyAria": "Bedrijf: over ons, contact en beleid",
     "featuresLinkTitle": "Overzicht van kassa, reserveringen, online bestellen en alle modules",
-    "pricingLinkTitle": "Abonnementen en prijzen voor het platform",
+    "pricingLinkTitle": "Licenties en prijzen voor het platform",
     "updatesLinkTitle": "Productnieuws en updates van Vysion",
     "supportLinkTitle": "Hulp, handleidingen en technische ondersteuning",
     "aboutLinkTitle": "Meer over Vysion en het team",
@@ -1175,7 +1175,7 @@
       "title": "Ons verhaal",
       "p1": "Vysion is ontstaan uit echte ervaring. Als ondernemers liepen we tegen hetzelfde probleem aan als jij: te veel systemen, te veel kosten en te weinig overzicht.",
       "p2": "We betaalden elke maand voor losse tools: een bestelplatform, boekhouding, betalingen en analyses; alles apart, niets dat écht samenwerkte. De kosten liepen op. Het gedoe ook.",
-      "p3": "Dus besloten we het anders te doen. We bouwden één slim platform, met de kassa als hart, en alles wat je daarnaast nodig hebt gewoon inbegrepen. Geen overbodige functies. Geen losse abonnementen. Gewoon een eerlijk systeem dat werkt voor ondernemers zoals jij.",
+      "p3": "Dus besloten we het anders te doen. We bouwden één slim platform, met de kassa als hart, en alles wat je daarnaast nodig hebt gewoon inbegrepen. Geen overbodige functies. Geen losse licenties. Gewoon een eerlijk systeem dat werkt voor ondernemers zoals jij.",
       "p4": "Bij ons kan je alle modules apart aankopen. Wil je een restaurantreserveringssysteem, goedkoper en professioneler dan de meeste systemen op de markt? Of een online bestelsysteem, uitgebreider en beter gekoppeld dan de meeste systemen? Ja hoor, dat kan: registreer je gewoon gratis, kies je module en klaar."
     },
     "facts": {
@@ -2237,8 +2237,8 @@
         }
       },
       "subscription": {
-        "title": "Abonnement",
-        "subtitle": "Je huidige abonnement en pakket",
+        "title": "Licentie",
+        "subtitle": "Je huidige licentie en pakket",
         "currentPlan": "Huidig pakket",
         "standardPackage": "Standaard Pakket",
         "premiumPackage": "Premium Pakket",
@@ -2247,7 +2247,7 @@
         "perMonth": "/maand",
         "active": "Actief",
         "expiresOn": "Verloopt op",
-        "manageSubscription": "Abonnement beheren",
+        "manageSubscription": "Licentie beheren",
         "upgrade": "Upgraden",
         "downgrade": "Downgraden"
       },
@@ -2407,7 +2407,7 @@
       "dashboard": "Dashboard",
       "shopDisplay": "Shop Display",
       "kitchenDisplay": "Keuken Display",
-      "subscription": "Abonnement",
+      "subscription": "Licentie",
       "businessProfile": "Zaak profiel",
       "openingHours": "Openingstijden",
       "deliveryPickup": "Levering & afhaal",
@@ -3066,8 +3066,8 @@
       "noReviews": "Nog geen reviews"
     },
     "subscription": {
-      "title": "Abonnement",
-      "subtitle": "Beheer je abonnement en bekijk facturen",
+      "title": "Licentie",
+      "subtitle": "Beheer je licentie en bekijk facturen",
       "currentPlan": "Huidig plan",
       "status": "Status",
       "paymentOverview": "Betalingsoverzicht",
@@ -3108,7 +3108,7 @@
       "pay": "Betalen",
       "done": "Voldaan",
       "questions": "Vragen over facturatie?",
-      "questionsDesc": "Heb je vragen over je abonnement of facturen? Neem contact met ons op.",
+      "questionsDesc": "Heb je vragen over je licentie of facturen? Neem contact met ons op.",
       "loading": "Laden...",
       "noOutstanding": "Je hebt geen openstaande facturen",
       "overdueWarning": "Achterstallige betaling",
@@ -5360,14 +5360,14 @@
     "faq4A": "Ga naar Personeel in je dashboard. Klik op Medewerker toevoegen en vul de gegevens in. Je kunt ook rollen en permissies toewijzen.",
     "faq5Q": "Mijn printer werkt niet, wat moet ik doen?",
     "faq5A": "Controleer of de printer aan staat en verbonden is met hetzelfde netwerk. Ga naar Instellingen > Printers en klik op Test afdruk. Neem contact met ons op als het probleem aanhoudt.",
-    "faq6Q": "Hoe kan ik mijn abonnement wijzigen of opzeggen?",
-    "faq6A": "Ga naar Instellingen > Abonnement. Daar kun je upgraden naar Pro of je abonnement maandelijks opzeggen. Er zijn geen opzegkosten.",
+    "faq6Q": "Hoe kan ik mijn licentie wijzigen of opzeggen?",
+    "faq6A": "Ga naar Instellingen > Licentie. Daar kun je upgraden naar Pro of je licentie maandelijks opzeggen. Er zijn geen opzegkosten.",
     "faq7Q": "Worden mijn gegevens veilig bewaard?",
     "faq7A": "Ja, al je gegevens worden versleuteld opgeslagen op beveiligde servers binnen de EU. We voldoen aan alle GDPR-vereisten.",
     "faq8Q": "Kan ik de app op meerdere apparaten gebruiken?",
     "faq8A": "Ja, je kunt inloggen op onbeperkt aantal apparaten. Je dashboard synchroniseert automatisch tussen alle apparaten.",
     "faq9Q": "Wie is eigenaar van het systeem?",
-    "faq9A": "Vysion is eigenaar van de hardware: de kassa, printer en geldlade. Bij een premium abonnement krijgt u een gebruiksrecht zolang het abonnement loopt. De hardware wordt via het abonnement niet uw eigendom."
+    "faq9A": "Vysion is eigenaar van de hardware: de kassa, printer en geldlade. Bij een premium licentie krijgt u een gebruiksrecht zolang de licentie loopt. De hardware wordt via de licentie niet uw eigendom."
   },
   "resellersPage": {
     "badge": "Partner Programma",
@@ -5388,7 +5388,7 @@
     "benefit6Desc": "digitaliseert snel. QR bestellen en online ordering zijn de toekomst.",
     "commissionTitle": "Commissie Structuur",
     "monthlyCommission": "Maandelijkse commissie",
-    "monthlyCommissionNote": "van het maandabonnement",
+    "monthlyCommissionNote": "van de maandelijkse licentie",
     "setupCommission": "Setup fee commissie",
     "setupCommissionNote": "van eenmalige setup kosten",
     "exampleTitle": "Rekenvoorbeeld:",
@@ -6108,7 +6108,7 @@
       "sm_voorraad_producten": "Artikelen",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Bonprinter Windows",
-      "sm_abonnement": "Abonnement"
+      "sm_abonnement": "Licentie"
     }
   },
   "tenantModulesPage": {
@@ -6461,10 +6461,10 @@
       "h1": "Snelste Kassasysteem voor Bakkers | i9 Kracht & 9 Talen | Vysion",
       "intro": "Specifieke kassa-layout voor bakkers: Intel i9 (‘Het Beest’) voor pieksnelheid in de ochtend en 9 talen voor je team — dé keuze als je een sterk kassasysteem België en Nederland zoekt.",
       "body1": "Wil je de snelste kassa tijdens drukke brunches en weekenddrukte? Bij ons combineer je touchscreen POS, bonprinter en software die niet traag wordt. Kassa kopen of leasen wordt helder: één pakket, zonder verrassingen na installatie.",
-      "body2": "Vysion is gebouwd voor bakkers die marges en tempo willen houden. Krachtige i9-hardware inbegrepen in je abonnement — het kassasysteem België waar je op kunt bouwen.",
+      "body2": "Vysion is gebouwd voor bakkers die marges en tempo willen houden. Krachtige i9-hardware inbegrepen in je licentie — het kassasysteem België waar je op kunt bouwen.",
       "imageAlt": "Vysion kassa layout voor bakkerij",
       "cta": "Start gratis — 14 dagen proberen",
-      "ownership24": "Premium i9-kassa inbegrepen in je abonnement — snel, betrouwbaar, klaar voor elke piek."
+      "ownership24": "Premium i9-kassa inbegrepen in je licentie — snel, betrouwbaar, klaar voor elke piek."
     },
     "cafe": {
       "h1": "Kassa voor Cafés | i9 Dual-Screen & 9 Talen | Vysion",
@@ -6473,16 +6473,16 @@
       "body2": "Minder tikken, minder fouten, meer bedieningen per uur. Probeer Vysion gratis en ervaar i9-kracht met duidelijke voorwaarden.",
       "imageAlt": "Vysion kassa layout voor café en brasserie",
       "cta": "Start gratis",
-      "ownership24": "Premium i9-kassa inbegrepen in je abonnement — snel, betrouwbaar, klaar voor elke piek."
+      "ownership24": "Premium i9-kassa inbegrepen in je licentie — snel, betrouwbaar, klaar voor elke piek."
     },
     "frituur": {
       "h1": "Frituur Kassa | Snelste i9 Checkout | Vysion",
       "intro": "Frituurpieken en festivals: jouw kassa moet mee. Intel i9 (‘Het Beest’), dubbel scherm voor de klant, 9 talen voor je team — gebouwd voor drukte, olie en tempo.",
       "body1": "Bestellen, sauzen, bijgerechten: alles vlot invoeren zonder vastlopers. Touchscreen POS, ingebouwde printer en online bestelplatform in één aanpak — dé frituur kassa voor België en Nederland.",
-      "body2": "Houd wachtrijen kort en marges strak. Start gratis, test in je zaak, en kies voor premium hardware in je abonnement.",
+      "body2": "Houd wachtrijen kort en marges strak. Start gratis, test in je zaak, en kies voor premium hardware in je licentie.",
       "imageAlt": "Vysion kassa layout voor frituur en snackbar",
       "cta": "Start gratis",
-      "ownership24": "Premium i9-kassa inbegrepen in je abonnement — snel, betrouwbaar, klaar voor elke piek."
+      "ownership24": "Premium i9-kassa inbegrepen in je licentie — snel, betrouwbaar, klaar voor elke piek."
     },
     "kebab": {
       "h1": "Kebab & Broodjesbar Kassa | i9 Kracht | Vysion",
@@ -6491,7 +6491,7 @@
       "body2": "Minder stress aan de toonbank, meer controle op omzet. Probeer gratis en ontdek waarom ondernemers kiezen voor i9 in plaats van traag materiaal.",
       "imageAlt": "Vysion kassa layout voor kebab en broodjesbar",
       "cta": "Start gratis",
-      "ownership24": "Premium i9-kassa inbegrepen in je abonnement — snel, betrouwbaar, klaar voor elke piek."
+      "ownership24": "Premium i9-kassa inbegrepen in je licentie — snel, betrouwbaar, klaar voor elke piek."
     },
     "kapper": {
       "h1": "Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion",
@@ -6500,16 +6500,16 @@
       "body2": "Combineer afspraken, producten en fooi in één overzicht. Probeer Vysion gratis en ontdek stijlvolle, snelle checkout met premium hardware.",
       "imageAlt": "Vysion kassa layout voor kapper en salon",
       "cta": "Start gratis",
-      "ownership24": "Premium i9-kassa inbegrepen in je abonnement — snel, betrouwbaar, klaar voor elke piek."
+      "ownership24": "Premium i9-kassa inbegrepen in je licentie — snel, betrouwbaar, klaar voor elke piek."
     },
     "retail": {
       "h1": "Retail Kassa & Voorraadbeheer | Het i9 'Beest'voor Winkels | Vysion",
       "intro": "Beheer je winkelvoorraad op krachtige i9-hardware (16 GB RAM), met touchscreen POS en gratis website-integratie — retail kassa die meegroeit met je zaak.",
       "body1": "Wie een snelle retail kassa wil, combineert voorraad en verkoop in één scherm. Kassa kopen met zicht op marges en snelheid aan de kassa — dé keuze als kassasysteem België voor winkels.",
-      "body2": "Van barcode tot einddag: minder fouten, meer tempo. Premium hardware inbegrepen in je abonnement — zonder verrassingen.",
+      "body2": "Van barcode tot einddag: minder fouten, meer tempo. Premium hardware inbegrepen in je licentie — zonder verrassingen.",
       "imageAlt": "Vysion kassa layout voor retail en winkel",
       "cta": "Start gratis",
-      "ownership24": "Premium i9-kassa inbegrepen in je abonnement — snel, betrouwbaar, klaar voor elke piek."
+      "ownership24": "Premium i9-kassa inbegrepen in je licentie — snel, betrouwbaar, klaar voor elke piek."
     }
   },
   "winkelSite": {
@@ -6517,7 +6517,7 @@
     "lead": "Afrekenen, voorraad en uw eigen webshop in één systeem. Gemaakt voor de toonbank.",
     "point1": "Snel afrekenen met barcode of tikken op het scherm",
     "point2": "Voorraad per product, zonder extra pakket",
-    "point3": "Eigen webshop inbegrepen in het abonnement",
+    "point3": "Eigen webshop inbegrepen in de licentie",
     "heroImageAlt": "Elo touchscreen kassa voor winkels",
     "videoAltKassa": "Vysion winkelskassa in gebruik",
     "videoAltVoorraad": "Vysion voorraadscherm voor winkels",
@@ -6590,7 +6590,7 @@
     },
     "gratisWebsite": {
       "title": "Gratis website voor uw winkel",
-      "body": "Bij uw abonnement krijgt u een eigen website, zonder extra kosten. Kleuren, foto’s en teksten past u zelf aan.",
+      "body": "Bij uw licentie krijgt u een eigen website, zonder extra kosten. Kleuren, foto’s en teksten past u zelf aan.",
       "cta": "Bekijk een voorbeeld"
     },
     "kiosk": {
@@ -6608,9 +6608,9 @@
       }
     },
     "pricingModulesHeading": "Voor winkels",
-    "pricingModulesIncluded": "Inbegrepen in je abonnement",
+    "pricingModulesIncluded": "Inbegrepen in je licentie",
     "ctaViewPricing": "Bekijk de prijzen",
-    "ctaViewSubscription": "Bekijk het abonnement",
+    "ctaViewSubscription": "Bekijk de licentie",
     "pricingModules": {
       "1": "Kassa licentie inbegrepen",
       "2": "Voorraad",
@@ -6639,7 +6639,7 @@
     "lead": "Touchscreen POS, barcodes en voorraad voor veel artikelen. Een eigen site voor retail — los van horeca en de winkelstraat.",
     "point1": "Barcodes en voorraad voor veel SKU’s",
     "point2": "Geschikt voor winkel én groothandel",
-    "point3": "Hardware inbegrepen in het abonnement",
+    "point3": "Hardware inbegrepen in de licentie",
     "heroImageAlt": "Sunmi kassa voor retail",
     "usecasesTitle": "Voor retail & groothandel",
     "modulesTitle": "Wat retail krijgt",
@@ -6679,7 +6679,7 @@
     },
     "gratisWebsite": {
       "title": "Gratis webshop voor retail",
-      "body": "Bij uw abonnement krijgt u een eigen webshop voor boetiek, elektronica of groothandel, zonder extra kosten.",
+      "body": "Bij uw licentie krijgt u een eigen webshop voor boetiek, elektronica of groothandel, zonder extra kosten.",
       "cta": "Bekijk een voorbeeld"
     },
     "kiosk": {

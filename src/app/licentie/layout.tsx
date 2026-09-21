@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Aankoop licentie',
   description:
-    'Eenmalige levenslange Vysion licentie voor hardware en software — €1.499. Alternatief voor maandelijk abonnement.',
+    'Eenmalige levenslange Vysion licentie voor hardware en software — €1.499. Alternatief voor maandelijkse licentie.',
   openGraph: {
     title: 'Aankoop licentie | Vysion kassa',
     description:

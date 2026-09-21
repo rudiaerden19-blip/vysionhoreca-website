@@ -22,11 +22,11 @@
     "sectors": "行业",
     "services": "我们的服务",
     "integrations": "集成",
-    "subscriptions": "订阅"
+    "subscriptions": "许可证"
   },
   "licensePurchasePage": {
     "title": "购买许可证",
-    "subtitle": "一次性终身许可证 — 月付订阅的替代方案",
+    "subtitle": "一次性终身许可证 — 月付许可证的替代方案",
     "cardBadge": "终身许可证",
     "priceAmount": "€1,499",
     "priceNote": "一次性",
@@ -39,18 +39,18 @@
     "bullet2": "终身软件许可证 — 无月度收银软件费用",
     "bullet3": "按我们的条款提供更新与支持",
     "bullet4": "若您偏好一次性投资而非按月付款，这是理想选择",
-    "bullet5": "每月 €99 Premium 订阅的替代方案",
-    "compareTitle": "订阅还是许可证？",
-    "compareBody": "月付订阅无需大额前期投入。终身许可证一次性支付 €1,499 即可获得硬件与软件。两种方案均提供完整收银套餐 — 插电即可销售，无额外安装费用。",
+    "bullet5": "每月 €99 Premium 许可证的替代方案",
+    "compareTitle": "许可证还是许可证？",
+    "compareBody": "月付许可证无需大额前期投入。终身许可证一次性支付 €1,499 即可获得硬件与软件。两种方案均提供完整收银套餐 — 插电即可销售，无额外安装费用。",
     "ctaContact": "咨询购买许可证",
-    "ctaSubscription": "查看订阅",
+    "ctaSubscription": "查看许可证",
     "emailSubject": "Vysion 终身许可证购买",
     "footerNote": "请联系我们获取定制报价。"
   },
   "subscriptionsPage": {
-    "title": "订阅方案",
+    "title": "许可证方案",
     "subtitle": "一站式餐饮管理平台 — 价格透明，按月灵活取消。",
-    "lead": "选择 Pro 或 Premium，按月或按年付费。更新与支持包含在订阅内。",
+    "lead": "选择 Pro 或 Premium，按月或按年付费。更新与支持包含在许可证内。",
     "bullet1": "无长期合约；月付方案可随时取消。",
     "bullet2": "14 天免费试用，无需信用卡。",
     "bullet3": "收银、预订、在线点餐等功能同一平台。",
@@ -62,7 +62,7 @@
     "vysionProLargeTitle": "在线订餐平台",
     "vysionPremiumLargeTitle": "Vysion Premium",
     "vysionProImageAlt": "在线订餐平台套餐概览",
-    "vysionProRightP1": "在线订餐、自有网站、库存、厨房屏、桌位预订等均包含在此订阅中。",
+    "vysionProRightP1": "在线订餐、自有网站、库存、厨房屏、桌位预订等均包含在此许可证中。",
     "vysionProRightP2": "支持按月或按年付费；年付可省 10%。卡片上所列功能均已包含，并提供免费入门培训与支持。",
     "vysionProModulesP1": "硬件里用哪些模块由您决定；不需要的模块，也不必付费。",
     "vysionProModulesP2": "想保留以前收银机上那样的自定义模块？没问题：我们的程序员可在公司内部为您定制开发。",
@@ -153,7 +153,7 @@
     "title": "赚钱的平台。",
     "description": "让顾客按照他们想要的方式下单 — 在线、在桌边或外带。一切自动汇集到一个地方，您只需要准备。",
     "extras": "而且…这些也包含在内:",
-    "extrasList": "• 完整收银系统\n• 餐车收银系统\n• 您自己的网站（按您的风格完成）\n• Peppol发票无会计压力\n• 收入、高峰时段和业绩洞察\n• 员工和工时管理\n• 每个产品的完整成本计算\n• 您自己的餐厅或小酒馆预订平台\n• 推送通知\n• 二维码\n• 无需单独系统。无额外订阅。",
+    "extrasList": "• 完整收银系统\n• 餐车收银系统\n• 您自己的网站（按您的风格完成）\n• Peppol发票无会计压力\n• 收入、高峰时段和业绩洞察\n• 员工和工时管理\n• 每个产品的完整成本计算\n• 您自己的餐厅或小酒馆预订平台\n• 推送通知\n• 二维码\n• 无需单独系统。无额外许可证。",
     "tagline": "一个平台。一个屏幕。完全控制。",
     "ctaPrimary": "开始免费试用",
     "ctaSecondary": "观看演示",
@@ -165,7 +165,7 @@
     "bottomArc": "实惠"
   },
   "hardware": {
-    "kicker": "Premium 订阅已含硬件",
+    "kicker": "Premium 许可证已含硬件",
     "title": "我们的硬件",
     "subtitle": "我们的旗舰收银机与周边设备品质顶尖。搭载最新芯片，带来极速流畅的操作体验。",
     "imageAlt": "硬件示例",
@@ -408,7 +408,7 @@
     "chooseStandard": "选择Standard",
     "choosePro": "选择Pro",
     "cancelAnytime": "随时可取消",
-    "yearlySave": "年付订阅可节省 10%。",
+    "yearlySave": "年付许可证可节省 10%。",
     "billingMonthly": "按月",
     "billingYearly": "按年",
     "hardwareWithout": "不含硬件",
@@ -514,7 +514,7 @@
     }
   },
   "industry": {
-    "sectionTitle": "订阅中包含的额外功能",
+    "sectionTitle": "许可证中包含的额外功能",
     "imageAltPrefix": "Vysion 收银布局：",
     "invoicing": {
       "tab": "发票",
@@ -560,7 +560,7 @@
     "title": "餐饮业者信任Vysion",
     "quotes": {
       "1": {
-        "quote": "终于有一个一切都集成的平台了。我取消了所有其他订阅，现在以很小的价格拥有了一切。",
+        "quote": "终于有一个一切都集成的平台了。我取消了所有其他许可证，现在以很小的价格拥有了一切。",
         "author": "Marc V.",
         "role": "炸鸡店老板"
       },
@@ -653,7 +653,7 @@
     "navProductAria": "产品：功能、价格与动态",
     "navCompanyAria": "公司：简介、联系与政策",
     "featuresLinkTitle": "收银、订位、在线点单等全部模块",
-    "pricingLinkTitle": "餐饮软件订阅与价格",
+    "pricingLinkTitle": "餐饮软件许可证与价格",
     "updatesLinkTitle": "Vysion kassa's产品更新",
     "supportLinkTitle": "帮助与技术支持",
     "aboutLinkTitle": "了解Vysion kassa's",
@@ -857,7 +857,7 @@
       "title": "我们的故事",
       "p1": "Vysion kassa's源于真实经验。作为餐饮业者，我们遇到了和你一样的问题：系统太多、成本太多、视野太少。",
       "p2": "我们每月为单独的工具付费：订单平台、会计、支付和分析 — 一切都是分开的，没有什么真正协同工作。成本在累积。麻烦也是如此。",
-      "p3": "所以我们决定用不同的方式来做。我们以收银为核心构建了一个智能平台，你需要的一切都简单地包含在内。没有不必要的功能。没有单独的订阅。只是一个为创业者工作的诚实系统。",
+      "p3": "所以我们决定用不同的方式来做。我们以收银为核心构建了一个智能平台，你需要的一切都简单地包含在内。没有不必要的功能。没有单独的许可证。只是一个为创业者工作的诚实系统。",
       "p4": "在我们这里，您可以单独购买每个模块。想要比市面上大多数系统更实惠、更专业的餐厅预订系统？或比大多数更全面、连接更好的在线订餐？可以：免费注册，选择模块即可。"
     },
     "facts": {
@@ -1920,8 +1920,8 @@
         }
       },
       "subscription": {
-        "title": "订阅",
-        "subtitle": "您当前的订阅和套餐",
+        "title": "许可证",
+        "subtitle": "您当前的许可证和套餐",
         "currentPlan": "当前套餐",
         "standardPackage": "标准套餐",
         "premiumPackage": "高级套餐",
@@ -1930,7 +1930,7 @@
         "perMonth": "/月",
         "active": "有效",
         "expiresOn": "到期日期",
-        "manageSubscription": "管理订阅",
+        "manageSubscription": "管理许可证",
         "upgrade": "升级",
         "downgrade": "降级"
       },
@@ -2090,7 +2090,7 @@
       "dashboard": "仪表板",
       "shopDisplay": "店铺显示屏",
       "kitchenDisplay": "厨房显示屏",
-      "subscription": "订阅",
+      "subscription": "许可证",
       "businessProfile": "企业资料",
       "openingHours": "营业时间",
       "deliveryPickup": "配送和自取",
@@ -2730,8 +2730,8 @@
       "noReviews": "暂无评价"
     },
     "subscription": {
-      "title": "订阅",
-      "subtitle": "管理您的订阅并查看发票",
+      "title": "许可证",
+      "subtitle": "管理您的许可证并查看发票",
       "currentPlan": "当前计划",
       "status": "状态",
       "paymentOverview": "付款概览",
@@ -2772,7 +2772,7 @@
       "pay": "支付",
       "done": "完成",
       "questions": "账单问题？",
-      "questionsDesc": "对您的订阅或发票有疑问？联系我们。",
+      "questionsDesc": "对您的许可证或发票有疑问？联系我们。",
       "loading": "加载中...",
       "noOutstanding": "您没有待付发票",
       "overdueWarning": "逾期付款",
@@ -5061,14 +5061,14 @@
     "faq4A": "在仪表板中进入员工。点击添加员工并填写详细信息。您还可以分配角色和权限。",
     "faq5Q": "我的打印机不工作，该怎么办?",
     "faq5A": "检查打印机是否已开机并连接到同一网络。进入设置然后打印机，点击测试打印。如果问题仍然存在，请联系我们。",
-    "faq6Q": "如何更改或取消我的订阅?",
-    "faq6A": "进入设置然后订阅。您可以升级到Pro或每月取消订阅。没有取消费用。",
+    "faq6Q": "如何更改或取消我的许可证?",
+    "faq6A": "进入设置然后许可证。您可以升级到Pro或每月取消许可证。没有取消费用。",
     "faq7Q": "我的数据安全存储吗?",
     "faq7A": "是的，您的所有数据都已加密并存储在欧盟内的安全服务器上。我们符合所有GDPR要求。",
     "faq8Q": "我可以在多个设备上使用该应用吗?",
     "faq8A": "是的，您可以在无限数量的设备上登录。您的仪表板会在所有设备之间自动同步。",
     "faq9Q": "谁拥有系统？",
-    "faq9A": "收银机、打印机和钱箱等硬件的所有者为 Vysion。高级订阅期间您享有使用权。订阅不会使硬件成为您的财产。"
+    "faq9A": "收银机、打印机和钱箱等硬件的所有者为 Vysion。高级许可证期间您享有使用权。许可证不会使硬件成为您的财产。"
   },
   "resellersPage": {
     "badge": "合作伙伴计划",
@@ -5089,7 +5089,7 @@
     "benefit6Desc": "餐饮业正在快速数字化。二维码点餐和在线点餐是未来趋势。",
     "commissionTitle": "佣金结构",
     "monthlyCommission": "月度佣金",
-    "monthlyCommissionNote": "月度订阅费用的",
+    "monthlyCommissionNote": "月度许可证费用的",
     "setupCommission": "安装费佣金",
     "setupCommissionNote": "一次性安装费用的",
     "exampleTitle": "计算示例:",
@@ -5201,7 +5201,7 @@
     },
     "rightPrice": {
       "title": "合适的价格",
-      "body": "不必再单独支付佣金和安装费。已包含在订阅中。定价清晰、无隐藏费用；按所需付费，随业务成长而扩展。"
+      "body": "不必再单独支付佣金和安装费。已包含在许可证中。定价清晰、无隐藏费用；按所需付费，随业务成长而扩展。"
     },
     "inHouseSoftware": {
       "title": "自主研发",
@@ -5226,7 +5226,7 @@
     "subtitleVysionLine": "使用 Vysion，一切尽在一个系统、一块屏幕。",
     "subtitlePoint1": "无需五套不同系统。",
     "subtitlePoint2": "收银台无需多块屏幕。",
-    "subtitlePoint3": "每个应用无需单独订阅。",
+    "subtitlePoint3": "每个应用无需单独许可证。",
     "subtitleClosing": "您店铺所需的一切，互联于一个完整平台。",
     "subtitleModulesToggle": "按需开关模块，无需多付一欧元。",
     "centerLabel": "Vysion",
@@ -5245,7 +5245,7 @@
   },
   "gratisWebsiteBanner": {
     "title": "免费网站",
-    "body": "订阅即享完全免费的自有网站——已包含，无需额外费用。您可以根据自己的喜好全面自定义网站：颜色、照片，一切皆可。",
+    "body": "许可证即享完全免费的自有网站——已包含，无需额外费用。您可以根据自己的喜好全面自定义网站：颜色、照片，一切皆可。",
     "cta": "查看餐厅网站示例",
     "ctaFrituur": "查看快餐/炸薯店示例站"
   },
@@ -5256,7 +5256,7 @@
     "imageAlt3": "全套收银布置：双触屏、钱箱、键盘与票据打印机",
     "eyebrow": "Vysion 猛兽",
     "headline": "Vysion「野兽」：极致性能，专业硬件",
-    "intro": "选择能加快店铺节奏的硬件：强劲 i9 收银机，含在订阅中。无隐藏费用，条款清晰。",
+    "intro": "选择能加快店铺节奏的硬件：强劲 i9 收银机，含在许可证中。无隐藏费用，条款清晰。",
     "specsHeading": "决定体验的关键规格",
     "specSpeed": "**极速响应**：凭借 **英特尔酷睿 i9 处理器** 与 **16 GB 内存**，交易瞬间完成、不卡顿——无论 10 个还是上万个商品。",
     "specDualTitle": "坚固硬件",
@@ -5265,13 +5265,13 @@
     "specStorage": "**可靠存储**：**128 GB SSD** 让收银机数秒启动，数据安全且极速读取。",
     "worksHeading": "为何这套系统适合各类业态",
     "worksLead": "这不是支架上的普通平板，而是专业级工业工作站。烘焙、服饰、咖啡馆或网店，硬件都能跟上您的节奏。",
-    "worksBullet1": "**透明方案**：无隐藏费用。高级硬件含在订阅中，可按月取消。",
+    "worksBullet1": "**透明方案**：无隐藏费用。高级硬件含在许可证中，可按月取消。",
     "worksBullet2": "**全行业友好**：简洁外观，在任何柜台都显专业。",
     "quote": "选择 i9 工作站的强劲动力。快速、可靠，随时应对高峰。"
   },
   "platform": {
     "sectionTitle": "您将获得",
-    "sectionSubtitle1": "这些模块及更多内容均包含在您的订阅中。需要额外定制模块？我们免费为您开发并集成到系统中。",
+    "sectionSubtitle1": "这些模块及更多内容均包含在您的许可证中。需要额外定制模块？我们免费为您开发并集成到系统中。",
     "gridTestCta": "免费开始演示",
     "gridTrustLine": "无需安装 · 浏览器中直接使用 · 如同真实店铺",
     "gridDemoCta": "查看炸薯条店演示",
@@ -6143,7 +6143,7 @@
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "模块",
       "sm_inst_bonprinter_windows": "Windows 小票打印机",
-      "sm_abonnement": "Subscription",
+      "sm_abonnement": "许可证",
       "sm_retail_kassa_pos": "销售（条码）",
       "sm_retail_kassa_producten": "商品",
       "sm_retail_product_intake": "Scan with phone",
@@ -6190,10 +6190,10 @@
       "h1": "面包房最快收银系统 | i9 性能与 9 种语言 | Vysion",
       "intro": "面包店收银布局：Intel i9 应对早高峰，团队可用 9 种语言 — 比利时与荷兰的收银系统。",
       "body1": "早午餐与周末高峰也能保持流畅：触屏 POS、小票打印机与稳定软件。购买或租赁方案清晰，一次打包无隐藏费用。",
-      "body2": "为重视利润与节奏的面包师打造。强劲 i9 硬件含在订阅中 — 可长期使用的比利时收银。",
+      "body2": "为重视利润与节奏的面包师打造。强劲 i9 硬件含在许可证中 — 可长期使用的比利时收银。",
       "imageAlt": "Vysion 面包房收银布局",
       "cta": "免费开始 — 14 天试用",
-      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
+      "ownership24": "高级 i9 收银机含在许可证中 — 快速、可靠，随时应对高峰。"
     },
     "cafe": {
       "h1": "咖啡馆餐饮收银 | i9 双屏与 9 种语言 | Vysion",
@@ -6202,16 +6202,16 @@
       "body2": "更少点击、更少差错、更高翻台。免费试用 Vysion，以清晰条款体验 i9 性能。",
       "imageAlt": "Vysion 咖啡馆与餐吧收银布局",
       "cta": "免费开始",
-      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
+      "ownership24": "高级 i9 收银机含在许可证中 — 快速、可靠，随时应对高峰。"
     },
     "frituur": {
       "h1": "炸物店收银 | 最快 i9 结账 | Vysion",
       "intro": "高峰与活动日也要跟得上：Intel i9、面向顾客的双屏、团队 9 种语言 — 为排队与快节奏而设计。",
       "body1": "订单、酱汁与配菜流畅录入。触屏 POS、内置打印机与线上点餐一体 — 比利时与荷兰炸物店方案。",
-      "body2": "缩短排队、守住利润。免费开始，在店里试用，订阅包含高级硬件。",
+      "body2": "缩短排队、守住利润。免费开始，在店里试用，许可证包含高级硬件。",
       "imageAlt": "Vysion 炸物店与小吃店收银布局",
       "cta": "免费开始",
-      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
+      "ownership24": "高级 i9 收银机含在许可证中 — 快速、可靠，随时应对高峰。"
     },
     "kebab": {
       "h1": "烤肉/三明治店收银 | i9 强劲性能 | Vysion",
@@ -6220,7 +6220,7 @@
       "body2": "减轻柜台压力，更好掌控营收。免费试用，了解为何商家选择 i9。",
       "imageAlt": "Vysion 烤肉与三明治店收银布局",
       "cta": "免费开始",
-      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
+      "ownership24": "高级 i9 收银机含在许可证中 — 快速、可靠，随时应对高峰。"
     },
     "kapper": {
       "h1": "美发沙龙收银 | 优雅且快速 | Vysion",
@@ -6229,16 +6229,16 @@
       "body2": "预约、零售与小费一屏掌握。免费试用 Vysion，体验高端硬件下的流畅结账。",
       "imageAlt": "Vysion 美发沙龙收银布局",
       "cta": "免费开始",
-      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
+      "ownership24": "高级 i9 收银机含在许可证中 — 快速、可靠，随时应对高峰。"
     },
     "retail": {
       "h1": "零售收银与库存 | 门店 i9「猛兽」| Vysion",
       "intro": "以 i9（16GB RAM）管理库存，触屏 POS 与免费网站对接 — 与门店共同成长的零售收银。",
       "body1": "想要快速零售收银？库存与销售同屏完成。关注毛利与排队速度 — 比利时门店系统。",
-      "body2": "从条码到日结：更少差错、更快节奏。高级硬件含在订阅中 — 没有意外。",
+      "body2": "从条码到日结：更少差错、更快节奏。高级硬件含在许可证中 — 没有意外。",
       "imageAlt": "Vysion 零售门店收银布局",
       "cta": "免费开始",
-      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
+      "ownership24": "高级 i9 收银机含在许可证中 — 快速、可靠，随时应对高峰。"
     }
   },
   "stockPage": {
@@ -6558,7 +6558,7 @@
     "lead": "收银、库存和自有网店集于一套系统。为柜台打造。",
     "point1": "扫码或点按即可快速结账",
     "point2": "按商品管库存，无需额外套餐",
-    "point3": "订阅已包含自有网店",
+    "point3": "许可证已包含自有网店",
     "heroImageAlt": "店铺用 Elo 触屏收银机",
     "videoAltKassa": "店铺收银界面",
     "videoAltVoorraad": "店铺库存界面",
@@ -6631,7 +6631,7 @@
     },
     "gratisWebsite": {
       "title": "店铺免费网站",
-      "body": "订阅包含您自己的网站，无需额外费用。颜色、照片和文字均可自行调整。",
+      "body": "许可证包含您自己的网站，无需额外费用。颜色、照片和文字均可自行调整。",
       "cta": "See an example"
     },
     "kiosk": {
@@ -6649,9 +6649,9 @@
       }
     },
     "pricingModulesHeading": "面向店铺",
-    "pricingModulesIncluded": "已包含在您的订阅中",
+    "pricingModulesIncluded": "已包含在您的许可证中",
     "ctaViewPricing": "查看价格",
-    "ctaViewSubscription": "查看订阅",
+    "ctaViewSubscription": "查看许可证",
     "pricingModules": {
       "1": "含收银许可",
       "2": "库存",
@@ -6680,7 +6680,7 @@
     "lead": "触屏 POS、条码和多品类库存。独立零售站点——与餐饮和街边店网站分开。",
     "point1": "适合大目录的条码与库存",
     "point2": "店铺与批发都适用",
-    "point3": "订阅已包含硬件",
+    "point3": "许可证已包含硬件",
     "heroImageAlt": "零售用 Sunmi 收银机",
     "usecasesTitle": "面向零售与批发",
     "modulesTitle": "零售能获得什么",
@@ -6720,7 +6720,7 @@
     },
     "gratisWebsite": {
       "title": "Free webshop for retail",
-      "body": "Your subscription includes a webshop for boutique, electronics or wholesale, at no extra cost.",
+      "body": "许可证包含精品店、电子产品或批发的网店，无需额外费用。",
       "cta": "See an example"
     },
     "kiosk": {

@@ -22,11 +22,11 @@
     "sectors": "Secteurs",
     "services": "Nos services",
     "integrations": "Intégrations",
-    "subscriptions": "Abonnements"
+    "subscriptions": "Licences"
   },
   "licensePurchasePage": {
     "title": "Achat de licence",
-    "subtitle": "Licence à vie unique — alternative à l’abonnement mensuel",
+    "subtitle": "Licence à vie unique — alternative à la licence mensuelle",
     "cardBadge": "Licence à vie",
     "priceAmount": "1 499 €",
     "priceNote": "En une fois",
@@ -39,16 +39,16 @@
     "bullet2": "Licence logicielle à vie — pas de frais mensuels de logiciel de caisse",
     "bullet3": "Mises à jour et support selon nos conditions générales",
     "bullet4": "Idéal si vous préférez un investissement unique plutôt qu’un paiement mensuel",
-    "bullet5": "Alternative à l’abonnement Premium à 99 € par mois",
-    "compareTitle": "Abonnement ou licence ?",
-    "compareBody": "Avec l'abonnement mensuel, pas de gros investissement initial. Avec la licence à vie, vous payez une fois 1 499 € pour le matériel et le logiciel. Les deux options livrent un pack caisse complet — brancher et vendre, sans frais d'installation supplémentaires.",
+    "bullet5": "Alternative à la licence Premium à 99 € par mois",
+    "compareTitle": "Licence mensuelle ou unique ?",
+    "compareBody": "Avec la licence mensuelle, pas de gros investissement initial. Avec la licence à vie, vous payez une fois 1 499 € pour le matériel et le logiciel. Les deux options livrent un pack caisse complet — brancher et vendre, sans frais d'installation supplémentaires.",
     "ctaContact": "Demander l’achat de licence",
-    "ctaSubscription": "Voir l’abonnement",
+    "ctaSubscription": "Voir la licence",
     "emailSubject": "Achat licence à vie Vysion",
     "footerNote": "Contactez-nous pour une offre personnalisée."
   },
   "subscriptionsPage": {
-    "title": "Abonnements",
+    "title": "Licences",
     "subtitle": "Une seule plateforme pour votre établissement — transparent et résiliable chaque mois.",
     "lead": "Choisissez Pro ou Premium et payez au mois ou à l'année. Mises à jour et support inclus.",
     "bullet1": "Sans engagement longue durée ; résiliation à tout moment en mensuel.",
@@ -62,7 +62,7 @@
     "vysionProLargeTitle": "Plateforme de commande en ligne",
     "vysionPremiumLargeTitle": "Vysion Premium",
     "vysionProImageAlt": "Aperçu du forfait plateforme de commande en ligne",
-    "vysionProRightP1": "Commandes en ligne, votre propre site, stocks, écran cuisine, réservations de tables et bien plus sont inclus dans cet abonnement.",
+    "vysionProRightP1": "Commandes en ligne, votre propre site, stocks, écran cuisine, réservations de tables et bien plus sont inclus dans cette licence.",
     "vysionProRightP2": "Choisissez la facturation mensuelle ou annuelle ; l’offre annuelle inclut 10 % de réduction. Tous les avantages listés sont inclus, avec formation et support.",
     "vysionProModulesP1": "Vous choisissez les modules dans votre matériel ; ce dont vous n’avez pas besoin, vous ne payez pas non plus.",
     "vysionProModulesP2": "Vous voulez votre propre module, comme avec votre ancienne caisse ? Pas de problème : nos développeurs le réalisent pour vous en interne.",
@@ -153,7 +153,7 @@
     "title": "La plateforme qui rapporte.",
     "description": "Laissez les clients commander comme ils veulent — en ligne, à table ou à emporter. Tout arrive automatiquement en un seul endroit et vous n'avez plus qu'à préparer.",
     "extras": "Et puis… tout ceci est aussi inclus:",
-    "extrasList": "• Caisse enregistreuse complète\n• Caisse pour food trucks\n• Votre propre site web (prêt dans votre style)\n• Facturation Peppol sans stress comptable\n• Aperçu du chiffre d'affaires, des heures de pointe et des performances\n• Gestion du personnel et des heures\n• Calcul complet des coûts par produit\n• Votre propre plateforme de réservation pour restaurant ou bistro\n• Notifications push\n• Codes QR\n• Pas de systèmes séparés. Pas d'abonnements supplémentaires.",
+    "extrasList": "• Caisse enregistreuse complète\n• Caisse pour food trucks\n• Votre propre site web (prêt dans votre style)\n• Facturation Peppol sans stress comptable\n• Aperçu du chiffre d'affaires, des heures de pointe et des performances\n• Gestion du personnel et des heures\n• Calcul complet des coûts par produit\n• Votre propre plateforme de réservation pour restaurant ou bistro\n• Notifications push\n• Codes QR\n• Pas de systèmes séparés. Pas d'licences supplémentaires.",
     "tagline": "Une plateforme. Un écran. Contrôle total.",
     "ctaPrimary": "Démarrer l'essai gratuit",
     "ctaSecondary": "Voir la démo",
@@ -165,7 +165,7 @@
     "bottomArc": "avantageux"
   },
   "hardware": {
-    "kicker": "Matériel inclus dans l’abonnement Premium",
+    "kicker": "Matériel inclus dans la licence Premium",
     "title": "Notre matériel",
     "subtitle": "Nos caisses premium et nos périphériques sont d’une qualité maximale. Avec les toutes dernières puces intégrées, vous profitez d’une utilisation ultra-rapide.",
     "imageAlt": "Exemple de matériel",
@@ -408,7 +408,7 @@
     "chooseStandard": "Choisir Standard",
     "choosePro": "Choisir Pro",
     "cancelAnytime": "Résiliable mensuellement",
-    "yearlySave": "Vous économisez 10 % avec l'abonnement annuel.",
+    "yearlySave": "Vous économisez 10 % avec la licence annuelle.",
     "billingMonthly": "Mensuel",
     "billingYearly": "Annuel",
     "hardwareWithout": "Sans matériel",
@@ -514,7 +514,7 @@
     }
   },
   "industry": {
-    "sectionTitle": "Extra inclus dans votre abonnement",
+    "sectionTitle": "Extra inclus dans votre licence",
     "imageAltPrefix": "Disposition caisse Vysion pour",
     "invoicing": {
       "tab": "Facturation",
@@ -560,7 +560,7 @@
     "title": "Les restaurateurs font confiance à Vysion",
     "quotes": {
       "1": {
-        "quote": "Enfin une plateforme où tout est intégré. J'ai annulé tous mes autres abonnements et j'ai maintenant tout en un pour une fraction du prix.",
+        "quote": "Enfin une plateforme où tout est intégré. J'ai annulé tous mes autres licences et j'ai maintenant tout en un pour une fraction du prix.",
         "author": "Marc V.",
         "role": "Propriétaire de friterie"
       },
@@ -857,7 +857,7 @@
       "title": "Notre histoire",
       "p1": "Vysion kassa's est né d'une vraie expérience. En tant que restaurateurs, nous avons rencontré le même problème que vous: trop de systèmes, trop de coûts et trop peu de visibilité.",
       "p2": "Nous payions chaque mois pour des outils séparés: une plateforme de commande, comptabilité, paiements et analyses — tout séparé, rien qui fonctionnait vraiment ensemble. Les coûts s'accumulaient. Les tracas aussi.",
-      "p3": "Alors nous avons décidé de faire autrement. Nous avons construit une plateforme intelligente, avec la caisse au cœur, et tout ce dont vous avez besoin simplement inclus. Pas de fonctionnalités superflues. Pas d'abonnements séparés. Juste un système honnête qui fonctionne pour les entrepreneurs.",
+      "p3": "Alors nous avons décidé de faire autrement. Nous avons construit une plateforme intelligente, avec la caisse au cœur, et tout ce dont vous avez besoin simplement inclus. Pas de fonctionnalités superflues. Pas d'licences séparés. Juste un système honnête qui fonctionne pour les entrepreneurs.",
       "p4": "Chez nous, vous pouvez acheter chaque module séparément. Vous voulez un système de réservation restaurant, plus abordable et plus professionnel que la plupart des solutions du marché ? Ou une commande en ligne plus complète et mieux connectée ? Oui, c'est possible : inscrivez-vous gratuitement, choisissez votre module et c'est prêt."
     },
     "facts": {
@@ -1420,8 +1420,8 @@
         }
       },
       "subscription": {
-        "title": "Abonnement",
-        "subtitle": "Votre abonnement et forfait actuels",
+        "title": "Licence",
+        "subtitle": "Votre licence et forfait actuels",
         "currentPlan": "Forfait actuel",
         "standardPackage": "Forfait Standard",
         "premiumPackage": "Forfait Premium",
@@ -1430,7 +1430,7 @@
         "perMonth": "/mois",
         "active": "Actif",
         "expiresOn": "Expire le",
-        "manageSubscription": "Gérer l'abonnement",
+        "manageSubscription": "Gérer la licence",
         "upgrade": "Mettre à niveau",
         "downgrade": "Rétrograder"
       },
@@ -1590,7 +1590,7 @@
       "dashboard": "Tableau de bord",
       "shopDisplay": "Affichage boutique",
       "kitchenDisplay": "Affichage cuisine",
-      "subscription": "Abonnement",
+      "subscription": "Licence",
       "businessProfile": "Profil de l'entreprise",
       "openingHours": "Heures d'ouverture",
       "deliveryPickup": "Livraison & Retrait",
@@ -2230,8 +2230,8 @@
       "noReviews": "Pas encore d'avis"
     },
     "subscription": {
-      "title": "Abonnement",
-      "subtitle": "Gérez votre abonnement et consultez vos factures",
+      "title": "Licence",
+      "subtitle": "Gérez votre licence et consultez vos factures",
       "currentPlan": "Plan actuel",
       "status": "Statut",
       "paymentOverview": "Aperçu des paiements",
@@ -2272,7 +2272,7 @@
       "pay": "Payer",
       "done": "Fait",
       "questions": "Questions sur la facturation?",
-      "questionsDesc": "Des questions sur votre abonnement ou vos factures? Contactez-nous.",
+      "questionsDesc": "Des questions sur votre licence ou vos factures? Contactez-nous.",
       "loading": "Chargement...",
       "noOutstanding": "Vous n'avez aucune facture en attente",
       "overdueWarning": "Paiement en retard",
@@ -5084,14 +5084,14 @@
     "faq4A": "Allez dans Personnel dans votre tableau de bord. Cliquez sur Ajouter un employe et remplissez les informations. Vous pouvez egalement attribuer des roles et des permissions.",
     "faq5Q": "Mon imprimante ne fonctionne pas, que faire?",
     "faq5A": "Verifiez que l imprimante est allumee et connectee au meme reseau. Allez dans Parametres > Imprimantes et cliquez sur Impression test. Contactez-nous si le probleme persiste.",
-    "faq6Q": "Comment modifier ou resilier mon abonnement?",
-    "faq6A": "Allez dans Parametres > Abonnement. Vous pouvez passer a Pro ou resilier votre abonnement mensuellement. Il n y a pas de frais de resiliation.",
+    "faq6Q": "Comment modifier ou resilier ma licence?",
+    "faq6A": "Allez dans Parametres > Licence. Vous pouvez passer a Pro ou resilier votre licence mensuellement. Il n y a pas de frais de resiliation.",
     "faq7Q": "Mes donnees sont-elles stockees en securite?",
     "faq7A": "Oui, toutes vos donnees sont chiffrees et stockees sur des serveurs securises au sein de l UE. Nous respectons toutes les exigences du RGPD.",
     "faq8Q": "Puis-je utiliser l application sur plusieurs appareils?",
     "faq8A": "Oui, vous pouvez vous connecter sur un nombre illimite d appareils. Votre tableau de bord se synchronise automatiquement entre tous les appareils.",
     "faq9Q": "A qui appartient le systeme?",
-    "faq9A": "Vysion est propriétaire du matériel : la caisse, l’imprimante et le tiroir-caisse. Avec un abonnement premium, vous avez un droit d’usage tant que l’abonnement court. Le matériel ne devient pas votre propriété via l’abonnement."
+    "faq9A": "Vysion est propriétaire du matériel : la caisse, l’imprimante et le tiroir-caisse. Avec une licence premium, vous avez un droit d’usage tant que la licence court. Le matériel ne devient pas votre propriété via la licence."
   },
   "resellersPage": {
     "badge": "Programme Partenaire",
@@ -5112,7 +5112,7 @@
     "benefit6Desc": "La restauration se numerise rapidement. La commande QR et en ligne sont l avenir.",
     "commissionTitle": "Structure des commissions",
     "monthlyCommission": "Commission mensuelle",
-    "monthlyCommissionNote": "de l abonnement mensuel",
+    "monthlyCommissionNote": "de l licence mensuel",
     "setupCommission": "Commission frais d installation",
     "setupCommissionNote": "des frais d installation uniques",
     "exampleTitle": "Exemple de calcul:",
@@ -5224,7 +5224,7 @@
     },
     "rightPrice": {
       "title": "Le bon prix",
-      "body": "Fini les commissions et les frais d’installation à régler à part. C’est inclus dans votre abonnement. Des offres claires sans frais cachés : vous payez pour ce dont vous avez besoin et évoluez avec votre activité."
+      "body": "Fini les commissions et les frais d’installation à régler à part. C’est inclus dans votre licence. Des offres claires sans frais cachés : vous payez pour ce dont vous avez besoin et évoluez avec votre activité."
     },
     "inHouseSoftware": {
       "title": "Développé en interne",
@@ -5249,7 +5249,7 @@
     "subtitleVysionLine": "Avec Vysion, tout se fait depuis un seul système et un seul écran.",
     "subtitlePoint1": "Pas cinq systèmes différents.",
     "subtitlePoint2": "Pas plusieurs écrans au comptoir.",
-    "subtitlePoint3": "Pas d’abonnements séparés pour chaque application.",
+    "subtitlePoint3": "Pas d’licences séparés pour chaque application.",
     "subtitleClosing": "Tout ce dont votre établissement a besoin, réuni sur une plateforme complète.",
     "subtitleModulesToggle": "Vous activez ou désactivez les modules que vous voulez, sans payer un euro de plus.",
     "centerLabel": "Vysion",
@@ -5268,7 +5268,7 @@
   },
   "gratisWebsiteBanner": {
     "title": "Site web gratuit",
-    "body": "Avec votre abonnement, vous recevez un site web entièrement gratuit — inclus sans frais supplémentaires. Vous pouvez entièrement personnaliser votre site à votre goût : couleurs, photos, tout.",
+    "body": "Avec votre licence, vous recevez un site web entièrement gratuit — inclus sans frais supplémentaires. Vous pouvez entièrement personnaliser votre site à votre goût : couleurs, photos, tout.",
     "cta": "Voir un exemple de site restaurant",
     "ctaFrituur": "Voir un exemple friterie / takeaway"
   },
@@ -5279,7 +5279,7 @@
     "imageAlt3": "Poste complet : double écran tactile, tiroir-caisse, clavier et imprimante de tickets",
     "eyebrow": "La bête Vysion",
     "headline": "Le « bête » Vysion : puissance maximale, matériel professionnel",
-    "intro": "Choisissez un matériel qui accélère votre établissement : caisse i9 puissante, incluse dans l’abonnement. Pas de frais cachés, conditions claires.",
+    "intro": "Choisissez un matériel qui accélère votre établissement : caisse i9 puissante, incluse dans la licence. Pas de frais cachés, conditions claires.",
     "specsHeading": "Des spécifications qui font la différence",
     "specSpeed": "**Vitesse inégalée** : grâce au **processeur Intel Core i9** et **16 Go de RAM**, vous traitez les transactions instantanément, sans à-coups — avec 10 ou 10 000 produits.",
     "specDualTitle": "Matériel robuste",
@@ -5288,13 +5288,13 @@
     "specStorage": "**Stockage fiable** : le **SSD 128 Go** démarre la caisse en quelques secondes et garde vos données accessibles ultra-rapidement.",
     "worksHeading": "Pourquoi ce système convient à tous",
     "worksLead": "Ce n’est pas une simple tablette sur pied, mais un poste industriel professionnel. Boulangerie, prêt-à-porter, café ou boutique en ligne : le matériel suit votre rythme.",
-    "worksBullet1": "**Offre transparente** : pas de frais cachés. Matériel premium inclus dans l’abonnement, résiliable chaque mois.",
+    "worksBullet1": "**Offre transparente** : pas de frais cachés. Matériel premium inclus dans la licence, résiliable chaque mois.",
     "worksBullet2": "**Adapté à tous les secteurs** : un design épuré, professionnel sur tout comptoir.",
     "quote": "Choisissez la puissance d’une station i9. Rapide, fiable, prête pour chaque rush."
   },
   "platform": {
     "sectionTitle": "Ce que vous obtenez",
-    "sectionSubtitle1": "Ces modules et bien plus encore font partie de votre abonnement. Vous voulez un module sur mesure en plus ? Nous le développons gratuitement pour vous et l’intégrons à votre système.",
+    "sectionSubtitle1": "Ces modules et bien plus encore font partie de votre licence. Vous voulez un module sur mesure en plus ? Nous le développons gratuitement pour vous et l’intégrons à votre système.",
     "gridTestCta": "Démarrer la démo gratuite",
     "gridTrustLine": "Aucune installation requise · Fonctionne directement dans votre navigateur · Comme dans un vrai établissement",
     "gridDemoCta": "Voir la démo friterie",
@@ -6166,7 +6166,7 @@
       "sm_inst_betaling": "Moyens de paiement",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Imprimante tickets (Windows)",
-      "sm_abonnement": "Abonnement",
+      "sm_abonnement": "Licence",
       "sm_retail_kassa_pos": "Vente (code-barres)",
       "sm_retail_kassa_producten": "Articles",
       "sm_retail_product_intake": "Scan with phone",
@@ -6213,10 +6213,10 @@
       "h1": "Caisse la plus rapide pour boulangers | i9 & 9 langues | Vysion",
       "intro": "Mise en caisse boulangerie : Intel i9 pour les pics du matin et 9 langues pour l’équipe — le système de caisse Belgique et Pays-Bas.",
       "body1": "Brunch chargé ou week-end : POS tactile, imprimante, logiciel réactif. Acheter ou louer : un forfait clair, sans mauvaises surprises.",
-      "body2": "Pour les boulangers qui veulent marge et rythme. Matériel i9 puissant inclus dans l’abonnement — la caisse belge pour grandir.",
+      "body2": "Pour les boulangers qui veulent marge et rythme. Matériel i9 puissant inclus dans la licence — la caisse belge pour grandir.",
       "imageAlt": "Mise en caisse Vysion pour boulangerie",
       "cta": "Commencer gratuitement — essai 14 jours",
-      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
+      "ownership24": "Caisse i9 premium incluse dans la licence — rapide, fiable, prête pour chaque rush."
     },
     "cafe": {
       "h1": "Caisse restauration pour cafés | i9 double écran & 9 langues | Vysion",
@@ -6225,16 +6225,16 @@
       "body2": "Moins de saisies, moins d’erreurs, plus de couverts. Essayez Vysion gratuitement — puissance i9 et conditions claires.",
       "imageAlt": "Mise en caisse Vysion pour café et brasserie",
       "cta": "Commencer gratuitement",
-      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
+      "ownership24": "Caisse i9 premium incluse dans la licence — rapide, fiable, prête pour chaque rush."
     },
     "frituur": {
       "h1": "Caisse friterie | Checkout i9 le plus rapide | Vysion",
       "intro": "Pics friterie et événements : votre caisse doit suivre. Intel i9, double écran client, 9 langues — pour la file, l’huile et le tempo.",
       "body1": "Commandes, sauces et accompagnements sans ralentissement. POS tactile, imprimante intégrée et commande en ligne — la caisse friterie Belgique & Pays-Bas.",
-      "body2": "Files courtes, marges serrées. Démarrez gratuitement, testez en boutique, matériel premium dans l’abonnement.",
+      "body2": "Files courtes, marges serrées. Démarrez gratuitement, testez en boutique, matériel premium dans la licence.",
       "imageAlt": "Mise en caisse Vysion pour friterie et snack",
       "cta": "Commencer gratuitement",
-      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
+      "ownership24": "Caisse i9 premium incluse dans la licence — rapide, fiable, prête pour chaque rush."
     },
     "kebab": {
       "h1": "Caisse kebab & sandwicherie | Puissance i9 | Vysion",
@@ -6243,7 +6243,7 @@
       "body2": "Moins de stress au comptoir, plus de contrôle sur le CA. Essayez gratuitement et voyez pourquoi les pros choisissent l’i9.",
       "imageAlt": "Mise en caisse Vysion pour kebab et sandwicherie",
       "cta": "Commencer gratuitement",
-      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
+      "ownership24": "Caisse i9 premium incluse dans la licence — rapide, fiable, prête pour chaque rush."
     },
     "kapper": {
       "h1": "Caisse salons de coiffure | Élégant & rapide | Vysion",
@@ -6252,16 +6252,16 @@
       "body2": "Rendez-vous, vente et pourboires dans une vue. Essayez Vysion gratuitement — checkout premium.",
       "imageAlt": "Mise en caisse Vysion pour salon de coiffure",
       "cta": "Commencer gratuitement",
-      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
+      "ownership24": "Caisse i9 premium incluse dans la licence — rapide, fiable, prête pour chaque rush."
     },
     "retail": {
       "h1": "Caisse retail & stock | L'i9 « Bête » pour magasins | Vysion",
       "intro": "Stock sur i9 (16 Go RAM), POS tactile et intégration site gratuite — la caisse retail qui grandit avec vous.",
       "body1": "Caisse retail rapide : stock et vente sur un écran. Achat de caisse avec marges et vitesse — système belge pour magasins.",
-      "body2": "Du code-barres à la clôture : moins d’erreurs, plus de rythme. Matériel premium inclus dans l’abonnement — sans surprise.",
+      "body2": "Du code-barres à la clôture : moins d’erreurs, plus de rythme. Matériel premium inclus dans la licence — sans surprise.",
       "imageAlt": "Mise en caisse Vysion pour retail et magasin",
       "cta": "Commencer gratuitement",
-      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
+      "ownership24": "Caisse i9 premium incluse dans la licence — rapide, fiable, prête pour chaque rush."
     }
   },
   "stockPage": {
@@ -6581,7 +6581,7 @@
     "lead": "Encaissement, stock et votre propre boutique en ligne dans un seul système. Fait pour le comptoir.",
     "point1": "Encaisser vite avec code-barres ou tactile",
     "point2": "Stock par produit, sans pack en plus",
-    "point3": "Boutique en ligne incluse dans l’abonnement",
+    "point3": "Boutique en ligne incluse dans la licence",
     "heroImageAlt": "Caisse tactile Elo pour magasins",
     "videoAltKassa": "Caisse magasin Vysion en usage",
     "videoAltVoorraad": "Écran de stock Vysion pour magasins",
@@ -6654,7 +6654,7 @@
     },
     "gratisWebsite": {
       "title": "Site web gratuit pour votre magasin",
-      "body": "Votre abonnement inclut un site web, sans frais extra. Couleurs, photos et textes à votre goût.",
+      "body": "Votre licence inclut un site web, sans frais extra. Couleurs, photos et textes à votre goût.",
       "cta": "Voir un exemple"
     },
     "kiosk": {
@@ -6672,9 +6672,9 @@
       }
     },
     "pricingModulesHeading": "Pour les magasins",
-    "pricingModulesIncluded": "Inclus dans votre abonnement",
+    "pricingModulesIncluded": "Inclus dans votre licence",
     "ctaViewPricing": "Voir les tarifs",
-    "ctaViewSubscription": "Voir l’abonnement",
+    "ctaViewSubscription": "Voir la licence",
     "pricingModules": {
       "1": "Licence caisse incluse",
       "2": "Stock",
@@ -6703,7 +6703,7 @@
     "lead": "POS tactile, codes-barres et stock pour de nombreux articles. Un site retail dédié — séparé de l’horeca et du magasin de proximité.",
     "point1": "Codes-barres et stock pour de gros catalogues",
     "point2": "Pour magasin et gros",
-    "point3": "Matériel inclus dans l’abonnement",
+    "point3": "Matériel inclus dans la licence",
     "heroImageAlt": "Caisse Sunmi pour le retail",
     "usecasesTitle": "Pour le retail et le gros",
     "modulesTitle": "Ce que le retail reçoit",
@@ -6743,7 +6743,7 @@
     },
     "gratisWebsite": {
       "title": "Boutique en ligne gratuite pour le retail",
-      "body": "Votre abonnement inclut une boutique pour boutique, électronique ou gros, sans frais extra.",
+      "body": "Votre licence inclut une boutique pour boutique, électronique ou gros, sans frais extra.",
       "cta": "Voir un exemple"
     },
     "kiosk": {

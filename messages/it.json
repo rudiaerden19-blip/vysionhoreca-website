@@ -22,11 +22,11 @@
     "sectors": "Settori",
     "services": "I nostri servizi",
     "integrations": "Integrazioni",
-    "subscriptions": "Abbonamenti"
+    "subscriptions": "Licenze"
   },
   "licensePurchasePage": {
     "title": "Acquisto licenza",
-    "subtitle": "Licenza a vita una tantum — alternativa all’abbonamento mensile",
+    "subtitle": "Licenza a vita una tantum — alternativa all’licenza mensile",
     "cardBadge": "Licenza a vita",
     "priceAmount": "€1.499",
     "priceNote": "Una tantum",
@@ -39,16 +39,16 @@
     "bullet2": "Licenza software a vita — nessun costo mensile del software di cassa",
     "bullet3": "Aggiornamenti e assistenza secondo i nostri termini",
     "bullet4": "Ideale se preferisci un investimento unico invece del pagamento mensile",
-    "bullet5": "Alternativa all’abbonamento Premium a €99 al mese",
-    "compareTitle": "Abbonamento o licenza?",
-    "compareBody": "Con l'abbonamento mensile non c'è un grande investimento iniziale. Con la licenza a vita paghi una volta €1.499 per hardware e software. Entrambe le opzioni consegnano un pacchetto cassa completo — collega e vendi, senza costi extra di installazione.",
+    "bullet5": "Alternativa all’licenza Premium a €99 al mese",
+    "compareTitle": "Licenza mensile o unica?",
+    "compareBody": "Con l'licenza mensile non c'è un grande investimento iniziale. Con la licenza a vita paghi una volta €1.499 per hardware e software. Entrambe le opzioni consegnano un pacchetto cassa completo — collega e vendi, senza costi extra di installazione.",
     "ctaContact": "Richiedi acquisto licenza",
-    "ctaSubscription": "Vedi abbonamento",
+    "ctaSubscription": "Vedi licenza",
     "emailSubject": "Acquisto licenza a vita Vysion",
     "footerNote": "Contattaci per un’offerta su misura."
   },
   "subscriptionsPage": {
-    "title": "Abbonamenti",
+    "title": "Licenze",
     "subtitle": "Un’unica piattaforma per la tua attività — trasparente e disdetta mensile.",
     "lead": "Scegli Pro o Premium e paga mensile o annuale. Aggiornamenti e assistenza inclusi.",
     "bullet1": "Nessun vincolo pluriennale; disdici quando vuoi con piano mensile.",
@@ -62,7 +62,7 @@
     "vysionProLargeTitle": "Piattaforma ordini online",
     "vysionPremiumLargeTitle": "Vysion Premium",
     "vysionProImageAlt": "Panoramica del pacchetto piattaforma ordini online",
-    "vysionProRightP1": "Ordini online, il tuo sito, magazzino, display cucina, prenotazioni tavoli e altro sono inclusi in questo abbonamento.",
+    "vysionProRightP1": "Ordini online, il tuo sito, magazzino, display cucina, prenotazioni tavoli e altro sono inclusi in questa licenza.",
     "vysionProRightP2": "Scegli pagamento mensile o annuale; con l’annuale risparmi il 10%. Tutte le funzioni indicate sono incluse, con formazione iniziale gratuita e assistenza.",
     "vysionProModulesP1": "Scegli tu quali moduli avere nell’hardware; per ciò che non vuoi, non paghi neanche.",
     "vysionProModulesP2": "Vuoi il tuo modulo come con la cassa precedente? Nessun problema: i nostri programmatori lo realizzano per te internamente.",
@@ -153,7 +153,7 @@
     "title": "La piattaforma che fa guadagnare.",
     "description": "Lascia che i clienti ordinino come vogliono — online, al tavolo o da asporto. Tutto arriva automaticamente in un unico posto e tu devi solo preparare.",
     "extras": "E poi… anche questo è incluso:",
-    "extrasList": "• Sistema di cassa completo\n• Cassa per food truck\n• Il tuo sito web (pronto nel tuo stile)\n• Fatturazione Peppol senza stress contabile\n• Insight su fatturato, ore di punta e prestazioni\n• Gestione personale e ore\n• Calcolo completo dei costi per prodotto\n• La tua piattaforma di prenotazione per ristorante o bistro\n• Notifiche push\n• Codici QR\n• Nessun sistema separato. Nessun abbonamento extra.",
+    "extrasList": "• Sistema di cassa completo\n• Cassa per food truck\n• Il tuo sito web (pronto nel tuo stile)\n• Fatturazione Peppol senza stress contabile\n• Insight su fatturato, ore di punta e prestazioni\n• Gestione personale e ore\n• Calcolo completo dei costi per prodotto\n• La tua piattaforma di prenotazione per ristorante o bistro\n• Notifiche push\n• Codici QR\n• Nessun sistema separato. Nessuna licenza extra.",
     "tagline": "Una piattaforma. Uno schermo. Controllo totale.",
     "ctaPrimary": "Inizia prova gratuita",
     "ctaSecondary": "Guarda demo",
@@ -165,7 +165,7 @@
     "bottomArc": "conveniente"
   },
   "hardware": {
-    "kicker": "Hardware incluso nell’abbonamento Premium",
+    "kicker": "Hardware incluso nell’licenza Premium",
     "title": "Il nostro hardware",
     "subtitle": "Le nostre casse premium e le periferiche sono di altissima qualità. Con i chip più recenti a bordo, ottieni un utilizzo fulmineo.",
     "imageAlt": "Esempio di hardware",
@@ -408,7 +408,7 @@
     "chooseStandard": "Scegli Standard",
     "choosePro": "Scegli Pro",
     "cancelAnytime": "Disdetta mensile",
-    "yearlySave": "Risparmi il 10% con l'abbonamento annuale.",
+    "yearlySave": "Risparmi il 10% con l'licenza annuale.",
     "billingMonthly": "Mensile",
     "billingYearly": "Annuale",
     "hardwareWithout": "Senza hardware",
@@ -514,7 +514,7 @@
     }
   },
   "industry": {
-    "sectionTitle": "Extra incluso nel tuo abbonamento",
+    "sectionTitle": "Extra incluso nel tuo licenza",
     "imageAltPrefix": "Layout cassa Vysion per",
     "invoicing": {
       "tab": "Fatturazione",
@@ -560,7 +560,7 @@
     "title": "I ristoratori si fidano di Vysion",
     "quotes": {
       "1": {
-        "quote": "Finalmente una piattaforma dove tutto è integrato. Ho cancellato tutti gli altri abbonamenti e ora ho tutto in uno per una frazione del prezzo.",
+        "quote": "Finalmente una piattaforma dove tutto è integrato. Ho cancellato tutti gli altre licenze e ora ho tutto in uno per una frazione del prezzo.",
         "author": "Marc V.",
         "role": "Proprietario friggitoria"
       },
@@ -857,7 +857,7 @@
       "title": "La nostra storia",
       "p1": "Vysion kassa's è nato da vera esperienza. Come ristoratori, ci siamo imbattuti nello stesso problema di te: troppi sistemi, troppi costi e troppo poca visibilità.",
       "p2": "Pagavamo ogni mese per strumenti separati: una piattaforma ordini, contabilità, pagamenti e analisi — tutto separato, niente che funzionasse veramente insieme. I costi si accumulavano. Le complicazioni anche.",
-      "p3": "Quindi abbiamo deciso di fare diversamente. Abbiamo costruito una piattaforma intelligente, con la cassa al centro, e tutto ciò di cui hai bisogno semplicemente incluso. Nessuna funzione superflua. Nessun abbonamento separato. Solo un sistema onesto che funziona per imprenditori come te.",
+      "p3": "Quindi abbiamo deciso di fare diversamente. Abbiamo costruito una piattaforma intelligente, con la cassa al centro, e tutto ciò di cui hai bisogno semplicemente incluso. Nessuna funzione superflua. Nessuna licenza separato. Solo un sistema onesto che funziona per imprenditori come te.",
       "p4": "Da noi puoi acquistare ogni modulo separatamente. Vuoi un sistema prenotazioni ristorante, più conveniente e più professionale della maggior parte delle soluzioni sul mercato? O ordini online più completi e meglio collegati? Sì, si può: registrati gratis, scegli il modulo e hai finito."
     },
     "facts": {
@@ -1920,8 +1920,8 @@
         }
       },
       "subscription": {
-        "title": "Abbonamento",
-        "subtitle": "Il tuo abbonamento e piano attuale",
+        "title": "Licenza",
+        "subtitle": "La tua licenza e piano attuale",
         "currentPlan": "Piano attuale",
         "standardPackage": "Pacchetto Standard",
         "premiumPackage": "Pacchetto Premium",
@@ -1930,7 +1930,7 @@
         "perMonth": "/mese",
         "active": "Attivo",
         "expiresOn": "Scade il",
-        "manageSubscription": "Gestisci abbonamento",
+        "manageSubscription": "Gestisci licenza",
         "upgrade": "Aggiorna",
         "downgrade": "Declassa"
       },
@@ -2090,7 +2090,7 @@
       "dashboard": "Dashboard",
       "shopDisplay": "Display negozio",
       "kitchenDisplay": "Display cucina",
-      "subscription": "Abbonamento",
+      "subscription": "Licenza",
       "businessProfile": "Profilo attività",
       "openingHours": "Orari di apertura",
       "deliveryPickup": "Consegna e Ritiro",
@@ -2730,8 +2730,8 @@
       "noReviews": "Nessuna recensione ancora"
     },
     "subscription": {
-      "title": "Abbonamento",
-      "subtitle": "Gestisci il tuo abbonamento e visualizza le fatture",
+      "title": "Licenza",
+      "subtitle": "Gestisci la tua licenza e visualizza le fatture",
       "currentPlan": "Piano attuale",
       "status": "Stato",
       "paymentOverview": "Panoramica pagamenti",
@@ -2772,7 +2772,7 @@
       "pay": "Paga",
       "done": "Fatto",
       "questions": "Domande sulla fatturazione?",
-      "questionsDesc": "Hai domande sul tuo abbonamento o sulle fatture? Contattaci.",
+      "questionsDesc": "Hai domande sul tuo licenza o sulle fatture? Contattaci.",
       "loading": "Caricamento...",
       "noOutstanding": "Non hai fatture in sospeso",
       "overdueWarning": "Pagamento scaduto",
@@ -5061,14 +5061,14 @@
     "faq4A": "Vai su Personale nella tua dashboard. Clicca su Aggiungi dipendente e compila i dati. Puoi anche assegnare ruoli e permessi.",
     "faq5Q": "La mia stampante non funziona, cosa devo fare?",
     "faq5A": "Verifica che la stampante sia accesa e connessa alla stessa rete. Vai su Impostazioni > Stampanti e clicca su Stampa di prova. Contattaci se il problema persiste.",
-    "faq6Q": "Come posso modificare o annullare il mio abbonamento?",
-    "faq6A": "Vai su Impostazioni > Abbonamento. Puoi passare a Pro o annullare il tuo abbonamento mensilmente. Non ci sono costi di cancellazione.",
+    "faq6Q": "Come posso modificare o annullare il mio licenza?",
+    "faq6A": "Vai su Impostazioni > Licenza. Puoi passare a Pro o annullare la tua licenza mensilmente. Non ci sono costi di cancellazione.",
     "faq7Q": "I miei dati sono memorizzati in modo sicuro?",
     "faq7A": "Si, tutti i tuoi dati sono crittografati e memorizzati su server sicuri all interno dell UE. Rispettiamo tutti i requisiti del GDPR.",
     "faq8Q": "Posso usare l app su piu dispositivi?",
     "faq8A": "Si, puoi accedere su un numero illimitato di dispositivi. La tua dashboard si sincronizza automaticamente tra tutti i dispositivi.",
     "faq9Q": "Chi e il proprietario del sistema?",
-    "faq9A": "Vysion è proprietario dell’hardware: cassa, stampante e cassetto contanti. Con un abbonamento premium hai un diritto d’uso finché l’abbonamento è attivo. L’hardware non diventa tuo tramite l’abbonamento."
+    "faq9A": "Vysion è proprietario dell’hardware: cassa, stampante e cassetto contanti. Con una licenza premium hai un diritto d’uso finché l’licenza è attivo. L’hardware non diventa tuo tramite l’licenza."
   },
   "resellersPage": {
     "badge": "Programma Partner",
@@ -5089,7 +5089,7 @@
     "benefit6Desc": "La ristorazione si sta digitalizzando rapidamente. Gli ordini QR e online sono il futuro.",
     "commissionTitle": "Struttura delle commissioni",
     "monthlyCommission": "Commissione mensile",
-    "monthlyCommissionNote": "dell abbonamento mensile",
+    "monthlyCommissionNote": "dell licenza mensile",
     "setupCommission": "Commissione di configurazione",
     "setupCommissionNote": "dei costi di configurazione una tantum",
     "exampleTitle": "Esempio di calcolo:",
@@ -5201,7 +5201,7 @@
     },
     "rightPrice": {
       "title": "Il prezzo giusto",
-      "body": "Basta commissioni e costi di installazione extra: da noi sono inclusi nell’abbonamento. Piani chiari senza sorprese; paghi ciò che ti serve e cresci con l’attività."
+      "body": "Basta commissioni e costi di installazione extra: da noi sono inclusi nella licenza. Piani chiari senza sorprese; paghi ciò che ti serve e cresci con l’attività."
     },
     "inHouseSoftware": {
       "title": "Sviluppo interno",
@@ -5226,7 +5226,7 @@
     "subtitleVysionLine": "Con Vysion, tutto da un unico sistema e un unico schermo.",
     "subtitlePoint1": "Niente cinque sistemi diversi.",
     "subtitlePoint2": "Niente più schermi al banco.",
-    "subtitlePoint3": "Niente abbonamenti separati per ogni applicazione.",
+    "subtitlePoint3": "Niente licenze separate per ogni applicazione.",
     "subtitleClosing": "Tutto ciò che serve alla tua attività, collegato in un’unica piattaforma completa.",
     "subtitleModulesToggle": "Attivi o disattivi i moduli che vuoi, senza pagare un euro in più.",
     "centerLabel": "Vysion",
@@ -5245,7 +5245,7 @@
   },
   "gratisWebsiteBanner": {
     "title": "Sito web gratuito",
-    "body": "Con il tuo abbonamento ricevi un sito web tutto tuo, completamente gratuito — incluso senza costi extra. Puoi personalizzare completamente il tuo sito secondo i tuoi gusti: colori, foto, tutto.",
+    "body": "Con la tua licenza ricevi un sito web tutto tuo, completamente gratuito — incluso senza costi extra. Puoi personalizzare completamente il tuo sito secondo i tuoi gusti: colori, foto, tutto.",
     "cta": "Vedi esempio di sito ristorante",
     "ctaFrituur": "Vedi esempio frituur / asporto"
   },
@@ -5256,7 +5256,7 @@
     "imageAlt3": "Postazione completa: doppio touchscreen, cassetto portavalute, tastiera e stampante scontrini",
     "eyebrow": "La bestia Vysion",
     "headline": "La «bestia» Vysion: massima potenza, hardware professionale",
-    "intro": "Scegli hardware che accelera il locale: cassa i9 potente, inclusa nell’abbonamento. Nessun costo nascosto, condizioni chiare.",
+    "intro": "Scegli hardware che accelera il locale: cassa i9 potente, inclusa nella licenza. Nessun costo nascosto, condizioni chiare.",
     "specsHeading": "Specifiche che fanno la differenza",
     "specSpeed": "**Velocità senza pari**: grazie al **processore Intel Core i9** e **16 GB di RAM** gestisci le transazioni in un attimo, senza rallentamenti — con 10 o 10.000 prodotti.",
     "specDualTitle": "Hardware robusto",
@@ -5265,13 +5265,13 @@
     "specStorage": "**Archiviazione affidabile**: l’**SSD da 128 GB** fa avviare la cassa in pochi secondi e mantiene i dati sicuri e rapidissimi.",
     "worksHeading": "Perché questo sistema funziona per tutti",
     "worksLead": "Non è un tablet su un supporto, ma una workstation industriale professionale. Panificio, abbigliamento, bar o shop online: l’hardware segue il tuo ritmo.",
-    "worksBullet1": "**Offerta chiara**: nessun costo nascosto. Hardware premium incluso nell’abbonamento, disdicibile ogni mese.",
+    "worksBullet1": "**Offerta chiara**: nessun costo nascosto. Hardware premium incluso nella licenza, disdicibile ogni mese.",
     "worksBullet2": "**Adatto a ogni settore**: design pulito e professionale su ogni bancone.",
     "quote": "Scegli la potenza di una workstation i9. Veloce, affidabile, pronta per ogni rush."
   },
   "platform": {
     "sectionTitle": "Cosa ottieni",
-    "sectionSubtitle1": "Questi moduli e molto altro sono inclusi nel tuo abbonamento. Vuoi un modulo personalizzato in più? Lo sviluppiamo gratis per te e lo integriamo nel tuo sistema.",
+    "sectionSubtitle1": "Questi moduli e molto altro sono inclusi nel tuo licenza. Vuoi un modulo personalizzato in più? Lo sviluppiamo gratis per te e lo integriamo nel tuo sistema.",
     "gridTestCta": "Inizia demo gratuita",
     "gridTrustLine": "Nessuna installazione · Funziona subito nel browser · Come un’attività vera",
     "gridDemoCta": "Vedi demo friggitoria",
@@ -6143,7 +6143,7 @@
       "sm_inst_betaling": "Metodi di pagamento",
       "sm_inst_modules": "Moduli",
       "sm_inst_bonprinter_windows": "Stampante scontrini (Windows)",
-      "sm_abonnement": "Abbonamento",
+      "sm_abonnement": "Licenza",
       "sm_retail_kassa_pos": "Vendita (barcode)",
       "sm_retail_kassa_producten": "Articoli",
       "sm_retail_product_intake": "Scan with phone",
@@ -6190,10 +6190,10 @@
       "h1": "Cassa più veloce per panetterie | i9 e 9 lingue | Vysion",
       "intro": "Cassa per panifici: Intel i9 per i picchi del mattino e 9 lingue per il team — il POS per Belgio e Paesi Bassi.",
       "body1": "Brunch o weekend intenso? POS touch, stampante e software reattivo. Acquisto o leasing: un pacchetto chiaro, zero sorprese.",
-      "body2": "Per panettieri che vogliono margine e ritmo. Hardware i9 potente incluso nell’abbonamento — la cassa belga su cui crescere.",
+      "body2": "Per panettieri che vogliono margine e ritmo. Hardware i9 potente incluso nella licenza — la cassa belga su cui crescere.",
       "imageAlt": "Layout cassa Vysion per panetteria",
       "cta": "Inizia gratis — prova 14 giorni",
-      "ownership24": "Cassa i9 premium inclusa nell’abbonamento — veloce, affidabile, pronta per ogni rush."
+      "ownership24": "Cassa i9 premium inclusa nella licenza — veloce, affidabile, pronta per ogni rush."
     },
     "cafe": {
       "h1": "Cassa ristorazione per caffè | i9 dual-screen e 9 lingue | Vysion",
@@ -6202,16 +6202,16 @@
       "body2": "Meno tocchi, meno errori, più coperti. Prova Vysion gratis — potenza i9 e condizioni chiare.",
       "imageAlt": "Layout cassa Vysion per caffè e brasserie",
       "cta": "Inizia gratis",
-      "ownership24": "Cassa i9 premium inclusa nell’abbonamento — veloce, affidabile, pronta per ogni rush."
+      "ownership24": "Cassa i9 premium inclusa nella licenza — veloce, affidabile, pronta per ogni rush."
     },
     "frituur": {
       "h1": "Cassa friggitoria | Checkout i9 più veloce | Vysion",
       "intro": "Picchi da friggitoria ed eventi: la cassa deve reggere. Intel i9, doppio schermo cliente, 9 lingue — per code, olio e ritmo.",
       "body1": "Ordini, salse e contorni senza rallentamenti. POS touch, stampante integrata e ordini online — cassa friggitoria Belgio e Paesi Bassi.",
-      "body2": "Code corte, margini chiari. Inizia gratis, prova nel locale, hardware premium nell’abbonamento.",
+      "body2": "Code corte, margini chiari. Inizia gratis, prova nel locale, hardware premium nella licenza.",
       "imageAlt": "Layout cassa Vysion per friggitoria e snack",
       "cta": "Inizia gratis",
-      "ownership24": "Cassa i9 premium inclusa nell’abbonamento — veloce, affidabile, pronta per ogni rush."
+      "ownership24": "Cassa i9 premium inclusa nella licenza — veloce, affidabile, pronta per ogni rush."
     },
     "kebab": {
       "h1": "Cassa kebab & panineria | Potenza i9 | Vysion",
@@ -6220,7 +6220,7 @@
       "body2": "Meno stress al bancone, più controllo sui ricavi. Prova gratis e scopri perché si sceglie i9.",
       "imageAlt": "Layout cassa Vysion per kebab e panineria",
       "cta": "Inizia gratis",
-      "ownership24": "Cassa i9 premium inclusa nell’abbonamento — veloce, affidabile, pronta per ogni rush."
+      "ownership24": "Cassa i9 premium inclusa nella licenza — veloce, affidabile, pronta per ogni rush."
     },
     "kapper": {
       "h1": "Cassa per parrucchieri e saloni | Elegante e veloce | Vysion",
@@ -6229,16 +6229,16 @@
       "body2": "Appuntamenti, vendita e mance in un’unica vista. Prova Vysion gratis — checkout premium.",
       "imageAlt": "Layout cassa Vysion per salone",
       "cta": "Inizia gratis",
-      "ownership24": "Cassa i9 premium inclusa nell’abbonamento — veloce, affidabile, pronta per ogni rush."
+      "ownership24": "Cassa i9 premium inclusa nella licenza — veloce, affidabile, pronta per ogni rush."
     },
     "retail": {
       "h1": "Cassa retail & magazzino | L'i9 'Bestia'per negozi | Vysion",
       "intro": "Magazzino su i9 (16 GB RAM), POS touch e integrazione web gratuita — retail che scala con te.",
       "body1": "Cassa retail veloce: magazzino e vendita su uno schermo. Acquisto POS con margini e velocità — sistema belga per negozi.",
-      "body2": "Dal codice a barre alla chiusura: meno errori, più ritmo. Hardware premium incluso nell’abbonamento — senza sorprese.",
+      "body2": "Dal codice a barre alla chiusura: meno errori, più ritmo. Hardware premium incluso nella licenza — senza sorprese.",
       "imageAlt": "Layout cassa Vysion per retail e negozio",
       "cta": "Inizia gratis",
-      "ownership24": "Cassa i9 premium inclusa nell’abbonamento — veloce, affidabile, pronta per ogni rush."
+      "ownership24": "Cassa i9 premium inclusa nella licenza — veloce, affidabile, pronta per ogni rush."
     }
   },
   "stockPage": {
@@ -6558,7 +6558,7 @@
     "lead": "Incasso, magazzino e il tuo e-commerce in un solo sistema. Fatto per il bancone.",
     "point1": "Incassa in fretta con barcode o tocco",
     "point2": "Magazzino per prodotto, senza pacchetto extra",
-    "point3": "E-commerce incluso nell’abbonamento",
+    "point3": "E-commerce incluso nella licenza",
     "heroImageAlt": "Cassa touch Elo per negozi",
     "videoAltKassa": "Cassa negozio Vysion in uso",
     "videoAltVoorraad": "Schermata scorte Vysion per negozi",
@@ -6631,7 +6631,7 @@
     },
     "gratisWebsite": {
       "title": "Sito web gratis per il tuo negozio",
-      "body": "L’abbonamento include un sito web, senza costi extra. Colori, foto e testi li adatti tu.",
+      "body": "L’licenza include un sito web, senza costi extra. Colori, foto e testi li adatti tu.",
       "cta": "Vedi un esempio"
     },
     "kiosk": {
@@ -6649,9 +6649,9 @@
       }
     },
     "pricingModulesHeading": "Per i negozi",
-    "pricingModulesIncluded": "Incluso nel tuo abbonamento",
+    "pricingModulesIncluded": "Incluso nel tuo licenza",
     "ctaViewPricing": "Vedi i prezzi",
-    "ctaViewSubscription": "Vedi l’abbonamento",
+    "ctaViewSubscription": "Vedi la licenza",
     "pricingModules": {
       "1": "Licenza cassa inclusa",
       "2": "Magazzino",
@@ -6680,7 +6680,7 @@
     "lead": "POS touch, barcode e magazzino per tanti articoli. Un sito retail dedicato, separato da horeca e negozio di vicinato.",
     "point1": "Barcode e magazzino per cataloghi ampi",
     "point2": "Per negozio e ingrosso",
-    "point3": "Hardware incluso nell’abbonamento",
+    "point3": "Hardware incluso nella licenza",
     "heroImageAlt": "Cassa Sunmi per il retail",
     "usecasesTitle": "Per retail e ingrosso",
     "modulesTitle": "Cosa ottiene il retail",
@@ -6720,7 +6720,7 @@
     },
     "gratisWebsite": {
       "title": "E-commerce gratis per il retail",
-      "body": "L’abbonamento include un e-commerce per boutique, elettronica o ingrosso, senza costi extra.",
+      "body": "L’licenza include un e-commerce per boutique, elettronica o ingrosso, senza costi extra.",
       "cta": "Vedi un esempio"
     },
     "kiosk": {

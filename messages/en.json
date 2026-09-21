@@ -22,11 +22,11 @@
     "sectors": "Sectors",
     "services": "Our services",
     "integrations": "Integrations",
-    "subscriptions": "Subscriptions"
+    "subscriptions": "Licenses"
   },
   "licensePurchasePage": {
     "title": "Purchase license",
-    "subtitle": "One-time lifetime license — alternative to monthly subscription",
+    "subtitle": "One-time lifetime license — alternative to monthly license",
     "cardBadge": "Lifetime license",
     "priceAmount": "€1,499",
     "priceNote": "One-time",
@@ -39,16 +39,16 @@
     "bullet2": "Lifetime software license — no monthly POS software fees",
     "bullet3": "Updates and support according to our terms and conditions",
     "bullet4": "Ideal if you prefer one investment over paying monthly",
-    "bullet5": "Alternative to our Premium subscription at €99 per month",
-    "compareTitle": "Subscription or license?",
-    "compareBody": "With the monthly subscription you avoid a large upfront payment. With the lifetime license you pay once €1,499 for hardware and software. Both options deliver a complete POS package — plug in and sell, with no extra installation costs.",
+    "bullet5": "Alternative to our Premium license at €99 per month",
+    "compareTitle": "Monthly or one-time license?",
+    "compareBody": "With the monthly license you avoid a large upfront payment. With the lifetime license you pay once €1,499 for hardware and software. Both options deliver a complete POS package — plug in and sell, with no extra installation costs.",
     "ctaContact": "Request license purchase",
-    "ctaSubscription": "View subscription",
+    "ctaSubscription": "View license",
     "emailSubject": "Vysion lifetime license purchase",
     "footerNote": "Contact us for a tailored quote."
   },
   "subscriptionsPage": {
-    "title": "Subscriptions",
+    "title": "Licenses",
     "subtitle": "One platform for your business — transparent and cancel monthly.",
     "lead": "Choose Pro or Premium and pay monthly or yearly. Updates and support are included.",
     "bullet1": "No long-term lock-in; cancel anytime on a monthly plan.",
@@ -62,7 +62,7 @@
     "vysionProLargeTitle": "Online ordering platform",
     "vysionPremiumLargeTitle": "Vysion Premium",
     "vysionProImageAlt": "Online ordering platform plan overview",
-    "vysionProRightP1": "Online ordering, your own website, stock, kitchen display, table reservations and more are included in this subscription.",
+    "vysionProRightP1": "Online ordering, your own website, stock, kitchen display, table reservations and more are included in this license.",
     "vysionProRightP2": "Choose monthly or yearly billing; yearly plans save 10%. Every feature on the card is included, with free onboarding training and support.",
     "vysionProModulesP1": "You choose which modules you want in your hardware—you don't pay for what you don't use.",
     "vysionProModulesP2": "Want your own module the way it worked with your previous till? No problem: our programmers build it for you in-house.",
@@ -235,7 +235,7 @@
     "title": "The platform that makes money.",
     "description": "Let customers order how they want — online, at the table or for takeaway. Everything comes in automatically in one place and you just need to prepare.",
     "extras": "And then… this is also included:",
-    "extrasList": "• Full POS system\n• POS for food trucks\n• Your own website (ready in your style)\n• Cost calculator per product\n• Insight into revenue, peak times and performance\n• Staff & time registration\n• Know if you're priced too high or too low\n• Your own restaurant or bistro reservation platform\n• Push notifications\n• QR codes\n• No separate systems. No extra subscriptions.",
+    "extrasList": "• Full POS system\n• POS for food trucks\n• Your own website (ready in your style)\n• Cost calculator per product\n• Insight into revenue, peak times and performance\n• Staff & time registration\n• Know if you're priced too high or too low\n• Your own restaurant or bistro reservation platform\n• Push notifications\n• QR codes\n• No separate systems. No extra licenses.",
     "tagline": "One platform. One screen. Full control.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "View demo",
@@ -247,7 +247,7 @@
     "bottomArc": "affordable"
   },
   "hardware": {
-    "kicker": "Hardware included in the Premium subscription",
+    "kicker": "Hardware included in the Premium license",
     "title": "Our hardware",
     "subtitle": "Our premium POS systems and peripherals are top quality. With the latest chips on board, you enjoy ultra-fast operation.",
     "imageAlt": "Hardware example",
@@ -386,7 +386,7 @@
     },
     "rightPrice": {
       "title": "The right price",
-      "body": "No more paying commissions or extra installation fees on the side. That’s included in your subscription. Clear plans with no hidden fees; you pay for what you need and scale as your business grows."
+      "body": "No more paying commissions or extra installation fees on the side. That’s included in your license. Clear plans with no hidden fees; you pay for what you need and scale as your business grows."
     },
     "inHouseSoftware": {
       "title": "Built in-house",
@@ -411,7 +411,7 @@
     "subtitleVysionLine": "With Vysion, it all runs from one system and one screen.",
     "subtitlePoint1": "No five different systems.",
     "subtitlePoint2": "No multiple screens at your counter.",
-    "subtitlePoint3": "No separate subscription for every app.",
+    "subtitlePoint3": "No separate license for every app.",
     "subtitleClosing": "Everything your business needs, connected in one complete platform.",
     "subtitleModulesToggle": "You turn the modules on and off you want—without paying one euro more.",
     "centerLabel": "Vysion",
@@ -430,7 +430,7 @@
   },
   "gratisWebsiteBanner": {
     "title": "Free website",
-    "body": "With your subscription you receive a completely free website of your own — included at no extra cost. You can fully customize your site to your taste: colors, photos, everything.",
+    "body": "With your license you receive a completely free website of your own — included at no extra cost. You can fully customize your site to your taste: colors, photos, everything.",
     "cta": "View example restaurant website",
     "ctaFrituur": "View example takeaway (frituur) site"
   },
@@ -441,7 +441,7 @@
     "imageAlt3": "Complete POS setup: dual touchscreens, cash drawer, keyboard and receipt printer",
     "eyebrow": "The Vysion beast",
     "headline": "The Vysion \"beast\": maximum power, professional hardware",
-    "intro": "Choose hardware that speeds up your business: a powerful i9 till, included in your subscription. No hidden costs, clear terms.",
+    "intro": "Choose hardware that speeds up your business: a powerful i9 till, included in your license. No hidden costs, clear terms.",
     "specsHeading": "Specifications that make the difference",
     "specSpeed": "**Blazing speed**: thanks to the **Intel Core i9 processor** and **16 GB RAM**, you process transactions instantly, without stutter — whether you have 10 or 10,000 products.",
     "specDualTitle": "Robust hardware",
@@ -450,13 +450,13 @@
     "specStorage": "**Reliable storage**: the **128 GB SSD** means your till boots in seconds and your data stays safe and lightning-fast to access.",
     "worksHeading": "Why this system works for everyone",
     "worksLead": "This is not a simple tablet on a stand, but a professional, industrial workstation. Whether you run a bakery, clothing store, café or online shop: the hardware keeps up with your pace.",
-    "worksBullet1": "**Fair deal**: no hidden costs. Premium hardware included in your subscription, cancel monthly.",
+    "worksBullet1": "**Fair deal**: no hidden costs. Premium hardware included in your license, cancel monthly.",
     "worksBullet2": "**Sector-friendly**: the clean design looks professional on every counter.",
     "quote": "Choose the power of an i9 workstation. Fast, reliable, ready for every rush."
   },
   "platform": {
     "sectionTitle": "What you get",
-    "sectionSubtitle1": "These modules and much more are included in your subscription. Want a custom module on top? We build it for you at no extra charge and add it to your system.",
+    "sectionSubtitle1": "These modules and much more are included in your license. Want a custom module on top? We build it for you at no extra charge and add it to your system.",
     "gridTestCta": "Start free demo",
     "gridTrustLine": "No installation needed · Works right in your browser · Just like a real business",
     "gridDemoCta": "View demo fry shop",
@@ -726,7 +726,7 @@
     "chooseStandard": "Choose Standard",
     "choosePro": "Choose Pro",
     "cancelAnytime": "Cancel anytime",
-    "yearlySave": "You save 10% with an annual subscription.",
+    "yearlySave": "You save 10% with an annual license.",
     "billingMonthly": "Monthly",
     "billingYearly": "Yearly",
     "hardwareWithout": "Without hardware",
@@ -832,7 +832,7 @@
     }
   },
   "industry": {
-    "sectionTitle": "Extra included in your subscription",
+    "sectionTitle": "Extra included in your license",
     "imageAltPrefix": "Vysion POS layout for",
     "invoicing": {
       "tab": "Invoicing",
@@ -878,7 +878,7 @@
     "title": "Hospitality entrepreneurs trust Vysion",
     "quotes": {
       "1": {
-        "quote": "Finally a platform where everything is integrated. I cancelled all my other subscriptions and now have everything in one for a fraction of the price.",
+        "quote": "Finally a platform where everything is integrated. I cancelled all my other licenses and now have everything in one for a fraction of the price.",
         "author": "Marc V.",
         "role": "Snack bar owner"
       },
@@ -1175,7 +1175,7 @@
       "title": "Our story",
       "p1": "Vysion was born from real experience. As entrepreneurs, we ran into the same problem as you: too many systems, too many costs and too little overview.",
       "p2": "We paid every month for separate tools: an ordering platform, accounting, payments and analytics — all separate, nothing that really worked together. The costs added up. So did the hassle.",
-      "p3": "So we decided to do it differently. We built one smart platform, with the POS at its heart, and everything you need alongside it simply included. No unnecessary features. No separate subscriptions. Just an honest system that works for entrepreneurs like you.",
+      "p3": "So we decided to do it differently. We built one smart platform, with the POS at its heart, and everything you need alongside it simply included. No unnecessary features. No separate licenses. Just an honest system that works for entrepreneurs like you.",
       "p4": "With us you can buy every module separately. Want a restaurant reservation system that is more affordable and more professional than most systems on the market? Or online ordering that is more comprehensive and better integrated than most? Yes, you can: register for free, pick your module and you are done."
     },
     "facts": {
@@ -2237,8 +2237,8 @@
         }
       },
       "subscription": {
-        "title": "Subscription",
-        "subtitle": "Your current subscription and plan",
+        "title": "License",
+        "subtitle": "Your current license and plan",
         "currentPlan": "Current plan",
         "standardPackage": "Standard Package",
         "premiumPackage": "Premium Package",
@@ -2247,7 +2247,7 @@
         "perMonth": "/month",
         "active": "Active",
         "expiresOn": "Expires on",
-        "manageSubscription": "Manage subscription",
+        "manageSubscription": "Manage license",
         "upgrade": "Upgrade",
         "downgrade": "Downgrade"
       },
@@ -2407,7 +2407,7 @@
       "dashboard": "Dashboard",
       "shopDisplay": "Shop Display",
       "kitchenDisplay": "Kitchen Display",
-      "subscription": "Subscription",
+      "subscription": "License",
       "businessProfile": "Business Profile",
       "openingHours": "Opening Hours",
       "deliveryPickup": "Delivery & Pickup",
@@ -3066,8 +3066,8 @@
       "noReviews": "No reviews yet"
     },
     "subscription": {
-      "title": "Subscription",
-      "subtitle": "Manage your subscription and view invoices",
+      "title": "License",
+      "subtitle": "Manage your license and view invoices",
       "currentPlan": "Current plan",
       "status": "Status",
       "paymentOverview": "Payment overview",
@@ -3108,7 +3108,7 @@
       "pay": "Pay",
       "done": "Done",
       "questions": "Questions about billing?",
-      "questionsDesc": "Have questions about your subscription or invoices? Contact us.",
+      "questionsDesc": "Have questions about your license or invoices? Contact us.",
       "loading": "Loading...",
       "noOutstanding": "You have no outstanding invoices",
       "overdueWarning": "Overdue payment",
@@ -5360,14 +5360,14 @@
     "faq4A": "Go to Staff in your dashboard. Click Add employee and fill in the details. You can also assign roles and permissions.",
     "faq5Q": "My printer is not working, what should I do?",
     "faq5A": "Check that the printer is on and connected to the same network. Go to Settings > Printers and click Test print. Contact us if the problem persists.",
-    "faq6Q": "How can I change or cancel my subscription?",
-    "faq6A": "Go to Settings > Subscription. You can upgrade to Pro or cancel your subscription monthly. There are no cancellation fees.",
+    "faq6Q": "How can I change or cancel my license?",
+    "faq6A": "Go to Settings > License. You can upgrade to Pro or cancel your license monthly. There are no cancellation fees.",
     "faq7Q": "Is my data stored securely?",
     "faq7A": "Yes, all your data is encrypted and stored on secure servers within the EU. We comply with all GDPR requirements.",
     "faq8Q": "Can I use the app on multiple devices?",
     "faq8A": "Yes, you can log in on unlimited devices. Your dashboard synchronizes automatically between all devices.",
     "faq9Q": "Who owns the system?",
-    "faq9A": "Vysion owns the hardware—the POS, printer and cash drawer. On a premium subscription you have a right of use while the subscription runs. The hardware does not become yours through the subscription."
+    "faq9A": "Vysion owns the hardware—the POS, printer and cash drawer. On a premium license you have a right of use while the license runs. The hardware does not become yours through the license."
   },
   "resellersPage": {
     "badge": "Partner Program",
@@ -5388,7 +5388,7 @@
     "benefit6Desc": "Hospitality is digitalizing fast. QR ordering and online ordering are the future.",
     "commissionTitle": "Commission Structure",
     "monthlyCommission": "Monthly commission",
-    "monthlyCommissionNote": "of the monthly subscription",
+    "monthlyCommissionNote": "of the monthly license",
     "setupCommission": "Setup fee commission",
     "setupCommissionNote": "of one-time setup costs",
     "exampleTitle": "Example calculation:",
@@ -6102,7 +6102,7 @@
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Windows receipt printer",
-      "sm_abonnement": "Subscription",
+      "sm_abonnement": "License",
       "sm_retail_kassa_pos": "Sales (barcode)",
       "sm_retail_kassa_producten": "Articles",
       "sm_retail_product_intake": "Scan with phone",
@@ -6149,10 +6149,10 @@
       "h1": "Fastest POS for Bakeries | i9 Power & 9 Languages | Vysion",
       "intro": "Bakery-focused checkout: Intel i9 ('The Beast') for morning rush speed and 9 languages for your team — the POS Belgium and the Netherlands rely on.",
       "body1": "Need the fastest checkout for busy brunch and weekend peaks? Touchscreen POS, receipt printer and software that stay responsive. Buying or leasing stays clear: one package, no install surprises.",
-      "body2": "Built for bakers who care about margin and pace. Powerful i9 hardware included in your subscription — the Belgium POS you can grow on.",
+      "body2": "Built for bakers who care about margin and pace. Powerful i9 hardware included in your license — the Belgium POS you can grow on.",
       "imageAlt": "Vysion POS layout for bakery",
       "cta": "Start free — 14-day trial",
-      "ownership24": "Premium i9 POS included in your subscription — fast, reliable, ready for every rush."
+      "ownership24": "Premium i9 POS included in your license — fast, reliable, ready for every rush."
     },
     "cafe": {
       "h1": "Hospitality POS for Cafés | i9 Dual-Screen & 9 Languages | Vysion",
@@ -6161,16 +6161,16 @@
       "body2": "Fewer taps, fewer errors, more covers per hour. Try Vysion free and feel i9 power with clear terms.",
       "imageAlt": "Vysion POS layout for café and brasserie",
       "cta": "Start free",
-      "ownership24": "Premium i9 POS included in your subscription — fast, reliable, ready for every rush."
+      "ownership24": "Premium i9 POS included in your license — fast, reliable, ready for every rush."
     },
     "frituur": {
       "h1": "Chip Shop POS | Fastest i9 Checkout | Vysion",
       "intro": "Chip shop peaks and events: your till must keep up. Intel i9, dual screen for customers, 9 languages for your team — built for heat, queues and speed.",
       "body1": "Orders, sauces and sides without slowdowns. Touchscreen POS, built-in printer and online ordering in one stack — the chip shop POS for Belgium and the Netherlands.",
-      "body2": "Keep queues short and margins tight. Start free, test in your shop, and choose premium hardware in your subscription.",
+      "body2": "Keep queues short and margins tight. Start free, test in your shop, and choose premium hardware in your license.",
       "imageAlt": "Vysion POS layout for chip shop and snack bar",
       "cta": "Start free",
-      "ownership24": "Premium i9 POS included in your subscription — fast, reliable, ready for every rush."
+      "ownership24": "Premium i9 POS included in your license — fast, reliable, ready for every rush."
     },
     "kebab": {
       "h1": "Kebab & Sandwich Bar POS | i9 Power | Vysion",
@@ -6179,7 +6179,7 @@
       "body2": "Less stress at the counter, more control on revenue. Try free and see why operators pick i9 over sluggish kit.",
       "imageAlt": "Vysion POS layout for kebab and sandwich bar",
       "cta": "Start free",
-      "ownership24": "Premium i9 POS included in your subscription — fast, reliable, ready for every rush."
+      "ownership24": "Premium i9 POS included in your license — fast, reliable, ready for every rush."
     },
     "kapper": {
       "h1": "POS for Hair Salons | Stylish & Fast | Vysion",
@@ -6188,16 +6188,16 @@
       "body2": "Combine appointments, retail and tips in one view. Try Vysion free and discover stylish, fast checkout with premium hardware.",
       "imageAlt": "Vysion POS layout for hair salon",
       "cta": "Start free",
-      "ownership24": "Premium i9 POS included in your subscription — fast, reliable, ready for every rush."
+      "ownership24": "Premium i9 POS included in your license — fast, reliable, ready for every rush."
     },
     "retail": {
       "h1": "Retail POS & Stock Control | The i9 'Beast'for Shops | Vysion",
       "intro": "Run stock on powerful i9 hardware (16 GB RAM), touchscreen POS and free website integration — retail checkout that scales with you.",
       "body1": "Want a fast retail POS? Merge stock and sales on one screen. Buying a POS with margin insight and queue speed — the Belgium retail system for shops.",
-      "body2": "From barcode to closing: fewer errors, more speed. Premium hardware included in your subscription — no surprises.",
+      "body2": "From barcode to closing: fewer errors, more speed. Premium hardware included in your license — no surprises.",
       "imageAlt": "Vysion POS layout for retail and shops",
       "cta": "Start free",
-      "ownership24": "Premium i9 POS included in your subscription — fast, reliable, ready for every rush."
+      "ownership24": "Premium i9 POS included in your license — fast, reliable, ready for every rush."
     }
   },
   "stockPage": {
@@ -6517,7 +6517,7 @@
     "lead": "Checkout, stock and your own webshop in one system. Built for the counter.",
     "point1": "Fast checkout with barcode or tap on screen",
     "point2": "Stock per product, no extra package",
-    "point3": "Your own webshop included in the subscription",
+    "point3": "Your own webshop included in the license",
     "heroImageAlt": "Elo touchscreen POS for shops",
     "videoAltKassa": "Vysion shop POS in use",
     "videoAltVoorraad": "Vysion inventory screen for shops",
@@ -6590,7 +6590,7 @@
     },
     "gratisWebsite": {
       "title": "Free website for your shop",
-      "body": "Your subscription includes your own website, at no extra cost. Colours, photos and texts are yours to change.",
+      "body": "Your license includes your own website, at no extra cost. Colours, photos and texts are yours to change.",
       "cta": "See an example"
     },
     "kiosk": {
@@ -6608,9 +6608,9 @@
       }
     },
     "pricingModulesHeading": "For shops",
-    "pricingModulesIncluded": "Included in your subscription",
+    "pricingModulesIncluded": "Included in your license",
     "ctaViewPricing": "View pricing",
-    "ctaViewSubscription": "View the subscription",
+    "ctaViewSubscription": "View the license",
     "pricingModules": {
       "1": "POS licence included",
       "2": "Stock",
@@ -6639,7 +6639,7 @@
     "lead": "Touchscreen POS, barcodes and stock for many SKUs. A dedicated retail site — separate from hospitality and high-street shops.",
     "point1": "Barcodes and stock for large catalogues",
     "point2": "Built for shops and wholesale",
-    "point3": "Hardware included in the subscription",
+    "point3": "Hardware included in the license",
     "heroImageAlt": "Sunmi POS for retail",
     "usecasesTitle": "For retail & wholesale",
     "modulesTitle": "What retail gets",
@@ -6679,7 +6679,7 @@
     },
     "gratisWebsite": {
       "title": "Free webshop for retail",
-      "body": "Your subscription includes a webshop for boutique, electronics or wholesale, at no extra cost.",
+      "body": "Your license includes a webshop for boutique, electronics or wholesale, at no extra cost.",
       "cta": "See an example"
     },
     "kiosk": {
