@@ -39,9 +39,15 @@ function hardwareLabel(item: (typeof HARDWARE_ITEMS)[number] | (typeof HARDWARE_
   return item.model
 }
 
-export default function HardwareSection() {
+export default function HardwareSection({
+  omitLabelKeys = [],
+}: {
+  omitLabelKeys?: readonly string[]
+} = {}) {
   const { t } = useLanguage()
-  const allItems = [...HARDWARE_ITEMS, ...HARDWARE_PREMIUM_INCLUDED] as const
+  const allItems = [...HARDWARE_ITEMS, ...HARDWARE_PREMIUM_INCLUDED].filter(
+    (item) => !('labelKey' in item && omitLabelKeys.includes(item.labelKey)),
+  )
   const [expanded, setExpanded] = useState<number | null>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 

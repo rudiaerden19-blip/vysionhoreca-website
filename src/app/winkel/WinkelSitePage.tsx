@@ -1561,7 +1561,9 @@ export default function WinkelSitePage() {
           },
         }}
       />
-      <HardwareSection />
+      <HardwareSection
+        omitLabelKeys={['premiumIncludedKeukenschermen', 'premiumIncludedTafelBestelKiosk']}
+      />
       <StatsAndLiveDemoSection />
       <PricingSection />
       <PromoMarqueeBand />
