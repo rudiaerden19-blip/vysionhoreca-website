@@ -20,10 +20,12 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
     ])
   })
 
-  it('Light gebruikt grijze knoppen, geen luxe-goud', () => {
+  it('Light gebruikt website-blauw, geen grijs en geen luxe-goud', () => {
     const cls = kassaLayoutChromeBtnClass('light', false)
-    expect(cls).toContain('#4a4a4a')
+    expect(cls).toContain('#3C4D6B')
+    expect(cls).not.toContain('#4a4a4a')
     expect(cls).not.toContain('#c4a46a')
+    expect(kassaLayoutQuickMenuTileClass('light')).toContain('#3C4D6B')
     expect(kassaLayoutPlateBgClass('light')).toBe('bg-[#e3e3e3]')
     expect(kassaLayoutHeaderBarClass('light')).toBe('bg-black')
     expect(kassaLayoutCheckoutBtnClass('light')).toContain('bg-emerald-500')

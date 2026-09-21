@@ -14,10 +14,10 @@ import {
   type KassaPosChromeLook,
 } from '@/lib/kassa-pos-surface'
 
-/** Zelfde knopvlakken als de gewone kassa (Light / Klassiek). */
-export const KASSA_LIGHT_BTN_FACE = 'bg-[#4a4a4a] text-white hover:bg-[#5a5a5a]'
+/** Retail Light: website-blauw (`--primary`). Klassiek blijft gunmetal. Horeca-kassa gebruikt deze constants niet. */
+export const KASSA_LIGHT_BTN_FACE = 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
 export const KASSA_LIGHT_BTN_FACE_ON =
-  'bg-[#4a4a4a] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]'
+  'bg-[#3C4D6B] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]'
 export const KASSA_CLASSIC_BTN_FACE = 'bg-[#2d2d2d] text-white hover:bg-[#3a3a3a]'
 export const KASSA_CLASSIC_BTN_FACE_ON =
   'bg-[#2d2d2d] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]'
