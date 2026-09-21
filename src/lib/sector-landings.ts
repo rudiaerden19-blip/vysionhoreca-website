@@ -257,15 +257,15 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     cluster: 'winkel',
     title: `Kassasysteem voor kappers | ${BRAND}`,
     description:
-      'Kassasysteem voor kappers en salons: afrekenen van behandelingen en producten, klantenkaart, personeel en rapporten in één licentie.',
+      'Kassasysteem voor kappers en salons: afsprakenagenda, afrekenen van behandelingen en producten, klantenkaart, personeel en rapporten in één licentie.',
     h1: 'Kassasysteem voor jouw kapsalon',
     eyebrow: 'Kapper & salon',
     intro:
       'Aan de balie wil je knipbeurt, kleur en shampoo snel afrekenen. Vysion is een kassasysteem voor kappers: behandelingen, producten, klantenkaart en uren in één scherm.',
     bullets: [
+      'Kappersagenda met online afspraken, naast je kassa.',
       'Behandelingen en winkelproducten op hetzelfde scherm.',
-      'Klantenkaart en punten voor terugkerende gasten.',
-      'Personeel in- en uitklokken, plus rapportages.',
+      'Klantenkaart, personeel en rapportages in één licentie.',
     ],
     heroImage: {
       src: '/images/sectoren/kapper-hero.jpg',
@@ -277,7 +277,7 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
         title: 'Waarom Vysion voor een kapper',
         body: [
           'In een salon verkoop je tijd én producten. Vysion laat je beide afrekenen zonder een losse kassa naast een losse winkelapp. Voorraad van shampoos en merken blijft bij de kassa.',
-          'Dit is de kassa, klantenkaart en rapportage — geen aparte salonsoftware ernaast. Hardware en software in één licentie. 14 dagen gratis proberen.',
+          'Kassa, kappersagenda, klantenkaart en rapportage horen bij dezelfde licentie — geen losse salonsoftware ernaast. Hardware en software in één pakket. 14 dagen gratis proberen.',
         ],
       },
       {
@@ -336,9 +336,9 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
         answer: 'Ja. Klantenkaart, winkelpas en punten horen bij de licentie.',
       },
       {
-        question: 'Zit er een aparte salonagenda in Vysion?',
+        question: 'Zit er een kappersagenda in Vysion?',
         answer:
-          'Vysion is het kassasysteem, met personeel, rapporten en optioneel een eigen website. Een losse kappersagenda claimen we hier niet.',
+          'Ja. Afspraken en planning zitten in hetzelfde systeem als je kassa: klanten boeken online, jij ziet wie wanneer komt in je overzicht, gekoppeld aan je team. Geen apart abonnement voor een losse agenda-app.',
       },
     ],
     breadcrumbLabel: 'Kapper',
