@@ -9,13 +9,13 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
-  alternates: { canonical: '/retail' },
+  alternates: { canonical: '/winkel' },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
     type: 'website',
     locale: 'nl_BE',
-    url: `${VYSION_CANONICAL_ORIGIN}/retail`,
+    url: `${VYSION_CANONICAL_ORIGIN}/winkel`,
     siteName: VYSION_BRAND_SITE_NAME,
     images: [{ url: '/images/hardware/hardware-vm20-sunmi.png' }],
   },

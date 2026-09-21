@@ -712,7 +712,7 @@
     "other": "Other industry / browse generally.",
     "columns": {
       "winkel": {
-        "title": "SHOP",
+        "title": "متجر وتجزئة",
         "items": {
           "bakker": "Bakery",
           "slager": "Butcher",
@@ -720,8 +720,13 @@
           "nachtwinkel": "Night shop",
           "kledingzaak": "Clothing store",
           "schoenenwinkel": "Shoe store",
+          "boetiek": "Boutique",
+          "elektronica": "Electronics",
+          "geschenkzaak": "Gift shop",
+          "dierenwinkel": "Pet shop",
           "buurtwinkel": "Convenience store",
-          "speciaalzaak": "Specialty shop"
+          "speciaalzaak": "Specialty shop",
+          "groothandel": "Wholesale"
         }
       },
       "retail": {

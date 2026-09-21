@@ -1030,7 +1030,7 @@
     "other": "Andere branche / algemeen bekijken.",
     "columns": {
       "winkel": {
-        "title": "WINKEL",
+        "title": "WINKEL & RETAIL",
         "items": {
           "bakker": "Bakker",
           "slager": "Slager",
@@ -1038,8 +1038,13 @@
           "nachtwinkel": "Nachtwinkel",
           "kledingzaak": "Kledingzaak",
           "schoenenwinkel": "Schoenenwinkel",
+          "boetiek": "Boetiek",
+          "elektronica": "Elektronica",
+          "geschenkzaak": "Geschenkzaak",
+          "dierenwinkel": "Dierenwinkel",
           "buurtwinkel": "Buurtwinkel",
-          "speciaalzaak": "Speciaalzaak"
+          "speciaalzaak": "Speciaalzaak",
+          "groothandel": "Groothandel"
         }
       },
       "retail": {

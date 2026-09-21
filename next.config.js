@@ -200,6 +200,11 @@ const nextConfig = {
         destination: '/prijzen',
         permanent: true,
       },
+      {
+        source: '/retail',
+        destination: '/winkel',
+        permanent: true,
+      },
     ]
   },
 }

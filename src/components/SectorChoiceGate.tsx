@@ -108,7 +108,7 @@ export default function SectorChoiceGate() {
       aria-modal="true"
       aria-labelledby="sector-modal-title"
     >
-      <div className="flex max-h-[min(92dvh,100svh)] w-full max-w-5xl min-h-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
+      <div className="flex max-h-[min(92dvh,100svh)] w-full max-w-3xl min-h-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
         <div className="shrink-0 border-b border-gray-100 px-4 py-3 sm:px-8 sm:py-6">
           <h2
             id="sector-modal-title"
@@ -118,7 +118,7 @@ export default function SectorChoiceGate() {
           </h2>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3 sm:px-6 sm:py-5">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {LANDING_BRANCH_COLUMNS.map((column) => (
               <div
                 key={column.id}

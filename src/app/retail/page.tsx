@@ -1,8 +1,6 @@
-'use client'
+import { redirect } from 'next/navigation'
 
-import RetailSitePage from './RetailSitePage'
-
-/** Eigen marketingwebsite voor retail. Niet gekoppeld aan horeca of winkel. */
+/** Retail-marketing is samengevoegd met /winkel. */
 export default function Page() {
-  return <RetailSitePage />
+  redirect('/winkel')
 }

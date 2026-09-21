@@ -712,7 +712,7 @@
     "other": "Otro sector / ver en general.",
     "columns": {
       "winkel": {
-        "title": "TIENDA",
+        "title": "TIENDA & RETAIL",
         "items": {
           "bakker": "Panadería",
           "slager": "Carnicería",
@@ -720,8 +720,13 @@
           "nachtwinkel": "Tienda de noche",
           "kledingzaak": "Tienda de ropa",
           "schoenenwinkel": "Zapatería",
+          "boetiek": "Boutique",
+          "elektronica": "Electrónica",
+          "geschenkzaak": "Tienda de regalos",
+          "dierenwinkel": "Tienda de animales",
           "buurtwinkel": "Tienda de barrio",
-          "speciaalzaak": "Tienda especializada"
+          "speciaalzaak": "Tienda especializada",
+          "groothandel": "Mayorista"
         }
       },
       "retail": {

@@ -712,7 +712,7 @@
     "other": "Andere Branche / allgemein ansehen.",
     "columns": {
       "winkel": {
-        "title": "LADEN",
+        "title": "LADEN & RETAIL",
         "items": {
           "bakker": "Bäckerei",
           "slager": "Metzgerei",
@@ -720,8 +720,13 @@
           "nachtwinkel": "Nachtladen",
           "kledingzaak": "Bekleidungsgeschäft",
           "schoenenwinkel": "Schuhgeschäft",
+          "boetiek": "Boutique",
+          "elektronica": "Elektronik",
+          "geschenkzaak": "Geschenkeladen",
+          "dierenwinkel": "Zoohandlung",
           "buurtwinkel": "Tante-Emma-Laden",
-          "speciaalzaak": "Fachgeschäft"
+          "speciaalzaak": "Fachgeschäft",
+          "groothandel": "Großhandel"
         }
       },
       "retail": {

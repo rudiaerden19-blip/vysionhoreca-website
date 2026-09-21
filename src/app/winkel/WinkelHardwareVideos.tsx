@@ -10,7 +10,7 @@ const WINKEL_KASSA_HUB_JPG = '/images/winkel/winkel-kassa-hub.jpg'
 const WINKEL_KASSA_HUB_FULL = '/images/winkel/winkel-kassa-hub-full.png'
 
 /**
- * Alleen `/winkel`. Horeca (`/`) en retail blijven `WhyVysionHardwareVideos`.
+ * Alleen `/winkel` (winkel & retail). Horeca (`/`) blijft `WhyVysionHardwareVideos`.
  * Reservaties-tablet → winkelskassa; horeca-productkassa → voorraad.
  */
 const WINKEL_WHY_VYSION_VIDEOS: HardwareVideoConfig[] = [

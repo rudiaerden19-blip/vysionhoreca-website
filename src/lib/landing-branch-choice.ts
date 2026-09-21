@@ -1,11 +1,12 @@
 export const LANDING_BRANCH_STORAGE_KEY = 'vysion_landing_sector_v3'
 
+/** Oud opgeslagen `retail` blijft geldig; de marketing-site is /winkel. */
 export const LANDING_BRANCH_IDS = ['winkel', 'retail', 'horeca'] as const
 
 export type LandingBranchId = (typeof LANDING_BRANCH_IDS)[number] | 'other'
 
 export const LANDING_BRANCH_COLUMNS: Array<{
-  id: Exclude<LandingBranchId, 'other'>
+  id: 'winkel' | 'horeca'
   itemKeys: readonly string[]
 }> = [
   {
@@ -17,13 +18,14 @@ export const LANDING_BRANCH_COLUMNS: Array<{
       'nachtwinkel',
       'kledingzaak',
       'schoenenwinkel',
+      'boetiek',
+      'elektronica',
+      'geschenkzaak',
+      'dierenwinkel',
       'buurtwinkel',
       'speciaalzaak',
+      'groothandel',
     ],
-  },
-  {
-    id: 'retail',
-    itemKeys: ['boetiek', 'elektronica', 'geschenkzaak', 'dierenwinkel', 'groothandel', 'andereRetail'],
   },
   {
     id: 'horeca',
@@ -69,10 +71,10 @@ export function branchForService(service: LandingServiceId): LandingBranchId {
   return column?.id ?? 'other'
 }
 
-/** Drie marketing-sites: winkel + retail eigen URL, horeca = bestaande homepage. */
+/** Twee marketing-sites: winkel & retail = /winkel, horeca = homepage. */
 export const LANDING_SITE_PATHS = {
   winkel: '/winkel',
-  retail: '/retail',
+  retail: '/winkel',
   horeca: '/',
   other: '/',
 } as const
@@ -86,7 +88,7 @@ export function landingBranchFromPathname(
 ): Exclude<LandingBranchId, 'other'> {
   const path = (pathname || '/').split('?')[0].replace(/\/+$/, '') || '/'
   if (path === '/winkel' || path.startsWith('/winkel/')) return 'winkel'
-  if (path === '/retail' || path.startsWith('/retail/')) return 'retail'
+  if (path === '/retail' || path.startsWith('/retail/')) return 'winkel'
   return 'horeca'
 }
 

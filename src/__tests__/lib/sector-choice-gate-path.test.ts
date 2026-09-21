@@ -101,47 +101,52 @@ describe('shouldOpenSectorChoiceOnThisLoad', () => {
 })
 
 describe('landing branch columns', () => {
-  it('has three visitor fields plus other', () => {
-    expect(LANDING_BRANCH_COLUMNS.map((c) => c.id)).toEqual(['winkel', 'retail', 'horeca'])
+  it('has two visitor fields plus other', () => {
+    expect(LANDING_BRANCH_COLUMNS.map((c) => c.id)).toEqual(['winkel', 'horeca'])
     expect(isLandingBranchId('winkel')).toBe(true)
+    expect(isLandingBranchId('retail')).toBe(true)
     expect(isLandingBranchId('other')).toBe(true)
     expect(isLandingBranchId('frituur')).toBe(false)
     expect(isLandingServiceId('frituur')).toBe(true)
     expect(isLandingServiceId('kebab')).toBe(true)
     expect(isLandingServiceId('pizza')).toBe(true)
     expect(isLandingServiceId('bakker')).toBe(true)
+    expect(isLandingServiceId('groothandel')).toBe(true)
+    expect(isLandingServiceId('andereRetail')).toBe(false)
     expect(branchForService('bakker')).toBe('winkel')
     expect(branchForService('kebab')).toBe('horeca')
     expect(branchForService('pizza')).toBe('horeca')
-    expect(branchForService('boetiek')).toBe('retail')
+    expect(branchForService('boetiek')).toBe('winkel')
+    expect(branchForService('groothandel')).toBe('winkel')
     expect(branchForService('frituur')).toBe('horeca')
     expect(branchForService('other')).toBe('other')
   })
 
-  it('routes each branch to its own marketing site', () => {
+  it('routes winkel and retail to one marketing site', () => {
     expect(landingSitePathForBranch('winkel')).toBe('/winkel')
-    expect(landingSitePathForBranch('retail')).toBe('/retail')
+    expect(landingSitePathForBranch('retail')).toBe('/winkel')
     expect(landingSitePathForBranch('horeca')).toBe('/')
     expect(landingSitePathForBranch('other')).toBe('/')
     expect(landingBranchFromPathname('/winkel')).toBe('winkel')
-    expect(landingBranchFromPathname('/retail')).toBe('retail')
+    expect(landingBranchFromPathname('/retail')).toBe('winkel')
     expect(landingBranchFromPathname('/')).toBe('horeca')
     expect(landingBranchFromPathname('/over-ons')).toBe('horeca')
     expect(marketingSiteHashHref('/winkel', 'prijzen')).toBe('/winkel#prijzen')
+    expect(marketingSiteHashHref('/retail', 'prijzen')).toBe('/winkel#prijzen')
     expect(marketingSiteHashHref('/', 'prijzen')).toBe('/#prijzen')
   })
 
-  it('has Dutch copy for the three columns and the other link', () => {
+  it('has Dutch copy for the two columns and the other link', () => {
     const modal = (nl as { sectorModal: { title: string; other: string; columns: Record<string, { title: string; items: Record<string, string> }> } }).sectorModal
     expect(modal.title).toBe('Kies jouw branche')
     expect(modal.other).toBe('Andere branche / algemeen bekijken.')
+    expect(modal.columns.winkel.title).toBe('WINKEL & RETAIL')
+    expect(modal.columns.winkel.items.bakker).toBe('Bakker')
+    expect(modal.columns.winkel.items.groothandel).toBe('Groothandel')
     const sites = (nl as { heroLanding: { sites: Record<string, { title: string }> } }).heroLanding.sites
     expect(sites.winkel.title).toBe('Kassa & platform voor uw winkel')
-    expect(sites.retail.title).toBe('Kassa & retailplatform voor uw zaak')
     const winkelSite = (nl as { winkelSite: { title: string } }).winkelSite
-    const retailSite = (nl as { retailSite: { title: string } }).retailSite
     expect(winkelSite.title).toBe('Kassa voor bakker, slager, kapper en de winkelstraat')
-    expect(retailSite.title).toBe('Kassa voor retail, boetiek en groothandel')
     for (const column of LANDING_BRANCH_COLUMNS) {
       expect(modal.columns[column.id]?.title).toBeTruthy()
       for (const itemKey of column.itemKeys) {

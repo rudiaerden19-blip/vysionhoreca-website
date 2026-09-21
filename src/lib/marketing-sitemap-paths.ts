@@ -9,6 +9,7 @@ export type MarketingSitemapEntry = {
 
 export const MARKETING_SITEMAP_ENTRIES: MarketingSitemapEntry[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1 },
+  { path: '/winkel', changeFrequency: 'weekly', priority: 0.98 },
   { path: '/prijzen', changeFrequency: 'weekly', priority: 0.95 },
   { path: '/registreer', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/licentie', changeFrequency: 'monthly', priority: 0.85 },
