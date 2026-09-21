@@ -76,8 +76,8 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
       alt: 'Bakker aan het werk: broodjes snijden en verse bollerig brood in de bakkerij',
     },
     extraImage: {
-      src: '/images/winkel/winkel-eigen-website-card.png',
-      alt: 'Voorbeeldwebsite van een bakkerij met online bestellen',
+      src: '/images/sectoren/bakkerij-assortiment.jpg',
+      alt: 'Assortiment gebak en taart in de toonbank van een bakkerij',
     },
     sections: [
       {
