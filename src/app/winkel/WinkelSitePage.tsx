@@ -24,7 +24,7 @@ import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
-import { WhyVysionHardwareVideos } from '@/components/HardwareVideoStack'
+import WinkelHardwareVideos from './WinkelHardwareVideos'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -61,7 +61,7 @@ function GratisWebsiteBannerSection() {
   )
 }
 
-/** @see HardwareVideoStack — showcase-video in Waarom Vysion */
+/** @see WinkelHardwareVideos — winkelskassa + voorraad, niet de horeca-clips */
 
 function WhyVysionSection() {
   const { t, locale } = useLanguage()
@@ -121,7 +121,7 @@ function WhyVysionSection() {
           </ul>
 
           <div className="order-1 lg:order-2 relative flex w-full flex-col gap-8 self-start sm:gap-10 lg:gap-12 lg:pl-6 xl:pl-10">
-            <WhyVysionHardwareVideos />
+            <WinkelHardwareVideos />
             <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="relative z-10 w-full shrink-0 lg:justify-start lg:px-0" />
           </div>
         </div>
