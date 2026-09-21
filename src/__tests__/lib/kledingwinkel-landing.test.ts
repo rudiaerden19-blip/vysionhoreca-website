@@ -1,3 +1,4 @@
+import { MARKETING_FAQ_KASSA_AANPASSEN } from '@/lib/marketing-kassa-aanpassen-faq'
 import {
   KLEDINGWINKEL_FAQS,
   KLEDINGWINKEL_H1,
@@ -15,6 +16,10 @@ describe('kledingwinkel landing', () => {
     expect(KLEDINGWINKEL_TITLE).toBe('Kassasysteem voor kledingwinkels | Vysion kassa')
     expect(KLEDINGWINKEL_PATH).toBe('/sectoren/kledingwinkel')
     expect(kledingwinkelCanonicalUrl()).toBe('https://www.vysion-kassa.com/sectoren/kledingwinkel')
+  })
+
+  it('includes kassa-aanpassen FAQ', () => {
+    expect(KLEDINGWINKEL_FAQS.some((f) => f.question === MARKETING_FAQ_KASSA_AANPASSEN.question)).toBe(true)
   })
 
   it('matches FAQ JSON-LD to the visible questions and answers', () => {

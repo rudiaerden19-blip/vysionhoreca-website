@@ -1,3 +1,4 @@
+import { MARKETING_FAQ_KASSA_AANPASSEN } from '@/lib/marketing-kassa-aanpassen-faq'
 import {
   SECTOR_LANDINGS,
   SECTOR_LANDING_SLUGS,
@@ -29,6 +30,15 @@ describe('sector landings', () => {
       const blob = [landing.title, landing.description, landing.h1, landing.intro, ...landing.sections.flatMap((s) => s.body)].join(' ')
       expect(blob.toLowerCase()).not.toMatch(/snelste|#1|nummer 1|beste kassa/)
       expect(landing.title.toLowerCase()).not.toContain('i9')
+    }
+  })
+
+  it('includes kassa-aanpassen FAQ on every sector landing', () => {
+    for (const slug of SECTOR_LANDING_SLUGS) {
+      const faqs = SECTOR_LANDINGS[slug].faqs
+      expect(faqs.some((f) => f.question === MARKETING_FAQ_KASSA_AANPASSEN.question)).toBe(true)
+      const match = faqs.find((f) => f.question === MARKETING_FAQ_KASSA_AANPASSEN.question)
+      expect(match?.answer).toBe(MARKETING_FAQ_KASSA_AANPASSEN.answer)
     }
   })
 

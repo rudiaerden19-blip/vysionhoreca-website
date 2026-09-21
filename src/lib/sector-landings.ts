@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { MARKETING_FAQ_KASSA_AANPASSEN } from '@/lib/marketing-kassa-aanpassen-faq'
 import { VYSION_BRAND_SITE_NAME, VYSION_CANONICAL_ORIGIN } from '@/lib/vysion-site'
 
 export type SectorCluster = 'winkel' | 'horeca'
@@ -54,7 +55,21 @@ function relatedExcept(list: typeof WINKEL_RELATED, href: string) {
   return list.filter((item) => item.href !== href)
 }
 
-export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
+function ensureKassaAanpassenFaq(faqs: SectorFaq[]): SectorFaq[] {
+  if (faqs.some((f) => f.question === MARKETING_FAQ_KASSA_AANPASSEN.question)) return faqs
+  return [...faqs, MARKETING_FAQ_KASSA_AANPASSEN]
+}
+
+function applyStandardSectorFaqs(landings: Record<string, SectorLanding>): Record<string, SectorLanding> {
+  return Object.fromEntries(
+    Object.entries(landings).map(([slug, landing]) => [
+      slug,
+      { ...landing, faqs: ensureKassaAanpassenFaq(landing.faqs) },
+    ]),
+  )
+}
+
+const SECTOR_LANDINGS_RAW: Record<string, SectorLanding> = {
   bakkerij: {
     slug: 'bakkerij',
     path: '/sectoren/bakkerij',
@@ -418,11 +433,6 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
         question: 'Kan ik honderden artikelen in voorraad houden?',
         answer: 'Ja. Voorraad, import, inkoop en goederenontvangst horen bij de licentie.',
       },
-      {
-        question: 'Kan ik mijn kassa laten aanpassen?',
-        answer:
-          'Jazeker. Je kunt je kassa gratis laten aanpassen naar jouw smaak. Heb je een module nodig die echt bij jouw zaak past? Geen probleem — wij bouwen die gratis in je kassa.',
-      },
     ],
     breadcrumbLabel: 'Nachtwinkel',
     related: relatedExcept(WINKEL_RELATED, '/sectoren/nachtwinkel'),
@@ -777,6 +787,8 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     ogImage: '/images/hardware/hardware-tf30-kassa.png',
   },
 }
+
+export const SECTOR_LANDINGS = applyStandardSectorFaqs(SECTOR_LANDINGS_RAW)
 
 export const SECTOR_LANDING_SLUGS = Object.keys(SECTOR_LANDINGS)
 

@@ -1,3 +1,4 @@
+import { MARKETING_FAQ_KASSA_AANPASSEN } from '@/lib/marketing-kassa-aanpassen-faq'
 import { VYSION_BRAND_SITE_NAME, VYSION_CANONICAL_ORIGIN } from '@/lib/vysion-site'
 
 export const KLEDINGWINKEL_PATH = '/sectoren/kledingwinkel' as const
@@ -72,6 +73,7 @@ export const KLEDINGWINKEL_FAQS: readonly KledingwinkelFaq[] = [
     answer:
       'Ja. Je stuurt de kassabon of een factuur meteen per e-mail. Op het klantenscherm ziet de klant de prijs tijdens het afrekenen.',
   },
+  MARKETING_FAQ_KASSA_AANPASSEN,
 ] as const
 
 export const KLEDINGWINKEL_BREADCRUMBS = [

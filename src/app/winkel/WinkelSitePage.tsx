@@ -21,6 +21,7 @@ import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import { WinkelSectorLinks } from '@/components/MarketingSectorLinks'
+import MarketingKassaAanpassenFaqSection from '@/components/MarketingKassaAanpassenFaqSection'
 import WinkelHardwareVideos from './WinkelHardwareVideos'
 import {
   WINKEL_PRICING_MODULE_IDS,
@@ -1385,6 +1386,7 @@ export default function WinkelSitePage() {
       <StatsAndLiveDemoSection />
       <PricingSection />
       <TestimonialSection />
+      <MarketingKassaAanpassenFaqSection />
       <ContactPageSection sectionId="contact" />
       <Footer />
       <CookieBanner />
