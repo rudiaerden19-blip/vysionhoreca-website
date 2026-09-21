@@ -123,7 +123,14 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hardware:
       'Bij de premium licentie hoort professionele kassahardware: Elo-touchscreen, optionele barcodescanner, elektrische kassalade en Epson-bonprinter. Zonder hardware gebruik je de software op je eigen scherm.',
     hardwareImages: [
-      { src: '/images/hardware/hardware-tf30-kassa.png', alt: 'Elo-touchscreen kassa', contain: true },
+      {
+        src: '/images/sectoren/bakkerij-hardware-kassa.jpg',
+        alt: 'Touchscreenkassa aan de toonbank in een bakkerij, medewerker bedient klant',
+      },
+      {
+        src: '/images/sectoren/bakkerij-hardware-betalen.jpg',
+        alt: 'Klant betaalt aan de kassa in een bakkerij met koffie en gebak op de toonbank',
+      },
     ],
     faqs: [
       {
