@@ -1,20 +1,19 @@
 import type { Metadata } from 'next'
 
 import { VYSION_CANONICAL_ORIGIN, VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
+import {
+  MARKETING_HOME_DESCRIPTION,
+  MARKETING_HOME_TITLE,
+} from '@/lib/marketing-home-seo'
 
 const siteUrl = VYSION_CANONICAL_ORIGIN
 
-/** SEO homepage (/): kernzoektermen kassa, bestelplatform, hardware, gratis proberen. */
-const HOME_TITLE =
-  `Kassa, online bestelplatform & hardware | Gratis proberen | ${VYSION_BRAND_SITE_NAME}`
-const HOME_DESCRIPTION =
-  'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa: touchscreen POS, webshop, premium kassahardware (Intel i9). 14 dagen gratis — reserveringen, keukenscherm, WhatsApp, 9 talen. België & Nederland.'
-
 export const metadata: Metadata = {
   title: {
-    absolute: HOME_TITLE,
+    absolute: MARKETING_HOME_TITLE,
   },
-  description: HOME_DESCRIPTION,
+  description: MARKETING_HOME_DESCRIPTION,
+  robots: { index: true, follow: true },
   keywords: [
     'kassa software',
     'gratis kassa',
@@ -36,8 +35,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
+    title: MARKETING_HOME_TITLE,
+    description: MARKETING_HOME_DESCRIPTION,
     type: 'website',
     locale: 'nl_BE',
     url: siteUrl,
@@ -46,8 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
+    title: MARKETING_HOME_TITLE,
+    description: MARKETING_HOME_DESCRIPTION,
     images: ['/images/online-order-platform-1.png'],
   },
 }

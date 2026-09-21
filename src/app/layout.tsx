@@ -71,9 +71,9 @@ const organizationJsonLd = {
       operatingSystem: 'Web, Android, iOS',
       offers: {
         '@type': 'Offer',
-        price: '0',
-        priceCurrency: 'EUR',
-        description: '14 dagen gratis proberen',
+        url: `${siteUrl}/prijzen`,
+        description: '14 dagen gratis proberen — licentie met software en optionele kassahardware',
+        availability: 'https://schema.org/InStock',
       },
       publisher: { '@id': `${siteUrl}/#organization`},
       url: siteUrl,
@@ -85,7 +85,7 @@ const organizationJsonLd = {
       name: VYSION_BRAND_SITE_NAME,
       alternateName: [VYSION_BRAND_PRODUCT_NAME],
       description:
-        'Zoek je een kassa, online bestelplatform of gratis uitproberen? Vysion kassa combineert POS, bestellen, hardware en reserveringen voor België en Nederland.',
+        'Kassasysteem en kassa voor horeca en zaken: POS, online bestellen, reservaties, keukenscherm en webshop. België en Nederland.',
       publisher: { '@id': `${siteUrl}/#organization`},
       inLanguage: 'nl-BE',
     },

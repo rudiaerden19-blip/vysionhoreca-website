@@ -1,5 +1,3 @@
-'use client'
-
 import {
   HORECA_SECTOR_LINKS,
   WINKEL_SECTOR_LINKS,

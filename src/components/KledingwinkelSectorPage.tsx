@@ -125,8 +125,17 @@ export default function KledingwinkelSectorPage() {
                   <li>Scannen aan de kassa, etiketten printen wanneer je dat nodig hebt.</li>
                   <li>Retour, omruilen en tegoedbon horen bij de toonbank.</li>
                 </ul>
-                <div className="mt-8">
+                <div className="mt-8 flex flex-col items-start gap-3 sm:items-stretch">
                   <CtaRow />
+                  <p className="text-sm text-gray-600 text-center sm:text-left">
+                    <a href="/prijzen" className="font-semibold text-accent underline-offset-2 hover:underline">
+                      Bekijk prijzen en licenties
+                    </a>
+                    {' · '}
+                    <a href="/winkel" className="font-semibold text-accent underline-offset-2 hover:underline">
+                      Alle winkelfuncties
+                    </a>
+                  </p>
                 </div>
               </div>
               <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-home-image">

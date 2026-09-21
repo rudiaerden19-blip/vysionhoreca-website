@@ -90,8 +90,17 @@ export default function SectorLandingPage({ landing }: { landing: SectorLanding 
                     <li key={bullet}>{bullet}</li>
                   ))}
                 </ul>
-                <div className="mt-8">
+                <div className="mt-8 flex flex-col items-start gap-3 sm:items-stretch">
                   <CtaRow demoHref={landing.demoHref} />
+                  <p className="text-sm text-gray-600 text-center sm:text-left">
+                    <a href="/prijzen" className="font-semibold text-accent underline-offset-2 hover:underline">
+                      Bekijk prijzen en licenties
+                    </a>
+                    {' · '}
+                    <a href={landing.hubHref} className="font-semibold text-accent underline-offset-2 hover:underline">
+                      {landing.cluster === 'winkel' ? 'Alle winkelfuncties' : 'Alle horecafuncties'}
+                    </a>
+                  </p>
                 </div>
               </div>
               {landing.heroImage ? <SectorImage image={landing.heroImage} priority /> : null}
