@@ -194,19 +194,19 @@ export default function KledingwinkelSectorPage() {
             <div className="grid gap-6 sm:grid-cols-2">
               <figure className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <Image
-                  src="/images/hardware/hardware-tf30-kassa.png"
-                  alt="Elo-touchscreen kassa"
+                  src="/images/sectoren/kledingwinkel-hardware-kassa.jpg"
+                  alt="Medewerker werkt achter de kassa in een kledingwinkel"
                   fill
-                  className="object-contain object-center p-6"
+                  className="object-cover object-center"
                   sizes="(min-width: 640px) 28rem, 100vw"
                 />
               </figure>
               <figure className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <Image
-                  src="/images/hardware/hardware-barcode-scanner.png"
-                  alt="Barcodescanner voor de kassa"
+                  src="/images/sectoren/kledingwinkel-hardware-scanner.jpg"
+                  alt="Barcodescanner scant het label van een kledingstuk aan de kassa"
                   fill
-                  className="object-contain object-center p-6"
+                  className="object-cover object-center"
                   sizes="(min-width: 640px) 28rem, 100vw"
                 />
               </figure>
