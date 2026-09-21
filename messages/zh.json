@@ -6594,8 +6594,8 @@
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."
     },
     "gratisWebsite": {
-      "title": "Free webshop for your shop",
-      "body": "Your subscription includes your own webshop, at no extra cost. Colours, photos and texts are yours to change.",
+      "title": "店铺免费网站",
+      "body": "订阅包含您自己的网站，无需额外费用。颜色、照片和文字均可自行调整。",
       "cta": "See an example"
     },
     "kiosk": {
