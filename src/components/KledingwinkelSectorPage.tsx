@@ -1,12 +1,14 @@
 import Image from 'next/image'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
+import MarketingSectorLinks from '@/components/MarketingSectorLinks'
 import {
   KLEDINGWINKEL_BREADCRUMBS,
   KLEDINGWINKEL_FAQS,
   KLEDINGWINKEL_H1,
   KLEDINGWINKEL_OG_IMAGE,
 } from '@/lib/kledingwinkel-landing'
+import { WINKEL_SECTOR_LINKS } from '@/lib/sector-landings'
 
 const SECTIONS = [
   {
@@ -265,6 +267,12 @@ export default function KledingwinkelSectorPage() {
             <CtaRow />
           </div>
         </section>
+
+        <MarketingSectorLinks
+          title="Vysion voor jouw zaak"
+          links={WINKEL_SECTOR_LINKS.filter((link) => link.href !== '/sectoren/kledingwinkel')}
+          compact
+        />
       </main>
       <Footer />
       <CookieBanner />

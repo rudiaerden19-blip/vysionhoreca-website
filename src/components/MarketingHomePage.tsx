@@ -25,6 +25,7 @@ import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import { WhyVysionHardwareVideos } from '@/components/HardwareVideoStack'
+import { HorecaSectorLinks } from '@/components/MarketingSectorLinks'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -1478,6 +1479,7 @@ export default function MarketingHomePage() {
       <Navigation />
       <HomeLandingHero />
       <WhyVysionSection />
+      <HorecaSectorLinks />
       <ConnectedSystemHubSection />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />

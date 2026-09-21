@@ -4,13 +4,16 @@ import { VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 import { useLanguage } from '@/i18n'
 import BackToTopBar from '@/components/BackToTopBar'
 import { usePathname } from 'next/navigation'
-import { marketingSiteHashHref } from '@/lib/landing-branch-choice'
+import { landingBranchFromPathname, marketingSiteHashHref } from '@/lib/landing-branch-choice'
+import { HORECA_SECTOR_LINKS, WINKEL_SECTOR_LINKS } from '@/lib/sector-landings'
 
 export default function Footer() {
   const { t } = useLanguage()
   const pathname = usePathname()
   const pricingHref = marketingSiteHashHref(pathname, 'prijzen')
   const contactHref = marketingSiteHashHref(pathname, 'contact')
+  const footerSectors =
+    landingBranchFromPathname(pathname) === 'winkel' ? WINKEL_SECTOR_LINKS : HORECA_SECTOR_LINKS
 
   return (
     <>
@@ -117,17 +120,16 @@ export default function Footer() {
                     {t('footer.winkelRetail')}
                   </a>
                 </li>
-                {pathname === '/winkel' || pathname === '/sectoren/kledingwinkel' ? (
-                  <li>
+                {footerSectors.map((link) => (
+                  <li key={link.href}>
                     <a
-                      href="/sectoren/kledingwinkel"
-                      title={t('footer.kledingwinkelLinkTitle')}
+                      href={link.href}
                       className="text-gray-400 hover:text-white transition-colors"
                     >
-                      {t('footer.kledingwinkel')}
+                      {link.label}
                     </a>
                   </li>
-                ) : null}
+                ))}
                 <li>
                   <a
                     href={pricingHref}

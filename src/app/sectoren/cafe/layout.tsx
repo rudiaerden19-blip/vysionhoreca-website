@@ -1,36 +1,6 @@
-import type { Metadata } from 'next'
+import { sectorLandingMetadata } from '@/lib/sector-landings'
 
-const canonical = '/sectoren/cafe'
-
-export const metadata: Metadata = {
-  title: {
-    absolute: 'kassa voor Cafés | i9 Dual-Screen & 9 Talen | Vysion kassa',
-  },
-  description:
-    'Café: razendsnelle i9-kassa (Het Beest), 9 talen, dubbel scherm. Snelste kassa — kassasysteem België & Nederland.',
-  keywords: [
-    'kassa',
-    'café kassa',
-    'snelste kassa',
-    'kassa kopen',
-    'kassasysteem België',
-    'i9 kassa',
-    'online bestellen',
-  ],
-  alternates: { canonical },
-  openGraph: {
-    title: 'kassa voor Cafés | i9 Dual-Screen & 9 Talen | Vysion kassa',
-    description:
-      'Café: i9, 9 talen, snelle checkout. Kassasysteem België — start gratis.',
-    url: canonical,
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'kassa voor Cafés | i9 Dual-Screen & 9 Talen | Vysion kassa',
-    description: 'Café POS met i9 en 9 talen. Gratis proberen — België & Nederland.',
-  },
-}
+export const metadata = sectorLandingMetadata('cafe')
 
 export default function CafeSectorLayout({ children }: { children: React.ReactNode }) {
   return children

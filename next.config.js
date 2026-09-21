@@ -187,7 +187,12 @@ const nextConfig = {
       },
       {
         source: '/sectoren/hardware-en-platform',
-        destination: '/sectoren/retail',
+        destination: '/winkel',
+        permanent: true,
+      },
+      {
+        source: '/sectoren/retail',
+        destination: '/winkel',
         permanent: true,
       },
       {

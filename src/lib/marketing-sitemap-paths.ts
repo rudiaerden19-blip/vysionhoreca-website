@@ -35,7 +35,9 @@ export const MARKETING_SITEMAP_ENTRIES: MarketingSitemapEntry[] = [
   { path: '/sectoren/kebab', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/sectoren/kapper', changeFrequency: 'monthly', priority: 0.85 },
   { path: '/sectoren/kledingwinkel', changeFrequency: 'monthly', priority: 0.86 },
-  { path: '/sectoren/retail', changeFrequency: 'monthly', priority: 0.85 },
+  { path: '/sectoren/slagerij', changeFrequency: 'monthly', priority: 0.85 },
+  { path: '/sectoren/restaurant', changeFrequency: 'monthly', priority: 0.86 },
+  { path: '/sectoren/nachtwinkel', changeFrequency: 'monthly', priority: 0.84 },
 ]
 
 export function marketingSitemapUrl(path: string): string {

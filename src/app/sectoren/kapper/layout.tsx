@@ -1,34 +1,6 @@
-import type { Metadata } from 'next'
+import { sectorLandingMetadata } from '@/lib/sector-landings'
 
-const canonical = '/sectoren/kapper'
-
-export const metadata: Metadata = {
-  title: {
-    absolute: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
-  },
-  description:
-    'Salon-upgrade: professionele i9-kassa (Het Beest), eenvoudig afrekenen, 9 talen. Snelste kassa voor salons — kassasysteem België & Nederland.',
-  keywords: [
-    'kapper kassa',
-    'salon kassa',
-    'snelste kassa',
-    'kassa kopen',
-    'kassasysteem België',
-    'i9 kassa',
-  ],
-  alternates: { canonical },
-  openGraph: {
-    title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
-    description: 'Kappers & salons: i9, stijlvolle checkout. Kassasysteem België — start gratis.',
-    url: canonical,
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
-    description: 'Salon POS met i9-kracht. Kassasysteem België — probeer gratis.',
-  },
-}
+export const metadata = sectorLandingMetadata('kapper')
 
 export default function KapperSectorLayout({ children }: { children: React.ReactNode }) {
   return children

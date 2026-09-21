@@ -144,6 +144,8 @@ describe('landing branch columns', () => {
     expect(landingBranchFromPathname('/winkel')).toBe('winkel')
     expect(landingBranchFromPathname('/retail')).toBe('winkel')
     expect(landingBranchFromPathname('/sectoren/kledingwinkel')).toBe('winkel')
+    expect(landingBranchFromPathname('/sectoren/bakkerij')).toBe('winkel')
+    expect(landingBranchFromPathname('/sectoren/restaurant')).toBe('horeca')
     expect(landingBranchFromPathname('/')).toBe('horeca')
     expect(landingBranchFromPathname('/over-ons')).toBe('horeca')
     expect(marketingSiteHashHref('/winkel', 'prijzen')).toBe('/winkel#prijzen')

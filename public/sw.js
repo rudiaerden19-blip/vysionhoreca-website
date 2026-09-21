@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Offline: kassa-app + statische assets + sector-marketingpagina’s; productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v17'
-const STATIC_CACHE = 'vysion-static-v17'
+const CACHE = 'vysion-kassa-v18'
+const STATIC_CACHE = 'vysion-static-v18'
 const IMAGE_CACHE = 'vysion-images-v4'
 
 /** Clone synchronously vóór de response naar de pagina gaat — anders "body already used". */
@@ -27,7 +27,10 @@ const PRECACHE_SAME_ORIGIN = [
   '/sectoren/frituur',
   '/sectoren/kebab',
   '/sectoren/kapper',
-  '/sectoren/retail',
+  '/sectoren/kledingwinkel',
+  '/sectoren/slagerij',
+  '/sectoren/restaurant',
+  '/sectoren/nachtwinkel',
 ]
 
 self.addEventListener('install', event => {

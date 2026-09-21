@@ -109,6 +109,9 @@ export function landingBranchFromPathname(
   if (path === '/sectoren/kledingwinkel' || path.startsWith('/sectoren/kledingwinkel/')) {
     return 'winkel'
   }
+  const winkelSectors = ['bakkerij', 'kapper', 'slagerij', 'nachtwinkel']
+  const sectorSlug = path.startsWith('/sectoren/') ? path.slice('/sectoren/'.length).split('/')[0] : ''
+  if (winkelSectors.includes(sectorSlug)) return 'winkel'
   return 'horeca'
 }
 

@@ -1,34 +1,7 @@
 import type { Metadata } from 'next'
 
-const canonical = '/sectoren/retail'
-
 export const metadata: Metadata = {
-  title: {
-    absolute: "Retail Kassa & Voorraadbeheer | Het i9 'Beest'voor Winkels | Vysion kassa",
-  },
-  description:
-    'Winkelvoorraad op krachtige i9-kassa (16 GB RAM), touchscreen POS, gratis website-integratie. Snelste retail kassa — kassasysteem België & Nederland.',
-  keywords: [
-    'retail kassa',
-    'winkel kassa',
-    'voorraad kassa',
-    'snelste kassa',
-    'kassa kopen',
-    'kassasysteem België',
-    'i9 kassa',
-  ],
-  alternates: { canonical },
-  openGraph: {
-    title: "Retail Kassa & Voorraadbeheer | Het i9 'Beest'voor Winkels | Vysion kassa",
-    description: 'Retail: i9, voorraad, snelle checkout. Kassasysteem België — start gratis.',
-    url: canonical,
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: "Retail Kassa & Voorraadbeheer | Het i9 'Beest'voor Winkels | Vysion kassa",
-    description: 'Retail POS met i9. Kassa kopen of proef — België & Nederland.',
-  },
+  robots: { index: false, follow: true },
 }
 
 export default function RetailSectorLayout({ children }: { children: React.ReactNode }) {

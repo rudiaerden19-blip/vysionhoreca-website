@@ -42,12 +42,12 @@ describe('kledingwinkel landing', () => {
     ])
   })
 
-  it('adds the clothing page to the marketing sitemap as the 28th URL', () => {
+  it('adds the clothing page to the marketing sitemap without the old retail duplicate', () => {
     const paths = MARKETING_SITEMAP_ENTRIES.map((entry) => entry.path)
-    expect(paths).toHaveLength(28)
-    expect(new Set(paths).size).toBe(28)
+    expect(paths).toHaveLength(30)
+    expect(new Set(paths).size).toBe(30)
     expect(paths).toContain('/sectoren/kledingwinkel')
     expect(paths).toContain('/winkel')
-    expect(paths).toContain('/sectoren/retail')
+    expect(paths).not.toContain('/sectoren/retail')
   })
 })

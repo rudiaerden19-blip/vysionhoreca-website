@@ -1,7 +1,6 @@
-import SectorSeoPage from '@/components/SectorSeoPage'
-import { SECTOR_SEO_ROUTES } from '@/lib/sector-seo-routes'
+import { permanentRedirect } from 'next/navigation'
 
+/** Zelfde zoekintentie als /winkel — permanente redirect, geen dunne duplicate. */
 export default function RetailSectorPage() {
-  const c = SECTOR_SEO_ROUTES.retail
-  return <SectorSeoPage sectorKey={c.sectorKey} imageSrc={c.imageSrc} />
+  permanentRedirect('/winkel')
 }
