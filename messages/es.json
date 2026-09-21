@@ -6567,6 +6567,15 @@
       "teaser": "No desperdicie papel: envíe los tickets de compra por correo al cliente.",
       "imageAlt": "Ticket de caja impreso en el mostrador"
     },
+    "platformKassasysteem": {
+      "imageAlt": "Caja de tienda en el mostrador de una panadería"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "Sitio web de ejemplo de una panadería"
+    },
+    "platformRapporten": {
+      "imageAlt": "Comerciante revisando el informe Z en un portátil"
+    },
     "usecasesTitle": "Para cada tienda",
     "modulesTitle": "Lo que obtiene en la tienda",
     "hardwareTitle": "Hardware para el mostrador",

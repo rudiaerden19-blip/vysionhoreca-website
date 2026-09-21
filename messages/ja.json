@@ -6567,6 +6567,15 @@
       "teaser": "紙を無駄にせず、購入レシートをお客様へ直接メールします。",
       "imageAlt": "カウンター上の印刷レシート"
     },
+    "platformKassasysteem": {
+      "imageAlt": "ベーカリーのカウンターにある店舗レジ"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "ベーカリーのウェブサイト例"
+    },
+    "platformRapporten": {
+      "imageAlt": "店主がノートPCでZレポートを確認している様子"
+    },
     "usecasesTitle": "あらゆるお店に",
     "modulesTitle": "お店で使える機能",
     "hardwareTitle": "カウンター向けハードウェア",

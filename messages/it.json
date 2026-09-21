@@ -6567,6 +6567,15 @@
       "teaser": "Non sprecare carta: invia gli scontrini d'acquisto direttamente via e-mail al cliente.",
       "imageAlt": "Scontrino stampato sul bancone"
     },
+    "platformKassasysteem": {
+      "imageAlt": "Cassa del negozio sul bancone di una panetteria"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "Sito web di esempio di una panetteria"
+    },
+    "platformRapporten": {
+      "imageAlt": "Negoziante che consulta il report Z su un laptop"
+    },
     "usecasesTitle": "Per ogni negozio",
     "modulesTitle": "Cosa hai in negozio",
     "hardwareTitle": "Hardware per il bancone",

@@ -6567,6 +6567,15 @@
       "teaser": "不浪费纸张，将购物小票直接发送到顾客邮箱。",
       "imageAlt": "柜台上的收银小票"
     },
+    "platformKassasysteem": {
+      "imageAlt": "面包店柜台上的店铺收银机"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "面包店网站示例"
+    },
+    "platformRapporten": {
+      "imageAlt": "店主在笔记本电脑上查看Z报表"
+    },
     "usecasesTitle": "适合每家店铺",
     "modulesTitle": "店铺能用到什么",
     "hardwareTitle": "柜台硬件",

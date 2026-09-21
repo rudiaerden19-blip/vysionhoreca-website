@@ -6567,6 +6567,15 @@
       "teaser": "لا تهدر الورق وأرسل إيصالات الشراء مباشرة إلى بريد الزبون.",
       "imageAlt": "إيصال صندوق مطبوع على المنضدة"
     },
+    "platformKassasysteem": {
+      "imageAlt": "صندوق متجر على منضدة مخبز"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "موقع إلكتروني نموذجي لمخبز"
+    },
+    "platformRapporten": {
+      "imageAlt": "صاحب متجر يراجع تقرير Z على حاسوب محمول"
+    },
     "usecasesTitle": "لكل متجر",
     "modulesTitle": "ما تحصل عليه في المتجر",
     "hardwareTitle": "أجهزة للكاونتر",

@@ -6590,6 +6590,15 @@
       "teaser": "Verschwenden Sie kein Papier und lassen Sie die Kaufbelege direkt an den Kunden mailen.",
       "imageAlt": "Gedruckter Kassenbon auf der Theke"
     },
+    "platformKassasysteem": {
+      "imageAlt": "Ladenkasse auf der Theke einer Bäckerei"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "Beispielwebsite einer Bäckerei"
+    },
+    "platformRapporten": {
+      "imageAlt": "Ladeninhaber prüft den Z-Bericht auf einem Laptop"
+    },
     "usecasesTitle": "Für jeden Laden",
     "modulesTitle": "Was Sie im Laden bekommen",
     "hardwareTitle": "Hardware für die Theke",

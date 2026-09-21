@@ -1522,6 +1522,10 @@ export default function WinkelSitePage() {
       <VysionBeestSection />
       <PlatformGridSection
         itemOverrides={{
+          kassasysteem: {
+            cardHeaderImage: '/images/winkel/winkel-kassasysteem-card.png',
+            cardHeaderAltKey: 'winkelSite.platformKassasysteem.imageAlt',
+          },
           keukenschermen: {
             titleKey: 'winkelSite.platformBarcode.title',
             teaserKey: 'winkelSite.platformBarcode.teaser',
@@ -1534,6 +1538,14 @@ export default function WinkelSitePage() {
             teaserKey: 'winkelSite.platformDigitalReceipt.teaser',
             cardHeaderImage: '/images/winkel/winkel-digitale-kassabon-card.png',
             cardHeaderAltKey: 'winkelSite.platformDigitalReceipt.imageAlt',
+          },
+          'eigen-website': {
+            cardHeaderImage: '/images/winkel/winkel-eigen-website-card.png',
+            cardHeaderAltKey: 'winkelSite.platformEigenWebsite.imageAlt',
+          },
+          rapporten: {
+            cardHeaderImage: '/images/winkel/winkel-rapporten-card.png',
+            cardHeaderAltKey: 'winkelSite.platformRapporten.imageAlt',
           },
         }}
       />

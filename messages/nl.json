@@ -6526,6 +6526,15 @@
       "teaser": "Verspil geen papier en laat de aankoopbonnen rechtstreeks mailen naar de klant.",
       "imageAlt": "Gedrukte kassabon op de toonbank"
     },
+    "platformKassasysteem": {
+      "imageAlt": "Winkelskassa op de toonbank van een bakkerij"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "Voorbeeldwebsite van een bakkerij"
+    },
+    "platformRapporten": {
+      "imageAlt": "Winkelier bekijkt het Z-rapport op een laptop"
+    },
     "usecasesTitle": "Voor iedere winkel",
     "modulesTitle": "Wat u in de winkel krijgt",
     "hardwareTitle": "Hardware voor de toonbank",

@@ -6526,6 +6526,15 @@
       "teaser": "Don't waste paper — email purchase receipts straight to the customer.",
       "imageAlt": "Printed till receipt on the counter"
     },
+    "platformKassasysteem": {
+      "imageAlt": "Shop till on a bakery counter"
+    },
+    "platformEigenWebsite": {
+      "imageAlt": "Example bakery shop website"
+    },
+    "platformRapporten": {
+      "imageAlt": "Shop owner reviewing the Z-report on a laptop"
+    },
     "usecasesTitle": "For every shop",
     "modulesTitle": "What you get in the shop",
     "hardwareTitle": "Hardware for the counter",

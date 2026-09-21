@@ -9,8 +9,8 @@ const cardShellClasses =
   'group flex h-full min-h-[22rem] sm:min-h-[21rem] xl:min-h-[19.5rem] flex-col rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
 
 export type PlatformGridItemOverride = {
-  titleKey: string
-  teaserKey: string
+  titleKey?: string
+  teaserKey?: string
   cardHeaderImage?: string
   cardHeaderAltKey?: string
   headerImageContain?: boolean
