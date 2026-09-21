@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { useLanguage } from '@/i18n'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import SubscriptionsTermsPopup from '@/components/SubscriptionsTermsPopup'
-import KassaProductNavMenu from '@/components/KassaProductNavMenu'
 import GoogleReviewsHeroBadge from '@/components/GoogleReviewsHeroBadge'
 import {
   monthlyPriceForHardware,
@@ -249,11 +248,13 @@ export default function RetailLandingHero() {
 
         {isMenuOpen && (
           <div className="mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1 sm:hidden">
-            <KassaProductNavMenu
-              linkClass="block py-3 px-3 rounded-lg text-white font-medium hover:bg-white/10 w-full"
-              layout="mobile"
-              onNavigate={() => setIsMenuOpen(false)}
-            />
+            <a
+              href="/winkel"
+              className="block py-3 px-3 rounded-lg text-white font-medium hover:bg-white/10 w-full"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t('nav.home')}
+            </a>
             {pillLinks.map(({ href, label }) => (
               <a
                 key={href + label}

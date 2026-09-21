@@ -20,7 +20,9 @@ export default function Navigation() {
   const langRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, t, locales, localeNames } = useLanguage()
   const pathname = usePathname()
-  const homeHref = landingSitePathForBranch(landingBranchFromPathname(pathname))
+  const landingBranch = landingBranchFromPathname(pathname)
+  const isHorecaPage = landingBranch === 'horeca'
+  const homeHref = landingSitePathForBranch(landingBranch)
   const pricingHref = marketingSiteHashHref(pathname, 'prijzen')
 
   // Sluit taalmenu bij klik/tik buiten (pointerdown: betrouwbaarder op iPad dan mousedown)
@@ -62,7 +64,11 @@ export default function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1 ml-12">
-            <KassaProductNavMenu linkClass={navLinkClass} layout="desktop" />
+            {isHorecaPage ? (
+              <KassaProductNavMenu linkClass={navLinkClass} layout="desktop" />
+            ) : (
+              <a href={homeHref} className={navLinkClass}>{t('nav.home')}</a>
+            )}
             <a href={pricingHref} className={navLinkClass}>{t('nav.pricing')}</a>
             <a href="/licentie" className={navLinkClass}>{t('nav.license')}</a>
             <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
@@ -144,11 +150,17 @@ export default function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-700">
             <div className="flex flex-col gap-1">
-              <KassaProductNavMenu
-                linkClass={navLinkClassMobile}
-                layout="mobile"
-                onNavigate={() => setIsMenuOpen(false)}
-              />
+              {isHorecaPage ? (
+                <KassaProductNavMenu
+                  linkClass={navLinkClassMobile}
+                  layout="mobile"
+                  onNavigate={() => setIsMenuOpen(false)}
+                />
+              ) : (
+                <a href={homeHref} className={navLinkClassMobile} onClick={() => setIsMenuOpen(false)}>
+                  {t('nav.home')}
+                </a>
+              )}
               <a href={pricingHref} className={navLinkClassMobile}>{t('nav.pricing')}</a>
               <a href="/over-ons" className={navLinkClassMobile}>{t('nav.about')}</a>
               <a href="/support" className={navLinkClassMobile}>{t('nav.support')}</a>
