@@ -304,7 +304,14 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hardware:
       'Premium licentie: Elo-touchscreen, optionele scanner, kassalade en Epson-bonprinter. Zonder hardware werkt de software op je eigen scherm.',
     hardwareImages: [
-      { src: '/images/hardware/hardware-tf30-kassa.png', alt: 'Elo-touchscreen kassa', contain: true },
+      {
+        src: '/images/sectoren/kapper-hardware-kassa.jpg',
+        alt: 'Touchscreenkassa met klantenscherm aan de salonbalie',
+      },
+      {
+        src: '/images/sectoren/kapper-hardware-betalen.jpg',
+        alt: 'Kapster helpt klant afrekenen met pinterminal aan de balie',
+      },
     ],
     faqs: [
       {
