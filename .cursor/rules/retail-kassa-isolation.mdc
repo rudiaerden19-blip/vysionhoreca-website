@@ -16,7 +16,7 @@ Zie ook **`horeca-kassa-never-touch.mdc`**: horeca-kassa **nooit** aanraken.
 
 - `src/app/shop/[tenant]/admin/retail-kassa/**`
 - `src/components/retail-kassa/**`
-- `src/lib/retail-kassa-pos.ts`, `src/lib/retail-pos-catalog.ts`, retail-API’s onder `src/app/api/retail/**`
+- `src/lib/retail-kassa-pos.ts`, `src/lib/retail-pos-catalog.ts`, `src/lib/kassa-layout-chrome.ts`, retail-API’s onder `src/app/api/retail/**`
 
 ## Gedeelde code
 
