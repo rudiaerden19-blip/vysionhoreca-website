@@ -106,6 +106,9 @@ export function landingBranchFromPathname(
   const path = (pathname || '/').split('?')[0].replace(/\/+$/, '') || '/'
   if (path === '/winkel' || path.startsWith('/winkel/')) return 'winkel'
   if (path === '/retail' || path.startsWith('/retail/')) return 'winkel'
+  if (path === '/sectoren/kledingwinkel' || path.startsWith('/sectoren/kledingwinkel/')) {
+    return 'winkel'
+  }
   return 'horeca'
 }
 

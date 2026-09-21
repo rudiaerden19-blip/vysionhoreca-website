@@ -664,6 +664,8 @@
     "legalLinkTitle": "Términos e información legal",
     "winkelRetail": "Sistema de caja para tiendas",
     "winkelRetailLinkTitle": "Sistema de caja para tiendas y retail",
+    "kledingwinkel": "Sistema de caja para tiendas de ropa",
+    "kledingwinkelLinkTitle": "Sistema de caja para tiendas de ropa, moda y boutiques",
     "linkAppsAria": "Vysion Apps — se abre en una pestaña nueva",
     "linkHorecaAria": "Sitio web oficial de Vysion kassa — nueva pestaña",
     "websiteLinkLabel": "Vysion kassa — sitio web oficial",
@@ -6560,6 +6562,8 @@
   "winkelSite": {
     "title": "La caja completa para tu tienda",
     "seoLead": "Vysion es un sistema de caja para tiendas y retail. Gestionas venta, stock, clientes y tu tienda online desde una sola pantalla — sin paquetes sueltos.",
+    "kledingwinkelLead": "¿Tienes una tienda de ropa, moda o un boutique?",
+    "kledingwinkelLink": "Sistema de caja para tiendas de ropa",
     "lead": "Cobro, stock y su propia tienda online en un solo sistema. Hecho para el mostrador.",
     "point1": "Cobrar rápido con código de barras o toque",
     "point2": "Stock por producto, sin paquete extra",

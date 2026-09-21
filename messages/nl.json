@@ -982,6 +982,8 @@
     "legalLinkTitle": "Algemene voorwaarden en juridische documenten",
     "winkelRetail": "Kassasysteem voor winkels",
     "winkelRetailLinkTitle": "Kassasysteem voor winkels en retail",
+    "kledingwinkel": "Kassasysteem voor kledingwinkels",
+    "kledingwinkelLinkTitle": "Kassasysteem voor kledingwinkels, modewinkels en boetieks",
     "linkAppsAria": "Vysion Apps, opent in een nieuw venster",
     "linkHorecaAria": "Officiële website Vysion kassa, nieuw venster",
     "websiteLinkLabel": "Vysion kassa — officiële website",
@@ -6519,6 +6521,8 @@
   "winkelSite": {
     "title": "De complete kassa voor jouw winkel",
     "seoLead": "Vysion is een kassasysteem voor winkels en retail. Je regelt verkoop, voorraad, klantenbeheer en je webshop vanuit één scherm — zonder losse pakketten.",
+    "kledingwinkelLead": "Heb je een kledingwinkel, modewinkel of boetiek?",
+    "kledingwinkelLink": "Kassasysteem voor kledingwinkels",
     "lead": "Afrekenen, voorraad en je eigen webshop in één systeem. Gemaakt voor de toonbank.",
     "point1": "Snel afrekenen met barcode of tikken op het scherm",
     "point2": "Voorraad per product, zonder extra pakket",

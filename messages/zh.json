@@ -664,6 +664,8 @@
     "legalLinkTitle": "条款与法律信息",
     "winkelRetail": "门店收银系统",
     "winkelRetailLinkTitle": "门店与零售收银系统",
+    "kledingwinkel": "服装店收银系统",
+    "kledingwinkelLinkTitle": "服装店、时装店和精品店收银系统",
     "linkAppsAria": "Vysion Apps — 新标签页打开",
     "linkHorecaAria": "Vysion kassa官方网站 — 新标签页",
     "websiteLinkLabel": "Vysion kassa — 官方网站",
@@ -6560,6 +6562,8 @@
   "winkelSite": {
     "title": "适合你店铺的完整收银系统",
     "seoLead": "Vysion 是面向门店和零售的收银系统。销售、库存、客户管理和网店都在同一个屏幕上——无需额外套餐。",
+    "kledingwinkelLead": "你经营服装店、时装店或精品店吗？",
+    "kledingwinkelLink": "服装店收银系统",
     "lead": "收银、库存和自有网店集于一套系统。为柜台打造。",
     "point1": "扫码或点按即可快速结账",
     "point2": "按商品管库存，无需额外套餐",

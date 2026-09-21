@@ -982,6 +982,8 @@
     "legalLinkTitle": "Terms of use and legal information",
     "winkelRetail": "POS system for shops",
     "winkelRetailLinkTitle": "POS system for shops and retail",
+    "kledingwinkel": "POS system for clothing shops",
+    "kledingwinkelLinkTitle": "POS system for clothing shops, fashion stores and boutiques",
     "linkAppsAria": "Vysion Apps — opens in a new tab",
     "linkHorecaAria": "Official Vysion kassa website — new tab",
     "websiteLinkLabel": "Vysion kassa — official website",
@@ -6519,6 +6521,8 @@
   "winkelSite": {
     "title": "The complete POS for your shop",
     "seoLead": "Vysion is a POS system for shops and retail. You handle sales, stock, customer management and your webshop from one screen — no extra packages.",
+    "kledingwinkelLead": "Do you run a clothing shop, fashion store or boutique?",
+    "kledingwinkelLink": "POS system for clothing shops",
     "lead": "Checkout, stock and your own webshop in one system. Built for the counter.",
     "point1": "Fast checkout with barcode or tap on screen",
     "point2": "Stock per product, no extra package",

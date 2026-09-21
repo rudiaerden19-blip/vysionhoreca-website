@@ -117,6 +117,17 @@ export default function Footer() {
                     {t('footer.winkelRetail')}
                   </a>
                 </li>
+                {pathname === '/winkel' || pathname === '/sectoren/kledingwinkel' ? (
+                  <li>
+                    <a
+                      href="/sectoren/kledingwinkel"
+                      title={t('footer.kledingwinkelLinkTitle')}
+                      className="text-gray-400 hover:text-white transition-colors"
+                    >
+                      {t('footer.kledingwinkel')}
+                    </a>
+                  </li>
+                ) : null}
                 <li>
                   <a
                     href={pricingHref}

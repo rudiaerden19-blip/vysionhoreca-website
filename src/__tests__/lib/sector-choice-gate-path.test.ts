@@ -35,6 +35,12 @@ describe('shouldShowSectorChoiceGate', () => {
     expect(shouldShowSectorChoiceGate('/superadmin', host)).toBe(false)
     expect(shouldShowSectorChoiceGate('/dashboard', host)).toBe(false)
   })
+
+  it('does not cover dedicated sector landings', () => {
+    expect(shouldShowSectorChoiceGate('/sectoren/kledingwinkel', host)).toBe(false)
+    expect(shouldShowSectorChoiceGate('/sectoren/bakkerij', host)).toBe(false)
+    expect(shouldShowSectorChoiceGate('/sectoren/retail', host)).toBe(false)
+  })
 })
 
 describe('shouldOpenSectorChoiceOnThisLoad', () => {
@@ -137,6 +143,7 @@ describe('landing branch columns', () => {
     expect(landingSitePathForBranch('other')).toBe('/')
     expect(landingBranchFromPathname('/winkel')).toBe('winkel')
     expect(landingBranchFromPathname('/retail')).toBe('winkel')
+    expect(landingBranchFromPathname('/sectoren/kledingwinkel')).toBe('winkel')
     expect(landingBranchFromPathname('/')).toBe('horeca')
     expect(landingBranchFromPathname('/over-ons')).toBe('horeca')
     expect(marketingSiteHashHref('/winkel', 'prijzen')).toBe('/winkel#prijzen')

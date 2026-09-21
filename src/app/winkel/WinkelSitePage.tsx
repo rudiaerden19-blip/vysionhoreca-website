@@ -62,6 +62,15 @@ function WinkelCapabilitiesSection() {
             </article>
           ))}
         </div>
+        <p className="mt-10 max-w-3xl mx-auto text-center text-sm sm:text-base text-gray-600 leading-relaxed">
+          {t('winkelSite.kledingwinkelLead')}{' '}
+          <a
+            href="/sectoren/kledingwinkel"
+            className="font-semibold text-accent underline-offset-2 hover:underline"
+          >
+            {t('winkelSite.kledingwinkelLink')}
+          </a>
+        </p>
       </div>
     </section>
   )
