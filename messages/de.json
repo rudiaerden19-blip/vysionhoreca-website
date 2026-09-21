@@ -6687,7 +6687,13 @@
       "11": "Zahlungsterminal-Anbindung",
       "12": "QR-Codes",
       "13": "Barcodes",
-      "14": "Kostenlose Website"
+      "14": "Kostenlose Website",
+      "15": "Z-Berichte",
+      "16": "Betriebsanalyse",
+      "17": "Beliebte Artikel",
+      "18": "Alle Zahlungsmethoden",
+      "19": "Kostenlose Installation",
+      "20": "Hardware enthalten"
     }
   },
   "retailSite": {

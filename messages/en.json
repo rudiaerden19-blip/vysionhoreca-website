@@ -6623,7 +6623,13 @@
       "11": "Payment terminal integration",
       "12": "QR codes",
       "13": "Barcodes",
-      "14": "Free website"
+      "14": "Free website",
+      "15": "Z-reports",
+      "16": "Business analytics",
+      "17": "Popular items",
+      "18": "All payment methods",
+      "19": "Free installation",
+      "20": "Hardware included"
     }
   },
   "retailSite": {
