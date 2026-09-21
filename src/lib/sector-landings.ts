@@ -419,9 +419,9 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
         answer: 'Ja. Voorraad, import, inkoop en goederenontvangst horen bij de licentie.',
       },
       {
-        question: 'Is dit hetzelfde als de kledingwinkelpagina?',
+        question: 'Kan ik mijn kassa laten aanpassen?',
         answer:
-          'Nee. Hier draait het om scannen en stock van dagelijkse artikelen, niet om maten en kleuren. Voor mode zie je de kledingwinkelpagina.',
+          'Jazeker. Je kunt je kassa gratis laten aanpassen naar jouw smaak. Heb je een module nodig die echt bij jouw zaak past? Geen probleem — wij bouwen die gratis in je kassa.',
       },
     ],
     breadcrumbLabel: 'Nachtwinkel',
