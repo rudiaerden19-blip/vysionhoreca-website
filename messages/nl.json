@@ -49,8 +49,8 @@
   },
   "subscriptionsPage": {
     "title": "Licenties",
-    "subtitle": "Eén platform voor uw zaak — transparant en maandelijks opzegbaar.",
-    "lead": "U kiest Pro of Premium en betaalt per maand of jaar. Updates en ondersteuning horen bij uw licentie.",
+    "subtitle": "Eén platform voor je zaak — transparant en maandelijks opzegbaar.",
+    "lead": "Je kiest Pro of Premium en betaalt per maand of jaar. Updates en ondersteuning horen bij je licentie.",
     "bullet1": "Geen langlopende contracten; op elk moment maandelijks opzegbaar.",
     "bullet2": "14 dagen gratis uitproberen, zonder creditcard.",
     "bullet3": "Kassa, reserveringen, online bestellen en meer in dezelfde omgeving.",
@@ -62,8 +62,8 @@
     "vysionProLargeTitle": "Online bestelplatform",
     "vysionPremiumLargeTitle": "Vysion Premium",
     "vysionProImageAlt": "Overzicht van het Online bestelplatform-pakket",
-    "vysionProRightP1": "Online bestellen, uw eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer zit in deze licentie.",
-    "vysionProRightP2": "Kies maandelijks of jaarlijks betalen; met jaarbetaling profiteert u van 10% korting. Alle vermelde voordelen zitten inbegrepen, inclusief gratis opleiding en support.",
+    "vysionProRightP1": "Online bestellen, je eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer zit in deze licentie.",
+    "vysionProRightP2": "Kies maandelijks of jaarlijks betalen; met jaarbetaling profiteer je van 10% korting. Alle vermelde voordelen zitten inbegrepen, inclusief gratis opleiding en support.",
     "vysionProModulesP1": "Jij kiest welke modules je in je hardware wilt; wat je niet wilt, betaal je ook niet voor.",
     "vysionProModulesP2": "Wil je je eigen module, zoals je die met een andere kassa gebruikte? Geen probleem: onze programmeurs bouwen dat voor jou in eigen huis.",
     "ctaToHardware": "Naar hardware",
@@ -189,13 +189,13 @@
     "audienceLine": "Zonder voorschot, zonder installatiekosten, zonder contract",
     "sites": {
       "winkel": {
-        "title": "Kassa & platform voor uw winkel",
+        "title": "Kassa & platform voor je winkel",
         "subtitleLead": "Kassa hardware & software inbegrepen",
         "subtitle": "Voor bakkers, slagers, kappers, kledingzaken en speciaalzaken.",
         "audienceLine": "Gemaakt voor de winkelstraat"
       },
       "retail": {
-        "title": "Kassa & retailplatform voor uw zaak",
+        "title": "Kassa & retailplatform voor je zaak",
         "subtitleLead": "Kassa hardware & software inbegrepen",
         "subtitle": "Voor boetieks, elektronica, groothandel en retail.",
         "audienceLine": "Gemaakt voor retail & groothandel"
@@ -249,7 +249,7 @@
   "hardware": {
     "kicker": "Hardware inbegrepen in de premium licentie",
     "title": "Onze hardware",
-    "subtitle": "Onze premium kassa's en randapparatuur zijn van topkwaliteit. Met de nieuwste chips aan boord ervaart u supersnelle handelingen.",
+    "subtitle": "Onze premium kassa's en randapparatuur zijn van topkwaliteit. Met de nieuwste chips aan boord ervaar je supersnelle handelingen.",
     "imageAlt": "Hardware voorbeeld",
     "openExpanded": "Afbeelding vergroten",
     "closeExpanded": "Sluiten",
@@ -478,8 +478,8 @@
       "horecaLeadBefore": "Onze kassasystemen bieden een ",
       "horecaLeadBold": "breed scala aan functies om jouw bedrijfsvoering te verbeteren.",
       "horecaLeadAfter": " Compatibel met vrijwel elke kassa-pc op een recente versie van Windows. Ook naadloos te gebruiken op iPad®, Android® en kiosken.",
-      "horecaCloudBold": "Beheer uw zaak moeiteloos via de cloud",
-      "horecaCloudAfter": ", waarbij een webpanel alle mogelijkheden biedt om uw zaak te optimaliseren en te laten groeien.",
+      "horecaCloudBold": "Beheer je zaak moeiteloos via de cloud",
+      "horecaCloudAfter": ", waarbij een webpanel alle mogelijkheden biedt om je zaak te optimaliseren en te laten groeien.",
       "horecaDemoCta": "Demo aanvragen",
       "featuresTitle": "Functionaliteiten",
       "features": {
@@ -617,7 +617,7 @@
   "liveDemo": {
     "title": "Wil je het platform in actie zien?",
     "subtitle": "Bekijk een echte frituur die draait op Vysion kassa's",
-    "clientsLead": "Deze klanten gingen u reeds voor",
+    "clientsLead": "Deze klanten gingen je al voor",
     "marquee": "· Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion kassa's · ",
     "successStories": {
       "vivaldi": {
@@ -832,7 +832,7 @@
     }
   },
   "industry": {
-    "sectionTitle": "Extra inbegrepen in uw licentie",
+    "sectionTitle": "Extra inbegrepen in je licentie",
     "imageAltPrefix": "Vysion kassa layout voor",
     "invoicing": {
       "tab": "Facturatie",
@@ -862,7 +862,7 @@
     "payroll": {
       "tab": "Loonadministratie",
       "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "description": "Houd je loonadministratie in orde voor iedere werknemer direct gekoppeld naar je gekozen loonkantoor"
     },
     "whatsapp": {
       "tab": "WhatsApp bestellen",
@@ -1850,8 +1850,8 @@
   "subscriptionsTermsPopup": {
     "title": "Algemene voorwaarden",
     "lastUpdated": "Laatst bijgewerkt: september 2026",
-    "footerBeforeLink": "Aanvullende contractuele bepalingen vindt u in de",
-    "body": "ALGEMENE VOORWAARDEN – KASSASYSTEEM & SOFTWARE\nLeverancier: Vysion kassa's\n\n1. Definities\n- Leverancier: Vysion kassa's\n- Klant: de natuurlijke of rechtspersoon die de kassasoftware gebruikt\n- Overeenkomst: de overeenkomst voor kassasoftware en bijhorende hardware\n- Hardware: kassa, touchscreen, barcodescanner, kassalade en printer\n- Maandelijkse licentie: maandelijkse dienst van €99 (of actuele prijs), maandelijks opzegbaar\n\n2. Toepasselijkheid\nDeze algemene voorwaarden zijn van toepassing op alle offertes, overeenkomsten en diensten geleverd door Vysion kassa's, tenzij schriftelijk anders overeengekomen.\n\n3. Levering\n3.1. De Klant gebruikt de kassasoftware via een maandelijkse licentie.\n3.2. Bij een premium maandelijkse licentie wordt Hardware ter beschikking gesteld zonder initiële aankoopkost.\n3.3. De Hardware blijft te allen tijde eigendom van Vysion kassa's. De Klant verkrijgt geen eigendomsrecht op de Hardware.\n3.4. Er zijn geen voorschotten te betalen.\n3.5. Vysion kassa's vraagt geen vergoedingskosten voor het installeren van uw gegevens, foto's en menu. Indien u achteraf producten, categorieën, prijzen en/of foto's wilt wijzigen, kunt u dat zelf eenvoudig aanpassen, of u belt ons en wij zetten het gratis voor u in de kassa.\n\n4. Eigendom en gebruik van hardware\n4.1. De Klant verkrijgt enkel een gebruiksrecht van de Hardware.\n4.2. Het is de Klant niet toegestaan om:\n- de Hardware te verkopen\n- te verhuren\n- te verpanden\n- over te dragen aan derden\n- of op enige wijze buiten eigen gebruik te exploiteren\n4.3. De Klant dient als een zorgvuldig huisvader met de Hardware om te gaan.\n\n5. Duur en opzegging\n5.1. De maandelijkse licentie is maandelijks opzegbaar. De Klant kan maandelijks stoppen.\n5.2. De hardware en software zijn maandelijks opzegbaar zonder bijkomende kosten.\n\n6. Teruggave hardware\n6.1. Bij beëindiging van de maandelijkse licentie is de Klant verplicht om de Hardware binnen 14 dagen terug te bezorgen aan Vysion kassa's.\n6.2. Indien de Hardware niet wordt teruggegeven:\n- wordt een schadevergoeding aangerekend gelijk aan de nieuwprijs van de Hardware\n- behoudt Vysion kassa's zich het recht voor om bijkomende kosten te vorderen\n6.3. De Hardware dient in goede staat teruggegeven te worden (normale slijtage uitgezonderd).\n\n7. Verlies, schade en aansprakelijkheid\n7.1. De Klant is volledig aansprakelijk voor:\n- verlies\n- diefstal\n- beschadiging\n7.2. In deze gevallen wordt de volledige vervangwaarde aangerekend.\n\n8. Betaling\n8.1. De maandelijkse licentie bedraagt €99 per maand (excl. btw tenzij anders vermeld).\n8.2. Facturen dienen betaald te worden binnen 14 dagen.\n8.3. Bij laattijdige betaling:\n- kan de dienst worden opgeschort\n- kan toegang tot de software worden geblokkeerd\n\n9. Niet-betaling\n9.1. Bij wanbetaling behoudt Vysion kassa's zich het recht voor om:\n- de maandelijkse licentie onmiddellijk te beëindigen\n- de Hardware terug te vorderen\n9.2. Alle kosten voor invordering zijn ten laste van de Klant.\n\n10. Gebruik software\n10.1. De software mag enkel gebruikt worden voor de bedrijfsactiviteiten van de Klant.\n10.2. Het is verboden om:\n- de software te kopiëren\n- te reverse engineeren\n- of door te geven aan derden\n\n11. Overmacht\nVysion kassa's is niet aansprakelijk voor storingen door overmacht (zoals internetproblemen, stroomuitval, etc.).\n\n12. Toepasselijk recht\nOp deze overeenkomst is het Belgisch recht van toepassing.\nGeschillen vallen onder de bevoegde rechtbank van de zetel van Vysion kassa's.\n\n13. Geen eigendomsoverdracht via de maandelijkse licentie\n13.1. De door Vysion kassa's ter beschikking gestelde Hardware blijft te allen tijde eigendom van Vysion kassa's, ook bij een langdurige of ononderbroken maandelijkse licentie.\n13.2. De maandelijkse licentie geeft de Klant uitsluitend een gebruiksrecht op de Hardware zolang de maandelijkse licentie loopt. Er is geen eigendomsoverdracht na een bepaalde periode.\n13.3. Reeds betaalde kosten van de maandelijkse licentie worden in geen geval beschouwd als afbetaling voor de aankoop van de Hardware en geven geen enkel recht op eigendom.\n13.4. Bij beëindiging van de maandelijkse licentie is de Klant verplicht de Hardware terug te bezorgen, zoals bepaald in artikel 6.\n\n14. Garantie en defecten\n14.1. Zolang de maandelijkse licentie loopt, verzorgt Vysion kassa's de gebruikelijke support voor de ter beschikking gestelde Hardware, behoudens misbruik, diefstal of schade zoals bepaald in artikel 7.\n14.2. Defecten door normale slijtage tijdens de maandelijkse licentie worden in overleg hersteld of vervangen volgens de dan geldende servicevoorwaarden.\n14.3. Vysion kassa's kan optioneel een onderhouds- of servicecontract aanbieden; dit is niet verplicht."
+    "footerBeforeLink": "Aanvullende contractuele bepalingen vind je in de",
+    "body": "ALGEMENE VOORWAARDEN – KASSASYSTEEM & SOFTWARE\nLeverancier: Vysion kassa's\n\n1. Definities\n- Leverancier: Vysion kassa's\n- Klant: de natuurlijke of rechtspersoon die de kassasoftware gebruikt\n- Overeenkomst: de overeenkomst voor kassasoftware en bijhorende hardware\n- Hardware: kassa, touchscreen, barcodescanner, kassalade en printer\n- Maandelijkse licentie: maandelijkse dienst van €99 (of actuele prijs), maandelijks opzegbaar\n\n2. Toepasselijkheid\nDeze algemene voorwaarden zijn van toepassing op alle offertes, overeenkomsten en diensten geleverd door Vysion kassa's, tenzij schriftelijk anders overeengekomen.\n\n3. Levering\n3.1. De Klant gebruikt de kassasoftware via een maandelijkse licentie.\n3.2. Bij een premium maandelijkse licentie wordt Hardware ter beschikking gesteld zonder initiële aankoopkost.\n3.3. De Hardware blijft te allen tijde eigendom van Vysion kassa's. De Klant verkrijgt geen eigendomsrecht op de Hardware.\n3.4. Er zijn geen voorschotten te betalen.\n3.5. Vysion kassa's vraagt geen vergoedingskosten voor het installeren van je gegevens, foto's en menu. Indien je achteraf producten, categorieën, prijzen en/of foto's wilt wijzigen, kun je dat zelf eenvoudig aanpassen, of je belt ons en wij zetten het gratis voor je in de kassa.\n\n4. Eigendom en gebruik van hardware\n4.1. De Klant verkrijgt enkel een gebruiksrecht van de Hardware.\n4.2. Het is de Klant niet toegestaan om:\n- de Hardware te verkopen\n- te verhuren\n- te verpanden\n- over te dragen aan derden\n- of op enige wijze buiten eigen gebruik te exploiteren\n4.3. De Klant dient als een zorgvuldig huisvader met de Hardware om te gaan.\n\n5. Duur en opzegging\n5.1. De maandelijkse licentie is maandelijks opzegbaar. De Klant kan maandelijks stoppen.\n5.2. De hardware en software zijn maandelijks opzegbaar zonder bijkomende kosten.\n\n6. Teruggave hardware\n6.1. Bij beëindiging van de maandelijkse licentie is de Klant verplicht om de Hardware binnen 14 dagen terug te bezorgen aan Vysion kassa's.\n6.2. Indien de Hardware niet wordt teruggegeven:\n- wordt een schadevergoeding aangerekend gelijk aan de nieuwprijs van de Hardware\n- behoudt Vysion kassa's zich het recht voor om bijkomende kosten te vorderen\n6.3. De Hardware dient in goede staat teruggegeven te worden (normale slijtage uitgezonderd).\n\n7. Verlies, schade en aansprakelijkheid\n7.1. De Klant is volledig aansprakelijk voor:\n- verlies\n- diefstal\n- beschadiging\n7.2. In deze gevallen wordt de volledige vervangwaarde aangerekend.\n\n8. Betaling\n8.1. De maandelijkse licentie bedraagt €99 per maand (excl. btw tenzij anders vermeld).\n8.2. Facturen dienen betaald te worden binnen 14 dagen.\n8.3. Bij laattijdige betaling:\n- kan de dienst worden opgeschort\n- kan toegang tot de software worden geblokkeerd\n\n9. Niet-betaling\n9.1. Bij wanbetaling behoudt Vysion kassa's zich het recht voor om:\n- de maandelijkse licentie onmiddellijk te beëindigen\n- de Hardware terug te vorderen\n9.2. Alle kosten voor invordering zijn ten laste van de Klant.\n\n10. Gebruik software\n10.1. De software mag enkel gebruikt worden voor de bedrijfsactiviteiten van de Klant.\n10.2. Het is verboden om:\n- de software te kopiëren\n- te reverse engineeren\n- of door te geven aan derden\n\n11. Overmacht\nVysion kassa's is niet aansprakelijk voor storingen door overmacht (zoals internetproblemen, stroomuitval, etc.).\n\n12. Toepasselijk recht\nOp deze overeenkomst is het Belgisch recht van toepassing.\nGeschillen vallen onder de bevoegde rechtbank van de zetel van Vysion kassa's.\n\n13. Geen eigendomsoverdracht via de maandelijkse licentie\n13.1. De door Vysion kassa's ter beschikking gestelde Hardware blijft te allen tijde eigendom van Vysion kassa's, ook bij een langdurige of ononderbroken maandelijkse licentie.\n13.2. De maandelijkse licentie geeft de Klant uitsluitend een gebruiksrecht op de Hardware zolang de maandelijkse licentie loopt. Er is geen eigendomsoverdracht na een bepaalde periode.\n13.3. Reeds betaalde kosten van de maandelijkse licentie worden in geen geval beschouwd als afbetaling voor de aankoop van de Hardware en geven geen enkel recht op eigendom.\n13.4. Bij beëindiging van de maandelijkse licentie is de Klant verplicht de Hardware terug te bezorgen, zoals bepaald in artikel 6.\n\n14. Garantie en defecten\n14.1. Zolang de maandelijkse licentie loopt, verzorgt Vysion kassa's de gebruikelijke support voor de ter beschikking gestelde Hardware, behoudens misbruik, diefstal of schade zoals bepaald in artikel 7.\n14.2. Defecten door normale slijtage tijdens de maandelijkse licentie worden in overleg hersteld of vervangen volgens de dan geldende servicevoorwaarden.\n14.3. Vysion kassa's kan optioneel een onderhouds- of servicecontract aanbieden; dit is niet verplicht."
   },
   "serviceAgreementPage": {
     "title": "Vysion Dienstenovereenkomst",
@@ -6514,7 +6514,7 @@
   },
   "winkelSite": {
     "title": "Kassa voor bakker, slager, kapper en de winkelstraat",
-    "lead": "Afrekenen, voorraad en uw eigen webshop in één systeem. Gemaakt voor de toonbank.",
+    "lead": "Afrekenen, voorraad en je eigen webshop in één systeem. Gemaakt voor de toonbank.",
     "point1": "Snel afrekenen met barcode of tikken op het scherm",
     "point2": "Voorraad per product, zonder extra pakket",
     "point3": "Eigen webshop inbegrepen in de licentie",
@@ -6553,7 +6553,7 @@
       "imageAlt": "Retour in een kledingwinkel met een tegoedbon"
     },
     "usecasesTitle": "Voor iedere winkel",
-    "modulesTitle": "Wat u in de winkel krijgt",
+    "modulesTitle": "Wat je in de winkel krijgt",
     "hardwareTitle": "Hardware voor de toonbank",
     "pricingTitle": "Prijzen voor winkels",
     "modules": {
@@ -6563,7 +6563,7 @@
       },
       "stock": {
         "title": "Voorraad",
-        "body": "Zie wat u moet nabestellen. Geen losse voorraad-app."
+        "body": "Zie wat je moet nabestellen. Geen losse voorraad-app."
       },
       "barcode": {
         "title": "Barcodescanner",
@@ -6571,7 +6571,7 @@
       },
       "webshop": {
         "title": "Eigen webshop",
-        "body": "Online bestellen zonder commissie, in uw huisstijl."
+        "body": "Online bestellen zonder commissie, in je huisstijl."
       },
       "reports": {
         "title": "Rapporten",
@@ -6579,18 +6579,18 @@
       },
       "support": {
         "title": "Live support",
-        "body": "Bij opstart en drukke momenten. U belt, wij lossen het op."
+        "body": "Bij opstart en drukke momenten. Je belt, wij lossen het op."
       }
     },
     "subtitleLead": "Kassa hardware & software inbegrepen",
     "audienceLine": "Zonder voorschot, zonder installatiekosten, zonder contract",
     "offline": {
       "title": "Ook offline in de winkel",
-      "body": "Werkt door als het internet even wegvalt. Zodra u weer online bent, werkt alles zichzelf bij — bakker, slager, kapper of nachtwinkel."
+      "body": "Werkt door als het internet even wegvalt. Zodra je weer online bent, werkt alles zichzelf bij — bakker, slager, kapper of nachtwinkel."
     },
     "gratisWebsite": {
-      "title": "Gratis website voor uw winkel",
-      "body": "Bij uw licentie krijgt u een eigen website, zonder extra kosten. Kleuren, foto’s en teksten past u zelf aan.",
+      "title": "Gratis website voor je winkel",
+      "body": "Bij je licentie krijg je een eigen website, zonder extra kosten. Kleuren, foto’s en teksten pas je zelf aan.",
       "cta": "Bekijk een voorbeeld"
     },
     "kiosk": {
@@ -6598,7 +6598,7 @@
       "carouselAria": "Foto’s van winkelhardware: blader met de pijlen",
       "clickToEnlarge": "Klik op de foto om te vergroten",
       "subtitle": "Hardware voor de toonbank",
-      "body": "Geen restaurantkiosk: een compacte kassa, barcodescanner, lade en printer voor bakker, slager, kapper en de winkelstraat. Alles gekoppeld aan uw voorraad en webshop.",
+      "body": "Geen restaurantkiosk: een compacte kassa, barcodescanner, lade en printer voor bakker, slager, kapper en de winkelstraat. Alles gekoppeld aan je voorraad en webshop.",
       "features": {
         "1": "Touchscreen kassa op de toonbank",
         "2": "Barcodescanner voor brood, vlees, kleding en meer",
@@ -6668,7 +6668,7 @@
       },
       "support": {
         "title": "Live support",
-        "body": "Opstart, training en hulp tijdens de rush. U belt ons."
+        "body": "Opstart, training en hulp tijdens de rush. Je belt ons."
       }
     },
     "subtitleLead": "Kassa hardware & software inbegrepen",
@@ -6679,7 +6679,7 @@
     },
     "gratisWebsite": {
       "title": "Gratis webshop voor retail",
-      "body": "Bij uw licentie krijgt u een eigen webshop voor boetiek, elektronica of groothandel, zonder extra kosten.",
+      "body": "Bij je licentie krijg je een eigen webshop voor boetiek, elektronica of groothandel, zonder extra kosten.",
       "cta": "Bekijk een voorbeeld"
     },
     "kiosk": {
