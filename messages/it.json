@@ -6562,6 +6562,11 @@
       "teaser": "Lavora con scanner intelligenti nella tua cassa e scansiona ogni tipo di codice.",
       "imageAlt": "Scanner barcode per la cassa del negozio"
     },
+    "platformDigitalReceipt": {
+      "title": "Scontrino digitale",
+      "teaser": "Non sprecare carta: invia gli scontrini d'acquisto direttamente via e-mail al cliente.",
+      "imageAlt": "Scontrino stampato sul bancone"
+    },
     "usecasesTitle": "Per ogni negozio",
     "modulesTitle": "Cosa hai in negozio",
     "hardwareTitle": "Hardware per il bancone",

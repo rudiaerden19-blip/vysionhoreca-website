@@ -1529,6 +1529,12 @@ export default function WinkelSitePage() {
             cardHeaderAltKey: 'winkelSite.platformBarcode.imageAlt',
             headerImageContain: true,
           },
+          reservaties: {
+            titleKey: 'winkelSite.platformDigitalReceipt.title',
+            teaserKey: 'winkelSite.platformDigitalReceipt.teaser',
+            cardHeaderImage: '/images/winkel/winkel-digitale-kassabon-card.png',
+            cardHeaderAltKey: 'winkelSite.platformDigitalReceipt.imageAlt',
+          },
         }}
       />
       <HardwareSection />

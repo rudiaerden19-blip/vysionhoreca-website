@@ -6585,6 +6585,11 @@
       "teaser": "Travaillez avec des scanners intelligents dans votre caisse et scannez tous types de codes.",
       "imageAlt": "Scanner de codes-barres pour la caisse magasin"
     },
+    "platformDigitalReceipt": {
+      "title": "Ticket de caisse numérique",
+      "teaser": "Ne gaspillez pas de papier : envoyez les tickets d'achat directement par e-mail au client.",
+      "imageAlt": "Ticket de caisse imprimé sur le comptoir"
+    },
     "usecasesTitle": "Pour chaque magasin",
     "modulesTitle": "Ce que vous avez en magasin",
     "hardwareTitle": "Matériel pour le comptoir",

@@ -6562,6 +6562,11 @@
       "teaser": "Trabaje con escáneres inteligentes en su caja y escanee todo tipo de códigos.",
       "imageAlt": "Escáner de códigos de barras para la caja de la tienda"
     },
+    "platformDigitalReceipt": {
+      "title": "Ticket digital",
+      "teaser": "No desperdicie papel: envíe los tickets de compra por correo al cliente.",
+      "imageAlt": "Ticket de caja impreso en el mostrador"
+    },
     "usecasesTitle": "Para cada tienda",
     "modulesTitle": "Lo que obtiene en la tienda",
     "hardwareTitle": "Hardware para el mostrador",

@@ -6521,6 +6521,11 @@
       "teaser": "Work with smart scanners at your till and scan all kinds of codes.",
       "imageAlt": "Barcode scanner for the shop till"
     },
+    "platformDigitalReceipt": {
+      "title": "Digital receipt",
+      "teaser": "Don't waste paper — email purchase receipts straight to the customer.",
+      "imageAlt": "Printed till receipt on the counter"
+    },
     "usecasesTitle": "For every shop",
     "modulesTitle": "What you get in the shop",
     "hardwareTitle": "Hardware for the counter",

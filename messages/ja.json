@@ -6562,6 +6562,11 @@
       "teaser": "スマートスキャナーでレジと連携し、あらゆるコードを読み取ります。",
       "imageAlt": "店舗レジ用バーコードスキャナー"
     },
+    "platformDigitalReceipt": {
+      "title": "デジタルレシート",
+      "teaser": "紙を無駄にせず、購入レシートをお客様へ直接メールします。",
+      "imageAlt": "カウンター上の印刷レシート"
+    },
     "usecasesTitle": "あらゆるお店に",
     "modulesTitle": "お店で使える機能",
     "hardwareTitle": "カウンター向けハードウェア",

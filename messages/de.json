@@ -6585,6 +6585,11 @@
       "teaser": "Arbeiten Sie mit intelligenten Scannern an Ihrer Kasse und scannen Sie alle Arten von Codes.",
       "imageAlt": "Barcode-Scanner für die Ladenkasse"
     },
+    "platformDigitalReceipt": {
+      "title": "Digitaler Kassenbon",
+      "teaser": "Verschwenden Sie kein Papier und lassen Sie die Kaufbelege direkt an den Kunden mailen.",
+      "imageAlt": "Gedruckter Kassenbon auf der Theke"
+    },
     "usecasesTitle": "Für jeden Laden",
     "modulesTitle": "Was Sie im Laden bekommen",
     "hardwareTitle": "Hardware für die Theke",

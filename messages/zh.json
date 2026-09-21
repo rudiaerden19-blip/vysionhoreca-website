@@ -6562,6 +6562,11 @@
       "teaser": "在收银机上使用智能扫描器，扫描各类条码。",
       "imageAlt": "店铺收银条码扫描器"
     },
+    "platformDigitalReceipt": {
+      "title": "电子小票",
+      "teaser": "不浪费纸张，将购物小票直接发送到顾客邮箱。",
+      "imageAlt": "柜台上的收银小票"
+    },
     "usecasesTitle": "适合每家店铺",
     "modulesTitle": "店铺能用到什么",
     "hardwareTitle": "柜台硬件",

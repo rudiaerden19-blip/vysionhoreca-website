@@ -6521,6 +6521,11 @@
       "teaser": "Werk met slimme scanners in jouw kassa en scan alle soorten codes.",
       "imageAlt": "Barcode scanner voor de winkelskassa"
     },
+    "platformDigitalReceipt": {
+      "title": "Digitale kassabon",
+      "teaser": "Verspil geen papier en laat de aankoopbonnen rechtstreeks mailen naar de klant.",
+      "imageAlt": "Gedrukte kassabon op de toonbank"
+    },
     "usecasesTitle": "Voor iedere winkel",
     "modulesTitle": "Wat u in de winkel krijgt",
     "hardwareTitle": "Hardware voor de toonbank",
