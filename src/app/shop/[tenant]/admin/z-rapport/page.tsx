@@ -46,6 +46,7 @@ import {
   type ZReportAmounts,
 } from '@/lib/z-report-document'
 import { ZReportDocumentBody } from '@/components/ZReportDocumentBody'
+import ZReportChangePaymentPanel from '@/components/ZReportChangePaymentPanel'
 import {
   addMonthsToYearMonth,
   buildZReportMonthDayRows,
@@ -203,6 +204,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [monthAmounts, setMonthAmounts] = useState<ZReportAmounts | null>(null)
   const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
   const [articleLines, setArticleLines] = useState<ZReportArticleLine[]>([])
+  const [dayReceipts, setDayReceipts] = useState<Order[]>([])
   const reconciledTenantRef = useRef(false)
   const ownerFormDateRef = useRef(selectedDate)
 
@@ -323,6 +325,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       ),
     )
     setArticleLines(aggregateZReportArticleLines(counted, settingsBtw, vatContext))
+    setDayReceipts(counted)
     setHoursForDay(hours)
 
     const amounts = buildZReportDayAmountsFromOrders(
@@ -1830,6 +1833,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             )}
 
           </motion.div>
+
+          {reportViewMode === 'day' ? (
+            <ZReportChangePaymentPanel
+              tenantSlug={params.tenant}
+              orders={dayReceipts}
+              onCorrected={() => {
+                void loadData()
+                void loadSavedReports()
+              }}
+            />
+          ) : null}
 
           {/* Instructies */}
           {reportViewMode === 'day' && (
