@@ -19,13 +19,15 @@ const WINKEL_WHY_VYSION_VIDEOS: HardwareVideoConfig[] = [
   },
   {
     kind: 'image',
-    src: '/images/winkel/winkel-kassa-screenshot.jpg',
+    src: '/images/winkel/winkel-kassa-screenshot.jpg?v=2',
     altKey: 'winkelSite.videoAltKassa',
+    enlargeContain: true,
   },
   {
     kind: 'image',
-    src: '/images/winkel/winkel-voorraad-screenshot.jpg',
+    src: '/images/winkel/winkel-voorraad-screenshot.jpg?v=2',
     altKey: 'winkelSite.videoAltVoorraad',
+    enlargeContain: true,
   },
 ]
 

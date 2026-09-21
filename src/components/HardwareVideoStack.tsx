@@ -12,6 +12,8 @@ export type HardwareVideoConfig = {
   altKey: string
   fullSrc?: string
   poster?: string
+  /** Lightbox toont de hele screenshot (geen crop). Default = bestaand cover-gedrag. */
+  enlargeContain?: boolean
 }
 
 export const BEEST_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
@@ -184,7 +186,11 @@ function HardwareImageTile({
           alt={label}
           width={2532}
           height={969}
-          className={ENLARGE_IMAGE_CLASS}
+          className={
+            item.enlargeContain
+              ? 'size-full max-h-[100dvh] max-w-[100vw] object-contain object-center bg-black'
+              : ENLARGE_IMAGE_CLASS
+          }
           decoding="sync"
           fetchPriority="high"
         />
