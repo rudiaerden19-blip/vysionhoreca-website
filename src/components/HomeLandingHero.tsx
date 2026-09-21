@@ -31,7 +31,7 @@ const HERO_CTA_CARD_SHELL =
 
 const HERO_CTA_FLIP_MS = 8000
 
-function HeroCtaFlipCard() {
+function HeroCtaFlipCard({ allowLicenseFlip }: { allowLicenseFlip: boolean }) {
   const { t } = useLanguage()
   const [showBack, setShowBack] = useState(false)
   const [withHardware, setWithHardware] = useState(false)
@@ -46,10 +46,13 @@ function HeroCtaFlipCard() {
   }, [])
 
   useEffect(() => {
-    if (reduceMotion) return
+    if (!allowLicenseFlip || reduceMotion) {
+      setShowBack(false)
+      return
+    }
     const id = window.setInterval(() => setShowBack(prev => !prev), HERO_CTA_FLIP_MS)
     return () => window.clearInterval(id)
-  }, [reduceMotion])
+  }, [allowLicenseFlip, reduceMotion])
 
   const flipped = !reduceMotion && showBack
   const monthlyPrice = monthlyPriceForHardware(withHardware)
@@ -160,6 +163,7 @@ function HeroCtaFlipCard() {
           </div>
         </div>
 
+        {allowLicenseFlip ? (
         <div className={`${faceBase} [transform:rotateY(180deg)]`}>
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesBackHeadline')}
@@ -202,6 +206,7 @@ function HeroCtaFlipCard() {
             </a>
           </div>
         </div>
+        ) : null}
       </div>
     </div>
   )
@@ -313,7 +318,7 @@ export default function HomeLandingHero() {
             {subtitle}
           </p>
         ) : null}
-        <HeroCtaFlipCard />
+        <HeroCtaFlipCard allowLicenseFlip={branch === 'horeca'} />
         <p
           className={`mt-6 sm:mt-8 max-w-2xl px-2 text-center text-xl sm:text-2xl md:text-[1.65rem] font-bold leading-snug tracking-tight ${HERO_KASSA_ACCENT}`}
         >
