@@ -2,6 +2,7 @@ import {
   MARKETING_HOME_DESCRIPTION,
   MARKETING_HOME_TITLE,
 } from '@/lib/marketing-home-seo'
+import { WINKEL_SEO_LEAD } from '@/lib/winkel-landing-seo'
 import { MARKETING_SITEMAP_ENTRIES } from '@/lib/marketing-sitemap-paths'
 
 describe('marketing SEO phase 4', () => {
@@ -10,6 +11,11 @@ describe('marketing SEO phase 4', () => {
     expect(MARKETING_HOME_TITLE).toContain('kassasysteem')
     expect(MARKETING_HOME_DESCRIPTION.toLowerCase()).not.toContain('i9')
     expect(MARKETING_HOME_DESCRIPTION.length).toBeLessThanOrEqual(180)
+  })
+
+  it('keeps winkel SEO lead text for crawlable intro under hero', () => {
+    expect(WINKEL_SEO_LEAD).toContain('kassasysteem voor winkels en retail')
+    expect(WINKEL_SEO_LEAD).toContain('zonder losse pakketten')
   })
 
   it('keeps sitemap free of redirects and retail duplicate', () => {

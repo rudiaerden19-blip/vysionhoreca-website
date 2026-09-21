@@ -291,9 +291,6 @@ export default function WinkelLandingHero() {
             {t('winkelSite.lead')}
           </p>
         ) : null}
-        <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
-          {t('winkelSite.seoLead')}
-        </p>
         <HeroCtaFlipCard />
         <p
           className={`mt-6 sm:mt-8 max-w-2xl px-2 text-center text-xl sm:text-2xl md:text-[1.65rem] font-bold leading-snug tracking-tight ${HERO_KASSA_ACCENT}`}

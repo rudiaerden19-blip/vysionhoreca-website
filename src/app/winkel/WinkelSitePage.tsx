@@ -9,6 +9,7 @@ import {
   CookieBanner,
 } from '@/components'
 import WinkelLandingHero from './WinkelLandingHero'
+import WinkelSeoLeadSection from './WinkelSeoLeadSection'
 import PlatformGridSection from '@/components/PlatformGridSection'
 import ConnectedSystemHubSection from '@/components/ConnectedSystemHubSection'
 import VysionBeestSection from '@/components/VysionBeestSection'
@@ -1313,6 +1314,7 @@ export default function WinkelSitePage() {
       <HomeScrollOnLoad />
       <Navigation />
       <WinkelLandingHero />
+      <WinkelSeoLeadSection />
       <WhyVysionSection />
       <ConnectedSystemHubSection
         centerImage="/images/winkel/winkel-kassa-hub.jpg"
