@@ -7,7 +7,8 @@ import { useLanguage } from '@/i18n'
 import {
   LANDING_BRANCH_COLUMNS,
   LANDING_BRANCH_STORAGE_KEY,
-  type LandingBranchId,
+  branchForService,
+  type LandingServiceId,
 } from '@/lib/landing-branch-choice'
 import { shouldShowSectorChoiceGate } from '@/lib/sector-choice-gate-path'
 
@@ -19,11 +20,15 @@ function hasStoredBranch(): boolean {
   }
 }
 
-function saveBranch(id: LandingBranchId) {
+function saveService(service: LandingServiceId) {
   try {
     localStorage.setItem(
       LANDING_BRANCH_STORAGE_KEY,
-      JSON.stringify({ branch: id, savedAt: Date.now() }),
+      JSON.stringify({
+        branch: branchForService(service),
+        service,
+        savedAt: Date.now(),
+      }),
     )
   } catch {
     /* ignore */
@@ -31,7 +36,7 @@ function saveBranch(id: LandingBranchId) {
 }
 
 /**
- * Eerste bezoek marketingwebsite: branche kiezen (niet op login/registratie/shop/admin).
+ * Eerste bezoek marketingwebsite: sub-dienst kiezen (niet op login/registratie/shop/admin).
  * Drie kolommen naast elkaar; onderaan algemeen bekijken.
  */
 export default function SectorChoiceGate() {
@@ -58,8 +63,8 @@ export default function SectorChoiceGate() {
     setOpen(true)
   }, [mounted, pathname])
 
-  const pick = useCallback((id: LandingBranchId) => {
-    saveBranch(id)
+  const pick = useCallback((service: LandingServiceId) => {
+    saveService(service)
     setOpen(false)
   }, [])
 
@@ -91,32 +96,32 @@ export default function SectorChoiceGate() {
           </h2>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 sm:px-6 sm:py-5">
-          <div
-            className="grid grid-cols-3 gap-2 sm:gap-4"
-            role="radiogroup"
-            aria-labelledby="sector-modal-title"
-          >
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             {LANDING_BRANCH_COLUMNS.map((column) => (
-              <button
+              <div
                 key={column.id}
-                type="button"
-                onClick={() => pick(column.id)}
-                className="flex min-h-0 touch-manipulation flex-col rounded-xl border-2 border-gray-200 bg-white px-1.5 py-3 text-left transition-colors hover:border-accent/50 hover:bg-accent/[0.04] active:bg-accent/10 sm:rounded-2xl sm:px-4 sm:py-5"
+                className="flex min-h-0 flex-col rounded-xl border-2 border-gray-200 bg-white px-1 py-3 sm:rounded-2xl sm:px-3 sm:py-5"
               >
-                <span className="text-center text-[11px] font-extrabold tracking-wide text-gray-900 sm:text-base">
+                <p className="px-1 text-center text-[11px] font-extrabold tracking-wide text-gray-900 sm:text-base">
                   {t(`sectorModal.columns.${column.id}.title`)}
-                </span>
-                <span className="mt-2 flex flex-1 flex-col gap-1 sm:mt-4 sm:gap-2">
+                </p>
+                <div
+                  className="mt-2 flex flex-1 flex-col gap-0.5 sm:mt-4 sm:gap-1"
+                  role="list"
+                  aria-label={t(`sectorModal.columns.${column.id}.title`)}
+                >
                   {column.itemKeys.map((itemKey) => (
-                    <span
+                    <button
                       key={itemKey}
-                      className="block text-center text-[10px] leading-snug text-gray-600 sm:text-sm"
+                      type="button"
+                      onClick={() => pick(itemKey)}
+                      className="touch-manipulation rounded-lg px-1 py-1.5 text-center text-[10px] leading-snug text-gray-700 transition-colors hover:bg-accent/[0.08] hover:text-gray-900 active:bg-accent/15 sm:px-2 sm:py-2 sm:text-sm"
                     >
                       {t(`sectorModal.columns.${column.id}.items.${itemKey}`)}
-                    </span>
+                    </button>
                   ))}
-                </span>
-              </button>
+                </div>
+              </div>
             ))}
           </div>
           <p className="mt-5 text-center sm:mt-6">

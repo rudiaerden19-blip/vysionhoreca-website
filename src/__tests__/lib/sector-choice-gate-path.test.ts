@@ -1,5 +1,10 @@
 import { shouldShowSectorChoiceGate } from '@/lib/sector-choice-gate-path'
-import { isLandingBranchId, LANDING_BRANCH_COLUMNS } from '@/lib/landing-branch-choice'
+import {
+  branchForService,
+  isLandingBranchId,
+  isLandingServiceId,
+  LANDING_BRANCH_COLUMNS,
+} from '@/lib/landing-branch-choice'
 import nl from '../../../messages/nl.json'
 
 describe('shouldShowSectorChoiceGate', () => {
@@ -28,6 +33,12 @@ describe('landing branch columns', () => {
     expect(isLandingBranchId('winkel')).toBe(true)
     expect(isLandingBranchId('other')).toBe(true)
     expect(isLandingBranchId('frituur')).toBe(false)
+    expect(isLandingServiceId('frituur')).toBe(true)
+    expect(isLandingServiceId('bakker')).toBe(true)
+    expect(branchForService('bakker')).toBe('winkel')
+    expect(branchForService('boetiek')).toBe('retail')
+    expect(branchForService('frituur')).toBe('horeca')
+    expect(branchForService('other')).toBe('other')
   })
 
   it('has Dutch copy for the three columns and the other link', () => {
