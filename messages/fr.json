@@ -708,7 +708,7 @@
     "decline": "Refuser"
   },
   "sectorModal": {
-    "title": "Quelle branche correspond à votre établissement ?",
+    "title": "Choisissez votre branche",
     "other": "Autre branche / voir en général.",
     "columns": {
       "winkel": {

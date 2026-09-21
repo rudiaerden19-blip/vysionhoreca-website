@@ -133,7 +133,7 @@ describe('landing branch columns', () => {
 
   it('has Dutch copy for the three columns and the other link', () => {
     const modal = (nl as { sectorModal: { title: string; other: string; columns: Record<string, { title: string; items: Record<string, string> }> } }).sectorModal
-    expect(modal.title).toBe('Welke branche past bij uw zaak?')
+    expect(modal.title).toBe('Kies jouw branche')
     expect(modal.other).toBe('Andere branche / algemeen bekijken.')
     const sites = (nl as { heroLanding: { sites: Record<string, { title: string }> } }).heroLanding.sites
     expect(sites.winkel.title).toBe('Kassa & platform voor uw winkel')

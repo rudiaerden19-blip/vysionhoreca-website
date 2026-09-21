@@ -708,7 +708,7 @@
     "decline": "拒否する"
   },
   "sectorModal": {
-    "title": "Which industry fits your business?",
+    "title": "業種を選んでください",
     "other": "Other industry / browse generally.",
     "columns": {
       "winkel": {
