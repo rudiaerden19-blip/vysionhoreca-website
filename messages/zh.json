@@ -105,6 +105,20 @@
     "subtitleLead": "收银硬件与软件包含在您的订阅中",
     "subtitle": "",
     "audienceLine": "面向餐饮与零售企业",
+    "sites": {
+      "winkel": {
+        "title": "为您的店铺打造的收银与平台",
+        "subtitleLead": "收银硬件与软件均含在订阅中",
+        "subtitle": "适用于面包店、肉铺、美发店、服装店和专卖店。",
+        "audienceLine": "为街边店铺而建"
+      },
+      "retail": {
+        "title": "为零售打造的收银与平台",
+        "subtitleLead": "收银硬件与软件均含在订阅中",
+        "subtitle": "适用于精品店、电子、批发和零售。",
+        "audienceLine": "为零售与批发而建"
+      }
+    },
     "ctaStartFree": "免费开始",
     "ctaViewDemo": "查看演示",
     "ctaModulesHeadline": "完整专业系统",

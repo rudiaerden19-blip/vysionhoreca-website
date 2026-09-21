@@ -187,6 +187,20 @@
     "subtitleLead": "POS hardware & software included in your subscription",
     "subtitle": "",
     "audienceLine": "For hospitality and retail businesses",
+    "sites": {
+      "winkel": {
+        "title": "POS & platform for your shop",
+        "subtitleLead": "POS hardware & software included in your subscription",
+        "subtitle": "For bakeries, butchers, hair salons, clothing stores and specialty shops.",
+        "audienceLine": "Built for the high street"
+      },
+      "retail": {
+        "title": "POS & retail platform for your business",
+        "subtitleLead": "POS hardware & software included in your subscription",
+        "subtitle": "For boutiques, electronics, wholesale and retail.",
+        "audienceLine": "Built for retail & wholesale"
+      }
+    },
     "ctaStartFree": "Start free",
     "ctaViewDemo": "View demo",
     "ctaModulesHeadline": "Complete premium system",

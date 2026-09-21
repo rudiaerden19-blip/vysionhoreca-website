@@ -105,6 +105,20 @@
     "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
     "subtitle": "",
     "audienceLine": "Für Gastronomie- und Retail-Unternehmen",
+    "sites": {
+      "winkel": {
+        "title": "Kasse & Plattform für Ihr Geschäft",
+        "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
+        "subtitle": "Für Bäckereien, Metzgereien, Friseure, Modegeschäfte und Fachhandel.",
+        "audienceLine": "Gemacht für die Einkaufsstraße"
+      },
+      "retail": {
+        "title": "Kasse & Retail-Plattform für Ihr Unternehmen",
+        "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
+        "subtitle": "Für Boutiquen, Elektronik, Großhandel und Retail.",
+        "audienceLine": "Gemacht für Retail & Großhandel"
+      }
+    },
     "ctaStartFree": "Kostenlos starten",
     "ctaViewDemo": "Demo ansehen",
     "ctaModulesHeadline": "Komplettes Premium-System",

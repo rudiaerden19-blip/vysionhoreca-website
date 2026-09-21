@@ -105,6 +105,20 @@
     "subtitleLead": "Hardware e software cassa inclusi nel tuo abbonamento",
     "subtitle": "",
     "audienceLine": "Per imprese horeca e retail",
+    "sites": {
+      "winkel": {
+        "title": "Cassa e piattaforma per il tuo negozio",
+        "subtitleLead": "Hardware e software cassa inclusi nell'abbonamento",
+        "subtitle": "Per panifici, macellerie, parrucchieri, abbigliamento e negozi specializzati.",
+        "audienceLine": "Pensato per il negozio di vicinato"
+      },
+      "retail": {
+        "title": "Cassa e piattaforma retail per la tua attività",
+        "subtitleLead": "Hardware e software cassa inclusi nell'abbonamento",
+        "subtitle": "Per boutique, elettronica, ingrosso e retail.",
+        "audienceLine": "Pensato per retail e ingrosso"
+      }
+    },
     "ctaStartFree": "Inizia gratis",
     "ctaViewDemo": "Guarda la demo",
     "ctaModulesHeadline": "Sistema premium completo",

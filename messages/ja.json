@@ -105,6 +105,20 @@
     "subtitleLead": "レジのハードとソフトがサブスクに含まれます",
     "subtitle": "",
     "audienceLine": "ホスピタリティ・小売の事業者向け",
+    "sites": {
+      "winkel": {
+        "title": "お店のためのレジ＆プラットフォーム",
+        "subtitleLead": "レジ機器とソフトがサブスクに含まれます",
+        "subtitle": "パン屋、精肉店、美容室、衣料品店、専門店向け。",
+        "audienceLine": "街のお店のために"
+      },
+      "retail": {
+        "title": "小売のためのレジ＆プラットフォーム",
+        "subtitleLead": "レジ機器とソフトがサブスクに含まれます",
+        "subtitle": "ブティック、家電、卸売、小売向け。",
+        "audienceLine": "小売と卸売のために"
+      }
+    },
     "ctaStartFree": "無料で始める",
     "ctaViewDemo": "デモを見る",
     "ctaModulesHeadline": "プレミアム一式システム",

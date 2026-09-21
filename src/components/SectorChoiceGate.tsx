@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import {
   LANDING_BRANCH_COLUMNS,
   LANDING_BRANCH_STORAGE_KEY,
   branchForService,
+  landingSitePathForBranch,
   type LandingServiceId,
 } from '@/lib/landing-branch-choice'
 import {
@@ -37,6 +38,7 @@ function saveService(service: LandingServiceId) {
  */
 export default function SectorChoiceGate() {
   const pathname = usePathname()
+  const router = useRouter()
   const { t } = useLanguage()
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
@@ -80,7 +82,13 @@ export default function SectorChoiceGate() {
     saveService(service)
     setDismissed(true)
     setOpen(false)
-  }, [])
+    const dest = landingSitePathForBranch(branchForService(service))
+    const current = (pathname || window.location.pathname).split('?')[0].replace(/\/+$/, '') || '/'
+    const destNorm = dest.replace(/\/+$/, '') || '/'
+    if (current !== destNorm) {
+      router.push(dest)
+    }
+  }, [pathname, router])
 
   useEffect(() => {
     if (!open) return

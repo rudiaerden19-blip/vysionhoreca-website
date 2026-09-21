@@ -3,9 +3,14 @@
 import { VYSION_BRAND_SITE_NAME } from '@/lib/vysion-site'
 import { useLanguage } from '@/i18n'
 import BackToTopBar from '@/components/BackToTopBar'
+import { usePathname } from 'next/navigation'
+import { marketingSiteHashHref } from '@/lib/landing-branch-choice'
 
 export default function Footer() {
   const { t } = useLanguage()
+  const pathname = usePathname()
+  const pricingHref = marketingSiteHashHref(pathname, 'prijzen')
+  const contactHref = marketingSiteHashHref(pathname, 'contact')
 
   return (
     <>
@@ -105,7 +110,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="/#prijzen"
+                    href={pricingHref}
                     title={t('footer.pricingLinkTitle')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >
@@ -129,7 +134,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="/#contact"
+                    href={contactHref}
                     title={t('footer.contactLinkTitle')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >

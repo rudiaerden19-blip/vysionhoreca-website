@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
@@ -12,6 +13,10 @@ import {
   MONTHLY_PRICE_WITHOUT_HARDWARE,
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
+import {
+  landingBranchFromPathname,
+  marketingSiteHashHref,
+} from '@/lib/landing-branch-choice'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -205,11 +210,27 @@ function HeroCtaFlipCard() {
 export default function HomeLandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useLanguage()
+  const pathname = usePathname()
+  const branch = landingBranchFromPathname(pathname)
+  const title =
+    branch === 'horeca' ? t('heroLanding.title') : t(`heroLanding.sites.${branch}.title`)
+  const subtitleLead =
+    branch === 'horeca' ? t('heroLanding.subtitleLead') : t(`heroLanding.sites.${branch}.subtitleLead`)
+  const subtitle =
+    branch === 'horeca' ? t('heroLanding.subtitle') : t(`heroLanding.sites.${branch}.subtitle`)
+  const audienceLine =
+    branch === 'horeca' ? t('heroLanding.audienceLine') : t(`heroLanding.sites.${branch}.audienceLine`)
+  const heroBg =
+    branch === 'winkel'
+      ? '/images/kassa-platform-2.png'
+      : branch === 'retail'
+        ? '/images/kassa-platform-4.png'
+        : HERO_BG
 
   const pillLinks: { href: string; label: string }[] = [
-    { href: '/#sectoren', label: t('nav.sectors') },
-    { href: '/#platform', label: t('nav.services') },
-    { href: '/#prijzen', label: t('nav.pricing') },
+    { href: marketingSiteHashHref(pathname, 'sectoren'), label: t('nav.sectors') },
+    { href: marketingSiteHashHref(pathname, 'platform'), label: t('nav.services') },
+    { href: marketingSiteHashHref(pathname, 'prijzen'), label: t('nav.pricing') },
   ]
 
   return (
@@ -218,7 +239,7 @@ export default function HomeLandingHero() {
     >
       <div className="absolute inset-x-0 top-[-5rem] bottom-0">
         <Image
-          src={HERO_BG}
+          src={heroBg}
           alt=""
           fill
           priority
@@ -276,22 +297,27 @@ export default function HomeLandingHero() {
           ariaLabel={t('heroLanding.googleReviewsAria')}
           className="mb-5 sm:mb-6"
         />
+        {branch !== 'horeca' ? (
+          <p className="mb-3 text-sm font-extrabold tracking-[0.18em] text-[#5EC4E8]">
+            {t(`sectorModal.columns.${branch}.title`)}
+          </p>
+        ) : null}
         <h1 className={`mx-auto w-full max-w-4xl text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight tracking-tight ${HERO_KASSA_ACCENT}`}>
-          {t('heroLanding.title')}
+          {title}
         </h1>
         <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
-          {t('heroLanding.subtitleLead')}
+          {subtitleLead}
         </p>
-        {t('heroLanding.subtitle') ? (
+        {subtitle ? (
           <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
-            {t('heroLanding.subtitle')}
+            {subtitle}
           </p>
         ) : null}
         <HeroCtaFlipCard />
         <p
           className={`mt-6 sm:mt-8 max-w-2xl px-2 text-center text-xl sm:text-2xl md:text-[1.65rem] font-bold leading-snug tracking-tight ${HERO_KASSA_ACCENT}`}
         >
-          {t('heroLanding.audienceLine')}
+          {audienceLine}
         </p>
       </div>
     </section>

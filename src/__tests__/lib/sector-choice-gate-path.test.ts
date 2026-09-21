@@ -7,14 +7,19 @@ import {
   isLandingBranchId,
   isLandingServiceId,
   LANDING_BRANCH_COLUMNS,
+  landingBranchFromPathname,
+  landingSitePathForBranch,
+  marketingSiteHashHref,
 } from '@/lib/landing-branch-choice'
 import nl from '../../../messages/nl.json'
 
 describe('shouldShowSectorChoiceGate', () => {
   const host = 'www.vysion-kassa.com'
 
-  it('shows on the marketing homepage', () => {
+  it('shows on the marketing homepage and branch sites', () => {
     expect(shouldShowSectorChoiceGate('/', host)).toBe(true)
+    expect(shouldShowSectorChoiceGate('/winkel', host)).toBe(true)
+    expect(shouldShowSectorChoiceGate('/retail', host)).toBe(true)
   })
 
   it('does not show on login or register', () => {
@@ -113,10 +118,26 @@ describe('landing branch columns', () => {
     expect(branchForService('other')).toBe('other')
   })
 
+  it('routes each branch to its own marketing site', () => {
+    expect(landingSitePathForBranch('winkel')).toBe('/winkel')
+    expect(landingSitePathForBranch('retail')).toBe('/retail')
+    expect(landingSitePathForBranch('horeca')).toBe('/')
+    expect(landingSitePathForBranch('other')).toBe('/')
+    expect(landingBranchFromPathname('/winkel')).toBe('winkel')
+    expect(landingBranchFromPathname('/retail')).toBe('retail')
+    expect(landingBranchFromPathname('/')).toBe('horeca')
+    expect(landingBranchFromPathname('/over-ons')).toBe('horeca')
+    expect(marketingSiteHashHref('/winkel', 'prijzen')).toBe('/winkel#prijzen')
+    expect(marketingSiteHashHref('/', 'prijzen')).toBe('/#prijzen')
+  })
+
   it('has Dutch copy for the three columns and the other link', () => {
     const modal = (nl as { sectorModal: { title: string; other: string; columns: Record<string, { title: string; items: Record<string, string> }> } }).sectorModal
     expect(modal.title).toBe('Welke branche past bij uw zaak?')
     expect(modal.other).toBe('Andere branche / algemeen bekijken.')
+    const sites = (nl as { heroLanding: { sites: Record<string, { title: string }> } }).heroLanding.sites
+    expect(sites.winkel.title).toBe('Kassa & platform voor uw winkel')
+    expect(sites.retail.title).toBe('Kassa & retailplatform voor uw zaak')
     for (const column of LANDING_BRANCH_COLUMNS) {
       expect(modal.columns[column.id]?.title).toBeTruthy()
       for (const itemKey of column.itemKeys) {

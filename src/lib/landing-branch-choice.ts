@@ -68,3 +68,30 @@ export function branchForService(service: LandingServiceId): LandingBranchId {
   const column = LANDING_BRANCH_COLUMNS.find((c) => c.itemKeys.includes(service))
   return column?.id ?? 'other'
 }
+
+/** Drie marketing-sites: winkel + retail eigen URL, horeca = bestaande homepage. */
+export const LANDING_SITE_PATHS = {
+  winkel: '/winkel',
+  retail: '/retail',
+  horeca: '/',
+  other: '/',
+} as const
+
+export function landingSitePathForBranch(branch: LandingBranchId): string {
+  return LANDING_SITE_PATHS[branch]
+}
+
+export function landingBranchFromPathname(
+  pathname: string | null,
+): Exclude<LandingBranchId, 'other'> {
+  const path = (pathname || '/').split('?')[0].replace(/\/+$/, '') || '/'
+  if (path === '/winkel' || path.startsWith('/winkel/')) return 'winkel'
+  if (path === '/retail' || path.startsWith('/retail/')) return 'retail'
+  return 'horeca'
+}
+
+export function marketingSiteHashHref(pathname: string | null, hashId: string): string {
+  const base = landingSitePathForBranch(landingBranchFromPathname(pathname))
+  const id = hashId.replace(/^#/, '')
+  return base === '/' ? `/#${id}` : `${base}#${id}`
+}

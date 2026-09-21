@@ -105,6 +105,20 @@
     "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
     "subtitle": "",
     "audienceLine": "Para negocios de hostelería y retail",
+    "sites": {
+      "winkel": {
+        "title": "Caja y plataforma para tu tienda",
+        "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
+        "subtitle": "Para panaderías, carnicerías, peluquerías, tiendas de ropa y comercios especializados.",
+        "audienceLine": "Hecho para el comercio de barrio"
+      },
+      "retail": {
+        "title": "Caja y plataforma retail para tu negocio",
+        "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
+        "subtitle": "Para boutiques, electrónica, mayoristas y retail.",
+        "audienceLine": "Hecho para retail y mayoristas"
+      }
+    },
     "ctaStartFree": "Empezar gratis",
     "ctaViewDemo": "Ver demo",
     "ctaModulesHeadline": "Sistema premium completo",

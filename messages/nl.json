@@ -187,6 +187,20 @@
     "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
     "subtitle": "",
     "audienceLine": "Voor horeca- en retailondernemingen",
+    "sites": {
+      "winkel": {
+        "title": "Kassa & platform voor uw winkel",
+        "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+        "subtitle": "Voor bakkers, slagers, kappers, kledingzaken en speciaalzaken.",
+        "audienceLine": "Gemaakt voor de winkelstraat"
+      },
+      "retail": {
+        "title": "Kassa & retailplatform voor uw zaak",
+        "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+        "subtitle": "Voor boetieks, elektronica, groothandel en retail.",
+        "audienceLine": "Gemaakt voor retail & groothandel"
+      }
+    },
     "ctaStartFree": "Start gratis",
     "ctaViewDemo": "Bekijk demo",
     "ctaModulesHeadline": "Compleet premium systeem",

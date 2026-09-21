@@ -105,6 +105,20 @@
     "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
     "subtitle": "",
     "audienceLine": "Pour les établissements horeca et retail",
+    "sites": {
+      "winkel": {
+        "title": "Caisse & plateforme pour votre magasin",
+        "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
+        "subtitle": "Pour boulangeries, boucheries, salons, magasins de vêtements et commerces spécialisés.",
+        "audienceLine": "Conçu pour le commerce de proximité"
+      },
+      "retail": {
+        "title": "Caisse & plateforme retail pour votre enseigne",
+        "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
+        "subtitle": "Pour boutiques, électronique, gros et retail.",
+        "audienceLine": "Conçu pour le retail et le gros"
+      }
+    },
     "ctaStartFree": "Commencer gratuitement",
     "ctaViewDemo": "Voir la démo",
     "ctaModulesHeadline": "Système premium complet",
