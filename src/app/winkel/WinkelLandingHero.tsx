@@ -13,7 +13,7 @@ import {
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
 
-const HERO_BG = '/images/abonnement-gallery-pos-3.png'
+const HERO_BG = '/images/winkel-hero-header.jpg'
 
 /** Marketing kassa-hero: lichtblauw accent op titel/prijs (lichter dan platform `accent` #0E5D82). */
 const HERO_KASSA_ACCENT = 'text-[#5EC4E8]'
