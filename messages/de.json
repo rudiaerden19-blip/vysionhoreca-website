@@ -6587,6 +6587,31 @@
         "title": "Live-Support",
         "body": "Beim Start und in Stoßzeiten. Sie rufen an, wir lösen es."
       }
+    },
+    "subtitleLead": "Kassen-Hardware und Software im Abo enthalten",
+    "audienceLine": "Gemacht für die Ladenstraße",
+    "offline": {
+      "title": "Auch offline im Laden",
+      "body": "Läuft weiter, wenn das Internet ausfällt. Sobald Sie wieder online sind, gleicht sich alles ab."
+    },
+    "gratisWebsite": {
+      "title": "Kostenloser Webshop für Ihren Laden",
+      "body": "Im Abo ist ein eigener Webshop enthalten, ohne Aufpreis. Farben, Fotos und Texte passen Sie selbst an.",
+      "cta": "Beispiel ansehen"
+    },
+    "kiosk": {
+      "imageAlt": "Kassenhardware für die Ladentheke",
+      "carouselAria": "Fotos der Ladenhardware: mit den Pfeilen blättern",
+      "clickToEnlarge": "Klicken Sie auf das Foto zum Vergrößern",
+      "subtitle": "Hardware für die Theke",
+      "body": "Keine Gastro-Kiosk: eine kompakte Kasse, Scanner, Lade und Drucker für Bäcker, Metzger, Friseur und die Ladenstraße.",
+      "features": {
+        "1": "Touchscreen-Kasse auf der Theke",
+        "2": "Barcode-Scanner für Brot, Fleisch, Kleidung und mehr",
+        "3": "Kassenschublade und Bondrucker bei Hardware",
+        "4": "Eigener Webshop, dieselben Produkte wie im Laden",
+        "5": "Kasse und Lager in einem System"
+      }
     }
   },
   "retailSite": {
@@ -6624,6 +6649,31 @@
       "support": {
         "title": "Live-Support",
         "body": "Start, Schulung und Hilfe im Rush. Sie rufen uns."
+      }
+    },
+    "subtitleLead": "Kassen-Hardware und Software im Abo enthalten",
+    "audienceLine": "Gemacht für Retail & Großhandel",
+    "offline": {
+      "title": "Auch offline im Betrieb",
+      "body": "Retail und Großhandel verkaufen weiter, wenn das Netz ausfällt. Abends synchronisiert das System automatisch."
+    },
+    "gratisWebsite": {
+      "title": "Kostenloser Webshop für Retail",
+      "body": "Im Abo ist ein Webshop für Boutique, Elektronik oder Großhandel enthalten, ohne Aufpreis.",
+      "cta": "Beispiel ansehen"
+    },
+    "kiosk": {
+      "imageAlt": "Kassenhardware für Retail und Großhandel",
+      "carouselAria": "Fotos der Retail-Hardware: mit den Pfeilen blättern",
+      "clickToEnlarge": "Klicken Sie auf das Foto zum Vergrößern",
+      "subtitle": "Hardware für Retail",
+      "body": "Keine Gastro-Kiosk: eine Kasse mit Barcodes, Drucker und Lager für Boutique, Elektronik, Großhandel und Retail.",
+      "features": {
+        "1": "Touchscreen-POS für viele Artikel",
+        "2": "Barcodes in Laden und Lager",
+        "3": "Drucker und Scanner bei Hardware",
+        "4": "Lager für tausende SKUs",
+        "5": "Kasse, Karte und Berichte auf einem Bildschirm"
       }
     }
   }

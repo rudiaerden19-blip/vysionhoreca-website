@@ -6564,6 +6564,31 @@
         "title": "Supporto live",
         "body": "All’avvio e nei picchi. Chiami, risolviamo."
       }
+    },
+    "subtitleLead": "Hardware e software cassa inclusi nell’abbonamento",
+    "audienceLine": "Fatto per i negozi di vicinato",
+    "offline": {
+      "title": "Funziona anche offline in negozio",
+      "body": "Continua se internet cade. Tornati online, tutto si aggiorna."
+    },
+    "gratisWebsite": {
+      "title": "E-commerce gratis per il tuo negozio",
+      "body": "L’abbonamento include un e-commerce, senza costi extra.",
+      "cta": "Vedi un esempio"
+    },
+    "kiosk": {
+      "imageAlt": "Hardware cassa per il bancone",
+      "carouselAria": "Foto dell’hardware negozio: sfoglia con le frecce",
+      "clickToEnlarge": "Clicca la foto per ingrandire",
+      "subtitle": "Hardware per il bancone",
+      "body": "Non è un kiosk horeca: cassa compatta, scanner, cassetto e stampante per panetteria, macelleria, parrucchiere e negozi di vicinato.",
+      "features": {
+        "1": "Cassa touch sul bancone",
+        "2": "Scanner barcode per pane, carne, abbigliamento",
+        "3": "Cassetto e stampante con l’hardware",
+        "4": "E-commerce, gli stessi prodotti del negozio",
+        "5": "Cassa e magazzino in un solo sistema"
+      }
     }
   },
   "retailSite": {
@@ -6601,6 +6626,31 @@
       "support": {
         "title": "Supporto live",
         "body": "Avvio, formazione e aiuto nel rush. Ci chiami."
+      }
+    },
+    "subtitleLead": "Hardware e software cassa inclusi nell’abbonamento",
+    "audienceLine": "Fatto per retail e ingrosso",
+    "offline": {
+      "title": "Funziona anche offline",
+      "body": "Retail e ingrosso vendono anche se la rete cade. La sera il sistema si sincronizza."
+    },
+    "gratisWebsite": {
+      "title": "E-commerce gratis per il retail",
+      "body": "L’abbonamento include un e-commerce per boutique, elettronica o ingrosso, senza costi extra.",
+      "cta": "Vedi un esempio"
+    },
+    "kiosk": {
+      "imageAlt": "Hardware cassa per retail e ingrosso",
+      "carouselAria": "Foto dell’hardware retail: sfoglia con le frecce",
+      "clickToEnlarge": "Clicca la foto per ingrandire",
+      "subtitle": "Hardware per il retail",
+      "body": "Non è un kiosk horeca: cassa con barcode, stampante e magazzino per boutique, elettronica, ingrosso e retail.",
+      "features": {
+        "1": "POS touch per tanti articoli",
+        "2": "Barcode in negozio e magazzino",
+        "3": "Stampante e scanner con l’hardware",
+        "4": "Magazzino per migliaia di SKU",
+        "5": "Cassa, carta e report su uno schermo"
       }
     }
   }

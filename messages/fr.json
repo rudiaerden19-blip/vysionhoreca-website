@@ -6587,6 +6587,31 @@
         "title": "Support en direct",
         "body": "Au démarrage et aux heures de pointe. Vous appelez, on résout."
       }
+    },
+    "subtitleLead": "Matériel et logiciel de caisse inclus dans l’abonnement",
+    "audienceLine": "Fait pour le commerce de proximité",
+    "offline": {
+      "title": "Fonctionne hors ligne en magasin",
+      "body": "Continue si internet tombe. Une fois reconnecté, tout se met à jour — boulanger, boucher, coiffeur ou magasin de nuit."
+    },
+    "gratisWebsite": {
+      "title": "Boutique en ligne gratuite pour votre magasin",
+      "body": "Votre abonnement inclut une boutique en ligne, sans frais extra. Couleurs, photos et textes à votre goût.",
+      "cta": "Voir un exemple"
+    },
+    "kiosk": {
+      "imageAlt": "Matériel de caisse pour le comptoir",
+      "carouselAria": "Photos du matériel magasin : parcourez avec les flèches",
+      "clickToEnlarge": "Cliquez sur la photo pour agrandir",
+      "subtitle": "Matériel pour le comptoir",
+      "body": "Pas une kiosque horeca : une caisse compacte, scanner, tiroir et imprimante pour boulanger, boucher, coiffeur et commerces de proximité.",
+      "features": {
+        "1": "Caisse tactile sur le comptoir",
+        "2": "Scanner codes-barres pour pain, viande, vêtements",
+        "3": "Tiroir et imprimante avec le matériel",
+        "4": "Boutique en ligne, les mêmes produits qu’en magasin",
+        "5": "Caisse et stock dans un seul système"
+      }
     }
   },
   "retailSite": {
@@ -6624,6 +6649,31 @@
       "support": {
         "title": "Support en direct",
         "body": "Démarrage, formation et aide pendant le rush. Vous nous appelez."
+      }
+    },
+    "subtitleLead": "Matériel et logiciel de caisse inclus dans l’abonnement",
+    "audienceLine": "Fait pour le retail et le gros",
+    "offline": {
+      "title": "Fonctionne hors ligne en magasin",
+      "body": "Retail et gros continuent de vendre si le réseau tombe. Le soir, le système se synchronise."
+    },
+    "gratisWebsite": {
+      "title": "Boutique en ligne gratuite pour le retail",
+      "body": "Votre abonnement inclut une boutique pour boutique, électronique ou gros, sans frais extra.",
+      "cta": "Voir un exemple"
+    },
+    "kiosk": {
+      "imageAlt": "Matériel de caisse pour retail et gros",
+      "carouselAria": "Photos du matériel retail : parcourez avec les flèches",
+      "clickToEnlarge": "Cliquez sur la photo pour agrandir",
+      "subtitle": "Matériel retail",
+      "body": "Pas une kiosque horeca : une caisse avec codes-barres, imprimante et stock pour boutique, électronique, gros et retail.",
+      "features": {
+        "1": "POS tactile pour de nombreux articles",
+        "2": "Codes-barres en magasin et entrepôt",
+        "3": "Imprimante et scanner avec le matériel",
+        "4": "Stock pour des milliers de SKU",
+        "5": "Caisse, carte et rapports sur un écran"
       }
     }
   }

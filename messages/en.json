@@ -6523,6 +6523,31 @@
         "title": "Live support",
         "body": "At launch and busy moments. You call, we fix it."
       }
+    },
+    "subtitleLead": "POS hardware & software included in your subscription",
+    "audienceLine": "Built for the high street",
+    "offline": {
+      "title": "Works offline in the shop",
+      "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."
+    },
+    "gratisWebsite": {
+      "title": "Free webshop for your shop",
+      "body": "Your subscription includes your own webshop, at no extra cost. Colours, photos and texts are yours to change.",
+      "cta": "See an example"
+    },
+    "kiosk": {
+      "imageAlt": "POS hardware for the shop counter",
+      "carouselAria": "Shop hardware photos: browse with the arrows",
+      "clickToEnlarge": "Click the photo to enlarge",
+      "subtitle": "Hardware for the counter",
+      "body": "Not a restaurant kiosk: a compact till, barcode scanner, drawer and printer for bakers, butchers, hairdressers and high-street shops. Linked to your stock and webshop.",
+      "features": {
+        "1": "Touchscreen till on the counter",
+        "2": "Barcode scanner for bread, meat, clothing and more",
+        "3": "Cash drawer and receipt printer with hardware",
+        "4": "Your own webshop, the same products as in the shop",
+        "5": "Checkout and stock in one system"
+      }
     }
   },
   "retailSite": {
@@ -6560,6 +6585,31 @@
       "support": {
         "title": "Live support",
         "body": "Onboarding, training and help during the rush. You call us."
+      }
+    },
+    "subtitleLead": "POS hardware & software included in your subscription",
+    "audienceLine": "Built for retail & wholesale",
+    "offline": {
+      "title": "Works offline in the store",
+      "body": "Retail and wholesale keep selling if the network drops. At night the system syncs automatically."
+    },
+    "gratisWebsite": {
+      "title": "Free webshop for retail",
+      "body": "Your subscription includes a webshop for boutique, electronics or wholesale, at no extra cost.",
+      "cta": "See an example"
+    },
+    "kiosk": {
+      "imageAlt": "POS hardware for retail and wholesale",
+      "carouselAria": "Retail hardware photos: browse with the arrows",
+      "clickToEnlarge": "Click the photo to enlarge",
+      "subtitle": "Hardware for retail",
+      "body": "Not a hospitality kiosk: a till with barcodes, printer and stock for boutique, electronics, wholesale and retail.",
+      "features": {
+        "1": "Touchscreen POS for large catalogues",
+        "2": "Barcodes in shop and warehouse",
+        "3": "Printer and scanner included with hardware",
+        "4": "Stock for thousands of SKUs",
+        "5": "Checkout, card and reports on one screen"
       }
     }
   }

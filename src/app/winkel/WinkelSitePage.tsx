@@ -1,184 +1,1525 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { Navigation, Footer, CookieBanner } from '@/components'
-import ContactPageSection from '@/components/ContactPageSection'
+import {
+  Navigation,
+  Footer,
+  CookieBanner,
+} from '@/components'
+import WinkelLandingHero from './WinkelLandingHero'
+
+const PlatformGridSection = dynamic(() => import('@/components/PlatformGridSection'), { loading: () => null })
+const ConnectedSystemHubSection = dynamic(
+  () => import('@/components/ConnectedSystemHubSection'),
+  { loading: () => null },
+)
+const VysionBeestSection = dynamic(() => import('@/components/VysionBeestSection'), { loading: () => null })
+const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
+const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
+import { useLanguage } from '@/i18n'
+import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
+import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
-import GoogleReviewsHeroBadge from '@/components/GoogleReviewsHeroBadge'
-import { useLanguage } from '@/i18n'
-import { LANDING_BRANCH_COLUMNS } from '@/lib/landing-branch-choice'
-import {
-  MONTHLY_PRICE_WITHOUT_HARDWARE,
-  MONTHLY_PRICE_WITH_HARDWARE,
-  monthlyPriceForHardware,
-} from '@/lib/pricing-hardware'
+import { WhyVysionHardwareVideos } from '@/components/HardwareVideoStack'
 
-const WINKEL_ITEM_KEYS =
-  LANDING_BRANCH_COLUMNS.find((column) => column.id === 'winkel')?.itemKeys ?? []
+const GRATIS_WEBSITE_EXAMPLE_HREF =
+  'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
 
-const MODULE_KEYS = ['pos', 'stock', 'barcode', 'webshop', 'reports', 'support'] as const
-
-const HARDWARE = [
-  { src: '/images/hardware/hardware-tf30-kassa.png', alt: 'Elo touchscreen kassa' },
-  { src: '/images/hardware/hardware-barcode-scanner.png', alt: 'Barcodescanner' },
-  { src: '/images/hardware/hardware-premium-lade.png', alt: 'Kassalade' },
-] as const
-
-export default function WinkelSitePage() {
+function GratisWebsiteBannerSection() {
   const { t } = useLanguage()
-  const [withHardware, setWithHardware] = useState(false)
-  const price = monthlyPriceForHardware(withHardware)
+  return (
+    <section
+      className="relative py-12 sm:py-14 bg-white border-b border-gray-100"
+      aria-labelledby="gratis-website-heading"
+    >
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2
+          id="gratis-website-heading"
+          className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight mb-3"
+        >
+          {t('winkelSite.gratisWebsite.title')}
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-6">
+          {t('winkelSite.gratisWebsite.body')}
+        </p>
+        <div className="flex justify-center">
+          <a
+            href={GRATIS_WEBSITE_EXAMPLE_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
+          >
+            {t('winkelSite.gratisWebsite.cta')}
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/** @see HardwareVideoStack — showcase-video in Waarom Vysion */
+
+function WhyVysionSection() {
+  const { t, locale } = useLanguage()
+  const pointKeys = [
+    'inHouseSoftware',
+    'fullPlatform',
+    'liveSupport',
+    'rightPrice',
+    'posQuality',
+    'foodtrucksOffline',
+  ] as const
 
   return (
-    <main className="bg-[#f7f4ef] text-gray-900">
-      <HomeScrollOnLoad />
-      <Navigation />
-
-      <section className="relative pt-28 sm:pt-32 pb-16 sm:pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div>
-            <p className="text-sm font-extrabold tracking-[0.18em] text-[#0E5D82] mb-4">
-              {t('sectorModal.columns.winkel.title')}
-            </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight text-[#0E5D82]">
-              {t('winkelSite.title')}
-            </h1>
-            <p className="mt-5 text-lg sm:text-xl text-gray-700 leading-relaxed max-w-xl">
-              {t('winkelSite.lead')}
-            </p>
-            <ul className="mt-8 space-y-3 text-base sm:text-lg text-gray-800">
-              <li className="flex gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#5EC4E8]" aria-hidden />
-                {t('winkelSite.point1')}
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#5EC4E8]" aria-hidden />
-                {t('winkelSite.point2')}
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#5EC4E8]" aria-hidden />
-                {t('winkelSite.point3')}
-              </li>
-            </ul>
-            <div className="mt-8">
-              <GoogleReviewsHeroBadge
-                label={t('heroLanding.googleReviewsLabel')}
-                ariaLabel={t('heroLanding.googleReviewsAria')}
-                className="!bg-white !text-gray-900 !border-gray-200 hover:!bg-gray-50"
-              />
-            </div>
-            <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="mt-8 sm:justify-start" />
-          </div>
-          <div className="relative rounded-3xl bg-white border border-gray-200 shadow-home-float p-6 sm:p-10">
-            <Image
-              src="/images/hardware/hardware-tf30-kassa.png"
-              alt={t('winkelSite.heroImageAlt')}
-              width={720}
-              height={560}
-              priority
-              className="w-full h-auto object-contain"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 sm:py-20 bg-white border-y border-gray-100" id="sectoren">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">
-            {t('winkelSite.usecasesTitle')}
-          </h2>
-          <ul className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            {WINKEL_ITEM_KEYS.map((key) => (
-              <li
-                key={key}
-                className="rounded-2xl border border-gray-200 bg-[#f7f4ef] px-4 py-5 text-center font-semibold text-gray-800"
-              >
-                {t(`sectorModal.columns.winkel.items.${key}`)}
+    <section className="relative pt-8 sm:pt-10 lg:pt-12 pb-24 sm:pb-32 lg:pb-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
+      <div
+        className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-accent/[0.08] blur-3xl sm:h-96 sm:w-96"
+        aria-hidden
+      />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-[clamp(1.05rem,3.4vw,2.5rem)] sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-none mb-10 sm:mb-12 lg:mb-14 text-center lg:text-left max-w-full lg:mx-0 mx-auto whitespace-nowrap">
+          {t('whyVysion.title')}
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-24 items-stretch">
+          <ul className="order-2 lg:order-1 space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0 lg:max-w-none min-h-0 lg:pr-4">
+            {pointKeys.map((key, i) => (
+              <li key={key} className="flex gap-4 sm:gap-5">
+                <span
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/12 text-sm font-bold tabular-nums text-accent ring-1 ring-accent/20"
+                  aria-hidden
+                >
+                  {i + 1}
+                </span>
+                <div className="min-w-0 pt-0.5">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
+                    {key === 'foodtrucksOffline'
+                      ? t('winkelSite.offline.title')
+                      : t(`whyVysion.${key}.title`)}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                    {key === 'foodtrucksOffline'
+                      ? t('winkelSite.offline.body')
+                      : t(`whyVysion.${key}.body`)}
+                  </p>
+                  {key === 'fullPlatform'? (
+                    <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
+                      {t('whyVysion.fullPlatform.bodyExtra')}
+                    </p>
+                  ) : null}
+                  {key === 'inHouseSoftware'? (
+                    <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
+                      {t('whyVysion.inHouseSoftware.bodyExtra')}
+                    </p>
+                  ) : null}
+                </div>
               </li>
             ))}
           </ul>
-        </div>
-      </section>
 
-      <section className="py-16 sm:py-24" id="platform">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">
-            {t('winkelSite.modulesTitle')}
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {MODULE_KEYS.map((key) => (
-              <article key={key} className="rounded-2xl bg-white border border-gray-200 p-6 shadow-home-card">
-                <h3 className="text-lg font-bold text-[#0E5D82] mb-2">
-                  {t(`winkelSite.modules.${key}.title`)}
-                </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  {t(`winkelSite.modules.${key}.body`)}
-                </p>
-              </article>
-            ))}
+          <div className="order-1 lg:order-2 relative flex w-full flex-col gap-8 self-start sm:gap-10 lg:gap-12 lg:pl-6 xl:pl-10">
+            <WhyVysionHardwareVideos />
+            <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="relative z-10 w-full shrink-0 lg:justify-start lg:px-0" />
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  )
+}
 
-      <section className="py-16 sm:py-20 bg-white border-y border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10">
-            {t('winkelSite.hardwareTitle')}
+// Stats Section
+function CountUp({ end, suffix = '', prefix = ''}: { end: number, suffix?: string, prefix?: string }) {
+  const [count, setCount] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [isVisible])
+
+  useEffect(() => {
+    if (!isVisible) return
+
+    const duration = 2000
+    const steps = 60
+    const increment = end / steps
+    let current = 0
+
+    const timer = setInterval(() => {
+      current += increment
+      if (current >= end) {
+        setCount(end)
+        clearInterval(timer)
+      } else {
+        setCount(Math.floor(current))
+      }
+    }, duration / steps)
+
+    return () => clearInterval(timer)
+  }, [isVisible, end])
+
+  return <div ref={ref}>{prefix}{count.toLocaleString()}{suffix}</div>
+}
+
+/** Trust-marquee: witte kaarten met logo + klantcase (i18n liveDemo.successStories.*). */
+const SUCCESS_STORY_CARDS = [
+  { src: '/images/partner-logos/02.png', key: 'vivaldi'},
+  { src: '/images/partner-logos/03.png', key: 'broodZo'},
+  { src: '/images/partner-logos/04.png', key: 'broodjesbar'},
+  { src: '/images/partner-logos/05.png', key: 'saintGermain'},
+  { src: '/images/partner-logos/06.png', key: 'frituurAnn'},
+  { src: '/images/partner-logos/07.png', key: 'butcher'},
+  { src: '/images/partner-logos/08.png', key: 'seelen'},
+] as const
+
+function StatsAndLiveDemoSection() {
+  const { t } = useLanguage()
+
+  const stats = [
+    { value: 250_000, prefix: '', suffix: '+', labelKey: 'stats.processed'},
+    { value: 1321, prefix: '', suffix: '', labelKey: 'stats.businesses'},
+    { value: 99.9, prefix: '', suffix: '%', labelKey: 'stats.uptime'},
+    { value: 24, prefix: '', suffix: '/7', labelKey: 'stats.support'},
+  ]
+
+  return (
+    <section className="pt-24 sm:pt-32 pb-24 sm:pb-32 bg-[#E3E3E3]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative -translate-y-[3cm]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
+                <CountUp end={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
+              </div>
+              <div className="text-gray-600">
+                {t(stat.labelKey)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Succesverhalen-marquee: glijdende kaarten (zelfde animatie als vroeger) */}
+      <div className="mt-12 sm:mt-16 md:mt-20">
+        <p className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-bold text-accent tracking-tight leading-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {t('liveDemo.clientsLead')}
+        </p>
+        <div className="relative w-full bg-[#E3E3E3] py-8 sm:py-10 md:py-12">
+          <div className="partner-marquee-viewport">
+            <div className="partner-marquee-track">
+              {[0, 1].map((dup) => (
+                <div key={dup} className="partner-marquee-segment">
+                  {SUCCESS_STORY_CARDS.map((card) => (
+                    <div key={`${dup}-${card.key}`} className="partner-marquee-slot">
+                      <div className="partner-success-card h-full">
+                        <div className="partner-success-logo">
+                          <Image
+                            src={card.src}
+                            alt=""
+                            width={280}
+                            height={120}
+                            sizes="(max-width: 768px) 60vw, 240px"
+                            loading="lazy"
+                            className="object-contain"
+                          />
+                        </div>
+                        <p className="text-center text-sm sm:text-base font-bold text-gray-900 leading-snug mb-3 min-h-[2.5rem] sm:min-h-[2.75rem] flex items-center justify-center">
+                          {t(`liveDemo.successStories.${card.key}.name`)}
+                        </p>
+                        <div className="mt-auto flex flex-col gap-2 pt-3 border-t border-gray-100">
+                          <div className="flex gap-2.5">
+                            <span
+                              className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
+                              aria-hidden
+                            >
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </span>
+                            <p className="text-left leading-snug">
+                              <span className="block text-lg sm:text-xl font-extrabold text-emerald-600 tabular-nums tracking-tight">
+                                {t(`liveDemo.successStories.${card.key}.metricHighlight`)}
+                              </span>
+                              <span className="mt-0.5 block text-xs sm:text-sm font-semibold text-gray-700">
+                                {t(`liveDemo.successStories.${card.key}.metricDetail`)}
+                              </span>
+                            </p>
+                          </div>
+                          <p className="border-l-2 border-accent/35 pl-2.5 text-[11px] sm:text-xs font-medium text-gray-500 leading-snug">
+                            {t(`liveDemo.successStories.${card.key}.credibility`)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Order App Section - Product Showcase with fade-in animation
+function OrderAppSection() {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [visibleImages, setVisibleImages] = useState<number[]>([])
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const hasTriggeredRef = useRef(false)
+  const { t } = useLanguage()
+
+  const images = [
+    '/images/app-1.png',
+    '/images/app-2.png',
+    '/images/app-3.png',
+    '/images/app-4.png',
+    '/images/app-5.png',
+  ]
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lightboxIndex !== null) {
+      setLightboxIndex(lightboxIndex === 0 ? images.length - 1 : lightboxIndex - 1)
+    }
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lightboxIndex !== null) {
+      setLightboxIndex(lightboxIndex === images.length - 1 ? 0 : lightboxIndex + 1)
+    }
+  }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasTriggeredRef.current) {
+          hasTriggeredRef.current = true
+          // Fade in images one by one with 200ms delay
+          images.forEach((_, index) => {
+            setTimeout(() => {
+              setVisibleImages(prev => [...prev, index])
+            }, index * 200)
+          })
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <section ref={sectionRef} className="py-28 sm:py-36 bg-[#e3e3e3] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            {t('orderApp.title')}
           </h2>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {HARDWARE.map((item) => (
-              <div key={item.src} className="rounded-2xl border border-gray-200 bg-[#f7f4ef] p-6 flex items-center justify-center min-h-[12rem]">
-                <Image src={item.src} alt={item.alt} width={280} height={220} className="w-full h-auto object-contain max-h-40" />
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            {t('orderApp.subtitle')}
+          </p>
+        </div>
+
+        {/* Product Showcase Grid - 1 row of 5 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
+          {images.map((src, index) => (
+            <div
+              key={index}
+              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300 shadow-home-image"
+              style={{
+                opacity: visibleImages.includes(index) ? 1 : 0,
+                transform: visibleImages.includes(index) ? 'translateY(0) scale(1)': 'translateY(30px) scale(0.95)',
+              }}
+              onClick={() => setLightboxIndex(index)}
+            >
+              <Image
+                src={src}
+                alt={`Vysion Platform ${index + 1}`}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                loading="lazy"
+                className="object-cover rounded-2xl hover:scale-105 transition-transform"
+              />
+            </div>
+          ))}
+        </div>
+
+        <p className="text-gray-500 text-sm text-center mt-6">{t('hero.clickToOpen')}</p>
+
+        {/* Lightbox with navigation */}
+        {lightboxIndex !== null && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+            onClick={() => setLightboxIndex(null)}
+          >
+            {/* Left Arrow */}
+            <button 
+              className="absolute left-4 sm:left-8 text-white text-5xl hover:text-accent transition-colors p-4"
+              onClick={goToPrev}
+              aria-label={t('ui.ariaPrevImage')}
+            >
+              <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <div
+              className="relative w-full max-w-5xl h-[min(88vh,1280px)] max-h-[90vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={images[lightboxIndex]}
+                alt={t('ui.lightboxImageAlt')}
+                fill
+                sizes="100vw"
+                priority
+                className="object-contain rounded-2xl shadow-home-image"
+              />
+            </div>
+
+            {/* Right Arrow */}
+            <button 
+              className="absolute right-4 sm:right-8 text-white text-5xl hover:text-accent transition-colors p-4"
+              onClick={goToNext}
+              aria-label={t('ui.ariaNextImage')}
+            >
+              <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Close button */}
+            <button 
+              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
+              onClick={() => setLightboxIndex(null)}
+              aria-label={t('ui.ariaClose')}
+            >
+              ×
+            </button>
+
+            {/* Image counter */}
+            <div className="absolute bottom-4 text-white text-sm">
+              {lightboxIndex + 1} / {images.length}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-12">
+          <MarketingStartAndDemoButtons demoHref="/winkel#contact" />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function PromoMarqueeBand() {
+  const { t } = useLanguage()
+  const promoText = t('whyVysion.promoMarquee')
+
+  return (
+    <div
+      className="why-vysion-promo-viewport relative w-full bg-black py-2.5 sm:py-3"
+      role="marquee"
+      aria-label={promoText}
+    >
+      <div className="why-vysion-promo-track">
+        {[0, 1].map((dup) => (
+          <div key={dup} className="why-vysion-promo-segment" aria-hidden={dup === 1 ? true : undefined}>
+            {[0, 1, 2, 3].map((i) => (
+              <span
+                key={`${dup}-${i}`}
+                className="text-white font-bold text-lg sm:text-xl md:text-2xl tracking-tight whitespace-nowrap uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+              >
+                {promoText}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Pricing Section
+/** Premium-kaart: alle Pro+-features in de vinkjeslijst (incl. reserveringsplatform). */
+/** Retail-popup: vaste featurevolgorde (links → rechts, per kolom). */
+const RETAIL_POPUP_FEATURE_IDS = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+] as const
+const RETAIL_POPUP_MID = Math.ceil(RETAIL_POPUP_FEATURE_IDS.length / 2)
+
+/** Vaste volgorde modules-popup (links → rechts, per kolom van boven naar beneden). */
+const MODULES_POPUP_ORDER = [
+  { plan: 'pro', i: 1 },
+  { plan: 'starter', i: 1 },
+  { plan: 'pro', i: 10 },
+  { plan: 'pro', i: 7 },
+  { plan: 'pro', i: 4 },
+  { plan: 'starter', i: 2 },
+  { plan: 'starter', i: 4 },
+  { plan: 'starter', i: 5 },
+  { plan: 'starter', i: 8 },
+  { plan: 'starter', i: 10 },
+  { plan: 'starter', i: 12 },
+  { plan: 'pro', i: 3 },
+  { plan: 'pro', i: 5 },
+  { plan: 'pro', i: 9 },
+  { plan: 'pro', i: 6 },
+  { plan: 'pro', i: 2 },
+  { plan: 'starter', i: 11 },
+  { plan: 'starter', i: 9 },
+  { plan: 'starter', i: 3 },
+  { plan: 'starter', i: 13 },
+  { plan: 'starter', i: 6 },
+] as const
+
+function modulePopupLabel(t: (key: string) => string, entry: (typeof MODULES_POPUP_ORDER)[number]) {
+  return t(`pricing.${entry.plan}.features.${entry.i}`)
+}
+
+const MODULES_POPUP_MID = Math.ceil(MODULES_POPUP_ORDER.length / 2)
+
+function PricingFeatureCheck({ label }: { label: string }) {
+  return (
+    <li className="flex items-start gap-3">
+      <svg
+        className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+      <span className="text-sm leading-snug text-gray-600 sm:text-base">{label}</span>
+    </li>
+  )
+}
+
+function PricingModalHardwareFooter({
+  withHardware,
+  t,
+}: {
+  withHardware: boolean
+  t: (key: string) => string
+}) {
+  if (!withHardware) return null
+  return (
+    <p className="mb-3 text-center text-xs leading-relaxed text-gray-600 sm:text-sm sm:leading-relaxed">
+      {t('pricing.hardwarePackageFooter')}
+    </p>
+  )
+}
+
+function PricingModalPriceBar({
+  withHardware,
+  onHardwareChange,
+  price,
+  t,
+}: {
+  withHardware: boolean
+  onHardwareChange: (v: boolean) => void
+  price: number
+  t: (key: string) => string
+}) {
+  return (
+    <div className="mx-5 mb-5 rounded-2xl border-2 border-accent/25 bg-white px-4 py-5 shadow-sm sm:mx-6 sm:px-6 sm:py-6">
+      <div className="flex flex-col items-center gap-4">
+        <PricingHardwareToggle
+          withHardware={withHardware}
+          onChange={onHardwareChange}
+          labelWithout={t('pricing.hardwareWithout')}
+          labelWith={t('pricing.hardwareWith')}
+          labelLicense={t('pricing.buyLicense')}
+          className="shadow-sm w-full max-w-md justify-center"
+        />
+        <div className="text-center">
+          <p className="text-3xl font-bold tabular-nums text-gray-900 sm:text-4xl">
+            €{price}
+            <span className="text-lg font-semibold text-accent sm:text-xl">{t('pricing.perMonth')}</span>
+          </p>
+          {t('pricing.exclVat') ? (
+            <p className="mt-1 text-sm font-medium text-gray-600">{t('pricing.exclVat')}</p>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PricingSection() {
+  const { t, locale } = useLanguage()
+  const [withHardware, setWithHardware] = useState(false)
+  const [modulesOpen, setModulesOpen] = useState(false)
+  const [retailOpen, setRetailOpen] = useState(false)
+
+  const horecaPrice = monthlyPriceForHardware(withHardware)
+  const retailPrice = monthlyPriceForHardware(withHardware)
+
+  const anyModalOpen = modulesOpen || retailOpen
+
+  useEffect(() => {
+    if (!anyModalOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (modulesOpen) setModulesOpen(false)
+      else if (retailOpen) setRetailOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [anyModalOpen, modulesOpen, retailOpen])
+
+  const modulesModal =
+    modulesOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pricing-modules-modal-title"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 sm:p-6"
+            onClick={() => setModulesOpen(false)}
+          >
+            <div
+              className="relative flex max-h-[min(90vh,880px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-home-image"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex shrink-0 flex-col border-b border-gray-100 bg-[#faf8f6]">
+                <div className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
+                  <h3 id="pricing-modules-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
+                    {t('pricing.modulesModalTitle')}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setModulesOpen(false)}
+                    className="rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-200/80 hover:text-gray-900"
+                  >
+                    {t('pricing.modulesModalClose')}
+                  </button>
+                </div>
+                <PricingModalPriceBar
+                  withHardware={withHardware}
+                  onHardwareChange={setWithHardware}
+                  price={horecaPrice}
+                  t={t}
+                />
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+                <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+                  <div>
+                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.starter.name')}</h4>
+                    <ul className="space-y-3">
+                      {MODULES_POPUP_ORDER.slice(0, MODULES_POPUP_MID).map((entry, idx) => (
+                        <PricingFeatureCheck
+                          key={`m-l-${entry.plan}-${entry.i}-${idx}`}
+                          label={modulePopupLabel(t, entry)}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <div className="mb-4 hidden text-base font-bold sm:text-lg md:block md:invisible" aria-hidden>
+                      .
+                    </div>
+                    <ul className="space-y-3">
+                      {MODULES_POPUP_ORDER.slice(MODULES_POPUP_MID).map((entry, idx) => (
+                        <PricingFeatureCheck
+                          key={`m-r-${entry.plan}-${entry.i}-${idx}`}
+                          label={modulePopupLabel(t, entry)}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
+                <PricingModalHardwareFooter withHardware={withHardware} t={t} />
+                <button
+                  type="button"
+                  onClick={() => setModulesOpen(false)}
+                  className="w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+                >
+                  {t('pricing.modulesModalClose')}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
+  const retailModal =
+    retailOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pricing-retail-modal-title"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 sm:p-6"
+            onClick={() => setRetailOpen(false)}
+          >
+            <div
+              className="relative flex max-h-[min(90vh,880px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-home-image"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex shrink-0 flex-col border-b border-gray-100 bg-[#faf8f6]">
+                <div className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
+                  <h3 id="pricing-retail-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
+                    {t('pricing.retailModalTitle')}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setRetailOpen(false)}
+                    className="rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-200/80 hover:text-gray-900"
+                  >
+                    {t('pricing.modulesModalClose')}
+                  </button>
+                </div>
+                <PricingModalPriceBar
+                  withHardware={withHardware}
+                  onHardwareChange={setWithHardware}
+                  price={retailPrice}
+                  t={t}
+                />
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+                {withHardware && (
+                  <p className="mb-4 flex items-start gap-3 text-sm font-medium text-gray-800 sm:text-base">
+                    <svg
+                      className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {t('pricing.pro.hardwareIncluded')}
+                  </p>
+                )}
+                <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+                  <ul className="space-y-3">
+                    {RETAIL_POPUP_FEATURE_IDS.slice(0, RETAIL_POPUP_MID).map((i) => (
+                      <PricingFeatureCheck key={`r-l-${i}`} label={t(`pricing.retail.features.${i}`)} />
+                    ))}
+                  </ul>
+                  <ul className="space-y-3">
+                    {RETAIL_POPUP_FEATURE_IDS.slice(RETAIL_POPUP_MID).map((i) => (
+                      <PricingFeatureCheck key={`r-r-${i}`} label={t(`pricing.retail.features.${i}`)} />
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
+                <PricingModalHardwareFooter withHardware={withHardware} t={t} />
+                <a
+                  href={`/registreer?lang=${locale}&plan=pro&billing=monthly`}
+                  className="block w-full rounded-full bg-accent py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+                >
+                  {t('pricing.choosePro')}
+                </a>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null
+
+  return (
+    <section id="prijzen" className="py-28 sm:py-36 lg:py-40 bg-[#e3e3e3] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-14 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-5">
+            {t('pricing.title')}
+          </h2>
+          <p className="text-xl text-gray-600">
+            {t('pricing.subtitle')}
+          </p>
+          {t('pricing.exclVat') ? (
+            <p className="text-gray-600 text-sm sm:text-base mt-3 font-medium">{t('pricing.exclVat')}</p>
+          ) : null}
+        </div>
+
+        <div className="mx-auto flex max-w-md flex-col items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setModulesOpen(true)}
+            className="w-full rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
+          >
+            {t('pricing.ctaHomeHorecaPricing')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setRetailOpen(true)}
+            className="w-full rounded-full bg-accent px-6 py-4 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+          >
+            {t('pricing.ctaHomeRetailPricing')}
+          </button>
+          <p className="text-center text-accent text-sm font-medium">{t('pricing.cancelAnytime')}</p>
+          <a
+            href="/licentie"
+            className="w-full rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
+          >
+            {t('pricing.ctaBuyOneTimeLicense')}
+          </a>
+        </div>
+
+        <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="mt-12 sm:mt-14" />
+      </div>
+      {modulesModal}
+      {retailModal}
+    </section>
+  )
+}
+
+// STOP Section - One-time animation
+function StopSection() {
+  const { t, locale } = useLanguage()
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const [phase, setPhase] = useState(0) // 0: waiting, 1: STOP visible, 2: STOP fading, 3: content visible
+  const hasTriggeredRef = useRef(false) // Use ref to prevent re-triggers
+  
+  const cardKeys = [1, 2, 3, 4]
+  const freeKeys = [1, 2, 3, 4, 5]
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Only trigger ONCE when section comes into view
+        if (entry.isIntersecting && !hasTriggeredRef.current) {
+          hasTriggeredRef.current = true
+          
+          // Phase 1: Show STOP
+          setPhase(1)
+          
+          // Phase 2: Fade STOP after 1.2s
+          setTimeout(() => setPhase(2), 1200)
+          
+          // Phase 3: Show content after 2s
+          setTimeout(() => setPhase(3), 2000)
+        }
+      },
+      { threshold: 0.3 }
+    )
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+    
+    return () => observer.disconnect()
+  }, [])
+  
+  return (
+    <section 
+      ref={sectionRef}
+      className="relative bg-[#e3e3e3] min-h-screen flex items-center justify-center overflow-hidden"
+    >
+      {/* STOP Text - Big and centered */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none transition-all duration-700"
+        style={{ 
+          opacity: phase === 0 ? 0 : phase === 1 ? 1 : 0.05,
+          transform: `scale(${phase >= 1 ? 1 : 0.5})`,
+        }}
+      >
+        <span 
+          className="text-[30vw] sm:text-[25vw] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-accent to-red-600 select-none"
+          style={{
+            textShadow: '0 0 80px rgba(234, 88, 12, 0.6)',
+          }}
+        >
+          {t('stop.title')}
+        </span>
+      </div>
+      
+      {/* Main Content */}
+      <div 
+        className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700"
+        style={{ 
+          opacity: phase >= 3 ? 1 : 0,
+          transform: `translateY(${phase >= 3 ? 0 : 30}px)`,
+        }}
+      >
+        {/* Headline */}
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-4">
+            {t('stop.headline')}
+          </h2>
+          <p className="text-xl sm:text-2xl text-gray-600">
+            {t('stop.subheadline')}
+          </p>
+        </div>
+        
+        {/* Cards Grid */}
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-12 sm:mb-16">
+          {cardKeys.map((key, index) => (
+            <div 
+              key={key}
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-home-card hover:border-accent/50 transition-all duration-500 hover:scale-105 hover:shadow-home-image"
+              style={{
+                opacity: phase >= 3 ? 1 : 0,
+                transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
+                transitionDelay: `${index * 100}ms`,
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex-1 text-left">
+                  <p className="text-gray-500 text-sm mb-1">{t(`stop.cards.${key}.you`)}</p>
+                  <p className="text-gray-900 font-bold text-lg flex items-center gap-2">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    {t(`stop.cards.${key}.we`)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Custom Build Note */}
+        <div className="text-center mb-12 sm:mb-16">
+          <p className="text-gray-500 text-base sm:text-lg">
+            {t('stop.customBuildNote')}
+          </p>
+        </div>
+        
+        {/* FREE Section */}
+        <div 
+          className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center transition-all duration-500 shadow-home-card"
+          style={{
+            opacity: phase >= 3 ? 1 : 0,
+            transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
+            transitionDelay: '400ms',
+          }}
+        >
+          <h3 className="text-2xl sm:text-4xl font-black text-accent mb-6">
+            {t('stop.freeTitle')}
+          </h3>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
+            {freeKeys.map((key) => (
+              <div key={key} className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-full shadow-home-float">
+                <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-gray-900 font-medium text-sm sm:text-base">{t(`stop.freeItems.${key}`)}</span>
               </div>
             ))}
           </div>
+          <MarketingStartAndDemoButtons demoHref="/winkel#contact" />
         </div>
-      </section>
+      </div>
+    </section>
+  )
+}
 
-      <section id="prijzen" className="py-16 sm:py-24">
-        <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-            {t('winkelSite.pricingTitle')}
-          </h2>
-          <p className="text-gray-600 mb-8">{t('pricing.subtitle')}</p>
-          <div className="rounded-3xl bg-white border border-gray-200 p-8 shadow-home-float">
-            <div className="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1 mb-6">
+/** Alleen deze vier beelden, vaste volgorde (gebruikersassets). */
+const TABLE_KIOSK_SLIDES = [
+  '/images/hardware/hardware-tf30-kassa.png',
+  '/images/hardware/hardware-barcode-scanner.png',
+  '/images/hardware/hardware-premium-lade.png',
+  '/images/hardware/hardware-printer-epson.png',
+] as const
+
+function TableKioskSection() {
+  const { t, locale } = useLanguage()
+  const featureKeys = [1, 2, 3, 4, 5] as const
+  const [kioskSlide, setKioskSlide] = useState(0)
+  const [kioskLightboxOpen, setKioskLightboxOpen] = useState(false)
+  const kioskCount = TABLE_KIOSK_SLIDES.length
+
+  useEffect(() => {
+    if (!kioskLightboxOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setKioskLightboxOpen(false)
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setKioskSlide((i) => (i + 1) % kioskCount)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [kioskLightboxOpen, kioskCount])
+
+  return (
+    <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto lg:mx-0 rounded-3xl bg-[#e3e3e3] p-3 sm:p-5 lg:p-6 shadow-home-image ring-1 ring-black/[0.06]">
+            <div
+              className="relative outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3e3e3] rounded-2xl"
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={t('winkelSite.kiosk.carouselAria')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault()
+                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+                }
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault()
+                  setKioskSlide((i) => (i + 1) % kioskCount)
+                }
+              }}
+            >
               <button
                 type="button"
-                onClick={() => setWithHardware(false)}
-                className={`rounded-lg px-4 py-2 text-sm font-semibold ${
-                  !withHardware ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
-                }`}
+                onClick={() => setKioskLightboxOpen(true)}
+                className="relative mx-auto h-[min(78vw,440px)] w-full cursor-zoom-in sm:h-[min(72vw,480px)] lg:h-[520px]"
+                aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${t('winkelSite.kiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
               >
-                €{MONTHLY_PRICE_WITHOUT_HARDWARE} {t('pricing.hardwareWithout')}
+                <Image
+                  src={TABLE_KIOSK_SLIDES[kioskSlide]}
+                  alt={`${t('winkelSite.kiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
+                  fill
+                  className="object-contain object-center drop-shadow-sm pointer-events-none"
+                  sizes="(min-width: 1024px) 520px, (min-width: 640px) 90vw, 100vw"
+                  priority={kioskSlide === 0}
+                />
               </button>
               <button
                 type="button"
-                onClick={() => setWithHardware(true)}
-                className={`rounded-lg px-4 py-2 text-sm font-semibold ${
-                  withHardware ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
-                }`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+                }}
+                className="absolute left-1 sm:left-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label={t('ui.ariaPrevImage')}
               >
-                €{MONTHLY_PRICE_WITH_HARDWARE} {t('pricing.hardwareWith')}
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskSlide((i) => (i + 1) % kioskCount)
+                }}
+                className="absolute right-1 sm:right-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label={t('ui.ariaNextImage')}
+              >
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
-            <p className="text-5xl font-extrabold tabular-nums text-[#0E5D82]">€ {price}</p>
-            <p className="mt-1 text-gray-600 font-medium">{t('heroLanding.ctaModulesPricePeriod')}</p>
-            <p className="mt-2 text-xs text-gray-500">{t('pricing.exclVat')}</p>
-            <p className="mt-4 text-sm text-gray-600">{t('pricing.cancelAnytime')}</p>
-            <a
-              href="/licentie"
-              className="mt-6 inline-flex items-center justify-center rounded-full border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            <div className="mt-4 flex justify-center gap-1.5" aria-hidden>
+              {TABLE_KIOSK_SLIDES.map((src, i) => (
+                <span
+                  key={src}
+                  className={`h-1.5 w-1.5 rounded-full ${i === kioskSlide ? 'bg-accent': 'bg-gray-400/60'}`}
+                />
+              ))}
+            </div>
+            <p className="mt-3 text-center text-sm text-gray-600">{t('winkelSite.kiosk.clickToEnlarge')}</p>
+          </div>
+
+          <div className="flex flex-col justify-center py-2 lg:py-4">
+            <h2
+              id="table-kiosk-heading"
+              className="text-3xl sm:text-4xl font-bold text-accent tracking-tight mb-6"
             >
-              {t('heroLanding.ctaModulesBackLink')}
-            </a>
-            <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="mt-6" />
+              {t('winkelSite.kiosk.subtitle')}
+            </h2>
+            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">{t('winkelSite.kiosk.body')}</p>
+            <ul className="space-y-4">
+              {featureKeys.map((key) => (
+                <li key={key} className="flex items-start gap-3">
+                  <svg
+                    className="w-6 h-6 text-accent flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-800 text-base sm:text-lg leading-snug">{t(`winkelSite.kiosk.features.${key}`)}</span>
+                </li>
+              ))}
+            </ul>
+            <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="mt-[calc(2.5rem+2cm)]" />
           </div>
         </div>
-      </section>
+      </div>
 
+      {kioskLightboxOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black p-0 sm:bg-black/90 sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('subscriptionsPage.enlargeImageHint')}
+            onClick={() => setKioskLightboxOpen(false)}
+          >
+            <div
+              className="relative flex h-[100dvh] w-full max-w-full min-w-0 items-center justify-center sm:inline-flex sm:h-auto sm:max-h-[min(85vh,920px)] sm:w-auto sm:max-w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- lightbox: native img op ware grootte */}
+              <img
+                src={TABLE_KIOSK_SLIDES[kioskSlide]}
+                alt={`${t('ui.lightboxImageAlt')}: ${t('winkelSite.kiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
+                className="block h-auto max-h-[100dvh] w-auto max-w-full object-contain sm:max-h-[min(85vh,920px)] sm:max-w-[calc(100%-3rem)] sm:rounded-lg sm:shadow-2xl"
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskLightboxOpen(false)
+                }}
+                className="absolute z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 top-[max(0.5rem,env(safe-area-inset-top))] right-[max(0.5rem,env(safe-area-inset-right))] sm:top-3 sm:right-3 sm:h-11 sm:w-11"
+                aria-label={t('ui.ariaClose')}
+              >
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+                }}
+                className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:left-3 sm:h-12 sm:w-12"
+                aria-label={t('ui.ariaPrevImage')}
+              >
+                <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskSlide((i) => (i + 1) % kioskCount)
+                }}
+                className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:right-3 sm:h-12 sm:w-12"
+                aria-label={t('ui.ariaNextImage')}
+              >
+                <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
+    </section>
+  )
+}
+
+// Industry Section
+function IndustrySection() {
+  const [activeTab, setActiveTab] = useState('ordering')
+  const [showLightbox, setShowLightbox] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+  const { t, locale } = useLanguage()
+  
+  const industries: Record<string, { images: string[] }> = {
+    ordering: {
+      images: [
+        '/images/online-order-platform-1.png',
+        '/images/online-order-platform-2.png',
+        '/images/online-order-platform-3.png',
+        '/images/online-order-platform-4.png',
+        '/images/online-order-platform-5.png',
+      ],
+    },
+    reservations: {
+      images: [
+        '/images/reservation-platform-1.png',
+        '/images/reservation-platform-2.png',
+        '/images/reservation-platform-3.png',
+        '/images/reservation-platform-4.png',
+        '/images/reservation-platform-5.png',
+        '/images/reservation-platform-6.png',
+      ],
+    },
+    kassa: {
+      images: [
+        '/images/kassa-platform-1.png',
+        '/images/kassa-platform-2.png',
+        '/images/kassa-platform-3.png',
+        '/images/kassa-platform-4.png',
+        '/images/kassa-platform-5.png',
+        '/images/kassa-platform-6.png',
+      ],
+    },
+    analytics: {
+      images: [
+        '/images/business-analytics-1.png',
+        '/images/business-analytics-2.png',
+        '/images/business-analytics-3.png',
+        '/images/business-analytics-4.png',
+        '/images/business-analytics-5.png',
+      ],
+    },
+    payroll: {
+      images: [
+        '/images/loonadministratie-1.png',
+        '/images/loonadministratie-2.png',
+        '/images/loonadministratie-3.png',
+      ],
+    },
+    whatsapp: { images: [
+      '/images/whatsapp-1.png',
+      '/images/whatsapp-2.png',
+      '/images/whatsapp-3.png',
+      '/images/whatsapp-4.png',
+      '/images/whatsapp-5.png',
+      '/images/whatsapp-6.png',
+    ] },
+  }
+
+  const current = industries[activeTab]
+  const hasMultipleImages = current.images.length > 1
+  const industryTabLabel = t(`industry.${activeTab}.tab`)
+  const industryAltBase = `${t('industry.imageAltPrefix')} ${industryTabLabel}`
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index)
+    setShowLightbox(true)
+  }
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setLightboxIndex(lightboxIndex === 0 ? current.images.length - 1 : lightboxIndex - 1)
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setLightboxIndex(lightboxIndex === current.images.length - 1 ? 0 : lightboxIndex + 1)
+  }
+
+  const goInlinePrev = () => {
+    const idx = lightboxIndex === 0 ? current.images.length - 1 : lightboxIndex - 1
+    setLightboxIndex(idx)
+    setShowLightbox(true)
+  }
+
+  const goInlineNext = () => {
+    const idx = lightboxIndex === current.images.length - 1 ? 0 : lightboxIndex + 1
+    setLightboxIndex(idx)
+    setShowLightbox(true)
+  }
+
+  useEffect(() => {
+    setShowLightbox(false)
+    setLightboxIndex(0)
+  }, [activeTab])
+
+  return (
+    <section id="sectoren" className="py-28 sm:py-36 bg-[#e3e3e3]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Title */}
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-14 sm:mb-16">
+          {t('industry.sectionTitle')}
+        </h2>
+        
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
+          {['ordering', 'reservations', 'kassa', 'analytics', 'payroll', 'whatsapp'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`text-sm sm:text-base lg:text-lg font-semibold pb-2 border-b-4 transition-colors ${
+                activeTab === tab
+                  ? 'text-accent border-accent'
+                  : 'text-gray-400 border-transparent hover:text-gray-600'
+              }`}
+            >
+              {t(`industry.${tab}.tab`)}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          {/* Left content */}
+          <div>
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+              {t(`industry.${activeTab}.title`)}
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              {t(`industry.${activeTab}.description`)}
+            </p>
+            <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="mb-8 justify-start sm:justify-start" layout="stack" fullWidth={false} />
+          </div>
+
+          {/* Right content - Images */}
+          <div className="relative text-center flex flex-col items-center justify-center w-full">
+            {hasMultipleImages ? (
+              <div className="relative w-full max-w-[520px]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full">
+                  {current.images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="relative w-full h-28 sm:h-36 rounded-xl shadow-home-thumb overflow-hidden cursor-pointer border-2 border-gray-100 hover:scale-[1.02] transition-transform"
+                    >
+                      <Image
+                        src={img}
+                        alt={`${industryAltBase} (${idx + 1})`}
+                        fill
+                        sizes="(max-width: 1024px) 33vw, 200px"
+                        loading="lazy"
+                        className="object-cover object-top"
+                        onClick={() => openLightbox(idx)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-4">
+                  <button
+                    type="button"
+                    onClick={goInlinePrev}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow-home-float hover:bg-gray-50 transition-colors"
+                    aria-label={t('industry.prevImage')}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    {t('industry.prevImage')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goInlineNext}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow-home-float hover:bg-gray-50 transition-colors"
+                    aria-label={t('industry.nextImage')}
+                  >
+                    {t('industry.nextImage')}
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Single image for other tabs */
+              <Image
+                src={current.images[0]}
+                alt={industryAltBase}
+                width={900}
+                height={1200}
+                sizes="(min-width: 1024px) 660px, 90vw"
+                loading="lazy"
+                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-home-image cursor-pointer mx-auto"
+                onClick={() => openLightbox(0)}
+              />
+            )}
+            <p className="text-gray-500 text-sm mt-6">{t('industry.clickToEnlarge')}</p>
+          </div>
+        </div>
+
+        {/* Lightbox Modal with Navigation */}
+        {showLightbox && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+            onClick={() => setShowLightbox(false)}
+          >
+            {/* Left Arrow */}
+            {hasMultipleImages && (
+              <button
+                onClick={goToPrev}
+                className="absolute left-4 sm:left-8 text-white hover:text-gray-300 p-2 z-10"
+                aria-label={t('ui.ariaPrev')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-14 sm:w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+
+            <div
+              className="relative w-full max-w-6xl h-[min(90vh,1200px)] max-h-[92vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={current.images[lightboxIndex]}
+                alt={`${industryAltBase} — ${lightboxIndex + 1} / ${current.images.length}`}
+                fill
+                sizes="100vw"
+                priority
+                className="object-contain shadow-home-image"
+              />
+            </div>
+
+            {/* Right Arrow */}
+            {hasMultipleImages && (
+              <button
+                onClick={goToNext}
+                className="absolute right-4 sm:right-8 text-white hover:text-gray-300 p-2 z-10"
+                aria-label={t('ui.ariaNext')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-14 sm:w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+
+            {/* Close button */}
+            <button 
+              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
+              onClick={() => setShowLightbox(false)}
+              aria-label={t('ui.ariaClose')}
+            >
+              ×
+            </button>
+
+            {/* Image counter */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-4 text-white text-sm">
+                {lightboxIndex + 1} / {current.images.length}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+// Testimonial Section
+function TestimonialSection() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const { t } = useLanguage()
+  
+  const testimonialKeys = [1, 2, 3, 4, 5, 6, 7, 8]
+  
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + testimonialKeys.length) % testimonialKeys.length)
+  }
+  
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % testimonialKeys.length)
+  }
+
+  return (
+    <section className="py-28 sm:py-36 bg-[#E3E3E3] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            {t('testimonials.title')}
+          </h2>
+        </div>
+
+        <div className="relative">
+          {/* Left Arrow */}
+          <button 
+            onClick={goToPrev}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-home-float transition-all hover:scale-110"
+            aria-label={t('ui.ariaPrevReview')}
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          {/* Right Arrow */}
+          <button 
+            onClick={goToNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-home-float transition-all hover:scale-110"
+            aria-label={t('ui.ariaNextReview')}
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          
+          <div 
+            className="flex transition-transform duration-500 ease-in-out mx-12"
+            style={{ transform: `translateX(-${currentSlide * 100}%)`}}
+          >
+            {testimonialKeys.map((key, index) => (
+              <div key={index} className="w-full flex-shrink-0 px-4">
+                <div className="bg-white rounded-2xl p-8 shadow-home-card max-w-2xl mx-auto">
+                  <div className="flex mb-4 justify-center">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 italic text-center text-lg">
+                    &ldquo;{t(`testimonials.quotes.${key}.quote`)}&rdquo;
+                  </p>
+                  <div className="text-center">
+                    <p className="font-semibold text-gray-900">{t(`testimonials.quotes.${key}.author`)}</p>
+                    <p className="text-sm text-gray-500">{t(`testimonials.quotes.${key}.role`)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Counter */}
+          <div className="text-center mt-6 text-gray-500">
+            {currentSlide + 1} / {testimonialKeys.length}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Main Page Component
+export default function WinkelSitePage() {
+  return (
+    <main>
+      <HomeScrollOnLoad />
+      <Navigation />
+      <WinkelLandingHero />
+      <WhyVysionSection />
+      <ConnectedSystemHubSection />
+      <GratisWebsiteBannerSection />
+      <VysionBeestSection />
+      <PlatformGridSection />
+      <HardwareSection />
+      <StatsAndLiveDemoSection />
+      <PricingSection />
+      <PromoMarqueeBand />
+      <TableKioskSection />
+      <TestimonialSection />
       <ContactPageSection sectionId="contact" />
       <Footer />
       <CookieBanner />

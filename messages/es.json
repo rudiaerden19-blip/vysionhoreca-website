@@ -6564,6 +6564,31 @@
         "title": "Soporte en vivo",
         "body": "En el arranque y en las horas punta. Llama, lo resolvemos."
       }
+    },
+    "subtitleLead": "Hardware y software de caja incluidos en la suscripción",
+    "audienceLine": "Hecho para la calle comercial",
+    "offline": {
+      "title": "También offline en la tienda",
+      "body": "Sigue si cae internet. Al volver a estar online, todo se actualiza."
+    },
+    "gratisWebsite": {
+      "title": "Tienda online gratis para su tienda",
+      "body": "La suscripción incluye su propia tienda online, sin coste extra.",
+      "cta": "Ver un ejemplo"
+    },
+    "kiosk": {
+      "imageAlt": "Hardware de caja para el mostrador",
+      "carouselAria": "Fotos del hardware de tienda: pase con las flechas",
+      "clickToEnlarge": "Pulse la foto para ampliar",
+      "subtitle": "Hardware para el mostrador",
+      "body": "No es un kiosco de hostelería: caja compacta, escáner, cajón e impresora para panadería, carnicería, peluquería y tiendas de barrio.",
+      "features": {
+        "1": "Caja táctil en el mostrador",
+        "2": "Escáner de códigos para pan, carne, ropa y más",
+        "3": "Cajón e impresora con el hardware",
+        "4": "Tienda online, los mismos productos que en tienda",
+        "5": "Caja y stock en un solo sistema"
+      }
     }
   },
   "retailSite": {
@@ -6601,6 +6626,31 @@
       "support": {
         "title": "Soporte en vivo",
         "body": "Arranque, formación y ayuda en el rush. Nos llama."
+      }
+    },
+    "subtitleLead": "Hardware y software de caja incluidos en la suscripción",
+    "audienceLine": "Hecho para retail y mayoristas",
+    "offline": {
+      "title": "También offline en el negocio",
+      "body": "Retail y mayorista siguen vendiendo si cae la red. Por la noche el sistema se sincroniza."
+    },
+    "gratisWebsite": {
+      "title": "Tienda online gratis para retail",
+      "body": "La suscripción incluye una tienda para boutique, electrónica o mayorista, sin coste extra.",
+      "cta": "Ver un ejemplo"
+    },
+    "kiosk": {
+      "imageAlt": "Hardware de caja para retail y mayorista",
+      "carouselAria": "Fotos del hardware retail: pase con las flechas",
+      "clickToEnlarge": "Pulse la foto para ampliar",
+      "subtitle": "Hardware para retail",
+      "body": "No es un kiosco de hostelería: caja con códigos, impresora y stock para boutique, electrónica, mayorista y retail.",
+      "features": {
+        "1": "POS táctil para muchos artículos",
+        "2": "Códigos en tienda y almacén",
+        "3": "Impresora y escáner con el hardware",
+        "4": "Stock para miles de SKU",
+        "5": "Caja, tarjeta e informes en una pantalla"
       }
     }
   }

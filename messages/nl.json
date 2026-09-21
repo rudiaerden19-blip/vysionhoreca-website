@@ -6523,6 +6523,31 @@
         "title": "Live support",
         "body": "Bij opstart en drukke momenten. U belt, wij lossen het op."
       }
+    },
+    "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+    "audienceLine": "Gemaakt voor de winkelstraat",
+    "offline": {
+      "title": "Ook offline in de winkel",
+      "body": "Werkt door als het internet even wegvalt. Zodra u weer online bent, werkt alles zichzelf bij — bakker, slager, kapper of nachtwinkel."
+    },
+    "gratisWebsite": {
+      "title": "Gratis webshop voor uw winkel",
+      "body": "Bij uw abonnement krijgt u een eigen webshop, zonder extra kosten. Kleuren, foto’s en teksten past u zelf aan.",
+      "cta": "Bekijk een voorbeeld"
+    },
+    "kiosk": {
+      "imageAlt": "Kassa-hardware voor de winkeltoonbank",
+      "carouselAria": "Foto’s van winkelhardware: blader met de pijlen",
+      "clickToEnlarge": "Klik op de foto om te vergroten",
+      "subtitle": "Hardware voor de toonbank",
+      "body": "Geen restaurantkiosk: een compacte kassa, barcodescanner, lade en printer voor bakker, slager, kapper en de winkelstraat. Alles gekoppeld aan uw voorraad en webshop.",
+      "features": {
+        "1": "Touchscreen kassa op de toonbank",
+        "2": "Barcodescanner voor brood, vlees, kleding en meer",
+        "3": "Kassalade en bonprinter inbegrepen bij hardware",
+        "4": "Eigen webshop, dezelfde producten als in de winkel",
+        "5": "Afrekenen en voorraad in één systeem"
+      }
     }
   },
   "retailSite": {
@@ -6560,6 +6585,31 @@
       "support": {
         "title": "Live support",
         "body": "Opstart, training en hulp tijdens de rush. U belt ons."
+      }
+    },
+    "subtitleLead": "Kassa hardware & software inbegrepen in je abonnement",
+    "audienceLine": "Gemaakt voor retail & groothandel",
+    "offline": {
+      "title": "Ook offline in de zaak",
+      "body": "Retail en groothandel blijven verkopen als het netwerk even wegvalt. ’s Avonds synchroniseert het systeem automatisch."
+    },
+    "gratisWebsite": {
+      "title": "Gratis webshop voor retail",
+      "body": "Bij uw abonnement krijgt u een eigen webshop voor boetiek, elektronica of groothandel, zonder extra kosten.",
+      "cta": "Bekijk een voorbeeld"
+    },
+    "kiosk": {
+      "imageAlt": "Kassa-hardware voor retail en groothandel",
+      "carouselAria": "Foto’s van retailhardware: blader met de pijlen",
+      "clickToEnlarge": "Klik op de foto om te vergroten",
+      "subtitle": "Hardware voor retail",
+      "body": "Geen horecakiosk: een kassa met barcodes, printer en voorraad voor boetiek, elektronica, groothandel en retail.",
+      "features": {
+        "1": "Touchscreen POS voor veel artikelen",
+        "2": "Barcodes in winkel en magazijn",
+        "3": "Printer en scanner inbegrepen bij hardware",
+        "4": "Voorraad voor duizenden SKU’s",
+        "5": "Afrekenen, PIN en rapporten in één scherm"
       }
     }
   }
