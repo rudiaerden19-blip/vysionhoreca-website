@@ -214,8 +214,10 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hardware:
       'Premium licentie: Elo-touchscreen, barcodescanner, elektrische kassalade en Epson-bonprinter. Zonder hardware gebruik je je eigen scherm.',
     hardwareImages: [
-      { src: '/images/hardware/hardware-tf30-kassa.png', alt: 'Elo-touchscreen kassa', contain: true },
-      { src: '/images/hardware/hardware-barcode-scanner.png', alt: 'Barcodescanner', contain: true },
+      {
+        src: '/images/sectoren/slagerij-hardware-kassa.jpg',
+        alt: 'Kassasysteem met weegschaal aan de toonbank, slager scant verpakkingen',
+      },
     ],
     faqs: [
       {
