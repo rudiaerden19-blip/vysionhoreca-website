@@ -104,7 +104,7 @@
     "title": "Una plataforma para todo tu negocio",
     "subtitleLead": "Hardware y software de caja incluidos en tu suscripción",
     "subtitle": "",
-    "audienceLine": "Para negocios de hostelería y retail",
+    "audienceLine": "Sin anticipo, sin costes de instalación, sin contrato",
     "sites": {
       "winkel": {
         "title": "Caja y plataforma para tu tienda",
@@ -6624,7 +6624,7 @@
       }
     },
     "subtitleLead": "Hardware y software de caja incluidos en la suscripción",
-    "audienceLine": "Sin anticipo, sin costes de instalación",
+    "audienceLine": "Sin anticipo, sin costes de instalación, sin contrato",
     "offline": {
       "title": "También offline en la tienda",
       "body": "Sigue si cae internet. Al volver a estar online, todo se actualiza."

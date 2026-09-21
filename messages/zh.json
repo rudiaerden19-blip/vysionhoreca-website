@@ -104,7 +104,7 @@
     "title": "一套平台打理整店业务",
     "subtitleLead": "收银硬件与软件包含在您的订阅中",
     "subtitle": "",
-    "audienceLine": "面向餐饮与零售企业",
+    "audienceLine": "无需预付款，无安装费用，无合同",
     "sites": {
       "winkel": {
         "title": "为您的店铺打造的收银与平台",
@@ -6624,7 +6624,7 @@
       }
     },
     "subtitleLead": "POS hardware & software included in your subscription",
-    "audienceLine": "无需预付款，无安装费用",
+    "audienceLine": "无需预付款，无安装费用，无合同",
     "offline": {
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."

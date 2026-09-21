@@ -186,7 +186,7 @@
     "title": "One platform for your entire business",
     "subtitleLead": "POS hardware & software included in your subscription",
     "subtitle": "",
-    "audienceLine": "For hospitality and retail businesses",
+    "audienceLine": "No deposit, no installation costs, no contract",
     "sites": {
       "winkel": {
         "title": "POS & platform for your shop",
@@ -6583,7 +6583,7 @@
       }
     },
     "subtitleLead": "POS hardware & software included in your subscription",
-    "audienceLine": "No deposit, no installation costs",
+    "audienceLine": "No deposit, no installation costs, no contract",
     "offline": {
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."

@@ -104,7 +104,7 @@
     "title": "منصة واحدة لعملك بالكامل",
     "subtitleLead": "أجهزة وبرمجيات الكاشير مشمولة في اشتراكك",
     "subtitle": "",
-    "audienceLine": "لأعمال الضيافة والتجزئة",
+    "audienceLine": "بدون دفعة مقدمة، بدون تكاليف تركيب، بدون عقد",
     "sites": {
       "winkel": {
         "title": "صندوق وكاشير لمتجرك",
@@ -6624,7 +6624,7 @@
       }
     },
     "subtitleLead": "POS hardware & software included in your subscription",
-    "audienceLine": "بدون دفعة مقدمة، بدون تكاليف تركيب",
+    "audienceLine": "بدون دفعة مقدمة، بدون تكاليف تركيب، بدون عقد",
     "offline": {
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."

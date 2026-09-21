@@ -104,7 +104,7 @@
     "title": "お店全体をひとつのプラットフォームで",
     "subtitleLead": "レジのハードとソフトがサブスクに含まれます",
     "subtitle": "",
-    "audienceLine": "ホスピタリティ・小売の事業者向け",
+    "audienceLine": "前払いなし、導入費用なし、契約なし",
     "sites": {
       "winkel": {
         "title": "お店のためのレジ＆プラットフォーム",
@@ -6624,7 +6624,7 @@
       }
     },
     "subtitleLead": "POS hardware & software included in your subscription",
-    "audienceLine": "前払いなし、導入費用なし",
+    "audienceLine": "前払いなし、導入費用なし、契約なし",
     "offline": {
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."

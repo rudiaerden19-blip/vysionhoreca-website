@@ -104,7 +104,7 @@
     "title": "Une plateforme pour toute votre entreprise",
     "subtitleLead": "Matériel et logiciel de caisse inclus dans votre abonnement",
     "subtitle": "",
-    "audienceLine": "Pour les établissements horeca et retail",
+    "audienceLine": "Sans acompte, sans frais d’installation, sans contrat",
     "sites": {
       "winkel": {
         "title": "Caisse & plateforme pour votre magasin",
@@ -6647,7 +6647,7 @@
       }
     },
     "subtitleLead": "Matériel et logiciel de caisse inclus dans l’abonnement",
-    "audienceLine": "Sans acompte, sans frais d’installation",
+    "audienceLine": "Sans acompte, sans frais d’installation, sans contrat",
     "offline": {
       "title": "Fonctionne hors ligne en magasin",
       "body": "Continue si internet tombe. Une fois reconnecté, tout se met à jour — boulanger, boucher, coiffeur ou magasin de nuit."

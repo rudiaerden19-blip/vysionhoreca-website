@@ -104,7 +104,7 @@
     "title": "Eine Plattform für Ihr gesamtes Unternehmen",
     "subtitleLead": "Kassen-Hardware & Software in Ihrem Abo enthalten",
     "subtitle": "",
-    "audienceLine": "Für Gastronomie- und Retail-Unternehmen",
+    "audienceLine": "Ohne Anzahlung, ohne Installationskosten, ohne Vertrag",
     "sites": {
       "winkel": {
         "title": "Kasse & Plattform für Ihr Geschäft",
@@ -6647,7 +6647,7 @@
       }
     },
     "subtitleLead": "Kassen-Hardware und Software im Abo enthalten",
-    "audienceLine": "Ohne Anzahlung, ohne Installationskosten",
+    "audienceLine": "Ohne Anzahlung, ohne Installationskosten, ohne Vertrag",
     "offline": {
       "title": "Auch offline im Laden",
       "body": "Läuft weiter, wenn das Internet ausfällt. Sobald Sie wieder online sind, gleicht sich alles ab."
