@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'Kebab & Broodjesbar Kassa | i9 Kracht | Vysion kassa',
   },
   description:
-    'Kebab, döner en broodjesbar: i9 dual-screen kassa, 9 talen, snelle orders. Stop met huren. Na 24 maanden is deze i9 kassa 100% jouw eigendom. kassa België & Nederland.',
+    'Kebab, döner en broodjesbar: i9 dual-screen kassa, 9 talen, snelle orders. kassa België & Nederland.',
   keywords: [
     'kebab kassa',
     'broodjesbar kassa',

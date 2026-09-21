@@ -590,12 +590,12 @@
         "role": "Propriétaire de Fish & Chips"
       },
       "7": {
-        "quote": "Je n'ai jamais eu une caisse aussi rapide dans ma boulangerie. Au début, je ne croyais pas que le matériel serait à moi après 24 mois — mais pile après 24 mois, j'ai reçu un message clair : Félicitations, la caisse matérielle et les accessoires sont désormais votre propriété.",
+        "quote": "Je n’ai jamais eu une caisse aussi rapide dans ma boulangerie. Tout tourne fluide, même aux heures de pointe du matin.",
         "author": "Bakkerij de Vliet",
         "role": "Boulangerie"
       },
       "8": {
-        "quote": "Mon ancienne caisse était Lightspeed : 2 440 € et 600 € d'installation. Aujourd'hui j'ai une caisse et un logiciel pour 99 € par mois — 10× plus rapide qu'avant et bientôt à moi. Alors je me demande : pourquoi les autres n'y arrivent-ils pas ?",
+        "quote": "Ma caisse précédente était Lightspeed et m’a coûté 2 440 € plus 600 € d’installation. Aujourd’hui j’ai caisse et logiciel pour 99 € par mois — 10× plus rapide. Je me demande : pourquoi les autres n’y arrivent pas ?",
         "author": "Thamman Diblio",
         "role": "Kebab Tio, Amsterdam"
       }
@@ -4482,9 +4482,9 @@
   },
   "subscriptionsTermsPopup": {
     "title": "Conditions générales",
-    "lastUpdated": "Dernière mise à jour : avril 2026",
+    "lastUpdated": "Dernière mise à jour : septembre 2026",
     "footerBeforeLink": "Les dispositions contractuelles supplémentaires figurent dans les",
-    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE (SUBSCRIPTION)\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person entering into a subscription\n- Agreement: the subscription for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Subscription: monthly service of €99 (or current price)\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. Subscription and delivery\n3.1. The Customer takes out a subscription for the use of the POS software.\n3.2. Under a premium subscription, Hardware is made available without an initial purchase cost.\n3.3. The Hardware remains the property of Vysion kassa's at all times, unless otherwise stated in article 13.\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. The subscription is entered into for an indefinite period (or minimum duration if applicable).\n5.2. Termination must be given in writing with one month's notice.\n5.3. Upon termination of the subscription, the right to use both software and Hardware ceases immediately.\n5.4. Le matériel et les logiciels peuvent être résiliés chaque mois sans frais supplémentaires.\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. Transfer of ownership after subscription period\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's for the entire duration of the subscription.\n13.2. If the Customer maintains the premium subscription for an uninterrupted period of 24 months and has paid all amounts due in full and on time, ownership of the Hardware is transferred free of charge to the Customer.\n13.3. \"Uninterrupted\" means: no missed, late or partial payment and no suspension or termination of the subscription.\n13.4. In case of:\n- early termination\n- default\n- breach of contract\n- or any interruption of the subscription\nthe right to transfer of ownership lapses automatically and the Hardware remains the property of Vysion kassa's.\n13.5. In such cases, the Customer must return the Hardware immediately and within 14 days at the latest, as set out in article 6.\n13.6. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n\n14. Warranty and defects after transfer of ownership\n14.1. From the moment the Hardware becomes the property of the Customer, all warranty and service obligations of Vysion kassa's cease.\n14.2. The Customer accepts that from that moment:\n- Vysion kassa's is not responsible for defects, wear or loss\n- repair, maintenance or replacement is fully at the Customer's expense\n14.3. Normal wear occurring after transfer of ownership is fully the responsibility of the Customer.\n14.4. Vysion kassa's may optionally offer a maintenance or service contract after transfer of ownership, but this is not mandatory."
+    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE (SUBSCRIPTION)\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person entering into a subscription\n- Agreement: the subscription for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Subscription: monthly service of €99 (or current price)\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. Subscription and delivery\n3.1. The Customer takes out a subscription for the use of the POS software.\n3.2. Under a premium subscription, Hardware is made available without an initial purchase cost.\n3.3. The Hardware remains the property of Vysion kassa's at all times. The Customer does not acquire any ownership of the Hardware through the subscription.\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. The subscription is entered into for an indefinite period (or minimum duration if applicable).\n5.2. Termination must be given in writing with one month's notice.\n5.3. Upon termination of the subscription, the right to use both software and Hardware ceases immediately.\n5.4. Le matériel et les logiciels peuvent être résiliés chaque mois sans frais supplémentaires.\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. No transfer of ownership through the subscription\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's at all times, including during a long or uninterrupted subscription.\n13.2. The subscription only grants the Customer a right to use the Hardware while the subscription is in force. There is no transfer of ownership after any period of time.\n13.3. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n13.4. Upon termination of the subscription, the Customer must return the Hardware as set out in article 6.\n\n14. Warranty and defects\n14.1. While the subscription is in force, Vysion kassa's provides the usual support for the Hardware made available, except in cases of misuse, theft or damage as set out in article 7.\n14.2. Defects due to normal wear during the subscription are repaired or replaced by agreement, according to the service terms then in force.\n14.3. Vysion kassa's may optionally offer a maintenance or service contract; this is not mandatory."
   },
   "serviceAgreementPage": {
     "title": "Vysion Dienstenovereenkomst",
@@ -5084,7 +5084,7 @@
     "faq8Q": "Puis-je utiliser l application sur plusieurs appareils?",
     "faq8A": "Oui, vous pouvez vous connecter sur un nombre illimite d appareils. Votre tableau de bord se synchronise automatiquement entre tous les appareils.",
     "faq9Q": "A qui appartient le systeme?",
-    "faq9A": "Vysion est proprietaire du materiel : la caisse, l imprimante et le tiroir-caisse. Si vous etes client Premium pendant 24 mois, vous devenez automatiquement proprietaire du materiel apres 24 mois, sans frais supplementaires."
+    "faq9A": "Vysion est propriétaire du matériel : la caisse, l’imprimante et le tiroir-caisse. Avec un abonnement premium, vous avez un droit d’usage tant que l’abonnement court. Le matériel ne devient pas votre propriété via l’abonnement."
   },
   "resellersPage": {
     "badge": "Programme Partenaire",
@@ -5271,8 +5271,8 @@
     "imageAlt2": "Caisse double écran avec affichage client, bureau à l’écran",
     "imageAlt3": "Poste complet : double écran tactile, tiroir-caisse, clavier et imprimante de tickets",
     "eyebrow": "La bête Vysion",
-    "headline": "La « bête » Vysion : puissance maximale, pleine propriété",
-    "intro": "Optez pour du matériel qui accélère votre établissement et devient, après 24 mois, vraiment **votre propriété**. Fini la location sans fin : un investissement dans l’avenir de votre entreprise.",
+    "headline": "Le « bête » Vysion : puissance maximale, matériel professionnel",
+    "intro": "Choisissez un matériel qui accélère votre établissement : caisse i9 puissante, incluse dans l’abonnement. Pas de frais cachés, conditions claires.",
     "specsHeading": "Des spécifications qui font la différence",
     "specSpeed": "**Vitesse inégalée** : grâce au **processeur Intel Core i9** et **16 Go de RAM**, vous traitez les transactions instantanément, sans à-coups — avec 10 ou 10 000 produits.",
     "specDualTitle": "Matériel robuste",
@@ -5281,9 +5281,9 @@
     "specStorage": "**Stockage fiable** : le **SSD 128 Go** démarre la caisse en quelques secondes et garde vos données accessibles ultra-rapidement.",
     "worksHeading": "Pourquoi ce système convient à tous",
     "worksLead": "Ce n’est pas une simple tablette sur pied, mais un poste industriel professionnel. Boulangerie, prêt-à-porter, café ou boutique en ligne : le matériel suit votre rythme.",
-    "worksBullet1": "**Offre transparente** : pas de frais cachés. Après 24 mois, fin du financement — la machine est 100 % à vous.",
+    "worksBullet1": "**Offre transparente** : pas de frais cachés. Matériel premium inclus dans l’abonnement, résiliable chaque mois.",
     "worksBullet2": "**Adapté à tous les secteurs** : un design épuré, professionnel sur tout comptoir.",
-    "quote": "Arrêtez de louer, commencez à posséder. Choisissez la puissance d’un poste i9."
+    "quote": "Choisissez la puissance d’une station i9. Rapide, fiable, prête pour chaque rush."
   },
   "platform": {
     "sectionTitle": "Ce que vous obtenez",
@@ -6204,30 +6204,30 @@
     },
     "bakkerij": {
       "h1": "Caisse la plus rapide pour boulangers | i9 & 9 langues | Vysion",
-      "intro": "Mise en caisse boulangerie : Intel i9 pour les pics du matin, 9 langues, propriété du matériel après 24 mois — le système de caisse Belgique et Pays-Bas.",
+      "intro": "Mise en caisse boulangerie : Intel i9 pour les pics du matin et 9 langues pour l’équipe — le système de caisse Belgique et Pays-Bas.",
       "body1": "Brunch chargé ou week-end : POS tactile, imprimante, logiciel réactif. Acheter ou louer : un forfait clair, sans mauvaises surprises.",
-      "body2": "Pour les boulangers qui veulent marge et rythme. Propriété après 24 mois plutôt que location sans fin — la caisse belge pour grandir.",
+      "body2": "Pour les boulangers qui veulent marge et rythme. Matériel i9 puissant inclus dans l’abonnement — la caisse belge pour grandir.",
       "imageAlt": "Mise en caisse Vysion pour boulangerie",
       "cta": "Commencer gratuitement — essai 14 jours",
-      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i9 est 100 % à vous."
+      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
     },
     "cafe": {
       "h1": "Caisse restauration pour cafés | i9 double écran & 9 langues | Vysion",
       "intro": "Rythme café = caisse rapide : matériel i9, 9 langues pour équipes multilingues, vision des marges — la caisse pour brasserie, coffee shop et déjeuner.",
       "body1": "Rush du matin ou terrasse : la caisse la plus rapide au comptoir. Salle, à emporter et commande en ligne — idéal en Belgique pour cafés chargés.",
-      "body2": "Moins de saisies, moins d’erreurs, plus de couverts. Essayez Vysion gratuitement — puissance i9 et propriété après 24 mois.",
+      "body2": "Moins de saisies, moins d’erreurs, plus de couverts. Essayez Vysion gratuitement — puissance i9 et conditions claires.",
       "imageAlt": "Mise en caisse Vysion pour café et brasserie",
       "cta": "Commencer gratuitement",
-      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i9 est 100 % à vous."
+      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
     },
     "frituur": {
       "h1": "Caisse friterie | Checkout i9 le plus rapide | Vysion",
       "intro": "Pics friterie et événements : votre caisse doit suivre. Intel i9, double écran client, 9 langues — pour la file, l’huile et le tempo.",
       "body1": "Commandes, sauces et accompagnements sans ralentissement. POS tactile, imprimante intégrée et commande en ligne — la caisse friterie Belgique & Pays-Bas.",
-      "body2": "Files courtes, marges serrées. Démarrez gratuitement, testez en boutique, matériel à vous après 24 mois.",
+      "body2": "Files courtes, marges serrées. Démarrez gratuitement, testez en boutique, matériel premium dans l’abonnement.",
       "imageAlt": "Mise en caisse Vysion pour friterie et snack",
       "cta": "Commencer gratuitement",
-      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i9 est 100 % à vous."
+      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
     },
     "kebab": {
       "h1": "Caisse kebab & sandwicherie | Puissance i9 | Vysion",
@@ -6236,25 +6236,25 @@
       "body2": "Moins de stress au comptoir, plus de contrôle sur le CA. Essayez gratuitement et voyez pourquoi les pros choisissent l’i9.",
       "imageAlt": "Mise en caisse Vysion pour kebab et sandwicherie",
       "cta": "Commencer gratuitement",
-      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i9 est 100 % à vous."
+      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
     },
     "kapper": {
       "h1": "Caisse salons de coiffure | Élégant & rapide | Vysion",
-      "intro": "La caisse pro i9, paiements fluides, 9 langues pour l’équipe, propriété du matériel après 24 mois — l’upgrade pour votre salon.",
+      "intro": "La caisse pro i9, paiements fluides et 9 langues pour l’équipe — l’upgrade pour votre salon.",
       "body1": "Pas de file à l’accueil quand les fauteuils sont pleins. Le flux le plus rapide garde la journée sous contrôle — salons Belgique & Pays-Bas.",
       "body2": "Rendez-vous, vente et pourboires dans une vue. Essayez Vysion gratuitement — checkout premium.",
       "imageAlt": "Mise en caisse Vysion pour salon de coiffure",
       "cta": "Commencer gratuitement",
-      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i9 est 100 % à vous."
+      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
     },
     "retail": {
       "h1": "Caisse retail & stock | L'i9 « Bête » pour magasins | Vysion",
       "intro": "Stock sur i9 (16 Go RAM), POS tactile et intégration site gratuite — la caisse retail qui grandit avec vous.",
       "body1": "Caisse retail rapide : stock et vente sur un écran. Achat de caisse avec marges et vitesse — système belge pour magasins.",
-      "body2": "Du code-barres à la clôture : moins d’erreurs, plus de rythme. Matériel premium à vous après 24 mois — fini la location sans gain.",
+      "body2": "Du code-barres à la clôture : moins d’erreurs, plus de rythme. Matériel premium inclus dans l’abonnement — sans surprise.",
       "imageAlt": "Mise en caisse Vysion pour retail et magasin",
       "cta": "Commencer gratuitement",
-      "ownership24": "Arrêtez de louer. Après 24 mois, cette caisse i9 est 100 % à vous."
+      "ownership24": "Caisse i9 premium incluse dans l’abonnement — rapide, fiable, prête pour chaque rush."
     }
   },
   "stockPage": {

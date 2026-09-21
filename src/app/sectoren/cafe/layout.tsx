@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'kassa voor Cafés | i9 Dual-Screen & 9 Talen | Vysion kassa',
   },
   description:
-    'Café: razendsnelle i9-kassa (Het Beest), 9 talen, dubbel scherm, na 24 maanden eigendom. Stop met huren. Na 24 maanden is deze i9 kassa 100% jouw eigendom. Snelste kassa — kassasysteem België & Nederland.',
+    'Café: razendsnelle i9-kassa (Het Beest), 9 talen, dubbel scherm. Snelste kassa — kassasysteem België & Nederland.',
   keywords: [
     'kassa',
     'café kassa',

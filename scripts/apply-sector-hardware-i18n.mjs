@@ -1,7 +1,10 @@
 /**
  * One-off patch: sectorPages (6 sectors + hardwareBeest block), all locales.
+ * RETIRED — do not run. Would restore outdated 24-month hardware-ownership copy.
  * Run: node scripts/apply-sector-hardware-i18n.mjs
  */
+throw new Error('Retired: do not run apply-sector-hardware-i18n.mjs (24-month ownership copy).')
+
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'Snelste Kassasysteem voor Bakkers | i9 Kracht & 9 Talen | Vysion kassa',
   },
   description:
-    'Specifieke kassa-layout voor bakkers: Intel i9 (Het Beest) voor ochtenddrukte, 9 talen, na 24 maanden eigendom van hardware. Stop met huren. Na 24 maanden is deze i9 kassa 100% jouw eigendom. Snelste kassa — kassasysteem België & Nederland.',
+    'Specifieke kassa-layout voor bakkers: Intel i9 (Het Beest) voor ochtenddrukte, 9 talen. Snelste kassa — kassasysteem België & Nederland.',
   keywords: [
     'bakkerij kassa',
     'snelste kassa',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Snelste Kassasysteem voor Bakkers | i9 Kracht & 9 Talen | Vysion kassa',
     description:
-      'Bakkers: i9-kracht, 9 talen, eigendom na 24 maanden. Kassasysteem België — start gratis.',
+      'Bakkers: i9-kracht, 9 talen. Kassasysteem België — start gratis.',
     url: canonical,
     type: 'website',
   },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Snelste Kassasysteem voor Bakkers | i9 Kracht & 9 Talen | Vysion kassa',
     description:
-      'Kassa-layout voor bakkers: i9, 9 talen, eigendom na 24 maanden. Kassasysteem België.',
+      'Kassa-layout voor bakkers: i9, 9 talen. Kassasysteem België.',
   },
 }
 

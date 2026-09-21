@@ -1,7 +1,10 @@
 /**
  * Voegt sectorPages toe aan messages/*.json (éénmalig uitvoeren na wijzigingen).
+ * RETIRED — do not run. Would restore outdated 24-month hardware-ownership copy.
  * Run: node scripts/merge-sector-pages-i18n.mjs
  */
+throw new Error('Retired: do not run merge-sector-pages-i18n.mjs (24-month ownership copy).')
+
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'

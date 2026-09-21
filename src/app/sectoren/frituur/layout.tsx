@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'Frituur Kassa | Snelste i9 Checkout | Vysion kassa',
   },
   description:
-    'Frituur en snackbar: Intel i9-kassa, dubbel scherm, 9 talen, ingebouwde printer. Stop met huren. Na 24 maanden is deze i9 kassa 100% jouw eigendom. Kassasysteem België & Nederland.',
+    'Frituur en snackbar: Intel i9-kassa, dubbel scherm, 9 talen, ingebouwde printer. Kassasysteem België & Nederland.',
   keywords: [
     'frituur kassa',
     'snackbar kassa',

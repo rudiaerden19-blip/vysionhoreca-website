@@ -6,7 +6,7 @@ import { useLanguage } from '@/i18n'
 
 /** Vaste SEO-/alt-tekst zoals afgesproken voor beide productfoto's. */
 export const VYSION_I5_DUAL_SCREEN_IMAGE_ALT =
-  'Vysion i9 Dual-Screen Kassa - Eigendom na 24 maanden - 9 talen ondersteuning'
+  'Vysion i9 Dual-Screen Kassa - 9 talen ondersteuning'
 
 const SPEC_KEYS = [
   'specProcessor',

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
   },
   description:
-    'Salon-upgrade: professionele i9-kassa (Het Beest), eenvoudig afrekenen, 9 talen, na 24 maanden hardware van jou. Stop met huren. Na 24 maanden is deze i9 kassa 100% jouw eigendom. Snelste kassa voor salons — kassasysteem België & Nederland.',
+    'Salon-upgrade: professionele i9-kassa (Het Beest), eenvoudig afrekenen, 9 talen. Snelste kassa voor salons — kassasysteem België & Nederland.',
   keywords: [
     'kapper kassa',
     'salon kassa',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   alternates: { canonical },
   openGraph: {
     title: 'Kassasysteem voor Kappers & Salons | Stijlvol & Snel | Vysion kassa',
-    description: 'Kappers & salons: i9, stijlvolle checkout, eigendom na 24 maanden.',
+    description: 'Kappers & salons: i9, stijlvolle checkout. Kassasysteem België — start gratis.',
     url: canonical,
     type: 'website',
   },

@@ -590,12 +590,12 @@
         "role": "Fish & Chips Owner"
       },
       "7": {
-        "quote": "我的面包店里从未有过如此快速的收银机。起初我不相信24个月后硬件会归我所有，但整整24个月后，我收到了明确提示：恭喜，硬件收银机及配件现已成为您的财产。",
+        "quote": "我的面包店里从未有过如此快速的收银机。即使早高峰也运转顺畅。",
         "author": "Bakkerij de Vliet",
         "role": "面包店"
       },
       "8": {
-        "quote": "我以前的收银系统是 Lightspeed，花了 2,440 欧元和 600 欧元安装费。现在我用每月 99 欧元的收银和软件，比以前快 10 倍，而且很快将归我所有。我不禁想：为什么其他家做不到？",
+        "quote": "我以前的收银系统是 Lightspeed，花了 2,440 欧元和 600 欧元安装费。现在我用每月 99 欧元的收银和软件，比以前快 10 倍。我不禁想：为什么其他家做不到？",
         "author": "Thamman Diblio",
         "role": "Kebab Tio, Amsterdam"
       }
@@ -1525,9 +1525,9 @@
   },
   "subscriptionsTermsPopup": {
     "title": "一般条款与条件",
-    "lastUpdated": "最近更新：2026年4月",
+    "lastUpdated": "最近更新：2026年9月",
     "footerBeforeLink": "更多合同约定请见",
-    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE (SUBSCRIPTION)\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person entering into a subscription\n- Agreement: the subscription for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Subscription: monthly service of €99 (or current price)\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. Subscription and delivery\n3.1. The Customer takes out a subscription for the use of the POS software.\n3.2. Under a premium subscription, Hardware is made available without an initial purchase cost.\n3.3. The Hardware remains the property of Vysion kassa's at all times, unless otherwise stated in article 13.\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. The subscription is entered into for an indefinite period (or minimum duration if applicable).\n5.2. Termination must be given in writing with one month's notice.\n5.3. Upon termination of the subscription, the right to use both software and Hardware ceases immediately.\n5.4. 硬件与软件可按月解约，不收取额外费用。\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. Transfer of ownership after subscription period\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's for the entire duration of the subscription.\n13.2. If the Customer maintains the premium subscription for an uninterrupted period of 24 months and has paid all amounts due in full and on time, ownership of the Hardware is transferred free of charge to the Customer.\n13.3. \"Uninterrupted\" means: no missed, late or partial payment and no suspension or termination of the subscription.\n13.4. In case of:\n- early termination\n- default\n- breach of contract\n- or any interruption of the subscription\nthe right to transfer of ownership lapses automatically and the Hardware remains the property of Vysion kassa's.\n13.5. In such cases, the Customer must return the Hardware immediately and within 14 days at the latest, as set out in article 6.\n13.6. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n\n14. Warranty and defects after transfer of ownership\n14.1. From the moment the Hardware becomes the property of the Customer, all warranty and service obligations of Vysion kassa's cease.\n14.2. The Customer accepts that from that moment:\n- Vysion kassa's is not responsible for defects, wear or loss\n- repair, maintenance or replacement is fully at the Customer's expense\n14.3. Normal wear occurring after transfer of ownership is fully the responsibility of the Customer.\n14.4. Vysion kassa's may optionally offer a maintenance or service contract after transfer of ownership, but this is not mandatory."
+    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE (SUBSCRIPTION)\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person entering into a subscription\n- Agreement: the subscription for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Subscription: monthly service of €99 (or current price)\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. Subscription and delivery\n3.1. The Customer takes out a subscription for the use of the POS software.\n3.2. Under a premium subscription, Hardware is made available without an initial purchase cost.\n3.3. The Hardware remains the property of Vysion kassa's at all times. The Customer does not acquire any ownership of the Hardware through the subscription.\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. The subscription is entered into for an indefinite period (or minimum duration if applicable).\n5.2. Termination must be given in writing with one month's notice.\n5.3. Upon termination of the subscription, the right to use both software and Hardware ceases immediately.\n5.4. 硬件与软件可按月解约，不收取额外费用。\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. No transfer of ownership through the subscription\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's at all times, including during a long or uninterrupted subscription.\n13.2. The subscription only grants the Customer a right to use the Hardware while the subscription is in force. There is no transfer of ownership after any period of time.\n13.3. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n13.4. Upon termination of the subscription, the Customer must return the Hardware as set out in article 6.\n\n14. Warranty and defects\n14.1. While the subscription is in force, Vysion kassa's provides the usual support for the Hardware made available, except in cases of misuse, theft or damage as set out in article 7.\n14.2. Defects due to normal wear during the subscription are repaired or replaced by agreement, according to the service terms then in force.\n14.3. Vysion kassa's may optionally offer a maintenance or service contract; this is not mandatory."
   },
   "serviceAgreementPage": {
     "title": "Vysion服务协议",
@@ -5061,7 +5061,7 @@
     "faq8Q": "我可以在多个设备上使用该应用吗?",
     "faq8A": "是的，您可以在无限数量的设备上登录。您的仪表板会在所有设备之间自动同步。",
     "faq9Q": "谁拥有系统？",
-    "faq9A": "收银机、打印机和钱箱等硬件的所有者为 Vysion。若您连续 24 个月为高级版客户，24 个月后将自动成为硬件所有者，无需额外付款。"
+    "faq9A": "收银机、打印机和钱箱等硬件的所有者为 Vysion。高级订阅期间您享有使用权。订阅不会使硬件成为您的财产。"
   },
   "resellersPage": {
     "badge": "合作伙伴计划",
@@ -5248,8 +5248,8 @@
     "imageAlt2": "带顾客屏的双屏收银设备，桌面视图",
     "imageAlt3": "全套收银布置：双触屏、钱箱、键盘与票据打印机",
     "eyebrow": "Vysion 猛兽",
-    "headline": "Vysion「猛兽」：强劲性能，完全自有",
-    "intro": "选择不仅能加速门店运营、更在 24 个月后真正**归您所有**的硬件。告别无休止租赁，为企业未来投资。",
+    "headline": "Vysion「野兽」：极致性能，专业硬件",
+    "intro": "选择能加快店铺节奏的硬件：强劲 i9 收银机，含在订阅中。无隐藏费用，条款清晰。",
     "specsHeading": "决定体验的关键规格",
     "specSpeed": "**极速响应**：凭借 **英特尔酷睿 i9 处理器** 与 **16 GB 内存**，交易瞬间完成、不卡顿——无论 10 个还是上万个商品。",
     "specDualTitle": "坚固硬件",
@@ -5258,9 +5258,9 @@
     "specStorage": "**可靠存储**：**128 GB SSD** 让收银机数秒启动，数据安全且极速读取。",
     "worksHeading": "为何这套系统适合各类业态",
     "worksLead": "这不是支架上的普通平板，而是专业级工业工作站。烘焙、服饰、咖啡馆或网店，硬件都能跟上您的节奏。",
-    "worksBullet1": "**透明方案**：无隐藏费用。24 个月后分期结束，设备 100% 属于您。",
+    "worksBullet1": "**透明方案**：无隐藏费用。高级硬件含在订阅中，可按月取消。",
     "worksBullet2": "**全行业友好**：简洁外观，在任何柜台都显专业。",
-    "quote": "停止租赁，开始拥有。选择 i9 工作站的强劲动力。"
+    "quote": "选择 i9 工作站的强劲动力。快速、可靠，随时应对高峰。"
   },
   "platform": {
     "sectionTitle": "您将获得",
@@ -6181,30 +6181,30 @@
     },
     "bakkerij": {
       "h1": "面包房最快收银系统 | i9 性能与 9 种语言 | Vysion",
-      "intro": "面向面包房的布局：Intel i9 应对早高峰，团队支持 9 种语言，24 个月后硬件归您 — 比利时与荷兰门店之选。",
+      "intro": "面包店收银布局：Intel i9 应对早高峰，团队可用 9 种语言 — 比利时与荷兰的收银系统。",
       "body1": "早午餐与周末高峰也能保持流畅：触屏 POS、小票打印机与稳定软件。购买或租赁方案清晰，一次打包无隐藏费用。",
-      "body2": "为关注毛利与效率的烘焙商家而打造。24 个月后拥有设备，胜过长期租赁 — 可伴随业务成长的比利时 POS。",
+      "body2": "为重视利润与节奏的面包师打造。强劲 i9 硬件含在订阅中 — 可长期使用的比利时收银。",
       "imageAlt": "Vysion 面包房收银布局",
       "cta": "免费开始 — 14 天试用",
-      "ownership24": "别再只租不买。24 个月后，这台 i9 收银机 100% 归您所有。"
+      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
     },
     "cafe": {
       "h1": "咖啡馆餐饮收银 | i9 双屏与 9 种语言 | Vysion",
       "intro": "咖啡馆节奏需要更快收银：i9 硬件、多语言团队的 9 种语言、毛利一目了然 — 适用于餐吧、咖啡吧与简餐。",
       "body1": "早高峰或露台繁忙也能保持最快结账。堂食、外带与线上订单同一流程 — 适合比利时高客流咖啡馆。",
-      "body2": "更少点击、更少差错、更高翻台。免费试用 Vysion，感受 i9 性能与 24 个月后设备归属。",
+      "body2": "更少点击、更少差错、更高翻台。免费试用 Vysion，以清晰条款体验 i9 性能。",
       "imageAlt": "Vysion 咖啡馆与餐吧收银布局",
       "cta": "免费开始",
-      "ownership24": "别再只租不买。24 个月后，这台 i9 收银机 100% 归您所有。"
+      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
     },
     "frituur": {
       "h1": "炸物店收银 | 最快 i9 结账 | Vysion",
       "intro": "高峰与活动日也要跟得上：Intel i9、面向顾客的双屏、团队 9 种语言 — 为排队与快节奏而设计。",
       "body1": "订单、酱汁与配菜流畅录入。触屏 POS、内置打印机与线上点餐一体 — 比利时与荷兰炸物店方案。",
-      "body2": "缩短排队、稳住毛利。免费试用，店内实测，24 个月后硬件归您。",
+      "body2": "缩短排队、守住利润。免费开始，在店里试用，订阅包含高级硬件。",
       "imageAlt": "Vysion 炸物店与小吃店收银布局",
       "cta": "免费开始",
-      "ownership24": "别再只租不买。24 个月后，这台 i9 收银机 100% 归您所有。"
+      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
     },
     "kebab": {
       "h1": "烤肉/三明治店收银 | i9 强劲性能 | Vysion",
@@ -6213,25 +6213,25 @@
       "body2": "减轻柜台压力，更好掌控营收。免费试用，了解为何商家选择 i9。",
       "imageAlt": "Vysion 烤肉与三明治店收银布局",
       "cta": "免费开始",
-      "ownership24": "别再只租不买。24 个月后，这台 i9 收银机 100% 归您所有。"
+      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
     },
     "kapper": {
       "h1": "美发沙龙收银 | 优雅且快速 | Vysion",
-      "intro": "专业 i9 收银、顺畅收款、团队 9 种语言，24 个月后硬件归您 — 为沙龙升级而生。",
+      "intro": "专业 i9 收银、流畅结账、团队 9 种语言 — 为沙龙升级。",
       "body1": "满座也不让前台排长队。最快结账流程稳住全天节奏 — 面向比利时与荷兰沙龙。",
       "body2": "预约、零售与小费一屏掌握。免费试用 Vysion，体验高端硬件下的流畅结账。",
       "imageAlt": "Vysion 美发沙龙收银布局",
       "cta": "免费开始",
-      "ownership24": "别再只租不买。24 个月后，这台 i9 收银机 100% 归您所有。"
+      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
     },
     "retail": {
       "h1": "零售收银与库存 | 门店 i9「猛兽」| Vysion",
       "intro": "以 i9（16GB RAM）管理库存，触屏 POS 与免费网站对接 — 与门店共同成长的零售收银。",
       "body1": "想要快速零售收银？库存与销售同屏完成。关注毛利与排队速度 — 比利时门店系统。",
-      "body2": "从条码到日结：更少差错、更高效率。24 个月后拥有高端硬件 — 不再无意义地长期租用。",
+      "body2": "从条码到日结：更少差错、更快节奏。高级硬件含在订阅中 — 没有意外。",
       "imageAlt": "Vysion 零售门店收银布局",
       "cta": "免费开始",
-      "ownership24": "别再只租不买。24 个月后，这台 i9 收银机 100% 归您所有。"
+      "ownership24": "高级 i9 收银机含在订阅中 — 快速、可靠，随时应对高峰。"
     }
   },
   "stockPage": {
