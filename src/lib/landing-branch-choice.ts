@@ -36,6 +36,8 @@ export const LANDING_BRANCH_COLUMNS: Array<{
       'snackbar',
       'broodjeszaak',
       'takeaway',
+      'kebab',
+      'pizza',
     ],
   },
 ]

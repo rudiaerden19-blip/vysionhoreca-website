@@ -731,7 +731,9 @@
           "hotel": "Hotel",
           "snackbar": "Snack bar",
           "broodjeszaak": "Paninoteca",
-          "takeaway": "Asporto"
+          "takeaway": "Asporto",
+          "kebab": "Kebab",
+          "pizza": "Pizza"
         }
       }
     }

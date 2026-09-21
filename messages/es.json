@@ -731,7 +731,9 @@
           "hotel": "Hotel",
           "snackbar": "Snack bar",
           "broodjeszaak": "Bocatería",
-          "takeaway": "Para llevar"
+          "takeaway": "Para llevar",
+          "kebab": "Kebab",
+          "pizza": "Pizza"
         }
       }
     }
