@@ -168,9 +168,8 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
       'Etiketten printen en een klantenkaart voor vaste klanten.',
     ],
     heroImage: {
-      src: '/images/hardware/hardware-barcode-scanner.png',
-      alt: 'Barcodescanner voor de winkelskassa',
-      contain: true,
+      src: '/images/sectoren/slagerij-hero.jpg',
+      alt: 'Slager aan het werk met vers vlees aan de toonbank',
     },
     sections: [
       {
@@ -241,7 +240,7 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hubHref: '/winkel',
     hubLabel: 'Bekijk het complete kassasysteem voor winkels & retail',
     demoHref: '/winkel#contact',
-    ogImage: '/images/hardware/hardware-tf30-kassa.png',
+    ogImage: '/images/sectoren/slagerij-hero.jpg',
   },
   kapper: {
     slug: 'kapper',
@@ -260,9 +259,8 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
       'Personeel in- en uitklokken, plus rapportages.',
     ],
     heroImage: {
-      src: '/images/hardware/hardware-tf30-kassa.png',
-      alt: 'Elo-touchscreen kassa voor de salonbalie',
-      contain: true,
+      src: '/images/sectoren/kapper-hero.jpg',
+      alt: 'Kapper knipt haar met schaar en kam in de salon',
     },
     sections: [
       {
@@ -332,7 +330,7 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hubHref: '/winkel',
     hubLabel: 'Bekijk het complete kassasysteem voor winkels & retail',
     demoHref: '/winkel#contact',
-    ogImage: '/images/hardware/hardware-tf30-kassa.png',
+    ogImage: '/images/sectoren/kapper-hero.jpg',
   },
   nachtwinkel: {
     slug: 'nachtwinkel',
