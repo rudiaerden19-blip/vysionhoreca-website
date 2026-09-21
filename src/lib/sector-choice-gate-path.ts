@@ -25,6 +25,7 @@ export function shouldShowSectorChoiceGate(pathname: string | null, hostname: st
   if (pathname.startsWith('/dashboard')) return false
   if (pathname.startsWith('/keuken')) return false
   if (pathname.startsWith('/login')) return false
+  if (pathname.startsWith('/registreer')) return false
   if (pathname.startsWith('/verify-email')) return false
   if (pathname.startsWith('/welkom')) return false
   if (pathname.startsWith('/reserveren')) return false

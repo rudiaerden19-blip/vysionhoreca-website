@@ -694,21 +694,46 @@
     "decline": "رفض"
   },
   "sectorModal": {
-    "title": "اختر قطاعك واكتشف الحل المناسب لك",
-    "sectors": {
-      "frituur": "مطعم بطاطس / مقليات",
-      "broodjeszaak": "محل سندويشات",
-      "kebabzaak": "مطعم كباب",
-      "cafe": "مقهى",
-      "kapper": "صالون حلاقة / تجميل شعر",
-      "beauty_salon": "صالون تجميل",
-      "nagelstudio": "صالون أظافر",
-      "retail": "تجزئة",
-      "drankenhandel": "مشروبات (بيع بالتجزئة)",
-      "foodtruck": "شاحنة طعام",
-      "ijssalon": "محل آيس كريم",
-      "marktkramen": "أكشاك السوق",
-      "other": "أخرى"
+    "title": "Which industry fits your business?",
+    "other": "Other industry / browse generally.",
+    "columns": {
+      "winkel": {
+        "title": "SHOP",
+        "items": {
+          "bakker": "Bakery",
+          "slager": "Butcher",
+          "kapper": "Hair salon",
+          "nachtwinkel": "Night shop",
+          "kledingzaak": "Clothing store",
+          "schoenenwinkel": "Shoe store",
+          "buurtwinkel": "Convenience store",
+          "speciaalzaak": "Specialty shop"
+        }
+      },
+      "retail": {
+        "title": "RETAIL",
+        "items": {
+          "boetiek": "Boutique",
+          "elektronica": "Electronics",
+          "geschenkzaak": "Gift shop",
+          "dierenwinkel": "Pet shop",
+          "groothandel": "Wholesale",
+          "andereRetail": "Other retail"
+        }
+      },
+      "horeca": {
+        "title": "HORECA",
+        "items": {
+          "frituur": "Chip shop",
+          "restaurant": "Restaurant",
+          "cafe": "Café",
+          "brasserie": "Brasserie",
+          "hotel": "Hotel",
+          "snackbar": "Snack bar",
+          "broodjeszaak": "Sandwich shop",
+          "takeaway": "Take-away"
+        }
+      }
     }
   },
   "login": {

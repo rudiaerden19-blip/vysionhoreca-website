@@ -694,21 +694,46 @@
     "decline": "Ablehnen"
   },
   "sectorModal": {
-    "title": "Wählen Sie Ihre Branche und entdecken Sie Ihre maßgeschneiderte Lösung",
-    "sectors": {
-      "frituur": "Imbiss / Frittenbude",
-      "broodjeszaak": "Sandwichladen",
-      "kebabzaak": "Döner / Kebab",
-      "cafe": "Café",
-      "kapper": "Friseur",
-      "beauty_salon": "Kosmetikstudio",
-      "nagelstudio": "Nagelstudio",
-      "retail": "Einzelhandel",
-      "drankenhandel": "Getränkefachhandel",
-      "foodtruck": "Foodtruck",
-      "ijssalon": "Eisdiele",
-      "marktkramen": "Marktstände",
-      "other": "Sonstiges"
+    "title": "Welche Branche passt zu Ihrem Betrieb?",
+    "other": "Andere Branche / allgemein ansehen.",
+    "columns": {
+      "winkel": {
+        "title": "LADEN",
+        "items": {
+          "bakker": "Bäckerei",
+          "slager": "Metzgerei",
+          "kapper": "Friseur",
+          "nachtwinkel": "Nachtladen",
+          "kledingzaak": "Bekleidungsgeschäft",
+          "schoenenwinkel": "Schuhgeschäft",
+          "buurtwinkel": "Tante-Emma-Laden",
+          "speciaalzaak": "Fachgeschäft"
+        }
+      },
+      "retail": {
+        "title": "RETAIL",
+        "items": {
+          "boetiek": "Boutique",
+          "elektronica": "Elektronik",
+          "geschenkzaak": "Geschenkeladen",
+          "dierenwinkel": "Zoohandlung",
+          "groothandel": "Großhandel",
+          "andereRetail": "Anderer Einzelhandel"
+        }
+      },
+      "horeca": {
+        "title": "GASTRO",
+        "items": {
+          "frituur": "Imbiss / Fritten",
+          "restaurant": "Restaurant",
+          "cafe": "Café",
+          "brasserie": "Brasserie",
+          "hotel": "Hotel",
+          "snackbar": "Snack-Bar",
+          "broodjeszaak": "Sandwichladen",
+          "takeaway": "Take-away"
+        }
+      }
     }
   },
   "login": {

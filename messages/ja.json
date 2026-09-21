@@ -694,21 +694,46 @@
     "decline": "拒否する"
   },
   "sectorModal": {
-    "title": "業種を選び、最適なソリューションを見つけましょう",
-    "sectors": {
-      "frituur": "フライショップ",
-      "broodjeszaak": "サンドイッチ店",
-      "kebabzaak": "ケバブ店",
-      "cafe": "カフェ",
-      "kapper": "美容院（ヘア）",
-      "beauty_salon": "エステサロン",
-      "nagelstudio": "ネイルサロン",
-      "retail": "小売",
-      "drankenhandel": "飲料販売",
-      "foodtruck": "キッチンカー",
-      "ijssalon": "アイスクリーム店",
-      "marktkramen": "市場の屋台",
-      "other": "その他"
+    "title": "Which industry fits your business?",
+    "other": "Other industry / browse generally.",
+    "columns": {
+      "winkel": {
+        "title": "SHOP",
+        "items": {
+          "bakker": "Bakery",
+          "slager": "Butcher",
+          "kapper": "Hair salon",
+          "nachtwinkel": "Night shop",
+          "kledingzaak": "Clothing store",
+          "schoenenwinkel": "Shoe store",
+          "buurtwinkel": "Convenience store",
+          "speciaalzaak": "Specialty shop"
+        }
+      },
+      "retail": {
+        "title": "RETAIL",
+        "items": {
+          "boetiek": "Boutique",
+          "elektronica": "Electronics",
+          "geschenkzaak": "Gift shop",
+          "dierenwinkel": "Pet shop",
+          "groothandel": "Wholesale",
+          "andereRetail": "Other retail"
+        }
+      },
+      "horeca": {
+        "title": "HORECA",
+        "items": {
+          "frituur": "Chip shop",
+          "restaurant": "Restaurant",
+          "cafe": "Café",
+          "brasserie": "Brasserie",
+          "hotel": "Hotel",
+          "snackbar": "Snack bar",
+          "broodjeszaak": "Sandwich shop",
+          "takeaway": "Take-away"
+        }
+      }
     }
   },
   "login": {

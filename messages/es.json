@@ -694,21 +694,46 @@
     "decline": "Rechazar"
   },
   "sectorModal": {
-    "title": "Elija su sector y descubra una solución a su medida",
-    "sectors": {
-      "frituur": "Freiduría / churrería",
-      "broodjeszaak": "Bocatería",
-      "kebabzaak": "Kebab",
-      "cafe": "Café",
-      "kapper": "Peluquería",
-      "beauty_salon": "Centro de estética",
-      "nagelstudio": "Uñas / manicura",
-      "retail": "Retail",
-      "drankenhandel": "Bebidas (off-trade)",
-      "foodtruck": "Food truck",
-      "ijssalon": "Heladería",
-      "marktkramen": "Puestos de mercado",
-      "other": "Otro"
+    "title": "¿Qué sector encaja con su negocio?",
+    "other": "Otro sector / ver en general.",
+    "columns": {
+      "winkel": {
+        "title": "TIENDA",
+        "items": {
+          "bakker": "Panadería",
+          "slager": "Carnicería",
+          "kapper": "Peluquería",
+          "nachtwinkel": "Tienda de noche",
+          "kledingzaak": "Tienda de ropa",
+          "schoenenwinkel": "Zapatería",
+          "buurtwinkel": "Tienda de barrio",
+          "speciaalzaak": "Tienda especializada"
+        }
+      },
+      "retail": {
+        "title": "RETAIL",
+        "items": {
+          "boetiek": "Boutique",
+          "elektronica": "Electrónica",
+          "geschenkzaak": "Tienda de regalos",
+          "dierenwinkel": "Tienda de animales",
+          "groothandel": "Mayorista",
+          "andereRetail": "Otro retail"
+        }
+      },
+      "horeca": {
+        "title": "HORECA",
+        "items": {
+          "frituur": "Freiduría",
+          "restaurant": "Restaurante",
+          "cafe": "Café",
+          "brasserie": "Brasserie",
+          "hotel": "Hotel",
+          "snackbar": "Snack bar",
+          "broodjeszaak": "Bocatería",
+          "takeaway": "Para llevar"
+        }
+      }
     }
   },
   "login": {

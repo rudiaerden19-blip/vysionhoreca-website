@@ -1012,21 +1012,46 @@
     "decline": "Weigeren"
   },
   "sectorModal": {
-    "title": "Kies uw sector en ontdek uw oplossing op maat",
-    "sectors": {
-      "frituur": "Frituur",
-      "broodjeszaak": "Broodjeszaak",
-      "kebabzaak": "Kebabzaak",
-      "cafe": "Café",
-      "kapper": "Kapper",
-      "beauty_salon": "Schoonheidssalon",
-      "nagelstudio": "Nagelstudio",
-      "retail": "Retail",
-      "drankenhandel": "Drankenhandel",
-      "foodtruck": "Foodtruck",
-      "ijssalon": "IJssalon",
-      "marktkramen": "Marktkramen",
-      "other": "Andere"
+    "title": "Welke branche past bij uw zaak?",
+    "other": "Andere branche / algemeen bekijken.",
+    "columns": {
+      "winkel": {
+        "title": "WINKEL",
+        "items": {
+          "bakker": "Bakker",
+          "slager": "Slager",
+          "kapper": "Kapper",
+          "nachtwinkel": "Nachtwinkel",
+          "kledingzaak": "Kledingzaak",
+          "schoenenwinkel": "Schoenenwinkel",
+          "buurtwinkel": "Buurtwinkel",
+          "speciaalzaak": "Speciaalzaak"
+        }
+      },
+      "retail": {
+        "title": "RETAIL",
+        "items": {
+          "boetiek": "Boetiek",
+          "elektronica": "Elektronica",
+          "geschenkzaak": "Geschenkzaak",
+          "dierenwinkel": "Dierenwinkel",
+          "groothandel": "Groothandel",
+          "andereRetail": "Andere retail"
+        }
+      },
+      "horeca": {
+        "title": "HORECA",
+        "items": {
+          "frituur": "Frituur",
+          "restaurant": "Restaurant",
+          "cafe": "Café",
+          "brasserie": "Brasserie",
+          "hotel": "Hotel",
+          "snackbar": "Snackbar",
+          "broodjeszaak": "Broodjeszaak",
+          "takeaway": "Take-away"
+        }
+      }
     }
   },
   "login": {
