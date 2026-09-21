@@ -90,7 +90,7 @@ export default function SectorChoiceGate() {
         <div className="shrink-0 border-b border-gray-100 px-4 py-4 sm:px-8 sm:py-6">
           <h2
             id="sector-modal-title"
-            className="text-center text-lg font-bold leading-snug text-gray-900 sm:text-2xl"
+            className="text-center text-lg font-bold leading-snug text-[#5EC4E8] sm:text-2xl"
           >
             {t('sectorModal.title')}
           </h2>
@@ -102,7 +102,7 @@ export default function SectorChoiceGate() {
                 key={column.id}
                 className="flex min-h-0 flex-col rounded-xl border-2 border-gray-200 bg-white px-1 py-3 sm:rounded-2xl sm:px-3 sm:py-5"
               >
-                <p className="px-1 text-center text-[11px] font-extrabold tracking-wide text-gray-900 sm:text-base">
+                <p className="px-1 text-center text-[11px] font-extrabold tracking-wide text-[#5EC4E8] sm:text-base">
                   {t(`sectorModal.columns.${column.id}.title`)}
                 </p>
                 <div
