@@ -5,9 +5,11 @@ alwaysApply: true
 
 # Productie-kassa vs GKS (ZEER BELANGRIJK)
 
+**Horeca-kassa is bevroren** — zie `horeca-kassa-never-touch.mdc`. Niet “even” `/admin/kassa` aanpassen.
+
 ## Productie (branch `main` → Vercel production)
 
-- Alleen **`/shop/{tenant}/admin/kassa`** en tenant-kassa-ondersteuning aanpassen.
+- Retail-kassa en tenant-ondersteuning: **niet** via de horeca-POS-pagina. Horeca-kassa (`/shop/{tenant}/admin/kassa`) **niet wijzigen**.
 - UI-styling via **`src/lib/kassa-pos-surface.ts`** en **`kassa-register-ui-theme`** — **geen** imports uit `src/lib/gks-kassa/**`.
 - **Geen** routes, pages, API’s of fiscale flow van GKS op `main` toevoegen of meenemen.
 - Wijzigingen gelden **alle tenants** (500+); nooit hardcoded één slug.

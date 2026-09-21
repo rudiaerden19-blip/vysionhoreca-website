@@ -9,6 +9,8 @@ automatisch bij het opstarten, dus hier staan alleen niet-voor-de-hand-liggende 
 Eén multi-tenant horeca SaaS (Next.js 14, App Router). **De repo-root ís de website** — er is
 geen aparte `website/`-map. De enige losse app is de Print Agent onder `apps/vysion-print-agent/`
 (NIET aanraken, zie `.cursor/rules/no-print-agent.mdc`).
+De **horeca-kassa** (`src/app/shop/[tenant]/admin/kassa/`) **nooit aanraken**
+(zie `.cursor/rules/horeca-kassa-never-touch.mdc`). Retail-kassa is een apart pad.
 
 ### Standaardcommando's (zie `package.json` scripts)
 - Dev server: `npm run dev` → http://localhost:3000

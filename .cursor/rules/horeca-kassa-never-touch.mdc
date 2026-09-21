@@ -1,0 +1,26 @@
+---
+description: ABSOLUUT — horeca-kassa nooit meer aanraken
+alwaysApply: true
+---
+
+# 🚫 Horeca-kassa — NOOIT AANRAKEN
+
+**Vaste projectregel (eigenaar):** kom **nooit meer** aan de horeca-kassa. Geen uitzonderingen tenzij de gebruiker in **dezelfde opdracht** letterlijk schrijft dat de **horeca-kassa** (of een concreet bestand daaronder) **mag wijzigen**.
+
+## Verboden — altijd
+
+- **Geen enkele wijziging** onder `src/app/shop/[tenant]/admin/kassa/**` (pagina, layout, POS-flow)
+- Geen “even snel” theme-, Mode-, footer-, knop- of layout-fix op de horeca-POS
+- **Gedeelde kassa-chrome niet wijzigen** als horeca die ook gebruikt: `kassa-pos-surface.ts`, `kassa-ui-layout.ts`, `kassa-pos-register-ui-theme.ts`, `KassaModePicker.tsx`, `kassa-register-ui-dark-preference.ts`
+- Geen commit/push van horeca-kassa-bestanden “per ongeluk” bij retail, marketing of andere taken
+
+## Wel toegestaan
+
+- **Retail-kassa:** alleen `src/components/retail-kassa/**`, `src/app/shop/[tenant]/admin/retail-kassa/**`, `src/lib/kassa-layout-chrome.ts`, `src/lib/retail-*`
+- Marketing-site (`/`, `/winkel`, `/retail`) is **geen** kassa
+- Lezen van horeca-kassa-bestanden mag om te vergelijken; **niet schrijven**
+
+## Git staging
+
+- `git diff -- 'src/app/shop/[tenant]/admin/kassa/'` moet **leeg** blijven
+- Gedeelde kassa-libs hierboven: niet stagen tenzij de eigenaar in dezelfde opdracht horeca expliciet vrijgeeft

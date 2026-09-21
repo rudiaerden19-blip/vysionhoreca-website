@@ -1,4 +1,11 @@
+---
+description: Winkelkassa los van horeca-kassa — horeca-POS niet wijzigen
+alwaysApply: true
+---
+
 # Winkelkassa vs horeca-kassa — strikte scheiding
+
+Zie ook **`horeca-kassa-never-touch.mdc`**: horeca-kassa **nooit** aanraken.
 
 ## Verboden zonder expliciet verzoek van de eigenaar
 
