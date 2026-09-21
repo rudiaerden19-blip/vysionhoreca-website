@@ -12,14 +12,6 @@ import {
 } from '@/lib/landing-branch-choice'
 import { shouldShowSectorChoiceGate } from '@/lib/sector-choice-gate-path'
 
-function hasStoredBranch(): boolean {
-  try {
-    return Boolean(localStorage.getItem(LANDING_BRANCH_STORAGE_KEY))
-  } catch {
-    return false
-  }
-}
-
 function saveService(service: LandingServiceId) {
   try {
     localStorage.setItem(
@@ -36,14 +28,15 @@ function saveService(service: LandingServiceId) {
 }
 
 /**
- * Eerste bezoek marketingwebsite: sub-dienst kiezen (niet op login/registratie/shop/admin).
- * Drie kolommen naast elkaar; onderaan algemeen bekijken.
+ * Marketingwebsite: branche kiezen bij elke paginalaad (niet op login/registratie/shop/admin).
+ * Na een keuze sluit de popup tot de volgende refresh.
  */
 export default function SectorChoiceGate() {
   const pathname = usePathname()
   const { t } = useLanguage()
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -52,19 +45,16 @@ export default function SectorChoiceGate() {
   useEffect(() => {
     if (!mounted) return
     const host = typeof window !== 'undefined' ? window.location.hostname : ''
-    if (!shouldShowSectorChoiceGate(pathname, host)) {
-      setOpen(false)
-      return
-    }
-    if (hasStoredBranch()) {
+    if (!shouldShowSectorChoiceGate(pathname, host) || dismissed) {
       setOpen(false)
       return
     }
     setOpen(true)
-  }, [mounted, pathname])
+  }, [mounted, pathname, dismissed])
 
   const pick = useCallback((service: LandingServiceId) => {
     saveService(service)
+    setDismissed(true)
     setOpen(false)
   }, [])
 
