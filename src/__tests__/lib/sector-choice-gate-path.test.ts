@@ -10,6 +10,8 @@ import {
   landingBranchFromPathname,
   landingSitePathForBranch,
   marketingSiteHashHref,
+  readStoredLandingBranch,
+  LANDING_BRANCH_STORAGE_KEY,
 } from '@/lib/landing-branch-choice'
 import nl from '../../../messages/nl.json'
 
@@ -134,6 +136,19 @@ describe('landing branch columns', () => {
     expect(marketingSiteHashHref('/winkel', 'prijzen')).toBe('/winkel#prijzen')
     expect(marketingSiteHashHref('/retail', 'prijzen')).toBe('/winkel#prijzen')
     expect(marketingSiteHashHref('/', 'prijzen')).toBe('/#prijzen')
+  })
+
+  it('reads the stored landing branch from localStorage', () => {
+    localStorage.removeItem(LANDING_BRANCH_STORAGE_KEY)
+    expect(readStoredLandingBranch()).toBeNull()
+    localStorage.setItem(
+      LANDING_BRANCH_STORAGE_KEY,
+      JSON.stringify({ branch: 'winkel', service: 'bakker', savedAt: 1 }),
+    )
+    expect(readStoredLandingBranch()).toBe('winkel')
+    localStorage.setItem(LANDING_BRANCH_STORAGE_KEY, '{not-json')
+    expect(readStoredLandingBranch()).toBeNull()
+    localStorage.removeItem(LANDING_BRANCH_STORAGE_KEY)
   })
 
   it('has Dutch copy for the two columns and the other link', () => {

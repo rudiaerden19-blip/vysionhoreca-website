@@ -6604,6 +6604,26 @@
         "4": "Eigen webshop, dezelfde producten als in de winkel",
         "5": "Afrekenen en voorraad in één systeem"
       }
+    },
+    "pricingModulesHeading": "Voor winkels",
+    "pricingModulesIncluded": "Inbegrepen in je abonnement",
+    "ctaViewPricing": "Bekijk de prijzen",
+    "ctaViewSubscription": "Bekijk het abonnement",
+    "pricingModules": {
+      "1": "Kassa licentie inbegrepen",
+      "2": "Voorraad",
+      "3": "Rapporten",
+      "4": "Klantenkaart & loyaliteit",
+      "5": "Reviews",
+      "6": "Beheer je kassa op afstand",
+      "7": "SEO vindbaarheid",
+      "8": "Promoties",
+      "9": "Solden",
+      "10": "Producten & categorieën",
+      "11": "Betaalterminal integratie",
+      "12": "QR codes",
+      "13": "Barcodes",
+      "14": "Gratis website"
     }
   },
   "retailSite": {

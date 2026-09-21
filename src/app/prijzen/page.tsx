@@ -1,7 +1,7 @@
 'use client'
 
 import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { useLanguage } from '@/i18n'
@@ -10,17 +10,37 @@ import {
   monthlyPriceForHardware,
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
+import { readStoredLandingBranch } from '@/lib/landing-branch-choice'
+import {
+  WINKEL_PRICING_MODULE_IDS,
+  isWinkelMarketingBranch,
+  winkelPricingModuleKey,
+} from '@/lib/winkel-pricing-modules'
 
 export default function PrijzenPage() {
   const { t, locale } = useLanguage()
   const [withHardware, setWithHardware] = useState(false)
   const [isYearly, setIsYearly] = useState(false)
+  const [shopModules, setShopModules] = useState(false)
+
+  useEffect(() => {
+    setShopModules(isWinkelMarketingBranch(readStoredLandingBranch()))
+  }, [])
 
   const starterMonthly = monthlyPriceForHardware(withHardware)
   const proMonthly = MONTHLY_PRICE_WITH_HARDWARE
   const starterPrice = displayPrice(starterMonthly, isYearly)
   const proPrice = displayPrice(proMonthly, isYearly)
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
+  const shopFeatureIds = [...WINKEL_PRICING_MODULE_IDS]
+  const starterFeatureIds = shopModules ? shopFeatureIds : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+  const proFeatureIds = shopModules ? shopFeatureIds : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  const starterName = shopModules ? t('winkelSite.pricingModulesHeading') : t('pricing.starter.name')
+  const proName = shopModules ? t('winkelSite.pricingModulesIncluded') : t('pricing.pro.name')
+  const starterFeatureKey = (i: number) =>
+    shopModules ? winkelPricingModuleKey(i) : `pricing.starter.features.${i}`
+  const proFeatureKey = (i: number) =>
+    shopModules ? winkelPricingModuleKey(i) : `pricing.pro.features.${i}`
 
   return (
     <div className="min-h-screen bg-[#e3e3e3]">
@@ -86,7 +106,7 @@ export default function PrijzenPage() {
                       <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-accent">{t('pricing.starter.name')}</h3>
+                  <h3 className="text-xl font-bold text-accent">{starterName}</h3>
                 </div>
                 <div className="flex items-baseline mb-2">
                   <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
@@ -97,7 +117,7 @@ export default function PrijzenPage() {
                 )}
 
                 <ul className="space-y-3 mb-8">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
+                  {starterFeatureIds.map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
                         className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
@@ -107,7 +127,7 @@ export default function PrijzenPage() {
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(`pricing.starter.features.${i}`)}</span>
+                      <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(starterFeatureKey(i))}</span>
                     </li>
                   ))}
                 </ul>
@@ -138,7 +158,7 @@ export default function PrijzenPage() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
+                  <h3 className="text-xl font-bold text-accent">{proName}</h3>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
@@ -158,7 +178,7 @@ export default function PrijzenPage() {
                 )}
 
                 <ul className="space-y-3 mb-8">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                  {proFeatureIds.map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
                         className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
@@ -168,7 +188,7 @@ export default function PrijzenPage() {
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(`pricing.pro.features.${i}`)}</span>
+                      <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(proFeatureKey(i))}</span>
                     </li>
                   ))}
                 </ul>

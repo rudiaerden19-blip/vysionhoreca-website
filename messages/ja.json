@@ -6645,6 +6645,26 @@
         "4": "Your own webshop, the same products as in the shop",
         "5": "Checkout and stock in one system"
       }
+    },
+    "pricingModulesHeading": "店舗向け",
+    "pricingModulesIncluded": "サブスクリプションに含まれます",
+    "ctaViewPricing": "料金を見る",
+    "ctaViewSubscription": "サブスクを見る",
+    "pricingModules": {
+      "1": "レジライセンス込み",
+      "2": "在庫",
+      "3": "レポート",
+      "4": "ポイントカード・ロイヤルティ",
+      "5": "レビュー",
+      "6": "レジの遠隔管理",
+      "7": "SEOでの見つけやすさ",
+      "8": "プロモーション",
+      "9": "セール",
+      "10": "商品とカテゴリ",
+      "11": "決済端末連携",
+      "12": "QRコード",
+      "13": "バーコード",
+      "14": "無料ウェブサイト"
     }
   },
   "retailSite": {

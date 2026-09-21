@@ -6604,6 +6604,26 @@
         "4": "Your own webshop, the same products as in the shop",
         "5": "Checkout and stock in one system"
       }
+    },
+    "pricingModulesHeading": "For shops",
+    "pricingModulesIncluded": "Included in your subscription",
+    "ctaViewPricing": "View pricing",
+    "ctaViewSubscription": "View the subscription",
+    "pricingModules": {
+      "1": "POS licence included",
+      "2": "Stock",
+      "3": "Reports",
+      "4": "Loyalty card",
+      "5": "Reviews",
+      "6": "Manage your till remotely",
+      "7": "SEO visibility",
+      "8": "Promotions",
+      "9": "Sales",
+      "10": "Products & categories",
+      "11": "Payment terminal integration",
+      "12": "QR codes",
+      "13": "Barcodes",
+      "14": "Free website"
     }
   },
   "retailSite": {

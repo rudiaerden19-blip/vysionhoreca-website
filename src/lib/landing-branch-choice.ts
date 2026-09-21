@@ -83,6 +83,21 @@ export function landingSitePathForBranch(branch: LandingBranchId): string {
   return LANDING_SITE_PATHS[branch]
 }
 
+export function readStoredLandingBranch(): LandingBranchId | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(LANDING_BRANCH_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { branch?: unknown }
+    if (typeof parsed.branch === 'string' && isLandingBranchId(parsed.branch)) {
+      return parsed.branch
+    }
+  } catch {
+    /* ignore */
+  }
+  return null
+}
+
 export function landingBranchFromPathname(
   pathname: string | null,
 ): Exclude<LandingBranchId, 'other'> {

@@ -6645,6 +6645,26 @@
         "4": "Your own webshop, the same products as in the shop",
         "5": "Checkout and stock in one system"
       }
+    },
+    "pricingModulesHeading": "面向店铺",
+    "pricingModulesIncluded": "已包含在您的订阅中",
+    "ctaViewPricing": "查看价格",
+    "ctaViewSubscription": "查看订阅",
+    "pricingModules": {
+      "1": "含收银许可",
+      "2": "库存",
+      "3": "报表",
+      "4": "会员卡与忠诚度",
+      "5": "评价",
+      "6": "远程管理收银机",
+      "7": "SEO 可见度",
+      "8": "促销",
+      "9": "特卖",
+      "10": "商品与分类",
+      "11": "支付终端对接",
+      "12": "二维码",
+      "13": "条码",
+      "14": "免费网站"
     }
   },
   "retailSite": {

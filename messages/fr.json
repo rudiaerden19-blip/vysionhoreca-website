@@ -6668,6 +6668,26 @@
         "4": "Boutique en ligne, les mêmes produits qu’en magasin",
         "5": "Caisse et stock dans un seul système"
       }
+    },
+    "pricingModulesHeading": "Pour les magasins",
+    "pricingModulesIncluded": "Inclus dans votre abonnement",
+    "ctaViewPricing": "Voir les tarifs",
+    "ctaViewSubscription": "Voir l’abonnement",
+    "pricingModules": {
+      "1": "Licence caisse incluse",
+      "2": "Stock",
+      "3": "Rapports",
+      "4": "Carte de fidélité",
+      "5": "Avis",
+      "6": "Gérer votre caisse à distance",
+      "7": "Visibilité SEO",
+      "8": "Promotions",
+      "9": "Soldes",
+      "10": "Produits et catégories",
+      "11": "Intégration terminal de paiement",
+      "12": "Codes QR",
+      "13": "Codes-barres",
+      "14": "Site web gratuit"
     }
   },
   "retailSite": {

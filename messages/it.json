@@ -6645,6 +6645,26 @@
         "4": "E-commerce, gli stessi prodotti del negozio",
         "5": "Cassa e magazzino in un solo sistema"
       }
+    },
+    "pricingModulesHeading": "Per i negozi",
+    "pricingModulesIncluded": "Incluso nel tuo abbonamento",
+    "ctaViewPricing": "Vedi i prezzi",
+    "ctaViewSubscription": "Vedi l’abbonamento",
+    "pricingModules": {
+      "1": "Licenza cassa inclusa",
+      "2": "Magazzino",
+      "3": "Report",
+      "4": "Carta fedeltà",
+      "5": "Recensioni",
+      "6": "Gestisci la cassa da remoto",
+      "7": "Visibilità SEO",
+      "8": "Promozioni",
+      "9": "Saldi",
+      "10": "Prodotti e categorie",
+      "11": "Integrazione terminali di pagamento",
+      "12": "Codici QR",
+      "13": "Codici a barre",
+      "14": "Sito web gratis"
     }
   },
   "retailSite": {

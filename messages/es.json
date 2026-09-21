@@ -6645,6 +6645,26 @@
         "4": "Tienda online, los mismos productos que en tienda",
         "5": "Caja y stock en un solo sistema"
       }
+    },
+    "pricingModulesHeading": "Para tiendas",
+    "pricingModulesIncluded": "Incluido en su suscripción",
+    "ctaViewPricing": "Ver precios",
+    "ctaViewSubscription": "Ver la suscripción",
+    "pricingModules": {
+      "1": "Licencia de caja incluida",
+      "2": "Stock",
+      "3": "Informes",
+      "4": "Tarjeta de fidelidad",
+      "5": "Reseñas",
+      "6": "Gestione su caja a distancia",
+      "7": "Visibilidad SEO",
+      "8": "Promociones",
+      "9": "Rebajas",
+      "10": "Productos y categorías",
+      "11": "Integración de terminal de pago",
+      "12": "Códigos QR",
+      "13": "Códigos de barras",
+      "14": "Sitio web gratis"
     }
   },
   "retailSite": {

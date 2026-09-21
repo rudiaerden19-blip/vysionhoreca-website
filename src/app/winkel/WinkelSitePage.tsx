@@ -25,6 +25,10 @@ import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import WinkelHardwareVideos from './WinkelHardwareVideos'
+import {
+  WINKEL_PRICING_MODULE_IDS,
+  winkelPricingModuleKey,
+} from '@/lib/winkel-pricing-modules'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -465,44 +469,7 @@ function PromoMarqueeBand() {
   )
 }
 
-// Pricing Section
-/** Premium-kaart: alle Pro+-features in de vinkjeslijst (incl. reserveringsplatform). */
-/** Retail-popup: vaste featurevolgorde (links → rechts, per kolom). */
-const RETAIL_POPUP_FEATURE_IDS = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
-] as const
-const RETAIL_POPUP_MID = Math.ceil(RETAIL_POPUP_FEATURE_IDS.length / 2)
-
-/** Vaste volgorde modules-popup (links → rechts, per kolom van boven naar beneden). */
-const MODULES_POPUP_ORDER = [
-  { plan: 'pro', i: 1 },
-  { plan: 'starter', i: 1 },
-  { plan: 'pro', i: 10 },
-  { plan: 'pro', i: 7 },
-  { plan: 'pro', i: 4 },
-  { plan: 'starter', i: 2 },
-  { plan: 'starter', i: 4 },
-  { plan: 'starter', i: 5 },
-  { plan: 'starter', i: 8 },
-  { plan: 'starter', i: 10 },
-  { plan: 'starter', i: 12 },
-  { plan: 'pro', i: 3 },
-  { plan: 'pro', i: 5 },
-  { plan: 'pro', i: 9 },
-  { plan: 'pro', i: 6 },
-  { plan: 'pro', i: 2 },
-  { plan: 'starter', i: 11 },
-  { plan: 'starter', i: 9 },
-  { plan: 'starter', i: 3 },
-  { plan: 'starter', i: 13 },
-  { plan: 'starter', i: 6 },
-] as const
-
-function modulePopupLabel(t: (key: string) => string, entry: (typeof MODULES_POPUP_ORDER)[number]) {
-  return t(`pricing.${entry.plan}.features.${entry.i}`)
-}
-
-const MODULES_POPUP_MID = Math.ceil(MODULES_POPUP_ORDER.length / 2)
+const WINKEL_PRICING_MODULE_MID = Math.ceil(WINKEL_PRICING_MODULE_IDS.length / 2)
 
 function PricingFeatureCheck({ label }: { label: string }) {
   return (
@@ -636,13 +603,12 @@ function PricingSection() {
               <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
                 <div className="grid gap-8 md:grid-cols-2 md:gap-10">
                   <div>
-                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">{t('pricing.starter.name')}</h4>
+                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">
+                      {t('winkelSite.pricingModulesHeading')}
+                    </h4>
                     <ul className="space-y-3">
-                      {MODULES_POPUP_ORDER.slice(0, MODULES_POPUP_MID).map((entry, idx) => (
-                        <PricingFeatureCheck
-                          key={`m-l-${entry.plan}-${entry.i}-${idx}`}
-                          label={modulePopupLabel(t, entry)}
-                        />
+                      {WINKEL_PRICING_MODULE_IDS.slice(0, WINKEL_PRICING_MODULE_MID).map((id) => (
+                        <PricingFeatureCheck key={`m-l-${id}`} label={t(winkelPricingModuleKey(id))} />
                       ))}
                     </ul>
                   </div>
@@ -651,11 +617,8 @@ function PricingSection() {
                       .
                     </div>
                     <ul className="space-y-3">
-                      {MODULES_POPUP_ORDER.slice(MODULES_POPUP_MID).map((entry, idx) => (
-                        <PricingFeatureCheck
-                          key={`m-r-${entry.plan}-${entry.i}-${idx}`}
-                          label={modulePopupLabel(t, entry)}
-                        />
+                      {WINKEL_PRICING_MODULE_IDS.slice(WINKEL_PRICING_MODULE_MID).map((id) => (
+                        <PricingFeatureCheck key={`m-r-${id}`} label={t(winkelPricingModuleKey(id))} />
                       ))}
                     </ul>
                   </div>
@@ -694,7 +657,7 @@ function PricingSection() {
               <div className="flex shrink-0 flex-col border-b border-gray-100 bg-[#faf8f6]">
                 <div className="flex items-start justify-between gap-4 px-5 py-4 sm:px-6">
                   <h3 id="pricing-retail-modal-title" className="text-lg font-bold text-gray-900 sm:text-xl">
-                    {t('pricing.retailModalTitle')}
+                    {t('winkelSite.pricingModulesIncluded')}
                   </h3>
                   <button
                     type="button"
@@ -727,16 +690,26 @@ function PricingSection() {
                   </p>
                 )}
                 <div className="grid gap-8 md:grid-cols-2 md:gap-10">
-                  <ul className="space-y-3">
-                    {RETAIL_POPUP_FEATURE_IDS.slice(0, RETAIL_POPUP_MID).map((i) => (
-                      <PricingFeatureCheck key={`r-l-${i}`} label={t(`pricing.retail.features.${i}`)} />
-                    ))}
-                  </ul>
-                  <ul className="space-y-3">
-                    {RETAIL_POPUP_FEATURE_IDS.slice(RETAIL_POPUP_MID).map((i) => (
-                      <PricingFeatureCheck key={`r-r-${i}`} label={t(`pricing.retail.features.${i}`)} />
-                    ))}
-                  </ul>
+                  <div>
+                    <h4 className="mb-4 text-base font-bold text-accent sm:text-lg">
+                      {t('winkelSite.pricingModulesIncluded')}
+                    </h4>
+                    <ul className="space-y-3">
+                      {WINKEL_PRICING_MODULE_IDS.slice(0, WINKEL_PRICING_MODULE_MID).map((id) => (
+                        <PricingFeatureCheck key={`r-l-${id}`} label={t(winkelPricingModuleKey(id))} />
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <div className="mb-4 hidden text-base font-bold sm:text-lg md:block md:invisible" aria-hidden>
+                      .
+                    </div>
+                    <ul className="space-y-3">
+                      {WINKEL_PRICING_MODULE_IDS.slice(WINKEL_PRICING_MODULE_MID).map((id) => (
+                        <PricingFeatureCheck key={`r-r-${id}`} label={t(winkelPricingModuleKey(id))} />
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
               <div className="shrink-0 border-t border-gray-100 bg-[#faf8f6] px-5 py-4 sm:px-6">
@@ -769,20 +742,38 @@ function PricingSection() {
           ) : null}
         </div>
 
+        <div className="mx-auto mb-10 max-w-4xl rounded-2xl border border-gray-200 bg-white px-5 py-6 shadow-sm sm:px-8 sm:py-8">
+          <h3 className="mb-5 text-center text-lg font-bold text-accent sm:text-xl">
+            {t('winkelSite.pricingModulesIncluded')}
+          </h3>
+          <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+            <ul className="space-y-3">
+              {WINKEL_PRICING_MODULE_IDS.slice(0, WINKEL_PRICING_MODULE_MID).map((id) => (
+                <PricingFeatureCheck key={`p-l-${id}`} label={t(winkelPricingModuleKey(id))} />
+              ))}
+            </ul>
+            <ul className="space-y-3">
+              {WINKEL_PRICING_MODULE_IDS.slice(WINKEL_PRICING_MODULE_MID).map((id) => (
+                <PricingFeatureCheck key={`p-r-${id}`} label={t(winkelPricingModuleKey(id))} />
+              ))}
+            </ul>
+          </div>
+        </div>
+
         <div className="mx-auto flex max-w-md flex-col items-center gap-4">
           <button
             type="button"
             onClick={() => setModulesOpen(true)}
             className="w-full rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-center text-sm font-semibold text-gray-900 shadow-home-float transition-colors hover:bg-gray-900 hover:text-white sm:text-base"
           >
-            {t('pricing.ctaHomeHorecaPricing')}
+            {t('winkelSite.ctaViewPricing')}
           </button>
           <button
             type="button"
             onClick={() => setRetailOpen(true)}
             className="w-full rounded-full bg-accent px-6 py-4 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
           >
-            {t('pricing.ctaHomeRetailPricing')}
+            {t('winkelSite.ctaViewSubscription')}
           </button>
           <p className="text-center text-accent text-sm font-medium">{t('pricing.cancelAnytime')}</p>
           <a

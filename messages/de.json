@@ -6668,6 +6668,26 @@
         "4": "Eigener Webshop, dieselben Produkte wie im Laden",
         "5": "Kasse und Lager in einem System"
       }
+    },
+    "pricingModulesHeading": "Für Läden",
+    "pricingModulesIncluded": "In Ihrem Abo enthalten",
+    "ctaViewPricing": "Preise ansehen",
+    "ctaViewSubscription": "Abo ansehen",
+    "pricingModules": {
+      "1": "Kassenlizenz enthalten",
+      "2": "Lager",
+      "3": "Berichte",
+      "4": "Kundenkarte & Treue",
+      "5": "Bewertungen",
+      "6": "Kasse aus der Ferne verwalten",
+      "7": "SEO-Sichtbarkeit",
+      "8": "Aktionen",
+      "9": "Schlussverkauf",
+      "10": "Produkte & Kategorien",
+      "11": "Zahlungsterminal-Anbindung",
+      "12": "QR-Codes",
+      "13": "Barcodes",
+      "14": "Kostenlose Website"
     }
   },
   "retailSite": {
