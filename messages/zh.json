@@ -6527,5 +6527,81 @@
     "mailPassBarcode": "邮件发送条码",
     "mailingPass": "发送中…",
     "memberNoEmail": "此会员卡无邮箱。请在管理中或创建时添加。"
+  },
+  "winkelSite": {
+    "title": "面向面包店、肉店、理发店和街边店铺的收银系统",
+    "lead": "收银、库存和自有网店集于一套系统。为柜台打造——这不是餐饮网站。",
+    "point1": "扫码或点按即可快速结账",
+    "point2": "按商品管库存，无需额外套餐",
+    "point3": "订阅已包含自有网店",
+    "heroImageAlt": "店铺用 Elo 触屏收银机",
+    "usecasesTitle": "适合每家店铺",
+    "modulesTitle": "店铺能用到什么",
+    "hardwareTitle": "柜台硬件",
+    "pricingTitle": "店铺价格",
+    "modules": {
+      "pos": {
+        "title": "触屏收银",
+        "body": "结账、折扣、会员卡和日报在一个屏幕。"
+      },
+      "stock": {
+        "title": "库存",
+        "body": "看清该补什么货。不用另装库存应用。"
+      },
+      "barcode": {
+        "title": "条码扫描",
+        "body": "点按或扫描。面包、肉类、服装都可以。"
+      },
+      "webshop": {
+        "title": "自有网店",
+        "body": "线上点单无佣金，使用您的品牌。"
+      },
+      "reports": {
+        "title": "报表",
+        "body": "Z 报表和营业额发邮件，交给会计即可。"
+      },
+      "support": {
+        "title": "实时支持",
+        "body": "上线和高峰时段。您来电，我们解决。"
+      }
+    }
+  },
+  "retailSite": {
+    "title": "面向零售、精品店和批发的收银系统",
+    "lead": "触屏 POS、条码和多品类库存。独立零售站点——与餐饮和街边店网站分开。",
+    "point1": "适合大目录的条码与库存",
+    "point2": "店铺与批发都适用",
+    "point3": "订阅已包含硬件",
+    "heroImageAlt": "零售用 Sunmi 收银机",
+    "usecasesTitle": "面向零售与批发",
+    "modulesTitle": "零售能获得什么",
+    "hardwareTitle": "零售硬件",
+    "pricingTitle": "零售价格",
+    "modules": {
+      "pos": {
+        "title": "零售收银",
+        "body": "快速结账、刷卡、折扣和会员在一个屏幕。"
+      },
+      "barcode": {
+        "title": "条码",
+        "body": "在店铺或仓库扫描商品。"
+      },
+      "stock": {
+        "title": "库存",
+        "body": "无需额外软件即可管理数千SKU。"
+      },
+      "wholesale": {
+        "title": "批发",
+        "body": "批量、复购，以及按客户或商品查看。"
+      },
+      "reports": {
+        "title": "报表",
+        "body": "营业额、库存价值和 Z 报表交给财务。"
+      },
+      "support": {
+        "title": "实时支持",
+        "body": "上线、培训和高峰协助。请给我们打电话。"
+      }
+    }
   }
 }

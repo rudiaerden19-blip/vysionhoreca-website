@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
@@ -13,10 +12,6 @@ import {
   MONTHLY_PRICE_WITHOUT_HARDWARE,
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
-import {
-  landingBranchFromPathname,
-  marketingSiteHashHref,
-} from '@/lib/landing-branch-choice'
 
 const HERO_BG = '/images/hero-header.png'
 
@@ -31,7 +26,7 @@ const HERO_CTA_CARD_SHELL =
 
 const HERO_CTA_FLIP_MS = 8000
 
-function HeroCtaFlipCard({ allowLicenseFlip }: { allowLicenseFlip: boolean }) {
+function HeroCtaFlipCard() {
   const { t } = useLanguage()
   const [showBack, setShowBack] = useState(false)
   const [withHardware, setWithHardware] = useState(false)
@@ -46,13 +41,10 @@ function HeroCtaFlipCard({ allowLicenseFlip }: { allowLicenseFlip: boolean }) {
   }, [])
 
   useEffect(() => {
-    if (!allowLicenseFlip || reduceMotion) {
-      setShowBack(false)
-      return
-    }
+    if (reduceMotion) return
     const id = window.setInterval(() => setShowBack(prev => !prev), HERO_CTA_FLIP_MS)
     return () => window.clearInterval(id)
-  }, [allowLicenseFlip, reduceMotion])
+  }, [reduceMotion])
 
   const flipped = !reduceMotion && showBack
   const monthlyPrice = monthlyPriceForHardware(withHardware)
@@ -163,7 +155,6 @@ function HeroCtaFlipCard({ allowLicenseFlip }: { allowLicenseFlip: boolean }) {
           </div>
         </div>
 
-        {allowLicenseFlip ? (
         <div className={`${faceBase} [transform:rotateY(180deg)]`}>
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesBackHeadline')}
@@ -206,7 +197,6 @@ function HeroCtaFlipCard({ allowLicenseFlip }: { allowLicenseFlip: boolean }) {
             </a>
           </div>
         </div>
-        ) : null}
       </div>
     </div>
   )
@@ -215,27 +205,11 @@ function HeroCtaFlipCard({ allowLicenseFlip }: { allowLicenseFlip: boolean }) {
 export default function HomeLandingHero() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useLanguage()
-  const pathname = usePathname()
-  const branch = landingBranchFromPathname(pathname)
-  const title =
-    branch === 'horeca' ? t('heroLanding.title') : t(`heroLanding.sites.${branch}.title`)
-  const subtitleLead =
-    branch === 'horeca' ? t('heroLanding.subtitleLead') : t(`heroLanding.sites.${branch}.subtitleLead`)
-  const subtitle =
-    branch === 'horeca' ? t('heroLanding.subtitle') : t(`heroLanding.sites.${branch}.subtitle`)
-  const audienceLine =
-    branch === 'horeca' ? t('heroLanding.audienceLine') : t(`heroLanding.sites.${branch}.audienceLine`)
-  const heroBg =
-    branch === 'winkel'
-      ? '/images/kassa-platform-2.png'
-      : branch === 'retail'
-        ? '/images/kassa-platform-4.png'
-        : HERO_BG
 
   const pillLinks: { href: string; label: string }[] = [
-    { href: marketingSiteHashHref(pathname, 'sectoren'), label: t('nav.sectors') },
-    { href: marketingSiteHashHref(pathname, 'platform'), label: t('nav.services') },
-    { href: marketingSiteHashHref(pathname, 'prijzen'), label: t('nav.pricing') },
+    { href: '/#sectoren', label: t('nav.sectors') },
+    { href: '/#platform', label: t('nav.services') },
+    { href: '/#prijzen', label: t('nav.pricing') },
   ]
 
   return (
@@ -244,7 +218,7 @@ export default function HomeLandingHero() {
     >
       <div className="absolute inset-x-0 top-[-5rem] bottom-0">
         <Image
-          src={heroBg}
+          src={HERO_BG}
           alt=""
           fill
           priority
@@ -302,27 +276,22 @@ export default function HomeLandingHero() {
           ariaLabel={t('heroLanding.googleReviewsAria')}
           className="mb-5 sm:mb-6"
         />
-        {branch !== 'horeca' ? (
-          <p className="mb-3 text-sm font-extrabold tracking-[0.18em] text-[#5EC4E8]">
-            {t(`sectorModal.columns.${branch}.title`)}
-          </p>
-        ) : null}
         <h1 className={`mx-auto w-full max-w-4xl text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight tracking-tight ${HERO_KASSA_ACCENT}`}>
-          {title}
+          {t('heroLanding.title')}
         </h1>
         <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
-          {subtitleLead}
+          {t('heroLanding.subtitleLead')}
         </p>
-        {subtitle ? (
+        {t('heroLanding.subtitle') ? (
           <p className="mt-3 sm:mt-4 text-base sm:text-lg text-white/85 max-w-2xl leading-relaxed">
-            {subtitle}
+            {t('heroLanding.subtitle')}
           </p>
         ) : null}
-        <HeroCtaFlipCard allowLicenseFlip={branch === 'horeca'} />
+        <HeroCtaFlipCard />
         <p
           className={`mt-6 sm:mt-8 max-w-2xl px-2 text-center text-xl sm:text-2xl md:text-[1.65rem] font-bold leading-snug tracking-tight ${HERO_KASSA_ACCENT}`}
         >
-          {audienceLine}
+          {t('heroLanding.audienceLine')}
         </p>
       </div>
     </section>

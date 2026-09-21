@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     locale: 'nl_BE',
     url: `${VYSION_CANONICAL_ORIGIN}/winkel`,
     siteName: VYSION_BRAND_SITE_NAME,
-    images: [{ url: '/images/kassa-platform-2.png' }],
+    images: [{ url: '/images/hardware/hardware-tf30-kassa.png' }],
   },
 }
 

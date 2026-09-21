@@ -6486,5 +6486,81 @@
     "mailPassBarcode": "Email barcode",
     "mailingPass": "Sending…",
     "memberNoEmail": "No email on file for this pass. Add an email via Manage or when creating the pass."
+  },
+  "winkelSite": {
+    "title": "POS for bakers, butchers, hairdressers and high-street shops",
+    "lead": "Checkout, stock and your own webshop in one system. Built for the counter — this is not the hospitality site.",
+    "point1": "Fast checkout with barcode or tap on screen",
+    "point2": "Stock per product, no extra package",
+    "point3": "Your own webshop included in the subscription",
+    "heroImageAlt": "Elo touchscreen POS for shops",
+    "usecasesTitle": "For every shop",
+    "modulesTitle": "What you get in the shop",
+    "hardwareTitle": "Hardware for the counter",
+    "pricingTitle": "Pricing for shops",
+    "modules": {
+      "pos": {
+        "title": "Touchscreen POS",
+        "body": "Checkout, discounts, loyalty and daily report on one screen."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "See what to reorder. No separate stock app."
+      },
+      "barcode": {
+        "title": "Barcode scanner",
+        "body": "Tap or scan. Works for bread, meat, clothing and more."
+      },
+      "webshop": {
+        "title": "Your own webshop",
+        "body": "Online orders with no commission, in your brand."
+      },
+      "reports": {
+        "title": "Reports",
+        "body": "Z report and revenue by email, ready for your accountant."
+      },
+      "support": {
+        "title": "Live support",
+        "body": "At launch and busy moments. You call, we fix it."
+      }
+    }
+  },
+  "retailSite": {
+    "title": "POS for retail, boutiques and wholesale",
+    "lead": "Touchscreen POS, barcodes and stock for many SKUs. A dedicated retail site — separate from hospitality and high-street shops.",
+    "point1": "Barcodes and stock for large catalogues",
+    "point2": "Built for shops and wholesale",
+    "point3": "Hardware included in the subscription",
+    "heroImageAlt": "Sunmi POS for retail",
+    "usecasesTitle": "For retail & wholesale",
+    "modulesTitle": "What retail gets",
+    "hardwareTitle": "Hardware for retail",
+    "pricingTitle": "Pricing for retail",
+    "modules": {
+      "pos": {
+        "title": "Retail POS",
+        "body": "Fast checkout, card payments, discounts and loyalty on one screen."
+      },
+      "barcode": {
+        "title": "Barcodes",
+        "body": "Scan items in the shop or warehouse."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Track thousands of products without extra software."
+      },
+      "wholesale": {
+        "title": "Wholesale",
+        "body": "Bulk, repeat orders and overview per customer or item."
+      },
+      "reports": {
+        "title": "Reports",
+        "body": "Revenue, stock value and Z report ready for accounting."
+      },
+      "support": {
+        "title": "Live support",
+        "body": "Onboarding, training and help during the rush. You call us."
+      }
+    }
   }
 }

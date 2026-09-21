@@ -2,7 +2,7 @@
 
 import MarketingHomePage from '@/components/MarketingHomePage'
 
-/** Bestaande marketingwebsite — horeca / algemeen. */
+/** Bestaande horeca-website. Wijzigingen hier raken winkel of retail niet. */
 export default function HomePage() {
   return <MarketingHomePage />
 }

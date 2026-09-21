@@ -25,8 +25,6 @@ import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
 import HomeScrollOnLoad from '@/components/HomeScrollOnLoad'
 import MarketingStartAndDemoButtons from '@/components/MarketingStartAndDemoButtons'
 import { WhyVysionHardwareVideos } from '@/components/HardwareVideoStack'
-import { usePathname } from 'next/navigation'
-import { landingBranchFromPathname } from '@/lib/landing-branch-choice'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -1502,9 +1500,6 @@ function TestimonialSection() {
 
 // Main Page Component
 export default function MarketingHomePage() {
-  const pathname = usePathname()
-  const branch = landingBranchFromPathname(pathname)
-
   return (
     <main>
       <HomeScrollOnLoad />
@@ -1519,7 +1514,7 @@ export default function MarketingHomePage() {
       <StatsAndLiveDemoSection />
       <PricingSection />
       <PromoMarqueeBand />
-      {branch === 'horeca' ? <TableKioskSection /> : null}
+      <TableKioskSection />
       <TestimonialSection />
       <ContactPageSection sectionId="contact" />
       <Footer />

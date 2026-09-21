@@ -138,6 +138,10 @@ describe('landing branch columns', () => {
     const sites = (nl as { heroLanding: { sites: Record<string, { title: string }> } }).heroLanding.sites
     expect(sites.winkel.title).toBe('Kassa & platform voor uw winkel')
     expect(sites.retail.title).toBe('Kassa & retailplatform voor uw zaak')
+    const winkelSite = (nl as { winkelSite: { title: string } }).winkelSite
+    const retailSite = (nl as { retailSite: { title: string } }).retailSite
+    expect(winkelSite.title).toBe('Kassa voor bakker, slager, kapper en de winkelstraat')
+    expect(retailSite.title).toBe('Kassa voor retail, boetiek en groothandel')
     for (const column of LANDING_BRANCH_COLUMNS) {
       expect(modal.columns[column.id]?.title).toBeTruthy()
       for (const itemKey of column.itemKeys) {

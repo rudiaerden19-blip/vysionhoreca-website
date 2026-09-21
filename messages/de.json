@@ -6550,5 +6550,81 @@
     "mailPassBarcode": "Barcode mailen",
     "mailingPass": "Wird gesendet…",
     "memberNoEmail": "Keine E-Mail für diesen Pass hinterlegt. E-Mail über Verwalten oder bei der Erstellung ergänzen."
+  },
+  "winkelSite": {
+    "title": "Kasse für Bäcker, Metzger, Friseure und das Ladenstraße",
+    "lead": "Kassieren, Lager und Ihr eigener Webshop in einem System. Für die Theke gemacht — das ist nicht die Gastro-Website.",
+    "point1": "Schnell kassieren mit Barcode oder Tippen",
+    "point2": "Lager je Produkt, ohne Extra-Paket",
+    "point3": "Eigener Webshop im Abo enthalten",
+    "heroImageAlt": "Elo-Touchscreen-Kasse für Läden",
+    "usecasesTitle": "Für jeden Laden",
+    "modulesTitle": "Was Sie im Laden bekommen",
+    "hardwareTitle": "Hardware für die Theke",
+    "pricingTitle": "Preise für Läden",
+    "modules": {
+      "pos": {
+        "title": "Touchscreen-Kasse",
+        "body": "Kassieren, Rabatt, Kundenkarte und Tagesbericht auf einem Bildschirm."
+      },
+      "stock": {
+        "title": "Lager",
+        "body": "Sehen Sie, was nachbestellt werden muss. Keine extra Lager-App."
+      },
+      "barcode": {
+        "title": "Barcode-Scanner",
+        "body": "Tippen oder scannen. Für Brot, Fleisch, Kleidung und mehr."
+      },
+      "webshop": {
+        "title": "Eigener Webshop",
+        "body": "Online bestellen ohne Provision, in Ihrem Stil."
+      },
+      "reports": {
+        "title": "Berichte",
+        "body": "Z-Bericht und Umsatz per Mail, bereit für den Buchhalter."
+      },
+      "support": {
+        "title": "Live-Support",
+        "body": "Beim Start und in Stoßzeiten. Sie rufen an, wir lösen es."
+      }
+    }
+  },
+  "retailSite": {
+    "title": "Kasse für Retail, Boutiquen und Großhandel",
+    "lead": "Touchscreen-POS, Barcodes und Lager für viele Artikel. Eine eigene Retail-Seite — getrennt von Gastro und Ladenstraße.",
+    "point1": "Barcodes und Lager für große Sortimente",
+    "point2": "Für Laden und Großhandel",
+    "point3": "Hardware im Abo enthalten",
+    "heroImageAlt": "Sunmi-Kasse für Retail",
+    "usecasesTitle": "Für Retail & Großhandel",
+    "modulesTitle": "Was Retail bekommt",
+    "hardwareTitle": "Hardware für Retail",
+    "pricingTitle": "Preise für Retail",
+    "modules": {
+      "pos": {
+        "title": "Retail-Kasse",
+        "body": "Schnell kassieren, Karte, Rabatt und Kundenkarte auf einem Bildschirm."
+      },
+      "barcode": {
+        "title": "Barcodes",
+        "body": "Artikel im Laden oder Lager scannen."
+      },
+      "stock": {
+        "title": "Lager",
+        "body": "Tausende Produkte ohne Extra-Software führen."
+      },
+      "wholesale": {
+        "title": "Großhandel",
+        "body": "Mengen, Wiederholaufträge und Überblick je Kunde oder Artikel."
+      },
+      "reports": {
+        "title": "Berichte",
+        "body": "Umsatz, Lagerwert und Z-Bericht für die Buchhaltung."
+      },
+      "support": {
+        "title": "Live-Support",
+        "body": "Start, Schulung und Hilfe im Rush. Sie rufen uns."
+      }
+    }
   }
 }

@@ -6486,5 +6486,81 @@
       "cta": "Start gratis",
       "ownership24": "Stop met huren. Na 24 maanden is deze i9 kassa 100% jouw eigendom."
     }
+  },
+  "winkelSite": {
+    "title": "Kassa voor bakker, slager, kapper en de winkelstraat",
+    "lead": "Afrekenen, voorraad en uw eigen webshop in één systeem. Gemaakt voor de toonbank — dit is niet de horeca-website.",
+    "point1": "Snel afrekenen met barcode of tikken op het scherm",
+    "point2": "Voorraad per product, zonder extra pakket",
+    "point3": "Eigen webshop inbegrepen in het abonnement",
+    "heroImageAlt": "Elo touchscreen kassa voor winkels",
+    "usecasesTitle": "Voor iedere winkel",
+    "modulesTitle": "Wat u in de winkel krijgt",
+    "hardwareTitle": "Hardware voor de toonbank",
+    "pricingTitle": "Prijzen voor winkels",
+    "modules": {
+      "pos": {
+        "title": "Touchscreen kassa",
+        "body": "Afrekenen, korting, klantenkaart en dagrapport in één scherm."
+      },
+      "stock": {
+        "title": "Voorraad",
+        "body": "Zie wat u moet nabestellen. Geen losse voorraad-app."
+      },
+      "barcode": {
+        "title": "Barcodescanner",
+        "body": "Tik of scan. Werkt voor brood, vlees, kleding en meer."
+      },
+      "webshop": {
+        "title": "Eigen webshop",
+        "body": "Online bestellen zonder commissie, in uw huisstijl."
+      },
+      "reports": {
+        "title": "Rapporten",
+        "body": "Z-rapport en omzet per mail, klaar voor de boekhouder."
+      },
+      "support": {
+        "title": "Live support",
+        "body": "Bij opstart en drukke momenten. U belt, wij lossen het op."
+      }
+    }
+  },
+  "retailSite": {
+    "title": "Kassa voor retail, boetiek en groothandel",
+    "lead": "Touchscreen POS, barcodes en voorraad voor veel artikelen. Een eigen site voor retail — los van horeca en de winkelstraat.",
+    "point1": "Barcodes en voorraad voor veel SKU’s",
+    "point2": "Geschikt voor winkel én groothandel",
+    "point3": "Hardware inbegrepen in het abonnement",
+    "heroImageAlt": "Sunmi kassa voor retail",
+    "usecasesTitle": "Voor retail & groothandel",
+    "modulesTitle": "Wat retail krijgt",
+    "hardwareTitle": "Hardware voor retail",
+    "pricingTitle": "Prijzen voor retail",
+    "modules": {
+      "pos": {
+        "title": "Retailkassa",
+        "body": "Snel afrekenen, PIN, korting en klantenkaart op één scherm."
+      },
+      "barcode": {
+        "title": "Barcodes",
+        "body": "Scan artikelen in de winkel of het magazijn."
+      },
+      "stock": {
+        "title": "Voorraad",
+        "body": "Houd duizenden producten bij zonder extra software."
+      },
+      "wholesale": {
+        "title": "Groothandel",
+        "body": "Bulk, herhaalorders en overzicht per klant of artikel."
+      },
+      "reports": {
+        "title": "Rapporten",
+        "body": "Omzet, voorraadwaarde en Z-rapport klaar voor boekhouding."
+      },
+      "support": {
+        "title": "Live support",
+        "body": "Opstart, training en hulp tijdens de rush. U belt ons."
+      }
+    }
   }
 }

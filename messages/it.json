@@ -6527,5 +6527,81 @@
     "mailPassBarcode": "Invia codice via email",
     "mailingPass": "Invio…",
     "memberNoEmail": "Nessuna email per questa tessera. Aggiungila in Gestisci o in creazione."
+  },
+  "winkelSite": {
+    "title": "Cassa per panetteria, macelleria, parrucchiere e negozi di vicinato",
+    "lead": "Incasso, magazzino e il tuo e-commerce in un solo sistema. Fatto per il bancone: non è il sito horeca.",
+    "point1": "Incassa in fretta con barcode o tocco",
+    "point2": "Magazzino per prodotto, senza pacchetto extra",
+    "point3": "E-commerce incluso nell’abbonamento",
+    "heroImageAlt": "Cassa touch Elo per negozi",
+    "usecasesTitle": "Per ogni negozio",
+    "modulesTitle": "Cosa hai in negozio",
+    "hardwareTitle": "Hardware per il bancone",
+    "pricingTitle": "Prezzi per i negozi",
+    "modules": {
+      "pos": {
+        "title": "Cassa touch",
+        "body": "Incasso, sconto, fidelity e report giornaliero su uno schermo."
+      },
+      "stock": {
+        "title": "Magazzino",
+        "body": "Vedi cosa riordinare. Niente app magazzino a parte."
+      },
+      "barcode": {
+        "title": "Scanner barcode",
+        "body": "Tocca o scansiona. Pane, carne, abbigliamento e altro."
+      },
+      "webshop": {
+        "title": "Il tuo e-commerce",
+        "body": "Ordini online senza commissioni, nel tuo stile."
+      },
+      "reports": {
+        "title": "Report",
+        "body": "Report Z e fatturato via mail, pronto per il commercialista."
+      },
+      "support": {
+        "title": "Supporto live",
+        "body": "All’avvio e nei picchi. Chiami, risolviamo."
+      }
+    }
+  },
+  "retailSite": {
+    "title": "Cassa per retail, boutique e ingrosso",
+    "lead": "POS touch, barcode e magazzino per tanti articoli. Un sito retail dedicato, separato da horeca e negozio di vicinato.",
+    "point1": "Barcode e magazzino per cataloghi ampi",
+    "point2": "Per negozio e ingrosso",
+    "point3": "Hardware incluso nell’abbonamento",
+    "heroImageAlt": "Cassa Sunmi per il retail",
+    "usecasesTitle": "Per retail e ingrosso",
+    "modulesTitle": "Cosa ottiene il retail",
+    "hardwareTitle": "Hardware retail",
+    "pricingTitle": "Prezzi retail",
+    "modules": {
+      "pos": {
+        "title": "Cassa retail",
+        "body": "Incasso veloce, carta, sconto e fidelity su uno schermo."
+      },
+      "barcode": {
+        "title": "Barcode",
+        "body": "Scansiona articoli in negozio o magazzino."
+      },
+      "stock": {
+        "title": "Magazzino",
+        "body": "Tieni migliaia di prodotti senza software extra."
+      },
+      "wholesale": {
+        "title": "Ingrosso",
+        "body": "Volumi, riordini e vista per cliente o articolo."
+      },
+      "reports": {
+        "title": "Report",
+        "body": "Fatturato, valore magazzino e report Z per la contabilità."
+      },
+      "support": {
+        "title": "Supporto live",
+        "body": "Avvio, formazione e aiuto nel rush. Ci chiami."
+      }
+    }
   }
 }

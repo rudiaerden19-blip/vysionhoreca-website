@@ -1,8 +1,8 @@
 'use client'
 
-import MarketingHomePage from '@/components/MarketingHomePage'
+import RetailSitePage from './RetailSitePage'
 
-/** Aparte marketingwebsite voor retail en groothandel. */
-export default function RetailSitePage() {
-  return <MarketingHomePage />
+/** Eigen marketingwebsite voor retail. Niet gekoppeld aan horeca of winkel. */
+export default function Page() {
+  return <RetailSitePage />
 }

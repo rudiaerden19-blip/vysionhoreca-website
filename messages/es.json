@@ -6527,5 +6527,81 @@
     "mailPassBarcode": "Enviar código por email",
     "mailingPass": "Enviando…",
     "memberNoEmail": "No hay email para esta tarjeta. Añádalo en Gestionar o al crear la tarjeta."
+  },
+  "winkelSite": {
+    "title": "Caja para panadería, carnicería, peluquería y tiendas de barrio",
+    "lead": "Cobro, stock y su propia tienda online en un solo sistema. Hecho para el mostrador: no es el sitio de hostelería.",
+    "point1": "Cobrar rápido con código de barras o toque",
+    "point2": "Stock por producto, sin paquete extra",
+    "point3": "Tienda online incluida en la suscripción",
+    "heroImageAlt": "Caja táctil Elo para tiendas",
+    "usecasesTitle": "Para cada tienda",
+    "modulesTitle": "Lo que obtiene en la tienda",
+    "hardwareTitle": "Hardware para el mostrador",
+    "pricingTitle": "Precios para tiendas",
+    "modules": {
+      "pos": {
+        "title": "Caja táctil",
+        "body": "Cobro, descuento, tarjeta de cliente e informe diario en una pantalla."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Vea qué reponer. Sin app de stock aparte."
+      },
+      "barcode": {
+        "title": "Escáner de códigos",
+        "body": "Toque o escanee. Pan, carne, ropa y más."
+      },
+      "webshop": {
+        "title": "Su tienda online",
+        "body": "Pedidos online sin comisión, con su marca."
+      },
+      "reports": {
+        "title": "Informes",
+        "body": "Informe Z y ventas por correo, listo para el contable."
+      },
+      "support": {
+        "title": "Soporte en vivo",
+        "body": "En el arranque y en las horas punta. Llama, lo resolvemos."
+      }
+    }
+  },
+  "retailSite": {
+    "title": "Caja para retail, boutiques y mayoristas",
+    "lead": "POS táctil, códigos de barras y stock para muchos artículos. Un sitio de retail propio, aparte de hostelería y tienda de barrio.",
+    "point1": "Códigos de barras y stock para catálogos grandes",
+    "point2": "Para tienda y mayorista",
+    "point3": "Hardware incluido en la suscripción",
+    "heroImageAlt": "Caja Sunmi para retail",
+    "usecasesTitle": "Para retail y mayoristas",
+    "modulesTitle": "Lo que obtiene el retail",
+    "hardwareTitle": "Hardware de retail",
+    "pricingTitle": "Precios de retail",
+    "modules": {
+      "pos": {
+        "title": "Caja retail",
+        "body": "Cobro rápido, tarjeta, descuento y fidelidad en una pantalla."
+      },
+      "barcode": {
+        "title": "Códigos de barras",
+        "body": "Escanee artículos en tienda o almacén."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Controle miles de productos sin software extra."
+      },
+      "wholesale": {
+        "title": "Mayorista",
+        "body": "Volumen, pedidos repetidos y vista por cliente o artículo."
+      },
+      "reports": {
+        "title": "Informes",
+        "body": "Ventas, valor de stock e informe Z para contabilidad."
+      },
+      "support": {
+        "title": "Soporte en vivo",
+        "body": "Arranque, formación y ayuda en el rush. Nos llama."
+      }
+    }
   }
 }

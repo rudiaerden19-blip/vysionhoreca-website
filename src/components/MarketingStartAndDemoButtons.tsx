@@ -16,6 +16,8 @@ type Props = {
   compact?: boolean
   /** Volle breedte knoppen in stack-layout */
   fullWidth?: boolean
+  /** Demo-anker op deze site. Standaard de horeca-homepage. */
+  demoHref?: string
 }
 
 export default function MarketingStartAndDemoButtons({
@@ -24,7 +26,8 @@ export default function MarketingStartAndDemoButtons({
   onDark = false,
   compact = false,
   fullWidth = true,
-}) {
+  demoHref,
+}: Props) {
   const { t, locale } = useLanguage()
   const registerHref = `/registreer?lang=${locale}`
 
@@ -50,7 +53,7 @@ export default function MarketingStartAndDemoButtons({
       <a href={registerHref} className={primaryClass}>
         {t('heroLanding.ctaStartFree')}
       </a>
-      <a href={MARKETING_DEMO_SECTION_HREF} className={secondaryClass}>
+      <a href={demoHref ?? MARKETING_DEMO_SECTION_HREF} className={secondaryClass}>
         {t('heroLanding.demoRequest')}
       </a>
     </div>

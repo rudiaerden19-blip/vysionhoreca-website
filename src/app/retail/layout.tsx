@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     locale: 'nl_BE',
     url: `${VYSION_CANONICAL_ORIGIN}/retail`,
     siteName: VYSION_BRAND_SITE_NAME,
-    images: [{ url: '/images/kassa-platform-4.png' }],
+    images: [{ url: '/images/hardware/hardware-vm20-sunmi.png' }],
   },
 }
 

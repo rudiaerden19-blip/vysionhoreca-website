@@ -6550,5 +6550,81 @@
     "mailPassBarcode": "Envoyer le code-barres",
     "mailingPass": "Envoi…",
     "memberNoEmail": "Aucun e-mail enregistré pour cette carte. Ajoutez-en un via Gérer ou à la création."
+  },
+  "winkelSite": {
+    "title": "Caisse pour boulanger, boucher, coiffeur et commerces de proximité",
+    "lead": "Encaissement, stock et votre propre boutique en ligne dans un seul système. Fait pour le comptoir — ce n’est pas le site horeca.",
+    "point1": "Encaisser vite avec code-barres ou tactile",
+    "point2": "Stock par produit, sans pack en plus",
+    "point3": "Boutique en ligne incluse dans l’abonnement",
+    "heroImageAlt": "Caisse tactile Elo pour magasins",
+    "usecasesTitle": "Pour chaque magasin",
+    "modulesTitle": "Ce que vous avez en magasin",
+    "hardwareTitle": "Matériel pour le comptoir",
+    "pricingTitle": "Tarifs pour les magasins",
+    "modules": {
+      "pos": {
+        "title": "Caisse tactile",
+        "body": "Encaissement, remise, carte fidélité et rapport du jour sur un écran."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Voyez ce qu’il faut commander. Pas d’app stock séparée."
+      },
+      "barcode": {
+        "title": "Scanner codes-barres",
+        "body": "Toucher ou scanner. Pain, viande, vêtements et plus."
+      },
+      "webshop": {
+        "title": "Votre boutique en ligne",
+        "body": "Commandes en ligne sans commission, à vos couleurs."
+      },
+      "reports": {
+        "title": "Rapports",
+        "body": "Rapport Z et chiffre par e-mail, prêt pour le comptable."
+      },
+      "support": {
+        "title": "Support en direct",
+        "body": "Au démarrage et aux heures de pointe. Vous appelez, on résout."
+      }
+    }
+  },
+  "retailSite": {
+    "title": "Caisse pour le retail, boutiques et gros",
+    "lead": "POS tactile, codes-barres et stock pour de nombreux articles. Un site retail dédié — séparé de l’horeca et du magasin de proximité.",
+    "point1": "Codes-barres et stock pour de gros catalogues",
+    "point2": "Pour magasin et gros",
+    "point3": "Matériel inclus dans l’abonnement",
+    "heroImageAlt": "Caisse Sunmi pour le retail",
+    "usecasesTitle": "Pour le retail et le gros",
+    "modulesTitle": "Ce que le retail reçoit",
+    "hardwareTitle": "Matériel retail",
+    "pricingTitle": "Tarifs retail",
+    "modules": {
+      "pos": {
+        "title": "Caisse retail",
+        "body": "Encaissement rapide, carte, remise et fidélité sur un écran."
+      },
+      "barcode": {
+        "title": "Codes-barres",
+        "body": "Scanner les articles en magasin ou en entrepôt."
+      },
+      "stock": {
+        "title": "Stock",
+        "body": "Suivez des milliers de produits sans logiciel extra."
+      },
+      "wholesale": {
+        "title": "Gros",
+        "body": "Volumes, commandes répétées et vue par client ou article."
+      },
+      "reports": {
+        "title": "Rapports",
+        "body": "Chiffre, valeur de stock et rapport Z pour la compta."
+      },
+      "support": {
+        "title": "Support en direct",
+        "body": "Démarrage, formation et aide pendant le rush. Vous nous appelez."
+      }
+    }
   }
 }

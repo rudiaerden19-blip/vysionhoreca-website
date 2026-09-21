@@ -1,8 +1,8 @@
 'use client'
 
-import MarketingHomePage from '@/components/MarketingHomePage'
+import WinkelSitePage from './WinkelSitePage'
 
-/** Aparte marketingwebsite voor winkels (bakker, slager, kapper, …). */
-export default function WinkelSitePage() {
-  return <MarketingHomePage />
+/** Eigen marketingwebsite voor winkels. Niet gekoppeld aan horeca of retail. */
+export default function Page() {
+  return <WinkelSitePage />
 }
