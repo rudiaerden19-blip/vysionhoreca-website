@@ -6557,6 +6557,11 @@
     "videoAltVoorraad": "Schermata scorte Vysion per negozi",
     "hubBarcodeScan": "Scansione\nbarcode",
     "hubDiagramAria": "Diagramma: un sistema centrale collegato a cassa, ordini, prenotazioni, sito, personale, scorte, scansione barcode, report e analisi aziendale",
+    "platformBarcode": {
+      "title": "Scanner barcode",
+      "teaser": "Lavora con scanner intelligenti nella tua cassa e scansiona ogni tipo di codice.",
+      "imageAlt": "Scanner barcode per la cassa del negozio"
+    },
     "usecasesTitle": "Per ogni negozio",
     "modulesTitle": "Cosa hai in negozio",
     "hardwareTitle": "Hardware per il bancone",

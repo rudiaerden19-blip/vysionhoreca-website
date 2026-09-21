@@ -6580,6 +6580,11 @@
     "videoAltVoorraad": "Vysion-Lagerbestand für Läden",
     "hubBarcodeScan": "Barcode\nscannen",
     "hubDiagramAria": "Diagramm: ein zentrales System verbunden mit Kasse, Bestellen, Reservierungen, Website, Personal, Lager, Barcode scannen, Berichten und Geschäftsanalyse",
+    "platformBarcode": {
+      "title": "Barcode-Scanner",
+      "teaser": "Arbeiten Sie mit intelligenten Scannern an Ihrer Kasse und scannen Sie alle Arten von Codes.",
+      "imageAlt": "Barcode-Scanner für die Ladenkasse"
+    },
     "usecasesTitle": "Für jeden Laden",
     "modulesTitle": "Was Sie im Laden bekommen",
     "hardwareTitle": "Hardware für die Theke",

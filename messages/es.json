@@ -6557,6 +6557,11 @@
     "videoAltVoorraad": "Pantalla de inventario Vysion para tiendas",
     "hubBarcodeScan": "Escanear\ncódigo de barras",
     "hubDiagramAria": "Diagrama: un sistema central conectado a caja, pedidos, reservas, web, personal, stock, escaneo de códigos de barras, informes y análisis empresarial",
+    "platformBarcode": {
+      "title": "Escáner de códigos de barras",
+      "teaser": "Trabaje con escáneres inteligentes en su caja y escanee todo tipo de códigos.",
+      "imageAlt": "Escáner de códigos de barras para la caja de la tienda"
+    },
     "usecasesTitle": "Para cada tienda",
     "modulesTitle": "Lo que obtiene en la tienda",
     "hardwareTitle": "Hardware para el mostrador",

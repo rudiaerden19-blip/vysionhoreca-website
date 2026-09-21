@@ -6516,6 +6516,11 @@
     "videoAltVoorraad": "Vysion voorraadscherm voor winkels",
     "hubBarcodeScan": "Barcode\nscannen",
     "hubDiagramAria": "Diagram: één centraal systeem verbonden met kassa, bestellen, reservaties, website, personeel, voorraad, barcode scannen, rapporten en bedrijfsanalyse",
+    "platformBarcode": {
+      "title": "Barcode scanner",
+      "teaser": "Werk met slimme scanners in jouw kassa en scan alle soorten codes.",
+      "imageAlt": "Barcode scanner voor de winkelskassa"
+    },
     "usecasesTitle": "Voor iedere winkel",
     "modulesTitle": "Wat u in de winkel krijgt",
     "hardwareTitle": "Hardware voor de toonbank",

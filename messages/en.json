@@ -6516,6 +6516,11 @@
     "videoAltVoorraad": "Vysion inventory screen for shops",
     "hubBarcodeScan": "Barcode\nscanning",
     "hubDiagramAria": "Diagram: one central system connected to till, ordering, reservations, website, staff, stock, barcode scanning, reports and business analysis",
+    "platformBarcode": {
+      "title": "Barcode scanner",
+      "teaser": "Work with smart scanners at your till and scan all kinds of codes.",
+      "imageAlt": "Barcode scanner for the shop till"
+    },
     "usecasesTitle": "For every shop",
     "modulesTitle": "What you get in the shop",
     "hardwareTitle": "Hardware for the counter",

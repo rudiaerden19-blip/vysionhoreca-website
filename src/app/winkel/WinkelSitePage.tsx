@@ -1520,7 +1520,17 @@ export default function WinkelSitePage() {
       />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />
-      <PlatformGridSection />
+      <PlatformGridSection
+        itemOverrides={{
+          keukenschermen: {
+            titleKey: 'winkelSite.platformBarcode.title',
+            teaserKey: 'winkelSite.platformBarcode.teaser',
+            cardHeaderImage: '/images/hardware/hardware-barcode-scanner.png',
+            cardHeaderAltKey: 'winkelSite.platformBarcode.imageAlt',
+            headerImageContain: true,
+          },
+        }}
+      />
       <HardwareSection />
       <StatsAndLiveDemoSection />
       <PricingSection />

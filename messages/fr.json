@@ -6580,6 +6580,11 @@
     "videoAltVoorraad": "Écran de stock Vysion pour magasins",
     "hubBarcodeScan": "Scan\ncode-barres",
     "hubDiagramAria": "Schéma : un système central relié à la caisse, aux commandes, aux réservations, au site web, au personnel, au stock, au scan de codes-barres, aux rapports et à l'analyse d'entreprise",
+    "platformBarcode": {
+      "title": "Scanner de codes-barres",
+      "teaser": "Travaillez avec des scanners intelligents dans votre caisse et scannez tous types de codes.",
+      "imageAlt": "Scanner de codes-barres pour la caisse magasin"
+    },
     "usecasesTitle": "Pour chaque magasin",
     "modulesTitle": "Ce que vous avez en magasin",
     "hardwareTitle": "Matériel pour le comptoir",
