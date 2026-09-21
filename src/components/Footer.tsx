@@ -110,6 +110,15 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
+                    href="/winkel"
+                    title={t('footer.winkelRetailLinkTitle')}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    {t('footer.winkelRetail')}
+                  </a>
+                </li>
+                <li>
+                  <a
                     href={pricingHref}
                     title={t('footer.pricingLinkTitle')}
                     className="text-gray-400 hover:text-white transition-colors"

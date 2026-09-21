@@ -293,6 +293,12 @@ export default function HomeLandingHero() {
         >
           {t('heroLanding.audienceLine')}
         </p>
+        <a
+          href="/winkel"
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg px-3 text-sm font-semibold text-white/90 underline decoration-white/40 underline-offset-4 transition-colors hover:text-white hover:decoration-white sm:text-base"
+        >
+          {t('heroLanding.winkelLink')}
+        </a>
       </div>
     </section>
   )

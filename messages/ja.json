@@ -22,7 +22,8 @@
     "sectors": "業種",
     "services": "サービス",
     "integrations": "連携",
-    "subscriptions": "ライセンス"
+    "subscriptions": "ライセンス",
+    "winkelRetail": "店舗・小売向けレジ"
   },
   "licensePurchasePage": {
     "title": "ライセンス購入",
@@ -144,7 +145,8 @@
     "readTermsLink": "利用規約を読む",
     "demoRequest": "デモを申し込む",
     "googleReviewsLabel": "Googleで5つ星",
-    "googleReviewsAria": "Googleのレビューを見る"
+    "googleReviewsAria": "Googleのレビューを見る",
+    "winkelLink": "店舗・小売向けレジ"
   },
   "hero": {
     "badge1": "1つのプラットフォーム",
@@ -660,6 +662,8 @@
     "contactLinkTitle": "デモ・お問い合わせ",
     "privacyLinkTitle": "プライバシーポリシー",
     "legalLinkTitle": "利用規約と法的情報",
+    "winkelRetail": "店舗向けPOSシステム",
+    "winkelRetailLinkTitle": "店舗・小売向けPOSシステム",
     "linkAppsAria": "Vysion Apps（新しいタブ）",
     "linkHorecaAria": "Vysion kassa公式サイト（新しいタブ）",
     "websiteLinkLabel": "Vysion kassa — 公式サイト",
@@ -6555,6 +6559,7 @@
   },
   "winkelSite": {
     "title": "あなたの店舗のための完全なレジ",
+    "seoLead": "Vysionは店舗・小売向けのPOSです。販売、在庫、顧客管理、ウェブショップを1つの画面で — 別パッケージは不要です。",
     "lead": "会計、在庫、自社ネットショップを一つのシステムで。カウンター向け。",
     "point1": "バーコードまたはタップで素早く会計",
     "point2": "商品ごとの在庫。追加パッケージ不要",
@@ -6563,7 +6568,9 @@
     "videoAltKassa": "店舗向けVysionレジ画面",
     "videoAltVoorraad": "店舗向け在庫画面",
     "hubBarcodeScan": "バーコード\nスキャン",
-    "hubDiagramAria": "図：レジ、注文、予約、ウェブサイト、スタッフ、在庫、バーコードスキャン、レポート、事業分析につながる1つの中核システム",
+    "hubWebshop": "ウェブショップ",
+    "hubLoyalty": "会員カード",
+    "hubDiagramAria": "図: レジ、ウェブショップ、会員カード、サイト、スタッフ、在庫、バーコード、レポート、経営分析がつながる中核システム",
     "platformBarcode": {
       "title": "バーコードスキャナー",
       "teaser": "スマートスキャナーでレジと連携し、あらゆるコードを読み取ります。",
@@ -6629,6 +6636,41 @@
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "店舗向けの完全なPOS",
+        "body": "パン屋から衣料店まで。販売、バーコード、在庫、会員カード、返品、ウェブショップが同じライセンスに含まれます。追加モジュールも追加請求もありません。",
+        "bodyExtra": "店に必要なものは1画面に: カウンター、在庫、顧客、オンライン販売。"
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "レジ、ウェブショップ、在庫、会員カード、スタッフ、レポートを別々に支払う理由は？",
+      "subtitleVysionLine": "Vysionなら店舗向けPOSが1つの画面にまとまります。",
+      "subtitlePoint1": "5つの別システムは不要。",
+      "subtitlePoint2": "在庫やロイヤルティ用の追加ソフトは不要。",
+      "subtitlePoint3": "機能ごとの別ライセンスは不要。",
+      "subtitleClosing": "店に必要なものが、1つの完全なプラットフォームでつながります。"
+    },
+    "capabilities": {
+      "title": "店舗レジで本当にできること",
+      "lead": "Vysionはむき出しのレジではありません。販売、在庫、顧客認識、ウェブショップ連携 — 同じ商品、同じ価格。",
+      "sales": {
+        "title": "販売とバーコード",
+        "body": "タップまたはバーコードで会計。サイズや色のバリエーションは独自バーコード。ラベル印刷、シリアル番号、スマホでのスキャンや撮影。"
+      },
+      "stock": {
+        "title": "在庫と仕入れ",
+        "body": "在庫と最低在庫を管理。仕入先、発注、発注書、入荷。棚卸しと商品インポートもまとめて。"
+      },
+      "customers": {
+        "title": "顧客、返品、キャンペーン",
+        "body": "会員カード、店舗パス、ポイントが標準。返品、交換、商品券。価格・割引キャンペーンも追加ソフトなし。"
+      },
+      "team": {
+        "title": "チーム、レポート、ウェブショップ",
+        "body": "出退勤、レポート、経営分析。顧客画面に価格表示。デジタルレシートや請求書をメール。ウェブショップとハードウェアは同じライセンス。"
+      }
+    },
     "gratisWebsite": {
       "title": "店舗向け無料ウェブサイト",
       "body": "ライセンスに自社ウェブサイトが含まれます。追加料金はありません。色、写真、テキストはご自身で変更できます。",
@@ -6672,7 +6714,17 @@
       "17": "人気商品",
       "18": "すべての支払い方法",
       "19": "無料インストール",
-      "20": "ハードウェア込み"
+      "20": "ハードウェア込み",
+      "21": "返品と交換",
+      "22": "商品券",
+      "23": "仕入先と仕入れ",
+      "24": "発注書",
+      "25": "入荷",
+      "26": "棚卸し",
+      "27": "バリエーション（サイズ/色）",
+      "28": "シリアル番号",
+      "29": "商品インポート",
+      "30": "出退勤"
     }
   },
   "retailSite": {

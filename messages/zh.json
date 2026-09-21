@@ -22,7 +22,8 @@
     "sectors": "行业",
     "services": "我们的服务",
     "integrations": "集成",
-    "subscriptions": "许可证"
+    "subscriptions": "许可证",
+    "winkelRetail": "门店与零售收银"
   },
   "licensePurchasePage": {
     "title": "购买许可证",
@@ -144,7 +145,8 @@
     "readTermsLink": "阅读条款",
     "demoRequest": "申请演示",
     "googleReviewsLabel": "Google 五星好评",
-    "googleReviewsAria": "查看我们的 Google 评价"
+    "googleReviewsAria": "查看我们的 Google 评价",
+    "winkelLink": "门店与零售收银"
   },
   "hero": {
     "badge1": "1个平台",
@@ -660,6 +662,8 @@
     "contactLinkTitle": "联系Vysion—演示或咨询",
     "privacyLinkTitle": "隐私政策",
     "legalLinkTitle": "条款与法律信息",
+    "winkelRetail": "门店收银系统",
+    "winkelRetailLinkTitle": "门店与零售收银系统",
     "linkAppsAria": "Vysion Apps — 新标签页打开",
     "linkHorecaAria": "Vysion kassa官方网站 — 新标签页",
     "websiteLinkLabel": "Vysion kassa — 官方网站",
@@ -6555,6 +6559,7 @@
   },
   "winkelSite": {
     "title": "适合你店铺的完整收银系统",
+    "seoLead": "Vysion 是面向门店和零售的收银系统。销售、库存、客户管理和网店都在同一个屏幕上——无需额外套餐。",
     "lead": "收银、库存和自有网店集于一套系统。为柜台打造。",
     "point1": "扫码或点按即可快速结账",
     "point2": "按商品管库存，无需额外套餐",
@@ -6563,7 +6568,9 @@
     "videoAltKassa": "店铺收银界面",
     "videoAltVoorraad": "店铺库存界面",
     "hubBarcodeScan": "条码\n扫描",
-    "hubDiagramAria": "示意图：一个中央系统连接收银、点餐、预订、网站、员工、库存、条码扫描、报表与经营分析",
+    "hubWebshop": "网店",
+    "hubLoyalty": "会员卡",
+    "hubDiagramAria": "示意图：一个中心系统连接收银、网店、会员卡、网站、员工、库存、条码扫描、报表和经营分析",
     "platformBarcode": {
       "title": "条码扫描器",
       "teaser": "在收银机上使用智能扫描器，扫描各类条码。",
@@ -6629,6 +6636,41 @@
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "完整的门店收银系统",
+        "body": "从面包店到服装店：收银、条码、库存、会员卡、退货和网店都在同一许可里。没有额外模块，没有额外账单。",
+        "bodyExtra": "店铺所需都在一个屏幕：柜台、库存、客户和线上销售。"
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "为什么要分别支付收银、网店、库存、会员卡、员工和报表？",
+      "subtitleVysionLine": "有了 Vysion，门店收银系统都在一个屏幕上。",
+      "subtitlePoint1": "不必用五套不同系统。",
+      "subtitlePoint2": "库存或会员无需额外软件。",
+      "subtitlePoint3": "每个功能不必单独许可。",
+      "subtitleClosing": "店铺所需的一切，连在一个完整平台里。"
+    },
+    "capabilities": {
+      "title": "门店收银真正能做的事",
+      "lead": "Vysion 不是裸收银。你销售、管库存、识别客户并连接网店——同一商品，同一价格。",
+      "sales": {
+        "title": "收银与条码",
+        "body": "点按或扫描条码结账。尺码和颜色等变体有独立条码。打印标签、使用序列号，还能用手机扫描或拍照商品。"
+      },
+      "stock": {
+        "title": "库存与采购",
+        "body": "跟踪库存和最低库存。管理供应商、采购、订货单和收货。盘点库存，一次导入商品。"
+      },
+      "customers": {
+        "title": "客户、退货与促销",
+        "body": "会员卡、店铺卡和积分已内置。处理退货、换货和代金券。设置价格和折扣活动，无需额外软件。"
+      },
+      "team": {
+        "title": "团队、报表与网店",
+        "body": "员工打卡、报表和经营分析。在客显上显示价格。用邮件发送电子小票或发票。网店和硬件属于同一许可。"
+      }
+    },
     "gratisWebsite": {
       "title": "店铺免费网站",
       "body": "许可证包含您自己的网站，无需额外费用。颜色、照片和文字均可自行调整。",
@@ -6672,7 +6714,17 @@
       "17": "热门商品",
       "18": "所有支付方式",
       "19": "免费安装",
-      "20": "含硬件"
+      "20": "含硬件",
+      "21": "退货与换货",
+      "22": "代金券",
+      "23": "供应商与采购",
+      "24": "订货单",
+      "25": "收货",
+      "26": "盘点",
+      "27": "变体（尺码/颜色）",
+      "28": "序列号",
+      "29": "商品导入",
+      "30": "上下班打卡"
     }
   },
   "retailSite": {

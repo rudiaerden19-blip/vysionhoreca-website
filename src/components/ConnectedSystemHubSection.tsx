@@ -35,6 +35,13 @@ export type ConnectedSystemHubSectionProps = {
   centerEnlargeable?: boolean
   moduleLabelKeyOverrides?: Partial<Record<HubModuleKey, string>>
   diagramAriaKey?: string
+  /** Optionele i18n-keys; default blijft connectedSystemHub.* (horeca). */
+  subtitleQuestionKey?: string
+  subtitleVysionLineKey?: string
+  subtitlePoint1Key?: string
+  subtitlePoint2Key?: string
+  subtitlePoint3Key?: string
+  subtitleClosingKey?: string
 }
 
 /** Polaire layout in % van het vierkante diagram (midden = 50,50). */
@@ -126,6 +133,12 @@ export default function ConnectedSystemHubSection({
   centerEnlargeable = false,
   moduleLabelKeyOverrides,
   diagramAriaKey = 'connectedSystemHub.diagramAria',
+  subtitleQuestionKey = 'connectedSystemHub.subtitleQuestion',
+  subtitleVysionLineKey = 'connectedSystemHub.subtitleVysionLine',
+  subtitlePoint1Key = 'connectedSystemHub.subtitlePoint1',
+  subtitlePoint2Key = 'connectedSystemHub.subtitlePoint2',
+  subtitlePoint3Key = 'connectedSystemHub.subtitlePoint3',
+  subtitleClosingKey = 'connectedSystemHub.subtitleClosing',
 }: ConnectedSystemHubSectionProps = {}) {
   const { t } = useLanguage()
   const [centerOpen, setCenterOpen] = useState(false)
@@ -158,18 +171,18 @@ export default function ConnectedSystemHubSection({
 
         <div className="mx-auto mt-6 max-w-3xl text-center sm:mt-8">
           <p className="text-base font-medium leading-relaxed text-white/90 sm:text-lg">
-            {t('connectedSystemHub.subtitleQuestion')}
+            {t(subtitleQuestionKey)}
           </p>
           <p className="mt-4 text-base leading-relaxed text-white/80 sm:text-lg">
-            {t('connectedSystemHub.subtitleVysionLine')}
+            {t(subtitleVysionLineKey)}
           </p>
           <ul className="mt-4 space-y-2 text-sm leading-relaxed text-white/75 sm:text-base">
-            <li>{t('connectedSystemHub.subtitlePoint1')}</li>
-            <li>{t('connectedSystemHub.subtitlePoint2')}</li>
-            <li>{t('connectedSystemHub.subtitlePoint3')}</li>
+            <li>{t(subtitlePoint1Key)}</li>
+            <li>{t(subtitlePoint2Key)}</li>
+            <li>{t(subtitlePoint3Key)}</li>
           </ul>
           <p className="mt-5 text-base font-medium leading-relaxed text-white/90 sm:text-lg">
-            {t('connectedSystemHub.subtitleClosing')}
+            {t(subtitleClosingKey)}
           </p>
           <p className="mt-4 text-base font-semibold leading-relaxed text-white sm:text-lg">
             {t('connectedSystemHub.subtitleModulesToggle')}

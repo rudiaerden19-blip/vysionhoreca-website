@@ -22,7 +22,8 @@
     "sectors": "Sectors",
     "services": "Our services",
     "integrations": "Integrations",
-    "subscriptions": "Licenses"
+    "subscriptions": "Licenses",
+    "winkelRetail": "POS for shops & retail"
   },
   "licensePurchasePage": {
     "title": "Purchase license",
@@ -226,7 +227,8 @@
     "readTermsLink": "Read terms & conditions",
     "demoRequest": "Request a demo",
     "googleReviewsLabel": "5 stars on Google",
-    "googleReviewsAria": "Read our Google reviews"
+    "googleReviewsAria": "Read our Google reviews",
+    "winkelLink": "POS for shops & retail"
   },
   "hero": {
     "badge1": "1 Platform",
@@ -978,6 +980,8 @@
     "contactLinkTitle": "Contact Vysion — demo or sales enquiry",
     "privacyLinkTitle": "Privacy policy and data processing",
     "legalLinkTitle": "Terms of use and legal information",
+    "winkelRetail": "POS system for shops",
+    "winkelRetailLinkTitle": "POS system for shops and retail",
     "linkAppsAria": "Vysion Apps — opens in a new tab",
     "linkHorecaAria": "Official Vysion kassa website — new tab",
     "websiteLinkLabel": "Vysion kassa — official website",
@@ -6514,6 +6518,7 @@
   },
   "winkelSite": {
     "title": "The complete POS for your shop",
+    "seoLead": "Vysion is a POS system for shops and retail. You handle sales, stock, customer management and your webshop from one screen — no extra packages.",
     "lead": "Checkout, stock and your own webshop in one system. Built for the counter.",
     "point1": "Fast checkout with barcode or tap on screen",
     "point2": "Stock per product, no extra package",
@@ -6522,7 +6527,9 @@
     "videoAltKassa": "Vysion shop POS in use",
     "videoAltVoorraad": "Vysion inventory screen for shops",
     "hubBarcodeScan": "Barcode\nscanning",
-    "hubDiagramAria": "Diagram: one central system connected to till, ordering, reservations, website, staff, stock, barcode scanning, reports and business analysis",
+    "hubWebshop": "Webshop",
+    "hubLoyalty": "Loyalty card",
+    "hubDiagramAria": "Diagram: one central system connected to till, webshop, loyalty card, website, staff, stock, barcode scanning, reports and business analysis",
     "platformBarcode": {
       "title": "Barcode scanner",
       "teaser": "Work with smart scanners at your till and scan all kinds of codes.",
@@ -6588,6 +6595,41 @@
       "title": "Works offline in the shop",
       "body": "Keeps running if the internet drops. When you are back online, everything syncs — bakery, butcher, salon or night shop."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "Complete POS system for shops",
+        "body": "From baker to clothing store: till sales, barcode, stock, loyalty card, returns and webshop sit in the same licence. No extra modules, no extra invoices.",
+        "bodyExtra": "Everything your shop needs on one screen: counter, stock, customers and online sales."
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "Why pay separately for your till, webshop, stock, loyalty card, staff and reports?",
+      "subtitleVysionLine": "With Vysion it all lives in one POS system for shops, on one screen.",
+      "subtitlePoint1": "No five different systems.",
+      "subtitlePoint2": "No extra software for stock or loyalty.",
+      "subtitlePoint3": "No separate licences for every tool.",
+      "subtitleClosing": "Everything your shop needs, connected in one complete platform."
+    },
+    "capabilities": {
+      "title": "What your shop POS really does",
+      "lead": "Vysion is not a bare till. You sell, track stock, recognise customers and connect your webshop — the same products, the same prices.",
+      "sales": {
+        "title": "Till sales & barcode",
+        "body": "Check out with a tap or barcode scanning. Variants such as size and colour have their own barcode. Print labels, work with serial numbers and scan or photograph a product with your phone."
+      },
+      "stock": {
+        "title": "Stock & purchasing",
+        "body": "Track stock and minimum stock. Manage suppliers, purchasing, purchase orders and goods receipt. Run an inventory count and import products in one go."
+      },
+      "customers": {
+        "title": "Customers, returns & promotions",
+        "body": "Loyalty card, shop pass and points are built in. Process returns, exchanges and gift vouchers. Set price and discount promotions without extra software."
+      },
+      "team": {
+        "title": "Team, reports & webshop",
+        "body": "Staff clock in and out, reports and business analysis. Show prices on the customer display. Email the digital receipt or invoice. Your webshop and hardware belong to the same licence."
+      }
+    },
     "gratisWebsite": {
       "title": "Free website for your shop",
       "body": "Your license includes your own website, at no extra cost. Colours, photos and texts are yours to change.",
@@ -6631,7 +6673,17 @@
       "17": "Popular items",
       "18": "All payment methods",
       "19": "Free installation",
-      "20": "Hardware included"
+      "20": "Hardware included",
+      "21": "Returns & exchanges",
+      "22": "Gift voucher",
+      "23": "Suppliers & purchasing",
+      "24": "Purchase orders",
+      "25": "Goods receipt",
+      "26": "Inventory / stock count",
+      "27": "Variants (size/colour)",
+      "28": "Serial numbers",
+      "29": "Product import",
+      "30": "Clock in and out"
     }
   },
   "retailSite": {

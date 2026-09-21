@@ -22,7 +22,8 @@
     "sectors": "Settori",
     "services": "I nostri servizi",
     "integrations": "Integrazioni",
-    "subscriptions": "Licenze"
+    "subscriptions": "Licenze",
+    "winkelRetail": "Cassa per negozi e retail"
   },
   "licensePurchasePage": {
     "title": "Acquisto licenza",
@@ -144,7 +145,8 @@
     "readTermsLink": "Leggi termini e condizioni",
     "demoRequest": "Richiedi una demo",
     "googleReviewsLabel": "5 stelle su Google",
-    "googleReviewsAria": "Leggi le nostre recensioni su Google"
+    "googleReviewsAria": "Leggi le nostre recensioni su Google",
+    "winkelLink": "Cassa per negozi e retail"
   },
   "hero": {
     "badge1": "1 Piattaforma",
@@ -660,6 +662,8 @@
     "contactLinkTitle": "Contatta Vysion — demo o domanda",
     "privacyLinkTitle": "Informativa sulla privacy",
     "legalLinkTitle": "Termini e informazioni legali",
+    "winkelRetail": "Sistema di cassa per negozi",
+    "winkelRetailLinkTitle": "Sistema di cassa per negozi e retail",
     "linkAppsAria": "Vysion Apps — si apre in una nuova scheda",
     "linkHorecaAria": "Sito ufficiale Vysion kassa — nuova scheda",
     "websiteLinkLabel": "Vysion kassa — sito ufficiale",
@@ -6555,6 +6559,7 @@
   },
   "winkelSite": {
     "title": "La cassa completa per il tuo negozio",
+    "seoLead": "Vysion è un sistema di cassa per negozi e retail. Gestisci vendita, magazzino, clienti e il tuo shop online da un solo schermo — senza pacchetti extra.",
     "lead": "Incasso, magazzino e il tuo e-commerce in un solo sistema. Fatto per il bancone.",
     "point1": "Incassa in fretta con barcode o tocco",
     "point2": "Magazzino per prodotto, senza pacchetto extra",
@@ -6563,7 +6568,9 @@
     "videoAltKassa": "Cassa negozio Vysion in uso",
     "videoAltVoorraad": "Schermata scorte Vysion per negozi",
     "hubBarcodeScan": "Scansione\nbarcode",
-    "hubDiagramAria": "Diagramma: un sistema centrale collegato a cassa, ordini, prenotazioni, sito, personale, scorte, scansione barcode, report e analisi aziendale",
+    "hubWebshop": "Shop online",
+    "hubLoyalty": "Tessera cliente",
+    "hubDiagramAria": "Diagramma: un sistema centrale collegato a cassa, shop online, tessera cliente, sito, personale, magazzino, scansione barcode, report e analisi",
     "platformBarcode": {
       "title": "Scanner barcode",
       "teaser": "Lavora con scanner intelligenti nella tua cassa e scansiona ogni tipo di codice.",
@@ -6629,6 +6636,41 @@
       "title": "Funziona anche offline in negozio",
       "body": "Continua se internet cade. Tornati online, tutto si aggiorna."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "Sistema di cassa completo per negozi",
+        "body": "Dal fornaio al negozio di abbigliamento: vendita, barcode, magazzino, tessera, resi e shop online nella stessa licenza. Niente moduli extra, niente fatture extra.",
+        "bodyExtra": "Tutto ciò che serve al tuo negozio, su uno schermo: banco, stock, clienti e vendita online."
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "Perché pagare a parte cassa, shop online, magazzino, tessera, personale e report?",
+      "subtitleVysionLine": "Con Vysion tutto vive in un sistema di cassa per negozi, su uno schermo.",
+      "subtitlePoint1": "Niente cinque sistemi diversi.",
+      "subtitlePoint2": "Niente software extra per magazzino o fidelity.",
+      "subtitlePoint3": "Niente licenze separate per ogni funzione.",
+      "subtitleClosing": "Tutto ciò che serve al tuo negozio, collegato in una piattaforma completa."
+    },
+    "capabilities": {
+      "title": "Cosa sa fare davvero la tua cassa",
+      "lead": "Vysion non è una cassa nuda. Vendi, segui lo stock, riconosci i clienti e colleghi lo shop online — stessi prodotti, stessi prezzi.",
+      "sales": {
+        "title": "Vendita e barcode",
+        "body": "Incassa toccando o scansionando. Varianti come taglia e colore hanno un barcode proprio. Stampa etichette, gestisci numeri di serie e scansiona o fotografa un prodotto dal telefono."
+      },
+      "stock": {
+        "title": "Magazzino e acquisti",
+        "body": "Segui scorte e scorta minima. Gestisci fornitori, acquisti, ordini e ricezione merce. Fai l'inventario e importa i prodotti in un colpo solo."
+      },
+      "customers": {
+        "title": "Clienti, resi e promozioni",
+        "body": "Tessera, pass negozio e punti sono inclusi. Gestisci resi, cambi e buoni. Prepara prezzi e sconti senza software extra."
+      },
+      "team": {
+        "title": "Team, report e shop online",
+        "body": "Timbratura del personale, report e analisi. Mostra i prezzi sullo schermo cliente. Invia scontrino o fattura via e-mail. Shop online e hardware fanno parte della stessa licenza."
+      }
+    },
     "gratisWebsite": {
       "title": "Sito web gratis per il tuo negozio",
       "body": "L’licenza include un sito web, senza costi extra. Colori, foto e testi li adatti tu.",
@@ -6672,7 +6714,17 @@
       "17": "Articoli popolari",
       "18": "Tutti i metodi di pagamento",
       "19": "Installazione gratis",
-      "20": "Hardware incluso"
+      "20": "Hardware incluso",
+      "21": "Resi e cambi",
+      "22": "Buono / voucher",
+      "23": "Fornitori e acquisti",
+      "24": "Ordini di acquisto",
+      "25": "Ricezione merce",
+      "26": "Inventario / conteggio",
+      "27": "Varianti (taglia/colore)",
+      "28": "Numeri di serie",
+      "29": "Import prodotti",
+      "30": "Timbratura in/out"
     }
   },
   "retailSite": {

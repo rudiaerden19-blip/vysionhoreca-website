@@ -2,14 +2,15 @@ import type { Metadata } from 'next'
 
 import { VYSION_BRAND_SITE_NAME, VYSION_CANONICAL_ORIGIN } from '@/lib/vysion-site'
 
-const TITLE = `Kassa voor winkels & retail | bakker, slager, kapper | ${VYSION_BRAND_SITE_NAME}`
+const TITLE = `Kassasysteem voor winkels & retail | ${VYSION_BRAND_SITE_NAME}`
 const DESCRIPTION =
-  'Vysion kassa voor bakkers, slagers, kappers, kledingzaken, retail en groothandel. Touchscreen POS, webshop, voorraad en hardware. 14 dagen gratis proberen.'
+  'Compleet kassasysteem voor winkels en retail: verkoop, barcode, voorraad, klantenkaart, retour en webshop in één licentie. Hardware inbegrepen. 14 dagen gratis proberen.'
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
   alternates: { canonical: '/winkel' },
+  robots: { index: true, follow: true },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
@@ -18,6 +19,12 @@ export const metadata: Metadata = {
     url: `${VYSION_CANONICAL_ORIGIN}/winkel`,
     siteName: VYSION_BRAND_SITE_NAME,
     images: [{ url: '/images/hardware/hardware-tf30-kassa.png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ['/images/hardware/hardware-tf30-kassa.png'],
   },
 }
 

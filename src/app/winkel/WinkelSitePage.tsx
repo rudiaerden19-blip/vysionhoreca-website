@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import {
   Navigation,
@@ -10,15 +9,11 @@ import {
   CookieBanner,
 } from '@/components'
 import WinkelLandingHero from './WinkelLandingHero'
-
-const PlatformGridSection = dynamic(() => import('@/components/PlatformGridSection'), { loading: () => null })
-const ConnectedSystemHubSection = dynamic(
-  () => import('@/components/ConnectedSystemHubSection'),
-  { loading: () => null },
-)
-const VysionBeestSection = dynamic(() => import('@/components/VysionBeestSection'), { loading: () => null })
-const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
-const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
+import PlatformGridSection from '@/components/PlatformGridSection'
+import ConnectedSystemHubSection from '@/components/ConnectedSystemHubSection'
+import VysionBeestSection from '@/components/VysionBeestSection'
+import HardwareSection from '@/components/HardwareSection'
+import ContactPageSection from '@/components/ContactPageSection'
 import { useLanguage } from '@/i18n'
 import { PricingHardwareToggle } from '@/components/PricingHardwareToggle'
 import { monthlyPriceForHardware } from '@/lib/pricing-hardware'
@@ -32,6 +27,45 @@ import {
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
+
+function WinkelCapabilitiesSection() {
+  const { t } = useLanguage()
+  const cards = ['sales', 'stock', 'customers', 'team'] as const
+
+  return (
+    <section
+      className="relative py-16 sm:py-20 bg-white border-b border-gray-100"
+      aria-labelledby="winkel-capabilities-heading"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2
+          id="winkel-capabilities-heading"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 tracking-tight text-center mb-4"
+        >
+          {t('winkelSite.capabilities.title')}
+        </h2>
+        <p className="max-w-3xl mx-auto text-center text-base sm:text-lg text-gray-600 leading-relaxed mb-10 sm:mb-12">
+          {t('winkelSite.capabilities.lead')}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+          {cards.map((key) => (
+            <article
+              key={key}
+              className="rounded-2xl border border-gray-100 bg-[#faf8f6] p-6 sm:p-7 shadow-sm"
+            >
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 leading-snug">
+                {t(`winkelSite.capabilities.${key}.title`)}
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                {t(`winkelSite.capabilities.${key}.body`)}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 function GratisWebsiteBannerSection() {
   const { t } = useLanguage()
@@ -102,16 +136,20 @@ function WhyVysionSection() {
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
                     {key === 'foodtrucksOffline'
                       ? t('winkelSite.offline.title')
-                      : t(`whyVysion.${key}.title`)}
+                      : key === 'fullPlatform'
+                        ? t('winkelSite.why.fullPlatform.title')
+                        : t(`whyVysion.${key}.title`)}
                   </h3>
                   <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {key === 'foodtrucksOffline'
                       ? t('winkelSite.offline.body')
-                      : t(`whyVysion.${key}.body`)}
+                      : key === 'fullPlatform'
+                        ? t('winkelSite.why.fullPlatform.body')
+                        : t(`whyVysion.${key}.body`)}
                   </p>
                   {key === 'fullPlatform'? (
                     <p className="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed">
-                      {t('whyVysion.fullPlatform.bodyExtra')}
+                      {t('winkelSite.why.fullPlatform.bodyExtra')}
                     </p>
                   ) : null}
                   {key === 'inHouseSoftware'? (
@@ -905,213 +943,6 @@ function StopSection() {
   )
 }
 
-/** Alleen deze vier beelden, vaste volgorde (gebruikersassets). */
-const TABLE_KIOSK_SLIDES = [
-  '/images/hardware/hardware-tf30-kassa.png',
-  '/images/hardware/hardware-barcode-scanner.png',
-  '/images/hardware/hardware-premium-lade.png',
-  '/images/hardware/hardware-printer-epson.png',
-] as const
-
-function TableKioskSection() {
-  const { t, locale } = useLanguage()
-  const featureKeys = [1, 2, 3, 4, 5] as const
-  const [kioskSlide, setKioskSlide] = useState(0)
-  const [kioskLightboxOpen, setKioskLightboxOpen] = useState(false)
-  const kioskCount = TABLE_KIOSK_SLIDES.length
-
-  useEffect(() => {
-    if (!kioskLightboxOpen) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setKioskLightboxOpen(false)
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
-      }
-      if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        setKioskSlide((i) => (i + 1) % kioskCount)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.body.style.overflow = prev
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [kioskLightboxOpen, kioskCount])
-
-  return (
-    <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto lg:mx-0 rounded-3xl bg-[#e3e3e3] p-3 sm:p-5 lg:p-6 shadow-home-image ring-1 ring-black/[0.06]">
-            <div
-              className="relative outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3e3e3] rounded-2xl"
-              role="region"
-              aria-roledescription="carousel"
-              aria-label={t('winkelSite.kiosk.carouselAria')}
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowLeft') {
-                  e.preventDefault()
-                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
-                }
-                if (e.key === 'ArrowRight') {
-                  e.preventDefault()
-                  setKioskSlide((i) => (i + 1) % kioskCount)
-                }
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setKioskLightboxOpen(true)}
-                className="relative mx-auto h-[min(78vw,440px)] w-full cursor-zoom-in sm:h-[min(72vw,480px)] lg:h-[520px]"
-                aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${t('winkelSite.kiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
-              >
-                <Image
-                  src={TABLE_KIOSK_SLIDES[kioskSlide]}
-                  alt={`${t('winkelSite.kiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
-                  fill
-                  className="object-contain object-center drop-shadow-sm pointer-events-none"
-                  sizes="(min-width: 1024px) 520px, (min-width: 640px) 90vw, 100vw"
-                  priority={kioskSlide === 0}
-                />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
-                }}
-                className="absolute left-1 sm:left-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                aria-label={t('ui.ariaPrevImage')}
-              >
-                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setKioskSlide((i) => (i + 1) % kioskCount)
-                }}
-                className="absolute right-1 sm:right-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                aria-label={t('ui.ariaNextImage')}
-              >
-                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-            <div className="mt-4 flex justify-center gap-1.5" aria-hidden>
-              {TABLE_KIOSK_SLIDES.map((src, i) => (
-                <span
-                  key={src}
-                  className={`h-1.5 w-1.5 rounded-full ${i === kioskSlide ? 'bg-accent': 'bg-gray-400/60'}`}
-                />
-              ))}
-            </div>
-            <p className="mt-3 text-center text-sm text-gray-600">{t('winkelSite.kiosk.clickToEnlarge')}</p>
-          </div>
-
-          <div className="flex flex-col justify-center py-2 lg:py-4">
-            <h2
-              id="table-kiosk-heading"
-              className="text-3xl sm:text-4xl font-bold text-accent tracking-tight mb-6"
-            >
-              {t('winkelSite.kiosk.subtitle')}
-            </h2>
-            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">{t('winkelSite.kiosk.body')}</p>
-            <ul className="space-y-4">
-              {featureKeys.map((key) => (
-                <li key={key} className="flex items-start gap-3">
-                  <svg
-                    className="w-6 h-6 text-accent flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-800 text-base sm:text-lg leading-snug">{t(`winkelSite.kiosk.features.${key}`)}</span>
-                </li>
-              ))}
-            </ul>
-            <MarketingStartAndDemoButtons demoHref="/winkel#contact" className="mt-[calc(2.5rem+2cm)]" />
-          </div>
-        </div>
-      </div>
-
-      {kioskLightboxOpen &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black p-0 sm:bg-black/90 sm:p-6"
-            role="dialog"
-            aria-modal="true"
-            aria-label={t('subscriptionsPage.enlargeImageHint')}
-            onClick={() => setKioskLightboxOpen(false)}
-          >
-            <div
-              className="relative flex h-[100dvh] w-full max-w-full min-w-0 items-center justify-center sm:inline-flex sm:h-auto sm:max-h-[min(85vh,920px)] sm:w-auto sm:max-w-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element -- lightbox: native img op ware grootte */}
-              <img
-                src={TABLE_KIOSK_SLIDES[kioskSlide]}
-                alt={`${t('ui.lightboxImageAlt')}: ${t('winkelSite.kiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
-                className="block h-auto max-h-[100dvh] w-auto max-w-full object-contain sm:max-h-[min(85vh,920px)] sm:max-w-[calc(100%-3rem)] sm:rounded-lg sm:shadow-2xl"
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setKioskLightboxOpen(false)
-                }}
-                className="absolute z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 top-[max(0.5rem,env(safe-area-inset-top))] right-[max(0.5rem,env(safe-area-inset-right))] sm:top-3 sm:right-3 sm:h-11 sm:w-11"
-                aria-label={t('ui.ariaClose')}
-              >
-                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
-                }}
-                className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:left-3 sm:h-12 sm:w-12"
-                aria-label={t('ui.ariaPrevImage')}
-              >
-                <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setKioskSlide((i) => (i + 1) % kioskCount)
-                }}
-                className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:right-3 sm:h-12 sm:w-12"
-                aria-label={t('ui.ariaNextImage')}
-              >
-                <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>,
-          document.body
-        )}
-    </section>
-  )
-}
 
 // Industry Section
 function IndustrySection() {
@@ -1478,9 +1309,20 @@ export default function WinkelSitePage() {
         centerEnlargeSrc="/images/winkel/winkel-kassa-hub-full.png"
         centerEnlargeable
         centerAspect={2558 / 963}
-        moduleLabelKeyOverrides={{ keukenSchermen: 'winkelSite.hubBarcodeScan' }}
+        moduleLabelKeyOverrides={{
+          keukenSchermen: 'winkelSite.hubBarcodeScan',
+          onlineBestelsysteem: 'winkelSite.hubWebshop',
+          reservatieSysteem: 'winkelSite.hubLoyalty',
+        }}
         diagramAriaKey="winkelSite.hubDiagramAria"
+        subtitleQuestionKey="winkelSite.hub.subtitleQuestion"
+        subtitleVysionLineKey="winkelSite.hub.subtitleVysionLine"
+        subtitlePoint1Key="winkelSite.hub.subtitlePoint1"
+        subtitlePoint2Key="winkelSite.hub.subtitlePoint2"
+        subtitlePoint3Key="winkelSite.hub.subtitlePoint3"
+        subtitleClosingKey="winkelSite.hub.subtitleClosing"
       />
+      <WinkelCapabilitiesSection />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />
       <PlatformGridSection
@@ -1529,7 +1371,6 @@ export default function WinkelSitePage() {
       />
       <StatsAndLiveDemoSection />
       <PricingSection />
-      <TableKioskSection />
       <TestimonialSection />
       <ContactPageSection sectionId="contact" />
       <Footer />

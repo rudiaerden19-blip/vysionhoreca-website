@@ -22,7 +22,8 @@
     "sectors": "Sectores",
     "services": "Nuestros servicios",
     "integrations": "Integraciones",
-    "subscriptions": "Licencias"
+    "subscriptions": "Licencias",
+    "winkelRetail": "Caja para tiendas y retail"
   },
   "licensePurchasePage": {
     "title": "Compra de licencia",
@@ -144,7 +145,8 @@
     "readTermsLink": "Ver condiciones generales",
     "demoRequest": "Solicita una demo",
     "googleReviewsLabel": "5 estrellas en Google",
-    "googleReviewsAria": "Leer nuestras reseñas en Google"
+    "googleReviewsAria": "Leer nuestras reseñas en Google",
+    "winkelLink": "Caja para tiendas y retail"
   },
   "hero": {
     "badge1": "1 Plataforma",
@@ -660,6 +662,8 @@
     "contactLinkTitle": "Contactar con Vysion — demo o consulta",
     "privacyLinkTitle": "Política de privacidad",
     "legalLinkTitle": "Términos e información legal",
+    "winkelRetail": "Sistema de caja para tiendas",
+    "winkelRetailLinkTitle": "Sistema de caja para tiendas y retail",
     "linkAppsAria": "Vysion Apps — se abre en una pestaña nueva",
     "linkHorecaAria": "Sitio web oficial de Vysion kassa — nueva pestaña",
     "websiteLinkLabel": "Vysion kassa — sitio web oficial",
@@ -6555,6 +6559,7 @@
   },
   "winkelSite": {
     "title": "La caja completa para tu tienda",
+    "seoLead": "Vysion es un sistema de caja para tiendas y retail. Gestionas venta, stock, clientes y tu tienda online desde una sola pantalla — sin paquetes sueltos.",
     "lead": "Cobro, stock y su propia tienda online en un solo sistema. Hecho para el mostrador.",
     "point1": "Cobrar rápido con código de barras o toque",
     "point2": "Stock por producto, sin paquete extra",
@@ -6563,7 +6568,9 @@
     "videoAltKassa": "Caja de tienda Vysion en uso",
     "videoAltVoorraad": "Pantalla de inventario Vysion para tiendas",
     "hubBarcodeScan": "Escanear\ncódigo de barras",
-    "hubDiagramAria": "Diagrama: un sistema central conectado a caja, pedidos, reservas, web, personal, stock, escaneo de códigos de barras, informes y análisis empresarial",
+    "hubWebshop": "Tienda online",
+    "hubLoyalty": "Tarjeta de cliente",
+    "hubDiagramAria": "Diagrama: un sistema central conectado a caja, tienda online, tarjeta de cliente, web, personal, stock, escaneo de códigos, informes y análisis",
     "platformBarcode": {
       "title": "Escáner de códigos de barras",
       "teaser": "Trabaje con escáneres inteligentes en su caja y escanee todo tipo de códigos.",
@@ -6629,6 +6636,41 @@
       "title": "También offline en la tienda",
       "body": "Sigue si cae internet. Al volver a estar online, todo se actualiza."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "Sistema de caja completo para tiendas",
+        "body": "De la panadería a la tienda de ropa: venta, código de barras, stock, tarjeta de cliente, devoluciones y tienda online en la misma licencia. Sin módulos extra, sin facturas extra.",
+        "bodyExtra": "Todo lo que tu negocio necesita, en una pantalla: mostrador, stock, clientes y venta online."
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "¿Por qué pagar aparte caja, tienda online, stock, tarjeta, personal e informes?",
+      "subtitleVysionLine": "Con Vysion todo vive en un sistema de caja para tiendas, en una pantalla.",
+      "subtitlePoint1": "No cinco sistemas distintos.",
+      "subtitlePoint2": "No software extra para stock o fidelidad.",
+      "subtitlePoint3": "No licencias aparte para cada función.",
+      "subtitleClosing": "Todo lo que tu tienda necesita, conectado en una plataforma completa."
+    },
+    "capabilities": {
+      "title": "Lo que tu caja de tienda realmente hace",
+      "lead": "Vysion no es una caja vacía. Vendes, controlas stock, reconoces clientes y conectas tu tienda online — los mismos productos, los mismos precios.",
+      "sales": {
+        "title": "Venta y código de barras",
+        "body": "Cobra tocando o escaneando. Las variantes talla y color tienen su propio código. Imprime etiquetas, usa números de serie y escanea o fotografía un producto con el teléfono."
+      },
+      "stock": {
+        "title": "Stock y compras",
+        "body": "Controla stock y stock mínimo. Gestiona proveedores, compras, pedidos y recepción. Haz un inventario e importa productos de una vez."
+      },
+      "customers": {
+        "title": "Clientes, devoluciones y ofertas",
+        "body": "Tarjeta de cliente, pase de tienda y puntos están incluidos. Gestiona devoluciones, cambios y vales. Prepara precios y descuentos sin software extra."
+      },
+      "team": {
+        "title": "Equipo, informes y tienda online",
+        "body": "Fichar personal, informes y análisis. Muestra precios en la pantalla del cliente. Envía el ticket o la factura por correo. Tienda online y hardware van en la misma licencia."
+      }
+    },
     "gratisWebsite": {
       "title": "Sitio web gratis para su tienda",
       "body": "La licencia incluye su propio sitio web, sin coste extra. Colores, fotos y textos los adapta usted.",
@@ -6672,7 +6714,17 @@
       "17": "Artículos populares",
       "18": "Todos los métodos de pago",
       "19": "Instalación gratis",
-      "20": "Hardware incluido"
+      "20": "Hardware incluido",
+      "21": "Devoluciones y cambios",
+      "22": "Vale / bono",
+      "23": "Proveedores y compras",
+      "24": "Pedidos de compra",
+      "25": "Recepción de mercancía",
+      "26": "Inventario / recuento",
+      "27": "Variantes (talla/color)",
+      "28": "Números de serie",
+      "29": "Importación de productos",
+      "30": "Fichar entrada y salida"
     }
   },
   "retailSite": {

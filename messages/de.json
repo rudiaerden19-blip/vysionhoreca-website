@@ -22,7 +22,8 @@
     "sectors": "Branchen",
     "services": "Unsere Leistungen",
     "integrations": "Integrationen",
-    "subscriptions": "Lizenzen"
+    "subscriptions": "Lizenzen",
+    "winkelRetail": "Kasse für Läden & Retail"
   },
   "licensePurchasePage": {
     "title": "Lizenzkauf",
@@ -144,7 +145,8 @@
     "readTermsLink": "AGB lesen",
     "demoRequest": "Demo anfragen",
     "googleReviewsLabel": "5 Sterne auf Google",
-    "googleReviewsAria": "Unsere Google-Bewertungen lesen"
+    "googleReviewsAria": "Unsere Google-Bewertungen lesen",
+    "winkelLink": "Kasse für Läden & Retail"
   },
   "hero": {
     "badge1": "1 Plattform",
@@ -660,6 +662,8 @@
     "contactLinkTitle": "Kontakt zu Vysion — Demo oder Anfrage",
     "privacyLinkTitle": "Datenschutzerklärung",
     "legalLinkTitle": "AGB und rechtliche Hinweise",
+    "winkelRetail": "Kassensystem für Läden",
+    "winkelRetailLinkTitle": "Kassensystem für Läden und Retail",
     "linkAppsAria": "Vysion Apps — neues Fenster",
     "linkHorecaAria": "Offizielle Website Vysion kassa — neues Fenster",
     "websiteLinkLabel": "Vysion kassa — offizielle Website",
@@ -6578,6 +6582,7 @@
   },
   "winkelSite": {
     "title": "Die komplette Kasse für Ihr Geschäft",
+    "seoLead": "Vysion ist ein Kassensystem für Läden und Retail. Verkauf, Bestand, Kundenverwaltung und deinen Webshop steuerst du auf einem Bildschirm — ohne Extra-Pakete.",
     "lead": "Kassieren, Lager und Ihr eigener Webshop in einem System. Für die Theke gemacht.",
     "point1": "Schnell kassieren mit Barcode oder Tippen",
     "point2": "Lager je Produkt, ohne Extra-Paket",
@@ -6586,7 +6591,9 @@
     "videoAltKassa": "Vysion-Ladenkasse in Betrieb",
     "videoAltVoorraad": "Vysion-Lagerbestand für Läden",
     "hubBarcodeScan": "Barcode\nscannen",
-    "hubDiagramAria": "Diagramm: ein zentrales System verbunden mit Kasse, Bestellen, Reservierungen, Website, Personal, Lager, Barcode scannen, Berichten und Geschäftsanalyse",
+    "hubWebshop": "Webshop",
+    "hubLoyalty": "Kundenkarte",
+    "hubDiagramAria": "Diagramm: ein zentrales System verbunden mit Kasse, Webshop, Kundenkarte, Website, Personal, Bestand, Barcode-Scan, Berichten und Geschäftsanalyse",
     "platformBarcode": {
       "title": "Barcode-Scanner",
       "teaser": "Arbeiten Sie mit intelligenten Scannern an Ihrer Kasse und scannen Sie alle Arten von Codes.",
@@ -6652,6 +6659,41 @@
       "title": "Auch offline im Laden",
       "body": "Läuft weiter, wenn das Internet ausfällt. Sobald Sie wieder online sind, gleicht sich alles ab."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "Komplettes Kassensystem für Läden",
+        "body": "Vom Bäcker bis zum Bekleidungsgeschäft: Verkauf, Barcode, Bestand, Kundenkarte, Retoure und Webshop gehören zur selben Lizenz. Keine Extra-Module, keine Extra-Rechnungen.",
+        "bodyExtra": "Alles, was dein Geschäft braucht, auf einem Bildschirm: Theke, Bestand, Kunden und Onlineverkauf."
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "Warum extra zahlen für Kasse, Webshop, Bestand, Kundenkarte, Personal und Berichte?",
+      "subtitleVysionLine": "Mit Vysion läuft alles in einem Kassensystem für Läden, auf einem Bildschirm.",
+      "subtitlePoint1": "Keine fünf verschiedenen Systeme.",
+      "subtitlePoint2": "Keine Extra-Software für Bestand oder Treue.",
+      "subtitlePoint3": "Keine getrennten Lizenzen für jede Funktion.",
+      "subtitleClosing": "Alles, was dein Laden braucht, verbunden in einer kompletten Plattform."
+    },
+    "capabilities": {
+      "title": "Was deine Ladenkasse wirklich kann",
+      "lead": "Vysion ist keine nackte Kasse. Du verkaufst, führst Bestand, erkennst Kunden und koppelst deinen Webshop — dieselben Produkte, dieselben Preise.",
+      "sales": {
+        "title": "Verkauf & Barcode",
+        "body": "Kassieren per Tipp oder Barcode-Scan. Varianten wie Größe und Farbe haben einen eigenen Barcode. Drucke Etiketten, arbeite mit Seriennummern und scanne oder fotografiere ein Produkt mit dem Handy."
+      },
+      "stock": {
+        "title": "Bestand & Einkauf",
+        "body": "Führe Bestand und Mindestbestand. Verwalte Lieferanten, Einkauf, Bestellungen und Wareneingang. Mache eine Inventur und importiere Produkte in einem Schritt."
+      },
+      "customers": {
+        "title": "Kunden, Retoure & Aktionen",
+        "body": "Kundenkarte, Ladenpass und Punkte sind eingebaut. Verarbeite Retoure, Umtausch und Gutschein. Lege Preis- und Rabattaktionen an — ohne Extra-Software."
+      },
+      "team": {
+        "title": "Team, Berichte & Webshop",
+        "body": "Personal ein- und ausstempeln, Berichte und Geschäftsanalyse. Zeige Preise auf dem Kundendisplay. Sende den digitalen Kassenbon oder die Rechnung per E-Mail. Webshop und Hardware gehören zur selben Lizenz."
+      }
+    },
     "gratisWebsite": {
       "title": "Kostenlose Website für Ihren Laden",
       "body": "Im Lizenz ist eine eigene Website enthalten, ohne Aufpreis. Farben, Fotos und Texte passen Sie selbst an.",
@@ -6695,7 +6737,17 @@
       "17": "Beliebte Artikel",
       "18": "Alle Zahlungsmethoden",
       "19": "Kostenlose Installation",
-      "20": "Hardware enthalten"
+      "20": "Hardware enthalten",
+      "21": "Retoure & Umtausch",
+      "22": "Gutschein",
+      "23": "Lieferanten & Einkauf",
+      "24": "Bestellungen",
+      "25": "Wareneingang",
+      "26": "Inventur / Bestandszählung",
+      "27": "Varianten (Größe/Farbe)",
+      "28": "Seriennummern",
+      "29": "Produktimport",
+      "30": "Ein- und Ausstempeln"
     }
   },
   "retailSite": {

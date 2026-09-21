@@ -69,6 +69,9 @@ export default function Navigation() {
             ) : (
               <a href={homeHref} className={navLinkClass}>{t('nav.home')}</a>
             )}
+            {isHorecaPage ? (
+              <a href="/winkel" className={navLinkClass}>{t('nav.winkelRetail')}</a>
+            ) : null}
             <a href={pricingHref} className={navLinkClass}>{t('nav.pricing')}</a>
             <a href="/licentie" className={navLinkClass}>{t('nav.license')}</a>
             <a href="/over-ons" className={navLinkClass}>{t('nav.about')}</a>
@@ -161,6 +164,11 @@ export default function Navigation() {
                   {t('nav.home')}
                 </a>
               )}
+              {isHorecaPage ? (
+                <a href="/winkel" className={navLinkClassMobile} onClick={() => setIsMenuOpen(false)}>
+                  {t('nav.winkelRetail')}
+                </a>
+              ) : null}
               <a href={pricingHref} className={navLinkClassMobile}>{t('nav.pricing')}</a>
               <a href="/over-ons" className={navLinkClassMobile}>{t('nav.about')}</a>
               <a href="/support" className={navLinkClassMobile}>{t('nav.support')}</a>

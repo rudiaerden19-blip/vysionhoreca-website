@@ -22,7 +22,8 @@
     "sectors": "Secteurs",
     "services": "Nos services",
     "integrations": "Intégrations",
-    "subscriptions": "Licences"
+    "subscriptions": "Licences",
+    "winkelRetail": "Caisse pour magasins & retail"
   },
   "licensePurchasePage": {
     "title": "Achat de licence",
@@ -144,7 +145,8 @@
     "readTermsLink": "Lire les conditions générales",
     "demoRequest": "Demandez une démo",
     "googleReviewsLabel": "5 étoiles sur Google",
-    "googleReviewsAria": "Lire nos avis Google"
+    "googleReviewsAria": "Lire nos avis Google",
+    "winkelLink": "Caisse pour magasins & retail"
   },
   "hero": {
     "badge1": "1 Plateforme",
@@ -660,6 +662,8 @@
     "contactLinkTitle": "Contacter Vysion — démo ou question",
     "privacyLinkTitle": "Politique de confidentialité",
     "legalLinkTitle": "Conditions et informations légales",
+    "winkelRetail": "Système de caisse pour magasins",
+    "winkelRetailLinkTitle": "Système de caisse pour magasins et retail",
     "linkAppsAria": "Vysion Apps — s’ouvre dans un nouvel onglet",
     "linkHorecaAria": "Site officiel Vysion kassa — nouvel onglet",
     "websiteLinkLabel": "Vysion kassa — site officiel",
@@ -6578,6 +6582,7 @@
   },
   "winkelSite": {
     "title": "La caisse complète pour votre magasin",
+    "seoLead": "Vysion est un système de caisse pour magasins et retail. Tu gères vente, stock, clients et ta boutique en ligne depuis un seul écran — sans modules séparés.",
     "lead": "Encaissement, stock et votre propre boutique en ligne dans un seul système. Fait pour le comptoir.",
     "point1": "Encaisser vite avec code-barres ou tactile",
     "point2": "Stock par produit, sans pack en plus",
@@ -6586,7 +6591,9 @@
     "videoAltKassa": "Caisse magasin Vysion en usage",
     "videoAltVoorraad": "Écran de stock Vysion pour magasins",
     "hubBarcodeScan": "Scan\ncode-barres",
-    "hubDiagramAria": "Schéma : un système central relié à la caisse, aux commandes, aux réservations, au site web, au personnel, au stock, au scan de codes-barres, aux rapports et à l'analyse d'entreprise",
+    "hubWebshop": "Boutique en ligne",
+    "hubLoyalty": "Carte de fidélité",
+    "hubDiagramAria": "Schéma : un système central relié à la caisse, la boutique en ligne, la carte de fidélité, le site, le personnel, le stock, le scan de codes-barres, les rapports et l'analyse",
     "platformBarcode": {
       "title": "Scanner de codes-barres",
       "teaser": "Travaillez avec des scanners intelligents dans votre caisse et scannez tous types de codes.",
@@ -6652,6 +6659,41 @@
       "title": "Fonctionne hors ligne en magasin",
       "body": "Continue si internet tombe. Une fois reconnecté, tout se met à jour — boulanger, boucher, coiffeur ou magasin de nuit."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "Système de caisse complet pour magasins",
+        "body": "De la boulangerie à la boutique de vêtements : vente, code-barres, stock, carte de fidélité, retours et boutique en ligne dans la même licence. Pas de modules extra, pas de factures extra.",
+        "bodyExtra": "Tout ce dont ton magasin a besoin, sur un seul écran : comptoir, stock, clients et vente en ligne."
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "Pourquoi payer séparément caisse, boutique en ligne, stock, carte de fidélité, personnel et rapports ?",
+      "subtitleVysionLine": "Avec Vysion, tout se passe dans un système de caisse pour magasins, sur un seul écran.",
+      "subtitlePoint1": "Pas cinq systèmes différents.",
+      "subtitlePoint2": "Pas de logiciel extra pour le stock ou la fidélité.",
+      "subtitlePoint3": "Pas de licences séparées pour chaque fonction.",
+      "subtitleClosing": "Tout ce dont ton magasin a besoin, relié dans une plateforme complète."
+    },
+    "capabilities": {
+      "title": "Ce que ta caisse magasin sait vraiment faire",
+      "lead": "Vysion n'est pas une caisse nue. Tu vends, suis le stock, reconnais les clients et relies ta boutique en ligne — les mêmes produits, les mêmes prix.",
+      "sales": {
+        "title": "Vente & code-barres",
+        "body": "Encaisser d'un toucher ou par scan de code-barres. Les variantes taille et couleur ont leur propre code. Imprime des étiquettes, gère les numéros de série et scanne ou photographie un produit avec ton téléphone."
+      },
+      "stock": {
+        "title": "Stock & achats",
+        "body": "Suis le stock et le stock minimum. Gère fournisseurs, achats, bons de commande et réception. Fais un inventaire et importe tes produits en une fois."
+      },
+      "customers": {
+        "title": "Clients, retours & actions",
+        "body": "Carte de fidélité, carte magasin et points sont inclus. Traite retours, échanges et bons. Prépare prix et promotions sans logiciel extra."
+      },
+      "team": {
+        "title": "Équipe, rapports & boutique",
+        "body": "Pointer le personnel, rapports et analyse. Affiche les prix sur l'écran client. Envoie le ticket ou la facture par e-mail. Boutique en ligne et matériel font partie de la même licence."
+      }
+    },
     "gratisWebsite": {
       "title": "Site web gratuit pour votre magasin",
       "body": "Votre licence inclut un site web, sans frais extra. Couleurs, photos et textes à votre goût.",
@@ -6695,7 +6737,17 @@
       "17": "Articles populaires",
       "18": "Tous les moyens de paiement",
       "19": "Installation gratuite",
-      "20": "Matériel inclus"
+      "20": "Matériel inclus",
+      "21": "Retours & échanges",
+      "22": "Bon d'achat",
+      "23": "Fournisseurs & achats",
+      "24": "Bons de commande",
+      "25": "Réception marchandises",
+      "26": "Inventaire / comptage",
+      "27": "Variantes (taille/couleur)",
+      "28": "Numéros de série",
+      "29": "Import produits",
+      "30": "Pointer entrée/sortie"
     }
   },
   "retailSite": {

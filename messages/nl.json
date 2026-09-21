@@ -22,7 +22,8 @@
     "sectors": "Sectoren",
     "services": "Onze diensten",
     "integrations": "Integraties",
-    "subscriptions": "Licenties"
+    "subscriptions": "Licenties",
+    "winkelRetail": "Kassa voor winkels & retail"
   },
   "licensePurchasePage": {
     "title": "Aankoop licentie",
@@ -226,7 +227,8 @@
     "readTermsLink": "Lees alg. voorwaarden",
     "demoRequest": "Vraag demo aan",
     "googleReviewsLabel": "5 sterren op Google",
-    "googleReviewsAria": "Lees onze Google-reviews"
+    "googleReviewsAria": "Lees onze Google-reviews",
+    "winkelLink": "Kassa voor winkels & retail"
   },
   "hero": {
     "badge1": "1 Platform",
@@ -978,6 +980,8 @@
     "contactLinkTitle": "Neem contact op met Vysion: demo of vraag",
     "privacyLinkTitle": "Privacybeleid en verwerking van gegevens",
     "legalLinkTitle": "Algemene voorwaarden en juridische documenten",
+    "winkelRetail": "Kassasysteem voor winkels",
+    "winkelRetailLinkTitle": "Kassasysteem voor winkels en retail",
     "linkAppsAria": "Vysion Apps, opent in een nieuw venster",
     "linkHorecaAria": "Officiële website Vysion kassa, nieuw venster",
     "websiteLinkLabel": "Vysion kassa — officiële website",
@@ -6514,6 +6518,7 @@
   },
   "winkelSite": {
     "title": "De complete kassa voor jouw winkel",
+    "seoLead": "Vysion is een kassasysteem voor winkels en retail. Je regelt verkoop, voorraad, klantenbeheer en je webshop vanuit één scherm — zonder losse pakketten.",
     "lead": "Afrekenen, voorraad en je eigen webshop in één systeem. Gemaakt voor de toonbank.",
     "point1": "Snel afrekenen met barcode of tikken op het scherm",
     "point2": "Voorraad per product, zonder extra pakket",
@@ -6522,7 +6527,9 @@
     "videoAltKassa": "Vysion winkelskassa in gebruik",
     "videoAltVoorraad": "Vysion voorraadscherm voor winkels",
     "hubBarcodeScan": "Barcode\nscannen",
-    "hubDiagramAria": "Diagram: één centraal systeem verbonden met kassa, bestellen, reservaties, website, personeel, voorraad, barcode scannen, rapporten en bedrijfsanalyse",
+    "hubWebshop": "Webshop",
+    "hubLoyalty": "Klantenkaart",
+    "hubDiagramAria": "Diagram: één centraal systeem verbonden met kassa, webshop, klantenkaart, website, personeel, voorraad, barcode scannen, rapporten en bedrijfsanalyse",
     "platformBarcode": {
       "title": "Barcode scanner",
       "teaser": "Werk met slimme scanners in jouw kassa en scan alle soorten codes.",
@@ -6588,6 +6595,41 @@
       "title": "Ook offline in de winkel",
       "body": "Werkt door als het internet even wegvalt. Zodra je weer online bent, werkt alles zichzelf bij — bakker, slager, kapper of nachtwinkel."
     },
+    "why": {
+      "fullPlatform": {
+        "title": "Volledig kassasysteem voor winkels",
+        "body": "Van bakker tot kledingzaak: kassaverkoop, barcode, voorraad, klantenkaart, retour en webshop zitten in dezelfde licentie. Geen extra modules, geen extra facturen.",
+        "bodyExtra": "Alles wat je zaak nodig heeft, zit in één scherm: toonbank, stock, klanten en online verkoop."
+      }
+    },
+    "hub": {
+      "subtitleQuestion": "Waarom apart betalen voor je kassa, webshop, voorraad, klantenkaart, personeel en rapporten?",
+      "subtitleVysionLine": "Met Vysion kan het allemaal vanuit één kassasysteem voor winkels, in één scherm.",
+      "subtitlePoint1": "Geen 5 verschillende systemen.",
+      "subtitlePoint2": "Geen extra software voor voorraad of loyaliteit.",
+      "subtitlePoint3": "Geen aparte licenties voor elke toepassing.",
+      "subtitleClosing": "Alles wat je winkel nodig heeft, verbonden in één compleet platform."
+    },
+    "capabilities": {
+      "title": "Wat je winkelkassa écht kan",
+      "lead": "Vysion is geen kale kassa. Je verkoopt, volgt stock, herkent klanten en koppelt je webshop — dezelfde producten, dezelfde prijzen.",
+      "sales": {
+        "title": "Kassaverkoop & barcode",
+        "body": "Afrekenen met tikken of barcode scanning. Varianten zoals maat en kleur hebben een eigen barcode. Print etiketten, werk met serienummers en scan of fotografeer een product via je telefoon."
+      },
+      "stock": {
+        "title": "Voorraad & inkoop",
+        "body": "Volg voorraad en minimumvoorraad. Beheer leveranciers, inkoop, bestelbonnen en goederenontvangst. Doe een inventaris of stocktelling en importeer producten in één keer."
+      },
+      "customers": {
+        "title": "Klanten, retour & acties",
+        "body": "Klantenkaart, winkelpas en punten zitten in het systeem. Verwerk retour, omruilen en tegoedbon. Zet prijs- en kortingsacties klaar zonder extra software."
+      },
+      "team": {
+        "title": "Team, rapporten & webshop",
+        "body": "Personeel in- en uitklokken, rapportages en bedrijfsanalyse. Toon prijzen op het klantenscherm. Stuur de digitale kassabon of factuur per e-mail. Je webshop en hardware horen bij dezelfde licentie."
+      }
+    },
     "gratisWebsite": {
       "title": "Gratis website voor je winkel",
       "body": "Bij je licentie krijg je een eigen website, zonder extra kosten. Kleuren, foto’s en teksten pas je zelf aan.",
@@ -6631,7 +6673,17 @@
       "17": "Populaire items",
       "18": "Alle betaalmethodes",
       "19": "Installatie gratis",
-      "20": "Hardware inbegrepen"
+      "20": "Hardware inbegrepen",
+      "21": "Retour & omruilen",
+      "22": "Tegoedbon",
+      "23": "Leveranciers & inkoop",
+      "24": "Bestelbonnen",
+      "25": "Goederenontvangst",
+      "26": "Inventaris / stocktelling",
+      "27": "Varianten (maat/kleur)",
+      "28": "Serienummers",
+      "29": "Productimport",
+      "30": "In- en uitklokken"
     }
   },
   "retailSite": {
