@@ -6535,6 +6535,16 @@
     "platformRapporten": {
       "imageAlt": "Winkelier bekijkt het Z-rapport op een laptop"
     },
+    "platformLoyalty": {
+      "title": "Klantenkaart & punten",
+      "teaser": "Herken klanten, spaar automatisch punten en beloon trouwe klanten.",
+      "imageAlt": "Klantenkaart met punten aan de winkeltoonbank"
+    },
+    "platformRetour": {
+      "title": "Retour & tegoedbon",
+      "teaser": "Retour verwerken en onmiddellijk een tegoedbon aanmaken.",
+      "imageAlt": "Retour in een kledingwinkel met een tegoedbon"
+    },
     "usecasesTitle": "Voor iedere winkel",
     "modulesTitle": "Wat u in de winkel krijgt",
     "hardwareTitle": "Hardware voor de toonbank",

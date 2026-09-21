@@ -6576,6 +6576,16 @@
     "platformRapporten": {
       "imageAlt": "店主在笔记本电脑上查看Z报表"
     },
+    "platformLoyalty": {
+      "title": "会员卡与积分",
+      "teaser": "识别顾客、自动累计积分并奖励忠实顾客。",
+      "imageAlt": "店铺柜台上带积分的会员卡"
+    },
+    "platformRetour": {
+      "title": "退货与代金券",
+      "teaser": "处理退货并立即开具代金券。",
+      "imageAlt": "服装店退货并开具代金券"
+    },
     "usecasesTitle": "适合每家店铺",
     "modulesTitle": "店铺能用到什么",
     "hardwareTitle": "柜台硬件",

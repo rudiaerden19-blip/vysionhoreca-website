@@ -6576,6 +6576,16 @@
     "platformRapporten": {
       "imageAlt": "店主がノートPCでZレポートを確認している様子"
     },
+    "platformLoyalty": {
+      "title": "会員カードとポイント",
+      "teaser": "お客様を認識し、ポイントを自動で貯めて、常連を特典で報います。",
+      "imageAlt": "店舗カウンターでのポイント付き会員カード"
+    },
+    "platformRetour": {
+      "title": "返品と商品券",
+      "teaser": "返品を処理し、すぐに商品券を発行します。",
+      "imageAlt": "衣料品店での返品と商品券"
+    },
     "usecasesTitle": "あらゆるお店に",
     "modulesTitle": "お店で使える機能",
     "hardwareTitle": "カウンター向けハードウェア",

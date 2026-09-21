@@ -6535,6 +6535,16 @@
     "platformRapporten": {
       "imageAlt": "Shop owner reviewing the Z-report on a laptop"
     },
+    "platformLoyalty": {
+      "title": "Loyalty card & points",
+      "teaser": "Recognise customers, earn points automatically and reward loyal shoppers.",
+      "imageAlt": "Loyalty card with points at the shop counter"
+    },
+    "platformRetour": {
+      "title": "Returns & credit note",
+      "teaser": "Process a return and create a gift voucher immediately.",
+      "imageAlt": "Clothing shop return with a credit voucher"
+    },
     "usecasesTitle": "For every shop",
     "modulesTitle": "What you get in the shop",
     "hardwareTitle": "Hardware for the counter",

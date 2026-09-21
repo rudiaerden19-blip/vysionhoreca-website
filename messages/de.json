@@ -6599,6 +6599,16 @@
     "platformRapporten": {
       "imageAlt": "Ladeninhaber prüft den Z-Bericht auf einem Laptop"
     },
+    "platformLoyalty": {
+      "title": "Kundenkarte & Punkte",
+      "teaser": "Kunden erkennen, Punkte automatisch sammeln und treue Kunden belohnen.",
+      "imageAlt": "Kundenkarte mit Punkten an der Ladentheke"
+    },
+    "platformRetour": {
+      "title": "Rückgabe & Gutschein",
+      "teaser": "Eine Rückgabe verarbeiten und sofort einen Gutschein erstellen.",
+      "imageAlt": "Rückgabe in einem Bekleidungsgeschäft mit Gutschein"
+    },
     "usecasesTitle": "Für jeden Laden",
     "modulesTitle": "Was Sie im Laden bekommen",
     "hardwareTitle": "Hardware für die Theke",

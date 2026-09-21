@@ -1526,6 +1526,12 @@ export default function WinkelSitePage() {
             cardHeaderImage: '/images/winkel/winkel-kassasysteem-card.png',
             cardHeaderAltKey: 'winkelSite.platformKassasysteem.imageAlt',
           },
+          bestelplatform: {
+            titleKey: 'winkelSite.platformRetour.title',
+            teaserKey: 'winkelSite.platformRetour.teaser',
+            cardHeaderImage: '/images/winkel/winkel-retour-tegoedbon-card.png',
+            cardHeaderAltKey: 'winkelSite.platformRetour.imageAlt',
+          },
           keukenschermen: {
             titleKey: 'winkelSite.platformBarcode.title',
             teaserKey: 'winkelSite.platformBarcode.teaser',
@@ -1542,6 +1548,12 @@ export default function WinkelSitePage() {
           'eigen-website': {
             cardHeaderImage: '/images/winkel/winkel-eigen-website-card.png',
             cardHeaderAltKey: 'winkelSite.platformEigenWebsite.imageAlt',
+          },
+          'whatsapp-bestellingen': {
+            titleKey: 'winkelSite.platformLoyalty.title',
+            teaserKey: 'winkelSite.platformLoyalty.teaser',
+            cardHeaderImage: '/images/winkel/winkel-klantenkaart-punten-card.png',
+            cardHeaderAltKey: 'winkelSite.platformLoyalty.imageAlt',
           },
           rapporten: {
             cardHeaderImage: '/images/winkel/winkel-rapporten-card.png',

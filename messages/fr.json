@@ -6599,6 +6599,16 @@
     "platformRapporten": {
       "imageAlt": "Commerçant consultant le rapport Z sur un ordinateur portable"
     },
+    "platformLoyalty": {
+      "title": "Carte de fidélité & points",
+      "teaser": "Reconnaissez vos clients, cumulez des points automatiquement et récompensez les fidèles.",
+      "imageAlt": "Carte de fidélité avec points au comptoir du magasin"
+    },
+    "platformRetour": {
+      "title": "Retour & bon d'achat",
+      "teaser": "Traitez un retour et créez immédiatement un bon d'achat.",
+      "imageAlt": "Retour en boutique de vêtements avec un bon d'achat"
+    },
     "usecasesTitle": "Pour chaque magasin",
     "modulesTitle": "Ce que vous avez en magasin",
     "hardwareTitle": "Matériel pour le comptoir",

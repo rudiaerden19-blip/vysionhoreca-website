@@ -6576,6 +6576,16 @@
     "platformRapporten": {
       "imageAlt": "Negoziante che consulta il report Z su un laptop"
     },
+    "platformLoyalty": {
+      "title": "Tessera cliente e punti",
+      "teaser": "Riconosci i clienti, accumula punti automaticamente e premia i fedeli.",
+      "imageAlt": "Tessera fedeltà con punti al bancone del negozio"
+    },
+    "platformRetour": {
+      "title": "Reso e buono",
+      "teaser": "Gestisci un reso e crea subito un buono d'acquisto.",
+      "imageAlt": "Reso in un negozio di abbigliamento con buono"
+    },
     "usecasesTitle": "Per ogni negozio",
     "modulesTitle": "Cosa hai in negozio",
     "hardwareTitle": "Hardware per il bancone",

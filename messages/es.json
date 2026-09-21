@@ -6576,6 +6576,16 @@
     "platformRapporten": {
       "imageAlt": "Comerciante revisando el informe Z en un portátil"
     },
+    "platformLoyalty": {
+      "title": "Tarjeta de cliente y puntos",
+      "teaser": "Reconozca a sus clientes, acumule puntos automáticamente y premie a los fieles.",
+      "imageAlt": "Tarjeta de cliente con puntos en el mostrador"
+    },
+    "platformRetour": {
+      "title": "Devolución y vale",
+      "teaser": "Procese una devolución y cree un vale de inmediato.",
+      "imageAlt": "Devolución en una tienda de ropa con un vale"
+    },
     "usecasesTitle": "Para cada tienda",
     "modulesTitle": "Lo que obtiene en la tienda",
     "hardwareTitle": "Hardware para el mostrador",
