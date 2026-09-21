@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { Fragment } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 import { useLanguage } from '@/i18n'
+import { HardwareEnlargeModal } from '@/components/HardwareVideoStack'
 
 /** Bar Lies kassa-screenshot — past in rechthoekig hub-kader (1024×391). */
 const HUB_CENTER_IMAGE = '/images/hardware/connected-hub-kassa-screenshot.png'
@@ -29,6 +30,9 @@ export type ConnectedSystemHubSectionProps = {
   /** Alleen `/winkel`: eigen kassa-screenshot. Horeca/retail blijven default. */
   centerImage?: string
   centerAspect?: number
+  /** Origineel (PNG) voor lightbox — niet de verkleinde Next-thumbnail. */
+  centerEnlargeSrc?: string
+  centerEnlargeable?: boolean
   moduleLabelKeyOverrides?: Partial<Record<HubModuleKey, string>>
   diagramAriaKey?: string
 }
@@ -62,32 +66,75 @@ function tentaclePathD(angle: number) {
   return `M ${sx} ${sy} Q ${px} ${py}, ${ex} ${ey}`
 }
 
-function HubCenterPhoto({ alt, sizes, src }: { alt: string; sizes: string; src: string }) {
-  return (
-    <div className="relative h-full w-full overflow-hidden rounded-lg bg-[#0f1419] sm:rounded-xl">
+function HubCenterPhoto({
+  alt,
+  sizes,
+  src,
+  enlargeable,
+  tapLabel,
+  onEnlarge,
+}: {
+  alt: string
+  sizes: string
+  src: string
+  enlargeable?: boolean
+  tapLabel?: string
+  onEnlarge?: () => void
+}) {
+  const photo = (
+    <>
       <Image
         src={src}
-        alt={alt}
+        alt={enlargeable ? '' : alt}
         fill
         priority
         className="object-contain object-center"
         sizes={sizes}
       />
       <div className="hub-center-shimmer pointer-events-none absolute inset-0 rounded-lg sm:rounded-xl" aria-hidden />
-    </div>
+      {enlargeable && tapLabel ? (
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-2 pb-1.5 pt-6 text-center text-[0.625rem] font-semibold text-white/95 sm:pb-2 sm:text-xs">
+          {tapLabel}
+        </span>
+      ) : null}
+    </>
+  )
+
+  const frameClass =
+    'relative h-full w-full overflow-hidden rounded-lg bg-[#0f1419] sm:rounded-xl'
+
+  if (!enlargeable || !onEnlarge) {
+    return <div className={frameClass}>{photo}</div>
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onEnlarge}
+      className={`${frameClass} text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c0f14]`}
+      aria-label={`${alt}. ${tapLabel ?? ''}`}
+    >
+      {photo}
+    </button>
   )
 }
 
 export default function ConnectedSystemHubSection({
   centerImage = HUB_CENTER_IMAGE,
   centerAspect = HUB_CENTER_ASPECT,
+  centerEnlargeSrc,
+  centerEnlargeable = false,
   moduleLabelKeyOverrides,
   diagramAriaKey = 'connectedSystemHub.diagramAria',
 }: ConnectedSystemHubSectionProps = {}) {
   const { t } = useLanguage()
+  const [centerOpen, setCenterOpen] = useState(false)
+  const closeCenter = useCallback(() => setCenterOpen(false), [])
   const total = HUB_MODULE_KEYS.length
   const diagramAria = t(diagramAriaKey)
   const centerAlt = `${t('connectedSystemHub.centerLabel')} — ${diagramAria}`
+  const tapLabel = t('whyVysion.videoTapToEnlarge')
+  const enlargeSrc = centerEnlargeSrc ?? centerImage
   const moduleLabel = (key: HubModuleKey) =>
     t(moduleLabelKeyOverrides?.[key] ?? `connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
 
@@ -131,8 +178,8 @@ export default function ConnectedSystemHubSection({
 
         <div
           className="relative mx-auto mt-10 hidden w-full max-w-[min(100%,760px)] md:block lg:mt-12"
-          role="img"
-          aria-label={diagramAria}
+          role={centerEnlargeable ? undefined : 'img'}
+          aria-label={centerEnlargeable ? undefined : diagramAria}
         >
           <div className="relative aspect-square w-full pb-12">
             <div
@@ -183,12 +230,19 @@ export default function ConnectedSystemHubSection({
             </div>
 
             {/* Hub midden — vast, draait niet mee */}
-            <div className="absolute left-1/2 top-[48%] z-30 w-[48%] -translate-x-1/2 -translate-y-1/2">
+            <div className="absolute left-1/2 top-[48%] z-50 w-[48%] -translate-x-1/2 -translate-y-1/2">
               <div
                 className="relative w-full rounded-2xl border border-white/[0.14] bg-[#0c0f14] p-1.5 shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35"
                 style={{ aspectRatio: String(centerAspect) }}
               >
-                <HubCenterPhoto alt={centerAlt} src={centerImage} sizes="(min-width: 768px) 480px, 0px" />
+                <HubCenterPhoto
+                  alt={centerAlt}
+                  src={centerImage}
+                  sizes="(min-width: 768px) 480px, 0px"
+                  enlargeable={centerEnlargeable}
+                  tapLabel={tapLabel}
+                  onEnlarge={() => setCenterOpen(true)}
+                />
               </div>
               <p className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 text-sm font-semibold tracking-[0.14em] text-white/80 sm:text-base">
                 {t('connectedSystemHub.centerLabel').toUpperCase()}
@@ -203,7 +257,14 @@ export default function ConnectedSystemHubSection({
               className="relative mx-auto w-full max-w-[min(100%,360px)] rounded-2xl border border-white/10 bg-[#0c0f14] p-2 shadow-lg ring-1 ring-accent/35"
               style={{ aspectRatio: String(centerAspect) }}
             >
-              <HubCenterPhoto alt={centerAlt} src={centerImage} sizes="360px" />
+              <HubCenterPhoto
+                alt={centerAlt}
+                src={centerImage}
+                sizes="360px"
+                enlargeable={centerEnlargeable}
+                tapLabel={tapLabel}
+                onEnlarge={() => setCenterOpen(true)}
+              />
             </div>
             <p className="mt-4 text-center text-sm font-semibold tracking-wide text-white/80">
               {t('connectedSystemHub.centerLabel')}
@@ -221,6 +282,26 @@ export default function ConnectedSystemHubSection({
           </ul>
         </div>
       </div>
+
+      {centerEnlargeable ? (
+        <HardwareEnlargeModal
+          open={centerOpen}
+          onClose={closeCenter}
+          label={centerAlt}
+          closeLabel={t('ui.ariaClose')}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- lightbox: native img op ware grootte */}
+          <img
+            src={enlargeSrc}
+            alt={centerAlt}
+            width={2558}
+            height={963}
+            className="size-full max-h-[100dvh] max-w-[100vw] object-contain object-center bg-black"
+            decoding="sync"
+            fetchPriority="high"
+          />
+        </HardwareEnlargeModal>
+      ) : null}
     </section>
   )
 }

@@ -1512,6 +1512,8 @@ export default function WinkelSitePage() {
       <WhyVysionSection />
       <ConnectedSystemHubSection
         centerImage="/images/winkel/winkel-kassa-hub.jpg"
+        centerEnlargeSrc="/images/winkel/winkel-kassa-hub-full.png"
+        centerEnlargeable
         centerAspect={2558 / 963}
         moduleLabelKeyOverrides={{ keukenSchermen: 'winkelSite.hubBarcodeScan' }}
         diagramAriaKey="winkelSite.hubDiagramAria"

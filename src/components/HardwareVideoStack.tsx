@@ -73,7 +73,7 @@ function useHardwareEnlargeLock(expanded: boolean, onClose: () => void) {
   }, [expanded, onClose])
 }
 
-function HardwareEnlargeModal({
+export function HardwareEnlargeModal({
   open,
   onClose,
   label,
