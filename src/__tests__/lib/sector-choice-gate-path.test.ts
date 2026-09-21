@@ -1,4 +1,7 @@
-import { shouldShowSectorChoiceGate } from '@/lib/sector-choice-gate-path'
+import {
+  shouldOpenSectorChoiceOnThisLoad,
+  shouldShowSectorChoiceGate,
+} from '@/lib/sector-choice-gate-path'
 import {
   branchForService,
   isLandingBranchId,
@@ -24,6 +27,71 @@ describe('shouldShowSectorChoiceGate', () => {
     expect(shouldShowSectorChoiceGate('/shop/demo', host)).toBe(false)
     expect(shouldShowSectorChoiceGate('/superadmin', host)).toBe(false)
     expect(shouldShowSectorChoiceGate('/dashboard', host)).toBe(false)
+  })
+})
+
+describe('shouldOpenSectorChoiceOnThisLoad', () => {
+  const origin = 'https://www.vysion-kassa.com'
+
+  it('opens on a full page refresh', () => {
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 'reload',
+        referrer: `${origin}/`,
+        pageOrigin: origin,
+      }),
+    ).toBe(true)
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 1,
+        referrer: `${origin}/over-ons`,
+        pageOrigin: origin,
+      }),
+    ).toBe(true)
+  })
+
+  it('does not open when navigating between pages on the same site', () => {
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 'navigate',
+        referrer: `${origin}/`,
+        pageOrigin: origin,
+      }),
+    ).toBe(false)
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 'navigate',
+        referrer: `${origin}/login`,
+        pageOrigin: origin,
+      }),
+    ).toBe(false)
+  })
+
+  it('opens on first visit (no same-site referrer)', () => {
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 'navigate',
+        referrer: '',
+        pageOrigin: origin,
+      }),
+    ).toBe(true)
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 'navigate',
+        referrer: 'https://www.google.com/',
+        pageOrigin: origin,
+      }),
+    ).toBe(true)
+  })
+
+  it('does not reopen on back/forward', () => {
+    expect(
+      shouldOpenSectorChoiceOnThisLoad({
+        navigationType: 'back_forward',
+        referrer: `${origin}/`,
+        pageOrigin: origin,
+      }),
+    ).toBe(false)
   })
 })
 

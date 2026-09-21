@@ -36,3 +36,32 @@ export function shouldShowSectorChoiceGate(pathname: string | null, hostname: st
 
   return true
 }
+
+/**
+ * Popup alleen bij échte paginalaad: eerste bezoek of refresh.
+ * Niet bij interne navigatie (zelfde origin in referrer, type navigate).
+ */
+export function shouldOpenSectorChoiceOnThisLoad(input: {
+  navigationType: string | number | undefined
+  referrer: string
+  pageOrigin: string
+}): boolean {
+  const { navigationType, referrer, pageOrigin } = input
+  if (navigationType === 'reload' || navigationType === 1) return true
+  if (navigationType === 'back_forward' || navigationType === 2) return false
+  if (!referrer) return true
+  try {
+    return new URL(referrer).origin !== pageOrigin
+  } catch {
+    return true
+  }
+}
+
+export function readPageLoadNavigationType(): string | number | undefined {
+  if (typeof performance === 'undefined') return undefined
+  const entries = performance.getEntriesByType('navigation')
+  const latest = entries[entries.length - 1] as PerformanceNavigationTiming | undefined
+  if (latest?.type) return latest.type
+  const legacy = (performance as Performance & { navigation?: { type?: number } }).navigation?.type
+  return legacy
+}
