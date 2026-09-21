@@ -6555,6 +6555,8 @@
     "heroImageAlt": "店铺用 Elo 触屏收银机",
     "videoAltKassa": "店铺收银界面",
     "videoAltVoorraad": "店铺库存界面",
+    "hubBarcodeScan": "条码\n扫描",
+    "hubDiagramAria": "示意图：一个中央系统连接收银、点餐、预订、网站、员工、库存、条码扫描、报表与经营分析",
     "usecasesTitle": "适合每家店铺",
     "modulesTitle": "店铺能用到什么",
     "hardwareTitle": "柜台硬件",

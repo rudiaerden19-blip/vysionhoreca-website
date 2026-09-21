@@ -6514,6 +6514,8 @@
     "heroImageAlt": "Elo touchscreen POS for shops",
     "videoAltKassa": "Vysion shop POS in use",
     "videoAltVoorraad": "Vysion inventory screen for shops",
+    "hubBarcodeScan": "Barcode\nscanning",
+    "hubDiagramAria": "Diagram: one central system connected to till, ordering, reservations, website, staff, stock, barcode scanning, reports and business analysis",
     "usecasesTitle": "For every shop",
     "modulesTitle": "What you get in the shop",
     "hardwareTitle": "Hardware for the counter",

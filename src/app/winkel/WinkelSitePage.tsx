@@ -1510,7 +1510,12 @@ export default function WinkelSitePage() {
       <Navigation />
       <WinkelLandingHero />
       <WhyVysionSection />
-      <ConnectedSystemHubSection />
+      <ConnectedSystemHubSection
+        centerImage="/images/winkel/winkel-kassa-hub.jpg"
+        centerAspect={2558 / 963}
+        moduleLabelKeyOverrides={{ keukenSchermen: 'winkelSite.hubBarcodeScan' }}
+        diagramAriaKey="winkelSite.hubDiagramAria"
+      />
       <GratisWebsiteBannerSection />
       <VysionBeestSection />
       <PlatformGridSection />

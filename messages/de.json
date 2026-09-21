@@ -6578,6 +6578,8 @@
     "heroImageAlt": "Elo-Touchscreen-Kasse für Läden",
     "videoAltKassa": "Vysion-Ladenkasse in Betrieb",
     "videoAltVoorraad": "Vysion-Lagerbestand für Läden",
+    "hubBarcodeScan": "Barcode\nscannen",
+    "hubDiagramAria": "Diagramm: ein zentrales System verbunden mit Kasse, Bestellen, Reservierungen, Website, Personal, Lager, Barcode scannen, Berichten und Geschäftsanalyse",
     "usecasesTitle": "Für jeden Laden",
     "modulesTitle": "Was Sie im Laden bekommen",
     "hardwareTitle": "Hardware für die Theke",

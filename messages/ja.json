@@ -6555,6 +6555,8 @@
     "heroImageAlt": "店舗向けEloタッチレジ",
     "videoAltKassa": "店舗向けVysionレジ画面",
     "videoAltVoorraad": "店舗向け在庫画面",
+    "hubBarcodeScan": "バーコード\nスキャン",
+    "hubDiagramAria": "図：レジ、注文、予約、ウェブサイト、スタッフ、在庫、バーコードスキャン、レポート、事業分析につながる1つの中核システム",
     "usecasesTitle": "あらゆるお店に",
     "modulesTitle": "お店で使える機能",
     "hardwareTitle": "カウンター向けハードウェア",

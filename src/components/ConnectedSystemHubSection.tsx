@@ -23,6 +23,16 @@ const HUB_MODULE_KEYS = [
   'bedrijfsAnalyse',
 ] as const
 
+type HubModuleKey = (typeof HUB_MODULE_KEYS)[number]
+
+export type ConnectedSystemHubSectionProps = {
+  /** Alleen `/winkel`: eigen kassa-screenshot. Horeca/retail blijven default. */
+  centerImage?: string
+  centerAspect?: number
+  moduleLabelKeyOverrides?: Partial<Record<HubModuleKey, string>>
+  diagramAriaKey?: string
+}
+
 /** Polaire layout in % van het vierkante diagram (midden = 50,50). */
 const HUB_CENTER_R = 17.5
 const HUB_NODE_R = 39.5
@@ -52,11 +62,11 @@ function tentaclePathD(angle: number) {
   return `M ${sx} ${sy} Q ${px} ${py}, ${ex} ${ey}`
 }
 
-function HubCenterPhoto({ alt, sizes }: { alt: string; sizes: string }) {
+function HubCenterPhoto({ alt, sizes, src }: { alt: string; sizes: string; src: string }) {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg bg-[#0f1419] sm:rounded-xl">
       <Image
-        src={HUB_CENTER_IMAGE}
+        src={src}
         alt={alt}
         fill
         priority
@@ -68,10 +78,18 @@ function HubCenterPhoto({ alt, sizes }: { alt: string; sizes: string }) {
   )
 }
 
-export default function ConnectedSystemHubSection() {
+export default function ConnectedSystemHubSection({
+  centerImage = HUB_CENTER_IMAGE,
+  centerAspect = HUB_CENTER_ASPECT,
+  moduleLabelKeyOverrides,
+  diagramAriaKey = 'connectedSystemHub.diagramAria',
+}: ConnectedSystemHubSectionProps = {}) {
   const { t } = useLanguage()
   const total = HUB_MODULE_KEYS.length
-  const centerAlt = `${t('connectedSystemHub.centerLabel')} — ${t('connectedSystemHub.diagramAria')}`
+  const diagramAria = t(diagramAriaKey)
+  const centerAlt = `${t('connectedSystemHub.centerLabel')} — ${diagramAria}`
+  const moduleLabel = (key: HubModuleKey) =>
+    t(moduleLabelKeyOverrides?.[key] ?? `connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
 
   return (
     <section
@@ -114,7 +132,7 @@ export default function ConnectedSystemHubSection() {
         <div
           className="relative mx-auto mt-10 hidden w-full max-w-[min(100%,760px)] md:block lg:mt-12"
           role="img"
-          aria-label={t('connectedSystemHub.diagramAria')}
+          aria-label={diagramAria}
         >
           <div className="relative aspect-square w-full pb-12">
             <div
@@ -144,7 +162,7 @@ export default function ConnectedSystemHubSection() {
                 const angle = hubAngle(i, total)
                 const dot = polarPx(HUB_NODE_R, angle)
                 const labelPos = polarPx(HUB_LABEL_R, angle)
-                const label = t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')
+                const label = moduleLabel(key)
                 return (
                   <Fragment key={key}>
                     <span
@@ -168,9 +186,9 @@ export default function ConnectedSystemHubSection() {
             <div className="absolute left-1/2 top-[48%] z-30 w-[48%] -translate-x-1/2 -translate-y-1/2">
               <div
                 className="relative w-full rounded-2xl border border-white/[0.14] bg-[#0c0f14] p-1.5 shadow-[0_0_0_1px_rgba(14,93,130,0.35),0_20px_48px_rgba(0,0,0,0.5)] ring-1 ring-accent/35"
-                style={{ aspectRatio: String(HUB_CENTER_ASPECT) }}
+                style={{ aspectRatio: String(centerAspect) }}
               >
-                <HubCenterPhoto alt={centerAlt} sizes="(min-width: 768px) 480px, 0px" />
+                <HubCenterPhoto alt={centerAlt} src={centerImage} sizes="(min-width: 768px) 480px, 0px" />
               </div>
               <p className="pointer-events-none absolute -bottom-8 left-1/2 w-max -translate-x-1/2 text-sm font-semibold tracking-[0.14em] text-white/80 sm:text-base">
                 {t('connectedSystemHub.centerLabel').toUpperCase()}
@@ -183,9 +201,9 @@ export default function ConnectedSystemHubSection() {
           <div className="relative mx-auto max-w-sm">
             <div
               className="relative mx-auto w-full max-w-[min(100%,360px)] rounded-2xl border border-white/10 bg-[#0c0f14] p-2 shadow-lg ring-1 ring-accent/35"
-              style={{ aspectRatio: String(HUB_CENTER_ASPECT) }}
+              style={{ aspectRatio: String(centerAspect) }}
             >
-              <HubCenterPhoto alt={centerAlt} sizes="360px" />
+              <HubCenterPhoto alt={centerAlt} src={centerImage} sizes="360px" />
             </div>
             <p className="mt-4 text-center text-sm font-semibold tracking-wide text-white/80">
               {t('connectedSystemHub.centerLabel')}
@@ -197,7 +215,7 @@ export default function ConnectedSystemHubSection() {
                 key={key}
                 className="rounded-xl border border-white/10 bg-[#161b22] px-3 py-3.5 text-center text-sm font-semibold leading-snug text-white/90"
               >
-                {t(`connectedSystemHub.modules.${key}`).replace(/\n/g, ' ')}
+                {moduleLabel(key)}
               </li>
             ))}
           </ul>

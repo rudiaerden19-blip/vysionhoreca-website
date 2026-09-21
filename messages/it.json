@@ -6555,6 +6555,8 @@
     "heroImageAlt": "Cassa touch Elo per negozi",
     "videoAltKassa": "Cassa negozio Vysion in uso",
     "videoAltVoorraad": "Schermata scorte Vysion per negozi",
+    "hubBarcodeScan": "Scansione\nbarcode",
+    "hubDiagramAria": "Diagramma: un sistema centrale collegato a cassa, ordini, prenotazioni, sito, personale, scorte, scansione barcode, report e analisi aziendale",
     "usecasesTitle": "Per ogni negozio",
     "modulesTitle": "Cosa hai in negozio",
     "hardwareTitle": "Hardware per il bancone",

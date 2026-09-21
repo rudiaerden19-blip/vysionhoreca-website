@@ -6578,6 +6578,8 @@
     "heroImageAlt": "Caisse tactile Elo pour magasins",
     "videoAltKassa": "Caisse magasin Vysion en usage",
     "videoAltVoorraad": "Écran de stock Vysion pour magasins",
+    "hubBarcodeScan": "Scan\ncode-barres",
+    "hubDiagramAria": "Schéma : un système central relié à la caisse, aux commandes, aux réservations, au site web, au personnel, au stock, au scan de codes-barres, aux rapports et à l'analyse d'entreprise",
     "usecasesTitle": "Pour chaque magasin",
     "modulesTitle": "Ce que vous avez en magasin",
     "hardwareTitle": "Matériel pour le comptoir",
