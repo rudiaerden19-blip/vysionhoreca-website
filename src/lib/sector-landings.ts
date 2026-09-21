@@ -349,9 +349,8 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
       'Werkt door als het internet even wegvalt; daarna synchroniseert het systeem.',
     ],
     heroImage: {
-      src: '/images/hardware/hardware-barcode-scanner.png',
-      alt: 'Barcodescanner voor een nachtwinkelkassa',
-      contain: true,
+      src: '/images/sectoren/nachtwinkel-hero.jpg',
+      alt: 'Verlichte toonbank en klanten op straat in de avond — typisch voor een nachtwinkel',
     },
     sections: [
       {
@@ -414,7 +413,7 @@ export const SECTOR_LANDINGS: Record<string, SectorLanding> = {
     hubHref: '/winkel',
     hubLabel: 'Bekijk het complete kassasysteem voor winkels & retail',
     demoHref: '/winkel#contact',
-    ogImage: '/images/hardware/hardware-tf30-kassa.png',
+    ogImage: '/images/sectoren/nachtwinkel-hero.jpg',
   },
   cafe: {
     slug: 'cafe',
