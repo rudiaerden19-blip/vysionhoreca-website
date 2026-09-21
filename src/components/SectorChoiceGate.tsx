@@ -132,30 +132,28 @@ export default function SectorChoiceGate() {
                   role="list"
                   aria-label={t(`sectorModal.columns.${column.id}.title`)}
                 >
-                  {column.itemKeys.map((itemKey) => (
-                    <button
-                      key={itemKey}
-                      type="button"
-                      onClick={() => pick(itemKey)}
-                      className="min-h-10 touch-manipulation rounded-lg px-1.5 py-2 text-center text-xs leading-snug text-gray-700 transition-colors hover:bg-accent/[0.08] hover:text-gray-900 active:bg-accent/15 sm:min-h-0 sm:px-2 sm:py-2 sm:text-sm"
-                    >
-                      {t(`sectorModal.columns.${column.id}.items.${itemKey}`)}
-                    </button>
-                  ))}
+                  {column.itemKeys.map((itemKey) => {
+                    const isOther = itemKey.startsWith('andere')
+                    return (
+                      <button
+                        key={itemKey}
+                        type="button"
+                        onClick={() => pick(itemKey)}
+                        className={`min-h-10 touch-manipulation rounded-lg px-1.5 py-2 text-center text-xs leading-snug transition-colors hover:bg-accent/[0.08] hover:text-gray-900 active:bg-accent/15 sm:min-h-0 sm:px-2 sm:py-2 sm:text-sm ${
+                          isOther
+                            ? 'col-span-2 mt-1 border-t border-gray-100 pt-2 font-medium text-gray-600 sm:col-span-1 sm:mt-2'
+                            : 'text-gray-700'
+                        }`}
+                      >
+                        {t(`sectorModal.columns.${column.id}.items.${itemKey}`)}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <p className="shrink-0 border-t border-gray-100 px-3 py-2 text-center sm:py-4">
-          <button
-            type="button"
-            onClick={() => pick('other')}
-            className="inline-flex min-h-10 items-center px-3 text-sm text-gray-500 underline-offset-2 transition-colors hover:text-gray-800 hover:underline sm:min-h-0 sm:text-[13px]"
-          >
-            {t('sectorModal.other')}
-          </button>
-        </p>
       </div>
     </div>,
     document.body,

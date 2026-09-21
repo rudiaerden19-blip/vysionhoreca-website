@@ -709,7 +709,7 @@
   },
   "sectorModal": {
     "title": "業種を選んでください",
-    "other": "Other industry / browse generally.",
+    "other": "その他",
     "columns": {
       "winkel": {
         "title": "店舗・リテール",
@@ -726,7 +726,8 @@
           "dierenwinkel": "Pet shop",
           "buurtwinkel": "Convenience store",
           "speciaalzaak": "Specialty shop",
-          "groothandel": "Wholesale"
+          "groothandel": "Wholesale",
+          "andereWinkel": "その他"
         }
       },
       "retail": {
@@ -752,7 +753,8 @@
           "broodjeszaak": "Sandwich shop",
           "takeaway": "Take-away",
           "kebab": "ケバブ",
-          "pizza": "ピザ"
+          "pizza": "ピザ",
+          "andereHoreca": "その他"
         }
       }
     }
@@ -1415,7 +1417,7 @@
       },
       "license": {
         "title": "2. ライセンス",
-        "content": "サブスクリプションを購入することにより、ビジネス運営のためにソフトウェアを使用する限定的、非独占的、譲渡不可のライセンスを受け取ります。このライセンスはサブスクリプションの終了時に終了します。"
+        "content": "月額ライセンスを契約することにより、事業運営のためにソフトウェアを使用する限定的、非独占的、譲渡不可のライセンスを受け取ります。このライセンスは月額ライセンスの終了時に終了します。"
       },
       "prohibited": {
         "title": "3. 禁止行為",
@@ -1532,7 +1534,7 @@
     "title": "利用規約",
     "lastUpdated": "最終更新：2026年9月",
     "footerBeforeLink": "追加の契約条項については、",
-    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person using the POS software\n- Agreement: the agreement for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Monthly service: €99 (or current price), cancellable monthly. There is no subscription.\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. 提供\n3.1. サブスクリプションはありません。お客様はPOSソフトウェアを利用し、毎月解約できます。\n3.2. プレミアムプランでは、初期購入費用なしでハードウェアが提供されます。\n3.3. ハードウェアは常に Vysion kassa's の所有物です。お客様はハードウェアの所有権を取得しません。\n3.4. 前払い金は不要です。\n3.5. Vysion kassa's は、データ・写真・メニューの導入に手数料を請求しません。後から商品、カテゴリ、価格、写真を変更したい場合は、ご自身で簡単に調整できます。お電話いただければ、無料でレジに反映します。\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. 定期契約はありません。お客様は月単位で停止できます。\n5.2. ハードウェアおよびソフトウェアは、追加費用なく月単位で解約できます。\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. No transfer of ownership through the subscription\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's at all times, including during a long or uninterrupted subscription.\n13.2. The subscription only grants the Customer a right to use the Hardware while the subscription is in force. There is no transfer of ownership after any period of time.\n13.3. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n13.4. Upon termination of the subscription, the Customer must return the Hardware as set out in article 6.\n\n14. Warranty and defects\n14.1. While the subscription is in force, Vysion kassa's provides the usual support for the Hardware made available, except in cases of misuse, theft or damage as set out in article 7.\n14.2. Defects due to normal wear during the subscription are repaired or replaced by agreement, according to the service terms then in force.\n14.3. Vysion kassa's may optionally offer a maintenance or service contract; this is not mandatory."
+    "body": "利用規約 – POSシステムおよびソフトウェア\n提供者: Vysion kassa's\n\n1. 定義\n- 提供者: Vysion kassa's\n- お客様: POSソフトウェアを利用する自然人または法人\n- 契約: POSソフトウェアおよび関連ハードウェアに関する契約\n- ハードウェア: レジ、キャッシュドロワー、プリンター\n- 月額ライセンス: 月額99ユーロ（または現行価格）のサービス。毎月解約可能\n\n2. 適用\n本規約は、書面で別段の合意がない限り、Vysion kassa's が提供するすべての見積、契約およびサービスに適用されます。\n\n3. 提供\n3.1. お客様は月額ライセンスによりPOSソフトウェアを利用します。\n3.2. プレミアム月額ライセンスでは、初期購入費用なしでハードウェアが提供されます。\n3.3. ハードウェアは常に Vysion kassa's の所有物です。お客様はハードウェアの所有権を取得しません。\n3.4. 前払い金は不要です。\n3.5. Vysion kassa's は、データ・写真・メニューの導入に手数料を請求しません。後から商品、カテゴリ、価格、写真を変更したい場合は、ご自身で簡単に調整できます。お電話いただければ、無料でレジに反映します。\n\n4. ハードウェアの所有と使用\n4.1. お客様はハードウェアの使用権のみを取得します。\n4.2. お客様は次のことをしてはなりません。\n- ハードウェアの売却\n- 賃貸\n- 質入れ\n- 第三者への譲渡\n- 自己使用以外の方法での利用\n4.3. お客様はハードウェアを善良な管理者の注意をもって取り扱うものとします。\n\n5. 期間と解約\n5.1. 月額ライセンスは毎月解約できます。お客様は毎月停止できます。\n5.2. ハードウェアおよびソフトウェアは追加費用なしで毎月解約できます。\n\n6. ハードウェアの返却\n6.1. 月額ライセンスの終了時、お客様は14日以内にハードウェアを Vysion kassa's へ返却しなければなりません。\n6.2. ハードウェアが返却されない場合:\n- ハードウェアの新品価格相当の損害賠償が請求されます\n- Vysion kassa's は追加費用を請求する権利を留保します\n6.3. ハードウェアは良好な状態で返却してください（通常の摩耗を除く）。\n\n7. 紛失・損害・責任\n7.1. お客様は次について全面的に責任を負います。\n- 紛失\n- 盗難\n- 破損\n7.2. これらの場合、交換価値の全額が請求されます。\n\n8. 支払い\n8.1. 月額ライセンスは月額99ユーロです（別段の記載がない限り税別）。\n8.2. 請求書は14日以内に支払うものとします。\n8.3. 支払遅延の場合:\n- サービスが停止されることがあります\n- ソフトウェアへのアクセスが遮断されることがあります\n\n9. 未払い\n9.1. 支払不履行の場合、Vysion kassa's は次の権利を留保します。\n- 月額ライセンスの即時終了\n- ハードウェアの返還請求\n9.2. 回収費用はすべてお客様の負担です。\n\n10. ソフトウェアの使用\n10.1. ソフトウェアはお客様の事業活動にのみ使用できます。\n10.2. 次の行為は禁止です。\n- ソフトウェアの複製\n- リバースエンジニアリング\n- 第三者への提供\n\n11. 不可抗力\nVysion kassa's は不可抗力（インターネット障害、停電など）による中断について責任を負いません。\n\n12. 準拠法\n本契約にはベルギー法が適用されます。\n紛争は Vysion kassa's の本店所在地を管轄する裁判所の管轄とします。\n\n13. 月額ライセンスによる所有権移転なし\n13.1. Vysion kassa's が提供するハードウェアは、長期または継続的な月額ライセンスであっても常に Vysion kassa's の所有物です。\n13.2. 月額ライセンスは、ライセンス期間中に限りハードウェアの使用権のみをお客様に与えます。一定期間後の所有権移転はありません。\n13.3. すでに支払った月額ライセンス費用は、ハードウェア購入の分割払いとはみなされず、所有権を生じさせません。\n13.4. 月額ライセンス終了時、お客様は第6条に従いハードウェアを返却しなければなりません。\n\n14. 保証と不具合\n14.1. 月額ライセンスの期間中、Vysion kassa's は提供ハードウェアの通常サポートを行います。ただし第7条の誤用、盗難、損害を除きます。\n14.2. 月額ライセンス期間中の通常摩耗による不具合は、その時点のサービス条件に従い協議のうえ修理または交換します。\n14.3. Vysion kassa's は任意の保守・サービス契約を提案できます。義務ではありません。"
   },
   "serviceAgreementPage": {
     "title": "Vysionサービス契約",
@@ -1547,8 +1549,8 @@
         "content": "Vysion kassa'sは、飲食業界向けにレジソフトウェア、オンライン注文プラットフォーム、会計ソフトウェア、および関連サービスを提供します。当社はサービスを変更、拡張、または制限する権利を留保します。"
       },
       "subscription": {
-        "title": "3. サブスクリプションと支払い",
-        "intro": "当社のサービスへのアクセスは、月額または年額のサブスクリプションを通じて利用できます。支払いは前払いで請求され、特に記載がない限り返金不可です。",
+        "title": "3. 月額ライセンスと支払い",
+        "intro": "当社サービスへのアクセスは、月額または年額ライセンスを通じて利用できます。支払いは前払いで請求され、特に記載がない限り返金不可です。",
         "items": {
           "1": "請求書は月次または年次で送付されます",
           "2": "支払い期限は請求書日付から14日です",
@@ -1569,7 +1571,7 @@
       },
       "termination": {
         "title": "7. 終了",
-        "content": "いつでもサブスクリプションをキャンセルできます。キャンセルは現在の請求期間の終了時に有効になります。当社は、これらの条件に違反した場合、契約を終了することができます。"
+        "content": "月額ライセンスはいつでも解約できます。解約は現在の請求期間の終了時に有効になります。当社は、これらの条件に違反した場合、契約を終了することができます。"
       },
       "law": {
         "title": "8. 準拠法",

@@ -115,13 +115,19 @@ describe('landing branch columns', () => {
     expect(isLandingServiceId('bakker')).toBe(true)
     expect(isLandingServiceId('groothandel')).toBe(true)
     expect(isLandingServiceId('andereRetail')).toBe(false)
+    expect(isLandingServiceId('andereWinkel')).toBe(true)
+    expect(isLandingServiceId('andereHoreca')).toBe(true)
     expect(branchForService('bakker')).toBe('winkel')
     expect(branchForService('kebab')).toBe('horeca')
     expect(branchForService('pizza')).toBe('horeca')
     expect(branchForService('boetiek')).toBe('winkel')
     expect(branchForService('groothandel')).toBe('winkel')
+    expect(branchForService('andereWinkel')).toBe('winkel')
     expect(branchForService('frituur')).toBe('horeca')
+    expect(branchForService('andereHoreca')).toBe('horeca')
     expect(branchForService('other')).toBe('other')
+    expect(landingSitePathForBranch(branchForService('andereWinkel'))).toBe('/winkel')
+    expect(landingSitePathForBranch(branchForService('andereHoreca'))).toBe('/')
   })
 
   it('routes winkel and retail to one marketing site', () => {
@@ -154,10 +160,12 @@ describe('landing branch columns', () => {
   it('has Dutch copy for the two columns and the other link', () => {
     const modal = (nl as { sectorModal: { title: string; other: string; columns: Record<string, { title: string; items: Record<string, string> }> } }).sectorModal
     expect(modal.title).toBe('Kies jouw branche')
-    expect(modal.other).toBe('Andere branche / algemeen bekijken.')
+    expect(modal.other).toBe('Andere')
     expect(modal.columns.winkel.title).toBe('WINKEL & RETAIL')
     expect(modal.columns.winkel.items.bakker).toBe('Bakker')
     expect(modal.columns.winkel.items.groothandel).toBe('Groothandel')
+    expect(modal.columns.winkel.items.andereWinkel).toBe('Andere')
+    expect(modal.columns.horeca.items.andereHoreca).toBe('Andere')
     const sites = (nl as { heroLanding: { sites: Record<string, { title: string }> } }).heroLanding.sites
     expect(sites.winkel.title).toBe('Kassa & platform voor uw winkel')
     const winkelSite = (nl as { winkelSite: { title: string } }).winkelSite

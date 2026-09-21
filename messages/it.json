@@ -709,7 +709,7 @@
   },
   "sectorModal": {
     "title": "Scegli il tuo settore",
-    "other": "Altro settore / vedi in generale.",
+    "other": "Altro",
     "columns": {
       "winkel": {
         "title": "NEGOZIO & RETAIL",
@@ -726,7 +726,8 @@
           "dierenwinkel": "Negozio per animali",
           "buurtwinkel": "Negozio di quartiere",
           "speciaalzaak": "Negozio specializzato",
-          "groothandel": "Ingrosso"
+          "groothandel": "Ingrosso",
+          "andereWinkel": "Altro"
         }
       },
       "retail": {
@@ -752,7 +753,8 @@
           "broodjeszaak": "Paninoteca",
           "takeaway": "Asporto",
           "kebab": "Kebab",
-          "pizza": "Pizza"
+          "pizza": "Pizza",
+          "andereHoreca": "Altro"
         }
       }
     }
@@ -1415,7 +1417,7 @@
       },
       "license": {
         "title": "2. Licenza",
-        "content": "Sottoscrivendo un abbonamento, ricevi una licenza limitata, non esclusiva e non trasferibile per utilizzare il software per le tue operazioni aziendali. Questa licenza termina alla cessazione dell'abbonamento."
+        "content": "Concludendo una licenza mensile, ricevi una licenza limitata, non esclusiva e non trasferibile per usare il software nella tua attività. Questa licenza cessa alla fine della licenza mensile."
       },
       "prohibited": {
         "title": "3. Azioni Vietate",
@@ -1532,7 +1534,7 @@
     "title": "Termini e condizioni generali",
     "lastUpdated": "Ultimo aggiornamento: settembre 2026",
     "footerBeforeLink": "Le ulteriori disposizioni contrattuali sono disponibili nei",
-    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person using the POS software\n- Agreement: the agreement for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Monthly service: €99 (or current price), cancellable monthly. There is no subscription.\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. Consegna\n3.1. Non c'è abbonamento. Il Cliente usa il software di cassa e può interrompere ogni mese.\n3.2. Con una formula premium, l'hardware è messo a disposizione senza costo di acquisto iniziale.\n3.3. L'hardware resta in ogni momento di proprietà di Vysion kassa's. Il Cliente non acquisisce alcun diritto di proprietà sull'hardware.\n3.4. Non sono dovuti acconti.\n3.5. Vysion kassa's non chiede alcun compenso per l’installazione dei dati, delle foto e del menu. Se in seguito vuole modificare prodotti, categorie, prezzi e/o foto, può farlo facilmente da solo, oppure ci chiama e lo inseriamo gratis in cassa.\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. Non c'è un abbonamento. Il Cliente può interrompere mensilmente.\n5.2. Hardware e software possono essere disdetti mensilmente senza costi aggiuntivi.\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. No transfer of ownership through the subscription\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's at all times, including during a long or uninterrupted subscription.\n13.2. The subscription only grants the Customer a right to use the Hardware while the subscription is in force. There is no transfer of ownership after any period of time.\n13.3. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n13.4. Upon termination of the subscription, the Customer must return the Hardware as set out in article 6.\n\n14. Warranty and defects\n14.1. While the subscription is in force, Vysion kassa's provides the usual support for the Hardware made available, except in cases of misuse, theft or damage as set out in article 7.\n14.2. Defects due to normal wear during the subscription are repaired or replaced by agreement, according to the service terms then in force.\n14.3. Vysion kassa's may optionally offer a maintenance or service contract; this is not mandatory."
+    "body": "CONDIZIONI GENERALI – SISTEMA DI CASSA E SOFTWARE\nFornitore: Vysion kassa's\n\n1. Definizioni\n- Fornitore: Vysion kassa's\n- Cliente: la persona fisica o giuridica che usa il software di cassa\n- Contratto: il contratto per software di cassa e hardware correlato\n- Hardware: cassa, cassetto portamonete e stampante\n- Licenza mensile: servizio mensile di 99 € (o prezzo in vigore), disdicibile ogni mese\n\n2. Applicabilità\nLe presenti condizioni generali si applicano a tutte le offerte, i contratti e i servizi di Vysion kassa's, salvo diverso accordo scritto.\n\n3. Consegna\n3.1. Il Cliente usa il software di cassa tramite una licenza mensile.\n3.2. Con una licenza mensile premium, l’hardware è messo a disposizione senza costo di acquisto iniziale.\n3.3. L’hardware resta in ogni momento di proprietà di Vysion kassa's. Il Cliente non acquisisce alcun diritto di proprietà sull’hardware.\n3.4. Non sono dovuti acconti.\n3.5. Vysion kassa's non chiede alcun compenso per l’installazione dei dati, delle foto e del menu. Se in seguito vuole modificare prodotti, categorie, prezzi e/o foto, può farlo facilmente da solo, oppure ci chiama e lo inseriamo gratis in cassa.\n\n4. Proprietà e uso dell’hardware\n4.1. Il Cliente ottiene solo un diritto d’uso dell’hardware.\n4.2. Al Cliente non è consentito:\n- vendere l’hardware\n- affittarlo\n- darlo in pegno\n- cederlo a terzi\n- o sfruttarlo al di fuori del proprio uso\n4.3. Il Cliente deve trattare l’hardware con la diligenza del buon padre di famiglia.\n\n5. Durata e disdetta\n5.1. La licenza mensile è disdicibile ogni mese. Il Cliente può interrompere ogni mese.\n5.2. Hardware e software sono disdicibili ogni mese senza costi aggiuntivi.\n\n6. Restituzione dell’hardware\n6.1. Alla cessazione della licenza mensile, il Cliente è tenuto a restituire l’hardware a Vysion kassa's entro 14 giorni.\n6.2. Se l’hardware non viene restituito:\n- viene addebitato un risarcimento pari al prezzo di nuovo dell’hardware\n- Vysion kassa's si riserva di chiedere costi aggiuntivi\n6.3. L’hardware deve essere restituito in buono stato (salvo usura normale).\n\n7. Perdita, danni e responsabilità\n7.1. Il Cliente è pienamente responsabile per:\n- perdita\n- furto\n- danneggiamento\n7.2. In questi casi viene addebitato l’intero valore di sostituzione.\n\n8. Pagamento\n8.1. La licenza mensile ammonta a 99 € al mese (IVA esclusa salvo diversa indicazione).\n8.2. Le fatture vanno pagate entro 14 giorni.\n8.3. In caso di pagamento tardivo:\n- il servizio può essere sospeso\n- l’accesso al software può essere bloccato\n\n9. Mancato pagamento\n9.1. In caso di inadempimento, Vysion kassa's si riserva il diritto di:\n- cessare immediatamente la licenza mensile\n- rivendicare l’hardware\n9.2. Tutti i costi di recupero sono a carico del Cliente.\n\n10. Uso del software\n10.1. Il software può essere usato solo per l’attività del Cliente.\n10.2. È vietato:\n- copiare il software\n- fare reverse engineering\n- o cederlo a terzi\n\n11. Forza maggiore\nVysion kassa's non è responsabile per interruzioni da forza maggiore (problemi di internet, blackout, ecc.).\n\n12. Diritto applicabile\nAl presente contratto si applica il diritto belga.\nLe controversie spettano al tribunale competente della sede di Vysion kassa's.\n\n13. Nessun trasferimento di proprietà tramite la licenza mensile\n13.1. L’hardware messo a disposizione da Vysion kassa's resta in ogni momento di proprietà di Vysion kassa's, anche in caso di licenza mensile lunga o ininterrotta.\n13.2. La licenza mensile conferisce al Cliente solo un diritto d’uso dell’hardware finché la licenza mensile è in corso. Non c’è trasferimento di proprietà dopo un periodo determinato.\n13.3. I costi già pagati della licenza mensile non sono in alcun caso considerati rate per l’acquisto dell’hardware e non conferiscono alcun diritto di proprietà.\n13.4. Alla cessazione della licenza mensile, il Cliente è tenuto a restituire l’hardware, come previsto all’articolo 6.\n\n14. Garanzia e difetti\n14.1. Finché la licenza mensile è in corso, Vysion kassa's fornisce il supporto usuale per l’hardware messo a disposizione, salvo abuso, furto o danni di cui all’articolo 7.\n14.2. I difetti da usura normale durante la licenza mensile sono riparati o sostituiti di comune accordo secondo le condizioni di servizio allora vigenti.\n14.3. Vysion kassa's può offrire facoltativamente un contratto di manutenzione o assistenza; non è obbligatorio."
   },
   "serviceAgreementPage": {
     "title": "Accordo sui Servizi Vysion",
@@ -1547,8 +1549,8 @@
         "content": "Vysion kassa's offre software di cassa, piattaforma ordini online, software di contabilità e servizi correlati per il settore della ristorazione. Ci riserviamo il diritto di modificare, espandere o limitare i nostri servizi."
       },
       "subscription": {
-        "title": "3. Abbonamento e Pagamento",
-        "intro": "L'accesso ai nostri servizi è disponibile tramite abbonamento mensile o annuale. I pagamenti sono fatturati in anticipo e non sono rimborsabili, salvo diversa indicazione.",
+        "title": "3. Licenza mensile e pagamento",
+        "intro": "L’accesso ai nostri servizi è disponibile tramite una licenza mensile o annuale. I pagamenti sono fatturati in anticipo e non sono rimborsabili, salvo diversa indicazione.",
         "items": {
           "1": "Le fatture vengono inviate mensilmente o annualmente",
           "2": "Il termine di pagamento è di 14 giorni dalla data della fattura",
@@ -1569,7 +1571,7 @@
       },
       "termination": {
         "title": "7. Terminazione",
-        "content": "Puoi annullare il tuo abbonamento in qualsiasi momento. L'annullamento entra in vigore alla fine del periodo di fatturazione corrente. Possiamo terminare l'accordo in caso di violazione di questi termini."
+        "content": "Puoi disdire la licenza mensile in qualsiasi momento. La disdetta entra in vigore alla fine del periodo di fatturazione corrente. Possiamo cessare il contratto in caso di violazione di queste condizioni."
       },
       "law": {
         "title": "8. Legge Applicabile",

@@ -25,6 +25,7 @@ export const LANDING_BRANCH_COLUMNS: Array<{
       'buurtwinkel',
       'speciaalzaak',
       'groothandel',
+      'andereWinkel',
     ],
   },
   {
@@ -40,6 +41,7 @@ export const LANDING_BRANCH_COLUMNS: Array<{
       'takeaway',
       'kebab',
       'pizza',
+      'andereHoreca',
     ],
   },
 ]

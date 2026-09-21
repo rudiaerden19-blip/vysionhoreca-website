@@ -709,7 +709,7 @@
   },
   "sectorModal": {
     "title": "اختر قطاعك",
-    "other": "Other industry / browse generally.",
+    "other": "أخرى",
     "columns": {
       "winkel": {
         "title": "متجر وتجزئة",
@@ -726,7 +726,8 @@
           "dierenwinkel": "Pet shop",
           "buurtwinkel": "Convenience store",
           "speciaalzaak": "Specialty shop",
-          "groothandel": "Wholesale"
+          "groothandel": "Wholesale",
+          "andereWinkel": "أخرى"
         }
       },
       "retail": {
@@ -752,7 +753,8 @@
           "broodjeszaak": "Sandwich shop",
           "takeaway": "Take-away",
           "kebab": "كباب",
-          "pizza": "بيتزا"
+          "pizza": "بيتزا",
+          "andereHoreca": "أخرى"
         }
       }
     }
@@ -1415,7 +1417,7 @@
       },
       "license": {
         "title": "2. الترخيص",
-        "content": "بالاشتراك، تحصل على ترخيص محدود وغير حصري وغير قابل للتحويل لاستخدام البرنامج لعملياتك التجارية. ينتهي هذا الترخيص عند إنهاء الاشتراك."
+        "content": "بإبرام رخصة شهرية تحصل على ترخيص محدود وغير حصري وغير قابل للتحويل لاستخدام البرنامج لعملياتك التجارية. ينتهي هذا الترخيص عند إنهاء الرخصة الشهرية."
       },
       "prohibited": {
         "title": "3. الإجراءات المحظورة",
@@ -1532,7 +1534,7 @@
     "title": "الشروط والأحكام العامة",
     "lastUpdated": "آخر تحديث: سبتمبر 2026",
     "footerBeforeLink": "الأحكام التعاقدية الإضافية متوفرة في",
-    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person using the POS software\n- Agreement: the agreement for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Monthly service: €99 (or current price), cancellable monthly. There is no subscription.\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. التسليم\n3.1. لا يوجد اشتراك. يستخدم العميل برنامج الصندوق ويمكنه التوقف شهريًا.\n3.2. في الباقة المميزة تُوفَّر الأجهزة دون تكلفة شراء أولية.\n3.3. تبقى الأجهزة ملكًا لـ Vysion kassa's في جميع الأوقات. لا يكتسب العميل أي حق ملكية على الأجهزة.\n3.4. لا توجد دفعات مقدمة مستحقة.\n3.5. لا تطلب Vysion kassa's أي رسوم مقابل تثبيت بياناتكم وصوركم وقائمتكم. إذا رغبتم لاحقًا في تغيير المنتجات أو الفئات أو الأسعار و/أو الصور، يمكنكم تعديل ذلك بسهولة بأنفسكم، أو تتصلون بنا ونضعه مجانًا في الصندوق.\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. لا يوجد اشتراك. يمكن للعميل التوقف شهريًا.\n5.2. يمكن إلغاء اشتراك الأجهزة والبرمجيات شهريًا دون رسوم إضافية.\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. No transfer of ownership through the subscription\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's at all times, including during a long or uninterrupted subscription.\n13.2. The subscription only grants the Customer a right to use the Hardware while the subscription is in force. There is no transfer of ownership after any period of time.\n13.3. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n13.4. Upon termination of the subscription, the Customer must return the Hardware as set out in article 6.\n\n14. Warranty and defects\n14.1. While the subscription is in force, Vysion kassa's provides the usual support for the Hardware made available, except in cases of misuse, theft or damage as set out in article 7.\n14.2. Defects due to normal wear during the subscription are repaired or replaced by agreement, according to the service terms then in force.\n14.3. Vysion kassa's may optionally offer a maintenance or service contract; this is not mandatory."
+    "body": "الشروط العامة – نظام الصندوق والبرمجيات\nالمورّد: Vysion kassa's\n\n1. التعاريف\n- المورّد: Vysion kassa's\n- العميل: الشخص الطبيعي أو الاعتباري الذي يستخدم برنامج الصندوق\n- العقد: العقد الخاص ببرنامج الصندوق والأجهزة المرتبطة\n- الأجهزة: الصندوق ودرج النقود والطابعة\n- الرخصة الشهرية: خدمة شهرية بقيمة 99 يورو (أو السعر الحالي)، قابلة للإلغاء شهريًا\n\n2. النطاق\nتسري هذه الشروط العامة على جميع العروض والعقود والخدمات المقدمة من Vysion kassa's، ما لم يُتفق كتابةً على خلاف ذلك.\n\n3. التسليم\n3.1. يستخدم العميل برنامج الصندوق بموجب رخصة شهرية.\n3.2. في الرخصة الشهرية المميزة تُوفَّر الأجهزة دون تكلفة شراء أولية.\n3.3. تبقى الأجهزة ملكًا لـ Vysion kassa's في جميع الأوقات. لا يكتسب العميل أي حق ملكية على الأجهزة.\n3.4. لا توجد دفعات مقدمة مستحقة.\n3.5. لا تطلب Vysion kassa's أي رسوم مقابل تثبيت بياناتكم وصوركم وقائمتكم. إذا رغبتم لاحقًا في تغيير المنتجات أو الفئات أو الأسعار و/أو الصور، يمكنكم تعديل ذلك بسهولة بأنفسكم، أو تتصلون بنا ونضعه مجانًا في الصندوق.\n\n4. ملكية الأجهزة واستخدامها\n4.1. يحصل العميل على حق استخدام الأجهزة فقط.\n4.2. لا يُسمح للعميل بـ:\n- بيع الأجهزة\n- تأجيرها\n- رهنها\n- نقلها إلى أطراف ثالثة\n- أو استغلالها خارج الاستخدام الخاص\n4.3. يجب على العميل التعامل مع الأجهزة بعناية رب الأسرة الحريص.\n\n5. المدة والإلغاء\n5.1. الرخصة الشهرية قابلة للإلغاء شهريًا. يمكن للعميل التوقف شهريًا.\n5.2. يمكن إلغاء الأجهزة والبرمجيات شهريًا دون تكاليف إضافية.\n\n6. إعادة الأجهزة\n6.1. عند إنهاء الرخصة الشهرية يلتزم العميل بإعادة الأجهزة إلى Vysion kassa's خلال 14 يومًا.\n6.2. إذا لم تُعاد الأجهزة:\n- تُحتسب تعويضات تعادل سعر الأجهزة الجديد\n- تحتفظ Vysion kassa's بحق المطالبة بتكاليف إضافية\n6.3. يجب إعادة الأجهزة بحالة جيدة (مع استثناء التآكل العادي).\n\n7. الفقدان والضرر والمسؤولية\n7.1. العميل مسؤول بالكامل عن:\n- الفقدان\n- السرقة\n- التلف\n7.2. في هذه الحالات تُحتسب قيمة الاستبدال الكاملة.\n\n8. الدفع\n8.1. تبلغ الرخصة الشهرية 99 يورو شهريًا (غير شامل ضريبة القيمة المضافة ما لم يُذكر خلاف ذلك).\n8.2. يجب دفع الفواتير خلال 14 يومًا.\n8.3. عند التأخر في الدفع:\n- يمكن تعليق الخدمة\n- يمكن حظر الوصول إلى البرنامج\n\n9. عدم الدفع\n9.1. عند التخلف عن الدفع تحتفظ Vysion kassa's بحق:\n- إنهاء الرخصة الشهرية فورًا\n- استرداد الأجهزة\n9.2. جميع تكاليف التحصيل على عاتق العميل.\n\n10. استخدام البرنامج\n10.1. لا يجوز استخدام البرنامج إلا لأنشطة العميل التجارية.\n10.2. يُحظر:\n- نسخ البرنامج\n- إجراء الهندسة العكسية\n- أو تمريره إلى أطراف ثالثة\n\n11. القوة القاهرة\nVysion kassa's غير مسؤولة عن الانقطاعات بسبب القوة القاهرة (مثل مشاكل الإنترنت أو انقطاع الكهرباء وغيرها).\n\n12. القانون الواجب التطبيق\nيخضع هذا العقد للقانون البلجيكي.\nتختص محكمة مقر Vysion kassa's بالنزاعات.\n\n13. لا نقل ملكية عبر الرخصة الشهرية\n13.1. تبقى الأجهزة التي توفرها Vysion kassa's ملكًا لها في جميع الأوقات، بما في ذلك أثناء رخصة شهرية طويلة أو غير منقطعة.\n13.2. تمنح الرخصة الشهرية العميل حق استخدام الأجهزة فقط طالما الرخصة الشهرية سارية. لا يوجد نقل ملكية بعد مدة معينة.\n13.3. المبالغ المدفوعة مسبقًا للرخصة الشهرية لا تُعد بأي حال أقساطًا لشراء الأجهزة ولا تمنح أي حق ملكية.\n13.4. عند إنهاء الرخصة الشهرية يلتزم العميل بإعادة الأجهزة كما هو محدد في المادة 6.\n\n14. الضمان والعيوب\n14.1. طالما الرخصة الشهرية سارية، تقدم Vysion kassa's الدعم المعتاد للأجهزة المقدمة، باستثناء سوء الاستخدام أو السرقة أو الضرر كما في المادة 7.\n14.2. العيوب الناتجة عن التآكل العادي أثناء الرخصة الشهرية تُصلح أو تُستبدل بالاتفاق وفق شروط الخدمة السارية آنذاك.\n14.3. يمكن لـ Vysion kassa's عرض عقد صيانة أو خدمة اختياري؛ وهذا غير إلزامي."
   },
   "serviceAgreementPage": {
     "title": "اتفاقية خدمة Vysion",
@@ -1547,8 +1549,8 @@
         "content": "يقدم Vysion kassa's برنامج كاشير ومنصة طلبات أونلاين وبرنامج محاسبة وخدمات ذات صلة لقطاع المطاعم. نحتفظ بالحق في تعديل أو توسيع أو تقييد خدماتنا."
       },
       "subscription": {
-        "title": "3. الاشتراك والدفع",
-        "intro": "الوصول إلى خدماتنا متاح من خلال اشتراك شهري أو سنوي. المدفوعات تُفوتر مقدماً وغير قابلة للاسترداد، ما لم يُذكر خلاف ذلك.",
+        "title": "3. الرخصة الشهرية والدفع",
+        "intro": "الوصول إلى خدماتنا متاح عبر رخصة شهرية أو سنوية. المدفوعات تُفوتر مقدمًا وغير قابلة للاسترداد، ما لم يُذكر خلاف ذلك.",
         "items": {
           "1": "تُرسل الفواتير شهرياً أو سنوياً",
           "2": "مهلة الدفع 14 يوماً من تاريخ الفاتورة",
@@ -1569,7 +1571,7 @@
       },
       "termination": {
         "title": "7. الإنهاء",
-        "content": "يمكنك إلغاء اشتراكك في أي وقت. يسري الإلغاء في نهاية فترة الفوترة الحالية. يمكننا إنهاء الاتفاقية في حالة انتهاك هذه الشروط."
+        "content": "يمكنك إلغاء الرخصة الشهرية في أي وقت. يسري الإلغاء في نهاية فترة الفوترة الحالية. يمكننا إنهاء الاتفاقية في حالة انتهاك هذه الشروط."
       },
       "law": {
         "title": "8. القانون المعمول به",

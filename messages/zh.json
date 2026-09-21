@@ -709,7 +709,7 @@
   },
   "sectorModal": {
     "title": "选择您的行业",
-    "other": "Other industry / browse generally.",
+    "other": "其他",
     "columns": {
       "winkel": {
         "title": "商店与零售",
@@ -726,7 +726,8 @@
           "dierenwinkel": "Pet shop",
           "buurtwinkel": "Convenience store",
           "speciaalzaak": "Specialty shop",
-          "groothandel": "Wholesale"
+          "groothandel": "Wholesale",
+          "andereWinkel": "其他"
         }
       },
       "retail": {
@@ -752,7 +753,8 @@
           "broodjeszaak": "Sandwich shop",
           "takeaway": "Take-away",
           "kebab": "烤肉卷饼",
-          "pizza": "披萨"
+          "pizza": "披萨",
+          "andereHoreca": "其他"
         }
       }
     }
@@ -1415,7 +1417,7 @@
       },
       "license": {
         "title": "2. 许可",
-        "content": "通过订阅，您将获得有限的、非排他性的、不可转让的许可，以将软件用于您的业务运营。此许可在订阅终止时结束。"
+        "content": "签订月度许可后，您将获得有限的、非排他性的、不可转让的许可，以将软件用于您的业务运营。此许可在月度许可终止时结束。"
       },
       "prohibited": {
         "title": "3. 禁止行为",
@@ -1532,7 +1534,7 @@
     "title": "一般条款与条件",
     "lastUpdated": "最近更新：2026年9月",
     "footerBeforeLink": "更多合同约定请见",
-    "body": "GENERAL TERMS AND CONDITIONS – POS SYSTEM & SOFTWARE\nSupplier: Vysion kassa's\n\n1. Definitions\n- Supplier: Vysion kassa's\n- Customer: the natural or legal person using the POS software\n- Agreement: the agreement for POS software and related hardware\n- Hardware: POS terminal, cash drawer and printer\n- Monthly service: €99 (or current price), cancellable monthly. There is no subscription.\n\n2. Applicability\nThese general terms and conditions apply to all quotations, agreements and services provided by Vysion kassa's, unless otherwise agreed in writing.\n\n3. 交付\n3.1. 无订阅。客户使用收银软件，并可按月停止。\n3.2. 高级方案下，硬件无偿提供，无初始购买费用。\n3.3. 硬件始终归 Vysion kassa's 所有。客户不因此获得硬件所有权。\n3.4. 无需支付任何预付款。\n3.5. Vysion kassa's 不收取安装您的数据、照片和菜单的费用。若之后要更改商品、分类、价格和/或照片，您可以自行轻松修改，也可致电我们，我们免费帮您录入收银系统。\n\n4. Ownership and use of hardware\n4.1. The Customer only acquires a right of use of the Hardware.\n4.2. The Customer is not permitted to:\n- sell the Hardware\n- rent it out\n- pledge it\n- transfer it to third parties\n- or exploit it in any way outside own use\n4.3. The Customer must handle the Hardware with reasonable care.\n\n5. Duration and termination\n5.1. 没有固定订阅。客户可按月停止。\n5.2. 硬件与软件可按月解约，不收取额外费用。\n\n6. Return of hardware\n6.1. Upon termination of the subscription, the Customer must return the Hardware to Vysion kassa's within 14 days.\n6.2. If the Hardware is not returned:\n- damages equal to the new purchase price of the Hardware will be charged\n- Vysion kassa's reserves the right to claim additional costs\n6.3. The Hardware must be returned in good condition (normal wear and tear excepted).\n\n7. Loss, damage and liability\n7.1. The Customer is fully liable for:\n- loss\n- theft\n- damage\n7.2. In these cases, the full replacement value will be charged.\n\n8. Payment\n8.1. The subscription fee is €99 per month (excl. VAT unless stated otherwise).\n8.2. Invoices must be paid within 14 days.\n8.3. In case of late payment:\n- the service may be suspended\n- access to the software may be blocked\n\n9. Non-payment\n9.1. In case of default, Vysion kassa's reserves the right to:\n- terminate the subscription immediately\n- reclaim the Hardware\n9.2. All collection costs are borne by the Customer.\n\n10. Use of software\n10.1. The software may only be used for the Customer's business activities.\n10.2. It is prohibited to:\n- copy the software\n- reverse engineer it\n- or pass it on to third parties\n\n11. Force majeure\nVysion kassa's is not liable for disruptions due to force majeure (such as internet issues, power outages, etc.).\n\n12. Applicable law\nBelgian law applies to this agreement.\nDisputes fall under the competent court of Vysion kassa's's registered office.\n\n13. No transfer of ownership through the subscription\n13.1. The Hardware made available by Vysion kassa's remains the property of Vysion kassa's at all times, including during a long or uninterrupted subscription.\n13.2. The subscription only grants the Customer a right to use the Hardware while the subscription is in force. There is no transfer of ownership after any period of time.\n13.3. Subscription fees already paid are in no case deemed instalments towards purchase of the Hardware and confer no right of ownership.\n13.4. Upon termination of the subscription, the Customer must return the Hardware as set out in article 6.\n\n14. Warranty and defects\n14.1. While the subscription is in force, Vysion kassa's provides the usual support for the Hardware made available, except in cases of misuse, theft or damage as set out in article 7.\n14.2. Defects due to normal wear during the subscription are repaired or replaced by agreement, according to the service terms then in force.\n14.3. Vysion kassa's may optionally offer a maintenance or service contract; this is not mandatory."
+    "body": "一般条款 – 收银系统与软件\n供应商：Vysion kassa's\n\n1. 定义\n- 供应商：Vysion kassa's\n- 客户：使用收银软件的自然人或法人\n- 合同：收银软件及相关硬件的合同\n- 硬件：收银机、钱箱和打印机\n- 月度许可：每月 99 欧元（或现行价格）的服务，可按月取消\n\n2. 适用范围\n除非另有书面约定，本一般条款适用于 Vysion kassa's 提供的所有报价、合同和服务。\n\n3. 交付\n3.1. 客户通过月度许可使用收银软件。\n3.2. 高级月度许可下，硬件无偿提供，无初始购买费用。\n3.3. 硬件始终归 Vysion kassa's 所有。客户不因此获得硬件所有权。\n3.4. 无需支付任何预付款。\n3.5. Vysion kassa's 不收取安装您的数据、照片和菜单的费用。若之后要更改商品、分类、价格和/或照片，您可以自行轻松修改，也可致电我们，我们免费帮您录入收银系统。\n\n4. 硬件所有权与使用\n4.1. 客户仅获得硬件使用权。\n4.2. 客户不得：\n- 出售硬件\n- 出租\n- 抵押\n- 转让给第三方\n- 或以任何超出自用的方式利用\n4.3. 客户应以善良管理人的注意对待硬件。\n\n5. 期限与取消\n5.1. 月度许可可按月取消。客户可按月停止。\n5.2. 硬件和软件可按月取消，无额外费用。\n\n6. 硬件退还\n6.1. 月度许可终止时，客户须在 14 天内将硬件退还给 Vysion kassa's。\n6.2. 若未退还硬件：\n- 将按硬件新品价格收取赔偿\n- Vysion kassa's 保留追讨额外费用的权利\n6.3. 硬件须以良好状态退还（正常磨损除外）。\n\n7. 丢失、损坏与责任\n7.1. 客户对以下情况负全部责任：\n- 丢失\n- 盗窃\n- 损坏\n7.2. 在这些情况下将收取全部重置价值。\n\n8. 付款\n8.1. 月度许可为每月 99 欧元（除非另有说明，不含增值税）。\n8.2. 发票须在 14 天内支付。\n8.3. 逾期付款时：\n- 可暂停服务\n- 可封锁软件访问\n\n9. 未付款\n9.1. 拖欠付款时，Vysion kassa's 保留以下权利：\n- 立即终止月度许可\n- 收回硬件\n9.2. 所有催收费用由客户承担。\n\n10. 软件使用\n10.1. 软件仅可用于客户的经营活动。\n10.2. 禁止：\n- 复制软件\n- 进行逆向工程\n- 或转给第三方\n\n11. 不可抗力\nVysion kassa's 不对因不可抗力（如网络故障、停电等）造成的中断承担责任。\n\n12. 适用法律\n本协议适用比利时法律。\n争议由 Vysion kassa's 住所地有管辖权的法院管辖。\n\n13. 月度许可不导致所有权转移\n13.1. Vysion kassa's 提供的硬件始终归其所有，即使月度许可长期或不间断。\n13.2. 月度许可仅在许可有效期内授予客户硬件使用权。经过一定期限后也不会发生所有权转移。\n13.3. 已支付的月度许可费用在任何情况下均不视为购买硬件的分期付款，亦不产生任何所有权。\n13.4. 月度许可终止时，客户须按第 6 条退还硬件。\n\n14. 保修与缺陷\n14.1. 月度许可有效期间，Vysion kassa's 对所提供硬件提供常规支持，但第 7 条规定的滥用、盗窃或损坏除外。\n14.2. 月度许可期间因正常磨损产生的缺陷，将根据当时适用的服务条款协商修理或更换。\n14.3. Vysion kassa's 可选择提供维护或服务合同；非强制。"
   },
   "serviceAgreementPage": {
     "title": "Vysion服务协议",
@@ -1547,8 +1549,8 @@
         "content": "Vysion kassa's为餐饮行业提供收银软件、在线订单平台、会计软件和相关服务。我们保留修改、扩展或限制我们服务的权利。"
       },
       "subscription": {
-        "title": "3. 订阅和付款",
-        "intro": "我们的服务通过月度或年度订阅提供。付款预先计费，除非另有说明，否则不可退款。",
+        "title": "3. 月度许可与付款",
+        "intro": "我们的服务通过月度或年度许可提供。付款预先计费，除非另有说明，否则不可退款。",
         "items": {
           "1": "发票按月或按年发送",
           "2": "付款期限为发票日期后14天",
@@ -1569,7 +1571,7 @@
       },
       "termination": {
         "title": "7. 终止",
-        "content": "您可以随时取消订阅。取消在当前计费周期结束时生效。如违反这些条款，我们可以终止协议。"
+        "content": "您可以随时取消月度许可。取消在当前计费周期结束时生效。如违反这些条款，我们可以终止协议。"
       },
       "law": {
         "title": "8. 适用法律",
