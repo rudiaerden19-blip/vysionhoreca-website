@@ -205,6 +205,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [opening, setOpening] = useState('')
+  const [openingConfirmed, setOpeningConfirmed] = useState(false)
   const [showMove, setShowMove] = useState(false)
   const [editingMove, setEditingMove] = useState('')
   const [moveType, setMoveType] = useState<CashbookMovementType>('cash_in')
@@ -236,9 +237,10 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     if (loadedDate.current !== view.date) {
       setCounted('')
       setCloseNote('')
+      setOpening('')
+      setOpeningConfirmed(false)
     }
     loadedDate.current = view.date
-    setOpening(view.status === 'open' ? (view.openingCents / 100).toFixed(2) : '')
     setLoading(false)
   }, [tenant])
 
@@ -290,7 +292,13 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     }
     await loadDay(date)
     historySpans.current = []
+    if (body.action === 'opening') {
+      setOpeningConfirmed(true)
+      setOpening(Number(body.openingEuros).toFixed(2))
+    }
     if (body.action === 'close') {
+      setOpening('')
+      setOpeningConfirmed(false)
       setHistory((rows) => rows.map((row) => row.date === date ? { ...row, status: 'closed' } : row))
     }
     return true
@@ -682,8 +690,8 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 </label>
                 <button
                   type="button"
-                  disabled={busy || (day.status !== 'open' && !closed && opening.trim() === '')}
-                  className={`px-4 py-2 rounded-xl text-white text-sm disabled:opacity-100 ${day.status === 'open' ? 'bg-green-600' : 'bg-accent hover:bg-accent/90'}`}
+                  disabled={busy || (!openingConfirmed && opening.trim() === '')}
+                  className={`px-4 py-2 rounded-xl text-white text-sm disabled:opacity-100 ${openingConfirmed ? 'bg-green-600' : 'bg-accent hover:bg-accent/90'}`}
                   onClick={() => {
                     if (closed) {
                       setError('Deze dag is afgesloten. Kies een andere dag.')
@@ -693,7 +701,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     void post({ action: 'opening', openingEuros: Number(opening) })
                   }}
                 >
-                  {day.status === 'open' ? 'Bedrag in kas' : 'Beginsaldo bevestigen'}
+                  {openingConfirmed ? 'Bedrag in kas' : 'Beginsaldo bevestigen'}
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-y-2 text-sm">
