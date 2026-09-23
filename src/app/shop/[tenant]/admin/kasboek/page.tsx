@@ -103,7 +103,7 @@ function euro(cents: number | null | undefined) {
   const n = Number(cents) || 0
   const sign = n < 0 ? '-' : ''
   const abs = Math.abs(n)
-  return `${sign}€ ${Math.floor(abs / 100)},${String(abs % 100).padStart(2, '0')}`
+  return `${sign}€${Math.floor(abs / 100)},${String(abs % 100).padStart(2, '0')}`
 }
 
 function labelOf(type: string) {
@@ -573,15 +573,15 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 ) : history.filter(historyRowVisible).map((row) => (
                   <tr key={row.date} className="border-t cursor-pointer hover:bg-gray-50" onClick={() => { setTab('day'); void loadDay(row.date) }}>
                     <td className="px-3 py-2">{showDate(row.date)}</td>
-                    <td className="px-3 py-2">{euro(row.grossCents)}</td>
-                    <td className="px-3 py-2">{euro(row.cashCents)}</td>
-                    <td className="px-3 py-2">{euro(row.cardCents)}</td>
-                    <td className="px-3 py-2">{euro(row.onlineCents)}</td>
-                    <td className="px-3 py-2">{euro(row.openingCents || 0)}</td>
-                    <td className="px-3 py-2">{euro(row.outCents)}</td>
-                    <td className="px-3 py-2">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
-                    <td className="px-3 py-2">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
-                    <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.grossCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.cashCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.cardCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.onlineCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.openingCents || 0)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.outCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
                     <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
                     <td className="px-3 py-2" onClick={(event) => event.stopPropagation()}>
                       {row.status === 'closed' || (row.closureDay && row.grossCents === 0 && row.status !== 'open') ? (
