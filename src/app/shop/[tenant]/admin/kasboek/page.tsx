@@ -253,35 +253,58 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     void ensureHistoryWindow()
   }
 
-  function printDay() {
-    if (!day) return
-    const rows = day.movements
-      .map((m) => `<tr><td>${new Date(m.created_at).toLocaleString('nl-BE')}</td><td>${labelOf(m.movement_type)}</td><td>${m.description}</td><td>${m.staff_name || ''}</td><td style="text-align:right">${euro(m.amount_cents)}</td></tr>`)
-      .join('')
-    const fixes = (day.adjustments || [])
-      .map((a) => `<tr><td>${new Date(String(a.created_at || '')).toLocaleString('nl-BE')}</td><td>${euro(Number(a.original_cents) || 0)} → ${euro(Number(a.corrected_cents) || 0)}</td><td>${String(a.reason || '')}</td><td>${String(a.created_by || '')}</td></tr>`)
-      .join('')
-    const vatRows = day.vat.map((line) => `<tr><td>${line.rate}%</td><td style="text-align:right">${euro(line.baseCents)}</td><td style="text-align:right">${euro(line.taxCents)}</td><td style="text-align:right">${euro(line.inclCents)}</td></tr>`).join('')
-    const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(day.date)}</title>
-      <style>@page{size:A4;margin:16mm}body{font-family:sans-serif;color:#111;max-width:180mm;margin:0 auto}h1{font-size:18px}h2{font-size:13px;margin:16px 0 6px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:12px}</style>
+  function selectedPeriod() {
+    if (periodFrom && periodTo && periodFrom <= periodTo) return { from: periodFrom, to: periodTo }
+    return historyRange('month', belgiumToday())
+  }
+
+  function periodFor(scope: 'period' | 'month' | 'year') {
+    const today = belgiumToday()
+    const selected = selectedPeriod()
+    if (scope === 'year') return { from: `${today.slice(0, 4)}-01-01`, to: today }
+    if (scope === 'month') return { from: `${selected.to.slice(0, 7)}-01`, to: selected.to }
+    return selected
+  }
+
+  function historyRowVisible(row: HistoryRow) {
+    if (periodFrom && row.date < periodFrom) return false
+    if (periodTo && row.date > periodTo) return false
+    if (row.grossCents === 0 && row.status === 'none') return false
+    const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
+    if (historyStatus === 'attention' && badge !== 'attention') return false
+    if (historyStatus === 'difference' && badge !== 'difference') return false
+    if (historyStatus === 'correction' && badge !== 'correction') return false
+    if (historyStatus === 'open' && row.status !== 'open') return false
+    if (historyStatus === 'closed' && row.status !== 'closed') return false
+    if (payFilter === 'cash' && row.cashCents === 0) return false
+    if (payFilter === 'card' && row.cardCents === 0) return false
+    if (payFilter === 'online' && row.onlineCents === 0) return false
+    if (staffFilter.trim() && !(row.staffNames || []).some((name) => name.toLowerCase().includes(staffFilter.trim().toLowerCase()))) return false
+    return true
+  }
+
+  function statusLabel(row: HistoryRow) {
+    const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
+    if (badge === 'attention') return 'Aandacht nodig'
+    if (badge === 'difference') return 'Verschil'
+    if (badge === 'correction') return 'Correctie'
+    if (badge === 'closed') return 'Afgesloten'
+    if (badge === 'open') return 'Open'
+    return '—'
+  }
+
+  function printPeriod() {
+    const period = periodFor('period')
+    const rows = history.filter(historyRowVisible)
+    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td>${statusLabel(row)}</td></tr>`).join('')
+    const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(period.from)} – ${showDate(period.to)}</title>
+      <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;color:#111}h1{font-size:16px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:11px}</style>
       </head><body>
-      <h1>VYSION – DAGONTVANGSTEN / KASBOEK</h1>
-      <p>${day.businessName}<br>${day.btwNumber ? `BTW ${day.btwNumber}<br>` : ''}${day.address}<br>${showDate(day.date)} · ${day.status === 'closed' ? 'AFGESLOTEN' : 'OPEN'}</p>
-      <p>${day.openedBy ? `Geopend door ${day.openedBy}` : ''}${day.closedBy ? `<br>Afgesloten door ${day.closedBy} op ${day.closedAt ? new Date(day.closedAt).toLocaleString('nl-BE') : ''}` : ''}</p>
-      <h2>Dagontvangsten</h2>
-      <p>Bruto ${euro(day.payments.grossCents)} · excl. btw ${euro(day.exclCents)} · btw ${euro(day.taxCents)} · ${day.payments.count} transacties<br>Kortingen ${euro(day.payments.discountCents)} · Retouren ${euro(day.payments.refundCents)}</p>
-      <table><thead><tr><th>Tarief</th><th>Excl.</th><th>Btw</th><th>Incl.</th></tr></thead><tbody>${vatRows}</tbody></table>
-      <h2>Betaalmethodes</h2>
-      <p>Cash ${euro(day.payments.cashCents)} · Terminal ${euro(day.payments.cardCents)} · Online ${euro(day.payments.onlineCents)}</p>
-      <h2>Cashkas</h2>
-      <p>Beginkas ${euro(day.openingCents)} · Cash verkopen ${euro(day.payments.cashCents)} · Verwacht ${euro(day.expectedCents)} · Geteld ${day.countedCents == null ? '—' : euro(day.countedCents)} · Verschil ${day.differenceCents == null ? '—' : euro(day.differenceCents)}</p>
-      ${day.closeNote ? `<p>Opmerking: ${day.closeNote}</p>` : ''}
-      <h2>Kasbewegingen</h2>
-      <table><thead><tr><th>Tijdstip</th><th>Type</th><th>Omschrijving</th><th>Persoon</th><th>Bedrag</th></tr></thead><tbody>${rows}</tbody></table>
-      <h2>Correcties</h2>
-      <table><thead><tr><th>Tijdstip</th><th>Van / naar</th><th>Reden</th><th>Door</th></tr></thead><tbody>${fixes}</tbody></table>
+      <h1>VYSION – KASBOEK</h1>
+      <p>Periode ${showDate(period.from)} – ${showDate(period.to)}</p>
+      <table><thead><tr><th>Datum</th><th>Omzet</th><th>Cash</th><th>Terminal</th><th>Online</th><th>Beginkas</th><th>Cash uit</th><th>Verwacht</th><th>Geteld</th><th>Verschil</th><th>Status</th></tr></thead><tbody>${body}</tbody></table>
       </body></html>`
-    const w = window.open('', '_blank', 'width=800,height=900')
+    const w = window.open('', '_blank', 'width=1100,height=800')
     if (w) {
       w.document.write(html)
       w.document.close()
@@ -291,7 +314,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     void authFetch('/api/kasboek', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenantSlug: tenant, date: day.date, action: 'audit', event: 'report_printed', detail: { date: day.date } }),
+      body: JSON.stringify({ tenantSlug: tenant, date: period.from, action: 'audit', event: 'report_printed', detail: period }),
     })
   }
 
@@ -405,22 +428,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <tbody>
                 {historyLoading && history.length === 0 ? (
                   <tr><td className="px-3 py-4 text-gray-500" colSpan={11}>Laden…</td></tr>
-                ) : history.filter((row) => {
-                  if (periodFrom && row.date < periodFrom) return false
-                  if (periodTo && row.date > periodTo) return false
-                  if (row.grossCents === 0 && row.status === 'none') return false
-                  const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < (date || belgiumToday()) })
-                  if (historyStatus === 'attention' && badge !== 'attention') return false
-                  if (historyStatus === 'difference' && badge !== 'difference') return false
-                  if (historyStatus === 'correction' && badge !== 'correction') return false
-                  if (historyStatus === 'open' && row.status !== 'open') return false
-                  if (historyStatus === 'closed' && row.status !== 'closed') return false
-                  if (payFilter === 'cash' && row.cashCents === 0) return false
-                  if (payFilter === 'card' && row.cardCents === 0) return false
-                  if (payFilter === 'online' && row.onlineCents === 0) return false
-                  if (staffFilter.trim() && !(row.staffNames || []).some((name) => name.toLowerCase().includes(staffFilter.trim().toLowerCase()))) return false
-                  return true
-                }).map((row) => (
+                ) : history.filter(historyRowVisible).map((row) => (
                   <tr key={row.date} className="border-t cursor-pointer hover:bg-gray-50" onClick={() => { setTab('day'); void loadDay(row.date) }}>
                     <td className="px-3 py-2">{showDate(row.date)}</td>
                     <td className="px-3 py-2">{euro(row.grossCents)}</td>
@@ -432,12 +440,23 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     <td className="px-3 py-2">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
                     <td className="px-3 py-2">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
                     <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
-                    <td className="px-3 py-2">{(() => { const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < (date || belgiumToday()) }); return badge === 'attention' ? 'Aandacht nodig' : badge === 'difference' ? 'Verschil' : badge === 'correction' ? 'Correctie' : badge === 'closed' ? 'Afgesloten' : badge === 'open' ? 'Open' : '—' })()}</td>
+                    <td className="px-3 py-2">{statusLabel(row)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={printPeriod}>Afdrukken</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('csv', period.from, period.to) }}>CSV</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('pdf', period.from, period.to) }}>PDF</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('xlsx', period.from, period.to) }}>Excel</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('boekhouding', period.from, period.to) }}>Export voor boekhouding</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('month'); void downloadExport('boekhouding', period.from, period.to) }}>Maand</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('year'); void downloadExport('boekhouding', period.from, period.to) }}>Jaar</button>
+            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
+          </div>
+          <p className="text-sm text-gray-500">Dit geldt voor {showDate(periodFor('period').from)} – {showDate(periodFor('period').to)}. De boekhouder krijgt deze periode in één keer.</p>
           </div>
         ) : loading || !day ? (
           <p className="text-gray-500">Laden…</p>
@@ -605,16 +624,6 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 </ul>
               </section>
             )}
-            <div className="flex flex-wrap gap-2">
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={printDay}>Afdrukken</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('csv', day.date, day.date)}>CSV</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('pdf', day.date, day.date)}>PDF</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('xlsx', day.date, day.date)}>Excel</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('boekhouding', day.date, day.date)}>Export voor boekhouding</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const month = `${day.date.slice(0, 7)}-01`; void downloadExport('boekhouding', month, day.date) }}>Maand</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('boekhouding', `${day.date.slice(0, 4)}-01-01`, day.date)}>Jaar</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
-            </div>
           </div>
         )}
 
@@ -655,18 +664,19 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             </div>
           </div>
         )}
-        {mailOpen && day && (
+        {mailOpen && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setMailOpen(false)}>
             <form
               className="bg-white rounded-2xl p-5 w-full max-w-md space-y-3"
               onClick={(e) => e.stopPropagation()}
               onSubmit={(e) => {
                 e.preventDefault()
+                const period = periodFor('period')
                 setBusy(true)
                 void authFetch('/api/kasboek/email', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ tenantSlug: tenant, from: day.date, to: day.date, toEmail: mailTo || undefined }),
+                  body: JSON.stringify({ tenantSlug: tenant, from: period.from, to: period.to, toEmail: mailTo || undefined }),
                 }).then(async (res) => {
                   const json = await res.json().catch(() => ({}))
                   setBusy(false)
@@ -675,12 +685,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     return
                   }
                   setMailOpen(false)
-                  await loadDay(day.date)
                 })
               }}
             >
               <h3 className="font-semibold">Verstuur naar boekhouder</h3>
-              <p className="text-sm text-gray-500">Periode {showDate(day.date)}. Bijlage: PDF en boekhoud-CSV. Er wordt niets automatisch verstuurd.</p>
+              <p className="text-sm text-gray-500">Periode {showDate(periodFor('period').from)} – {showDate(periodFor('period').to)}. Bijlage: PDF en boekhoud-CSV van die hele periode. Er wordt niets automatisch verstuurd.</p>
               <input value={mailTo} onChange={(e) => setMailTo(e.target.value)} placeholder="boekhouder@email.be" className="w-full border rounded-xl px-3 py-2" />
               <p className="text-xs text-gray-400">Laat leeg om het adres uit Instellingen → Boekhouding te gebruiken.</p>
               <div className="flex justify-end gap-2">
