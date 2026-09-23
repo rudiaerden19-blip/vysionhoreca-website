@@ -153,6 +153,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [periodFrom, setPeriodFrom] = useState('')
   const [periodTo, setPeriodTo] = useState('')
   const historySpan = useRef({ from: '', to: '' })
+  const loadedDate = useRef('')
   const [historyStatus, setHistoryStatus] = useState<'all' | 'open' | 'closed' | 'attention' | 'difference' | 'correction'>('all')
   const [payFilter, setPayFilter] = useState<'all' | 'cash' | 'card' | 'online'>('all')
   const [staffFilter, setStaffFilter] = useState('')
@@ -194,6 +195,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     const view = json as DayView
     setDay(view)
     setDate(view.date)
+    if (loadedDate.current !== view.date) {
+      setCounted('')
+      setCloseNote('')
+    }
+    loadedDate.current = view.date
     setOpening(view.status === 'none' ? '' : (view.openingCents / 100).toFixed(2))
     setLoading(false)
   }, [tenant])
@@ -526,7 +532,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               </div>
               {day.status === 'open' && (
                 <div className="mt-4 flex flex-wrap gap-2 items-end">
-                  <input type="number" min={0} step="0.01" value={counted} onChange={(e) => setCounted(e.target.value)} placeholder="Geteld bedrag" className="px-3 py-2 border rounded-xl w-40" />
+                  <input key={day.date} type="number" min={0} step="0.01" autoComplete="off" value={counted} onChange={(e) => setCounted(e.target.value)} placeholder="Geteld bedrag" className="px-3 py-2 border rounded-xl w-40" />
                   <input value={closeNote} onChange={(e) => setCloseNote(e.target.value)} placeholder="Reden bij verschil" className="px-3 py-2 border rounded-xl flex-1 min-w-[180px]" />
                   <button type="button" disabled={busy} className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm" onClick={() => setShowClose(true)}>Dag afsluiten</button>
                 </div>
@@ -634,7 +640,10 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                       return
                     }
                     void post({ action: 'close', countedEuros: Number(counted) || 0, note: closeNote }).then((ok) => {
-                      if (ok) setShowClose(false)
+                      if (!ok) return
+                      setShowClose(false)
+                      setCounted('')
+                      setCloseNote('')
                     })
                   }}
                 >
