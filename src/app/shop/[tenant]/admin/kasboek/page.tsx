@@ -200,7 +200,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       setCloseNote('')
     }
     loadedDate.current = view.date
-    setOpening(view.status === 'none' ? '' : (view.openingCents / 100).toFixed(2))
+    setOpening(view.openingCents > 0 ? (view.openingCents / 100).toFixed(2) : '')
     setLoading(false)
   }, [tenant])
 
@@ -498,9 +498,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 <label className="text-sm text-gray-500">
                   Beginkas
                   <input
+                    key={day.date}
                     type="number"
                     min={0}
                     step="0.01"
+                    autoComplete="off"
                     value={opening}
                     disabled={closed}
                     onChange={(e) => setOpening(e.target.value)}
