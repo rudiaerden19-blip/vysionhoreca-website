@@ -257,50 +257,101 @@ export function renderCashbookXlsx(meta: CashbookExportMeta, rows: CashbookRange
   return boldTotalRow(raw)
 }
 
+function pdfDayLabel(ymd: string): string {
+  const [year, month, day] = ymd.slice(0, 10).split('-')
+  return day && month && year ? `${day}/${month}/${year}` : ymd
+}
+
+function pdfStatus(row: CashbookRangeRow): string {
+  if (row.closureDay && row.grossCents === 0 && row.status !== 'open' && row.status !== 'closed') return 'Sluitingsdag'
+  if (row.status === 'closed') return 'Afgesloten'
+  if (row.status === 'open' || row.grossCents !== 0) return 'Nog niet afgesloten'
+  return '—'
+}
+
+function pdfMoney(cents: number | null | undefined, blankZero = false): string {
+  if (cents == null) return '—'
+  if (blankZero && cents === 0) return '—'
+  return formatEuroFromCents(cents)
+}
+
 export async function renderCashbookPdf(meta: CashbookExportMeta, rows: CashbookRangeRow[]): Promise<Buffer> {
   const { default: PDFDocument } = await import('pdfkit')
+  const columns: Array<{ title: string; width: number; align: 'left' | 'right'; cell: (row: CashbookRangeRow) => string; total: string }> = [
+    { title: 'Datum', width: 72, align: 'left', cell: (row) => pdfDayLabel(row.date), total: 'Totaal' },
+    { title: 'Omzet', width: 64, align: 'right', cell: (row) => pdfMoney(row.grossCents), total: formatEuroFromCents(sumBy(rows, (row) => row.grossCents)) },
+    { title: 'Cash', width: 64, align: 'right', cell: (row) => pdfMoney(row.cashCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cashCents)) },
+    { title: 'Terminal', width: 68, align: 'right', cell: (row) => pdfMoney(row.cardCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cardCents)) },
+    { title: 'Online', width: 64, align: 'right', cell: (row) => pdfMoney(row.onlineCents), total: formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)) },
+    { title: 'Beginkas', width: 68, align: 'right', cell: (row) => pdfMoney(row.openingCents, true), total: '' },
+    { title: 'Cash uit', width: 60, align: 'right', cell: (row) => pdfMoney(row.outCents), total: formatEuroFromCents(sumBy(rows, (row) => row.outCents)) },
+    { title: 'Verwacht', width: 68, align: 'right', cell: (row) => pdfMoney(row.expectedCents), total: '' },
+    { title: 'Geteld', width: 64, align: 'right', cell: (row) => pdfMoney(row.countedCents), total: '' },
+    { title: 'Verschil', width: 64, align: 'right', cell: (row) => pdfMoney(row.differenceCents), total: euroOrBlank(sumKnown(rows, (row) => row.differenceCents)) || '—' },
+    { title: 'Status', width: 130, align: 'left', cell: (row) => pdfStatus(row), total: '' },
+  ]
+  const tableWidth = columns.reduce((sum, column) => sum + column.width, 0)
+
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ size: 'A4', margin: 40 })
+    const doc = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 28 })
     const chunks: Buffer[] = []
     doc.on('data', (chunk: Buffer) => chunks.push(chunk))
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
-    doc.fontSize(16).text('VYSION – DAGONTVANGSTEN / KASBOEK')
-    doc.moveDown(0.4)
-    doc.fontSize(10)
-    doc.text(meta.businessName)
-    if (meta.btwNumber) doc.text(`BTW ${meta.btwNumber}`)
-    if (meta.address) doc.text(meta.address)
-    doc.text(meta.periodLabel)
-    doc.moveDown(0.6)
-    for (const row of rows) {
-      if (doc.y > 760) doc.addPage()
-      doc.fontSize(11).text(`${row.date}  ·  ${row.status === 'closed' ? 'AFGESLOTEN' : row.status === 'open' ? 'OPEN' : '—'}`)
-      doc.fontSize(9).text(
-        `Dagontvangsten ${formatEuroFromCents(row.grossCents)}   excl. ${formatEuroFromCents(row.exclCents)}   btw ${formatEuroFromCents(row.taxCents)}`,
-      )
-      doc.text(
-        `Cash ${formatEuroFromCents(row.cashCents)}   Terminal ${formatEuroFromCents(row.cardCents)}   Online ${formatEuroFromCents(row.onlineCents)}`,
-      )
-      doc.text(
-        `Beginkas ${formatEuroFromCents(row.openingCents)}   Verwacht ${row.expectedCents == null ? '—' : formatEuroFromCents(row.expectedCents)}   Geteld ${row.countedCents == null ? '—' : formatEuroFromCents(row.countedCents)}   Verschil ${row.differenceCents == null ? '—' : formatEuroFromCents(row.differenceCents)}`,
-      )
-      const vatText = row.vat.map((line) => `${line.rate}% ${formatEuroFromCents(line.inclCents)}`).join('   ')
-      if (vatText) doc.text(`BTW ${vatText}`)
-      if (row.adjustmentCount) doc.text(`Correcties: ${row.adjustmentCount}`)
-      doc.moveDown(0.4)
+
+    const margin = 28
+    const rowHeight = 18
+    const bottom = doc.page.height - 32
+
+    const drawCell = (text: string, x: number, y: number, width: number, align: 'left' | 'right', bold: boolean, color: string) => {
+      const yBefore = doc.y
+      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(8).fillColor(color)
+      doc.text(text, x + 4, y + 5, { width: width - 8, align, lineBreak: false, ellipsis: true })
+      doc.y = yBefore
     }
-    if (doc.y > 720) doc.addPage()
-    doc.moveDown(0.4)
-    doc.font('Helvetica-Bold').fontSize(12).text('Totaal')
-    doc.fontSize(9).text(
-      `Dagontvangsten ${formatEuroFromCents(sumBy(rows, (row) => row.grossCents))}   excl. ${formatEuroFromCents(sumBy(rows, (row) => row.exclCents))}   btw ${formatEuroFromCents(sumBy(rows, (row) => row.taxCents))}`,
-    )
-    doc.text(
-      `Cash ${formatEuroFromCents(sumBy(rows, (row) => row.cashCents))}   Terminal ${formatEuroFromCents(sumBy(rows, (row) => row.cardCents))}   Online ${formatEuroFromCents(sumBy(rows, (row) => row.onlineCents))}`,
-    )
-    const difference = sumKnown(rows, (row) => row.differenceCents)
-    doc.text(`Kasverschil ${difference == null ? '—' : formatEuroFromCents(difference)}   Correcties ${sumBy(rows, (row) => row.adjustmentCount)}`)
+
+    const drawHeader = (y: number) => {
+      doc.rect(margin, y, tableWidth, rowHeight).fill('#0E5D82')
+      let x = margin
+      for (const column of columns) {
+        drawCell(column.title, x, y, column.width, column.align, true, '#ffffff')
+        x += column.width
+      }
+      return y + rowHeight
+    }
+
+    doc.fillColor('#0E5D82').font('Helvetica-Bold').fontSize(16).text('VYSION – KASBOEK', margin, margin, { lineBreak: false })
+    doc.fillColor('#334155').font('Helvetica').fontSize(9)
+    const identity = [meta.businessName, meta.btwNumber ? `BTW ${meta.btwNumber}` : '', meta.address].filter(Boolean).join('  ·  ')
+    doc.text(identity, margin, margin + 22, { width: tableWidth, lineBreak: false })
+    doc.text(`Periode ${meta.periodLabel}`, margin, margin + 36, { width: tableWidth, lineBreak: false })
+
+    let y = margin + 52
+    y = drawHeader(y)
+    rows.forEach((row, index) => {
+      if (y + rowHeight > bottom) {
+        doc.addPage()
+        y = drawHeader(margin)
+      }
+      doc.rect(margin, y, tableWidth, rowHeight).fill(index % 2 === 0 ? '#f4f8fb' : '#ffffff')
+      doc.moveTo(margin, y + rowHeight).lineTo(margin + tableWidth, y + rowHeight).strokeColor('#d5e0e8').lineWidth(0.4).stroke()
+      let x = margin
+      for (const column of columns) {
+        drawCell(column.cell(row), x, y, column.width, column.align, false, '#111111')
+        x += column.width
+      }
+      y += rowHeight
+    })
+    if (y + rowHeight > bottom) {
+      doc.addPage()
+      y = drawHeader(margin)
+    }
+    doc.rect(margin, y, tableWidth, rowHeight).fill('#0E5D82')
+    let x = margin
+    for (const column of columns) {
+      drawCell(column.total, x, y, column.width, column.align, true, '#ffffff')
+      x += column.width
+    }
     doc.end()
   })
 }
