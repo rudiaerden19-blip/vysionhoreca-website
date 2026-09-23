@@ -857,5 +857,5 @@ export function formatEuroFromCents(cents: number): string {
   const abs = Math.abs(cents)
   const euros = Math.floor(abs / 100)
   const rem = String(abs % 100).padStart(2, '0')
-  return `${sign}€${euros},${rem}`
+  return `${sign}€ ${euros},${rem}`
 }
