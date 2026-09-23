@@ -83,6 +83,7 @@ type HistoryRow = {
   adjustmentCount: number
   staffNames: string[]
   closureDay?: boolean
+  closureChoice?: '' | 'gesloten' | 'vakantie'
 }
 
 const MOVEMENTS: Array<{ id: CashbookMovementType; label: string }> = [
@@ -291,6 +292,25 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     return true
   }
 
+  async function saveClosureChoice(date: string, choice: '' | 'gesloten' | 'vakantie') {
+    setError('')
+    const res = await authFetch('/api/kasboek', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tenantSlug: tenant, date, action: 'closure', choice }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      setError(json.error || 'Sluitingsdag opslaan mislukt.')
+      return
+    }
+    setHistory((rows) => rows.map((row) => row.date === date ? {
+      ...row,
+      closureChoice: json.closureChoice || '',
+      closureDay: !!json.closureDay,
+    } : row))
+  }
+
   async function ensureHistoryRange(from: string, to: string) {
     if (historySpans.current.some((span) => from >= span.from && to <= span.to)) return
     setHistoryLoading(true)
@@ -378,13 +398,13 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   function printPeriod() {
     const period = periodFor('period')
     const rows = history.filter(historyRowVisible)
-    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td style="color:${statusPresentation(row).color}">${statusPresentation(row).text}</td></tr>`).join('')
+    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td style="color:${statusPresentation(row).color}">${statusPresentation(row).text}</td><td>${row.closureChoice === 'vakantie' ? 'Vakantie' : row.closureChoice === 'gesloten' ? 'Gesloten' : ''}</td></tr>`).join('')
     const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(period.from)} – ${showDate(period.to)}</title>
       <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;color:#111}h1{font-size:16px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:11px}</style>
       </head><body>
       <h1>VYSION – KASBOEK</h1>
       <p>Periode ${showDate(period.from)} – ${showDate(period.to)}</p>
-      <table><thead><tr><th>Datum</th><th>Omzet</th><th>Cash</th><th>Terminal</th><th>Online</th><th>Beginkas</th><th>Cash uit</th><th>Verwacht</th><th>Geteld</th><th>Verschil</th><th>Status</th></tr></thead><tbody>${body}</tbody></table>
+      <table><thead><tr><th>Datum</th><th>Omzet</th><th>Cash</th><th>Terminal</th><th>Online</th><th>Beginkas</th><th>Cash uit</th><th>Verwacht</th><th>Geteld</th><th>Verschil</th><th>Status</th><th>Sluiting</th></tr></thead><tbody>${body}</tbody></table>
       </body></html>`
     const w = window.open('', '_blank', 'width=1100,height=800')
     if (w) {
@@ -503,14 +523,14 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-400 uppercase">
-                  {['Datum', 'Omzet', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'].map((h) => (
+                  {['Datum', 'Omzet', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status', 'Sluiting'].map((h) => (
                     <th key={h} className="px-3 py-2">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {historyLoading && !history.some((row) => (!periodFrom || row.date >= periodFrom) && (!periodTo || row.date <= periodTo)) ? (
-                  <tr><td className="px-3 py-4 text-gray-500" colSpan={11}>Laden…</td></tr>
+                  <tr><td className="px-3 py-4 text-gray-500" colSpan={12}>Laden…</td></tr>
                 ) : history.filter(historyRowVisible).map((row) => (
                   <tr key={row.date} className="border-t cursor-pointer hover:bg-gray-50" onClick={() => { setTab('day'); void loadDay(row.date) }}>
                     <td className="px-3 py-2">{showDate(row.date)}</td>
@@ -524,6 +544,18 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     <td className="px-3 py-2">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
                     <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
                     <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
+                    <td className="px-3 py-2" onClick={(event) => event.stopPropagation()}>
+                      <select
+                        value={row.closureChoice || ''}
+                        onChange={(event) => void saveClosureChoice(row.date, event.target.value as '' | 'gesloten' | 'vakantie')}
+                        className="px-2 py-1 rounded-lg border border-accent text-accent text-xs bg-white"
+                        aria-label={`Sluiting ${showDate(row.date)}`}
+                      >
+                        <option value="">Kies</option>
+                        <option value="gesloten">Gesloten</option>
+                        <option value="vakantie">Vakantie</option>
+                      </select>
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -1,5 +1,6 @@
 import {
   cashbookBadge,
+  cashbookClosureChoice,
   cashbookDayNeedsClose,
   isListedClosureDate,
   cashbookWriteBlock,
@@ -279,5 +280,8 @@ describe('cashbook berekening', () => {
       isPast: true,
       closureDay: true,
     })).toBe(true)
+    expect(cashbookClosureChoice('2026-09-07', [{ date: '2026-09-07', reason: 'Vakantie', holiday_key: 'kasboek-vakantie' }], false)).toBe('vakantie')
+    expect(cashbookClosureChoice('2026-09-02', [], true)).toBe('gesloten')
+    expect(cashbookClosureChoice('2026-09-02', [], false)).toBe('')
   })
 })

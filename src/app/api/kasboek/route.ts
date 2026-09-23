@@ -9,6 +9,7 @@ import {
   loadPendingCloseDays,
   logCashbookEvent,
   saveOpening,
+  setCashbookClosureChoice,
 } from '@/lib/cashbook-store'
 import { eurosToCents } from '@/lib/cashbook-calc'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
@@ -90,6 +91,13 @@ const AdjustmentSchema = z.object({
   reason: z.string().min(1),
 })
 
+const ClosureSchema = z.object({
+  action: z.literal('closure'),
+  tenantSlug: z.string().min(1),
+  date: DateSchema,
+  choice: z.enum(['', 'gesloten', 'vakantie']),
+})
+
 const AuditSchema = z.object({
   action: z.literal('audit'),
   tenantSlug: z.string().min(1),
@@ -98,7 +106,7 @@ const AuditSchema = z.object({
   detail: z.record(z.string(), z.unknown()).optional().default({}),
 })
 
-const BodySchema = z.discriminatedUnion('action', [OpeningSchema, MovementSchema, CloseSchema, AdjustmentSchema, AuditSchema])
+const BodySchema = z.discriminatedUnion('action', [OpeningSchema, MovementSchema, CloseSchema, AdjustmentSchema, ClosureSchema, AuditSchema])
 
 export async function POST(request: NextRequest) {
   let raw: unknown
@@ -150,6 +158,13 @@ export async function POST(request: NextRequest) {
     )
     return NextResponse.json(
       result.ok ? { ok: true, differenceCents: result.differenceCents } : { error: result.error },
+      { status: result.ok ? 200 : result.status },
+    )
+  }
+  if (body.action === 'closure') {
+    const result = await setCashbookClosureChoice(client, body.tenantSlug, body.date, body.choice)
+    return NextResponse.json(
+      result.ok ? { ok: true, closureChoice: result.closureChoice, closureDay: result.closureDay } : { error: result.error },
       { status: result.ok ? 200 : result.status },
     )
   }

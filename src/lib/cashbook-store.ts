@@ -6,8 +6,10 @@ import {
   expectedCashCents,
   isCashbookMovementType,
   orderBelongsToCashbookDay,
+  cashbookClosureChoice,
   cashbookDayNeedsClose,
   isListedClosureDate,
+  type CashbookClosureChoice,
   summarizeCashbookOrders,
   vatLinesFromAggregate,
   type CashbookMovementType,
@@ -504,6 +506,7 @@ export type CashbookRangeRow = {
   adjustmentCount: number
   staffNames: string[]
   closureDay: boolean
+  closureChoice: CashbookClosureChoice
   exclCents: number
   taxCents: number
   discountCents: number
@@ -548,13 +551,13 @@ export async function loadCashbookRange(
       .lte('book_date', toDate),
     client
       .from('exceptional_closings')
-      .select('date, date_end')
+      .select('date, date_end, reason, holiday_key')
       .eq('tenant_slug', tenantSlug),
   ])
   const defaultBtw = Number((settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage) || 6
   const closings = missingTable(closingRes.error)
     ? []
-    : ((closingRes.data || []) as Array<{ date: string; date_end?: string | null }>)
+    : ((closingRes.data || []) as Array<{ date: string; date_end?: string | null; reason?: string | null; holiday_key?: string | null }>)
   const days = new Map<string, Record<string, unknown>>()
   if (!missingTable(dayRes.error)) {
     for (const row of dayRes.data || []) days.set(String((row as { book_date: string }).book_date), row as Record<string, unknown>)
@@ -611,7 +614,8 @@ export async function loadCashbookRange(
       : null
     const vat = vatLinesFromAggregate(vatAgg)
     const closed = day?.status === 'closed'
-    const closureDay = isWeeklyClosedDay(date, hours) || isListedClosureDate(date, closings)
+    const closureChoice = cashbookClosureChoice(date, closings, isWeeklyClosedDay(date, hours))
+    const closureDay = closureChoice !== '' || isListedClosureDate(date, closings)
     const openingCents = day ? Number(day.opening_cash_cents) || 0 : 0
     const staffNames = Array.from(new Set(movements.map((m) => (m.staff_name || '').trim()).filter(Boolean)))
     const expected = closed
@@ -638,6 +642,7 @@ export async function loadCashbookRange(
       adjustmentCount: adjustmentsByDay.get(date) || 0,
       staffNames,
       closureDay,
+      closureChoice,
       exclCents: vatAgg ? eurosToCents(vatAgg.subtotalExcl) : 0,
       taxCents: vatAgg ? eurosToCents(vatAgg.totalTax) : 0,
       discountCents: summary.payments.discountCents,
@@ -684,6 +689,55 @@ export async function logCashbookEvent(
   detail: Record<string, unknown>,
 ) {
   await audit(client, tenantSlug, actor, action, 'cashbook_days', null, null, detail, null, bookDate)
+}
+
+export async function setCashbookClosureChoice(
+  client: SupabaseClient,
+  tenantSlug: string,
+  bookDate: string,
+  choice: CashbookClosureChoice,
+): Promise<{ ok: true; closureChoice: CashbookClosureChoice; closureDay: boolean } | { ok: false; error: string; status: number }> {
+  const existing = await client
+    .from('exceptional_closings')
+    .select('date, date_end, reason, is_holiday, holiday_key')
+    .eq('tenant_slug', tenantSlug)
+    .eq('date', bookDate)
+    .maybeSingle()
+  if (existing.error && missingTable(existing.error)) {
+    return { ok: false, error: 'Sluitingsdagen zijn nog niet beschikbaar.', status: 503 }
+  }
+  if (existing.error) return { ok: false, error: 'Sluitingsdag opslaan mislukt.', status: 500 }
+  const row = existing.data as {
+    date?: string
+    date_end?: string | null
+    is_holiday?: boolean
+    holiday_key?: string | null
+  } | null
+  const foreignHoliday = !!row?.is_holiday && !!row.holiday_key && row.holiday_key !== 'kasboek-vakantie'
+  const start = String(row?.date || bookDate).slice(0, 10)
+  const end = row?.date_end ? String(row.date_end).slice(0, 10) : start
+  if (foreignHoliday || (row && end > start)) {
+    return { ok: false, error: 'Deze sluiting staat in de openingstijden. Pas die daar aan.', status: 409 }
+  }
+  if (!choice) {
+    if (row) {
+      const deleted = await client.from('exceptional_closings').delete().eq('tenant_slug', tenantSlug).eq('date', bookDate)
+      if (deleted.error) return { ok: false, error: 'Sluitingsdag wissen mislukt.', status: 500 }
+    }
+  } else {
+    const saved = await client.from('exceptional_closings').upsert({
+      tenant_slug: tenantSlug,
+      date: bookDate,
+      date_end: bookDate,
+      reason: choice === 'vakantie' ? 'Vakantie' : 'Gesloten',
+      is_holiday: false,
+      holiday_key: choice === 'vakantie' ? 'kasboek-vakantie' : null,
+    }, { onConflict: 'tenant_slug,date' })
+    if (saved.error) return { ok: false, error: 'Sluitingsdag opslaan mislukt.', status: 500 }
+  }
+  const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
+  const closureChoice: CashbookClosureChoice = choice || (isWeeklyClosedDay(bookDate, hours) ? 'gesloten' : '')
+  return { ok: true, closureChoice, closureDay: closureChoice !== '' }
 }
 
 export function formatEuroFromCents(cents: number): string {

@@ -248,6 +248,28 @@ export function vatReconciliation(
 
 export type CashbookBadge = 'open' | 'closed' | 'correction' | 'difference' | 'attention' | 'none'
 
+export type CashbookClosureChoice = '' | 'gesloten' | 'vakantie'
+
+export function cashbookClosureChoice(
+  ymd: string,
+  closings: Array<{ date: string; date_end?: string | null; reason?: string | null; holiday_key?: string | null }>,
+  weeklyClosed: boolean,
+): CashbookClosureChoice {
+  const exact = closings.find((closing) => closing.date.slice(0, 10) === ymd && (!closing.date_end || closing.date_end.slice(0, 10) === closing.date.slice(0, 10)))
+  const covering = closings.find((closing) => {
+    const start = closing.date.slice(0, 10)
+    const end = closing.date_end && closing.date_end.slice(0, 10) >= start ? closing.date_end.slice(0, 10) : start
+    return ymd >= start && ymd <= end
+  })
+  const hit = exact || covering
+  if (hit) {
+    const reason = String(hit.reason || '').trim().toLowerCase()
+    if (hit.holiday_key === 'kasboek-vakantie' || reason === 'vakantie') return 'vakantie'
+    return 'gesloten'
+  }
+  return weeklyClosed ? 'gesloten' : ''
+}
+
 export function isListedClosureDate(
   ymd: string,
   closings: Array<{ date: string; date_end?: string | null }>,
