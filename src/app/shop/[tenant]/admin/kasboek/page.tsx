@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import PinGate from '@/components/PinGate'
 import { authFetch } from '@/lib/auth-headers'
 import {
@@ -148,6 +148,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [date, setDate] = useState('')
   const [day, setDay] = useState<DayView | null>(null)
   const [history, setHistory] = useState<HistoryRow[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [periodKind, setPeriodKind] = useState<'today' | 'yesterday' | 'week' | 'month' | 'lastMonth' | 'custom'>('month')
+  const [periodFrom, setPeriodFrom] = useState('')
+  const [periodTo, setPeriodTo] = useState('')
+  const historySpan = useRef({ from: '', to: '' })
   const [historyStatus, setHistoryStatus] = useState<'all' | 'open' | 'closed' | 'attention' | 'difference' | 'correction'>('all')
   const [payFilter, setPayFilter] = useState<'all' | 'cash' | 'card' | 'online'>('all')
   const [staffFilter, setStaffFilter] = useState('')
@@ -218,13 +223,26 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     return true
   }
 
-  async function loadHistory(from: string, to: string) {
-    setTab('history')
-    setLoading(true)
+  async function ensureHistoryWindow() {
+    const anchor = date || belgiumToday()
+    const from = historyRange('lastMonth', anchor).from
+    const to = historyRange('today', anchor).to
+    if (historySpan.current.from === from && historySpan.current.to === to) return
+    historySpan.current = { from, to }
+    setHistoryLoading(true)
     const res = await authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&from=${from}&to=${to}`)
     const json = await res.json().catch(() => ({}))
     setHistory((json.rows || []) as HistoryRow[])
-    setLoading(false)
+    setHistoryLoading(false)
+  }
+
+  function showPeriod(kind: 'today' | 'yesterday' | 'week' | 'month' | 'lastMonth') {
+    const range = historyRange(kind, date || belgiumToday())
+    setPeriodKind(kind)
+    setPeriodFrom(range.from)
+    setPeriodTo(range.to)
+    setTab('history')
+    void ensureHistoryWindow()
   }
 
   function printDay() {
@@ -304,12 +322,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
           </div>
           <div className="flex gap-2">
             <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'day' ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => { setTab('day'); void loadDay() }}>Vandaag</button>
-            <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'history' ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => { const range = historyRange('month', date || belgiumToday()); void loadHistory(range.from, range.to) }}>Historiek</button>
+            <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'history' ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => showPeriod('month')}>Historiek</button>
           </div>
         </div>
 
         {pendingCount > 0 && (
-          <button type="button" className="mb-4 w-full text-left text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3" onClick={() => { setHistoryStatus('attention'); const range = historyRange('month', date || belgiumToday()); void loadHistory(shiftDate(range.from, -60), range.to) }}>
+          <button type="button" className="mb-4 w-full text-left text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3" onClick={() => { setHistoryStatus('attention'); showPeriod('month') }}>
             {pendingCount} {pendingCount === 1 ? 'dag moet' : 'dagen moeten'} nog worden afgesloten
           </button>
         )}
@@ -330,7 +348,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               ['month', 'Deze maand'],
               ['lastMonth', 'Vorige maand'],
             ] as const).map(([kind, label]) => (
-              <button key={kind} type="button" className="px-3 py-2 rounded-xl bg-white border text-sm" onClick={() => { const range = historyRange(kind, date || belgiumToday()); void loadHistory(range.from, range.to) }}>{label}</button>
+              <button key={kind} type="button" className={`px-3 py-2 rounded-xl text-sm ${periodKind === kind ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => showPeriod(kind)}>{label}</button>
             ))}
             <select value={historyStatus} onChange={(e) => setHistoryStatus(e.target.value as typeof historyStatus)} className="px-3 py-2 rounded-xl border text-sm bg-white">
               <option value="all">Alle statussen</option>
@@ -349,7 +367,23 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <input value={staffFilter} onChange={(e) => setStaffFilter(e.target.value)} placeholder="Medewerker" className="px-3 py-2 rounded-xl border text-sm" />
             <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="px-3 py-2 rounded-xl border text-sm" />
             <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="px-3 py-2 rounded-xl border text-sm" />
-            <button type="button" className="px-3 py-2 rounded-xl bg-white border text-sm" onClick={() => customFrom && customTo && void loadHistory(customFrom, customTo)}>Eigen periode</button>
+            <button type="button" className="px-3 py-2 rounded-xl bg-white border text-sm" onClick={() => {
+              if (!customFrom || !customTo) return
+              setPeriodKind('custom')
+              setPeriodFrom(customFrom)
+              setPeriodTo(customTo)
+              setTab('history')
+              const span = historySpan.current
+              if (span.from && customFrom >= span.from && customTo <= span.to) return
+              setHistoryLoading(true)
+              void authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&from=${customFrom}&to=${customTo}`)
+                .then((res) => res.json())
+                .then((json) => {
+                  setHistory((json.rows || []) as HistoryRow[])
+                  historySpan.current = { from: customFrom, to: customTo }
+                })
+                .finally(() => setHistoryLoading(false))
+            }}>Eigen periode</button>
           </div>
           <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
             <table className="min-w-full text-sm">
@@ -361,7 +395,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 </tr>
               </thead>
               <tbody>
-                {history.filter((row) => {
+                {historyLoading && history.length === 0 ? (
+                  <tr><td className="px-3 py-4 text-gray-500" colSpan={11}>Laden…</td></tr>
+                ) : history.filter((row) => {
+                  if (periodFrom && row.date < periodFrom) return false
+                  if (periodTo && row.date > periodTo) return false
                   if (row.grossCents === 0 && row.status === 'none') return false
                   const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < (date || belgiumToday()) })
                   if (historyStatus === 'attention' && badge !== 'attention') return false
