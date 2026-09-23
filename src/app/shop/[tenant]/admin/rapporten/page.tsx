@@ -370,8 +370,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const todayStart = startOfDay(now)
   const weekStart = startOfWeek(now)
   const monthStart = startOfMonth(now)
-  const weekDays = new Set(listBusinessDaysEndingAt(todayYmd, 7))
-  const monthPrefix = todayYmd.slice(0, 7)
+  // Zelfde kalenderdag = zelfde getal. Een nieuw Date-object zou elke klik de totalen opnieuw laten rekenen.
+  const todayStartMs = todayStart.getTime()
+  const weekStartMs = weekStart.getTime()
+  const monthStartMs = monthStart.getTime()
 
   const ownerCloseOn = zReportOwnerEveningCloseEnabled(
     (tenantInfo as TenantSettings | null)?.z_report_owner_evening_close,
@@ -394,28 +396,44 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     return map
   }, [ownerCloseByDate])
 
-  const revenueForBusinessDay = (ymd: string | null) => {
-    if (!ymd) return 0
-    const owner = ownerTotalByDate.get(ymd)
-    if (owner != null) return owner
-    return validOrders.filter((o) => orderDay(o) === ymd).reduce((s, o) => s + o.total, 0)
-  }
-
-  const todayOrders = validOrders.filter((o) => orderDay(o) === todayYmd)
-  const todayRevenue = revenueForBusinessDay(todayYmd)
-  const weekRevenue = [...weekDays].reduce((s, d) => s + revenueForBusinessDay(d), 0)
-  const monthRevenue = validOrders
-    .map((o) => orderDay(o))
-    .filter((d): d is string => !!d && d.startsWith(monthPrefix))
-    .filter((d, i, arr) => arr.indexOf(d) === i)
-    .concat(
-      [...ownerTotalByDate.keys()].filter((d) => d.startsWith(monthPrefix)),
-    )
-    .filter((d, i, arr) => arr.indexOf(d) === i)
-    .reduce((s, d) => s + revenueForBusinessDay(d), 0)
-  const avgOrder = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0
-  /** Week start (maandag) kan vóór de 1e van deze maand vallen → weekomzet > maandomzet is dan logisch. */
-  const weekStartsBeforeThisMonth = weekStart.getTime() < monthStart.getTime()
+  const {
+    todayOrders,
+    todayRevenue,
+    weekRevenue,
+    monthRevenue,
+    avgOrder,
+    weekStartsBeforeThisMonth,
+  } = useMemo(() => {
+    const weekDays = new Set(listBusinessDaysEndingAt(todayYmd, 7))
+    const monthPrefix = todayYmd.slice(0, 7)
+    const revenueForBusinessDay = (ymd: string | null) => {
+      if (!ymd) return 0
+      const owner = ownerTotalByDate.get(ymd)
+      if (owner != null) return owner
+      return validOrders.filter((o) => orderDay(o) === ymd).reduce((s, o) => s + o.total, 0)
+    }
+    const todayOrdersInner = validOrders.filter((o) => orderDay(o) === todayYmd)
+    const todayRevenueInner = revenueForBusinessDay(todayYmd)
+    const weekRevenueInner = [...weekDays].reduce((s, d) => s + revenueForBusinessDay(d), 0)
+    const monthRevenueInner = validOrders
+      .map((o) => orderDay(o))
+      .filter((d): d is string => !!d && d.startsWith(monthPrefix))
+      .filter((d, i, arr) => arr.indexOf(d) === i)
+      .concat(
+        [...ownerTotalByDate.keys()].filter((d) => d.startsWith(monthPrefix)),
+      )
+      .filter((d, i, arr) => arr.indexOf(d) === i)
+      .reduce((s, d) => s + revenueForBusinessDay(d), 0)
+    return {
+      todayOrders: todayOrdersInner,
+      todayRevenue: todayRevenueInner,
+      weekRevenue: weekRevenueInner,
+      monthRevenue: monthRevenueInner,
+      avgOrder: todayOrdersInner.length > 0 ? todayRevenueInner / todayOrdersInner.length : 0,
+      /** Week start (maandag) kan vóór de 1e van deze maand vallen → weekomzet > maandomzet is dan logisch. */
+      weekStartsBeforeThisMonth: weekStartMs < monthStartMs,
+    }
+  }, [validOrders, ownerTotalByDate, todayYmd, openingHours, weekStartMs, monthStartMs])
 
   // ── Last 7 days chart ──
   const last7Days = useMemo(() => {
@@ -474,7 +492,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       else acc.ONLINE += o.total
     }
     return acc
-  }, [validOrders, todayStart, ownerCloseOn, zReports, todayYmd])
+  }, [validOrders, todayStartMs, ownerCloseOn, zReports, todayYmd])
 
   // ── Besteltypen vandaag ──
   const orderTypesToday = useMemo(() => {
@@ -488,14 +506,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       TAKEAWAY: td.filter(o=>['TAKEAWAY','pickup'].includes(o.order_type)).reduce((s,o)=>s+o.total,0),
       DELIVERY: td.filter(o=>['DELIVERY','delivery'].includes(o.order_type)).reduce((s,o)=>s+o.total,0),
     }
-  }, [validOrders, todayStart, ownerCloseOn, ownerCloseByDate, todayYmd])
+  }, [validOrders, todayStartMs, ownerCloseOn, ownerCloseByDate, todayYmd])
 
   // ── Klanten ──
   const klanten = useMemo(() => ({
     today: ordersInPeriod(validOrders, todayStart).length,
     week: ordersInPeriod(validOrders, weekStart).length,
     month: ordersInPeriod(validOrders, monthStart).length,
-  }), [validOrders, todayStart, weekStart, monthStart])
+  }), [validOrders, todayStartMs, weekStartMs, monthStartMs])
 
   // ── Online bestellingen ──
   const online = useMemo(() => ({
@@ -505,7 +523,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     weekRev: revenueInPeriod(onlineOrders, weekStart),
     monthCount: ordersInPeriod(onlineOrders, monthStart).length,
     monthRev: revenueInPeriod(onlineOrders, monthStart),
-  }), [onlineOrders, todayStart, weekStart, monthStart])
+  }), [onlineOrders, todayStartMs, weekStartMs, monthStartMs])
 
   // ── Populaire producten ──
   const popularDineIn = useMemo(() => {
@@ -518,7 +536,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       })
     })
     return Object.values(map).sort((a,b)=>b.count-a.count).slice(0,5)
-  }, [kassaOrders, todayStart])
+  }, [kassaOrders, todayStartMs])
 
   const popularOnline = useMemo(() => {
     const map: Record<string,{name:string;count:number;revenue:number}> = {}
@@ -530,7 +548,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       })
     })
     return Object.values(map).sort((a,b)=>b.count-a.count).slice(0,5)
-  }, [onlineOrders, todayStart])
+  }, [onlineOrders, todayStartMs])
 
   // ── Betalingen tabel ──
   const paymentsForCalendarDay = (y: number, m: number, dayNum: number) => {
