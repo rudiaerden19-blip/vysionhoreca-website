@@ -364,12 +364,28 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     return historyRange('month', belgiumToday())
   }
 
+  function monthEnd(ymd: string): string {
+    const [year, month] = ymd.slice(0, 7).split('-').map(Number)
+    return new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10)
+  }
+
   function periodFor(scope: 'period' | 'month' | 'year') {
     const today = belgiumToday()
     const selected = selectedPeriod()
     if (scope === 'year') return { from: `${today.slice(0, 4)}-01-01`, to: today }
-    if (scope === 'month') return { from: `${selected.to.slice(0, 7)}-01`, to: selected.to }
+    if (scope === 'month') {
+      const start = `${selected.to.slice(0, 7)}-01`
+      return { from: start, to: monthEnd(start) }
+    }
     return selected
+  }
+
+  function downloadPeriod(scope: 'period' | 'month' | 'year') {
+    const period = periodFor(scope)
+    if (period.from.endsWith('-01') && period.from.slice(0, 7) === period.to.slice(0, 7)) {
+      return { from: period.from, to: monthEnd(period.from) }
+    }
+    return period
   }
 
   function historyRowVisible(row: HistoryRow) {
@@ -578,11 +594,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={printPeriod}>Afdrukken</button>
-            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('csv', period.from, period.to) }}>CSV</button>
-            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('pdf', period.from, period.to) }}>PDF</button>
-            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('pdf', period.from, period.to) }}>Excel</button>
-            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('pdf', period.from, period.to) }}>Export voor boekhouding</button>
-            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('month'); void downloadExport('pdf', period.from, period.to) }}>Download maand</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = downloadPeriod('period'); void downloadExport('csv', period.from, period.to) }}>CSV</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = downloadPeriod('period'); void downloadExport('pdf', period.from, period.to) }}>PDF</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = downloadPeriod('period'); void downloadExport('pdf', period.from, period.to) }}>Excel</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = downloadPeriod('period'); void downloadExport('pdf', period.from, period.to) }}>Export voor boekhouding</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = downloadPeriod('month'); void downloadExport('pdf', period.from, period.to) }}>Download maand</button>
             <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('year'); void downloadExport('pdf', period.from, period.to) }}>Download jaar</button>
             <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
           </div>
