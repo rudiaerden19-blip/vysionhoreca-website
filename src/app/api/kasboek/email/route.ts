@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { loadAccountingSettings } from '@/lib/cashbook-accounting'
 import { renderBoekhoudingXlsx, renderCashbookPdf, type CashbookExportMeta } from '@/lib/cashbook-export'
 import { loadCashbookRange, logCashbookEvent } from '@/lib/cashbook-store'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
@@ -14,7 +13,7 @@ const BodySchema = z.object({
   tenantSlug: z.string().min(1),
   from: DateSchema,
   to: DateSchema,
-  toEmail: z.string().email().optional(),
+  toEmail: z.string().email(),
 })
 
 export async function POST(request: NextRequest) {
@@ -37,11 +36,7 @@ export async function POST(request: NextRequest) {
   const client = getServerSupabaseClient()
   if (!client) return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
 
-  const settings = await loadAccountingSettings(client, parsed.data.tenantSlug)
-  const to = (parsed.data.toEmail || settings.accountantEmail || '').trim()
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
-    return NextResponse.json({ error: 'E-mailadres van de boekhouder ontbreekt.' }, { status: 400 })
-  }
+  const to = parsed.data.toEmail.trim()
   const [rows, profile] = await Promise.all([
     loadCashbookRange(client, parsed.data.tenantSlug, parsed.data.from, parsed.data.to, { withVat: true }),
     client.from('tenant_settings').select('business_name, btw_number, address, postal_code, city').eq('tenant_slug', parsed.data.tenantSlug).maybeSingle(),

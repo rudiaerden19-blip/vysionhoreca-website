@@ -68,7 +68,7 @@ export async function saveAccountingSettings(
     package: input.packageName,
     client_reference: input.clientReference.trim() || null,
     export_format: input.exportFormat,
-    auto_export: input.autoExport,
+    auto_export: false,
     auto_export_day: input.autoExportDay,
     updated_at: new Date().toISOString(),
   }

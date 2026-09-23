@@ -871,10 +871,16 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 e.preventDefault()
                 const period = periodFor('period')
                 setBusy(true)
+                const toEmail = mailTo.trim()
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) {
+                  setBusy(false)
+                  setError('Vul het e-mailadres van de boekhouder in.')
+                  return
+                }
                 void authFetch('/api/kasboek/email', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ tenantSlug: tenant, from: period.from, to: period.to, toEmail: mailTo || undefined }),
+                  body: JSON.stringify({ tenantSlug: tenant, from: period.from, to: period.to, toEmail }),
                 }).then(async (res) => {
                   const json = await res.json().catch(() => ({}))
                   setBusy(false)
@@ -887,12 +893,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               }}
             >
               <h3 className="font-semibold">Verstuur naar boekhouder</h3>
-              <p className="text-sm text-gray-500">Periode {showDate(periodFor('period').from)} – {showDate(periodFor('period').to)}. Bijlage: PDF en boekhoud-CSV van die hele periode. Er wordt niets automatisch verstuurd.</p>
-              <input value={mailTo} onChange={(e) => setMailTo(e.target.value)} placeholder="boekhouder@email.be" className="w-full border rounded-xl px-3 py-2" />
-              <p className="text-xs text-gray-400">Laat leeg om het adres uit Instellingen → Boekhouding te gebruiken.</p>
+              <p className="text-sm text-gray-500">Vul het e-mailadres van de boekhouder in. De mail gaat alleen weg als je op Versturen drukt. Periode {showDate(periodFor('period').from)} – {showDate(periodFor('period').to)}.</p>
+              <input required type="email" value={mailTo} onChange={(e) => setMailTo(e.target.value)} placeholder="boekhouder@email.be" className="w-full border rounded-xl px-3 py-2" />
               <div className="flex justify-end gap-2">
                 <button type="button" className="px-3 py-2" onClick={() => setMailOpen(false)}>Annuleren</button>
-                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90">Versturen</button>
+                <button type="submit" disabled={busy || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mailTo.trim())} className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90">Versturen</button>
               </div>
             </form>
           </div>

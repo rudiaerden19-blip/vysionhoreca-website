@@ -23,8 +23,6 @@ export default function BoekhoudingPage({ params }: { params: { tenant: string }
   const [packageName, setPackageName] = useState('none')
   const [reference, setReference] = useState('')
   const [format, setFormat] = useState('csv')
-  const [autoExport, setAutoExport] = useState(false)
-  const [autoDay, setAutoDay] = useState(1)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
 
@@ -38,8 +36,6 @@ export default function BoekhoudingPage({ params }: { params: { tenant: string }
         setPackageName(json.packageName || 'none')
         setReference(json.clientReference || '')
         setFormat(json.exportFormat || 'csv')
-        setAutoExport(json.autoExport === true)
-        setAutoDay(Number(json.autoExportDay) || 1)
       })
       .catch(() => setError('Instellingen laden mislukt.'))
   }, [tenant])
@@ -72,8 +68,8 @@ export default function BoekhoudingPage({ params }: { params: { tenant: string }
                 packageName,
                 clientReference: reference,
                 exportFormat: format,
-                autoExport,
-                autoExportDay: autoDay,
+                autoExport: false,
+                autoExportDay: 1,
               }),
             }).then(async (res) => {
               const json = await res.json().catch(() => ({}))
@@ -106,14 +102,7 @@ export default function BoekhoudingPage({ params }: { params: { tenant: string }
               <option value="xlsx">Excel</option>
             </select>
           </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={autoExport} onChange={(e) => setAutoExport(e.target.checked)} />
-            Automatische maandexport
-          </label>
-          <label className="block text-sm">Dag van verzending
-            <input type="number" min={1} max={28} value={autoDay} onChange={(e) => setAutoDay(Number(e.target.value) || 1)} className="mt-1 w-24 border rounded-xl px-3 py-2" />
-          </label>
-          <p className="text-xs text-gray-400">Standaard de eerste dag van de volgende maand. De mail gaat alleen weg als dit aan staat en het e-mailadres is ingevuld.</p>
+          <p className="text-xs text-gray-400">De kasboekmail gaat niet automatisch weg. In het kasboek vul je het adres in en druk je zelf op Versturen.</p>
           <button type="submit" className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm">Opslaan</button>
         </form>
       </div>
