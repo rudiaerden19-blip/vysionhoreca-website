@@ -334,20 +334,20 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     return true
   }
 
-  function statusLabel(row: HistoryRow) {
+  function statusPresentation(row: HistoryRow) {
     const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
-    if (badge === 'attention') return 'Aandacht nodig'
-    if (badge === 'difference') return 'Verschil'
-    if (badge === 'correction') return 'Correctie'
-    if (badge === 'closed') return 'Afgesloten'
-    if (badge === 'open') return 'Open'
-    return '—'
+    if (badge === 'attention') return { text: 'Nog niet afgesloten', className: 'text-red-600 font-medium', color: '#dc2626' }
+    if (badge === 'closed') return { text: 'Afgesloten', className: 'text-green-600 font-medium', color: '#16a34a' }
+    if (badge === 'difference') return { text: 'Verschil', className: 'text-red-600 font-medium', color: '#dc2626' }
+    if (badge === 'correction') return { text: 'Correctie', className: '', color: '' }
+    if (badge === 'open') return { text: 'Nog niet afgesloten', className: 'text-red-600 font-medium', color: '#dc2626' }
+    return { text: '—', className: 'text-gray-400', color: '' }
   }
 
   function printPeriod() {
     const period = periodFor('period')
     const rows = history.filter(historyRowVisible)
-    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td>${statusLabel(row)}</td></tr>`).join('')
+    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td style="color:${statusPresentation(row).color}">${statusPresentation(row).text}</td></tr>`).join('')
     const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(period.from)} – ${showDate(period.to)}</title>
       <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;color:#111}h1{font-size:16px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:11px}</style>
       </head><body>
@@ -446,7 +446,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <option value="all">Alle statussen</option>
               <option value="open">Open</option>
               <option value="closed">Afgesloten</option>
-              <option value="attention">Aandacht nodig</option>
+              <option value="attention">Nog niet afgesloten</option>
               <option value="difference">Met kasverschil</option>
               <option value="correction">Met correcties</option>
             </select>
@@ -492,7 +492,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     <td className="px-3 py-2">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
                     <td className="px-3 py-2">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
                     <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
-                    <td className="px-3 py-2">{statusLabel(row)}</td>
+                    <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
                   </tr>
                 ))}
               </tbody>
