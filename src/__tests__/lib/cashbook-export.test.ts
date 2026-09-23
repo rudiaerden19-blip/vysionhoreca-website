@@ -1,4 +1,5 @@
-import { buildBoekhoudingCsv, buildCashbookCsv } from '@/lib/cashbook-export'
+import { strFromU8, unzipSync } from 'fflate'
+import { buildBoekhoudingCsv, buildCashbookCsv, renderBoekhoudingXlsx, renderCashbookXlsx } from '@/lib/cashbook-export'
 import { loadCashbookDay } from '@/lib/cashbook-store'
 import type { CashbookRangeRow } from '@/lib/cashbook-store'
 
@@ -62,7 +63,22 @@ describe('kasboek export', () => {
     expect(bookCsv).toContain('€2,50')
     expect(dayCsv).toContain('"Totaal"')
     expect(dayCsv).toContain('€37,90')
+    expect(dayCsv).toContain('€33,84')
+    expect(dayCsv).toContain('€4,06')
+    expect(bookCsv).toContain('€4,06')
     expect(dayCsv).toContain('-€0,50')
+    const files = unzipSync(new Uint8Array(renderCashbookXlsx(meta, [first, second])))
+    const bookFiles = unzipSync(new Uint8Array(renderBoekhoudingXlsx(meta, [first, second])))
+    const sheet = strFromU8(files['xl/worksheets/sheet1.xml'])
+    const styles = strFromU8(files['xl/styles.xml'])
+    const bookSheet = strFromU8(bookFiles['xl/worksheets/sheet1.xml'])
+    expect(sheet).toContain('€37,90')
+    expect(sheet).toMatch(/<v>Totaal<\/v>/)
+    expect(sheet).toContain('s="1"')
+    expect(styles).toContain('<b/>')
+    expect(bookSheet).toContain('€37,90')
+    expect(bookSheet).toContain('€4,06')
+    expect(bookSheet).toContain('s="1"')
   })
 })
 

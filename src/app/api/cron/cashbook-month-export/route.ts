@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { loadAccountingSettings } from '@/lib/cashbook-accounting'
-import { buildBoekhoudingCsv, renderCashbookPdf, type CashbookExportMeta } from '@/lib/cashbook-export'
+import { renderBoekhoudingXlsx, renderCashbookPdf, type CashbookExportMeta } from '@/lib/cashbook-export'
 import { loadCashbookRange, logCashbookEvent } from '@/lib/cashbook-store'
 import { requireCronSecret } from '@/lib/cron-auth'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
@@ -54,15 +54,15 @@ export async function GET(request: NextRequest) {
         periodLabel: `${period.from} – ${period.to}`,
       }
       const pdf = await renderCashbookPdf(meta, rows)
-      const csv = buildBoekhoudingCsv(meta, rows)
+      const book = renderBoekhoudingXlsx(meta, rows)
       await createZohoMailTransport().sendMail({
         from: `"Vysion" <${resolveZohoEmail()}>`,
         to: email,
         subject: `Vysion kasboek ${period.key}`,
-        text: `Automatische maandexport ${meta.businessName} voor ${period.key}.`,
+        text: `Automatische maandexport ${meta.businessName} voor ${period.key}. De totaalregel is de som van de dagen.`,
         attachments: [
           { filename: `Vysion-Kasboek-${period.key}.pdf`, content: pdf },
-          { filename: `Vysion-Boekhouding-${period.key}.csv`, content: csv },
+          { filename: `Vysion-Boekhouding-${period.key}.xlsx`, content: book },
         ],
       })
       await logCashbookEvent(client, tenantSlug, 'cron', period.from, 'report_emailed', { to: email, period: period.key, automatic: true })

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import {
-  buildBoekhoudingCsv,
   buildCashbookCsv,
+  renderBoekhoudingXlsx,
   renderCashbookPdf,
   renderCashbookXlsx,
   type CashbookExportMeta,
@@ -53,17 +53,18 @@ export async function GET(request: NextRequest) {
       },
     })
   }
-  if (format === 'xlsx') {
-    const book = renderCashbookXlsx(meta, rows)
+  if (format === 'xlsx' || format === 'boekhouding') {
+    const book = format === 'boekhouding' ? renderBoekhoudingXlsx(meta, rows) : renderCashbookXlsx(meta, rows)
+    const name = format === 'boekhouding' ? `vysion-boekhouding-${from}-${to}.xlsx` : `${filename}.xlsx`
     return new NextResponse(new Uint8Array(book), {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${filename}.xlsx"`,
+        'Content-Disposition': `attachment; filename="${name}"`,
       },
     })
   }
-  const csv = format === 'boekhouding' ? buildBoekhoudingCsv(meta, rows) : buildCashbookCsv(meta, rows)
-  const name = format === 'boekhouding' ? `vysion-boekhouding-${from}-${to}.csv` : `${filename}.csv`
+  const csv = buildCashbookCsv(meta, rows)
+  const name = `${filename}.csv`
   return new NextResponse(csv, {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',

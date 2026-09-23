@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { loadAccountingSettings } from '@/lib/cashbook-accounting'
-import { buildBoekhoudingCsv, renderCashbookPdf, type CashbookExportMeta } from '@/lib/cashbook-export'
+import { renderBoekhoudingXlsx, renderCashbookPdf, type CashbookExportMeta } from '@/lib/cashbook-export'
 import { loadCashbookRange, logCashbookEvent } from '@/lib/cashbook-store'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
@@ -55,16 +55,16 @@ export async function POST(request: NextRequest) {
     periodLabel: period,
   }
   const pdf = await renderCashbookPdf(meta, rows)
-  const csv = buildBoekhoudingCsv(meta, rows)
+  const book = renderBoekhoudingXlsx(meta, rows)
   const fromAddress = resolveZohoEmail()
   await createZohoMailTransport().sendMail({
     from: `"Vysion" <${fromAddress}>`,
     to,
     subject: `Vysion kasboek ${period}`,
-    text: `Kasboek ${meta.businessName} voor ${period}. In de bijlage staan de PDF en de boekhoud-CSV.`,
+    text: `Kasboek ${meta.businessName} voor ${period}. In de bijlage staan de PDF en het Excel-bestand. De totaalregel is de som van de dagen.`,
     attachments: [
       { filename: `Vysion-Kasboek-${period}.pdf`, content: pdf },
-      { filename: `Vysion-Boekhouding-${period}.csv`, content: csv },
+      { filename: `Vysion-Boekhouding-${period}.xlsx`, content: book },
     ],
   })
   const actor = access.businessId || request.headers.get('x-auth-email') || 'owner'
