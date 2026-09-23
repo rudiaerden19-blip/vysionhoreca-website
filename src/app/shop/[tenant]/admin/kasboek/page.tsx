@@ -238,7 +238,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       setCloseNote('')
     }
     loadedDate.current = view.date
-    setOpening(view.status === 'none' ? '' : (view.openingCents / 100).toFixed(2))
+    setOpening(view.status === 'open' ? (view.openingCents / 100).toFixed(2) : '')
     setLoading(false)
   }, [tenant])
 
@@ -612,9 +612,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
           <p className="text-gray-500">Laden…</p>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <button type="button" className="px-3 py-2 bg-gray-100 rounded-lg" onClick={() => void loadDay(shiftDate(day.date, -1))}>‹</button>
-              <p className="font-semibold">{day.status === 'closed' ? 'AFGESLOTEN' : day.status === 'open' ? 'OPEN' : 'NOG GEEN BEGINSALDO'}</p>
+              <div className="text-center">
+                <input type="date" value={day.date} onChange={(event) => { if (event.target.value) void loadDay(event.target.value) }} className="px-3 py-2 rounded-xl border text-sm" />
+                <p className="font-semibold mt-1">{day.status === 'closed' ? 'AFGESLOTEN' : day.status === 'open' ? 'OPEN' : 'NOG GEEN BEGINSALDO'}</p>
+              </div>
               <button type="button" className="px-3 py-2 bg-gray-100 rounded-lg" onClick={() => void loadDay(shiftDate(day.date, 1))}>›</button>
             </div>
 
@@ -673,22 +676,24 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     step="0.01"
                     autoComplete="off"
                     value={opening}
-                    disabled={closed}
                     onChange={(e) => setOpening(e.target.value)}
                     className="mt-1 block w-36 px-3 py-2 border rounded-xl"
                   />
                 </label>
                 <button
                   type="button"
-                  disabled={busy || (!closed && opening.trim() === '')}
-                  className={`px-4 py-2 rounded-xl text-white text-sm disabled:opacity-100 ${day.status === 'none' ? 'bg-accent hover:bg-accent/90' : 'bg-green-600'}`}
+                  disabled={busy || (day.status !== 'open' && !closed && opening.trim() === '')}
+                  className={`px-4 py-2 rounded-xl text-white text-sm disabled:opacity-100 ${day.status === 'open' ? 'bg-green-600' : 'bg-accent hover:bg-accent/90'}`}
                   onClick={() => {
-                    if (closed) return
+                    if (closed) {
+                      setError('Deze dag is afgesloten. Kies een andere dag.')
+                      return
+                    }
                     if (opening.trim() === '' || Number.isNaN(Number(opening))) return
                     void post({ action: 'opening', openingEuros: Number(opening) })
                   }}
                 >
-                  {day.status === 'none' ? 'Beginsaldo bevestigen' : 'Bedrag in kas'}
+                  {day.status === 'open' ? 'Bedrag in kas' : 'Beginsaldo bevestigen'}
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-y-2 text-sm">
