@@ -418,13 +418,17 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     return { text: '—', className: 'text-gray-400', color: '' }
   }
 
+  function closureLabel(row: HistoryRow): string {
+    return row.closureChoice === 'vakantie' ? 'Vakantie' : ''
+  }
+
   function printPeriod() {
     const period = periodFor('period')
     const rows = history.filter(historyRowVisible)
     const sum = (pick: (row: HistoryRow) => number) => rows.reduce((total, row) => total + pick(row), 0)
     const differences = rows.map((row) => row.differenceCents).filter((value): value is number => value != null)
     const differenceTotal = differences.length === 0 ? null : differences.reduce((total, value) => total + value, 0)
-    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td style="color:${statusPresentation(row).color}">${statusPresentation(row).text}</td><td>${row.closureChoice === 'vakantie' ? 'Vakantie' : row.closureChoice === 'gesloten' ? 'Gesloten' : ''}</td></tr>`).join('')
+    const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td style="color:${statusPresentation(row).color}">${statusPresentation(row).text}</td><td>${closureLabel(row)}</td></tr>`).join('')
     const totalRow = `<tr><td><strong>Totaal</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.grossCents))}</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.cashCents))}</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.cardCents))}</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.onlineCents))}</strong></td><td></td><td style="text-align:right"><strong>${euro(sum((row) => row.outCents))}</strong></td><td></td><td></td><td style="text-align:right"><strong>${differenceTotal == null ? '—' : euro(differenceTotal)}</strong></td><td></td><td></td></tr>`
     const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(period.from)} – ${showDate(period.to)}</title>
       <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;color:#111}h1{font-size:16px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:11px}tfoot td{border-top:2px solid #111;font-weight:700;font-size:12px}</style>
@@ -573,7 +577,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
                     <td className="px-3 py-2" onClick={(event) => event.stopPropagation()}>
                       {row.status === 'closed' || (row.closureDay && row.grossCents === 0 && row.status !== 'open') ? (
-                        <span className="text-gray-500">{row.closureChoice === 'vakantie' ? 'Vakantie' : row.closureChoice === 'gesloten' ? 'Gesloten' : ''}</span>
+                        <span className="text-gray-500">{closureLabel(row)}</span>
                       ) : (
                         <select
                           value={row.closureChoice || ''}
