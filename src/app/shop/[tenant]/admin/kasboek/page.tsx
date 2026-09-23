@@ -118,6 +118,20 @@ function showDate(ymd: string) {
   return `${d}/${m}/${y}`
 }
 
+function visibleActor(value: string | null | undefined) {
+  const name = (value || '').trim()
+  if (!name) return ''
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(name)) return ''
+  return name
+}
+
+function actorMoment(prefix: string, who: string | null | undefined, at: string | null | undefined) {
+  const name = visibleActor(who)
+  if (!name && !at) return ''
+  const moment = at ? ` op ${new Date(at).toLocaleString('nl-BE')}` : ''
+  return `${prefix}${name ? ` door ${name}` : ''}${moment}`
+}
+
 const MONTHS_NL = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December']
 
 function belgiumToday() {
@@ -507,9 +521,9 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             </div>
 
             <p className="text-sm text-gray-500">{day.businessName}{day.btwNumber ? ` · BTW ${day.btwNumber}` : ''}{day.address ? ` · ${day.address}` : ''}</p>
-            {(day.openedBy || day.closedBy) && (
-              <p className="text-sm text-gray-500">{day.openedBy ? `Geopend door ${day.openedBy}${day.openedAt ? ` op ${new Date(day.openedAt).toLocaleString('nl-BE')}` : ''}` : ''}{day.closedBy ? ` · Afgesloten door ${day.closedBy}${day.closedAt ? ` op ${new Date(day.closedAt).toLocaleString('nl-BE')}` : ''}` : ''}</p>
-            )}
+            {actorMoment('Geopend', day.openedBy, day.openedAt) || actorMoment('Afgesloten', day.closedBy, day.closedAt) ? (
+              <p className="text-sm text-gray-500">{[actorMoment('Geopend', day.openedBy, day.openedAt), actorMoment('Afgesloten', day.closedBy, day.closedAt)].filter(Boolean).join(' · ')}</p>
+            ) : null}
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <p className="text-xs uppercase tracking-wide text-gray-400">Dagontvangstenboek</p>
               <h2 className="font-semibold mb-3">Dagontvangsten</h2>
@@ -596,7 +610,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                   <button type="button" disabled={busy} className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm" onClick={() => setShowClose(true)}>Dag afsluiten</button>
                 </div>
               )}
-              {closed && <p className="text-sm text-gray-500 mt-3">{day.closeNote ? `Opmerking: ${day.closeNote}. ` : ''}{day.closedBy ? `Afgesloten door ${day.closedBy}.` : ''}</p>}
+              {closed && <p className="text-sm text-gray-500 mt-3">{day.closeNote ? `Opmerking: ${day.closeNote}. ` : ''}{visibleActor(day.closedBy) ? `Afgesloten door ${visibleActor(day.closedBy)}.` : ''}</p>}
             </section>
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
@@ -657,7 +671,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 <h2 className="font-semibold mb-3">Audit</h2>
                 <ul className="text-sm text-gray-600 space-y-1">
                   {day.audits.map((entry) => (
-                    <li key={entry.id}>{new Date(entry.created_at).toLocaleString('nl-BE')} · {entry.action} · {entry.actor}{entry.reason ? ` · ${entry.reason}` : ''}</li>
+                    <li key={entry.id}>{new Date(entry.created_at).toLocaleString('nl-BE')} · {entry.action}{visibleActor(entry.actor) ? ` · ${visibleActor(entry.actor)}` : ''}{entry.reason ? ` · ${entry.reason}` : ''}</li>
                   ))}
                 </ul>
               </section>

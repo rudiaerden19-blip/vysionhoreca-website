@@ -640,17 +640,43 @@ export async function loadPendingCloseDays(
   today: string,
 ): Promise<{ count: number; dates: string[] }> {
   const yesterday = shiftBookDate(today, -1)
-  const dayRes = await client
-    .from('cashbook_days')
-    .select('book_date')
-    .eq('tenant_slug', tenantSlug)
-    .eq('status', 'open')
-    .lte('book_date', yesterday)
-    .order('book_date', { ascending: false })
-    .limit(60)
+  const [y, m] = today.split('-').map(Number)
+  const from = new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 10)
+  const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
+  const start = getTenantBusinessDayBounds(from, hours).startUTC
+  const end = getTenantBusinessDayBounds(yesterday, hours).endUTC
+  const [dayRes, orders] = await Promise.all([
+    client
+      .from('cashbook_days')
+      .select('book_date, status')
+      .eq('tenant_slug', tenantSlug)
+      .lte('book_date', yesterday),
+    fetchOrders(client, tenantSlug, start, end, false),
+  ])
   if (missingTable(dayRes.error)) return { count: 0, dates: [] }
-  const dates = ((dayRes.data || []) as Array<{ book_date: string }>).map((row) => String(row.book_date))
-  return { count: dates.length, dates }
+  const statusByDate = new Map<string, string>()
+  for (const row of (dayRes.data || []) as Array<{ book_date: string; status: string }>) {
+    statusByDate.set(String(row.book_date), String(row.status))
+  }
+  const salesDays = new Set<string>()
+  for (const row of orders) {
+    if (!orderCountsTowardRevenueAndZReport(row as never)) continue
+    const bookDay = businessDayForOrder(String(row.created_at || ''), hours)
+    if (!bookDay || bookDay < from || bookDay > yesterday) continue
+    if ((Number(row.total) || 0) === 0) continue
+    salesDays.add(bookDay)
+  }
+  const dates = new Set<string>()
+  for (const [date, status] of statusByDate) {
+    if (date > yesterday || status === 'closed') continue
+    if (status === 'open') dates.add(date)
+  }
+  for (const date of salesDays) {
+    if (statusByDate.get(date) === 'closed') continue
+    dates.add(date)
+  }
+  const list = Array.from(dates).sort((a, b) => (a < b ? 1 : -1))
+  return { count: list.length, dates: list.slice(0, 120) }
 }
 
 function shiftBookDate(ymd: string, days: number): string {
