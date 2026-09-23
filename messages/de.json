@@ -6057,7 +6057,17 @@
     "paySplit": "Geteilt (Bar / Karte)",
     "period30": "30 Tage",
     "period60": "60 Tage",
-    "period90": "90 Tage"
+    "period90": "90 Tage",
+    "paymentsIntro": "Jede Zahlung, die zählt: bar, Karte und online.",
+    "readOnlyNote": "Dieser Bildschirm speichert nichts und ändert den Z-Bericht nicht.",
+    "prevMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "totalCash": "Bar",
+    "totalCard": "Karte",
+    "totalOnline": "Online",
+    "dayTotal": "Tagessumme",
+    "emptyPayments": "Keine Zahlungen in diesem Monat.",
+    "loadFailed": "Kassenbuch konnte nicht geladen werden."
   },
   "adminLayout": {
     "loading": "Laden...",
@@ -6169,6 +6179,7 @@
       "sm_rpt_analyse": "Unternehmensanalyse",
       "sm_rpt_verkoop": "Verkauf",
       "sm_rpt_populair": "Beliebte Artikel",
+      "sm_rpt_kasboek": "Digitales Kassenbuch",
       "sm_inst_betaling": "Zahlungsarten",
       "sm_inst_modules": "Module",
       "sm_inst_bonprinter_windows": "Windows-Bondrucker",

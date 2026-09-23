@@ -6034,7 +6034,17 @@
     "paySplit": "拆分付款（现金／刷卡）",
     "period30": "30 天",
     "period60": "60 天",
-    "period90": "90 天"
+    "period90": "90 天",
+    "paymentsIntro": "显示所有计入营业额的付款：现金、银行卡和在线支付。",
+    "readOnlyNote": "此页面不保存数据，也不会更改 Z 报表。",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
+    "totalCash": "现金",
+    "totalCard": "银行卡",
+    "totalOnline": "在线",
+    "dayTotal": "当日合计",
+    "emptyPayments": "本月没有付款。",
+    "loadFailed": "无法加载现金账。"
   },
   "adminLayout": {
     "loading": "加载中...",
@@ -6146,6 +6156,7 @@
       "sm_rpt_analyse": "Business analysis",
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
+      "sm_rpt_kasboek": "数字现金账",
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "模块",
       "sm_inst_bonprinter_windows": "Windows 小票打印机",

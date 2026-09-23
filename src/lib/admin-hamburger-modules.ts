@@ -8,6 +8,7 @@ import {
   isShopAdminKassaPosPath,
   isShopAdminRetailKassaPosPath,
   isTenantSubmenuEffectiveOn,
+  kasboekSubmenuVisible,
   parseEnabledModulesJson,
   submenuParentAllowedForSubmenuId,
   TENANT_MODULE_IDS,
@@ -561,6 +562,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           href: `${baseUrl}/rapporten`,
         },
         {
+          id: 'sm_rpt_kasboek',
+          icon: '',
+          label: 'Digitale kasboek',
+          labelKey: itemLabelKey('sm_rpt_kasboek'),
+          href: `${baseUrl}/kasboek`,
+        },
+        {
           id: 'sm_rpt_z',
           icon: '',
           label: 'Z-Rapporten (GKS)',
@@ -787,6 +795,7 @@ export function isAdminSubmenuEnabled(
     if (subId === 'sm_kassa_op_rekening') {
       return enabledJson.sm_kassa_op_rekening === true
     }
+    if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledJson)) return true
     return false
   }
 
@@ -870,6 +879,7 @@ export function hasShopAdminPathAccess(
     ) {
       return true
     }
+    if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
     return false
   }
   const gate = adminPathToModule(pathname, tenantSlug)
@@ -943,6 +953,7 @@ export function filterHamburgerModulesForAccess(
           if (item.id === 'sm_kassa_op_rekening') {
             return enabledModulesJson.sm_kassa_op_rekening === true
           }
+          if (item.id === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
           return false
         }
         let parentOn = effectiveAccess[m.key]

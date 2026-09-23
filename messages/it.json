@@ -6034,7 +6034,17 @@
     "paySplit": "Diviso (contanti / carta)",
     "period30": "30 giorni",
     "period60": "60 giorni",
-    "period90": "90 giorni"
+    "period90": "90 giorni",
+    "paymentsIntro": "Ogni pagamento che conta: contanti, carta e online.",
+    "readOnlyNote": "Questa schermata non salva nulla e non modifica il report Z.",
+    "prevMonth": "Mese precedente",
+    "nextMonth": "Mese successivo",
+    "totalCash": "Contanti",
+    "totalCard": "Carta",
+    "totalOnline": "Online",
+    "dayTotal": "Totale del giorno",
+    "emptyPayments": "Nessun pagamento in questo mese.",
+    "loadFailed": "Impossibile caricare il libro cassa."
   },
   "adminLayout": {
     "loading": "Caricamento...",
@@ -6146,6 +6156,7 @@
       "sm_rpt_analyse": "Analisi aziendale",
       "sm_rpt_verkoop": "Vendite",
       "sm_rpt_populair": "Articoli popolari",
+      "sm_rpt_kasboek": "Libro cassa digitale",
       "sm_inst_betaling": "Metodi di pagamento",
       "sm_inst_modules": "Moduli",
       "sm_inst_bonprinter_windows": "Stampante scontrini (Windows)",

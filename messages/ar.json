@@ -6034,7 +6034,17 @@
     "paySplit": "دفع مقسّم (نقد / بطاقة)",
     "period30": "30 يومًا",
     "period60": "60 يومًا",
-    "period90": "90 يومًا"
+    "period90": "90 يومًا",
+    "paymentsIntro": "كل دفعة تُحتسب: نقداً والبطاقة وعبر الإنترنت.",
+    "readOnlyNote": "هذه الشاشة لا تحفظ شيئاً ولا تغيّر تقرير Z.",
+    "prevMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "totalCash": "نقداً",
+    "totalCard": "بطاقة",
+    "totalOnline": "عبر الإنترنت",
+    "dayTotal": "مجموع اليوم",
+    "emptyPayments": "لا مدفوعات في هذا الشهر.",
+    "loadFailed": "تعذر تحميل دفتر الصندوق."
   },
   "adminLayout": {
     "loading": "جاري التحميل...",
@@ -6146,6 +6156,7 @@
       "sm_rpt_analyse": "Business analysis",
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
+      "sm_rpt_kasboek": "دفتر الصندوق الرقمي",
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "الوحدات",
       "sm_inst_bonprinter_windows": "طابعة الإيصالات (Windows)",

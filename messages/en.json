@@ -5993,7 +5993,17 @@
     "paySplit": "Split (cash / card)",
     "period30": "30 days",
     "period60": "60 days",
-    "period90": "90 days"
+    "period90": "90 days",
+    "paymentsIntro": "Every payment that counts: cash, card and online.",
+    "readOnlyNote": "This screen does not save anything and does not change the Z-report.",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "totalCash": "Cash",
+    "totalCard": "Card",
+    "totalOnline": "Online",
+    "dayTotal": "Day total",
+    "emptyPayments": "No payments this month.",
+    "loadFailed": "Could not load the cash book."
   },
   "adminLayout": {
     "loading": "Loading...",
@@ -6105,6 +6115,7 @@
       "sm_rpt_analyse": "Business analysis",
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
+      "sm_rpt_kasboek": "Digital cash book",
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Windows receipt printer",

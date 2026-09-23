@@ -275,7 +275,25 @@ export function isTenantSubmenuEffectiveOn(
     if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return false
     return enabledJson.sm_kassa_op_rekening === true
   }
+  if (subId === 'sm_rpt_kasboek') return kasboekSubmenuVisible(enabledJson)
   return false
+}
+
+/**
+ * Digitaal kasboek volgt Rapporten. Ontbrekende key bij bestaande zaken = aan
+ * zodra rapporten of het Z-rapport aan staat. Expliciet uit blijft uit.
+ */
+export function kasboekSubmenuVisible(
+  enabledJson: Record<string, boolean> | null | undefined,
+): boolean {
+  if (!enabledJson) return false
+  if (enabledJson.sm_rpt_kasboek === false) return false
+  if (enabledJson.sm_rpt_kasboek === true) return true
+  return (
+    enabledJson.rapporten === true ||
+    enabledJson.sm_rpt_rapporten === true ||
+    enabledJson.sm_rpt_z === true
+  )
 }
 
 /** Schuif `kassa`in Modules (zelfde vlak als pincode/producten …). */
@@ -526,6 +544,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   }
   if (
     rest.startsWith('/rapporten') ||
+    rest.startsWith('/kasboek') ||
     rest.startsWith('/z-rapport') ||
     rest.startsWith('/analyse') ||
     rest.startsWith('/populair') ||

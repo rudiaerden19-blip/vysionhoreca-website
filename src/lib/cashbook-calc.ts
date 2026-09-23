@@ -1,0 +1,170 @@
+import {
+  distributeOrderPaymentForZRaport,
+  orderCountsTowardRevenueAndZReport,
+  type Order,
+} from '@/lib/admin-api-order-helpers'
+import type { ZReportVatAggregate } from '@/lib/order-vat'
+import { businessDayForOrder, type TenantHourRow } from '@/lib/tenant-business-day'
+
+/** Kasboek rekent in centen. Bestellingen blijven in euro, zoals de kassa ze opslaat. */
+export function eurosToCents(amount: unknown): number {
+  const n = typeof amount === 'number' ? amount : Number(amount)
+  if (!Number.isFinite(n)) return 0
+  return Math.round(n * 100)
+}
+
+export function centsToEuros(cents: number): number {
+  return (Number.isFinite(cents) ? cents : 0) / 100
+}
+
+export const CASHBOOK_MOVEMENT_TYPES = [
+  'cash_in',
+  'cash_out',
+  'float_in',
+  'take_out',
+  'bank_deposit',
+  'petty_expense',
+  'correction_in',
+  'correction_out',
+  'other_in',
+  'other_out',
+] as const
+
+export type CashbookMovementType = (typeof CASHBOOK_MOVEMENT_TYPES)[number]
+
+export function isCashbookMovementType(value: string): value is CashbookMovementType {
+  return (CASHBOOK_MOVEMENT_TYPES as readonly string[]).includes(value)
+}
+
+/** Plus = geld in de lade. Min = geld uit de lade. */
+export function movementEffectCents(type: CashbookMovementType, amountCents: number): number {
+  const amount = Math.abs(Math.round(amountCents))
+  switch (type) {
+    case 'cash_in':
+    case 'float_in':
+    case 'correction_in':
+    case 'other_in':
+      return amount
+    case 'cash_out':
+    case 'petty_expense':
+    case 'take_out':
+    case 'bank_deposit':
+    case 'correction_out':
+    case 'other_out':
+      return -amount
+    default:
+      return 0
+  }
+}
+
+export function expectedCashCents(input: {
+  openingCents: number
+  cashSalesCents: number
+  movements: Array<{ type: CashbookMovementType; amountCents: number }>
+}): number {
+  let expected = Math.round(input.openingCents) + Math.round(input.cashSalesCents)
+  for (const movement of input.movements) {
+    expected += movementEffectCents(movement.type, movement.amountCents)
+  }
+  return expected
+}
+
+export function cashDifferenceCents(countedCents: number, expectedCents: number): number {
+  return Math.round(countedCents) - Math.round(expectedCents)
+}
+
+export type CashbookPaymentTotals = {
+  cashCents: number
+  cardCents: number
+  onlineCents: number
+  grossCents: number
+  count: number
+  discountCents: number
+  refundCents: number
+}
+
+export type CashbookOrderSlice = Partial<Order> &
+  Pick<Order, 'order_type' | 'status' | 'payment_status'> & { created_at?: string | null }
+
+/** Zelfde werkdag als de kassa: van openingsuur tot sluitingsuur, ook na middernacht. */
+export function orderBelongsToCashbookDay(
+  createdAt: string | null | undefined,
+  bookDate: string,
+  hours: TenantHourRow[],
+): boolean {
+  if (!createdAt) return false
+  return businessDayForOrder(createdAt, hours) === bookDate
+}
+
+export function summarizeCashbookOrders(
+  orders: CashbookOrderSlice[],
+  hours: TenantHourRow[],
+  bookDate: string,
+): {
+  payments: CashbookPaymentTotals
+  cancelledCount: number
+  cancelledCents: number
+} {
+  const payments: CashbookPaymentTotals = {
+    cashCents: 0,
+    cardCents: 0,
+    onlineCents: 0,
+    grossCents: 0,
+    count: 0,
+    discountCents: 0,
+    refundCents: 0,
+  }
+  let cancelledCount = 0
+  let cancelledCents = 0
+  for (const order of orders) {
+    if (!orderBelongsToCashbookDay(order.created_at, bookDate, hours)) continue
+    const status = String(order.status || '').toLowerCase()
+    if (status === 'cancelled' || status === 'rejected') {
+      cancelledCount += 1
+      cancelledCents += eurosToCents(order.total)
+      continue
+    }
+    if (!orderCountsTowardRevenueAndZReport(order)) continue
+    const parts = distributeOrderPaymentForZRaport(order)
+    const cash = eurosToCents(parts.cash)
+    const card = eurosToCents(parts.card)
+    const online = eurosToCents(parts.online)
+    const total = cash + card + online
+    payments.cashCents += cash
+    payments.cardCents += card
+    payments.onlineCents += online
+    payments.grossCents += total
+    payments.count += 1
+    payments.discountCents += eurosToCents(order.discount_amount)
+    if (total < 0) payments.refundCents += total
+  }
+  return { payments, cancelledCount, cancelledCents }
+}
+
+export type CashbookVatLine = {
+  rate: number
+  baseCents: number
+  taxCents: number
+  inclCents: number
+}
+
+const VAT_RATES = [0, 6, 9, 12, 21] as const
+
+/** Elk tarief apart. 9% blijft 9%, niet opgeteld bij 12%. */
+export function vatLinesFromAggregate(agg: Pick<ZReportVatAggregate, 'taxByRate' | 'baseByRate'> | null): CashbookVatLine[] {
+  const taxMap = (agg?.taxByRate || {}) as Record<number, number>
+  const baseMap = (agg?.baseByRate || {}) as Record<number, number>
+  const lines: CashbookVatLine[] = []
+  for (const rate of VAT_RATES) {
+    const taxCents = eurosToCents(taxMap[rate] || 0)
+    const baseCents = eurosToCents(baseMap[rate] || 0)
+    if (rate !== 6 && rate !== 12 && rate !== 21 && taxCents === 0 && baseCents === 0) continue
+    lines.push({
+      rate,
+      baseCents,
+      taxCents,
+      inclCents: baseCents + taxCents,
+    })
+  }
+  return lines
+}

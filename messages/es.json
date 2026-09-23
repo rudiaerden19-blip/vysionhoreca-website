@@ -6034,7 +6034,17 @@
     "paySplit": "Mixto (efectivo / tarjeta)",
     "period30": "30 días",
     "period60": "60 días",
-    "period90": "90 días"
+    "period90": "90 días",
+    "paymentsIntro": "Cada pago que cuenta: efectivo, tarjeta y online.",
+    "readOnlyNote": "Esta pantalla no guarda nada y no cambia el informe Z.",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "totalCash": "Efectivo",
+    "totalCard": "Tarjeta",
+    "totalOnline": "Online",
+    "dayTotal": "Total del día",
+    "emptyPayments": "No hay pagos este mes.",
+    "loadFailed": "No se pudo cargar el libro de caja."
   },
   "adminLayout": {
     "loading": "Cargando...",
@@ -6146,6 +6156,7 @@
       "sm_rpt_analyse": "Análisis del negocio",
       "sm_rpt_verkoop": "Ventas",
       "sm_rpt_populair": "Productos populares",
+      "sm_rpt_kasboek": "Libro de caja digital",
       "sm_inst_betaling": "Métodos de pago",
       "sm_inst_modules": "Módulos",
       "sm_inst_bonprinter_windows": "Impresora de tickets (Windows)",

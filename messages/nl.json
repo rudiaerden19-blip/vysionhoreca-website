@@ -5993,7 +5993,17 @@
     "paySplit": "Gesplitst (contant / kaart)",
     "period30": "30 dagen",
     "period60": "60 dagen",
-    "period90": "90 dagen"
+    "period90": "90 dagen",
+    "paymentsIntro": "Elke betaling die meetelt: contant, kaart en online.",
+    "readOnlyNote": "Dit scherm schrijft niets weg en verandert het Z-rapport niet.",
+    "prevMonth": "Vorige maand",
+    "nextMonth": "Volgende maand",
+    "totalCash": "Contant",
+    "totalCard": "Kaart",
+    "totalOnline": "Online",
+    "dayTotal": "Dagtotaal",
+    "emptyPayments": "Geen betalingen in deze maand.",
+    "loadFailed": "Kasboek laden mislukt."
   },
   "adminLayout": {
     "loading": "Laden...",
@@ -6105,6 +6115,7 @@
       "sm_rpt_analyse": "Bedrijfsanalyse",
       "sm_rpt_verkoop": "Verkoop",
       "sm_rpt_populair": "Populaire items",
+      "sm_rpt_kasboek": "Digitale kasboek",
       "sm_inst_betaling": "Betaalmethodes",
       "sm_retail_kassa_pos": "Verkoop (barcode)",
       "sm_retail_kassa_producten": "Artikelen",

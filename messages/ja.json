@@ -6034,7 +6034,17 @@
     "paySplit": "分割（現金／カード）",
     "period30": "30日",
     "period60": "60日",
-    "period90": "90日"
+    "period90": "90日",
+    "paymentsIntro": "計上される支払いをすべて表示します。現金、カード、オンライン。",
+    "readOnlyNote": "この画面は保存せず、Zレポートも変更しません。",
+    "prevMonth": "前の月",
+    "nextMonth": "次の月",
+    "totalCash": "現金",
+    "totalCard": "カード",
+    "totalOnline": "オンライン",
+    "dayTotal": "日計",
+    "emptyPayments": "この月の支払いはありません。",
+    "loadFailed": "現金出納帳を読み込めませんでした。"
   },
   "adminLayout": {
     "loading": "読み込み中...",
@@ -6146,6 +6156,7 @@
       "sm_rpt_analyse": "Business analysis",
       "sm_rpt_verkoop": "Sales",
       "sm_rpt_populair": "Popular items",
+      "sm_rpt_kasboek": "デジタル現金出納帳",
       "sm_inst_betaling": "Payment methods",
       "sm_inst_modules": "モジュール",
       "sm_inst_bonprinter_windows": "Windowsレシートプリンター",

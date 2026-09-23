@@ -6057,7 +6057,17 @@
     "paySplit": "Répartition (espèces / carte)",
     "period30": "30 jours",
     "period60": "60 jours",
-    "period90": "90 jours"
+    "period90": "90 jours",
+    "paymentsIntro": "Chaque paiement qui compte : espèces, carte et en ligne.",
+    "readOnlyNote": "Cet écran n'enregistre rien et ne modifie pas le rapport Z.",
+    "prevMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "totalCash": "Espèces",
+    "totalCard": "Carte",
+    "totalOnline": "En ligne",
+    "dayTotal": "Total du jour",
+    "emptyPayments": "Aucun paiement ce mois-ci.",
+    "loadFailed": "Impossible de charger le livre de caisse."
   },
   "adminLayout": {
     "loading": "Chargement...",
@@ -6169,6 +6179,7 @@
       "sm_rpt_analyse": "Analyse d’activité",
       "sm_rpt_verkoop": "Ventes",
       "sm_rpt_populair": "Articles populaires",
+      "sm_rpt_kasboek": "Livre de caisse numérique",
       "sm_inst_betaling": "Moyens de paiement",
       "sm_inst_modules": "Modules",
       "sm_inst_bonprinter_windows": "Imprimante tickets (Windows)",
