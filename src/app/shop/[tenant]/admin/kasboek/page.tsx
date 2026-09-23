@@ -188,6 +188,8 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [periodFrom, setPeriodFrom] = useState('')
   const [periodTo, setPeriodTo] = useState('')
   const historySpans = useRef<Array<{ from: string; to: string }>>([])
+  const historyInflight = useRef(new Set<string>())
+  const periodChosen = useRef(false)
   const loadedDate = useRef('')
   const [historyStatus, setHistoryStatus] = useState<'all' | 'open' | 'closed' | 'attention' | 'difference' | 'correction'>('all')
   const [payFilter, setPayFilter] = useState<'all' | 'cash' | 'card' | 'online'>('all')
@@ -240,11 +242,18 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   }, [tenant])
 
   useEffect(() => {
-    void loadDay()
-    void authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&pending=1`)
-      .then((res) => res.json())
-      .then((json) => setPendingCount(Number(json.count) || 0))
-      .catch(() => setPendingCount(0))
+    let stop = false
+    void (async () => {
+      await loadDay()
+      if (stop || periodChosen.current) return
+      const today = belgiumToday()
+      const from = `${today.slice(0, 7)}-01`
+      setPeriodKind('month')
+      setPeriodFrom(from)
+      setPeriodTo(today)
+      void ensureHistoryRange(from, today)
+    })()
+    return () => { stop = true }
   }, [loadDay, tenant])
 
   useEffect(() => {
@@ -283,12 +292,6 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     if (body.action === 'close') {
       setHistory((rows) => rows.map((row) => row.date === date ? { ...row, status: 'closed' } : row))
     }
-    if (!periodFrom) {
-      void authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&pending=1`)
-        .then((res) => res.json())
-        .then((json) => setPendingCount(Number(json.count) || 0))
-        .catch(() => undefined)
-    }
     return true
   }
 
@@ -313,34 +316,38 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
   async function ensureHistoryRange(from: string, to: string) {
     if (historySpans.current.some((span) => from >= span.from && to <= span.to)) return
+    const key = `${from}:${to}`
+    if (historyInflight.current.has(key)) return
+    historyInflight.current.add(key)
     setHistoryLoading(true)
-    const res = await authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&from=${from}&to=${to}`)
-    const json = await res.json().catch(() => ({}))
-    const rows = (json.rows || []) as HistoryRow[]
-    setHistory((prev) => {
-      const byDate = new Map(prev.map((row) => [row.date, row]))
-      for (const row of rows) byDate.set(row.date, row)
-      return Array.from(byDate.values()).sort((a, b) => (a.date < b.date ? -1 : 1))
-    })
-    historySpans.current.push({ from, to })
-    setHistoryLoading(false)
-  }
-
-  function ensureHistoryWindow() {
-    const anchor = belgiumToday()
-    return ensureHistoryRange(historyRange('lastMonth', anchor).from, historyRange('today', anchor).to)
+    try {
+      const res = await authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&from=${from}&to=${to}`)
+      const json = await res.json().catch(() => ({}))
+      const rows = (json.rows || []) as HistoryRow[]
+      setHistory((prev) => {
+        const byDate = new Map(prev.map((row) => [row.date, row]))
+        for (const row of rows) byDate.set(row.date, row)
+        return Array.from(byDate.values()).sort((a, b) => (a.date < b.date ? -1 : 1))
+      })
+      if (res.ok) historySpans.current.push({ from, to })
+    } finally {
+      historyInflight.current.delete(key)
+      setHistoryLoading(false)
+    }
   }
 
   function showPeriod(kind: 'today' | 'yesterday' | 'week' | 'month' | 'lastMonth') {
+    periodChosen.current = true
     const range = historyRange(kind, belgiumToday())
     setPeriodKind(kind)
     setPeriodFrom(range.from)
     setPeriodTo(range.to)
     setTab('history')
-    void ensureHistoryWindow()
+    void ensureHistoryRange(range.from, range.to)
   }
 
   function showMonth(ym: string) {
+    periodChosen.current = true
     const today = belgiumToday()
     const range = monthBounds(ym, today)
     const thisMonth = today.slice(0, 7)

@@ -83,24 +83,31 @@ async function fetchOrders(
   endUTC: string,
   includeItems = false,
 ): Promise<Record<string, unknown>[]> {
-  const all: Record<string, unknown>[] = []
-  let from = 0
-  for (let page = 0; page < 50; page++) {
-    const { data, error } = await client
+  const pageSize = 1000
+  const columns = includeItems ? ORDER_SELECT_WITH_ITEMS : ORDER_SELECT
+  const page = (from: number, withCount: boolean) =>
+    client
       .from('orders')
-      .select(includeItems ? ORDER_SELECT_WITH_ITEMS : ORDER_SELECT)
+      .select(columns, withCount ? { count: 'exact' } : undefined)
       .eq('tenant_slug', tenantSlug)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
       .order('created_at', { ascending: true })
       .order('id', { ascending: true })
-      .range(from, from + 999)
-    if (error) break
-    const chunk = (data || []) as unknown as Record<string, unknown>[]
-    all.push(...chunk)
-    if (chunk.length < 1000) break
-    from += 1000
-  }
+      .range(from, from + pageSize - 1)
+
+  const first = await page(0, true)
+  if (first.error) return []
+  const all = ((first.data || []) as unknown as Record<string, unknown>[])
+  const total = typeof first.count === 'number' ? first.count : all.length
+  if (all.length < pageSize || all.length >= total) return all
+  const starts: number[] = []
+  for (let from = pageSize; from < Math.min(total, pageSize * 50); from += pageSize) starts.push(from)
+  const rest = await Promise.all(starts.map(async (from) => {
+    const next = await page(from, false)
+    return (next.data || []) as unknown as Record<string, unknown>[]
+  }))
+  for (const chunk of rest) all.push(...chunk)
   return all
 }
 
