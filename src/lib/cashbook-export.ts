@@ -27,7 +27,7 @@ export function buildCashbookCsv(meta: CashbookExportMeta, rows: CashbookRangeRo
     csvLine(['Vestiging', meta.address]),
     csvLine(['Periode', meta.periodLabel]),
     '',
-    csvLine(['Datum', 'Status', 'Bruto', 'Excl. btw', 'Btw', 'Cash', 'Kaart', 'Online', 'Kortingen', 'Retouren', 'Beginkas', 'Verwacht', 'Geteld', 'Verschil', 'Correcties']),
+    csvLine(['Datum', 'Status', 'Bruto', 'Excl. btw', 'Btw', 'Cash', 'Terminal', 'Online', 'Kortingen', 'Retouren', 'Beginkas', 'Verwacht', 'Geteld', 'Verschil', 'Correcties']),
     ...rows.map((row) =>
       csvLine([
         row.date,
@@ -68,7 +68,7 @@ export function buildBoekhoudingCsv(meta: CashbookExportMeta, rows: CashbookRang
       'Btw 12%',
       'Btw 21%',
       'Cash',
-      'Kaart',
+      'Terminal',
       'Online',
       'Retouren',
       'Correcties',
@@ -105,7 +105,7 @@ export function renderCashbookXlsx(meta: CashbookExportMeta, rows: CashbookRange
     'Excl. btw': formatEuroFromCents(row.exclCents),
     Btw: formatEuroFromCents(row.taxCents),
     Cash: formatEuroFromCents(row.cashCents),
-    Kaart: formatEuroFromCents(row.cardCents),
+    Terminal: formatEuroFromCents(row.cardCents),
     Online: formatEuroFromCents(row.onlineCents),
     Beginkas: formatEuroFromCents(row.openingCents),
     Verwacht: row.expectedCents == null ? '' : formatEuroFromCents(row.expectedCents),
@@ -142,7 +142,7 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
         `Dagontvangsten ${formatEuroFromCents(row.grossCents)}   excl. ${formatEuroFromCents(row.exclCents)}   btw ${formatEuroFromCents(row.taxCents)}`,
       )
       doc.text(
-        `Cash ${formatEuroFromCents(row.cashCents)}   Kaart ${formatEuroFromCents(row.cardCents)}   Online ${formatEuroFromCents(row.onlineCents)}`,
+        `Cash ${formatEuroFromCents(row.cashCents)}   Terminal ${formatEuroFromCents(row.cardCents)}   Online ${formatEuroFromCents(row.onlineCents)}`,
       )
       doc.text(
         `Beginkas ${formatEuroFromCents(row.openingCents)}   Verwacht ${row.expectedCents == null ? '—' : formatEuroFromCents(row.expectedCents)}   Geteld ${row.countedCents == null ? '—' : formatEuroFromCents(row.countedCents)}   Verschil ${row.differenceCents == null ? '—' : formatEuroFromCents(row.differenceCents)}`,

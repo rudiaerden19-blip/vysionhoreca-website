@@ -246,7 +246,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       <p>Bruto ${euro(day.payments.grossCents)} · excl. btw ${euro(day.exclCents)} · btw ${euro(day.taxCents)} · ${day.payments.count} transacties<br>Kortingen ${euro(day.payments.discountCents)} · Retouren ${euro(day.payments.refundCents)}</p>
       <table><thead><tr><th>Tarief</th><th>Excl.</th><th>Btw</th><th>Incl.</th></tr></thead><tbody>${vatRows}</tbody></table>
       <h2>Betaalmethodes</h2>
-      <p>Cash ${euro(day.payments.cashCents)} · Kaart ${euro(day.payments.cardCents)} · Online ${euro(day.payments.onlineCents)}</p>
+      <p>Cash ${euro(day.payments.cashCents)} · Terminal ${euro(day.payments.cardCents)} · Online ${euro(day.payments.onlineCents)}</p>
       <h2>Cashkas</h2>
       <p>Beginkas ${euro(day.openingCents)} · Cash verkopen ${euro(day.payments.cashCents)} · Verwacht ${euro(day.expectedCents)} · Geteld ${day.countedCents == null ? '—' : euro(day.countedCents)} · Verschil ${day.differenceCents == null ? '—' : euro(day.differenceCents)}</p>
       ${day.closeNote ? `<p>Opmerking: ${day.closeNote}</p>` : ''}
@@ -343,7 +343,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <select value={payFilter} onChange={(e) => setPayFilter(e.target.value as typeof payFilter)} className="px-3 py-2 rounded-xl border text-sm bg-white">
               <option value="all">Alle betaalmethodes</option>
               <option value="cash">Cash</option>
-              <option value="card">Kaart</option>
+              <option value="card">Terminal</option>
               <option value="online">Online</option>
             </select>
             <input value={staffFilter} onChange={(e) => setStaffFilter(e.target.value)} placeholder="Medewerker" className="px-3 py-2 rounded-xl border text-sm" />
@@ -355,7 +355,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-400 uppercase">
-                  {['Datum', 'Omzet', 'Cash', 'Kaart', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'].map((h) => (
+                  {['Datum', 'Omzet', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'].map((h) => (
                     <th key={h} className="px-3 py-2">{h}</th>
                   ))}
                 </tr>
@@ -431,10 +431,10 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <h2 className="font-semibold mb-3">Betaalmethodes</h2>
-              <p className="text-sm text-gray-500 mb-3">Kaart is een bankkaart in de zaak. Online is een bestelling uit de webshop. Geen van beide zit in de lade.</p>
+              <p className="text-sm text-gray-500 mb-3">Terminal is een bankkaart in de zaak. Online is een bestelling uit de webshop. Geen van beide zit in de lade.</p>
               <div className="grid grid-cols-3 gap-3">
                 <div><p className="text-sm text-gray-400">Cash</p><p className="text-xl font-bold">{euro(day.payments.cashCents)}</p></div>
-                <div><p className="text-sm text-gray-400">Kaart</p><p className="text-xl font-bold">{euro(day.payments.cardCents)}</p></div>
+                <div><p className="text-sm text-gray-400">Terminal</p><p className="text-xl font-bold">{euro(day.payments.cardCents)}</p></div>
                 <div><p className="text-sm text-gray-400">Online</p><p className="text-xl font-bold">{euro(day.payments.onlineCents)}</p></div>
               </div>
               {payCheck && !payCheck.ok && (
@@ -447,7 +447,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <p className="text-xs uppercase tracking-wide text-gray-400">Cashkas</p>
               <h2 className="font-semibold mb-1">Fysiek geld in de lade</h2>
-              <p className="text-sm text-gray-500 mb-3">Alleen cash telt mee. Een kaart- of online betaling verandert dit saldo niet.</p>
+              <p className="text-sm text-gray-500 mb-3">Alleen cash telt mee. Een terminal- of online betaling verandert dit saldo niet.</p>
               <div className="flex items-end gap-3 mb-4">
                 <label className="text-sm text-gray-500">
                   Beginkas
@@ -572,7 +572,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <div className="bg-white rounded-2xl p-5 w-full max-w-md space-y-2" onClick={(e) => e.stopPropagation()}>
               <h3 className="font-semibold">Dag definitief afsluiten</h3>
               <p className="text-sm">Dagontvangsten {euro(day.payments.grossCents)} · excl. {euro(day.exclCents)} · btw {euro(day.taxCents)}</p>
-              <p className="text-sm">Cash {euro(day.payments.cashCents)} · Kaart {euro(day.payments.cardCents)} · Online {euro(day.payments.onlineCents)}</p>
+              <p className="text-sm">Cash {euro(day.payments.cashCents)} · Terminal {euro(day.payments.cardCents)} · Online {euro(day.payments.onlineCents)}</p>
               <p className="text-sm">Verwacht in de lade {euro(day.expectedCents)}</p>
               <p className="text-sm">Geteld {euro(eurosToCents(Number(counted) || 0))} · Verschil {euro(eurosToCents(Number(counted) || 0) - day.expectedCents)}</p>
               {eurosToCents(Number(counted) || 0) - day.expectedCents !== 0 && !closeNote.trim() && (
