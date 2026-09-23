@@ -6,6 +6,8 @@ import {
   closeCashbookDay,
   loadCashbookDay,
   loadCashbookRange,
+  loadPendingCloseDays,
+  logCashbookEvent,
   saveOpening,
 } from '@/lib/cashbook-store'
 import { eurosToCents } from '@/lib/cashbook-calc'
@@ -24,6 +26,7 @@ export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get('date') || ''
   const from = request.nextUrl.searchParams.get('from') || ''
   const to = request.nextUrl.searchParams.get('to') || ''
+  const pending = request.nextUrl.searchParams.get('pending') === '1'
   if (!tenantSlug) return NextResponse.json({ error: 'Zaak ontbreekt.' }, { status: 400 })
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
   if (!access.authorized) {
@@ -31,6 +34,12 @@ export async function GET(request: NextRequest) {
   }
   const client = getServerSupabaseClient()
   if (!client) return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
+  if (pending) {
+    const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
+    const today = getCurrentBusinessDay(new Date(), hours)
+    const openDays = await loadPendingCloseDays(client, tenantSlug, today)
+    return NextResponse.json(openDays)
+  }
   if (from && to && DateSchema.safeParse(from).success && DateSchema.safeParse(to).success) {
     const rows = await loadCashbookRange(client, tenantSlug, from, to)
     return NextResponse.json({ rows })
@@ -75,12 +84,21 @@ const AdjustmentSchema = z.object({
   action: z.literal('adjustment'),
   tenantSlug: z.string().min(1),
   date: DateSchema,
-  fieldName: z.enum(['counted', 'opening']),
+  fieldName: z.enum(['counted', 'opening', 'movement']),
+  movementId: z.string().optional().default(''),
   correctedEuros: z.number().min(0),
   reason: z.string().min(1),
 })
 
-const BodySchema = z.discriminatedUnion('action', [OpeningSchema, MovementSchema, CloseSchema, AdjustmentSchema])
+const AuditSchema = z.object({
+  action: z.literal('audit'),
+  tenantSlug: z.string().min(1),
+  date: DateSchema,
+  event: z.enum(['report_printed', 'report_exported', 'report_emailed']),
+  detail: z.record(z.string(), z.unknown()).optional().default({}),
+})
+
+const BodySchema = z.discriminatedUnion('action', [OpeningSchema, MovementSchema, CloseSchema, AdjustmentSchema, AuditSchema])
 
 export async function POST(request: NextRequest) {
   let raw: unknown
@@ -135,11 +153,20 @@ export async function POST(request: NextRequest) {
       { status: result.ok ? 200 : result.status },
     )
   }
+  if (body.action === 'audit') {
+    await logCashbookEvent(client, body.tenantSlug, actor, body.date, body.event, body.detail)
+    return NextResponse.json({ ok: true })
+  }
   const result = await addAdjustment(
     client,
     body.tenantSlug,
     body.date,
-    { fieldName: body.fieldName, correctedCents: eurosToCents(body.correctedEuros), reason: body.reason },
+    {
+      fieldName: body.fieldName,
+      correctedCents: eurosToCents(body.correctedEuros),
+      reason: body.reason,
+      movementId: body.movementId || undefined,
+    },
     actor,
   )
   return NextResponse.json(result.ok ? { ok: true } : { error: result.error }, { status: result.ok ? 200 : result.status })

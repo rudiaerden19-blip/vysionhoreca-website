@@ -276,6 +276,7 @@ export function isTenantSubmenuEffectiveOn(
     return enabledJson.sm_kassa_op_rekening === true
   }
   if (subId === 'sm_rpt_kasboek') return kasboekSubmenuVisible(enabledJson)
+  if (subId === 'sm_inst_boekhouding') return boekhoudingSubmenuVisible(enabledJson)
   return false
 }
 
@@ -283,6 +284,15 @@ export function isTenantSubmenuEffectiveOn(
  * Digitaal kasboek volgt Rapporten. Ontbrekende key bij bestaande zaken = aan
  * zodra rapporten of het Z-rapport aan staat. Expliciet uit blijft uit.
  */
+export function boekhoudingSubmenuVisible(
+  enabledJson: Record<string, boolean> | null | undefined,
+): boolean {
+  if (!enabledJson) return false
+  if (enabledJson.sm_inst_boekhouding === false) return false
+  if (enabledJson.sm_inst_boekhouding === true) return true
+  return enabledJson.instellingen === true || enabledJson.sm_inst_betaling === true
+}
+
 export function kasboekSubmenuVisible(
   enabledJson: Record<string, boolean> | null | undefined,
 ): boolean {
@@ -520,7 +530,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/bestellingen') || rest.startsWith('/groepen')) {
     return { kind: 'module', module: 'online-bestellingen'}
   }
-  if (rest.startsWith('/betaling')) {
+  if (rest.startsWith('/betaling') || rest.startsWith('/boekhouding')) {
     return { kind: 'module', module: 'instellingen'}
   }
   if (

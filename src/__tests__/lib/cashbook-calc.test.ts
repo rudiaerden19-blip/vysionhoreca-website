@@ -1,11 +1,16 @@
 import {
+  cashbookBadge,
+  cashbookWriteBlock,
   cashDifferenceCents,
   eurosToCents,
   expectedCashCents,
   orderBelongsToCashbookDay,
+  paymentReconciliation,
   summarizeCashbookOrders,
   vatLinesFromAggregate,
+  vatReconciliation,
 } from '@/lib/cashbook-calc'
+import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import type { Order } from '@/lib/admin-api-order-helpers'
 import type { TenantHourRow } from '@/lib/tenant-business-day'
 
@@ -140,5 +145,99 @@ describe('cashbook berekening', () => {
       [12, 1200, 11200],
       [21, 2100, 12100],
     ])
+  })
+
+  it('laat een online betaling van 27,90 de fysieke kas ongemoeid', () => {
+    const agg = aggregateZReportVatFromOrderRows(
+      [
+        {
+          total: 27.9,
+          order_type: 'TAKEAWAY',
+          items: [{ name: 'Menu', quantity: 1, price: 27.9, btw_percentage: 12 }],
+        },
+      ],
+      12,
+      null,
+    )
+    const lines = vatLinesFromAggregate(agg)
+    const line12 = lines.find((line) => line.rate === 12)
+    expect(line12).toMatchObject({ baseCents: 2491, taxCents: 299, inclCents: 2790 })
+    expect(vatReconciliation(lines, 2790, eurosToCents(agg.subtotalExcl), eurosToCents(agg.totalTax)).ok).toBe(true)
+
+    const { payments } = summarizeCashbookOrders(
+      [order({ payment_status: 'paid', order_type: 'TAKEAWAY', total: 27.9, payment_method: 'ideal' })],
+      [],
+      '2026-09-23',
+    )
+    expect(payments).toMatchObject({ cashCents: 0, cardCents: 0, onlineCents: 2790, grossCents: 2790 })
+    expect(paymentReconciliation(payments).ok).toBe(true)
+    expect(expectedCashCents({ openingCents: 5000, cashSalesCents: payments.cashCents, movements: [] })).toBe(5000)
+  })
+
+  it('waarschuwt wanneer betaalmethodes de dagontvangsten niet dekken', () => {
+    const { payments } = summarizeCashbookOrders(
+      [
+        order({
+          payment_status: 'paid',
+          order_type: 'TAKEAWAY',
+          total: 10,
+          payment_method: 'split',
+          payment_split_cash: 4,
+          payment_split_card: 5,
+        }),
+      ],
+      [],
+      '2026-09-23',
+    )
+    const check = paymentReconciliation(payments)
+    expect(check.ok).toBe(false)
+    expect(check.leftCents).toBe(1000)
+    expect(check.rightCents).toBe(900)
+    expect(check.differenceCents).toBe(-100)
+  })
+
+  it('een kaartbetaling verandert het verwachte kassaldo niet', () => {
+    const { payments } = summarizeCashbookOrders(
+      [order({ payment_status: 'paid', order_type: 'DINE_IN', total: 18, payment_method: 'CARD' })],
+      [],
+      '2026-09-23',
+    )
+    expect(payments.cardCents).toBe(1800)
+    expect(payments.cashCents).toBe(0)
+    expect(
+      expectedCashCents({
+        openingCents: 2000,
+        cashSalesCents: payments.cashCents,
+        movements: [{ type: 'bank_deposit', amountCents: 500 }],
+      }),
+    ).toBe(1500)
+  })
+
+  it('telt een gedeeltelijke retour als negatieve cash', () => {
+    const { payments } = summarizeCashbookOrders(
+      [order({ payment_status: 'paid', order_type: 'TAKEAWAY', total: -2.5, payment_method: 'CASH' })],
+      [],
+      '2026-09-23',
+    )
+    expect(payments.refundCents).toBe(-250)
+    expect(payments.cashCents).toBe(-250)
+    expect(paymentReconciliation(payments).ok).toBe(true)
+  })
+
+  it('markeert een vorige open dag als aandacht en blokkeert wijziging na afsluiten', () => {
+    expect(
+      cashbookBadge({ status: 'open', differenceCents: null, adjustmentCount: 0, grossCents: 1000, isPast: true }),
+    ).toBe('attention')
+    expect(
+      cashbookBadge({ status: 'closed', differenceCents: -50, adjustmentCount: 0, grossCents: 1000, isPast: true }),
+    ).toBe('difference')
+    expect(
+      cashbookBadge({ status: 'closed', differenceCents: 0, adjustmentCount: 1, grossCents: 1000, isPast: true }),
+    ).toBe('correction')
+    expect(cashbookWriteBlock('closed', 'movement')).toMatch(/correctie/i)
+    expect(cashbookWriteBlock('closed', 'opening')).toBeTruthy()
+    expect(cashbookWriteBlock('closed', 'adjustment')).toBeNull()
+    expect(cashbookWriteBlock('none', 'close')).toMatch(/beginsaldo/i)
+    expect(cashbookWriteBlock('open', 'movement')).toBeNull()
   })
 })

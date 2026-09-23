@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import PinGate from '@/components/PinGate'
 import { authFetch } from '@/lib/auth-headers'
-import type { CashbookMovementType } from '@/lib/cashbook-calc'
+import {
+  cashbookBadge,
+  eurosToCents,
+  paymentReconciliation,
+  vatReconciliation,
+  type CashbookMovementType,
+} from '@/lib/cashbook-calc'
 
 type Movement = {
   id: string
@@ -53,9 +59,12 @@ type DayView = {
   closeNote: string | null
   closedAt: string | null
   closedBy: string | null
+  openedAt: string | null
+  openedBy: string | null
   businessName: string
   btwNumber: string
   address: string
+  audits: Array<{ id: string; actor: string; action: string; reason: string | null; created_at: string }>
 }
 
 type HistoryRow = {
@@ -66,9 +75,12 @@ type HistoryRow = {
   cardCents: number
   onlineCents: number
   outCents: number
+  openingCents: number
   expectedCents: number | null
   countedCents: number | null
   differenceCents: number | null
+  adjustmentCount: number
+  staffNames: string[]
 }
 
 const MOVEMENTS: Array<{ id: CashbookMovementType; label: string }> = [
@@ -136,7 +148,17 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [date, setDate] = useState('')
   const [day, setDay] = useState<DayView | null>(null)
   const [history, setHistory] = useState<HistoryRow[]>([])
-  const [historyStatus, setHistoryStatus] = useState<'all' | 'open' | 'closed'>('all')
+  const [historyStatus, setHistoryStatus] = useState<'all' | 'open' | 'closed' | 'attention' | 'difference' | 'correction'>('all')
+  const [payFilter, setPayFilter] = useState<'all' | 'cash' | 'card' | 'online'>('all')
+  const [staffFilter, setStaffFilter] = useState('')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
+  const [pendingCount, setPendingCount] = useState(0)
+  const [showClose, setShowClose] = useState(false)
+  const [fixField, setFixField] = useState<'counted' | 'opening' | 'movement'>('counted')
+  const [fixMovement, setFixMovement] = useState('')
+  const [mailTo, setMailTo] = useState('')
+  const [mailOpen, setMailOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [opening, setOpening] = useState('')
@@ -172,7 +194,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
   useEffect(() => {
     void loadDay()
-  }, [loadDay])
+    void authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&pending=1`)
+      .then((res) => res.json())
+      .then((json) => setPendingCount(Number(json.count) || 0))
+      .catch(() => setPendingCount(0))
+  }, [loadDay, tenant])
 
   async function post(body: Record<string, unknown>) {
     setBusy(true)
@@ -206,50 +232,56 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     const rows = day.movements
       .map((m) => `<tr><td>${new Date(m.created_at).toLocaleString('nl-BE')}</td><td>${labelOf(m.movement_type)}</td><td>${m.description}</td><td>${m.staff_name || ''}</td><td style="text-align:right">${euro(m.amount_cents)}</td></tr>`)
       .join('')
+    const fixes = (day.adjustments || [])
+      .map((a) => `<tr><td>${new Date(String(a.created_at || '')).toLocaleString('nl-BE')}</td><td>${euro(Number(a.original_cents) || 0)} → ${euro(Number(a.corrected_cents) || 0)}</td><td>${String(a.reason || '')}</td><td>${String(a.created_by || '')}</td></tr>`)
+      .join('')
+    const vatRows = day.vat.map((line) => `<tr><td>${line.rate}%</td><td style="text-align:right">${euro(line.baseCents)}</td><td style="text-align:right">${euro(line.taxCents)}</td><td style="text-align:right">${euro(line.inclCents)}</td></tr>`).join('')
     const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(day.date)}</title>
-      <style>body{font-family:sans-serif;max-width:720px;margin:24px auto;color:#111}h1{font-size:20px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:6px;text-align:left;font-size:13px}</style>
+      <style>@page{size:A4;margin:16mm}body{font-family:sans-serif;color:#111;max-width:180mm;margin:0 auto}h1{font-size:18px}h2{font-size:13px;margin:16px 0 6px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:12px}</style>
       </head><body>
-      <h1>Digitale kasboek ${showDate(day.date)}</h1>
-      <p>${day.businessName}<br>${day.btwNumber ? `BTW ${day.btwNumber}<br>` : ''}${day.address}</p>
-      <p>Status: ${day.status === 'closed' ? 'AFGESLOTEN' : 'OPEN'}</p>
-      <p>Omzet ${euro(day.payments.grossCents)} · excl. btw ${euro(day.exclCents)} · btw ${euro(day.taxCents)}</p>
+      <h1>VYSION – DAGONTVANGSTEN / KASBOEK</h1>
+      <p>${day.businessName}<br>${day.btwNumber ? `BTW ${day.btwNumber}<br>` : ''}${day.address}<br>${showDate(day.date)} · ${day.status === 'closed' ? 'AFGESLOTEN' : 'OPEN'}</p>
+      <p>${day.openedBy ? `Geopend door ${day.openedBy}` : ''}${day.closedBy ? `<br>Afgesloten door ${day.closedBy} op ${day.closedAt ? new Date(day.closedAt).toLocaleString('nl-BE') : ''}` : ''}</p>
+      <h2>Dagontvangsten</h2>
+      <p>Bruto ${euro(day.payments.grossCents)} · excl. btw ${euro(day.exclCents)} · btw ${euro(day.taxCents)} · ${day.payments.count} transacties<br>Kortingen ${euro(day.payments.discountCents)} · Retouren ${euro(day.payments.refundCents)}</p>
+      <table><thead><tr><th>Tarief</th><th>Excl.</th><th>Btw</th><th>Incl.</th></tr></thead><tbody>${vatRows}</tbody></table>
+      <h2>Betaalmethodes</h2>
       <p>Cash ${euro(day.payments.cashCents)} · Kaart ${euro(day.payments.cardCents)} · Online ${euro(day.payments.onlineCents)}</p>
-      <p>Beginkas ${euro(day.openingCents)} · Verwacht ${euro(day.expectedCents)} · Geteld ${day.countedCents == null ? '—' : euro(day.countedCents)} · Verschil ${day.differenceCents == null ? '—' : euro(day.differenceCents)}</p>
+      <h2>Cashkas</h2>
+      <p>Beginkas ${euro(day.openingCents)} · Cash verkopen ${euro(day.payments.cashCents)} · Verwacht ${euro(day.expectedCents)} · Geteld ${day.countedCents == null ? '—' : euro(day.countedCents)} · Verschil ${day.differenceCents == null ? '—' : euro(day.differenceCents)}</p>
       ${day.closeNote ? `<p>Opmerking: ${day.closeNote}</p>` : ''}
-      ${day.closedBy ? `<p>Afgesloten door ${day.closedBy} op ${day.closedAt ? new Date(day.closedAt).toLocaleString('nl-BE') : ''}</p>` : ''}
+      <h2>Kasbewegingen</h2>
       <table><thead><tr><th>Tijdstip</th><th>Type</th><th>Omschrijving</th><th>Persoon</th><th>Bedrag</th></tr></thead><tbody>${rows}</tbody></table>
+      <h2>Correcties</h2>
+      <table><thead><tr><th>Tijdstip</th><th>Van / naar</th><th>Reden</th><th>Door</th></tr></thead><tbody>${fixes}</tbody></table>
       </body></html>`
     const w = window.open('', '_blank', 'width=800,height=900')
     if (w) {
       w.document.write(html)
       w.document.close()
+      w.focus()
+      w.print()
     }
+    void authFetch('/api/kasboek', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tenantSlug: tenant, date: day.date, action: 'audit', event: 'report_printed', detail: { date: day.date } }),
+    })
   }
 
-  function exportCsv() {
-    if (!day) return
-    const lines = [
-      ['Datum', day.date],
-      ['Zaak', day.businessName],
-      ['BTW', day.btwNumber],
-      ['Omzet', euro(day.payments.grossCents)],
-      ['Cash', euro(day.payments.cashCents)],
-      ['Kaart', euro(day.payments.cardCents)],
-      ['Online', euro(day.payments.onlineCents)],
-      ['Beginkas', euro(day.openingCents)],
-      ['Verwacht', euro(day.expectedCents)],
-      ['Geteld', day.countedCents == null ? '' : euro(day.countedCents)],
-      ['Verschil', day.differenceCents == null ? '' : euro(day.differenceCents)],
-      [],
-      ['Tijdstip', 'Type', 'Omschrijving', 'Reden', 'Persoon', 'Referentie', 'Bedrag'],
-      ...day.movements.map((m) => [m.created_at, labelOf(m.movement_type), m.description, m.reason || '', m.staff_name || '', m.reference || '', euro(m.amount_cents)]),
-    ]
-    const csv = lines.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  async function downloadExport(format: 'csv' | 'pdf' | 'xlsx' | 'boekhouding', from: string, to: string) {
+    setError('')
+    const res = await authFetch(`/api/kasboek/export?tenantSlug=${encodeURIComponent(tenant)}&from=${from}&to=${to}&format=${format}`)
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}))
+      setError(json.error || 'Exporteren mislukt.')
+      return
+    }
+    const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `kasboek-${day.date}.csv`
+    a.download = `vysion-kasboek-${from}-${to}.${format === 'boekhouding' ? 'csv' : format}`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -259,6 +291,8 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const floatIn = (day?.movements || []).filter((m) => m.movement_type === 'float_in').reduce((s, m) => s + m.amount_cents, 0)
   const cashOut = (day?.movements || []).filter((m) => m.movement_type === 'cash_out' || m.movement_type === 'petty_expense' || m.movement_type === 'other_out' || m.movement_type === 'correction_out').reduce((s, m) => s + m.amount_cents, 0)
   const taken = (day?.movements || []).filter((m) => m.movement_type === 'take_out' || m.movement_type === 'bank_deposit').reduce((s, m) => s + m.amount_cents, 0)
+  const payCheck = day ? paymentReconciliation(day.payments) : null
+  const vatCheck = day ? vatReconciliation(day.vat, day.payments.grossCents, day.exclCents, day.taxCents) : null
 
   return (
     <PinGate tenant={tenant}>
@@ -274,6 +308,11 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
           </div>
         </div>
 
+        {pendingCount > 0 && (
+          <button type="button" className="mb-4 w-full text-left text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3" onClick={() => { setHistoryStatus('attention'); const range = historyRange('month', date || belgiumToday()); void loadHistory(shiftDate(range.from, -60), range.to) }}>
+            {pendingCount} {pendingCount === 1 ? 'dag moet' : 'dagen moeten'} nog worden afgesloten
+          </button>
+        )}
         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
         {day && !day.storageReady && (
           <p className="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">
@@ -293,34 +332,61 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             ] as const).map(([kind, label]) => (
               <button key={kind} type="button" className="px-3 py-2 rounded-xl bg-white border text-sm" onClick={() => { const range = historyRange(kind, date || belgiumToday()); void loadHistory(range.from, range.to) }}>{label}</button>
             ))}
-            <select value={historyStatus} onChange={(e) => setHistoryStatus(e.target.value as 'all' | 'open' | 'closed')} className="px-3 py-2 rounded-xl border text-sm bg-white">
+            <select value={historyStatus} onChange={(e) => setHistoryStatus(e.target.value as typeof historyStatus)} className="px-3 py-2 rounded-xl border text-sm bg-white">
               <option value="all">Alle statussen</option>
               <option value="open">Open</option>
               <option value="closed">Afgesloten</option>
+              <option value="attention">Aandacht nodig</option>
+              <option value="difference">Met kasverschil</option>
+              <option value="correction">Met correcties</option>
             </select>
+            <select value={payFilter} onChange={(e) => setPayFilter(e.target.value as typeof payFilter)} className="px-3 py-2 rounded-xl border text-sm bg-white">
+              <option value="all">Alle betaalmethodes</option>
+              <option value="cash">Cash</option>
+              <option value="card">Kaart</option>
+              <option value="online">Online</option>
+            </select>
+            <input value={staffFilter} onChange={(e) => setStaffFilter(e.target.value)} placeholder="Medewerker" className="px-3 py-2 rounded-xl border text-sm" />
+            <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="px-3 py-2 rounded-xl border text-sm" />
+            <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="px-3 py-2 rounded-xl border text-sm" />
+            <button type="button" className="px-3 py-2 rounded-xl bg-white border text-sm" onClick={() => customFrom && customTo && void loadHistory(customFrom, customTo)}>Eigen periode</button>
           </div>
           <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-gray-400 uppercase">
-                  {['Datum', 'Omzet', 'Cash', 'Kaart', 'Online', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'].map((h) => (
+                  {['Datum', 'Omzet', 'Cash', 'Kaart', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'].map((h) => (
                     <th key={h} className="px-3 py-2">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {history.filter((row) => (row.grossCents !== 0 || row.status !== 'none') && (historyStatus === 'all' || row.status === historyStatus)).map((row) => (
+                {history.filter((row) => {
+                  if (row.grossCents === 0 && row.status === 'none') return false
+                  const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < (date || belgiumToday()) })
+                  if (historyStatus === 'attention' && badge !== 'attention') return false
+                  if (historyStatus === 'difference' && badge !== 'difference') return false
+                  if (historyStatus === 'correction' && badge !== 'correction') return false
+                  if (historyStatus === 'open' && row.status !== 'open') return false
+                  if (historyStatus === 'closed' && row.status !== 'closed') return false
+                  if (payFilter === 'cash' && row.cashCents === 0) return false
+                  if (payFilter === 'card' && row.cardCents === 0) return false
+                  if (payFilter === 'online' && row.onlineCents === 0) return false
+                  if (staffFilter.trim() && !(row.staffNames || []).some((name) => name.toLowerCase().includes(staffFilter.trim().toLowerCase()))) return false
+                  return true
+                }).map((row) => (
                   <tr key={row.date} className="border-t cursor-pointer hover:bg-gray-50" onClick={() => { setTab('day'); void loadDay(row.date) }}>
                     <td className="px-3 py-2">{showDate(row.date)}</td>
                     <td className="px-3 py-2">{euro(row.grossCents)}</td>
                     <td className="px-3 py-2">{euro(row.cashCents)}</td>
                     <td className="px-3 py-2">{euro(row.cardCents)}</td>
                     <td className="px-3 py-2">{euro(row.onlineCents)}</td>
+                    <td className="px-3 py-2">{euro(row.openingCents || 0)}</td>
                     <td className="px-3 py-2">{euro(row.outCents)}</td>
                     <td className="px-3 py-2">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
                     <td className="px-3 py-2">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
                     <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
-                    <td className="px-3 py-2">{row.status === 'closed' ? 'Afgesloten' : row.status === 'open' ? 'Open' : '—'}</td>
+                    <td className="px-3 py-2">{(() => { const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < (date || belgiumToday()) }); return badge === 'attention' ? 'Aandacht nodig' : badge === 'difference' ? 'Verschil' : badge === 'correction' ? 'Correctie' : badge === 'closed' ? 'Afgesloten' : badge === 'open' ? 'Open' : '—' })()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -337,11 +403,21 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <button type="button" className="px-3 py-2 bg-gray-100 rounded-lg" onClick={() => void loadDay(shiftDate(day.date, 1))}>›</button>
             </div>
 
+            <p className="text-sm text-gray-500">{day.businessName}{day.btwNumber ? ` · BTW ${day.btwNumber}` : ''}{day.address ? ` · ${day.address}` : ''}</p>
+            {(day.openedBy || day.closedBy) && (
+              <p className="text-sm text-gray-500">{day.openedBy ? `Geopend door ${day.openedBy}${day.openedAt ? ` op ${new Date(day.openedAt).toLocaleString('nl-BE')}` : ''}` : ''}{day.closedBy ? ` · Afgesloten door ${day.closedBy}${day.closedAt ? ` op ${new Date(day.closedAt).toLocaleString('nl-BE')}` : ''}` : ''}</p>
+            )}
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
+              <p className="text-xs uppercase tracking-wide text-gray-400">Dagontvangstenboek</p>
               <h2 className="font-semibold mb-3">Dagontvangsten</h2>
               <p className="text-3xl font-bold">{euro(day.payments.grossCents)}</p>
               <p className="text-sm text-gray-500 mt-1">{day.payments.count} transacties · excl. btw {euro(day.exclCents)} · btw {euro(day.taxCents)}</p>
               <p className="text-sm text-gray-500">Kortingen {euro(day.payments.discountCents)} · Retouren {euro(day.payments.refundCents)} · Geannuleerd {day.cancelledCount} ({euro(day.cancelledCents)})</p>
+              {vatCheck && !vatCheck.ok && (
+                <p className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  BTW-totalen sluiten niet aan op de dagontvangsten. Dagontvangsten: {euro(vatCheck.parts.leftCents)} · BTW-som: {euro(vatCheck.parts.rightCents)} · Verschil: {euro(vatCheck.parts.differenceCents)}
+                </p>
+              )}
               <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
                 {day.vat.map((line) => (
                   <div key={line.rate} className="bg-gray-50 rounded-xl p-3">
@@ -355,15 +431,23 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <h2 className="font-semibold mb-3">Betaalmethodes</h2>
+              <p className="text-sm text-gray-500 mb-3">Kaart en online horen bij de dagontvangsten, niet bij het geld in de lade.</p>
               <div className="grid grid-cols-3 gap-3">
                 <div><p className="text-sm text-gray-400">Cash</p><p className="text-xl font-bold">{euro(day.payments.cashCents)}</p></div>
                 <div><p className="text-sm text-gray-400">Kaart</p><p className="text-xl font-bold">{euro(day.payments.cardCents)}</p></div>
                 <div><p className="text-sm text-gray-400">Online</p><p className="text-xl font-bold">{euro(day.payments.onlineCents)}</p></div>
               </div>
+              {payCheck && !payCheck.ok && (
+                <p className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  Betaalmethodes sluiten niet aan op de dagontvangsten. Dagontvangsten: {euro(payCheck.leftCents)} · Betaalmethodes: {euro(payCheck.rightCents)} · Verschil: {euro(payCheck.differenceCents)}
+                </p>
+              )}
             </section>
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
-              <h2 className="font-semibold mb-3">Kas</h2>
+              <p className="text-xs uppercase tracking-wide text-gray-400">Cashkas</p>
+              <h2 className="font-semibold mb-1">Fysiek geld in de lade</h2>
+              <p className="text-sm text-gray-500 mb-3">Alleen cash telt mee. Een kaart- of online betaling verandert dit saldo niet.</p>
               <div className="flex items-end gap-3 mb-4">
                 <label className="text-sm text-gray-500">
                   Beginkas
@@ -401,7 +485,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 <div className="mt-4 flex flex-wrap gap-2 items-end">
                   <input type="number" min={0} step="0.01" value={counted} onChange={(e) => setCounted(e.target.value)} placeholder="Geteld bedrag" className="px-3 py-2 border rounded-xl w-40" />
                   <input value={closeNote} onChange={(e) => setCloseNote(e.target.value)} placeholder="Reden bij verschil" className="px-3 py-2 border rounded-xl flex-1 min-w-[180px]" />
-                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm" onClick={() => void post({ action: 'close', countedEuros: Number(counted) || 0, note: closeNote })}>Dag afsluiten</button>
+                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm" onClick={() => setShowClose(true)}>Dag afsluiten</button>
                 </div>
               )}
               {closed && <p className="text-sm text-gray-500 mt-3">{day.closeNote ? `Opmerking: ${day.closeNote}. ` : ''}{day.closedBy ? `Afgesloten door ${day.closedBy}.` : ''}</p>}
@@ -427,28 +511,131 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <h2 className="font-semibold mb-3">Correcties</h2>
               {day.adjustments.length === 0 ? <p className="text-sm text-gray-400">Geen correcties.</p> : (
-                <ul className="text-sm space-y-2">
+                <ul className="text-sm space-y-3">
                   {day.adjustments.map((a) => (
-                    <li key={a.id}>{new Date(a.created_at).toLocaleString('nl-BE')} · {euro(a.original_cents)} → {euro(a.corrected_cents)} ({euro(a.difference_cents)}) · {a.reason}</li>
+                    <li key={String(a.id)}>
+                      <p>{new Date(String(a.created_at)).toLocaleString('nl-BE')} · {String(a.field_name || '').startsWith('movement:') ? 'Kasbeweging gecorrigeerd' : 'Bedrag gecorrigeerd'}</p>
+                      <p>Oorspronkelijk: {euro(Number(a.original_cents) || 0)}</p>
+                      <p>Correctie: {euro(Number(a.difference_cents) || 0)}</p>
+                      <p>Nieuwe effectieve waarde: {euro(Number(a.corrected_cents) || 0)}</p>
+                      <p>Reden: {String(a.reason || '')}</p>
+                      <p>Door: {String(a.created_by || '')}</p>
+                    </li>
                   ))}
                 </ul>
               )}
               {closed && (
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <input type="number" min={0} step="0.01" value={fixAmount} onChange={(e) => setFixAmount(e.target.value)} placeholder="Nieuw geteld bedrag" className="px-3 py-2 border rounded-xl" />
+                  <select value={fixField} onChange={(e) => setFixField(e.target.value as typeof fixField)} className="px-3 py-2 border rounded-xl text-sm">
+                    <option value="counted">Geteld bedrag</option>
+                    <option value="opening">Beginsaldo</option>
+                    <option value="movement">Kasbeweging</option>
+                  </select>
+                  {fixField === 'movement' && (
+                    <select value={fixMovement} onChange={(e) => setFixMovement(e.target.value)} className="px-3 py-2 border rounded-xl text-sm">
+                      <option value="">Kies beweging</option>
+                      {day.movements.map((m) => <option key={m.id} value={m.id}>{labelOf(m.movement_type)} {euro(m.amount_cents)}</option>)}
+                    </select>
+                  )}
+                  <input type="number" min={0} step="0.01" value={fixAmount} onChange={(e) => setFixAmount(e.target.value)} placeholder="Nieuwe waarde" className="px-3 py-2 border rounded-xl" />
                   <input value={fixReason} onChange={(e) => setFixReason(e.target.value)} placeholder="Reden" className="px-3 py-2 border rounded-xl flex-1" />
-                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl border text-sm" onClick={() => void post({ action: 'adjustment', fieldName: 'counted', correctedEuros: Number(fixAmount) || 0, reason: fixReason })}>Correctie toevoegen</button>
+                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl border text-sm" onClick={() => void post({ action: 'adjustment', fieldName: fixField, movementId: fixMovement, correctedEuros: Number(fixAmount) || 0, reason: fixReason })}>+ Correctie</button>
                 </div>
               )}
             </section>
 
-            <div className="flex gap-2">
+            {(day.audits || []).length > 0 && (
+              <section className="bg-white border border-gray-200 rounded-2xl p-5">
+                <h2 className="font-semibold mb-3">Audit</h2>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {day.audits.map((entry) => (
+                    <li key={entry.id}>{new Date(entry.created_at).toLocaleString('nl-BE')} · {entry.action} · {entry.actor}{entry.reason ? ` · ${entry.reason}` : ''}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            <div className="flex flex-wrap gap-2">
               <button type="button" className="px-4 py-2 rounded-xl border" onClick={printDay}>Afdrukken</button>
-              <button type="button" className="px-4 py-2 rounded-xl border" onClick={exportCsv}>Exporteren</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('csv', day.date, day.date)}>CSV</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('pdf', day.date, day.date)}>PDF</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('xlsx', day.date, day.date)}>Excel</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('boekhouding', day.date, day.date)}>Export voor boekhouding</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const month = `${day.date.slice(0, 7)}-01`; void downloadExport('boekhouding', month, day.date) }}>Maand</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => void downloadExport('boekhouding', `${day.date.slice(0, 4)}-01-01`, day.date)}>Jaar</button>
+              <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
             </div>
           </div>
         )}
 
+        {showClose && day && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setShowClose(false)}>
+            <div className="bg-white rounded-2xl p-5 w-full max-w-md space-y-2" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-semibold">Dag definitief afsluiten</h3>
+              <p className="text-sm">Dagontvangsten {euro(day.payments.grossCents)} · excl. {euro(day.exclCents)} · btw {euro(day.taxCents)}</p>
+              <p className="text-sm">Cash {euro(day.payments.cashCents)} · Kaart {euro(day.payments.cardCents)} · Online {euro(day.payments.onlineCents)}</p>
+              <p className="text-sm">Verwacht in de lade {euro(day.expectedCents)}</p>
+              <p className="text-sm">Geteld {euro(eurosToCents(Number(counted) || 0))} · Verschil {euro(eurosToCents(Number(counted) || 0) - day.expectedCents)}</p>
+              {eurosToCents(Number(counted) || 0) - day.expectedCents !== 0 && !closeNote.trim() && (
+                <p className="text-sm text-amber-800">Bij een kasverschil is een reden verplicht. Vul die in op het kasblok.</p>
+              )}
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" className="px-3 py-2" onClick={() => setShowClose(false)}>Annuleren</button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  className="px-4 py-2 rounded-xl bg-red-600 text-white"
+                  onClick={() => {
+                    const difference = eurosToCents(Number(counted) || 0) - day.expectedCents
+                    if (difference !== 0 && !closeNote.trim()) {
+                      setError('Bij een kasverschil is een reden verplicht.')
+                      return
+                    }
+                    void post({ action: 'close', countedEuros: Number(counted) || 0, note: closeNote }).then((ok) => {
+                      if (ok) setShowClose(false)
+                    })
+                  }}
+                >
+                  Definitief afsluiten
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {mailOpen && day && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setMailOpen(false)}>
+            <form
+              className="bg-white rounded-2xl p-5 w-full max-w-md space-y-3"
+              onClick={(e) => e.stopPropagation()}
+              onSubmit={(e) => {
+                e.preventDefault()
+                setBusy(true)
+                void authFetch('/api/kasboek/email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ tenantSlug: tenant, from: day.date, to: day.date, toEmail: mailTo || undefined }),
+                }).then(async (res) => {
+                  const json = await res.json().catch(() => ({}))
+                  setBusy(false)
+                  if (!res.ok) {
+                    setError(json.error || 'Versturen mislukt.')
+                    return
+                  }
+                  setMailOpen(false)
+                  await loadDay(day.date)
+                })
+              }}
+            >
+              <h3 className="font-semibold">Verstuur naar boekhouder</h3>
+              <p className="text-sm text-gray-500">Periode {showDate(day.date)}. Bijlage: PDF en boekhoud-CSV. Er wordt niets automatisch verstuurd.</p>
+              <input value={mailTo} onChange={(e) => setMailTo(e.target.value)} placeholder="boekhouder@email.be" className="w-full border rounded-xl px-3 py-2" />
+              <p className="text-xs text-gray-400">Laat leeg om het adres uit Instellingen → Boekhouding te gebruiken.</p>
+              <div className="flex justify-end gap-2">
+                <button type="button" className="px-3 py-2" onClick={() => setMailOpen(false)}>Annuleren</button>
+                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-gray-900 text-white">Versturen</button>
+              </div>
+            </form>
+          </div>
+        )}
         {showMove && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50" onClick={() => setShowMove(false)}>
             <form

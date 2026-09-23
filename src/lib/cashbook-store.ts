@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import {
+  cashbookWriteBlock,
   cashDifferenceCents,
   eurosToCents,
   expectedCashCents,
@@ -48,6 +49,7 @@ export type CashbookDayView = {
   exclCents: number
   movements: CashbookMovementRow[]
   adjustments: Array<Record<string, unknown>>
+  audits: Array<Record<string, unknown>>
   expectedCents: number
   countedCents: number | null
   differenceCents: number | null
@@ -104,7 +106,7 @@ export async function loadCashbookDay(
 ): Promise<CashbookDayView> {
   const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
   const bounds = getTenantBusinessDayBounds(bookDate, hours)
-  const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes] = await Promise.all([
+  const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes, auditRes] = await Promise.all([
     fetchOrders(client, tenantSlug, bounds.startUTC, bounds.endUTC),
     fetchZReportVatContextFromSupabase(client, tenantSlug),
     client
@@ -122,6 +124,12 @@ export async function loadCashbookDay(
     client
       .from('cashbook_adjustments')
       .select('*')
+      .eq('tenant_slug', tenantSlug)
+      .eq('book_date', bookDate)
+      .order('created_at', { ascending: true }),
+    client
+      .from('cashbook_audit_log')
+      .select('id, actor, action, record_type, record_id, old_value, new_value, reason, created_at, book_date')
       .eq('tenant_slug', tenantSlug)
       .eq('book_date', bookDate)
       .order('created_at', { ascending: true }),
@@ -174,6 +182,7 @@ export async function loadCashbookDay(
     exclCents: eurosToCents(vatAgg.subtotalExcl),
     movements,
     adjustments: storageReady ? ((adjRes.data || []) as Array<Record<string, unknown>>) : [],
+    audits: storageReady && !missingTable(auditRes.error) ? ((auditRes.data || []) as Array<Record<string, unknown>>) : [],
     expectedCents: closed ? Number(day?.expected_close_cents) || liveExpected : liveExpected,
     countedCents: closed ? Number(day?.counted_close_cents) : null,
     differenceCents: closed ? Number(day?.difference_cents) : null,
@@ -198,8 +207,9 @@ async function audit(
   oldValue: unknown,
   newValue: unknown,
   reason?: string | null,
+  bookDate?: string | null,
 ) {
-  await client.from('cashbook_audit_log').insert({
+  const row = {
     tenant_slug: tenantSlug,
     actor,
     action,
@@ -208,7 +218,13 @@ async function audit(
     old_value: oldValue ?? null,
     new_value: newValue ?? null,
     reason: reason || null,
-  })
+    book_date: bookDate || null,
+  }
+  const inserted = await client.from('cashbook_audit_log').insert(row)
+  if (inserted.error && /book_date|42703|schema cache/i.test(`${inserted.error.code || ''} ${inserted.error.message || ''}`)) {
+    const { book_date: _ignored, ...withoutDate } = row
+    await client.from('cashbook_audit_log').insert(withoutDate)
+  }
 }
 
 export async function saveOpening(
@@ -227,9 +243,8 @@ export async function saveOpening(
   if (missingTable(existing.error)) {
     return { ok: false, error: 'De kasboek-tabellen staan nog niet in de database.', status: 503 }
   }
-  if (existing.data?.status === 'closed') {
-    return { ok: false, error: 'Deze dag is afgesloten.', status: 409 }
-  }
+  const openingBlock = cashbookWriteBlock(existing.data?.status === 'closed' ? 'closed' : existing.data ? 'open' : 'none', 'opening')
+  if (openingBlock) return { ok: false, error: openingBlock, status: 409 }
   const now = new Date().toISOString()
   if (!existing.data) {
     const inserted = await client
@@ -249,7 +264,7 @@ export async function saveOpening(
     }
     await audit(client, tenantSlug, actor, 'day_opened', 'cashbook_days', inserted.data.id, null, {
       openingCents,
-    })
+    }, null, bookDate)
     return { ok: true }
   }
   const updated = await client
@@ -268,6 +283,8 @@ export async function saveOpening(
     existing.data.id,
     { openingCents: existing.data.opening_cash_cents },
     { openingCents },
+    null,
+    bookDate,
   )
   return { ok: true }
 }
@@ -304,12 +321,8 @@ export async function addMovement(
   if (missingTable(day.error)) {
     return { ok: false, error: 'De kasboek-tabellen staan nog niet in de database.', status: 503 }
   }
-  if (!day.data) {
-    return { ok: false, error: 'Bevestig eerst het beginsaldo.', status: 409 }
-  }
-  if (day.data.status === 'closed') {
-    return { ok: false, error: 'Een afgesloten dag krijgt geen nieuwe beweging. Gebruik een correctie.', status: 409 }
-  }
+  const movementBlock = cashbookWriteBlock(day.data?.status === 'closed' ? 'closed' : day.data ? 'open' : 'none', 'movement')
+  if (movementBlock) return { ok: false, error: movementBlock, status: 409 }
   const inserted = await client
     .from('cashbook_movements')
     .insert({
@@ -332,7 +345,7 @@ export async function addMovement(
     type: input.type,
     amountCents: input.amountCents,
     description: input.description.trim(),
-  })
+  }, null, bookDate)
   return { ok: true }
 }
 
@@ -348,12 +361,8 @@ export async function closeCashbookDay(
   if (!view.storageReady) {
     return { ok: false, error: 'De kasboek-tabellen staan nog niet in de database.', status: 503 }
   }
-  if (view.status === 'none') {
-    return { ok: false, error: 'Bevestig eerst het beginsaldo.', status: 409 }
-  }
-  if (view.status === 'closed') {
-    return { ok: false, error: 'Deze dag is al afgesloten.', status: 409 }
-  }
+  const closeBlock = cashbookWriteBlock(view.status, 'close')
+  if (closeBlock) return { ok: false, error: closeBlock, status: 409 }
   if (!Number.isInteger(countedCents) || countedCents < 0) {
     return { ok: false, error: 'Geteld bedrag is ongeldig.', status: 400 }
   }
@@ -400,7 +409,7 @@ export async function closeCashbookDay(
     expectedCents: view.expectedCents,
     countedCents,
     differenceCents: difference,
-  }, note.trim() || null)
+  }, note.trim() || null, bookDate)
   return { ok: true, differenceCents: difference }
 }
 
@@ -408,7 +417,7 @@ export async function addAdjustment(
   client: SupabaseClient,
   tenantSlug: string,
   bookDate: string,
-  input: { fieldName: string; correctedCents: number; reason: string },
+  input: { fieldName: string; correctedCents: number; reason: string; movementId?: string },
   actor: string,
 ): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
   if (!input.reason.trim()) return { ok: false, error: 'Een reden is verplicht.', status: 400 }
@@ -421,11 +430,25 @@ export async function addAdjustment(
   if (missingTable(day.error)) {
     return { ok: false, error: 'De kasboek-tabellen staan nog niet in de database.', status: 503 }
   }
-  if (!day.data || day.data.status !== 'closed') {
-    return { ok: false, error: 'Een correctie is alleen mogelijk na afsluiting.', status: 409 }
+  const adjustBlock = cashbookWriteBlock(day.data?.status === 'closed' ? 'closed' : 'open', 'adjustment')
+  if (!day.data || adjustBlock) {
+    return { ok: false, error: adjustBlock || 'Een correctie is alleen mogelijk na afsluiting.', status: 409 }
   }
-  const field = input.fieldName === 'counted' ? 'counted_close_cents' : 'opening_cash_cents'
-  const original = Number(day.data[field]) || 0
+  const dayRow = day.data as { opening_cash_cents?: number; counted_close_cents?: number }
+  let field = input.fieldName === 'opening' ? 'opening_cash_cents' : 'counted_close_cents'
+  let original = Number(input.fieldName === 'opening' ? dayRow.opening_cash_cents : dayRow.counted_close_cents) || 0
+  if (input.movementId) {
+    const movement = await client
+      .from('cashbook_movements')
+      .select('id, amount_cents')
+      .eq('id', input.movementId)
+      .eq('tenant_slug', tenantSlug)
+      .eq('book_date', bookDate)
+      .maybeSingle()
+    if (!movement.data) return { ok: false, error: 'Kasbeweging niet gevonden.', status: 404 }
+    original = Number(movement.data.amount_cents) || 0
+    field = `movement:${input.movementId}`
+  }
   const corrected = Math.round(input.correctedCents)
   const inserted = await client
     .from('cashbook_adjustments')
@@ -454,8 +477,30 @@ export async function addAdjustment(
     { cents: original },
     { cents: corrected },
     input.reason.trim(),
+    bookDate,
   )
   return { ok: true }
+}
+
+export type CashbookRangeRow = {
+  date: string
+  status: string
+  grossCents: number
+  cashCents: number
+  cardCents: number
+  onlineCents: number
+  outCents: number
+  openingCents: number
+  expectedCents: number | null
+  countedCents: number | null
+  differenceCents: number | null
+  adjustmentCount: number
+  staffNames: string[]
+  exclCents: number
+  taxCents: number
+  discountCents: number
+  refundCents: number
+  vat: CashbookVatLine[]
 }
 
 export async function loadCashbookRange(
@@ -463,12 +508,14 @@ export async function loadCashbookRange(
   tenantSlug: string,
   fromDate: string,
   toDate: string,
-): Promise<Array<{ date: string; status: string; grossCents: number; cashCents: number; cardCents: number; onlineCents: number; outCents: number; expectedCents: number | null; countedCents: number | null; differenceCents: number | null }>> {
+): Promise<CashbookRangeRow[]> {
   const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
   const start = getTenantBusinessDayBounds(fromDate, hours).startUTC
   const end = getTenantBusinessDayBounds(toDate, hours).endUTC
-  const [orders, dayRes, moveRes] = await Promise.all([
+  const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes] = await Promise.all([
     fetchOrders(client, tenantSlug, start, end),
+    fetchZReportVatContextFromSupabase(client, tenantSlug),
+    client.from('tenant_settings').select('btw_percentage').eq('tenant_slug', tenantSlug).maybeSingle(),
     client
       .from('cashbook_days')
       .select('book_date, status, opening_cash_cents, expected_close_cents, counted_close_cents, difference_cents')
@@ -477,27 +524,40 @@ export async function loadCashbookRange(
       .lte('book_date', toDate),
     client
       .from('cashbook_movements')
-      .select('book_date, movement_type, amount_cents')
+      .select('book_date, movement_type, amount_cents, staff_name')
+      .eq('tenant_slug', tenantSlug)
+      .gte('book_date', fromDate)
+      .lte('book_date', toDate),
+    client
+      .from('cashbook_adjustments')
+      .select('book_date')
       .eq('tenant_slug', tenantSlug)
       .gte('book_date', fromDate)
       .lte('book_date', toDate),
   ])
+  const defaultBtw = Number((settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage) || 6
   const days = new Map<string, Record<string, unknown>>()
   if (!missingTable(dayRes.error)) {
     for (const row of dayRes.data || []) days.set(String((row as { book_date: string }).book_date), row as Record<string, unknown>)
   }
-  const movesByDay = new Map<string, CashbookMovementRow[]>()
+  const movesByDay = new Map<string, Array<CashbookMovementRow & { staff_name?: string | null }>>()
   if (!missingTable(moveRes.error)) {
-    for (const row of (moveRes.data || []) as CashbookMovementRow[]) {
+    for (const row of (moveRes.data || []) as Array<CashbookMovementRow & { staff_name?: string | null }>) {
       const list = movesByDay.get(row.book_date) || []
       list.push(row)
       movesByDay.set(row.book_date, list)
     }
   }
+  const adjustmentsByDay = new Map<string, number>()
+  if (!missingTable(adjRes.error)) {
+    for (const row of (adjRes.data || []) as Array<{ book_date: string }>) {
+      adjustmentsByDay.set(row.book_date, (adjustmentsByDay.get(row.book_date) || 0) + 1)
+    }
+  }
   const dates: string[] = []
   const cursor = new Date(`${fromDate}T12:00:00Z`)
   const endDay = new Date(`${toDate}T12:00:00Z`)
-  while (cursor.getTime() <= endDay.getTime() && dates.length < 62) {
+  while (cursor.getTime() <= endDay.getTime() && dates.length < 370) {
     dates.push(cursor.toISOString().slice(0, 10))
     cursor.setUTCDate(cursor.getUTCDate() + 1)
   }
@@ -511,8 +571,19 @@ export async function loadCashbookRange(
         : 0
       return sum + effect
     }, 0)
+    const counting = (orders as Array<Record<string, unknown>>).filter((row) => {
+      if (!orderBelongsToCashbookDay(String(row.created_at || ''), date, hours)) return false
+      return orderCountsTowardRevenueAndZReport(row as never)
+    })
+    const vatAgg = aggregateZReportVatFromOrderRows(
+      counting.map((row) => ({ total: row.total, items: row.items, order_type: row.order_type as string })),
+      defaultBtw,
+      vatCtx,
+    )
+    const vat = vatLinesFromAggregate(vatAgg)
     const closed = day?.status === 'closed'
     const openingCents = day ? Number(day.opening_cash_cents) || 0 : 0
+    const staffNames = Array.from(new Set(movements.map((m) => (m.staff_name || '').trim()).filter(Boolean)))
     const expected = closed
       ? Number(day?.expected_close_cents)
       : day
@@ -530,11 +601,51 @@ export async function loadCashbookRange(
       cardCents: summary.payments.cardCents,
       onlineCents: summary.payments.onlineCents,
       outCents,
+      openingCents,
       expectedCents: expected,
       countedCents: closed ? Number(day?.counted_close_cents) : null,
       differenceCents: closed ? Number(day?.difference_cents) : null,
+      adjustmentCount: adjustmentsByDay.get(date) || 0,
+      staffNames,
+      exclCents: eurosToCents(vatAgg.subtotalExcl),
+      taxCents: eurosToCents(vatAgg.totalTax),
+      discountCents: summary.payments.discountCents,
+      refundCents: summary.payments.refundCents,
+      vat,
     }
   })
+}
+
+export async function loadPendingCloseDays(
+  client: SupabaseClient,
+  tenantSlug: string,
+  today: string,
+): Promise<{ count: number; dates: string[] }> {
+  const from = shiftBookDate(today, -60)
+  const yesterday = shiftBookDate(today, -1)
+  if (from > yesterday) return { count: 0, dates: [] }
+  const rows = await loadCashbookRange(client, tenantSlug, from, yesterday)
+  const dates = rows
+    .filter((row) => row.status === 'open' || (row.grossCents !== 0 && row.status !== 'closed'))
+    .map((row) => row.date)
+  return { count: dates.length, dates }
+}
+
+function shiftBookDate(ymd: string, days: number): string {
+  const [y, m, d] = ymd.split('-').map(Number)
+  const dt = new Date(Date.UTC(y, m - 1, d + days))
+  return dt.toISOString().slice(0, 10)
+}
+
+export async function logCashbookEvent(
+  client: SupabaseClient,
+  tenantSlug: string,
+  actor: string,
+  bookDate: string,
+  action: 'report_printed' | 'report_exported' | 'report_emailed',
+  detail: Record<string, unknown>,
+) {
+  await audit(client, tenantSlug, actor, action, 'cashbook_days', null, null, detail, null, bookDate)
 }
 
 export function formatEuroFromCents(cents: number): string {

@@ -129,14 +129,14 @@ export function summarizeCashbookOrders(
     const cash = eurosToCents(parts.cash)
     const card = eurosToCents(parts.card)
     const online = eurosToCents(parts.online)
-    const total = cash + card + online
+    const methodSum = cash + card + online
     payments.cashCents += cash
     payments.cardCents += card
     payments.onlineCents += online
-    payments.grossCents += total
+    payments.grossCents += eurosToCents(order.total)
     payments.count += 1
     payments.discountCents += eurosToCents(order.discount_amount)
-    if (total < 0) payments.refundCents += total
+    if (methodSum < 0) payments.refundCents += methodSum
   }
   return { payments, cancelledCount, cancelledCents }
 }
@@ -167,4 +167,83 @@ export function vatLinesFromAggregate(agg: Pick<ZReportVatAggregate, 'taxByRate'
     })
   }
   return lines
+}
+
+export type CashbookCheck = {
+  ok: boolean
+  leftCents: number
+  rightCents: number
+  differenceCents: number
+}
+
+/** Cash + kaart + online moet gelijk zijn aan de dagontvangsten. */
+export function paymentReconciliation(payments: CashbookPaymentTotals): CashbookCheck {
+  const methods = payments.cashCents + payments.cardCents + payments.onlineCents
+  return {
+    ok: methods === payments.grossCents,
+    leftCents: payments.grossCents,
+    rightCents: methods,
+    differenceCents: methods - payments.grossCents,
+  }
+}
+
+/** Som per btw-tarief en excl.+btw moeten gelijk zijn aan de dagontvangsten. */
+export function vatReconciliation(
+  lines: CashbookVatLine[],
+  grossCents: number,
+  exclCents: number,
+  taxCents: number,
+): { ok: boolean; rates: CashbookCheck; parts: CashbookCheck } {
+  const ratesSum = lines.reduce((sum, line) => sum + line.inclCents, 0)
+  const partsSum = exclCents + taxCents
+  const rates: CashbookCheck = {
+    ok: ratesSum === grossCents,
+    leftCents: grossCents,
+    rightCents: ratesSum,
+    differenceCents: ratesSum - grossCents,
+  }
+  const parts: CashbookCheck = {
+    ok: partsSum === grossCents,
+    leftCents: grossCents,
+    rightCents: partsSum,
+    differenceCents: partsSum - grossCents,
+  }
+  return { ok: rates.ok && parts.ok, rates, parts }
+}
+
+export type CashbookBadge = 'open' | 'closed' | 'correction' | 'difference' | 'attention' | 'none'
+
+export function cashbookBadge(input: {
+  status: string
+  differenceCents: number | null
+  adjustmentCount: number
+  grossCents: number
+  isPast: boolean
+}): CashbookBadge {
+  if (input.adjustmentCount > 0) return 'correction'
+  if (input.status === 'closed' && (input.differenceCents || 0) !== 0) return 'difference'
+  if (input.status === 'closed') return 'closed'
+  const unfinished = input.status === 'open' || input.grossCents !== 0
+  if (unfinished && input.isPast) return 'attention'
+  if (input.status === 'open') return 'open'
+  return 'none'
+}
+
+/** Afgesloten dagen blokkeren directe wijzigingen. Correctie is een aparte rij. */
+export function cashbookWriteBlock(
+  status: 'none' | 'open' | 'closed',
+  action: 'opening' | 'movement' | 'close' | 'adjustment',
+): string | null {
+  if (action === 'adjustment') {
+    return status === 'closed' ? null : 'Een correctie is alleen mogelijk na afsluiting.'
+  }
+  if (status === 'closed') {
+    if (action === 'opening') return 'Deze dag is afgesloten.'
+    if (action === 'movement') return 'Een afgesloten dag krijgt geen nieuwe beweging. Gebruik een correctie.'
+    return 'Deze dag is al afgesloten.'
+  }
+  if ((action === 'movement' || action === 'close') && status === 'none') {
+    return 'Bevestig eerst het beginsaldo.'
+  }
+  return null
 }
