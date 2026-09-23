@@ -342,15 +342,12 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
-    const margin = 18
+    const margin = 22
     const tableWidth = doc.page.width - margin * 2
-    const padX = 6
-    const monthSlots = 33
-    const tableTop = margin + 32
+    const padX = 5
+    const tableTop = margin + 40
     const bottom = doc.page.height - margin
-    const slots = Math.min(monthSlots, Math.max(listed.length + 2, 8))
-    const rowHeight = Math.floor((bottom - tableTop) / slots)
-    let fontSize = 9
+    let fontSize = 12
     const measuredWidths = (size: number) => columns.map((column) => {
       const texts = [column.title, column.total, ...listed.map((row) => column.cell(row))]
       doc.font('Helvetica-Bold').fontSize(size)
@@ -358,14 +355,20 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
       return Math.ceil(widest + padX * 2)
     })
     let widths = measuredWidths(fontSize)
-    while (widths.reduce((sum, width) => sum + width, 0) > tableWidth && fontSize > 7.5) {
-      fontSize = Math.round((fontSize - 0.25) * 4) / 4
+    while (widths.reduce((sum, width) => sum + width, 0) > tableWidth && fontSize > 9) {
+      fontSize = Math.round((fontSize - 0.5) * 2) / 2
       widths = measuredWidths(fontSize)
     }
     const used = widths.reduce((sum, width) => sum + width, 0)
-    const spare = tableWidth - used
-    if (spare > 0) widths = widths.map((width) => width + spare / widths.length)
+    if (used > tableWidth) {
+      const scale = tableWidth / used
+      widths = widths.map((width) => width * scale)
+    } else {
+      const spare = tableWidth - used
+      widths = widths.map((width) => width + spare / widths.length)
+    }
     for (let index = 0; index < columns.length; index += 1) columns[index].width = widths[index]
+    const rowHeight = 30
 
     const drawCell = (text: string, x: number, y: number, width: number, align: 'left' | 'right', bold: boolean, color: string) => {
       const yBefore = doc.y
@@ -392,18 +395,22 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
       return y + rowHeight
     }
 
-    doc.fillColor('#0E5D82').font('Helvetica-Bold').fontSize(12).text('VYSION – KASBOEK', margin, margin, { lineBreak: false })
-    doc.fillColor('#334155').font('Helvetica').fontSize(9)
+    doc.fillColor('#0E5D82').font('Helvetica-Bold').fontSize(16).text('VYSION – KASBOEK', margin, margin, { lineBreak: false })
+    doc.fillColor('#334155').font('Helvetica').fontSize(11)
     const identity = [meta.businessName, meta.btwNumber ? `BTW ${meta.btwNumber}` : '', meta.address].filter(Boolean).join('  ·  ')
-    doc.text(`${identity}   ·   Periode ${meta.periodLabel}`, margin, margin + 16, { width: tableWidth, lineBreak: false, ellipsis: true })
+    doc.text(`${identity}   ·   Periode ${meta.periodLabel}`, margin, margin + 20, { width: tableWidth, lineBreak: false, ellipsis: true })
+
+    const continuePage = () => {
+      doc.addPage()
+      doc.fillColor('#0E5D82').font('Helvetica-Bold').fontSize(14).text('VYSION – KASBOEK', margin, margin, { lineBreak: false })
+      doc.fillColor('#334155').font('Helvetica').fontSize(11).text(`Vervolg  ·  ${identity}  ·  Periode ${meta.periodLabel}`, margin, margin + 18, { width: tableWidth, lineBreak: false, ellipsis: true })
+      return drawHeader(margin + 36)
+    }
 
     let y = tableTop
     y = drawHeader(y)
     listed.forEach((row, index) => {
-      if (y + rowHeight > bottom) {
-        doc.addPage()
-        y = drawHeader(margin)
-      }
+      if (y + rowHeight > bottom) y = continuePage()
       doc.rect(margin, y, tableWidth, rowHeight).fill(index % 2 === 0 ? '#f4f8fb' : '#ffffff')
       doc.moveTo(margin, y + rowHeight).lineTo(margin + tableWidth, y + rowHeight).strokeColor('#d5e0e8').lineWidth(0.4).stroke()
       let x = margin
@@ -413,10 +420,7 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
       }
       y += rowHeight
     })
-    if (y + rowHeight > bottom) {
-      doc.addPage()
-      y = drawHeader(margin)
-    }
+    if (y + rowHeight > bottom) y = continuePage()
     doc.rect(margin, y, tableWidth, rowHeight).fill('#0E5D82')
     let x = margin
     for (const column of columns) {
