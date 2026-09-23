@@ -389,8 +389,8 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <p className="text-sm text-gray-500">{date ? showDate(date) : ''}</p>
           </div>
           <div className="flex gap-2">
-            <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'day' ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => { setTab('day'); void loadDay() }}>Vandaag</button>
-            <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'history' ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => showPeriod('month')}>Historiek</button>
+            <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'day' ? 'bg-accent text-white' : 'bg-white border border-accent text-accent'}`} onClick={() => { setTab('day'); void loadDay() }}>Vandaag</button>
+            <button type="button" className={`px-3 py-2 rounded-xl text-sm ${tab === 'history' ? 'bg-accent text-white' : 'bg-white border border-accent text-accent'}`} onClick={() => showPeriod('month')}>Historiek</button>
           </div>
         </div>
 
@@ -416,19 +416,19 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               ['month', 'Deze maand'],
               ['lastMonth', 'Vorige maand'],
             ] as const).map(([kind, label]) => (
-              <button key={kind} type="button" className={`px-3 py-2 rounded-xl text-sm ${periodKind === kind ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => showPeriod(kind)}>{label}</button>
+              <button key={kind} type="button" className={`px-3 py-2 rounded-xl text-sm ${periodKind === kind ? 'bg-accent text-white' : 'bg-white border border-accent text-accent'}`} onClick={() => showPeriod(kind)}>{label}</button>
             ))}
             <select
               value={periodKind === 'month' || periodKind === 'lastMonth' || periodKind === 'custom' ? periodFrom.slice(0, 7) : ''}
               onChange={(e) => { if (e.target.value) showMonth(e.target.value) }}
-              className="px-3 py-2 rounded-xl border text-sm bg-white"
+              className="px-3 py-2 rounded-xl border border-accent text-accent text-sm bg-white"
             >
               <option value="">Kies maand</option>
               {monthChoices(belgiumToday(), 120).map((month) => (
                 <option key={month.value} value={month.value}>{month.label}</option>
               ))}
             </select>
-            <select value={historyStatus} onChange={(e) => setHistoryStatus(e.target.value as typeof historyStatus)} className="px-3 py-2 rounded-xl border text-sm bg-white">
+            <select value={historyStatus} onChange={(e) => setHistoryStatus(e.target.value as typeof historyStatus)} className="px-3 py-2 rounded-xl border border-accent text-accent text-sm bg-white">
               <option value="all">Alle statussen</option>
               <option value="open">Open</option>
               <option value="closed">Afgesloten</option>
@@ -436,7 +436,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <option value="difference">Met kasverschil</option>
               <option value="correction">Met correcties</option>
             </select>
-            <select value={payFilter} onChange={(e) => setPayFilter(e.target.value as typeof payFilter)} className="px-3 py-2 rounded-xl border text-sm bg-white">
+            <select value={payFilter} onChange={(e) => setPayFilter(e.target.value as typeof payFilter)} className="px-3 py-2 rounded-xl border border-accent text-accent text-sm bg-white">
               <option value="all">Alle betaalmethodes</option>
               <option value="cash">Cash</option>
               <option value="card">Terminal</option>
@@ -445,7 +445,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <input value={staffFilter} onChange={(e) => setStaffFilter(e.target.value)} placeholder="Medewerker" className="px-3 py-2 rounded-xl border text-sm" />
             <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="px-3 py-2 rounded-xl border text-sm" />
             <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="px-3 py-2 rounded-xl border text-sm" />
-            <button type="button" className="px-3 py-2 rounded-xl bg-white border text-sm" onClick={() => {
+            <button type="button" className="px-3 py-2 rounded-xl bg-white border border-accent text-accent text-sm" onClick={() => {
               if (!customFrom || !customTo) return
               setPeriodKind('custom')
               setPeriodFrom(customFrom)
@@ -485,14 +485,14 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             </table>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={printPeriod}>Afdrukken</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('csv', period.from, period.to) }}>CSV</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('pdf', period.from, period.to) }}>PDF</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('xlsx', period.from, period.to) }}>Excel</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('period'); void downloadExport('boekhouding', period.from, period.to) }}>Export voor boekhouding</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('month'); void downloadExport('boekhouding', period.from, period.to) }}>Download maand</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => { const period = periodFor('year'); void downloadExport('boekhouding', period.from, period.to) }}>Download jaar</button>
-            <button type="button" className="px-4 py-2 rounded-xl border" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={printPeriod}>Afdrukken</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('csv', period.from, period.to) }}>CSV</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('pdf', period.from, period.to) }}>PDF</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('xlsx', period.from, period.to) }}>Excel</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('period'); void downloadExport('boekhouding', period.from, period.to) }}>Export voor boekhouding</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('month'); void downloadExport('boekhouding', period.from, period.to) }}>Download maand</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('year'); void downloadExport('boekhouding', period.from, period.to) }}>Download jaar</button>
+            <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
           </div>
           <p className="text-sm text-gray-500">Dit geldt voor {showDate(periodFor('period').from)} – {showDate(periodFor('period').to)}. De boekhouder krijgt deze periode in één keer.</p>
           </div>
@@ -570,7 +570,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                   <button
                     type="button"
                     disabled={busy || opening.trim() === ''}
-                    className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm disabled:opacity-40"
+                    className="px-4 py-2 rounded-xl bg-accent text-white text-sm hover:bg-accent/90 disabled:opacity-100"
                     onClick={() => {
                       if (opening.trim() === '' || Number.isNaN(Number(opening))) return
                       void post({ action: 'opening', openingEuros: Number(opening) })
@@ -602,7 +602,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-semibold">Kasbewegingen</h2>
-                {day.status === 'open' && <button type="button" className="px-3 py-2 rounded-xl bg-gray-900 text-white text-sm" onClick={() => setShowMove(true)}>+ Kasbeweging</button>}
+                {day.status === 'open' && <button type="button" className="px-3 py-2 rounded-xl bg-accent text-white hover:bg-accent/90 text-sm" onClick={() => setShowMove(true)}>+ Kasbeweging</button>}
               </div>
               {day.movements.length === 0 ? <p className="text-sm text-gray-400">Geen bewegingen.</p> : (
                 <ul className="divide-y text-sm">
@@ -647,7 +647,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                   )}
                   <input type="number" min={0} step="0.01" value={fixAmount} onChange={(e) => setFixAmount(e.target.value)} placeholder="Nieuwe waarde" className="px-3 py-2 border rounded-xl" />
                   <input value={fixReason} onChange={(e) => setFixReason(e.target.value)} placeholder="Reden" className="px-3 py-2 border rounded-xl flex-1" />
-                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl border text-sm" onClick={() => void post({ action: 'adjustment', fieldName: fixField, movementId: fixMovement, correctedEuros: Number(fixAmount) || 0, reason: fixReason })}>+ Correctie</button>
+                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl bg-accent text-white text-sm hover:bg-accent/90" onClick={() => void post({ action: 'adjustment', fieldName: fixField, movementId: fixMovement, correctedEuros: Number(fixAmount) || 0, reason: fixReason })}>+ Correctie</button>
                 </div>
               )}
             </section>
@@ -732,7 +732,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <p className="text-xs text-gray-400">Laat leeg om het adres uit Instellingen → Boekhouding te gebruiken.</p>
               <div className="flex justify-end gap-2">
                 <button type="button" className="px-3 py-2" onClick={() => setMailOpen(false)}>Annuleren</button>
-                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-gray-900 text-white">Versturen</button>
+                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90">Versturen</button>
               </div>
             </form>
           </div>
@@ -766,7 +766,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               <input value={moveRef} onChange={(e) => setMoveRef(e.target.value)} placeholder="Referentie" className="w-full border rounded-xl px-3 py-2" />
               <div className="flex justify-end gap-2">
                 <button type="button" className="px-3 py-2" onClick={() => setShowMove(false)}>Annuleren</button>
-                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-gray-900 text-white">Opslaan</button>
+                <button type="submit" disabled={busy} className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90">Opslaan</button>
               </div>
             </form>
           </div>
