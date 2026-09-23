@@ -124,7 +124,7 @@ function belgiumToday() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())
 }
 
-function monthChoices(today: string, count = 36) {
+function monthChoices(today: string, count = 120) {
   const [y, m] = today.split('-').map(Number)
   return Array.from({ length: count }, (_, index) => {
     const dt = new Date(Date.UTC(y, m - 1 - index, 1))
@@ -424,7 +424,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               className="px-3 py-2 rounded-xl border text-sm bg-white"
             >
               <option value="">Kies maand</option>
-              {monthChoices(belgiumToday()).map((month) => (
+              {monthChoices(belgiumToday(), 120).map((month) => (
                 <option key={month.value} value={month.value}>{month.label}</option>
               ))}
             </select>
