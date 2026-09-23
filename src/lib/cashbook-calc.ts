@@ -125,7 +125,7 @@ export function summarizeCashbookOrders(
       continue
     }
     if (!orderCountsTowardRevenueAndZReport(order)) continue
-    const parts = distributeOrderPaymentForZRaport(order)
+    const parts = cashbookPaymentParts(order)
     const cash = eurosToCents(parts.cash)
     const card = eurosToCents(parts.card)
     const online = eurosToCents(parts.online)
@@ -174,6 +174,35 @@ export type CashbookCheck = {
   leftCents: number
   rightCents: number
   differenceCents: number
+}
+
+const KASBOEK_CARD_METHODS = new Set([
+  'card',
+  'pin',
+  'kaart',
+  'bancontact',
+  'visa',
+  'mastercard',
+  'maestro',
+  'creditcard',
+  'credit_card',
+])
+
+/**
+ * Z-rapport stopt Bancontact bij online. In het kasboek is dat kaart:
+ * het geld komt van de betaalterminal, niet van de webshop.
+ */
+export function cashbookPaymentParts(order: {
+  total?: unknown
+  payment_method?: unknown
+  payment_split_cash?: unknown
+  payment_split_card?: unknown
+}): { cash: number; card: number; online: number } {
+  const parts = distributeOrderPaymentForZRaport(order)
+  const method = String(order.payment_method || '').toLowerCase()
+  if (method === 'split' || !KASBOEK_CARD_METHODS.has(method)) return parts
+  if (parts.card !== 0 || parts.online === 0) return parts
+  return { cash: parts.cash, card: parts.online, online: 0 }
 }
 
 /** Cash + kaart + online moet gelijk zijn aan de dagontvangsten. */
