@@ -545,7 +545,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
                     <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
                     <td className="px-3 py-2" onClick={(event) => event.stopPropagation()}>
-                      {row.status === 'closed' ? (
+                      {row.status === 'closed' || (row.closureDay && row.grossCents === 0 && row.status !== 'open') ? (
                         <span className="text-gray-500">{row.closureChoice === 'vakantie' ? 'Vakantie' : row.closureChoice === 'gesloten' ? 'Gesloten' : ''}</span>
                       ) : (
                         <select
