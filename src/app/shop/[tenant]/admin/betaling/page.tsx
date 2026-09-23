@@ -4,7 +4,6 @@ import { Suspense, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
-import { adminDb } from '@/lib/admin-db-client'
 import PinGate from '@/components/PinGate'
 import { KassaPaymentTerminalsAdmin } from '@/components/KassaPaymentTerminalsAdmin'
 
@@ -28,7 +27,6 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   const [savingStripe, setSavingStripe] = useState(false)
   const [savedStripe, setSavedStripe] = useState(false)
   const [showStripeKeys, setShowStripeKeys] = useState(false)
-  const [stripeSecretsLoaded, setStripeSecretsLoaded] = useState(false)
 
   useEffect(() => {
     loadSettings()
@@ -38,37 +36,22 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   async function loadSettings() {
     const { data } = await supabase
       .from('tenant_settings')
-      .select('payment_methods, btw_percentage, stripe_public_key')
+      .select('payment_methods, btw_percentage, stripe_public_key, stripe_secret_key, stripe_webhook_secret')
       .eq('tenant_slug', params.tenant)
       .single()
 
-    const secretRes = await adminDb.select<{
-      stripe_secret_key?: string | null
-      stripe_webhook_secret?: string | null
-      stripe_public_key?: string | null
-      btw_percentage?: number | null
-      payment_methods?: string[] | null
-    }>('tenant_settings', {
-      tenantSlug: params.tenant,
-      select: 'payment_methods, btw_percentage, stripe_public_key, stripe_secret_key, stripe_webhook_secret',
-      match: { tenant_slug: params.tenant },
-      single: 'maybe',
-    })
-    const secrets = secretRes.ok ? secretRes.data : null
-    if (secretRes.ok) setStripeSecretsLoaded(true)
+    if (data) {
+      // Load BTW percentage
+      if (data.btw_percentage) {
+        setVatRate(data.btw_percentage)
+      }
 
-    if (data || secrets) {
-      const btw = secrets?.btw_percentage ?? data?.btw_percentage
-      if (btw) setVatRate(btw)
-
-      const publicKey = secrets?.stripe_public_key || data?.stripe_public_key
-      if (publicKey) setStripePublicKey(publicKey)
-      if (secrets?.stripe_secret_key) setStripeSecretKey(secrets.stripe_secret_key)
-      if (secrets?.stripe_webhook_secret) setStripeWebhookSecret(secrets.stripe_webhook_secret)
+      if (data.stripe_public_key) setStripePublicKey(data.stripe_public_key)
+      if (data.stripe_secret_key) setStripeSecretKey(data.stripe_secret_key)
+      if (data.stripe_webhook_secret) setStripeWebhookSecret(data.stripe_webhook_secret)
 
       // Load payment methods
-      const paymentMethods = secrets?.payment_methods ?? data?.payment_methods
-      if (paymentMethods && Array.isArray(paymentMethods)) {
+      if (data.payment_methods && Array.isArray(data.payment_methods)) {
         const loadedMethods: {[key: string]: boolean} = {
           cash: false,
           bancontact: false,
@@ -77,7 +60,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           paypal: false,
           ideal: false,
         }
-        paymentMethods.forEach((method: string) => {
+        data.payment_methods.forEach((method: string) => {
           if (method in loadedMethods) {
             loadedMethods[method] = true
           }
@@ -98,18 +81,16 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
       .filter(([_, enabled]) => enabled)
       .map(([method]) => method)
 
-    const savedRes = await adminDb.update(
-      'tenant_settings',
-      {
+    const { error } = await supabase
+      .from('tenant_settings')
+      .update({
         payment_methods: enabledMethods,
-        btw_percentage: vatRate,
-      },
-      { tenant_slug: params.tenant },
-      { tenantSlug: params.tenant },
-    )
+        btw_percentage: vatRate
+      })
+      .eq('tenant_slug', params.tenant)
 
-    if (!savedRes.ok) {
-      console.error('Error saving payment settings:', savedRes.error)
+    if (error) {
+      console.error('Error saving payment settings:', error)
       alert(t('adminPages.common.saveFailed'))
     } else {
       setSaved(true)
@@ -121,23 +102,15 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
 
   const handleSaveStripe = async () => {
     setSavingStripe(true)
-    const patch: Record<string, string | null> = {
-      stripe_public_key: stripePublicKey || null,
-    }
-    if (stripeSecretsLoaded) {
-      patch.stripe_secret_key = stripeSecretKey.trim() || null
-      patch.stripe_webhook_secret = stripeWebhookSecret.trim() || null
-    } else {
-      if (stripeSecretKey.trim()) patch.stripe_secret_key = stripeSecretKey.trim()
-      if (stripeWebhookSecret.trim()) patch.stripe_webhook_secret = stripeWebhookSecret.trim()
-    }
-    const savedRes = await adminDb.update(
-      'tenant_settings',
-      patch,
-      { tenant_slug: params.tenant },
-      { tenantSlug: params.tenant },
-    )
-    if (savedRes.ok) {
+    const { error } = await supabase
+      .from('tenant_settings')
+      .update({
+        stripe_public_key: stripePublicKey || null,
+        stripe_secret_key: stripeSecretKey || null,
+        stripe_webhook_secret: stripeWebhookSecret || null,
+      })
+      .eq('tenant_slug', params.tenant)
+    if (!error) {
       setSavedStripe(true)
       setTimeout(() => setSavedStripe(false), 2000)
     }

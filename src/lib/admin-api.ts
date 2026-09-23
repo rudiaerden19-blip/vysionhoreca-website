@@ -5,11 +5,6 @@ import { buildDefaultDeliverySettingsRow } from '@/lib/tenant-defaults'
 import bcrypt from 'bcryptjs'
 import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api-internal'
 import { adminDb } from './admin-db-client'
-import {
-  isTenantSettingsColumnPermissionError,
-  stripTenantSettingsSecrets,
-  TENANT_SETTINGS_PUBLIC_SELECT,
-} from './tenant-settings-secrets'
 
 // Belgium calendar / Z-rapport bounds — single implementation in `belgium-date-bounds.ts`
 // (light routes import that module directly to avoid pulling in admin-api).
@@ -241,19 +236,12 @@ export interface TenantSettings {
 
 export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {
   const fetchTenantSettings = async (): Promise<TenantSettings | null> => {
-    const base = supabase.from('tenant_settings').select('*').eq('tenant_slug', tenantSlug)
-    const first = signal ? base.abortSignal(signal) : base
-    let { data, error } = await first.maybeSingle()
-    if (error && isTenantSettingsColumnPermissionError(error.message)) {
-      const fallback = supabase
-        .from('tenant_settings')
-        .select(TENANT_SETTINGS_PUBLIC_SELECT)
-        .eq('tenant_slug', tenantSlug)
-      const retryQuery = signal ? fallback.abortSignal(signal) : fallback
-      const retry = await retryQuery.maybeSingle()
-      data = retry.data as typeof data
-      error = retry.error
-    }
+    const base = supabase
+      .from('tenant_settings')
+      .select('*')
+      .eq('tenant_slug', tenantSlug)
+    const q = signal ? base.abortSignal(signal) : base
+    const { data, error } = await q.maybeSingle()
 
     if (error) {
       throwIfSupabaseFetchAborted(error)
@@ -262,7 +250,10 @@ export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal
     }
 
     if (data) {
-      return stripTenantSettingsSecrets(data as unknown as Record<string, unknown>) as unknown as TenantSettings
+      const fullData = data as TenantSettings & { stripe_secret_key?: string; stripe_webhook_secret?: string }
+      delete fullData.stripe_secret_key
+      delete fullData.stripe_webhook_secret
+      return fullData as TenantSettings
     }
     return data
   }
