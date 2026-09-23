@@ -238,7 +238,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       setCloseNote('')
     }
     loadedDate.current = view.date
-    setOpening(view.openingCents > 0 ? (view.openingCents / 100).toFixed(2) : '')
+    setOpening(view.status === 'none' ? '' : (view.openingCents / 100).toFixed(2))
     setLoading(false)
   }, [tenant])
 
@@ -673,12 +673,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     step="0.01"
                     autoComplete="off"
                     value={opening}
-                    disabled={closed}
+                    disabled={day.status !== 'none'}
                     onChange={(e) => setOpening(e.target.value)}
                     className="mt-1 block w-36 px-3 py-2 border rounded-xl"
                   />
                 </label>
-                {!closed && (
+                {day.status === 'none' && (
                   <button
                     type="button"
                     disabled={busy || opening.trim() === ''}
