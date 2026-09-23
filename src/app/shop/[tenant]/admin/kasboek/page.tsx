@@ -244,6 +244,22 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       .catch(() => setPendingCount(0))
   }, [loadDay, tenant])
 
+  useEffect(() => {
+    if (history.length === 0 || !periodFrom || !periodTo) return
+    const today = belgiumToday()
+    const count = history.filter((row) => {
+      if (row.date < periodFrom || row.date > periodTo || row.date >= today) return false
+      return cashbookBadge({
+        status: row.status,
+        differenceCents: row.differenceCents,
+        adjustmentCount: row.adjustmentCount || 0,
+        grossCents: row.grossCents,
+        isPast: true,
+      }) === 'attention'
+    }).length
+    setPendingCount(count)
+  }, [history, periodFrom, periodTo])
+
   async function post(body: Record<string, unknown>) {
     setBusy(true)
     setError('')
@@ -260,6 +276,15 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     }
     await loadDay(date)
     historySpans.current = []
+    if (body.action === 'close') {
+      setHistory((rows) => rows.map((row) => row.date === date ? { ...row, status: 'closed' } : row))
+    }
+    if (!periodFrom) {
+      void authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&pending=1`)
+        .then((res) => res.json())
+        .then((json) => setPendingCount(Number(json.count) || 0))
+        .catch(() => undefined)
+    }
     return true
   }
 
