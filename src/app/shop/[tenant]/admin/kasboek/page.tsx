@@ -673,24 +673,23 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     step="0.01"
                     autoComplete="off"
                     value={opening}
-                    disabled={day.status !== 'none'}
+                    disabled={closed}
                     onChange={(e) => setOpening(e.target.value)}
                     className="mt-1 block w-36 px-3 py-2 border rounded-xl"
                   />
                 </label>
-                {day.status === 'none' && (
-                  <button
-                    type="button"
-                    disabled={busy || opening.trim() === ''}
-                    className="px-4 py-2 rounded-xl bg-accent text-white text-sm hover:bg-accent/90 disabled:opacity-100"
-                    onClick={() => {
-                      if (opening.trim() === '' || Number.isNaN(Number(opening))) return
-                      void post({ action: 'opening', openingEuros: Number(opening) })
-                    }}
-                  >
-                    Beginsaldo bevestigen
-                  </button>
-                )}
+                <button
+                  type="button"
+                  disabled={busy || (!closed && opening.trim() === '')}
+                  className={`px-4 py-2 rounded-xl text-white text-sm disabled:opacity-100 ${day.status === 'none' ? 'bg-accent hover:bg-accent/90' : 'bg-green-600'}`}
+                  onClick={() => {
+                    if (closed) return
+                    if (opening.trim() === '' || Number.isNaN(Number(opening))) return
+                    void post({ action: 'opening', openingEuros: Number(opening) })
+                  }}
+                >
+                  {day.status === 'none' ? 'Beginsaldo bevestigen' : 'Bedrag in kas'}
+                </button>
               </div>
               <div className="grid grid-cols-2 gap-y-2 text-sm">
                 <span>Cash verkopen</span><span className="text-right font-medium">{euro(day.payments.cashCents)}</span>
