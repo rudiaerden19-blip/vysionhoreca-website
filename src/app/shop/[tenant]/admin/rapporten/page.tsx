@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
   distributeOrderPaymentForZRaport,
-  fetchAllOrdersForRapporten,
+  fetchAllTenantOrdersInCreatedAtRange,
   getOpeningHours,
   getTenantSettings,
   orderCountsTowardRevenueAndZReport,
@@ -112,6 +112,33 @@ function fmtDayShort(d: Date) {
 }
 
 /** JSONB kan als object of als string binnenkomen — anders crasht .forEach op populaire producten. */
+const RAPPORT_ORDER_COLS =
+  'id,order_number,status,payment_status,payment_method,order_type,total,subtotal,tax,discount_amount,created_at,customer_name,customer_email'
+
+function mapRapportOrders(rows: Record<string, unknown>[]): Order[] {
+  return rows.map((row) => ({
+    ...row,
+    items: parseOrderItems(row.items),
+    discount_amount: Number(row.discount_amount) || 0,
+    tax: Number(row.tax) || 0,
+    subtotal: Number(row.subtotal) || 0,
+    total: Number(row.total) || 0,
+  })) as Order[]
+}
+
+function mergeRapportOrders(current: Order[], incoming: Order[]): Order[] {
+  const map = new Map(current.map((order) => [order.id, order]))
+  for (const row of incoming) {
+    const prev = map.get(row.id)
+    if (!prev) {
+      map.set(row.id, row)
+      continue
+    }
+    map.set(row.id, { ...prev, ...row, items: row.items?.length ? row.items : prev.items })
+  }
+  return Array.from(map.values())
+}
+
 function parseOrderItems(raw: unknown): Order['items'] {
   if (Array.isArray(raw)) return raw as Order['items']
   if (typeof raw === 'string') {
@@ -241,14 +268,42 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     }
   }, [])
 
+  const ordersRef = useRef<Order[]>([])
+  const coveredRef = useRef<Array<{ start: number; end: number; items: boolean }>>([])
+
+  const ensureOrders = useCallback(async (start: Date, end: Date, withItems: boolean) => {
+    const startMs = start.getTime()
+    const endMs = end.getTime()
+    const hit = coveredRef.current.some((span) => span.start <= startMs && span.end >= endMs && (!withItems || span.items))
+    if (hit) return ordersRef.current
+    const rows = await fetchAllTenantOrdersInCreatedAtRange(
+      tenant,
+      start.toISOString(),
+      end.toISOString(),
+      withItems ? `${RAPPORT_ORDER_COLS},items` : RAPPORT_ORDER_COLS,
+    )
+    const merged = mergeRapportOrders(ordersRef.current, mapRapportOrders(rows))
+    ordersRef.current = merged
+    coveredRef.current.push({ start: startMs, end: endMs, items: withItems })
+    setOrders(merged)
+    return merged
+  }, [tenant])
+
   const loadData = useCallback(async () => {
     setLoading(true)
     // z_reports gaat via /api/admin/db/read (na Phase 2-lockdown heeft de
     // anon-key geen SELECT meer op die tabel).
     const zSelectBase =
       'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
-    const [ordersData, zResultRaw, info, hours, vatCtx] = await Promise.all([
-      fetchAllOrdersForRapporten(tenant),
+    const windowStart = startOfMonth(new Date())
+    windowStart.setDate(windowStart.getDate() - 8)
+    const windowEnd = new Date()
+    windowEnd.setDate(windowEnd.getDate() + 2)
+    const itemsStart = startOfDay(new Date())
+    itemsStart.setDate(itemsStart.getDate() - 1)
+    const [monthRows, todayRows, zResultRaw, info, hours, vatCtx] = await Promise.all([
+      fetchAllTenantOrdersInCreatedAtRange(tenant, windowStart.toISOString(), windowEnd.toISOString(), RAPPORT_ORDER_COLS),
+      fetchAllTenantOrdersInCreatedAtRange(tenant, itemsStart.toISOString(), windowEnd.toISOString(), `${RAPPORT_ORDER_COLS},items`),
       adminDb.select<Array<Record<string, unknown>>>('z_reports', {
         tenantSlug: tenant,
         select: `${zSelectBase}, owner_dinein_drinks_incl`,
@@ -271,19 +326,13 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     }
     setOpeningHours(hours || [])
     const zData = zResult.ok && Array.isArray(zResult.data) ? zResult.data : null
-    setOrders(
-      (ordersData || []).map((o) => {
-        const row = o as Record<string, unknown>
-        return {
-          ...row,
-          items: parseOrderItems(row.items),
-          discount_amount: Number(row.discount_amount) || 0,
-          tax: Number(row.tax) || 0,
-          subtotal: Number(row.subtotal) || 0,
-          total: Number(row.total) || 0,
-        } as Order
-      })
-    )
+    const loadedOrders = mergeRapportOrders(mapRapportOrders(monthRows), mapRapportOrders(todayRows))
+    ordersRef.current = loadedOrders
+    coveredRef.current = [
+      { start: windowStart.getTime(), end: windowEnd.getTime(), items: false },
+      { start: itemsStart.getTime(), end: windowEnd.getTime(), items: true },
+    ]
+    setOrders(loadedOrders)
     setZReports((zData || []) as unknown as ZReport[])
     setTenantInfo(info as TenantInfo)
     setVatContext(vatCtx)
@@ -307,11 +356,50 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     setOpeningCash(opening)
 
     setLoading(false)
-  }, [tenant])
+    let lastZ = ''
+    for (const row of zData || []) {
+      const generated = String((row as { generated_at?: string }).generated_at || '')
+      if (generated > lastZ) lastZ = generated
+    }
+    if (lastZ && new Date(lastZ) < windowStart) {
+      const zFrom = new Date(lastZ)
+      zFrom.setDate(zFrom.getDate() - 1)
+      void ensureOrders(zFrom, windowEnd, false)
+    }
+  }, [tenant, ensureOrders])
 
   useEffect(() => {
     void loadData()
   }, [loadData])
+
+  useEffect(() => {
+    if (loading) return
+    const start = startOfMonth(selectedMonth)
+    start.setDate(start.getDate() - 2)
+    let end = addMonths(startOfMonth(selectedMonth), 1)
+    end.setDate(end.getDate() + 1)
+    const cap = new Date()
+    cap.setDate(cap.getDate() + 2)
+    if (end > cap) end = cap
+    void ensureOrders(start, end, false)
+  }, [selectedMonth, loading, ensureOrders])
+
+  useEffect(() => {
+    if (loading || paymentPeriod !== 'year') return
+    const start = new Date(selectedYear, 0, 1)
+    start.setDate(start.getDate() - 2)
+    const end = selectedYear >= new Date().getFullYear() ? new Date() : new Date(selectedYear + 1, 0, 1)
+    end.setDate(end.getDate() + 2)
+    void ensureOrders(start, end, false)
+  }, [paymentPeriod, selectedYear, loading, ensureOrders])
+
+  useEffect(() => {
+    if (loading || exportPeriod !== 'year') return
+    const start = startOfYear(new Date())
+    const end = new Date()
+    end.setDate(end.getDate() + 2)
+    void ensureOrders(start, end, false)
+  }, [exportPeriod, loading, ensureOrders])
 
   /** Laatste Z-afsluiting: bron = z_reports (gedeeld), niet localStorage */
   const lastZGeneratedAt = useMemo(() => {
@@ -636,8 +724,22 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
     const defaultBtw = tenantInfo?.btw_percentage ?? 6
+    const xFrom = lastZGeneratedAt ? new Date(lastZGeneratedAt) : startOfDay(now)
+    const xTo = new Date(now)
+    xTo.setDate(xTo.getDate() + 2)
+    const xList = (await ensureOrders(xFrom, xTo, true))
+      .filter(isValidOrder)
+      .filter((o) => new Date(o.created_at) >= xFrom)
+    let xCash = 0
+    let xCard = 0
+    for (const o of xList) {
+      const d = distributeOrderPaymentForZRaport(o)
+      xCash += d.cash
+      xCard += d.card + d.online
+    }
+    const xTotal = xList.reduce((s, o) => s + o.total, 0)
     const vatAgg = aggregateZReportVatFromOrderRows(
-      xOrders.map((o) => ({
+      xList.map((o) => ({
         total: o.total,
         items: (o as { items?: unknown }).items,
         order_type: o.order_type,
@@ -649,14 +751,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const zRes = await adminDb.upsert('z_reports', {
       tenant_slug: tenant,
       report_date: dateStr,
-      order_count: xData.count,
+      order_count: xList.length,
       subtotal: vatAgg.subtotalExcl,
       tax_low: vatAgg.tax_low,
       tax_mid: vatAgg.tax_mid,
       tax_high: vatAgg.tax_high,
-      total: xData.total,
-      cash_payments: xData.cash,
-      card_payments: xData.card,
+      total: xTotal,
+      cash_payments: xCash,
+      card_payments: xCard,
       online_payments: 0,
       btw_percentage: defaultBtw,
       generated_at: now.toISOString(),
@@ -693,7 +795,15 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }
 
   const sendOverviewEmailReport = async () => {
-    const snapshot = computeOmzetOverviewSnapshot(exportPeriod, validOrders, tenantInfo, vatContext)
+    const from = getPeriodStart(exportPeriod)
+    const end = new Date()
+    end.setDate(end.getDate() + 2)
+    const snapshot = computeOmzetOverviewSnapshot(
+      exportPeriod,
+      (await ensureOrders(from, end, true)).filter(isValidOrder),
+      tenantInfo,
+      vatContext,
+    )
     const { exp, totalRev, cash, card, vatAggPdf } = snapshot
     setOverviewEmailSending(true)
     setOverviewEmailError('')
@@ -734,9 +844,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }
 
   // ── CSV Export ──
-  const exportCSV = () => {
+  const exportCSV = async () => {
     const from = getPeriodStart(exportPeriod)
-    const exp = validOrders.filter((o) => new Date(o.created_at) >= from)
+    const end = new Date()
+    end.setDate(end.getDate() + 2)
+    const exp = (await ensureOrders(from, end, false)).filter(isValidOrder).filter((o) => new Date(o.created_at) >= from)
     const headers = ['Datum','Tijd','Bon#','Type','Betaling','Subtotaal','BTW','Totaal']
     const rows = exp.map(o => [
       new Date(o.created_at).toLocaleDateString('nl-NL'),
@@ -762,10 +874,13 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }
 
   // ── PDF Export ──
-  const exportPDF = () => {
+  const exportPDF = async () => {
+    const from = getPeriodStart(exportPeriod)
+    const end = new Date()
+    end.setDate(end.getDate() + 2)
     const { exp, totalRev, cash, card, vatAggPdf } = computeOmzetOverviewSnapshot(
       exportPeriod,
-      validOrders,
+      (await ensureOrders(from, end, true)).filter(isValidOrder),
       tenantInfo,
       vatContext,
     )
