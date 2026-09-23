@@ -614,7 +614,6 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => { const period = periodFor('year'); void downloadExport('pdf', period.from, period.to) }}>Download jaar</button>
             <button type="button" className="px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90" onClick={() => setMailOpen(true)}>Verstuur naar boekhouder</button>
           </div>
-          <p className="text-sm text-gray-500">Dit geldt voor {showDate(periodFor('period').from)} – {showDate(periodFor('period').to)}. De boekhouder krijgt deze periode in één keer.</p>
           </div>
         ) : loading || !day ? (
           <p className="text-gray-500">Laden…</p>
