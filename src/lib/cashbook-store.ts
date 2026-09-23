@@ -1,12 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import {
-  cashbookBadge,
   cashbookWriteBlock,
   cashDifferenceCents,
   eurosToCents,
   expectedCashCents,
   isCashbookMovementType,
   orderBelongsToCashbookDay,
+  cashbookDayNeedsClose,
+  isListedClosureDate,
   summarizeCashbookOrders,
   vatLinesFromAggregate,
   type CashbookMovementType,
@@ -18,6 +19,7 @@ import {
   businessDayForOrder,
   fetchOpeningHoursForTenant,
   getTenantBusinessDayBounds,
+  isWeeklyClosedDay,
   type TenantHourRow,
 } from '@/lib/tenant-business-day'
 import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
@@ -501,6 +503,7 @@ export type CashbookRangeRow = {
   differenceCents: number | null
   adjustmentCount: number
   staffNames: string[]
+  closureDay: boolean
   exclCents: number
   taxCents: number
   discountCents: number
@@ -519,7 +522,7 @@ export async function loadCashbookRange(
   const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
   const start = getTenantBusinessDayBounds(fromDate, hours).startUTC
   const end = getTenantBusinessDayBounds(toDate, hours).endUTC
-  const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes] = await Promise.all([
+  const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes, closingRes] = await Promise.all([
     fetchOrders(client, tenantSlug, start, end, withVat),
     withVat ? fetchZReportVatContextFromSupabase(client, tenantSlug) : Promise.resolve(null),
     withVat
@@ -543,8 +546,15 @@ export async function loadCashbookRange(
       .eq('tenant_slug', tenantSlug)
       .gte('book_date', fromDate)
       .lte('book_date', toDate),
+    client
+      .from('exceptional_closings')
+      .select('date, date_end')
+      .eq('tenant_slug', tenantSlug),
   ])
   const defaultBtw = Number((settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage) || 6
+  const closings = missingTable(closingRes.error)
+    ? []
+    : ((closingRes.data || []) as Array<{ date: string; date_end?: string | null }>)
   const days = new Map<string, Record<string, unknown>>()
   if (!missingTable(dayRes.error)) {
     for (const row of dayRes.data || []) days.set(String((row as { book_date: string }).book_date), row as Record<string, unknown>)
@@ -601,6 +611,7 @@ export async function loadCashbookRange(
       : null
     const vat = vatLinesFromAggregate(vatAgg)
     const closed = day?.status === 'closed'
+    const closureDay = isWeeklyClosedDay(date, hours) || isListedClosureDate(date, closings)
     const openingCents = day ? Number(day.opening_cash_cents) || 0 : 0
     const staffNames = Array.from(new Set(movements.map((m) => (m.staff_name || '').trim()).filter(Boolean)))
     const expected = closed
@@ -626,6 +637,7 @@ export async function loadCashbookRange(
       differenceCents: closed ? Number(day?.difference_cents) : null,
       adjustmentCount: adjustmentsByDay.get(date) || 0,
       staffNames,
+      closureDay,
       exclCents: vatAgg ? eurosToCents(vatAgg.subtotalExcl) : 0,
       taxCents: vatAgg ? eurosToCents(vatAgg.totalTax) : 0,
       discountCents: summary.payments.discountCents,
@@ -645,13 +657,14 @@ export async function loadPendingCloseDays(
   if (yesterday < from) return { count: 0, dates: [] }
   const rows = await loadCashbookRange(client, tenantSlug, from, yesterday)
   const dates = rows
-    .filter((row) => cashbookBadge({
+    .filter((row) => cashbookDayNeedsClose({
       status: row.status,
       differenceCents: row.differenceCents,
       adjustmentCount: row.adjustmentCount,
       grossCents: row.grossCents,
       isPast: true,
-    }) === 'attention')
+      closureDay: row.closureDay,
+    }))
     .map((row) => row.date)
   return { count: dates.length, dates }
 }

@@ -17,6 +17,7 @@ function row(partial: Partial<CashbookRangeRow>): CashbookRangeRow {
     differenceCents: null,
     adjustmentCount: 0,
     staffNames: [],
+    closureDay: false,
     exclCents: 2491,
     taxCents: 299,
     discountCents: 0,

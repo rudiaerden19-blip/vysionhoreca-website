@@ -39,6 +39,12 @@ export async function fetchOpeningHoursForTenant(
   return (data || []) as TenantHourRow[]
 }
 
+export function isWeeklyClosedDay(ymd: string, hours: TenantHourRow[]): boolean {
+  if (!hours.length) return false
+  const row = hoursForYmd(ymd, hours)
+  return !!row && row.is_open === false
+}
+
 function hoursForYmd(ymd: string, hours: TenantHourRow[]): TenantHourRow | undefined {
   const [y, m, d] = ymd.split('-').map(Number)
   const dow = getBelgiumWeekdayMon0(new Date(Date.UTC(y, m - 1, d, 12, 0, 0)))

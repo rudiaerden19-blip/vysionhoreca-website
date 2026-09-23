@@ -248,6 +248,28 @@ export function vatReconciliation(
 
 export type CashbookBadge = 'open' | 'closed' | 'correction' | 'difference' | 'attention' | 'none'
 
+export function isListedClosureDate(
+  ymd: string,
+  closings: Array<{ date: string; date_end?: string | null }>,
+): boolean {
+  return closings.some((closing) => {
+    const end = closing.date_end && closing.date_end >= closing.date ? closing.date_end : closing.date
+    return ymd >= closing.date && ymd <= end
+  })
+}
+
+export function cashbookDayNeedsClose(input: {
+  status: string
+  differenceCents: number | null
+  adjustmentCount: number
+  grossCents: number
+  isPast: boolean
+  closureDay?: boolean
+}): boolean {
+  if (input.closureDay && input.grossCents === 0 && input.status !== 'open') return false
+  return cashbookBadge(input) === 'attention'
+}
+
 export function cashbookBadge(input: {
   status: string
   differenceCents: number | null

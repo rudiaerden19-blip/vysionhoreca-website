@@ -5,6 +5,7 @@ import PinGate from '@/components/PinGate'
 import { authFetch } from '@/lib/auth-headers'
 import {
   cashbookBadge,
+  cashbookDayNeedsClose,
   eurosToCents,
   paymentReconciliation,
   vatReconciliation,
@@ -81,6 +82,7 @@ type HistoryRow = {
   differenceCents: number | null
   adjustmentCount: number
   staffNames: string[]
+  closureDay?: boolean
 }
 
 const MOVEMENTS: Array<{ id: CashbookMovementType; label: string }> = [
@@ -249,13 +251,14 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     const today = belgiumToday()
     const count = history.filter((row) => {
       if (row.date < periodFrom || row.date > periodTo || row.date >= today) return false
-      return cashbookBadge({
+      return cashbookDayNeedsClose({
         status: row.status,
         differenceCents: row.differenceCents,
         adjustmentCount: row.adjustmentCount || 0,
         grossCents: row.grossCents,
         isPast: true,
-      }) === 'attention'
+        closureDay: row.closureDay,
+      })
     }).length
     setPendingCount(count)
   }, [history, periodFrom, periodTo])
@@ -345,7 +348,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   function historyRowVisible(row: HistoryRow) {
     if (periodFrom && row.date < periodFrom) return false
     if (periodTo && row.date > periodTo) return false
-    if (row.grossCents === 0 && row.status === 'none') return false
+    if (row.grossCents === 0 && row.status === 'none' && !row.closureDay) return false
     const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
     if (historyStatus === 'attention' && badge !== 'attention') return false
     if (historyStatus === 'difference' && badge !== 'difference') return false
@@ -360,6 +363,9 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   }
 
   function statusPresentation(row: HistoryRow) {
+    if (row.closureDay && row.grossCents === 0 && row.status !== 'open' && row.status !== 'closed') {
+      return { text: 'Sluitingsdag', className: 'text-gray-500', color: '#6b7280' }
+    }
     const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
     if (badge === 'attention') return { text: 'Nog niet afgesloten', className: 'text-red-600 font-medium', color: '#dc2626' }
     if (badge === 'closed') return { text: 'Afgesloten', className: 'text-green-600 font-medium', color: '#16a34a' }

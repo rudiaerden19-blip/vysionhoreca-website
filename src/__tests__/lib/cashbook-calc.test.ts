@@ -1,5 +1,7 @@
 import {
   cashbookBadge,
+  cashbookDayNeedsClose,
+  isListedClosureDate,
   cashbookWriteBlock,
   cashDifferenceCents,
   eurosToCents,
@@ -255,5 +257,27 @@ describe('cashbook berekening', () => {
     expect(cashbookWriteBlock('closed', 'adjustment')).toBeNull()
     expect(cashbookWriteBlock('none', 'close')).toMatch(/beginsaldo/i)
     expect(cashbookWriteBlock('open', 'movement')).toBeNull()
+  })
+
+  it('telt een sluitingsdag zonder omzet niet als nog af te sluiten', () => {
+    expect(isListedClosureDate('2026-09-07', [{ date: '2026-09-07', date_end: null }])).toBe(true)
+    expect(isListedClosureDate('2026-09-08', [{ date: '2026-09-07', date_end: '2026-09-09' }])).toBe(true)
+    expect(isListedClosureDate('2026-09-10', [{ date: '2026-09-07', date_end: '2026-09-09' }])).toBe(false)
+    expect(cashbookDayNeedsClose({
+      status: 'none',
+      differenceCents: null,
+      adjustmentCount: 0,
+      grossCents: 0,
+      isPast: true,
+      closureDay: true,
+    })).toBe(false)
+    expect(cashbookDayNeedsClose({
+      status: 'none',
+      differenceCents: null,
+      adjustmentCount: 0,
+      grossCents: 1500,
+      isPast: true,
+      closureDay: true,
+    })).toBe(true)
   })
 })
