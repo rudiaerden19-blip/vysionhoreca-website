@@ -191,9 +191,10 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       setLoading(false)
       return
     }
-    setDay(json as DayView)
-    setDate((json as DayView).date)
-    setOpening(((json as DayView).openingCents / 100).toFixed(2))
+    const view = json as DayView
+    setDay(view)
+    setDate(view.date)
+    setOpening(view.status === 'none' ? '' : (view.openingCents / 100).toFixed(2))
     setLoading(false)
   }, [tenant])
 
@@ -503,9 +504,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 {!closed && (
                   <button
                     type="button"
-                    disabled={busy}
-                    className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm"
-                    onClick={() => void post({ action: 'opening', openingEuros: Number(opening) || 0 })}
+                    disabled={busy || opening.trim() === ''}
+                    className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm disabled:opacity-40"
+                    onClick={() => {
+                      if (opening.trim() === '' || Number.isNaN(Number(opening))) return
+                      void post({ action: 'opening', openingEuros: Number(opening) })
+                    }}
                   >
                     Beginsaldo bevestigen
                   </button>
