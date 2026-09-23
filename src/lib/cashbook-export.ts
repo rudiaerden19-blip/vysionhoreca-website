@@ -35,25 +35,65 @@ function euroOrBlank(cents: number | null): string {
   return cents == null ? '' : formatEuroFromCents(cents)
 }
 
-function boldTotalRow(buffer: Buffer): Buffer {
+function layoutOverviewSheet(buffer: Buffer, headerRow: number, firstDataRow: number, totalRow: number, widths: number[]): Buffer {
   const files = unzipSync(new Uint8Array(buffer))
   const stylesKey = 'xl/styles.xml'
   const sheetKey = 'xl/worksheets/sheet1.xml'
   let styles = strFromU8(files[stylesKey])
   const fontCount = Number(styles.match(/<fonts count="(\d+)">/)?.[1] || 1)
+  const fillCount = Number(styles.match(/<fills count="(\d+)">/)?.[1] || 2)
   const styleCount = Number(styles.match(/<cellXfs count="(\d+)">/)?.[1] || 1)
   styles = styles.replace(/<fonts count="\d+">/, `<fonts count="${fontCount + 1}">`)
   styles = styles.replace(
     '</fonts>',
-    '<font><b/><sz val="12"/><color theme="1"/><name val="Calibri"/><family val="2"/></font></fonts>',
+    `<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/><family val="2"/></font></fonts>`,
   )
-  styles = styles.replace(/<cellXfs count="\d+">/, `<cellXfs count="${styleCount + 1}">`)
+  styles = styles.replace(/<fills count="\d+">/, `<fills count="${fillCount + 2}">`)
+  styles = styles.replace(
+    '</fills>',
+    '<fill><patternFill patternType="solid"><fgColor rgb="FF0E5D82"/><bgColor rgb="FF0E5D82"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF4F8FB"/><bgColor rgb="FFF4F8FB"/></patternFill></fill></fills>',
+  )
+  const accentRight = styleCount
+  const accentLeft = styleCount + 1
+  const zebraRight = styleCount + 2
+  const zebraLeft = styleCount + 3
+  styles = styles.replace(/<cellXfs count="\d+">/, `<cellXfs count="${styleCount + 4}">`)
   styles = styles.replace(
     '</cellXfs>',
-    `<xf numFmtId="0" fontId="${fontCount}" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs>`,
+    `<xf numFmtId="0" fontId="${fontCount}" fillId="${fillCount}" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>` +
+      `<xf numFmtId="0" fontId="${fontCount}" fillId="${fillCount}" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>` +
+      `<xf numFmtId="0" fontId="0" fillId="${fillCount + 1}" borderId="0" xfId="0" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>` +
+      `<xf numFmtId="0" fontId="0" fillId="${fillCount + 1}" borderId="0" xfId="0" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>` +
+      '</cellXfs>',
   )
   let sheet = strFromU8(files[sheetKey])
-  sheet = sheet.replace(/<row r="\d+"[^>]*>(?:(?!<\/row>)[\s\S])*?<v>Totaal<\/v>[\s\S]*?<\/row>/, (row) => row.replace(/<c /g, `<c s="${styleCount}" `))
+  const cols = `<cols>${widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join('')}</cols>`
+  sheet = sheet.includes('<cols>') ? sheet.replace(/<cols>[\s\S]*?<\/cols>/, cols) : sheet.replace('<sheetData>', `${cols}<sheetData>`)
+  const paint = (rowNumber: number, styleForIndex: (index: number) => number) => {
+    sheet = sheet.replace(new RegExp(`<row r="${rowNumber}"([^>]*)>([\\s\\S]*?)</row>`), (_full, attrs: string, inner: string) => {
+      let index = 0
+      const cells = inner.replace(/<c /g, () => {
+        const styleId = styleForIndex(index)
+        index += 1
+        return `<c s="${styleId}" `
+      })
+      return `<row r="${rowNumber}"${attrs} ht="20" customHeight="1">${cells}</row>`
+    })
+  }
+  const accent = (index: number) => (index === 0 || index === widths.length - 1 ? accentLeft : accentRight)
+  const zebra = (index: number) => (index === 0 || index === widths.length - 1 ? zebraLeft : zebraRight)
+  paint(headerRow, accent)
+  for (let row = firstDataRow; row < totalRow; row += 1) {
+    if ((row - firstDataRow) % 2 === 0) paint(row, zebra)
+  }
+  paint(totalRow, accent)
+  sheet = sheet.replace(
+    /<sheetViews>[\s\S]*?<\/sheetViews>/,
+    `<sheetViews><sheetView workbookViewId="0"><pane ySplit="${headerRow}" topLeftCell="A${headerRow + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>`,
+  )
+  if (!sheet.includes('<mergeCells')) {
+    sheet = sheet.replace('</worksheet>', '<mergeCells count="3"><mergeCell ref="A1:K1"/><mergeCell ref="A2:K2"/><mergeCell ref="A3:K3"/></mergeCells></worksheet>')
+  }
   files[stylesKey] = strToU8(styles)
   files[sheetKey] = strToU8(sheet)
   return Buffer.from(zipSync(files))
@@ -170,91 +210,57 @@ export function buildBoekhoudingCsv(meta: CashbookExportMeta, rows: CashbookRang
   return lines.join('\n')
 }
 
-export function renderBoekhoudingXlsx(meta: CashbookExportMeta, rows: CashbookRangeRow[]): Buffer {
-  const sheetRows = [
-    ['Zaak', meta.businessName],
-    ['BTW', meta.btwNumber],
-    ['Periode', meta.periodLabel],
-    [],
-    ['Datum', 'Dagnummer', 'Bruto omzet', 'Netto omzet', 'Btw 0%', 'Btw 6%', 'Btw 9%', 'Btw 12%', 'Btw 21%', 'Cash', 'Terminal', 'Online', 'Retouren', 'Correcties', 'Kasverschil'],
+const overviewWidths = [16, 14, 14, 14, 14, 14, 13, 14, 14, 14, 24]
+
+function overviewSheet(meta: CashbookExportMeta, rows: CashbookRangeRow[]): unknown[][] {
+  const identity = [meta.businessName, meta.btwNumber ? `BTW ${meta.btwNumber}` : '', meta.address].filter(Boolean).join('  ·  ')
+  return [
+    ['VYSION – KASBOEK'],
+    [identity],
+    [`Periode ${meta.periodLabel}`],
+    ['Datum', 'Omzet', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'],
     ...rows.map((row) => [
-      row.date,
-      row.date.replace(/-/g, ''),
-      formatEuroFromCents(row.grossCents),
-      formatEuroFromCents(row.exclCents),
-      formatEuroFromCents(rateTax(row, 0)),
-      formatEuroFromCents(rateTax(row, 6)),
-      formatEuroFromCents(rateTax(row, 9)),
-      formatEuroFromCents(rateTax(row, 12)),
-      formatEuroFromCents(rateTax(row, 21)),
-      formatEuroFromCents(row.cashCents),
-      formatEuroFromCents(row.cardCents),
-      formatEuroFromCents(row.onlineCents),
-      formatEuroFromCents(row.refundCents),
-      row.adjustmentCount,
-      euroOrBlank(row.differenceCents),
+      pdfDayLabel(row.date),
+      pdfMoney(row.grossCents),
+      pdfMoney(row.cashCents),
+      pdfMoney(row.cardCents),
+      pdfMoney(row.onlineCents),
+      pdfMoney(row.openingCents, true),
+      pdfMoney(row.outCents),
+      pdfMoney(row.expectedCents),
+      pdfMoney(row.countedCents),
+      pdfMoney(row.differenceCents),
+      pdfStatus(row),
     ]),
     [
       'Totaal',
-      '',
       formatEuroFromCents(sumBy(rows, (row) => row.grossCents)),
-      formatEuroFromCents(sumBy(rows, (row) => row.exclCents)),
-      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 0))),
-      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 6))),
-      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 9))),
-      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 12))),
-      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 21))),
       formatEuroFromCents(sumBy(rows, (row) => row.cashCents)),
       formatEuroFromCents(sumBy(rows, (row) => row.cardCents)),
       formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)),
-      formatEuroFromCents(sumBy(rows, (row) => row.refundCents)),
-      sumBy(rows, (row) => row.adjustmentCount),
-      euroOrBlank(sumKnown(rows, (row) => row.differenceCents)),
+      '',
+      formatEuroFromCents(sumBy(rows, (row) => row.outCents)),
+      '',
+      '',
+      euroOrBlank(sumKnown(rows, (row) => row.differenceCents)) || '—',
+      '',
     ],
   ]
+}
+
+function writeOverviewXlsx(meta: CashbookExportMeta, rows: CashbookRangeRow[], sheetName: string): Buffer {
   const book = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(sheetRows), 'Boekhouding')
+  XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(overviewSheet(meta, rows)), sheetName)
   const raw = XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }) as Buffer
-  return boldTotalRow(raw)
+  return layoutOverviewSheet(raw, 4, 5, 5 + rows.length, overviewWidths)
+}
+
+export function renderBoekhoudingXlsx(meta: CashbookExportMeta, rows: CashbookRangeRow[]): Buffer {
+  return writeOverviewXlsx(meta, rows, 'Kasboek')
 }
 
 export function renderCashbookXlsx(meta: CashbookExportMeta, rows: CashbookRangeRow[]): Buffer {
-  const sheetRows = rows.map((row) => ({
-    Datum: row.date,
-    Zaak: meta.businessName,
-    Bruto: formatEuroFromCents(row.grossCents),
-    'Excl. btw': formatEuroFromCents(row.exclCents),
-    Btw: formatEuroFromCents(row.taxCents),
-    Cash: formatEuroFromCents(row.cashCents),
-    Terminal: formatEuroFromCents(row.cardCents),
-    Online: formatEuroFromCents(row.onlineCents),
-    Beginkas: formatEuroFromCents(row.openingCents),
-    Verwacht: row.expectedCents == null ? '' : formatEuroFromCents(row.expectedCents),
-    Geteld: row.countedCents == null ? '' : formatEuroFromCents(row.countedCents),
-    Verschil: row.differenceCents == null ? '' : formatEuroFromCents(row.differenceCents),
-    Correcties: row.adjustmentCount,
-    Status: row.status,
-  }))
-  sheetRows.push({
-    Datum: 'Totaal',
-    Zaak: meta.businessName,
-    Bruto: formatEuroFromCents(sumBy(rows, (row) => row.grossCents)),
-    'Excl. btw': formatEuroFromCents(sumBy(rows, (row) => row.exclCents)),
-    Btw: formatEuroFromCents(sumBy(rows, (row) => row.taxCents)),
-    Cash: formatEuroFromCents(sumBy(rows, (row) => row.cashCents)),
-    Terminal: formatEuroFromCents(sumBy(rows, (row) => row.cardCents)),
-    Online: formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)),
-    Beginkas: '',
-    Verwacht: '',
-    Geteld: '',
-    Verschil: euroOrBlank(sumKnown(rows, (row) => row.differenceCents)),
-    Correcties: sumBy(rows, (row) => row.adjustmentCount),
-    Status: '',
-  })
-  const book = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(book, XLSX.utils.json_to_sheet(sheetRows), 'Kasboek')
-  const raw = XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }) as Buffer
-  return boldTotalRow(raw)
+  return writeOverviewXlsx(meta, rows, 'Kasboek')
 }
 
 function pdfDayLabel(ymd: string): string {
