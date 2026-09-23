@@ -121,7 +121,7 @@ export default function TenantDetailPage() {
     // Load tenant
     const { data: tenantData } = await supabase
       .from('tenant_settings')
-      .select('*')
+      .select('id, tenant_slug, business_name, email, phone, address, postal_code, city, country, btw_number, created_at, is_blocked')
       .eq('tenant_slug', slug)
       .single()
 

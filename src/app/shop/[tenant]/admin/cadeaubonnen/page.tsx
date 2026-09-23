@@ -59,8 +59,9 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       ...settings,
       gift_cards_enabled: formData.gift_cards_enabled,
       stripe_public_key: formData.stripe_public_key,
-      stripe_secret_key: formData.stripe_secret_key,
     }
+    const typedSecret = formData.stripe_secret_key.trim()
+    if (typedSecret) updatedSettings.stripe_secret_key = typedSecret
     
     const success = await saveTenantSettings(updatedSettings)
     

@@ -114,7 +114,7 @@ export default function SuperAdminDashboard() {
     // Load all tenants
     const { data: tenantsData } = await supabase
       .from('tenant_settings')
-      .select('*')
+      .select('id, tenant_slug, business_name, email, phone, created_at, is_blocked')
       .order('created_at', { ascending: false })
 
     if (tenantsData) {
