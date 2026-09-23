@@ -118,8 +118,26 @@ function showDate(ymd: string) {
   return `${d}/${m}/${y}`
 }
 
+const MONTHS_NL = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December']
+
 function belgiumToday() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())
+}
+
+function monthChoices(today: string, count = 36) {
+  const [y, m] = today.split('-').map(Number)
+  return Array.from({ length: count }, (_, index) => {
+    const dt = new Date(Date.UTC(y, m - 1 - index, 1))
+    const value = dt.toISOString().slice(0, 7)
+    return { value, label: `${MONTHS_NL[dt.getUTCMonth()]} ${dt.getUTCFullYear()}` }
+  })
+}
+
+function monthBounds(ym: string, today: string) {
+  const [y, m] = ym.split('-').map(Number)
+  const from = `${ym}-01`
+  const last = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10)
+  return { from, to: last > today ? today : last }
 }
 
 function historyRange(kind: 'today' | 'yesterday' | 'week' | 'month' | 'lastMonth', anchor: string) {
@@ -152,7 +170,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [periodKind, setPeriodKind] = useState<'today' | 'yesterday' | 'week' | 'month' | 'lastMonth' | 'custom'>('month')
   const [periodFrom, setPeriodFrom] = useState('')
   const [periodTo, setPeriodTo] = useState('')
-  const historySpan = useRef({ from: '', to: '' })
+  const historySpans = useRef<Array<{ from: string; to: string }>>([])
   const loadedDate = useRef('')
   const [historyStatus, setHistoryStatus] = useState<'all' | 'open' | 'closed' | 'attention' | 'difference' | 'correction'>('all')
   const [payFilter, setPayFilter] = useState<'all' | 'cash' | 'card' | 'online'>('all')
@@ -227,21 +245,28 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       return false
     }
     await loadDay(date)
-    historySpan.current = { from: '', to: '' }
+    historySpans.current = []
     return true
   }
 
-  async function ensureHistoryWindow() {
-    const anchor = belgiumToday()
-    const from = historyRange('lastMonth', anchor).from
-    const to = historyRange('today', anchor).to
-    if (historySpan.current.from === from && historySpan.current.to === to) return
-    historySpan.current = { from, to }
+  async function ensureHistoryRange(from: string, to: string) {
+    if (historySpans.current.some((span) => from >= span.from && to <= span.to)) return
     setHistoryLoading(true)
     const res = await authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&from=${from}&to=${to}`)
     const json = await res.json().catch(() => ({}))
-    setHistory((json.rows || []) as HistoryRow[])
+    const rows = (json.rows || []) as HistoryRow[]
+    setHistory((prev) => {
+      const byDate = new Map(prev.map((row) => [row.date, row]))
+      for (const row of rows) byDate.set(row.date, row)
+      return Array.from(byDate.values()).sort((a, b) => (a.date < b.date ? -1 : 1))
+    })
+    historySpans.current.push({ from, to })
     setHistoryLoading(false)
+  }
+
+  function ensureHistoryWindow() {
+    const anchor = belgiumToday()
+    return ensureHistoryRange(historyRange('lastMonth', anchor).from, historyRange('today', anchor).to)
   }
 
   function showPeriod(kind: 'today' | 'yesterday' | 'week' | 'month' | 'lastMonth') {
@@ -251,6 +276,18 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     setPeriodTo(range.to)
     setTab('history')
     void ensureHistoryWindow()
+  }
+
+  function showMonth(ym: string) {
+    const today = belgiumToday()
+    const range = monthBounds(ym, today)
+    const thisMonth = today.slice(0, 7)
+    const previousMonth = historyRange('lastMonth', today).from.slice(0, 7)
+    setPeriodKind(ym === thisMonth ? 'month' : ym === previousMonth ? 'lastMonth' : 'custom')
+    setPeriodFrom(range.from)
+    setPeriodTo(range.to)
+    setTab('history')
+    void ensureHistoryRange(range.from, range.to)
   }
 
   function selectedPeriod() {
@@ -381,6 +418,16 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             ] as const).map(([kind, label]) => (
               <button key={kind} type="button" className={`px-3 py-2 rounded-xl text-sm ${periodKind === kind ? 'bg-gray-900 text-white' : 'bg-white border'}`} onClick={() => showPeriod(kind)}>{label}</button>
             ))}
+            <select
+              value={periodKind === 'month' || periodKind === 'lastMonth' || periodKind === 'custom' ? periodFrom.slice(0, 7) : ''}
+              onChange={(e) => { if (e.target.value) showMonth(e.target.value) }}
+              className="px-3 py-2 rounded-xl border text-sm bg-white"
+            >
+              <option value="">Kies maand</option>
+              {monthChoices(belgiumToday()).map((month) => (
+                <option key={month.value} value={month.value}>{month.label}</option>
+              ))}
+            </select>
             <select value={historyStatus} onChange={(e) => setHistoryStatus(e.target.value as typeof historyStatus)} className="px-3 py-2 rounded-xl border text-sm bg-white">
               <option value="all">Alle statussen</option>
               <option value="open">Open</option>
@@ -404,16 +451,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               setPeriodFrom(customFrom)
               setPeriodTo(customTo)
               setTab('history')
-              const span = historySpan.current
-              if (span.from && customFrom >= span.from && customTo <= span.to) return
-              setHistoryLoading(true)
-              void authFetch(`/api/kasboek?tenantSlug=${encodeURIComponent(tenant)}&from=${customFrom}&to=${customTo}`)
-                .then((res) => res.json())
-                .then((json) => {
-                  setHistory((json.rows || []) as HistoryRow[])
-                  historySpan.current = { from: customFrom, to: customTo }
-                })
-                .finally(() => setHistoryLoading(false))
+              void ensureHistoryRange(customFrom, customTo)
             }}>Eigen periode</button>
           </div>
           <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
@@ -426,7 +464,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                 </tr>
               </thead>
               <tbody>
-                {historyLoading && history.length === 0 ? (
+                {historyLoading && !history.some((row) => (!periodFrom || row.date >= periodFrom) && (!periodTo || row.date <= periodTo)) ? (
                   <tr><td className="px-3 py-4 text-gray-500" colSpan={11}>Laden…</td></tr>
                 ) : history.filter(historyRowVisible).map((row) => (
                   <tr key={row.date} className="border-t cursor-pointer hover:bg-gray-50" onClick={() => { setTab('day'); void loadDay(row.date) }}>
