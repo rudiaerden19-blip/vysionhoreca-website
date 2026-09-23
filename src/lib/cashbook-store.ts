@@ -365,6 +365,111 @@ export async function addMovement(
   return { ok: true }
 }
 
+async function openMovementDay(
+  client: SupabaseClient,
+  tenantSlug: string,
+  bookDate: string,
+): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
+  const day = await client
+    .from('cashbook_days')
+    .select('id, status')
+    .eq('tenant_slug', tenantSlug)
+    .eq('book_date', bookDate)
+    .maybeSingle()
+  if (missingTable(day.error)) {
+    return { ok: false, error: 'De kasboek-tabellen staan nog niet in de database.', status: 503 }
+  }
+  const block = cashbookWriteBlock(day.data?.status === 'closed' ? 'closed' : day.data ? 'open' : 'none', 'movement')
+  if (block) return { ok: false, error: block, status: 409 }
+  return { ok: true }
+}
+
+export async function updateMovement(
+  client: SupabaseClient,
+  tenantSlug: string,
+  bookDate: string,
+  movementId: string,
+  input: {
+    type: string
+    amountCents: number
+    description: string
+    reason: string
+    staffName: string
+    reference: string
+  },
+  actor: string,
+): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
+  if (!isCashbookMovementType(input.type)) return { ok: false, error: 'Onbekend type kasbeweging.', status: 400 }
+  if (!Number.isInteger(input.amountCents) || input.amountCents <= 0) return { ok: false, error: 'Bedrag moet groter zijn dan 0.', status: 400 }
+  if (!input.description.trim()) return { ok: false, error: 'Omschrijving is verplicht.', status: 400 }
+  const gate = await openMovementDay(client, tenantSlug, bookDate)
+  if (!gate.ok) return gate
+  const existing = await client
+    .from('cashbook_movements')
+    .select('id, movement_type, amount_cents, description')
+    .eq('id', movementId)
+    .eq('tenant_slug', tenantSlug)
+    .eq('book_date', bookDate)
+    .maybeSingle()
+  if (!existing.data) return { ok: false, error: 'Kasbeweging niet gevonden.', status: 404 }
+  const updated = await client
+    .from('cashbook_movements')
+    .update({
+      movement_type: input.type,
+      amount_cents: input.amountCents,
+      description: input.description.trim(),
+      reason: input.reason.trim() || null,
+      staff_name: input.staffName.trim() || null,
+      reference: input.reference.trim() || null,
+    })
+    .eq('id', movementId)
+    .eq('tenant_slug', tenantSlug)
+    .eq('book_date', bookDate)
+  if (updated.error) return { ok: false, error: 'Kasbeweging opslaan mislukt.', status: 500 }
+  await audit(client, tenantSlug, actor, 'movement_updated', 'cashbook_movements', movementId, {
+    type: existing.data.movement_type,
+    amountCents: existing.data.amount_cents,
+    description: existing.data.description,
+  }, {
+    type: input.type,
+    amountCents: input.amountCents,
+    description: input.description.trim(),
+  }, null, bookDate)
+  return { ok: true }
+}
+
+export async function deleteMovement(
+  client: SupabaseClient,
+  tenantSlug: string,
+  bookDate: string,
+  movementId: string,
+  actor: string,
+): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
+  const gate = await openMovementDay(client, tenantSlug, bookDate)
+  if (!gate.ok) return gate
+  const existing = await client
+    .from('cashbook_movements')
+    .select('id, movement_type, amount_cents, description')
+    .eq('id', movementId)
+    .eq('tenant_slug', tenantSlug)
+    .eq('book_date', bookDate)
+    .maybeSingle()
+  if (!existing.data) return { ok: false, error: 'Kasbeweging niet gevonden.', status: 404 }
+  const removed = await client
+    .from('cashbook_movements')
+    .delete()
+    .eq('id', movementId)
+    .eq('tenant_slug', tenantSlug)
+    .eq('book_date', bookDate)
+  if (removed.error) return { ok: false, error: 'Kasbeweging verwijderen mislukt.', status: 500 }
+  await audit(client, tenantSlug, actor, 'movement_deleted', 'cashbook_movements', movementId, {
+    type: existing.data.movement_type,
+    amountCents: existing.data.amount_cents,
+    description: existing.data.description,
+  }, null, null, bookDate)
+  return { ok: true }
+}
+
 export async function closeCashbookDay(
   client: SupabaseClient,
   tenantSlug: string,

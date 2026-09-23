@@ -206,6 +206,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const [error, setError] = useState('')
   const [opening, setOpening] = useState('')
   const [showMove, setShowMove] = useState(false)
+  const [editingMove, setEditingMove] = useState('')
   const [moveType, setMoveType] = useState<CashbookMovementType>('cash_in')
   const [moveAmount, setMoveAmount] = useState('')
   const [moveText, setMoveText] = useState('')
@@ -711,16 +712,52 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
             </section>
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 gap-3">
                 <h2 className="font-semibold">Kasbewegingen</h2>
-                {day.status === 'open' && <button type="button" className="px-3 py-2 rounded-xl bg-accent text-white hover:bg-accent/90 text-sm" onClick={() => setShowMove(true)}>+ Kasbeweging</button>}
+                {!closed && (
+                  <button type="button" className="px-3 py-2 rounded-xl bg-accent text-white hover:bg-accent/90 text-sm" onClick={() => {
+                    if (day.status !== 'open') {
+                      setError('Bevestig eerst het beginsaldo hierboven. Daarna kun je een kasbeweging opslaan.')
+                      return
+                    }
+                    setEditingMove('')
+                    setMoveType('cash_in')
+                    setMoveAmount('')
+                    setMoveText('')
+                    setMoveReason('')
+                    setMoveStaff('')
+                    setMoveRef('')
+                    setShowMove(true)
+                  }}>+ Kasbeweging</button>
+                )}
               </div>
+              {day.status !== 'open' && !closed && <p className="text-sm text-gray-500 mb-3">Bevestig eerst het beginsaldo. Daarna voeg je hier een kasbeweging toe en bewaar je die met Opslaan.</p>}
               {day.movements.length === 0 ? <p className="text-sm text-gray-400">Geen bewegingen.</p> : (
                 <ul className="divide-y text-sm">
                   {day.movements.map((m) => (
-                    <li key={m.id} className="py-2 flex justify-between gap-3">
+                    <li key={m.id} className="py-2 flex justify-between gap-3 items-center">
                       <span>{new Date(m.created_at).toLocaleString('nl-BE')} · {labelOf(m.movement_type)} · {m.description}{m.staff_name ? ` · ${m.staff_name}` : ''}</span>
-                      <span className="font-medium">{euro(m.amount_cents)}</span>
+                      <span className="flex items-center gap-3">
+                        <span className="font-medium">{euro(m.amount_cents)}</span>
+                        {day.status === 'open' && (
+                          <>
+                            <button type="button" className="text-accent" onClick={() => {
+                              setEditingMove(m.id)
+                              setMoveType(m.movement_type)
+                              setMoveAmount((m.amount_cents / 100).toFixed(2))
+                              setMoveText(m.description)
+                              setMoveReason(m.reason || '')
+                              setMoveStaff(m.staff_name || '')
+                              setMoveRef(m.reference || '')
+                              setShowMove(true)
+                            }}>Bewerken</button>
+                            <button type="button" className="text-red-600" disabled={busy} onClick={() => {
+                              if (!window.confirm('Deze kasbeweging verwijderen?')) return
+                              void post({ action: 'movement-delete', movementId: m.id })
+                            }}>Verwijderen</button>
+                          </>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -729,6 +766,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <h2 className="font-semibold mb-3">Correcties</h2>
+              {!closed && <p className="text-sm text-gray-500 mb-3">Een correctie bewaar je nadat de dag is afgesloten. Zolang vandaag open is, wijzig je het bedrag via Bewerken bij de kasbeweging en dan Opslaan.</p>}
               {day.adjustments.length === 0 ? <p className="text-sm text-gray-400">Geen correcties.</p> : (
                 <ul className="text-sm space-y-3">
                   {day.adjustments.map((a) => (
@@ -758,7 +796,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                   )}
                   <input type="number" min={0} step="0.01" value={fixAmount} onChange={(e) => setFixAmount(e.target.value)} placeholder="Nieuwe waarde" className="px-3 py-2 border rounded-xl" />
                   <input value={fixReason} onChange={(e) => setFixReason(e.target.value)} placeholder="Reden" className="px-3 py-2 border rounded-xl flex-1" />
-                  <button type="button" disabled={busy} className="px-4 py-2 rounded-xl bg-accent text-white text-sm hover:bg-accent/90" onClick={() => void post({ action: 'adjustment', fieldName: fixField, movementId: fixMovement, correctedEuros: Number(fixAmount) || 0, reason: fixReason })}>+ Correctie</button>
+                  <button type="button" disabled={busy || !fixReason.trim()} className="px-4 py-2 rounded-xl bg-accent text-white text-sm hover:bg-accent/90" onClick={() => void post({ action: 'adjustment', fieldName: fixField, movementId: fixMovement, correctedEuros: Number(fixAmount) || 0, reason: fixReason })}>Correctie opslaan</button>
                 </div>
               )}
             </section>
@@ -856,17 +894,18 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               onSubmit={(e) => {
                 e.preventDefault()
                 void post({
-                  action: 'movement',
+                  action: editingMove ? 'movement-update' : 'movement',
+                  movementId: editingMove || undefined,
                   type: moveType,
                   amountEuros: Number(moveAmount),
                   description: moveText,
                   reason: moveReason,
                   staffName: moveStaff,
                   reference: moveRef,
-                }).then((ok) => { if (ok) setShowMove(false) })
+                }).then((ok) => { if (ok) { setShowMove(false); setEditingMove('') } })
               }}
             >
-              <h3 className="font-semibold">Kasbeweging</h3>
+              <h3 className="font-semibold">{editingMove ? 'Kasbeweging bewerken' : 'Kasbeweging'}</h3>
               <select value={moveType} onChange={(e) => setMoveType(e.target.value as CashbookMovementType)} className="w-full border rounded-xl px-3 py-2">
                 {MOVEMENTS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
               </select>

@@ -3,6 +3,8 @@ import { z } from 'zod'
 import {
   addAdjustment,
   addMovement,
+  deleteMovement,
+  updateMovement,
   closeCashbookDay,
   loadCashbookDay,
   loadCashbookRange,
@@ -73,6 +75,26 @@ const MovementSchema = z.object({
   reference: z.string().optional().default(''),
 })
 
+const MovementEditSchema = z.object({
+  action: z.literal('movement-update'),
+  tenantSlug: z.string().min(1),
+  date: DateSchema,
+  movementId: z.string().min(1),
+  type: z.string().min(1),
+  amountEuros: z.number().positive(),
+  description: z.string().min(1),
+  reason: z.string().optional().default(''),
+  staffName: z.string().optional().default(''),
+  reference: z.string().optional().default(''),
+})
+
+const MovementDeleteSchema = z.object({
+  action: z.literal('movement-delete'),
+  tenantSlug: z.string().min(1),
+  date: DateSchema,
+  movementId: z.string().min(1),
+})
+
 const CloseSchema = z.object({
   action: z.literal('close'),
   tenantSlug: z.string().min(1),
@@ -106,7 +128,7 @@ const AuditSchema = z.object({
   detail: z.record(z.string(), z.unknown()).optional().default({}),
 })
 
-const BodySchema = z.discriminatedUnion('action', [OpeningSchema, MovementSchema, CloseSchema, AdjustmentSchema, ClosureSchema, AuditSchema])
+const BodySchema = z.discriminatedUnion('action', [OpeningSchema, MovementSchema, MovementEditSchema, MovementDeleteSchema, CloseSchema, AdjustmentSchema, ClosureSchema, AuditSchema])
 
 export async function POST(request: NextRequest) {
   let raw: unknown
@@ -145,6 +167,21 @@ export async function POST(request: NextRequest) {
       },
       actor,
     )
+    return NextResponse.json(result.ok ? { ok: true } : { error: result.error }, { status: result.ok ? 200 : result.status })
+  }
+  if (body.action === 'movement-update') {
+    const result = await updateMovement(client, body.tenantSlug, body.date, body.movementId, {
+      type: body.type,
+      amountCents: eurosToCents(body.amountEuros),
+      description: body.description,
+      reason: body.reason,
+      staffName: body.staffName,
+      reference: body.reference,
+    }, actor)
+    return NextResponse.json(result.ok ? { ok: true } : { error: result.error }, { status: result.ok ? 200 : result.status })
+  }
+  if (body.action === 'movement-delete') {
+    const result = await deleteMovement(client, body.tenantSlug, body.date, body.movementId, actor)
     return NextResponse.json(result.ok ? { ok: true } : { error: result.error }, { status: result.ok ? 200 : result.status })
   }
   if (body.action === 'close') {
