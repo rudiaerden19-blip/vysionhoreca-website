@@ -220,11 +220,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
       return false
     }
     await loadDay(date)
+    historySpan.current = { from: '', to: '' }
     return true
   }
 
   async function ensureHistoryWindow() {
-    const anchor = date || belgiumToday()
+    const anchor = belgiumToday()
     const from = historyRange('lastMonth', anchor).from
     const to = historyRange('today', anchor).to
     if (historySpan.current.from === from && historySpan.current.to === to) return
@@ -237,7 +238,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   }
 
   function showPeriod(kind: 'today' | 'yesterday' | 'week' | 'month' | 'lastMonth') {
-    const range = historyRange(kind, date || belgiumToday())
+    const range = historyRange(kind, belgiumToday())
     setPeriodKind(kind)
     setPeriodFrom(range.from)
     setPeriodTo(range.to)
