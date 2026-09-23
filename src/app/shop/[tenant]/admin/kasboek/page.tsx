@@ -545,16 +545,20 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                     <td className="px-3 py-2">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
                     <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
                     <td className="px-3 py-2" onClick={(event) => event.stopPropagation()}>
-                      <select
-                        value={row.closureChoice || ''}
-                        onChange={(event) => void saveClosureChoice(row.date, event.target.value as '' | 'gesloten' | 'vakantie')}
-                        className="px-2 py-1 rounded-lg border border-accent text-accent text-xs bg-white"
-                        aria-label={`Sluiting ${showDate(row.date)}`}
-                      >
-                        <option value="">Kies</option>
-                        <option value="gesloten">Gesloten</option>
-                        <option value="vakantie">Vakantie</option>
-                      </select>
+                      {row.status === 'closed' ? (
+                        <span className="text-gray-500">{row.closureChoice === 'vakantie' ? 'Vakantie' : row.closureChoice === 'gesloten' ? 'Gesloten' : ''}</span>
+                      ) : (
+                        <select
+                          value={row.closureChoice || ''}
+                          onChange={(event) => void saveClosureChoice(row.date, event.target.value as '' | 'gesloten' | 'vakantie')}
+                          className="px-2 py-1 rounded-lg border border-accent text-accent text-xs bg-white"
+                          aria-label={`Sluiting ${showDate(row.date)}`}
+                        >
+                          <option value="">Kies</option>
+                          <option value="gesloten">Gesloten</option>
+                          <option value="vakantie">Vakantie</option>
+                        </select>
+                      )}
                     </td>
                   </tr>
                 ))}
