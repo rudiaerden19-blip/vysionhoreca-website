@@ -381,11 +381,10 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   }
 
   function downloadPeriod(scope: 'period' | 'month' | 'year') {
+    const today = belgiumToday()
     const period = periodFor(scope)
-    if (period.from.endsWith('-01') && period.from.slice(0, 7) === period.to.slice(0, 7)) {
-      return { from: period.from, to: monthEnd(period.from) }
-    }
-    return period
+    const to = period.to > today ? today : period.to
+    return { from: period.from, to: to < period.from ? period.from : to }
   }
 
   function historyRowVisible(row: HistoryRow) {

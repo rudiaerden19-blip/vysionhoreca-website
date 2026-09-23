@@ -309,25 +309,30 @@ function pdfMoney(cents: number | null | undefined, blankZero = false): string {
   return formatEuroFromCents(cents)
 }
 
+function rowsForSheet(rows: CashbookRangeRow[]): CashbookRangeRow[] {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())
+  return rows.filter((row) => row.date <= today && !(row.grossCents === 0 && row.status === 'none' && !row.closureDay))
+}
+
 export async function renderCashbookPdf(meta: CashbookExportMeta, rows: CashbookRangeRow[]): Promise<Buffer> {
+  const listed = rowsForSheet(rows)
   const { default: PDFDocument } = await import('pdfkit')
-  const weights = [64, 58, 44, 44, 48, 48, 56, 60, 56, 58, 52, 58, 54, 56, 130]
-  const columns: Array<{ title: string; weight: number; width: number; align: 'left' | 'right'; cell: (row: CashbookRangeRow) => string; total: string }> = [
-    { title: 'Datum', weight: weights[0], width: 0, align: 'left', cell: (row) => pdfDayLabel(row.date), total: 'Totaal' },
-    { title: 'Omzet', weight: weights[1], width: 0, align: 'right', cell: (row) => pdfMoney(row.grossCents), total: formatEuroFromCents(sumBy(rows, (row) => row.grossCents)) },
-    { title: 'Btw 6%', weight: weights[2], width: 0, align: 'right', cell: (row) => vatAmount(row, 6), total: vatTotal(rows, 6) },
-    { title: 'Btw 9%', weight: weights[3], width: 0, align: 'right', cell: (row) => vatAmount(row, 9), total: vatTotal(rows, 9) },
-    { title: 'Btw 12%', weight: weights[4], width: 0, align: 'right', cell: (row) => vatAmount(row, 12), total: vatTotal(rows, 12) },
-    { title: 'Btw 21%', weight: weights[5], width: 0, align: 'right', cell: (row) => vatAmount(row, 21), total: vatTotal(rows, 21) },
-    { title: 'Cash', weight: weights[6], width: 0, align: 'right', cell: (row) => pdfMoney(row.cashCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cashCents)) },
-    { title: 'Terminal', weight: weights[7], width: 0, align: 'right', cell: (row) => pdfMoney(row.cardCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cardCents)) },
-    { title: 'Online', weight: weights[8], width: 0, align: 'right', cell: (row) => pdfMoney(row.onlineCents), total: formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)) },
-    { title: 'Beginkas', weight: weights[9], width: 0, align: 'right', cell: (row) => pdfMoney(row.openingCents, true), total: '' },
-    { title: 'Cash uit', weight: weights[10], width: 0, align: 'right', cell: (row) => pdfMoney(row.outCents), total: formatEuroFromCents(sumBy(rows, (row) => row.outCents)) },
-    { title: 'Verwacht', weight: weights[11], width: 0, align: 'right', cell: (row) => pdfMoney(row.expectedCents), total: '' },
-    { title: 'Geteld', weight: weights[12], width: 0, align: 'right', cell: (row) => pdfMoney(row.countedCents), total: '' },
-    { title: 'Verschil', weight: weights[13], width: 0, align: 'right', cell: (row) => pdfMoney(row.differenceCents), total: euroOrBlank(sumKnown(rows, (row) => row.differenceCents)) || '—' },
-    { title: 'Status', weight: weights[14], width: 0, align: 'left', cell: (row) => pdfStatus(row), total: '' },
+  const columns: Array<{ title: string; width: number; align: 'left' | 'right'; cell: (row: CashbookRangeRow) => string; total: string }> = [
+    { title: 'Datum', width: 0, align: 'left', cell: (row) => pdfDayLabel(row.date), total: 'Totaal' },
+    { title: 'Omzet', width: 0, align: 'right', cell: (row) => pdfMoney(row.grossCents), total: formatEuroFromCents(sumBy(listed, (row) => row.grossCents)) },
+    { title: 'Btw 6%', width: 0, align: 'right', cell: (row) => vatAmount(row, 6), total: vatTotal(listed, 6) },
+    { title: 'Btw 9%', width: 0, align: 'right', cell: (row) => vatAmount(row, 9), total: vatTotal(listed, 9) },
+    { title: 'Btw 12%', width: 0, align: 'right', cell: (row) => vatAmount(row, 12), total: vatTotal(listed, 12) },
+    { title: 'Btw 21%', width: 0, align: 'right', cell: (row) => vatAmount(row, 21), total: vatTotal(listed, 21) },
+    { title: 'Cash', width: 0, align: 'right', cell: (row) => pdfMoney(row.cashCents), total: formatEuroFromCents(sumBy(listed, (row) => row.cashCents)) },
+    { title: 'Terminal', width: 0, align: 'right', cell: (row) => pdfMoney(row.cardCents), total: formatEuroFromCents(sumBy(listed, (row) => row.cardCents)) },
+    { title: 'Online', width: 0, align: 'right', cell: (row) => pdfMoney(row.onlineCents), total: formatEuroFromCents(sumBy(listed, (row) => row.onlineCents)) },
+    { title: 'Beginkas', width: 0, align: 'right', cell: (row) => pdfMoney(row.openingCents, true), total: '' },
+    { title: 'Cash uit', width: 0, align: 'right', cell: (row) => pdfMoney(row.outCents), total: formatEuroFromCents(sumBy(listed, (row) => row.outCents)) },
+    { title: 'Verwacht', width: 0, align: 'right', cell: (row) => pdfMoney(row.expectedCents), total: '' },
+    { title: 'Geteld', width: 0, align: 'right', cell: (row) => pdfMoney(row.countedCents), total: '' },
+    { title: 'Verschil', width: 0, align: 'right', cell: (row) => pdfMoney(row.differenceCents), total: euroOrBlank(sumKnown(listed, (row) => row.differenceCents)) || '—' },
+    { title: 'Status', width: 0, align: 'left', cell: (row) => pdfStatus(row), total: '' },
   ]
 
   return new Promise((resolve, reject) => {
@@ -337,27 +342,43 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
     doc.on('end', () => resolve(Buffer.concat(chunks)))
     doc.on('error', reject)
 
-    const margin = 16
+    const margin = 18
     const tableWidth = doc.page.width - margin * 2
-    const weightSum = columns.reduce((sum, column) => sum + column.weight, 0)
-    for (const column of columns) column.width = (column.weight / weightSum) * tableWidth
-    const fontSize = 10
+    const padX = 6
     const monthSlots = 33
-    const tableTop = margin + 40
+    const tableTop = margin + 32
     const bottom = doc.page.height - margin
-    const rowHeight = Math.floor((bottom - tableTop) / monthSlots)
+    const slots = Math.min(monthSlots, Math.max(listed.length + 2, 8))
+    const rowHeight = Math.floor((bottom - tableTop) / slots)
+    let fontSize = 9
+    const measuredWidths = (size: number) => columns.map((column) => {
+      const texts = [column.title, column.total, ...listed.map((row) => column.cell(row))]
+      doc.font('Helvetica-Bold').fontSize(size)
+      const widest = texts.reduce((max, text) => Math.max(max, doc.widthOfString(text || '')), 0)
+      return Math.ceil(widest + padX * 2)
+    })
+    let widths = measuredWidths(fontSize)
+    while (widths.reduce((sum, width) => sum + width, 0) > tableWidth && fontSize > 7.5) {
+      fontSize = Math.round((fontSize - 0.25) * 4) / 4
+      widths = measuredWidths(fontSize)
+    }
+    const used = widths.reduce((sum, width) => sum + width, 0)
+    const spare = tableWidth - used
+    if (spare > 0) widths = widths.map((width) => width + spare / widths.length)
+    for (let index = 0; index < columns.length; index += 1) columns[index].width = widths[index]
 
     const drawCell = (text: string, x: number, y: number, width: number, align: 'left' | 'right', bold: boolean, color: string) => {
       const yBefore = doc.y
-      const face = bold ? 'Helvetica-Bold' : 'Helvetica'
-      let size = fontSize
-      doc.font(face).fontSize(size)
-      while (size > 8.5 && doc.widthOfString(text) > width - 8) {
-        size -= 0.5
-        doc.fontSize(size)
-      }
-      doc.fillColor(color)
-      doc.text(text, x + 3, y + Math.max(2, (rowHeight - size) / 2), { width: width - 6, align, lineBreak: false, ellipsis: true })
+      doc.save()
+      doc.rect(x, y, width, rowHeight).clip()
+      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(fontSize).fillColor(color)
+      doc.text(text, x + padX, y + Math.max(2, (rowHeight - fontSize) / 2), {
+        width: Math.max(4, width - padX * 2),
+        align,
+        lineBreak: false,
+        ellipsis: true,
+      })
+      doc.restore()
       doc.y = yBefore
     }
 
@@ -371,14 +392,14 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
       return y + rowHeight
     }
 
-    doc.fillColor('#0E5D82').font('Helvetica-Bold').fontSize(13).text('VYSION – KASBOEK', margin, margin, { lineBreak: false })
-    doc.fillColor('#334155').font('Helvetica').fontSize(10)
+    doc.fillColor('#0E5D82').font('Helvetica-Bold').fontSize(12).text('VYSION – KASBOEK', margin, margin, { lineBreak: false })
+    doc.fillColor('#334155').font('Helvetica').fontSize(9)
     const identity = [meta.businessName, meta.btwNumber ? `BTW ${meta.btwNumber}` : '', meta.address].filter(Boolean).join('  ·  ')
-    doc.text(`${identity}   ·   Periode ${meta.periodLabel}`, margin, margin + 18, { width: tableWidth, lineBreak: false })
+    doc.text(`${identity}   ·   Periode ${meta.periodLabel}`, margin, margin + 16, { width: tableWidth, lineBreak: false, ellipsis: true })
 
     let y = tableTop
     y = drawHeader(y)
-    rows.forEach((row, index) => {
+    listed.forEach((row, index) => {
       if (y + rowHeight > bottom) {
         doc.addPage()
         y = drawHeader(margin)
