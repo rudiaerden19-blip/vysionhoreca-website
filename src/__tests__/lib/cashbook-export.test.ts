@@ -79,6 +79,8 @@ describe('kasboek export', () => {
     expect(sheet).toContain('customWidth="1"')
     expect(styles).toContain('FF0E5D82')
     expect(bookSheet).toContain('€37,90')
+    expect(bookSheet).toContain('€4,06')
+    expect(bookSheet).toContain('Btw 12%')
     expect(bookSheet).toContain('€2,50')
     expect(bookSheet).toContain('customWidth="1"')
   })

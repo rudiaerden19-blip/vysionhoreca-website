@@ -35,6 +35,17 @@ function euroOrBlank(cents: number | null): string {
   return cents == null ? '' : formatEuroFromCents(cents)
 }
 
+function columnName(count: number): string {
+  let index = count
+  let name = ''
+  while (index > 0) {
+    const remainder = (index - 1) % 26
+    name = String.fromCharCode(65 + remainder) + name
+    index = Math.floor((index - 1) / 26)
+  }
+  return name
+}
+
 function layoutOverviewSheet(buffer: Buffer, headerRow: number, firstDataRow: number, totalRow: number, widths: number[]): Buffer {
   const files = unzipSync(new Uint8Array(buffer))
   const stylesKey = 'xl/styles.xml'
@@ -92,7 +103,8 @@ function layoutOverviewSheet(buffer: Buffer, headerRow: number, firstDataRow: nu
     `<sheetViews><sheetView workbookViewId="0"><pane ySplit="${headerRow}" topLeftCell="A${headerRow + 1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>`,
   )
   if (!sheet.includes('<mergeCells')) {
-    sheet = sheet.replace('</worksheet>', '<mergeCells count="3"><mergeCell ref="A1:K1"/><mergeCell ref="A2:K2"/><mergeCell ref="A3:K3"/></mergeCells></worksheet>')
+    const lastColumn = columnName(widths.length)
+    sheet = sheet.replace('</worksheet>', `<mergeCells count="3"><mergeCell ref="A1:${lastColumn}1"/><mergeCell ref="A2:${lastColumn}2"/><mergeCell ref="A3:${lastColumn}3"/></mergeCells></worksheet>`)
   }
   files[stylesKey] = strToU8(styles)
   files[sheetKey] = strToU8(sheet)
@@ -210,7 +222,15 @@ export function buildBoekhoudingCsv(meta: CashbookExportMeta, rows: CashbookRang
   return lines.join('\n')
 }
 
-const overviewWidths = [16, 14, 14, 14, 14, 14, 13, 14, 14, 14, 24]
+const overviewWidths = [14, 13, 12, 12, 13, 13, 12, 13, 12, 12, 12, 13, 12, 12, 22]
+
+function vatAmount(row: CashbookRangeRow, rate: number): string {
+  return formatEuroFromCents(rateTax(row, rate))
+}
+
+function vatTotal(rows: CashbookRangeRow[], rate: number): string {
+  return formatEuroFromCents(sumBy(rows, (row) => rateTax(row, rate)))
+}
 
 function overviewSheet(meta: CashbookExportMeta, rows: CashbookRangeRow[]): unknown[][] {
   const identity = [meta.businessName, meta.btwNumber ? `BTW ${meta.btwNumber}` : '', meta.address].filter(Boolean).join('  ·  ')
@@ -218,10 +238,14 @@ function overviewSheet(meta: CashbookExportMeta, rows: CashbookRangeRow[]): unkn
     ['VYSION – KASBOEK'],
     [identity],
     [`Periode ${meta.periodLabel}`],
-    ['Datum', 'Omzet', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'],
+    ['Datum', 'Omzet', 'Btw 6%', 'Btw 9%', 'Btw 12%', 'Btw 21%', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status'],
     ...rows.map((row) => [
       pdfDayLabel(row.date),
       pdfMoney(row.grossCents),
+      vatAmount(row, 6),
+      vatAmount(row, 9),
+      vatAmount(row, 12),
+      vatAmount(row, 21),
       pdfMoney(row.cashCents),
       pdfMoney(row.cardCents),
       pdfMoney(row.onlineCents),
@@ -235,6 +259,10 @@ function overviewSheet(meta: CashbookExportMeta, rows: CashbookRangeRow[]): unkn
     [
       'Totaal',
       formatEuroFromCents(sumBy(rows, (row) => row.grossCents)),
+      vatTotal(rows, 6),
+      vatTotal(rows, 9),
+      vatTotal(rows, 12),
+      vatTotal(rows, 21),
       formatEuroFromCents(sumBy(rows, (row) => row.cashCents)),
       formatEuroFromCents(sumBy(rows, (row) => row.cardCents)),
       formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)),
@@ -284,17 +312,21 @@ function pdfMoney(cents: number | null | undefined, blankZero = false): string {
 export async function renderCashbookPdf(meta: CashbookExportMeta, rows: CashbookRangeRow[]): Promise<Buffer> {
   const { default: PDFDocument } = await import('pdfkit')
   const columns: Array<{ title: string; width: number; align: 'left' | 'right'; cell: (row: CashbookRangeRow) => string; total: string }> = [
-    { title: 'Datum', width: 72, align: 'left', cell: (row) => pdfDayLabel(row.date), total: 'Totaal' },
-    { title: 'Omzet', width: 64, align: 'right', cell: (row) => pdfMoney(row.grossCents), total: formatEuroFromCents(sumBy(rows, (row) => row.grossCents)) },
-    { title: 'Cash', width: 64, align: 'right', cell: (row) => pdfMoney(row.cashCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cashCents)) },
-    { title: 'Terminal', width: 68, align: 'right', cell: (row) => pdfMoney(row.cardCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cardCents)) },
-    { title: 'Online', width: 64, align: 'right', cell: (row) => pdfMoney(row.onlineCents), total: formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)) },
-    { title: 'Beginkas', width: 68, align: 'right', cell: (row) => pdfMoney(row.openingCents, true), total: '' },
-    { title: 'Cash uit', width: 60, align: 'right', cell: (row) => pdfMoney(row.outCents), total: formatEuroFromCents(sumBy(rows, (row) => row.outCents)) },
-    { title: 'Verwacht', width: 68, align: 'right', cell: (row) => pdfMoney(row.expectedCents), total: '' },
-    { title: 'Geteld', width: 64, align: 'right', cell: (row) => pdfMoney(row.countedCents), total: '' },
-    { title: 'Verschil', width: 64, align: 'right', cell: (row) => pdfMoney(row.differenceCents), total: euroOrBlank(sumKnown(rows, (row) => row.differenceCents)) || '—' },
-    { title: 'Status', width: 130, align: 'left', cell: (row) => pdfStatus(row), total: '' },
+    { title: 'Datum', width: 52, align: 'left', cell: (row) => pdfDayLabel(row.date), total: 'Totaal' },
+    { title: 'Omzet', width: 50, align: 'right', cell: (row) => pdfMoney(row.grossCents), total: formatEuroFromCents(sumBy(rows, (row) => row.grossCents)) },
+    { title: 'Btw 6%', width: 46, align: 'right', cell: (row) => vatAmount(row, 6), total: vatTotal(rows, 6) },
+    { title: 'Btw 9%', width: 46, align: 'right', cell: (row) => vatAmount(row, 9), total: vatTotal(rows, 9) },
+    { title: 'Btw 12%', width: 48, align: 'right', cell: (row) => vatAmount(row, 12), total: vatTotal(rows, 12) },
+    { title: 'Btw 21%', width: 48, align: 'right', cell: (row) => vatAmount(row, 21), total: vatTotal(rows, 21) },
+    { title: 'Cash', width: 48, align: 'right', cell: (row) => pdfMoney(row.cashCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cashCents)) },
+    { title: 'Terminal', width: 52, align: 'right', cell: (row) => pdfMoney(row.cardCents), total: formatEuroFromCents(sumBy(rows, (row) => row.cardCents)) },
+    { title: 'Online', width: 48, align: 'right', cell: (row) => pdfMoney(row.onlineCents), total: formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)) },
+    { title: 'Beginkas', width: 50, align: 'right', cell: (row) => pdfMoney(row.openingCents, true), total: '' },
+    { title: 'Cash uit', width: 46, align: 'right', cell: (row) => pdfMoney(row.outCents), total: formatEuroFromCents(sumBy(rows, (row) => row.outCents)) },
+    { title: 'Verwacht', width: 50, align: 'right', cell: (row) => pdfMoney(row.expectedCents), total: '' },
+    { title: 'Geteld', width: 46, align: 'right', cell: (row) => pdfMoney(row.countedCents), total: '' },
+    { title: 'Verschil', width: 48, align: 'right', cell: (row) => pdfMoney(row.differenceCents), total: euroOrBlank(sumKnown(rows, (row) => row.differenceCents)) || '—' },
+    { title: 'Status', width: 88, align: 'left', cell: (row) => pdfStatus(row), total: '' },
   ]
   const tableWidth = columns.reduce((sum, column) => sum + column.width, 0)
 
@@ -311,8 +343,8 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
 
     const drawCell = (text: string, x: number, y: number, width: number, align: 'left' | 'right', bold: boolean, color: string) => {
       const yBefore = doc.y
-      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(8).fillColor(color)
-      doc.text(text, x + 4, y + 5, { width: width - 8, align, lineBreak: false, ellipsis: true })
+      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica').fontSize(7).fillColor(color)
+      doc.text(text, x + 2, y + 5, { width: width - 4, align, lineBreak: false, ellipsis: true })
       doc.y = yBefore
     }
 
