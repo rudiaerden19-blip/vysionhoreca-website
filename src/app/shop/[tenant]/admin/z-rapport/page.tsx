@@ -18,6 +18,7 @@ import {
   zReportShowSoldArticlesForTenant,
   zReportSoldArticlesLockedOff,
 } from '@/lib/z-report-accountant-articles'
+import { zReportShowDayReceiptsPanel } from '@/lib/z-report-tenant-ui'
 import {
   applyOwnerCloseToDayTotals,
   hasOwnerCloseValues,
@@ -1842,7 +1843,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
           </motion.div>
 
-          {reportViewMode === 'day' ? (
+          {reportViewMode === 'day' && zReportShowDayReceiptsPanel(params.tenant) ? (
             <ZReportChangePaymentPanel
               tenantSlug={params.tenant}
               orders={dayReceipts}

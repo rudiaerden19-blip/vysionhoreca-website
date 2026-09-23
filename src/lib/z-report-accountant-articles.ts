@@ -2,8 +2,12 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 /** Per-tenant: artikelregels (10 cola, …) in Z-scherm, mail, print en PDF. Standaard ja. */
 
+import { Z_REPORT_TONTBIJTHUISJE_SLUG } from '@/lib/z-report-tenant-ui'
+
 /** Z-rapport zonder artikellijst — ook als DB/toggle per ongeluk op true staat. */
-export const Z_REPORT_FORCE_HIDE_SOLD_ARTICLES_SLUGS = new Set<string>(['tontbijthuisje'])
+export const Z_REPORT_FORCE_HIDE_SOLD_ARTICLES_SLUGS = new Set<string>([
+  Z_REPORT_TONTBIJTHUISJE_SLUG,
+])
 
 export function zReportSoldArticlesLockedOff(tenantSlug: string): boolean {
   return Z_REPORT_FORCE_HIDE_SOLD_ARTICLES_SLUGS.has(tenantSlug)
