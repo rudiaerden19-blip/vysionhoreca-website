@@ -14,6 +14,7 @@ import {
 import { orderCountsTowardRevenueAndZReport } from '@/lib/admin-api-order-helpers'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import {
+  businessDayForOrder,
   fetchOpeningHoursForTenant,
   getTenantBusinessDayBounds,
   type TenantHourRow,
@@ -21,6 +22,8 @@ import {
 import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
 
 const ORDER_SELECT =
+  'id,order_number,status,payment_status,payment_method,payment_split_cash,payment_split_card,order_type,total,subtotal,tax,discount_amount,created_at'
+const ORDER_SELECT_WITH_ITEMS =
   'id,order_number,status,payment_status,payment_method,payment_split_cash,payment_split_card,order_type,total,subtotal,tax,discount_amount,created_at,items'
 
 export type CashbookMovementRow = {
@@ -73,13 +76,14 @@ async function fetchOrders(
   tenantSlug: string,
   startUTC: string,
   endUTC: string,
+  includeItems = false,
 ): Promise<Record<string, unknown>[]> {
   const all: Record<string, unknown>[] = []
   let from = 0
   for (let page = 0; page < 50; page++) {
     const { data, error } = await client
       .from('orders')
-      .select(ORDER_SELECT)
+      .select(includeItems ? ORDER_SELECT_WITH_ITEMS : ORDER_SELECT)
       .eq('tenant_slug', tenantSlug)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
@@ -87,7 +91,7 @@ async function fetchOrders(
       .order('id', { ascending: true })
       .range(from, from + 999)
     if (error) break
-    const chunk = (data || []) as Record<string, unknown>[]
+    const chunk = (data || []) as unknown as Record<string, unknown>[]
     all.push(...chunk)
     if (chunk.length < 1000) break
     from += 1000
@@ -107,7 +111,7 @@ export async function loadCashbookDay(
   const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
   const bounds = getTenantBusinessDayBounds(bookDate, hours)
   const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes, auditRes] = await Promise.all([
-    fetchOrders(client, tenantSlug, bounds.startUTC, bounds.endUTC),
+    fetchOrders(client, tenantSlug, bounds.startUTC, bounds.endUTC, true),
     fetchZReportVatContextFromSupabase(client, tenantSlug),
     client
       .from('tenant_settings')
@@ -508,14 +512,18 @@ export async function loadCashbookRange(
   tenantSlug: string,
   fromDate: string,
   toDate: string,
+  options?: { withVat?: boolean },
 ): Promise<CashbookRangeRow[]> {
+  const withVat = options?.withVat === true
   const hours = (await fetchOpeningHoursForTenant(client, tenantSlug)) as TenantHourRow[]
   const start = getTenantBusinessDayBounds(fromDate, hours).startUTC
   const end = getTenantBusinessDayBounds(toDate, hours).endUTC
   const [orders, vatCtx, settingsRes, dayRes, moveRes, adjRes] = await Promise.all([
-    fetchOrders(client, tenantSlug, start, end),
-    fetchZReportVatContextFromSupabase(client, tenantSlug),
-    client.from('tenant_settings').select('btw_percentage').eq('tenant_slug', tenantSlug).maybeSingle(),
+    fetchOrders(client, tenantSlug, start, end, withVat),
+    withVat ? fetchZReportVatContextFromSupabase(client, tenantSlug) : Promise.resolve(null),
+    withVat
+      ? client.from('tenant_settings').select('btw_percentage').eq('tenant_slug', tenantSlug).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
     client
       .from('cashbook_days')
       .select('book_date, status, opening_cash_cents, expected_close_cents, counted_close_cents, difference_cents')
@@ -554,6 +562,14 @@ export async function loadCashbookRange(
       adjustmentsByDay.set(row.book_date, (adjustmentsByDay.get(row.book_date) || 0) + 1)
     }
   }
+  const ordersByDay = new Map<string, Record<string, unknown>[]>()
+  for (const row of orders) {
+    const bookDay = businessDayForOrder(String(row.created_at || ''), hours)
+    if (!bookDay || bookDay < fromDate || bookDay > toDate) continue
+    const list = ordersByDay.get(bookDay) || []
+    list.push(row)
+    ordersByDay.set(bookDay, list)
+  }
   const dates: string[] = []
   const cursor = new Date(`${fromDate}T12:00:00Z`)
   const endDay = new Date(`${toDate}T12:00:00Z`)
@@ -562,7 +578,8 @@ export async function loadCashbookRange(
     cursor.setUTCDate(cursor.getUTCDate() + 1)
   }
   return dates.map((date) => {
-    const summary = summarizeCashbookOrders(orders as never, hours, date)
+    const dayOrders = ordersByDay.get(date) || []
+    const summary = summarizeCashbookOrders(dayOrders as never, hours, date)
     const day = days.get(date)
     const movements = movesByDay.get(date) || []
     const outCents = movements.reduce((sum, m) => {
@@ -571,15 +588,16 @@ export async function loadCashbookRange(
         : 0
       return sum + effect
     }, 0)
-    const counting = (orders as Array<Record<string, unknown>>).filter((row) => {
-      if (!orderBelongsToCashbookDay(String(row.created_at || ''), date, hours)) return false
-      return orderCountsTowardRevenueAndZReport(row as never)
-    })
-    const vatAgg = aggregateZReportVatFromOrderRows(
-      counting.map((row) => ({ total: row.total, items: row.items, order_type: row.order_type as string })),
-      defaultBtw,
-      vatCtx,
-    )
+    const counting = withVat
+      ? dayOrders.filter((row) => orderCountsTowardRevenueAndZReport(row as never))
+      : []
+    const vatAgg = withVat
+      ? aggregateZReportVatFromOrderRows(
+          counting.map((row) => ({ total: row.total, items: row.items, order_type: row.order_type as string })),
+          defaultBtw,
+          vatCtx,
+        )
+      : null
     const vat = vatLinesFromAggregate(vatAgg)
     const closed = day?.status === 'closed'
     const openingCents = day ? Number(day.opening_cash_cents) || 0 : 0
@@ -607,8 +625,8 @@ export async function loadCashbookRange(
       differenceCents: closed ? Number(day?.difference_cents) : null,
       adjustmentCount: adjustmentsByDay.get(date) || 0,
       staffNames,
-      exclCents: eurosToCents(vatAgg.subtotalExcl),
-      taxCents: eurosToCents(vatAgg.totalTax),
+      exclCents: vatAgg ? eurosToCents(vatAgg.subtotalExcl) : 0,
+      taxCents: vatAgg ? eurosToCents(vatAgg.totalTax) : 0,
       discountCents: summary.payments.discountCents,
       refundCents: summary.payments.refundCents,
       vat,
@@ -621,13 +639,17 @@ export async function loadPendingCloseDays(
   tenantSlug: string,
   today: string,
 ): Promise<{ count: number; dates: string[] }> {
-  const from = shiftBookDate(today, -60)
   const yesterday = shiftBookDate(today, -1)
-  if (from > yesterday) return { count: 0, dates: [] }
-  const rows = await loadCashbookRange(client, tenantSlug, from, yesterday)
-  const dates = rows
-    .filter((row) => row.status === 'open' || (row.grossCents !== 0 && row.status !== 'closed'))
-    .map((row) => row.date)
+  const dayRes = await client
+    .from('cashbook_days')
+    .select('book_date')
+    .eq('tenant_slug', tenantSlug)
+    .eq('status', 'open')
+    .lte('book_date', yesterday)
+    .order('book_date', { ascending: false })
+    .limit(60)
+  if (missingTable(dayRes.error)) return { count: 0, dates: [] }
+  const dates = ((dayRes.data || []) as Array<{ book_date: string }>).map((row) => String(row.book_date))
   return { count: dates.length, dates }
 }
 

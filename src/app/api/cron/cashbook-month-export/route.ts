@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       const settings = await loadAccountingSettings(client, tenantSlug)
       if (!settings.autoExport) continue
       const [rows, profile] = await Promise.all([
-        loadCashbookRange(client, tenantSlug, period.from, period.to),
+        loadCashbookRange(client, tenantSlug, period.from, period.to, { withVat: true }),
         client.from('tenant_settings').select('business_name, btw_number, address, postal_code, city').eq('tenant_slug', tenantSlug).maybeSingle(),
       ])
       const business = profile.data as { business_name?: string; btw_number?: string; address?: string; postal_code?: string; city?: string } | null

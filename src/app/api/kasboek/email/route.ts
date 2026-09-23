@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'E-mailadres van de boekhouder ontbreekt.' }, { status: 400 })
   }
   const [rows, profile] = await Promise.all([
-    loadCashbookRange(client, parsed.data.tenantSlug, parsed.data.from, parsed.data.to),
+    loadCashbookRange(client, parsed.data.tenantSlug, parsed.data.from, parsed.data.to, { withVat: true }),
     client.from('tenant_settings').select('business_name, btw_number, address, postal_code, city').eq('tenant_slug', parsed.data.tenantSlug).maybeSingle(),
   ])
   const business = profile.data as { business_name?: string; btw_number?: string; address?: string; postal_code?: string; city?: string } | null

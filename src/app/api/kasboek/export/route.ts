@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   if (!client) return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
 
   const [rows, settingsRes] = await Promise.all([
-    loadCashbookRange(client, tenantSlug, from, to),
+    loadCashbookRange(client, tenantSlug, from, to, { withVat: true }),
     client.from('tenant_settings').select('business_name, btw_number, address, postal_code, city').eq('tenant_slug', tenantSlug).maybeSingle(),
   ])
   const settings = settingsRes.data as { business_name?: string; btw_number?: string; address?: string; postal_code?: string; city?: string } | null
