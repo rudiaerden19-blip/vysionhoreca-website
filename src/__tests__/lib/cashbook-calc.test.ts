@@ -196,17 +196,18 @@ describe('cashbook berekening', () => {
     expect(check.differenceCents).toBe(-100)
   })
 
-  it('zet Bancontact bij kaart en laat iDEAL online', () => {
+  it('zet Bancontact in de zaak bij kaart en een webshopbetaling bij online', () => {
     const { payments } = summarizeCashbookOrders(
       [
         order({ payment_status: 'paid', order_type: 'TAKEAWAY', total: 12, payment_method: 'BANCONTACT' }),
-        order({ payment_status: 'paid', order_type: 'pickup', total: 8, payment_method: 'ideal', status: 'confirmed' }),
+        order({ payment_status: 'paid', order_type: 'pickup', total: 8, payment_method: 'BANCONTACT', status: 'confirmed' }),
+        order({ payment_status: 'paid', order_type: 'pickup', total: 5, payment_method: 'ideal', status: 'confirmed' }),
       ],
       [],
       '2026-09-23',
     )
     expect(payments.cardCents).toBe(1200)
-    expect(payments.onlineCents).toBe(800)
+    expect(payments.onlineCents).toBe(1300)
     expect(payments.cashCents).toBe(0)
     expect(paymentReconciliation(payments).ok).toBe(true)
   })

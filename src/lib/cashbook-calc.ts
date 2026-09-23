@@ -1,5 +1,6 @@
 import {
   distributeOrderPaymentForZRaport,
+  isKassaPosOrder,
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api-order-helpers'
@@ -189,15 +190,20 @@ const KASBOEK_CARD_METHODS = new Set([
 ])
 
 /**
- * Z-rapport stopt Bancontact bij online. In het kasboek is dat kaart:
- * het geld komt van de betaalterminal, niet van de webshop.
+ * Online = bestelling uit de webshop, ook als die met Bancontact of iDEAL betaald is.
+ * Kaart = de klant betaalt in de zaak met bankkaart of Bancontact.
  */
 export function cashbookPaymentParts(order: {
   total?: unknown
+  order_type?: unknown
   payment_method?: unknown
   payment_split_cash?: unknown
   payment_split_card?: unknown
 }): { cash: number; card: number; online: number } {
+  const total = Number(order.total) || 0
+  if (!isKassaPosOrder({ order_type: String(order.order_type || '') })) {
+    return { cash: 0, card: 0, online: total }
+  }
   const parts = distributeOrderPaymentForZRaport(order)
   const method = String(order.payment_method || '').toLowerCase()
   if (method === 'split' || !KASBOEK_CARD_METHODS.has(method)) return parts

@@ -431,7 +431,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
             <section className="bg-white border border-gray-200 rounded-2xl p-5">
               <h2 className="font-semibold mb-3">Betaalmethodes</h2>
-              <p className="text-sm text-gray-500 mb-3">Kaart en online horen bij de dagontvangsten, niet bij het geld in de lade.</p>
+              <p className="text-sm text-gray-500 mb-3">Kaart is een bankkaart in de zaak. Online is een bestelling uit de webshop. Geen van beide zit in de lade.</p>
               <div className="grid grid-cols-3 gap-3">
                 <div><p className="text-sm text-gray-400">Cash</p><p className="text-xl font-bold">{euro(day.payments.cashCents)}</p></div>
                 <div><p className="text-sm text-gray-400">Kaart</p><p className="text-xl font-bold">{euro(day.payments.cardCents)}</p></div>
