@@ -42,6 +42,28 @@ describe('kasboek export', () => {
     expect(bookCsv).toContain('€2,99')
     expect(bookCsv).not.toContain('zaak-b')
   })
+
+  it('zet onderaan een totaal van de dagen', () => {
+    const first = row({})
+    const second = row({
+      date: '2026-09-24',
+      grossCents: 1000,
+      onlineCents: 1000,
+      exclCents: 893,
+      taxCents: 107,
+      cashCents: 250,
+      differenceCents: -50,
+      vat: [{ rate: 12, baseCents: 893, taxCents: 107, inclCents: 1000 }],
+    })
+    const bookCsv = buildBoekhoudingCsv(meta, [first, second])
+    const dayCsv = buildCashbookCsv(meta, [first, second])
+    expect(bookCsv).toContain('"Totaal"')
+    expect(bookCsv).toContain('€37,90')
+    expect(bookCsv).toContain('€2,50')
+    expect(dayCsv).toContain('"Totaal"')
+    expect(dayCsv).toContain('€37,90')
+    expect(dayCsv).toContain('-€0,50')
+  })
 })
 
 describe('kasboek tenantfilter', () => {

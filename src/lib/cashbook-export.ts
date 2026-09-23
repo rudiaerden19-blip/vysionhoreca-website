@@ -20,6 +20,16 @@ function rateTax(row: CashbookRangeRow, rate: number): number {
   return row.vat.find((line) => line.rate === rate)?.taxCents || 0
 }
 
+function sumBy(rows: CashbookRangeRow[], pick: (row: CashbookRangeRow) => number): number {
+  return rows.reduce((sum, row) => sum + pick(row), 0)
+}
+
+function sumKnown(rows: CashbookRangeRow[], pick: (row: CashbookRangeRow) => number | null): number | null {
+  const values = rows.map(pick).filter((value): value is number => value != null)
+  if (values.length === 0) return null
+  return values.reduce((sum, value) => sum + value, 0)
+}
+
 export function buildCashbookCsv(meta: CashbookExportMeta, rows: CashbookRangeRow[]): string {
   const lines = [
     csvLine(['Zaak', meta.businessName]),
@@ -47,6 +57,23 @@ export function buildCashbookCsv(meta: CashbookExportMeta, rows: CashbookRangeRo
         row.adjustmentCount,
       ]),
     ),
+    csvLine([
+      'Totaal',
+      '',
+      formatEuroFromCents(sumBy(rows, (row) => row.grossCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.exclCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.taxCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.cashCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.cardCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.discountCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.refundCents)),
+      '',
+      '',
+      '',
+      sumKnown(rows, (row) => row.differenceCents) == null ? '' : formatEuroFromCents(sumKnown(rows, (row) => row.differenceCents) || 0),
+      sumBy(rows, (row) => row.adjustmentCount),
+    ]),
   ]
   return lines.join('\n')
 }
@@ -93,6 +120,23 @@ export function buildBoekhoudingCsv(meta: CashbookExportMeta, rows: CashbookRang
         row.differenceCents == null ? '' : formatEuroFromCents(row.differenceCents),
       ]),
     ),
+    csvLine([
+      'Totaal',
+      '',
+      formatEuroFromCents(sumBy(rows, (row) => row.grossCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.exclCents)),
+      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 0))),
+      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 6))),
+      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 9))),
+      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 12))),
+      formatEuroFromCents(sumBy(rows, (row) => rateTax(row, 21))),
+      formatEuroFromCents(sumBy(rows, (row) => row.cashCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.cardCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)),
+      formatEuroFromCents(sumBy(rows, (row) => row.refundCents)),
+      sumBy(rows, (row) => row.adjustmentCount),
+      sumKnown(rows, (row) => row.differenceCents) == null ? '' : formatEuroFromCents(sumKnown(rows, (row) => row.differenceCents) || 0),
+    ]),
   ]
   return lines.join('\n')
 }
@@ -114,6 +158,22 @@ export function renderCashbookXlsx(meta: CashbookExportMeta, rows: CashbookRange
     Correcties: row.adjustmentCount,
     Status: row.status,
   }))
+  sheetRows.push({
+    Datum: 'Totaal',
+    Zaak: meta.businessName,
+    Bruto: formatEuroFromCents(sumBy(rows, (row) => row.grossCents)),
+    'Excl. btw': formatEuroFromCents(sumBy(rows, (row) => row.exclCents)),
+    Btw: formatEuroFromCents(sumBy(rows, (row) => row.taxCents)),
+    Cash: formatEuroFromCents(sumBy(rows, (row) => row.cashCents)),
+    Terminal: formatEuroFromCents(sumBy(rows, (row) => row.cardCents)),
+    Online: formatEuroFromCents(sumBy(rows, (row) => row.onlineCents)),
+    Beginkas: '',
+    Verwacht: '',
+    Geteld: '',
+    Verschil: sumKnown(rows, (row) => row.differenceCents) == null ? '' : formatEuroFromCents(sumKnown(rows, (row) => row.differenceCents) || 0),
+    Correcties: sumBy(rows, (row) => row.adjustmentCount),
+    Status: '',
+  })
   const book = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(book, XLSX.utils.json_to_sheet(sheetRows), 'Kasboek')
   return XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }) as Buffer
@@ -152,6 +212,17 @@ export async function renderCashbookPdf(meta: CashbookExportMeta, rows: Cashbook
       if (row.adjustmentCount) doc.text(`Correcties: ${row.adjustmentCount}`)
       doc.moveDown(0.4)
     }
+    if (doc.y > 720) doc.addPage()
+    doc.moveDown(0.4)
+    doc.fontSize(12).text('Totaal')
+    doc.fontSize(9).text(
+      `Dagontvangsten ${formatEuroFromCents(sumBy(rows, (row) => row.grossCents))}   excl. ${formatEuroFromCents(sumBy(rows, (row) => row.exclCents))}   btw ${formatEuroFromCents(sumBy(rows, (row) => row.taxCents))}`,
+    )
+    doc.text(
+      `Cash ${formatEuroFromCents(sumBy(rows, (row) => row.cashCents))}   Terminal ${formatEuroFromCents(sumBy(rows, (row) => row.cardCents))}   Online ${formatEuroFromCents(sumBy(rows, (row) => row.onlineCents))}`,
+    )
+    const difference = sumKnown(rows, (row) => row.differenceCents)
+    doc.text(`Kasverschil ${difference == null ? '—' : formatEuroFromCents(difference)}   Correcties ${sumBy(rows, (row) => row.adjustmentCount)}`)
     doc.end()
   })
 }

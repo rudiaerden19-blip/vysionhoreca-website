@@ -398,13 +398,17 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   function printPeriod() {
     const period = periodFor('period')
     const rows = history.filter(historyRowVisible)
+    const sum = (pick: (row: HistoryRow) => number) => rows.reduce((total, row) => total + pick(row), 0)
+    const differences = rows.map((row) => row.differenceCents).filter((value): value is number => value != null)
+    const differenceTotal = differences.length === 0 ? null : differences.reduce((total, value) => total + value, 0)
     const body = rows.map((row) => `<tr><td>${showDate(row.date)}</td><td style="text-align:right">${euro(row.grossCents)}</td><td style="text-align:right">${euro(row.cashCents)}</td><td style="text-align:right">${euro(row.cardCents)}</td><td style="text-align:right">${euro(row.onlineCents)}</td><td style="text-align:right">${row.openingCents > 0 ? euro(row.openingCents) : '—'}</td><td style="text-align:right">${euro(row.outCents)}</td><td style="text-align:right">${row.expectedCents == null ? '—' : euro(row.expectedCents)}</td><td style="text-align:right">${row.countedCents == null ? '—' : euro(row.countedCents)}</td><td style="text-align:right">${row.differenceCents == null ? '—' : euro(row.differenceCents)}</td><td style="color:${statusPresentation(row).color}">${statusPresentation(row).text}</td><td>${row.closureChoice === 'vakantie' ? 'Vakantie' : row.closureChoice === 'gesloten' ? 'Gesloten' : ''}</td></tr>`).join('')
+    const totalRow = `<tr><td><strong>Totaal</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.grossCents))}</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.cashCents))}</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.cardCents))}</strong></td><td style="text-align:right"><strong>${euro(sum((row) => row.onlineCents))}</strong></td><td></td><td style="text-align:right"><strong>${euro(sum((row) => row.outCents))}</strong></td><td></td><td></td><td style="text-align:right"><strong>${differenceTotal == null ? '—' : euro(differenceTotal)}</strong></td><td></td><td></td></tr>`
     const html = `<!DOCTYPE html><html><head><title>Kasboek ${showDate(period.from)} – ${showDate(period.to)}</title>
-      <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;color:#111}h1{font-size:16px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:11px}</style>
+      <style>@page{size:A4 landscape;margin:12mm}body{font-family:sans-serif;color:#111}h1{font-size:16px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ddd;padding:4px;text-align:left;font-size:11px}tfoot td{border-top:2px solid #111}</style>
       </head><body>
       <h1>VYSION – KASBOEK</h1>
       <p>Periode ${showDate(period.from)} – ${showDate(period.to)}</p>
-      <table><thead><tr><th>Datum</th><th>Omzet</th><th>Cash</th><th>Terminal</th><th>Online</th><th>Beginkas</th><th>Cash uit</th><th>Verwacht</th><th>Geteld</th><th>Verschil</th><th>Status</th><th>Sluiting</th></tr></thead><tbody>${body}</tbody></table>
+      <table><thead><tr><th>Datum</th><th>Omzet</th><th>Cash</th><th>Terminal</th><th>Online</th><th>Beginkas</th><th>Cash uit</th><th>Verwacht</th><th>Geteld</th><th>Verschil</th><th>Status</th><th>Sluiting</th></tr></thead><tbody>${body}</tbody><tfoot>${totalRow}</tfoot></table>
       </body></html>`
     const w = window.open('', '_blank', 'width=1100,height=800')
     if (w) {
