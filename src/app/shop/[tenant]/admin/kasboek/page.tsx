@@ -399,7 +399,6 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   function historyRowVisible(row: HistoryRow) {
     if (periodFrom && row.date < periodFrom) return false
     if (periodTo && row.date > periodTo) return false
-    if (row.grossCents === 0 && row.status === 'none' && !row.closureDay) return false
     const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
     if (historyStatus === 'attention' && badge !== 'attention') return false
     if (historyStatus === 'difference' && badge !== 'difference') return false
@@ -486,7 +485,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
 
   return (
     <PinGate tenant={tenant}>
-      <div className="max-w-5xl mx-auto">
+      <div className="w-full">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Digitale kasboek</h1>
@@ -558,12 +557,12 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
               void ensureHistoryRange(customFrom, customTo)
             }}>Eigen periode</button>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
-            <table className="min-w-full text-sm">
+          <div className="bg-white border border-gray-200 rounded-2xl">
+            <table className="w-full table-fixed text-xs">
               <thead>
-                <tr className="text-left text-xs text-gray-400 uppercase">
+                <tr className="text-left text-[11px] text-gray-400 uppercase">
                   {['Datum', 'Omzet', 'Cash', 'Terminal', 'Online', 'Beginkas', 'Cash uit', 'Verwacht', 'Geteld', 'Verschil', 'Status', 'Sluiting'].map((h) => (
-                    <th key={h} className="px-3 py-2">{h}</th>
+                    <th key={h} className="px-1.5 py-2 font-medium">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -572,19 +571,19 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
                   <tr><td className="px-3 py-4 text-gray-500" colSpan={12}>Laden…</td></tr>
                 ) : history.filter(historyRowVisible).map((row) => (
                   <tr key={row.date} className="border-t cursor-pointer hover:bg-gray-50" onClick={() => { setTab('day'); void loadDay(row.date) }}>
-                    <td className="px-3 py-2">{showDate(row.date)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.grossCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.cashCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.cardCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.onlineCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.openingCents || 0)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{euro(row.outCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
-                    <td className={`px-3 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
-                    <td className="px-3 py-2" onClick={(event) => event.stopPropagation()}>
-                      {row.status === 'closed' || (row.closureDay && row.grossCents === 0 && row.status !== 'open') ? (
+                    <td className="px-1.5 py-2 whitespace-nowrap">{showDate(row.date)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{euro(row.grossCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{euro(row.cashCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{euro(row.cardCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{euro(row.onlineCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{euro(row.openingCents || 0)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{euro(row.outCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{row.expectedCents == null ? '—' : euro(row.expectedCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{row.countedCents == null ? '—' : euro(row.countedCents)}</td>
+                    <td className="px-1.5 py-2 whitespace-nowrap">{row.differenceCents == null ? '—' : euro(row.differenceCents)}</td>
+                    <td className={`px-1.5 py-2 ${statusPresentation(row).className}`}>{statusPresentation(row).text}</td>
+                    <td className="px-1.5 py-2" onClick={(event) => event.stopPropagation()}>
+                      {row.status === 'closed' ? (
                         <span className="text-gray-500">{closureLabel(row)}</span>
                       ) : (
                         <select
