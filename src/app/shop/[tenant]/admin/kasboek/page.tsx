@@ -11,6 +11,7 @@ import {
   vatReconciliation,
   type CashbookMovementType,
 } from '@/lib/cashbook-calc'
+import { tenantBookDateVisible, tenantBooksVisibleFrom } from '@/lib/z-report-tenant-ui'
 
 type Movement = {
   id: string
@@ -264,6 +265,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     const today = belgiumToday()
     const count = history.filter((row) => {
       if (row.date < periodFrom || row.date > periodTo || row.date >= today) return false
+      if (!tenantBookDateVisible(tenant, row.date)) return false
       return cashbookDayNeedsClose({
         status: row.status,
         differenceCents: row.differenceCents,
@@ -392,13 +394,16 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   function downloadPeriod(scope: 'period' | 'month' | 'year') {
     const today = belgiumToday()
     const period = periodFor(scope)
+    const opened = tenantBooksVisibleFrom(tenant)
+    const from = opened && period.from < opened ? opened : period.from
     const to = period.to > today ? today : period.to
-    return { from: period.from, to: to < period.from ? period.from : to }
+    return { from, to: to < from ? from : to }
   }
 
   function historyRowVisible(row: HistoryRow) {
     if (periodFrom && row.date < periodFrom) return false
     if (periodTo && row.date > periodTo) return false
+    if (!tenantBookDateVisible(tenant, row.date)) return false
     const badge = cashbookBadge({ status: row.status, differenceCents: row.differenceCents, adjustmentCount: row.adjustmentCount || 0, grossCents: row.grossCents, isPast: row.date < belgiumToday() })
     if (historyStatus === 'attention' && badge !== 'attention') return false
     if (historyStatus === 'difference' && badge !== 'difference') return false

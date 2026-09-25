@@ -18,7 +18,7 @@ import {
   zReportShowSoldArticlesForTenant,
   zReportSoldArticlesLockedOff,
 } from '@/lib/z-report-accountant-articles'
-import { zReportShowDayReceiptsPanel } from '@/lib/z-report-tenant-ui'
+import { tenantBookDateVisible, zReportShowDayReceiptsPanel } from '@/lib/z-report-tenant-ui'
 import {
   applyOwnerCloseToDayTotals,
   hasOwnerCloseValues,
@@ -837,6 +837,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       if (stats && selectedDate) allDates.add(selectedDate)
 
       return Array.from(allDates)
+        .filter((reportDate) => tenantBookDateVisible(params.tenant, reportDate))
         .sort((a, b) => b.localeCompare(a))
         .map((reportDate) => {
           const r = savedByDate.get(reportDate)
@@ -1788,7 +1789,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                           </tr>
                         </thead>
                         <tbody>
-                          {monthDayRows.map((day) => (
+                          {monthDayRows.filter((day) => tenantBookDateVisible(params.tenant, day.date)).map((day) => (
                             <tr
                               key={day.date}
                               className="border-t border-gray-100 cursor-pointer hover:bg-blue-50"
