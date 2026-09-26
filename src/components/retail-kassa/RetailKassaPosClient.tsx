@@ -1641,6 +1641,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     })
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return
+      if (articleSearchActiveRef.current) return
       const target = e.target
       if (target instanceof HTMLElement && target !== barcodeCaptureRef.current) {
         const typing =
@@ -2664,8 +2665,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               spellCheck={false}
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (priceFixSku || articleSearchActiveRef.current) return
+                if (e.relatedTarget === scanRef.current) return
                 if (stockBusyRef.current) return
                 const ae = document.activeElement
                 if (ae === scanRef.current) return
@@ -2689,21 +2691,38 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
                 onChange={(e) => setScanValue(e.target.value)}
+                onFocus={() => {
+                  if (!articleSearchActiveRef.current) openArticleSearchKeyboard()
+                }}
                 onPointerDown={(e) => {
-                  if (!articleSearchActiveRef.current) {
-                    e.preventDefault()
-                    openArticleSearchKeyboard()
-                  }
+                  if (articleSearchActiveRef.current) return
+                  if (e.pointerType !== 'touch') return
+                  e.preventDefault()
+                  openArticleSearchKeyboard()
                 }}
                 onBlur={() => {
                   window.setTimeout(() => {
+                    if (!articleSearchActiveRef.current) return
                     const active = document.activeElement
                     if (active === scanRef.current) return
-                    if (!articleSearchActiveRef.current) return
+                    const form = scanRef.current?.form
+                    if (active instanceof HTMLElement && form?.contains(active)) return
+                    const fellOffField =
+                      active == null ||
+                      active === document.body ||
+                      active === document.documentElement ||
+                      active === barcodeCaptureRef.current
+                    if (fellOffField) {
+                      const el = scanRef.current
+                      if (!el) return
+                      applyArticleSearchDomActive(el)
+                      el.focus({ preventScroll: true })
+                      return
+                    }
                     closeArticleSearchKeyboard()
                   }, 120)
                 }}
-                className={`min-h-[2.35rem] min-w-0 flex-1 rounded-full px-5 py-2 text-base text-[#f0f0f0] placeholder:text-white/45 focus:outline-none sm:min-h-[2.6rem] sm:py-2.5 ${KASSA_POS_FIELD}`}
+                className={`min-h-[2.35rem] min-w-0 flex-1 rounded-full px-5 py-2 text-base text-[#f0f0f0] caret-white placeholder:text-white/45 focus:outline-none sm:min-h-[2.6rem] sm:py-2.5 ${KASSA_POS_FIELD}`}
               />
               <button
                 type="submit"
