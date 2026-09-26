@@ -198,18 +198,22 @@ export type RetailLoyaltyCustomerSearchHit = {
 }
 
 /** Actieve klantenkaarten van deze zaak, met naam, adres en btw uit het klantenbestand. */
+export type RetailLoyaltyCardHolderRow = RetailLoyaltyMemberPos & { is_active: boolean }
+
 export async function listRetailLoyaltyCardHolders(
   tenantSlug: string,
   rawQuery = '',
-): Promise<{ ok: boolean; members: RetailLoyaltyMemberPos[]; error?: string }> {
+  opts?: { includeInactive?: boolean },
+): Promise<{ ok: boolean; members: RetailLoyaltyCardHolderRow[]; error?: string }> {
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, members: [], error: 'db_unavailable' }
 
-  const { data: rows, error } = await supabase
+  let memberQuery = supabase
     .from('retail_loyalty_members')
     .select(MEMBER_SELECT)
     .eq('tenant_slug', tenantSlug)
-    .eq('is_active', true)
+  if (!opts?.includeInactive) memberQuery = memberQuery.eq('is_active', true)
+  const { data: rows, error } = await memberQuery
     .order('display_name', { ascending: true })
     .limit(400)
 
@@ -246,7 +250,7 @@ export async function listRetailLoyaltyCardHolders(
     }
   }
 
-  const members: RetailLoyaltyMemberPos[] = (rows ?? []).map((row) => {
+  const members: RetailLoyaltyCardHolderRow[] = (rows ?? []).map((row) => {
     const customer = row.shop_customer_id ? customerById.get(row.shop_customer_id) : undefined
     return {
       id: row.id,
@@ -255,11 +259,12 @@ export async function listRetailLoyaltyCardHolders(
       phone: row.phone ?? customer?.phone ?? null,
       points_balance: Number(row.points_balance) || 0,
       email: row.email ?? customer?.email ?? null,
-      customer_name: customer?.name ?? null,
+      customer_name: customer?.name ?? row.display_name ?? null,
       customer_address: customer?.address ?? null,
       customer_postal_code: customer?.postal_code ?? null,
       customer_city: customer?.city ?? null,
       customer_btw_number: customer?.btw_number?.trim() || null,
+      is_active: row.is_active !== false,
     }
   })
 
@@ -298,7 +303,7 @@ export async function searchRetailLoyaltyCustomers(
   } else {
     const quoted = `"${safe.replace(/"/g, '')}"`
     customerQuery = customerQuery.or(
-      `name.ilike.${quoted},email.ilike.${quoted},phone.ilike.${quoted}`,
+      `name.ilike.${quoted},email.ilike.${quoted},phone.ilike.${quoted},address.ilike.${quoted},postal_code.ilike.${quoted},city.ilike.${quoted},btw_number.ilike.${quoted}`,
     )
   }
 
@@ -765,14 +770,41 @@ async function applyRetailLoyaltyPointsDelta(
 export async function updateRetailLoyaltyMember(
   tenantSlug: string,
   memberId: string,
-  patch: { display_name?: string | null; phone?: string | null; email?: string | null; is_active?: boolean },
+  patch: {
+    display_name?: string | null
+    first_name?: string | null
+    last_name?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    postal_code?: string | null
+    city?: string | null
+    btw_number?: string | null
+    is_active?: boolean
+  },
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, error: 'db_unavailable'}
 
+  const { data: existing, error: loadErr } = await supabase
+    .from('retail_loyalty_members')
+    .select('id, shop_customer_id, email, display_name, phone')
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', memberId)
+    .maybeSingle()
+  if (loadErr || !existing) return { ok: false, error: loadErr?.message || 'member_not_found' }
+
   const row: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (patch.display_name !== undefined) {
-    row.display_name = patch.display_name?.trim() || null
+  const hasNameParts = patch.first_name !== undefined || patch.last_name !== undefined
+  if (hasNameParts) {
+    const full = capitalizeCustomerWords(
+      `${patch.first_name ?? ''} ${patch.last_name ?? ''}`.trim(),
+    )
+    row.display_name = full || null
+  } else if (patch.display_name !== undefined) {
+    row.display_name = patch.display_name?.trim()
+      ? capitalizeCustomerWords(patch.display_name.trim())
+      : null
   }
   if (patch.phone !== undefined) {
     row.phone = patch.phone?.trim() || null
@@ -781,6 +813,58 @@ export async function updateRetailLoyaltyMember(
     row.email = patch.email?.trim().toLowerCase() || null
   }
   if (patch.is_active !== undefined) row.is_active = patch.is_active
+
+  const touchesCustomerFile =
+    hasNameParts ||
+    patch.address !== undefined ||
+    patch.postal_code !== undefined ||
+    patch.city !== undefined ||
+    patch.btw_number !== undefined ||
+    patch.email !== undefined ||
+    patch.phone !== undefined
+  if (touchesCustomerFile) {
+    const email = (patch.email ?? existing.email ?? '').trim().toLowerCase()
+    const name = String(row.display_name ?? existing.display_name ?? '').trim()
+    const btwRaw = patch.btw_number?.trim()
+    const btw_number = btwRaw ? normalizeCustomerBtwNumber(btwRaw) || null : null
+    const customerPatch: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    }
+    if (name) customerPatch.name = capitalizeCustomerWords(name)
+    if (patch.phone !== undefined) customerPatch.phone = patch.phone?.trim() || null
+    if (email.includes('@')) customerPatch.email = email
+    if (patch.address !== undefined) {
+      customerPatch.address = patch.address?.trim()
+        ? capitalizeCustomerWords(patch.address.trim())
+        : null
+    }
+    if (patch.postal_code !== undefined) customerPatch.postal_code = patch.postal_code?.trim() || null
+    if (patch.city !== undefined) {
+      customerPatch.city = patch.city?.trim() ? capitalizeCustomerWords(patch.city.trim()) : null
+    }
+    if (patch.btw_number !== undefined) customerPatch.btw_number = btw_number
+
+    if (existing.shop_customer_id) {
+      const { error: customerError } = await supabase
+        .from('shop_customers')
+        .update(customerPatch)
+        .eq('tenant_slug', tenantSlug)
+        .eq('id', existing.shop_customer_id)
+      if (customerError) return { ok: false, error: customerError.message }
+    } else if (email.includes('@') && name) {
+      const saved = await upsertShopCustomerForLoyalty(tenantSlug, {
+        name,
+        email,
+        phone: patch.phone ?? undefined,
+        address: patch.address ?? undefined,
+        postal_code: patch.postal_code ?? undefined,
+        city: patch.city ?? undefined,
+        btw_number: patch.btw_number ?? undefined,
+      })
+      if (!saved.ok) return { ok: false, error: saved.error || 'customer_save_failed' }
+      if (saved.customerId) row.shop_customer_id = saved.customerId
+    }
+  }
 
   const { error } = await supabase
     .from('retail_loyalty_members')

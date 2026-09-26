@@ -1,4 +1,8 @@
-import { retailCardHolderMatchesQuery } from '@/lib/retail-loyalty/card-holder-search'
+import {
+  joinCustomerFullName,
+  retailCardHolderMatchesQuery,
+  splitCustomerFullName,
+} from '@/lib/retail-loyalty/card-holder-search'
 
 const jan = {
   display_name: 'Jan',
@@ -27,5 +31,16 @@ describe('retailCardHolderMatchesQuery', () => {
 
   it('toont iedereen bij een lege zoekterm', () => {
     expect(retailCardHolderMatchesQuery(jan, '  ')).toBe(true)
+  })
+})
+
+describe('splitCustomerFullName', () => {
+  it('splitst voornaam en de rest als achternaam', () => {
+    expect(splitCustomerFullName('Jan Van Den Berg')).toEqual({
+      firstName: 'Jan',
+      lastName: 'Van Den Berg',
+    })
+    expect(joinCustomerFullName('Jan', 'Van Den Berg')).toBe('Jan Van Den Berg')
+    expect(splitCustomerFullName('Bastos')).toEqual({ firstName: 'Bastos', lastName: '' })
   })
 })

@@ -1,14 +1,19 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
-import { adminDb } from '@/lib/admin-db-client'
 import { RetailLoyaltyPassShare } from '@/components/retail-loyalty/RetailLoyaltyPassShare'
 import { RetailLoyaltyNewPassPanel } from '@/components/retail-loyalty/RetailLoyaltyNewPassPanel'
-import type { RetailLoyaltyMember } from '@/lib/retail-loyalty/types'
+import type { RetailLoyaltyMemberPos } from '@/lib/retail-loyalty/types'
+import {
+  retailCardHolderMatchesQuery,
+  splitCustomerFullName,
+} from '@/lib/retail-loyalty/card-holder-search'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
+
+type CardFileMember = RetailLoyaltyMemberPos & { is_active: boolean }
 
 type Settings = {
   enabled: boolean
@@ -24,21 +29,45 @@ function MemberManagePanel({
   onUpdated,
 }: {
   tenant: string
-  member: RetailLoyaltyMember
+  member: CardFileMember
   onUpdated: () => void | Promise<void>
 }) {
   const { t } = useLanguage()
-  const [name, setName] = useState(member.display_name ?? '')
+  const initialName = splitCustomerFullName(member.customer_name || member.display_name)
+  const [firstName, setFirstName] = useState(initialName.firstName)
+  const [lastName, setLastName] = useState(initialName.lastName)
   const [phone, setPhone] = useState(member.phone ?? '')
+  const [email, setEmail] = useState(member.email ?? '')
+  const [street, setStreet] = useState(member.customer_address ?? '')
+  const [postalCode, setPostalCode] = useState(member.customer_postal_code ?? '')
+  const [city, setCity] = useState(member.customer_city ?? '')
+  const [btwNumber, setBtwNumber] = useState(member.customer_btw_number ?? '')
   const [saving, setSaving] = useState(false)
   const [adjustDelta, setAdjustDelta] = useState('')
   const [adjustNote, setAdjustNote] = useState('')
   const [adjustBusy, setAdjustBusy] = useState(false)
 
   useEffect(() => {
-    setName(member.display_name ?? '')
+    const parts = splitCustomerFullName(member.customer_name || member.display_name)
+    setFirstName(parts.firstName)
+    setLastName(parts.lastName)
     setPhone(member.phone ?? '')
-  }, [member.display_name, member.phone, member.id])
+    setEmail(member.email ?? '')
+    setStreet(member.customer_address ?? '')
+    setPostalCode(member.customer_postal_code ?? '')
+    setCity(member.customer_city ?? '')
+    setBtwNumber(member.customer_btw_number ?? '')
+  }, [
+    member.id,
+    member.customer_name,
+    member.display_name,
+    member.phone,
+    member.email,
+    member.customer_address,
+    member.customer_postal_code,
+    member.customer_city,
+    member.customer_btw_number,
+  ])
 
   async function saveMember() {
     setSaving(true)
@@ -48,8 +77,14 @@ function MemberManagePanel({
         body: JSON.stringify({
           tenantSlug: tenant,
           memberId: member.id,
-          display_name: name.trim() || null,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
           phone: phone.trim() || null,
+          email: email.trim() || null,
+          address: street.trim() || null,
+          postal_code: postalCode.trim() || null,
+          city: city.trim() || null,
+          btw_number: btwNumber.trim() || null,
         }),
       })
       const json = (await res.json()) as { ok?: boolean }
@@ -121,16 +156,58 @@ function MemberManagePanel({
         <div className="mb-2 grid gap-2 sm:grid-cols-2">
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={t('retailLoyalty.namePlaceholder')}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder={t('retailLoyalty.fieldFirstName')}
             className="rounded-lg border px-3 py-2 text-sm"
+          />
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder={t('retailLoyalty.fieldLastName')}
+            className="rounded-lg border px-3 py-2 text-sm"
+          />
+          <input
+            type="text"
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
+            placeholder={t('retailLoyalty.fieldStreet')}
+            className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
+          />
+          <input
+            type="text"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            placeholder={t('retailLoyalty.fieldPostalCode')}
+            className="rounded-lg border px-3 py-2 text-sm"
+          />
+          <input
+            type="text"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder={t('retailLoyalty.fieldCity')}
+            className="rounded-lg border px-3 py-2 text-sm"
+          />
+          <input
+            type="text"
+            value={btwNumber}
+            onChange={(e) => setBtwNumber(e.target.value)}
+            placeholder={t('retailLoyalty.fieldBtwNumber')}
+            className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
           />
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder={t('retailLoyalty.phonePlaceholder')}
+            placeholder={t('retailLoyalty.fieldPhone')}
+            className="rounded-lg border px-3 py-2 text-sm"
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t('retailLoyalty.fieldEmail')}
             className="rounded-lg border px-3 py-2 text-sm"
           />
         </div>
@@ -211,7 +288,8 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
     redeem_enabled: true,
     redeem_points_per_euro: 100,
   })
-  const [members, setMembers] = useState<RetailLoyaltyMember[]>([])
+  const [members, setMembers] = useState<CardFileMember[]>([])
+  const [memberQuery, setMemberQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [savingSettings, setSavingSettings] = useState(false)
   const [expandedPassId, setExpandedPassId] = useState<string | null>(null)
@@ -221,27 +299,14 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
   const [mailingMemberId, setMailingMemberId] = useState<string | null>(null)
 
   const loadMembers = useCallback(async () => {
-    const baseSelect = 'id, tenant_slug, card_code, display_name, phone, points_balance, is_active'
-    const opts = {
-      tenantSlug: params.tenant,
-      match: showInactive ? undefined : { is_active: true },
-      order: { column: 'created_at', ascending: false as const },
-      limit: 500,
+    const res = await authFetch(
+      `/api/retail/loyalty/members?tenant=${encodeURIComponent(params.tenant)}&includeInactive=1`,
+    )
+    const json = (await res.json()) as { ok?: boolean; members?: CardFileMember[] }
+    if (res.ok && json.ok && Array.isArray(json.members)) {
+      setMembers(json.members)
     }
-    let res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
-      ...opts,
-      select: `${baseSelect}, email`,
-    })
-    if (!res.ok) {
-      res = await adminDb.select<RetailLoyaltyMember[]>('retail_loyalty_members', {
-        ...opts,
-        select: baseSelect,
-      })
-    }
-    if (res.ok && Array.isArray(res.data)) {
-      setMembers(res.data)
-    }
-  }, [params.tenant, showInactive])
+  }, [params.tenant])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -269,6 +334,15 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
     void load()
   }, [load])
 
+  const visibleMembers = useMemo(
+    () =>
+      members.filter((member) => {
+        if (!showInactive && !member.is_active) return false
+        return retailCardHolderMatchesQuery(member, memberQuery)
+      }),
+    [members, memberQuery, showInactive],
+  )
+
   async function saveSettings() {
     setSavingSettings(true)
     try {
@@ -290,7 +364,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
     }
   }
 
-  async function deleteMember(member: RetailLoyaltyMember) {
+  async function deleteMember(member: CardFileMember) {
     const label = member.display_name?.trim() || member.card_code
     if (!window.confirm(t('retailLoyalty.deletePassConfirm').replace('{name}', label))) {
       return
@@ -314,7 +388,7 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
     }
   }
 
-  async function mailPassBarcode(member: RetailLoyaltyMember) {
+  async function mailPassBarcode(member: CardFileMember) {
     if (!member.id) return
     setMailingMemberId(member.id)
     try {
@@ -434,18 +508,31 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
             {t('retailLoyalty.showInactive')}
           </label>
         </div>
+        <input
+          type="search"
+          value={memberQuery}
+          onChange={(e) => setMemberQuery(e.target.value)}
+          placeholder={t('retailLoyalty.memberFileSearch')}
+          className="mb-3 w-full rounded-lg border px-3 py-2 text-sm"
+        />
         {loading ? (
           <p className="text-sm text-gray-500">{t('retailLoyalty.loading')}</p>
         ) : members.length === 0 ? (
           <p className="text-sm text-gray-500">{t('retailLoyalty.noMembers')}</p>
+        ) : visibleMembers.length === 0 ? (
+          <p className="text-sm text-gray-500">{t('retailKassaPage.customersEmpty')}</p>
         ) : (
           <ul className="divide-y divide-gray-100">
-            {members.map((m) => (
+            {visibleMembers.map((m) => {
+              const place = [m.customer_address, m.customer_postal_code, m.customer_city]
+                .filter(Boolean)
+                .join(', ')
+              return (
               <li key={m.id} className="py-3 text-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {m.display_name?.trim() || t('retailLoyalty.unnamed')}
+                      {(m.customer_name || m.display_name)?.trim() || t('retailLoyalty.unnamed')}
                       {!m.is_active ? (
                         <span className="ml-2 rounded bg-gray-200 px-2 py-0.5 text-[10px] font-bold uppercase text-gray-700">
                           {t('retailLoyalty.passInactive')}
@@ -453,6 +540,12 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
                       ) : null}
                     </p>
                     <p className="font-mono text-xs text-gray-600">{m.card_code}</p>
+                    {place ? <p className="text-xs text-gray-500">{place}</p> : null}
+                    {m.customer_btw_number ? (
+                      <p className="text-xs text-gray-500">
+                        {t('retailKassaPage.customersVat')}: {m.customer_btw_number}
+                      </p>
+                    ) : null}
                     {m.phone ? <p className="text-xs text-gray-500">{m.phone}</p> : null}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -522,7 +615,8 @@ export default function RetailLoyaltyAdminPage({ params }: { params: { tenant: s
                   </div>
                 ) : null}
               </li>
-            ))}
+              )
+            })}
           </ul>
         )}
       </section>

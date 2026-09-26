@@ -1,3 +1,22 @@
+/** Eerste woord is de voornaam, de rest de achternaam. */
+export function splitCustomerFullName(full: string | null | undefined): {
+  firstName: string
+  lastName: string
+} {
+  const trimmed = (full ?? '').trim()
+  if (!trimmed) return { firstName: '', lastName: '' }
+  const space = trimmed.indexOf(' ')
+  if (space < 0) return { firstName: trimmed, lastName: '' }
+  return {
+    firstName: trimmed.slice(0, space),
+    lastName: trimmed.slice(space + 1).trim(),
+  }
+}
+
+export function joinCustomerFullName(firstName: string, lastName: string): string {
+  return `${firstName.trim()} ${lastName.trim()}`.trim()
+}
+
 /** Velden waarop de kassalijst «Klanten» zoekt. */
 export type RetailCardHolderSearchFields = {
   display_name?: string | null

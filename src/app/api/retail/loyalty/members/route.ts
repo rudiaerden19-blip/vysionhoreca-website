@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
   if (!access.authorized) {
     return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
   }
-  const res = await listRetailLoyaltyCardHolders(tenantSlug, q)
+  const includeInactive = req.nextUrl.searchParams.get('includeInactive') === '1'
+  const res = await listRetailLoyaltyCardHolders(tenantSlug, q, { includeInactive })
   if (!res.ok) {
     return NextResponse.json({ ok: false, error: res.error || 'list_failed' }, { status: 500 })
   }
@@ -43,7 +44,14 @@ const PatchSchema = z.object({
   tenantSlug: z.string().min(1),
   memberId: z.string().uuid(),
   display_name: z.string().max(120).nullable().optional(),
+  first_name: z.string().max(80).nullable().optional(),
+  last_name: z.string().max(80).nullable().optional(),
   phone: z.string().max(40).nullable().optional(),
+  email: z.string().max(200).nullable().optional(),
+  address: z.string().max(500).nullable().optional(),
+  postal_code: z.string().max(20).nullable().optional(),
+  city: z.string().max(255).nullable().optional(),
+  btw_number: z.string().max(50).nullable().optional(),
   is_active: z.boolean().optional(),
 })
 
@@ -111,7 +119,20 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid_body'}, { status: 400 })
   }
 
-  const { tenantSlug, memberId, display_name, phone, is_active } = parsed.data
+  const {
+    tenantSlug,
+    memberId,
+    display_name,
+    first_name,
+    last_name,
+    phone,
+    email,
+    address,
+    postal_code,
+    city,
+    btw_number,
+    is_active,
+  } = parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
   if (!access.authorized) {
     return NextResponse.json({ ok: false, error: access.error || 'forbidden'}, { status: 403 })
@@ -119,7 +140,14 @@ export async function PATCH(req: NextRequest) {
 
   const res = await updateRetailLoyaltyMember(tenantSlug, memberId, {
     display_name,
+    first_name,
+    last_name,
     phone,
+    email,
+    address,
+    postal_code,
+    city,
+    btw_number,
     is_active,
   })
   if (!res.ok) {
