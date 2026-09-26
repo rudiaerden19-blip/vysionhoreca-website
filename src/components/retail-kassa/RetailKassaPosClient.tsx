@@ -302,7 +302,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [stockBusy, setStockBusy] = useState(false)
   /** Schermtoetsenbord alleen na expliciete tik op «Artikel zoeken». */
   const [articleSearchActive, setArticleSearchActive] = useState(false)
-  /** Treffers na «Zoeken» — popup; na keuze in mand + grote lijst. */
+  /** Meerdere treffers na «Zoeken». Eén treffer gaat meteen in de mand. */
   const [articleSearchResults, setArticleSearchResults] = useState<RetailPosSku[]>([])
   const [articleSearchModalOpen, setArticleSearchModalOpen] = useState(false)
   const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
@@ -1537,6 +1537,23 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function showArticleSearchResults(hits: RetailPosSku[]) {
+    if (hits.length === 1) {
+      const only = hits[0]
+      setArticleSearchResults([])
+      setArticleSearchModalOpen(false)
+      const opensPriceFix = only.price <= 0 && retailSkuInStock(only, 1)
+      addToCart(only, 1)
+      if (opensPriceFix) {
+        setScanValue('')
+        setArticleSearchActive(false)
+        const el = scanRef.current
+        if (el) applyArticleSearchDomInactive(el)
+        el?.blur()
+        return
+      }
+      finishArticleSearchUi()
+      return
+    }
     setArticleSearchResults(hits)
     setArticleSearchModalOpen(true)
     finishArticleSearchUi()
@@ -1587,6 +1604,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       if (hits.length === 0 && looksLikeBarcodeOnlyQuery(trimmed)) {
         const imported = await resolveOrImportSku(trimmed)
         if (imported) {
+          playClick()
           showArticleSearchResults([imported])
           return
         }
