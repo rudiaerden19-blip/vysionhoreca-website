@@ -418,7 +418,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const focusBarcodeCapture = useCallback(() => {
     if (priceFixNameInputRef.current && document.activeElement === priceFixNameInputRef.current) return
     if (priceFixInputRef.current && document.activeElement === priceFixInputRef.current) return
-    barcodeCaptureRef.current?.focus({ preventScroll: true })
+    const el = barcodeCaptureRef.current
+    if (!el) return
+    // Focus voor de handscanner, zonder schermtoetsenbord.
+    el.readOnly = true
+    el.setAttribute('inputmode', 'none')
+    el.focus({ preventScroll: true })
   }, [])
 
   const applyArticleSearchDomInactive = useCallback((el: HTMLInputElement) => {
@@ -2583,8 +2588,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <input
               ref={barcodeCaptureRef}
               type="text"
+              readOnly
+              inputMode="none"
               tabIndex={-1}
               autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
               onBlur={() => {
