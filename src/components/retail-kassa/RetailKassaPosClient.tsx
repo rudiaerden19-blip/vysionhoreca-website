@@ -2795,10 +2795,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     key={sku.lineKey}
                     type="button"
                     className="flex min-h-12 w-full items-center gap-3 border-b border-black/5 px-3 py-2.5 text-left touch-manipulation last:border-b-0 hover:bg-neutral-100"
-                    onPointerDown={(e) => {
-                      e.preventDefault()
-                      pickLiveArticle(sku)
-                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => pickLiveArticle(sku)}
                   >
                     <span className="min-w-0 flex-1 truncate font-semibold text-black">{sku.name}</span>
                     <span className="shrink-0 font-mono text-xs text-black/50">
