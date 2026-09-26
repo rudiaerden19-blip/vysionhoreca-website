@@ -137,7 +137,10 @@ export function KassaSuccessReceiptModal({
           <p className="opacity-80">
             {order.checkoutReference
               ? t('kassaApp.successCheckoutRef').replace('{ref}', order.checkoutReference)
-              : t('kassaApp.successOrderLine').replace(/\{number\}/g, String(order.orderNumber))}
+              : t('kassaApp.successOrderLine').replace(
+                  /\{number\}/g,
+                  order.orderNumber > 0 ? String(order.orderNumber) : '…',
+                )}
           </p>
         </div>
 

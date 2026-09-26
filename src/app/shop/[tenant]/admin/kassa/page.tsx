@@ -2546,6 +2546,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showCheckoutVatModal, setShowCheckoutVatModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showSplitModal, setShowSplitModal] = useState(false)
+  /** Blokkeer een tweede afrekenen tot de mand leeg is of de bon mislukt. */
+  const payInFlightRef = useRef(false)
   /** BroadcastChannel-sessie voor tweede scherm (klant); optioneel — geen impact zonder token */
   const [customerDisplayToken, setCustomerDisplayToken] = useState<string | null>(null)
   /** Korte bedankmelding op klantscherm na betaling */
@@ -3126,6 +3128,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return hydrateKassaCartItemsFromCatalog(raw, products)
   }, [activeTableSlotKey, parkedOnTableLines, cart, products])
 
+  useEffect(() => {
+    if (billLines.length === 0) payInFlightRef.current = false
+  }, [billLines.length])
+
   const sidebarShowsOrderPanel = kassaSidebarShowsOrderLinePanel({
     cartLineCount: cart.length,
     showParkedTableLinesInSidebar,
@@ -3696,6 +3702,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     splitAmounts?: { cash: number; card: number },
   ) => {
     if (billLines.length === 0) return
+    if (payInFlightRef.current) return
 
     const dineInSettleAtCheckout =
       orderType === 'DINE_IN' && tableNumber.trim()
@@ -3783,6 +3790,54 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
     }
 
+    payInFlightRef.current = true
+    let holdLockUntilCartClears = false
+    const dismissUnsavedReceipt = () => {
+      setShowSuccessModal(false)
+      setCustomerDisplayThankYou(null)
+    }
+
+    setCustomerDisplayThankYou({
+      total: Math.round(total * 100) / 100,
+      until: Date.now() + KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
+      dineInSubtitle:
+        orderType === 'DINE_IN' && tableNumber
+          ? t('kassaCustomerDisplay.dineInTableZoneLine')
+              .replace(/\{number\}/g, String(tableNumber))
+              .replace(
+                /\{zone\}/g,
+                dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
+                  ? t('kassaApp.floorZoneTerrace')
+                  : t('kassaApp.floorZoneInside'),
+              )
+          : undefined,
+    })
+
+    setLastOrder({
+      orderNumber: 0,
+      items: sortKassaCartLinesByMenuCategory([...billLines], categories),
+      total,
+      vatSplit: vatSplit.byRate.map((l) => ({
+        rate: l.rate,
+        baseExcl: l.baseExcl,
+        tax: l.tax,
+      })),
+      subtotalExclVat: Math.round(subtotal * 100) / 100,
+      totalTax: Math.round(tax * 100) / 100,
+      paymentMethod: method,
+      splitCash: method === 'SPLIT'? splitAmounts?.cash : undefined,
+      splitCard: method === 'SPLIT'? splitAmounts?.card : undefined,
+      orderType,
+      tableNumber: receiptTable,
+      floorPlanZone: receiptTable ? dineInFloorZone : undefined,
+      createdAt,
+      helpedByStaffName: activeKassaStaff?.name?.trim() || null,
+    })
+    setShowPaymentModal(false)
+    setShowSplitModal(false)
+    setShowSuccessModal(true)
+
+    try {
     const insRes = await adminDb.insert(
       'orders',
       orderPayload as Record<string, unknown>,
@@ -3812,6 +3867,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       allocatedOrderNumber = await fetchOrderNumberByKassaClientUuid(supabase, tenant, kassa_client_uuid)
       if (allocatedOrderNumber <= 0) {
         console.error('Kassa: insert OK but order_number not resolved', { insertedRow, kassa_client_uuid })
+        dismissUnsavedReceipt()
         alert(`${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}`)
         return
       }
@@ -3863,61 +3919,39 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setTimeout(() => playSuccess(), 400)
     } else {
       console.error('Kassa: admin order insert error:', insRes.error)
+      dismissUnsavedReceipt()
       alert(
         `${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}${insRes.error ? `\n\n(${insRes.error})`: ''}`,
       )
       return
     }
 
-    setCustomerDisplayThankYou({
-      total: Math.round(total * 100) / 100,
-      until: Date.now() + KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
-      dineInSubtitle:
-        orderType === 'DINE_IN' && tableNumber
-          ? t('kassaCustomerDisplay.dineInTableZoneLine')
-              .replace(/\{number\}/g, String(tableNumber))
-              .replace(
-                /\{zone\}/g,
-                dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
-                  ? t('kassaApp.floorZoneTerrace')
-                  : t('kassaApp.floorZoneInside'),
-              )
-          : undefined,
-    })
-
-    setLastOrder({
-      orderNumber: allocatedOrderNumber,
-      checkoutReference: queuedOffline ? shortRef : undefined,
-      items: sortKassaCartLinesByMenuCategory([...billLines], categories),
-      total,
-      vatSplit: vatSplit.byRate.map((l) => ({
-        rate: l.rate,
-        baseExcl: l.baseExcl,
-        tax: l.tax,
-      })),
-      subtotalExclVat: Math.round(subtotal * 100) / 100,
-      totalTax: Math.round(tax * 100) / 100,
-      paymentMethod: method,
-      splitCash: method === 'SPLIT'? splitAmounts?.cash : undefined,
-      splitCard: method === 'SPLIT'? splitAmounts?.card : undefined,
-      orderType,
-      tableNumber: receiptTable,
-      floorPlanZone: receiptTable ? dineInFloorZone : undefined,
-      createdAt,
-      helpedByStaffName: activeKassaStaff?.name?.trim() || null,
-    })
+    setLastOrder((prev) =>
+      prev
+        ? {
+            ...prev,
+            orderNumber: allocatedOrderNumber,
+            checkoutReference: queuedOffline ? shortRef : undefined,
+          }
+        : prev,
+    )
 
     if (dineInSettleAtCheckout) {
       clearTableAfterPayment(dineInSettleAtCheckout.zone, dineInSettleAtCheckout.tblNr)
     }
 
+    holdLockUntilCartClears = true
     clearCart()
     setTableNumber('')
     setDineInFloorZone(FLOOR_PLAN_ZONE_INSIDE)
-    setShowPaymentModal(false)
-    setShowSplitModal(false)
-    setShowSuccessModal(true)
     void loadMenu({ silent: true })
+    } catch (err) {
+      console.error('Kassa: completePayment', err)
+      dismissUnsavedReceipt()
+      alert(`${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}`)
+    } finally {
+      if (!holdLockUntilCartClears) payInFlightRef.current = false
+    }
   }
 
   const printReceipt = async (
@@ -7139,7 +7173,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenantInfo={tenantInfo}
           locale={locale}
           onClose={() => setShowSuccessModal(false)}
-          printDisabled={successReceiptPrintBusy}
+          printDisabled={
+            successReceiptPrintBusy ||
+            (lastOrder.orderNumber <= 0 && !lastOrder.checkoutReference)
+          }
           onPrint={async () => {
             setShowSuccessModal(false)
             try {
