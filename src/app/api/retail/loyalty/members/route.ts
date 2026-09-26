@@ -1,7 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
-import { createRetailLoyaltyMember, deleteRetailLoyaltyMember, updateRetailLoyaltyMember } from '@/lib/retail-loyalty/server'
+import {
+  createRetailLoyaltyMember,
+  deleteRetailLoyaltyMember,
+  listRetailLoyaltyCardHolders,
+  updateRetailLoyaltyMember,
+} from '@/lib/retail-loyalty/server'
+
+export async function GET(req: NextRequest) {
+  const tenantSlug = req.nextUrl.searchParams.get('tenant')?.trim()
+  const q = req.nextUrl.searchParams.get('q')?.trim() ?? ''
+  if (!tenantSlug) {
+    return NextResponse.json({ ok: false, error: 'missing_tenant' }, { status: 400 })
+  }
+  const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ ok: false, error: access.error || 'forbidden' }, { status: 403 })
+  }
+  const res = await listRetailLoyaltyCardHolders(tenantSlug, q)
+  if (!res.ok) {
+    return NextResponse.json({ ok: false, error: res.error || 'list_failed' }, { status: 500 })
+  }
+  return NextResponse.json({ ok: true, members: res.members })
+}
 
 const CreateSchema = z.object({
   tenantSlug: z.string().min(1),

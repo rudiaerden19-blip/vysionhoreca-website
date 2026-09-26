@@ -94,6 +94,7 @@ import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import { extractRetailLoyaltyScanCode } from '@/lib/retail-loyalty/card-code'
+import { retailCardHolderMatchesQuery } from '@/lib/retail-loyalty/card-holder-search'
 import { isRetailStoreCreditScan } from '@/lib/retail-store-credit/code'
 import type { RetailOrderLineForReturn, RetailStoreCreditPos } from '@/lib/retail-store-credit/types'
 import {
@@ -343,6 +344,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [linkedLoyaltyMember, setLinkedLoyaltyMember] = useState<RetailLoyaltyMemberPos | null>(
     null,
   )
+  const [customerListOpen, setCustomerListOpen] = useState(false)
+  const [customerQuery, setCustomerQuery] = useState('')
+  const [cardHolders, setCardHolders] = useState<RetailLoyaltyMemberPos[]>([])
+  const [customerListLoading, setCustomerListLoading] = useState(false)
   const [loyaltyScanFeedback, setLoyaltyScanFeedback] = useState<string | null>(null)
   const loyaltyScanFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
@@ -1169,6 +1174,48 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
 
     return importSkuFromBarcode(code)
+  }
+
+  const visibleCardHolders = useMemo(
+    () => cardHolders.filter((member) => retailCardHolderMatchesQuery(member, customerQuery)),
+    [cardHolders, customerQuery],
+  )
+
+  async function openCustomerList() {
+    playClick()
+    if (articleSearchActiveRef.current) closeArticleSearchKeyboard()
+    setCustomerListOpen(true)
+    setCustomerQuery('')
+    setCustomerListLoading(true)
+    try {
+      const res = await authFetch(
+        `/api/retail/loyalty/members?tenant=${encodeURIComponent(tenant)}`,
+      )
+      const data = (await res.json()) as { ok?: boolean; members?: RetailLoyaltyMemberPos[] }
+      setCardHolders(res.ok && data.ok && Array.isArray(data.members) ? data.members : [])
+    } catch {
+      setCardHolders([])
+    } finally {
+      setCustomerListLoading(false)
+    }
+  }
+
+  function pickCardHolder(member: RetailLoyaltyMemberPos) {
+    setLinkedLoyaltyMember(member)
+    setLoyaltyRedeemPoints(0)
+    setCustomerListOpen(false)
+    setCustomerQuery('')
+    if (mode !== 'sales') switchMode('sales')
+    else playClick()
+    flashAddOkButton()
+  }
+
+  function cardHolderLabel(member: RetailLoyaltyMemberPos): string {
+    return (
+      member.customer_name?.trim() ||
+      member.display_name?.trim() ||
+      member.card_code
+    )
   }
 
   async function linkLoyaltyCardFromScan(raw: string) {
@@ -2287,6 +2334,90 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         </div>
       )}
 
+      {customerListOpen ? (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-4">
+          <div
+            className={`flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden ${KASSA_POS_BTN_SHAPE} ${kassaPlateBgClass} border ${KASSA_POS_RULE_BLACK}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="retail-customer-list-title"
+          >
+            <div className="flex shrink-0 items-start justify-between gap-2 border-b border-white/10 px-4 py-3">
+              <p id="retail-customer-list-title" className="text-lg font-bold text-white">
+                {t('retailKassaPage.customersTitle')}
+              </p>
+              <button
+                type="button"
+                className={`shrink-0 px-3 py-2 text-sm font-bold ${kassaLayoutChromeBtnClass(kassaLayout, false)}`}
+                onClick={() => {
+                  playClick()
+                  setCustomerListOpen(false)
+                }}
+              >
+                {t('common.close')}
+              </button>
+            </div>
+            <form
+              className="shrink-0 px-4 py-3"
+              onSubmit={(e) => e.preventDefault()}
+            >
+              <input
+                type="search"
+                autoFocus
+                value={customerQuery}
+                onChange={(e) => setCustomerQuery(e.target.value)}
+                placeholder={t('retailKassaPage.customersSearch')}
+                className={`min-h-[2.6rem] w-full rounded-full px-5 py-2 text-base text-[#f0f0f0] caret-white placeholder:text-white/45 focus:outline-none ${KASSA_POS_FIELD}`}
+              />
+            </form>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-3 pb-3">
+              {customerListLoading ? (
+                <p className="px-2 py-6 text-sm text-white/70">{t('retailKassaPage.customersLoading')}</p>
+              ) : visibleCardHolders.length === 0 ? (
+                <p className="px-2 py-6 text-sm text-white/70">{t('retailKassaPage.customersEmpty')}</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {visibleCardHolders.map((member) => {
+                    const place = [member.customer_address, member.customer_postal_code, member.customer_city]
+                      .filter((part) => part && part.trim())
+                      .join(', ')
+                    return (
+                      <button
+                        key={member.id}
+                        type="button"
+                        className="rounded-xl bg-white px-3 py-3 text-left touch-manipulation"
+                        onClick={() => pickCardHolder(member)}
+                      >
+                        <span className="block truncate text-base font-semibold text-black">
+                          {cardHolderLabel(member)}
+                        </span>
+                        {place ? (
+                          <span className="mt-0.5 block truncate text-sm text-black/70">{place}</span>
+                        ) : null}
+                        <span className="mt-0.5 block truncate text-xs text-black/55">
+                          {[
+                            member.customer_btw_number
+                              ? t('retailKassaPage.customersVat').replace('{vat}', member.customer_btw_number)
+                              : null,
+                            member.phone,
+                            t('retailKassaPage.customersPoints').replace(
+                              '{points}',
+                              String(member.points_balance),
+                            ),
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {articleSearchModalOpen && articleSearchResults.length > 0 ? (
         <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-4">
           <div
@@ -2644,6 +2775,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             >
               {t('adminHamburger.rows.rapporten')}
             </Link>
+            <button
+              type="button"
+              data-testid="retail-nav-customers"
+              aria-pressed={customerListOpen}
+              onClick={() => void openCustomerList()}
+              className={retailTopNavBtnClass(customerListOpen)}
+            >
+              {t('retailKassaPage.customersButton')}
+            </button>
             {showKassaStaffClockButton && clockedInStaff.length > 0 ? (
               <>
                 <span

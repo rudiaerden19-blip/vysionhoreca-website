@@ -5,6 +5,7 @@ import {
   maxRetailLoyaltyRedeemPoints,
 } from '@/lib/retail-loyalty/redeem-math'
 import { sendRetailLoyaltyPassEmail } from '@/lib/retail-loyalty/send-pass-email'
+import { retailCardHolderMatchesQuery } from '@/lib/retail-loyalty/card-holder-search'
 import type { RetailLoyaltyMemberPos, RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
 import {
   capitalizeCustomerWords,
@@ -194,6 +195,83 @@ export type RetailLoyaltyShopCustomerHit = {
 export type RetailLoyaltyCustomerSearchHit = {
   customer: RetailLoyaltyShopCustomerHit
   loyaltyMember: RetailLoyaltyMemberPublic | null
+}
+
+/** Actieve klantenkaarten van deze zaak, met naam, adres en btw uit het klantenbestand. */
+export async function listRetailLoyaltyCardHolders(
+  tenantSlug: string,
+  rawQuery = '',
+): Promise<{ ok: boolean; members: RetailLoyaltyMemberPos[]; error?: string }> {
+  const supabase = getServerSupabaseClient()
+  if (!supabase) return { ok: false, members: [], error: 'db_unavailable' }
+
+  const { data: rows, error } = await supabase
+    .from('retail_loyalty_members')
+    .select(MEMBER_SELECT)
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+    .order('display_name', { ascending: true })
+    .limit(400)
+
+  if (error) return { ok: false, members: [], error: error.message }
+
+  const customerIds = [
+    ...new Set(
+      (rows ?? [])
+        .map((row) => row.shop_customer_id)
+        .filter((id): id is string => typeof id === 'string' && id.length > 0),
+    ),
+  ]
+  const customerById = new Map<
+    string,
+    {
+      name: string | null
+      email: string | null
+      phone: string | null
+      address: string | null
+      postal_code: string | null
+      city: string | null
+      btw_number: string | null
+    }
+  >()
+  if (customerIds.length > 0) {
+    const { data: customers, error: customerError } = await supabase
+      .from('shop_customers')
+      .select('id, name, email, phone, address, postal_code, city, btw_number')
+      .eq('tenant_slug', tenantSlug)
+      .in('id', customerIds)
+    if (customerError) return { ok: false, members: [], error: customerError.message }
+    for (const customer of customers ?? []) {
+      customerById.set(customer.id, customer)
+    }
+  }
+
+  const members: RetailLoyaltyMemberPos[] = (rows ?? []).map((row) => {
+    const customer = row.shop_customer_id ? customerById.get(row.shop_customer_id) : undefined
+    return {
+      id: row.id,
+      card_code: row.card_code,
+      display_name: row.display_name,
+      phone: row.phone ?? customer?.phone ?? null,
+      points_balance: Number(row.points_balance) || 0,
+      email: row.email ?? customer?.email ?? null,
+      customer_name: customer?.name ?? null,
+      customer_address: customer?.address ?? null,
+      customer_postal_code: customer?.postal_code ?? null,
+      customer_city: customer?.city ?? null,
+      customer_btw_number: customer?.btw_number?.trim() || null,
+    }
+  })
+
+  const q = rawQuery.trim()
+  const filtered = q ? members.filter((member) => retailCardHolderMatchesQuery(member, q)) : members
+  filtered.sort((a, b) =>
+    (a.customer_name || a.display_name || a.card_code).localeCompare(
+      b.customer_name || b.display_name || b.card_code,
+      'nl',
+    ),
+  )
+  return { ok: true, members: filtered }
 }
 
 export async function searchRetailLoyaltyCustomers(
