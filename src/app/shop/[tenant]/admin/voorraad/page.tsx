@@ -339,14 +339,14 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       {status.label}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs min-w-[280px]">
-                    <div>
+                  <div className="grid min-w-0 max-w-full grid-cols-2 gap-2 text-xs sm:grid-cols-4 sm:min-w-[280px]">
+                    <div className="min-w-0">
                       <span className="text-gray-400">{t('stockPage.article')}</span>
-                      <p className="font-medium font-mono">{sku.article_number || sku.barcode || '—'}</p>
+                      <p className="break-all font-medium font-mono">{sku.article_number || sku.barcode || '—'}</p>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <span className="text-gray-400">{t('stockPage.barcode')}</span>
-                      <p className="font-medium font-mono">{sku.barcode || '—'}</p>
+                      <p className="break-all font-medium font-mono">{sku.barcode || '—'}</p>
                     </div>
                     <div>
                       <span className="text-gray-400">{t('stockPage.size')}</span>
@@ -360,7 +360,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                   {isSaving ? (
                     <div className="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                   ) : isEditing ? (
-                    <div className="flex flex-col gap-2 w-full md:w-auto">
+                    <div className="ml-auto flex w-full flex-col gap-2 md:w-auto md:items-end">
                       <div className="flex gap-2 flex-wrap">
                         <input
                           className="w-28 px-2 py-1 border rounded-lg text-sm"
@@ -427,7 +427,7 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       </div>
                     </div>
                   ) : sku.track_stock ? (
-                    <div className="flex flex-col gap-2 shrink-0 items-stretch sm:items-end">
+                    <div className="ml-auto flex shrink-0 flex-col items-end gap-2">
                       <div className="flex items-center gap-2 justify-end">
                         <button
                           type="button"
@@ -450,9 +450,9 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       <button
                         type="button"
                         onClick={() => void updateSku(sku, { track_stock: false })}
-                        className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm font-semibold touch-manipulation"
+                        className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold touch-manipulation"
                       >
-                        {t('stockPage.disableTracking')}
+                        {t('stockPage.enableTracking')}
                       </button>
                       <button
                         type="button"
@@ -463,13 +463,13 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
                       </button>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-2 shrink-0">
+                    <div className="ml-auto flex shrink-0 flex-col items-end gap-2">
                       <button
                         type="button"
                         onClick={() => void updateSku(sku, { track_stock: true, stock_quantity: 0, low_stock_threshold: 5 })}
-                        className="px-4 py-2 rounded-xl bg-[#1e293b] text-white text-sm font-semibold touch-manipulation"
+                        className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold touch-manipulation"
                       >
-                        {t('stockPage.enableTracking')}
+                        {t('stockPage.disableTracking')}
                       </button>
                       <button
                         type="button"
