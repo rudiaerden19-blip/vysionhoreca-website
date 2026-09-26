@@ -16,7 +16,6 @@ import {
   useKassaUiLayoutSync,
 } from '@/lib/kassa-register-ui-dark-preference'
 import {
-  RETAIL_GRAY_BTN_FACE,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutChromeBtnClass,
   kassaLayoutHamburgerMenuHeaderBg,
@@ -72,7 +71,6 @@ import {
   type RetailPosSku,
 } from '@/lib/retail-kassa-pos'
 import { patchSkuInList } from '@/lib/retail-pos-catalog'
-import { createRetailWedgeSession, normalizeRetailWedgeCode } from '@/lib/retail-barcode-wedge'
 import {
   parseRetailCsvText,
   parseRetailExcelBuffer,
@@ -122,8 +120,7 @@ import { useKassaStaffClockPos } from '@/lib/use-kassa-staff-clock-pos'
 
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
-const RETAIL_TRAY_TILE_SIZE_CLASS =
-  'flex h-full min-h-[4.25rem] w-full min-w-0 items-center justify-center overflow-hidden break-words px-1 py-1 text-center text-[11px] font-bold leading-tight sm:min-h-[4.5rem] sm:px-1.5 sm:text-xs'
+const RETAIL_TRAY_TILE_SIZE_CLASS = 'size-[4cm]'
 
 type RetailGrayTrayTile =
   | { key: string; kind: 'logout'; labelKey: string; submenuIds: string[] }
@@ -229,9 +226,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const scanRef = useRef<HTMLInputElement>(null)
   const articleSearchActiveRef = useRef(false)
   const barcodeCaptureRef = useRef<HTMLInputElement>(null)
-  const scanQueueRef = useRef<string[]>([])
-  const recentWedgeRef = useRef<{ code: string; at: number }>({ code: '', at: 0 })
-  const acceptRetailScanRef = useRef<(code: string) => void>(() => {})
   const scanBarRef = useRef<HTMLDivElement>(null)
   const cartScrollRef = useRef<HTMLDivElement>(null)
   const listScrollTargetRef = useRef<string | null>(null)
@@ -320,7 +314,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importBusy, setImportBusy] = useState(false)
   const [importHighlight, setImportHighlight] = useState<'csv' |  'excel'| null>(null)
-  const [quickMenuOpen, setQuickMenuOpen] = useState(true)
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   const [numpadValue, setNumpadValue] = useState('')
   const [addOkFlash, setAddOkFlash] = useState(false)
@@ -419,12 +412,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const focusBarcodeCapture = useCallback(() => {
     if (priceFixNameInputRef.current && document.activeElement === priceFixNameInputRef.current) return
     if (priceFixInputRef.current && document.activeElement === priceFixInputRef.current) return
-    const el = barcodeCaptureRef.current
-    if (!el) return
-    // Focus voor de handscanner, zonder schermtoetsenbord.
-    el.readOnly = true
-    el.setAttribute('inputmode', 'none')
-    el.focus({ preventScroll: true })
+    barcodeCaptureRef.current?.focus({ preventScroll: true })
   }, [])
 
   const applyArticleSearchDomInactive = useCallback((el: HTMLInputElement) => {
@@ -982,7 +970,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function renderRetailPlateTiles() {
-    const tileClass = `${kassaLayoutQuickMenuTileClass(kassaLayout)} ${RETAIL_TRAY_TILE_SIZE_CLASS} touch-manipulation select-none`
+    const tileClass = `${kassaLayoutQuickMenuTileClass(kassaLayout)} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
     return RETAIL_GRAY_TRAY_TILES.map((tile) => {
       const label = t(tile.labelKey)
       if (tile.kind === 'loyaltyNoCard') {
@@ -1216,33 +1204,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setLoyaltyRedeemDraft('')
   }
 
-  function settleBarcodeScan() {
-    stockBusyRef.current = false
-    setStockBusy(false)
-    releaseScanFocus()
-    const next = scanQueueRef.current.shift()
-    if (next) void processBarcode(next)
-  }
-
-  function acceptRetailScan(code: string) {
-    const trimmed = normalizeRetailWedgeCode(code)
-    if (!trimmed) return
-    const now = Date.now()
-    if (trimmed === recentWedgeRef.current.code && now - recentWedgeRef.current.at < 700) return
-    recentWedgeRef.current = { code: trimmed, at: now }
-    if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
-    void processBarcode(trimmed)
-  }
-  acceptRetailScanRef.current = acceptRetailScan
-
   async function processBarcode(code: string) {
-    const trimmed = normalizeRetailWedgeCode(code)
+    const trimmed = code.trim()
     if (!trimmed) return
-    if (stockBusyRef.current) {
-      const queued = scanQueueRef.current
-      if (queued[queued.length - 1] !== trimmed) queued.push(trimmed)
-      return
-    }
+    if (stockBusyRef.current) return
 
     const loyaltyCode =
       mode === 'sales' && loyaltyEnabled ? extractRetailLoyaltyScanCode(trimmed) : null
@@ -1253,7 +1218,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       try {
         await linkLoyaltyCardFromScan(trimmed)
       } finally {
-        settleBarcodeScan()
+        stockBusyRef.current = false
+        setStockBusy(false)
+        releaseScanFocus()
       }
       return
     }
@@ -1264,7 +1231,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       try {
         await linkStoreCreditFromScan(trimmed)
       } finally {
-        settleBarcodeScan()
+        stockBusyRef.current = false
+        setStockBusy(false)
+        releaseScanFocus()
       }
       return
     }
@@ -1278,7 +1247,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         if (hit) addToCart(hit, 1)
         else alert(t('retailKassaPage.autoScanImportError'))
       } finally {
-        settleBarcodeScan()
+        stockBusyRef.current = false
+        setStockBusy(false)
+        releaseScanFocus()
       }
       return
     }
@@ -1296,7 +1267,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return
     }
 
-    stockBusyRef.current = true
     setStockBusy(true)
     try {
       if (mode === 'stockCount') {
@@ -1317,7 +1287,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         pushStockActivity(res.sku, payload.quantity, 'goodsReceipt')
       }
     } finally {
-      settleBarcodeScan()
+      stockBusyRef.current = false
+      setStockBusy(false)
+      releaseScanFocus()
     }
   }
 
@@ -1602,43 +1574,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function onBarcodeWedgeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== 'Enter' && e.key !== 'Tab' && e.key !== 'NumpadEnter') return
+    if (e.key !== 'Enter') return
     e.preventDefault()
     const v = e.currentTarget.value
     e.currentTarget.value = ''
-    acceptRetailScan(v)
+    void processBarcode(v)
   }
-
-  useEffect(() => {
-    const session = createRetailWedgeSession({
-      onScan: (code) => acceptRetailScanRef.current(code),
-    })
-    const onKey = (e: KeyboardEvent) => {
-      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return
-      const target = e.target
-      if (target instanceof HTMLElement && target !== barcodeCaptureRef.current) {
-        const typing =
-          target instanceof HTMLTextAreaElement ||
-          target.isContentEditable ||
-          (target instanceof HTMLInputElement &&
-            !(
-              target.hasAttribute('data-retail-article-search') &&
-              target.readOnly &&
-              !articleSearchActiveRef.current
-            ))
-        if (typing) return
-      }
-      const result = session.pushKey(e.key)
-      if (result === 'ignore') return
-      e.preventDefault()
-      e.stopPropagation()
-    }
-    window.addEventListener('keydown', onKey, true)
-    return () => {
-      session.dispose()
-      window.removeEventListener('keydown', onKey, true)
-    }
-  }, [])
 
   function openImportPreview(rows: RetailImportRow[]) {
     if (rows.length === 0) {
@@ -2589,13 +2530,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <input
               ref={barcodeCaptureRef}
               type="text"
-              readOnly
-              inputMode="none"
               tabIndex={-1}
               autoComplete="off"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
               onBlur={() => {
@@ -2891,33 +2827,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </div>
 
             <div
-              className={`flex shrink-0 items-stretch gap-1.5 border-t py-1 pl-2 pr-2 sm:gap-2 sm:pl-3 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`}
+              className={`flex shrink-0 items-center gap-2 border-t py-1 pl-3 pr-2 sm:gap-2.5 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`}
             >
-              <button
-                type="button"
-                aria-pressed={quickMenuOpen}
-                data-testid="retail-quick-menu-toggle"
-                onClick={() => {
-                  playClick()
-                  setQuickMenuOpen((open) => !open)
-                }}
-                className={`flex w-[4.5rem] shrink-0 items-center justify-center px-1 text-center text-[11px] font-bold leading-tight sm:w-[5rem] sm:text-xs ${
-                  quickMenuOpen ? 'min-h-[4.25rem] sm:min-h-[4.5rem]' : 'min-h-[2.75rem]'
-                } ${kassaLayoutChromeBtnClass(kassaLayout, quickMenuOpen)}`}
-              >
-                {t('kassaApp.quickMenu')}
-              </button>
-              {quickMenuOpen ? (
               <div
-                className="grid min-w-0 flex-1 items-stretch gap-1.5 overflow-hidden [grid-template-columns:repeat(auto-fit,minmax(min(100%,5.75rem),1fr))] sm:gap-2"
+                className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto sm:gap-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 data-testid="retail-plate-tiles"
               >
                 {renderRetailPlateTiles()}
               </div>
-              ) : null}
-              {quickMenuOpen ? (
               <div
-                className={`size-[4.25rem] shrink-0 overflow-hidden rounded-lg border sm:size-[4.5rem] ${KASSA_POS_RULE_BLACK} bg-black/20`}
+                className={`size-[4cm] shrink-0 overflow-hidden rounded-lg border ${KASSA_POS_RULE_BLACK} bg-black/20`}
                 data-testid="retail-last-scan-thumb"
               >
                 {selectedPreviewSku?.image_url?.trim() ? (
@@ -2938,7 +2857,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </div>
                 )}
               </div>
-              ) : null}
             </div>
           </div>
 
@@ -3089,11 +3007,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         key={key}
                         type="button"
                         data-retail-numpad-key={key}
-                        className={
-                          kassaLayout === 'light'
-                            ? ui.numpadKeyNum
-                            : `${RETAIL_GRAY_BTN_FACE} min-h-[2.75rem] font-bold text-xl touch-manipulation select-none`
-                        }
+                        className={ui.numpadKeyNum}
                       >
                         {key}
                       </button>
