@@ -556,7 +556,7 @@ function PricingSection() {
   const anyModalOpen = modulesOpen || retailOpen
 
   useEffect(() => {
-    if (!anyModalOpen) return
+    if (!anyModalOpen || !document.body) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
@@ -566,13 +566,13 @@ function PricingSection() {
     }
     window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = prev
+      if (document.body) document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
   }, [anyModalOpen, modulesOpen, retailOpen])
 
   const modulesModal =
-    modulesOpen && typeof document !== 'undefined'
+    modulesOpen && typeof document !== 'undefined' && document.body
       ? createPortal(
           <div
             role="dialog"
@@ -650,7 +650,7 @@ function PricingSection() {
       : null
 
   const retailModal =
-    retailOpen && typeof document !== 'undefined'
+    retailOpen && typeof document !== 'undefined' && document.body
       ? createPortal(
           <div
             role="dialog"
@@ -930,7 +930,7 @@ function TableKioskSection() {
   const kioskCount = TABLE_KIOSK_SLIDES.length
 
   useEffect(() => {
-    if (!kioskLightboxOpen) return
+    if (!kioskLightboxOpen || !document.body) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
@@ -946,7 +946,7 @@ function TableKioskSection() {
     }
     window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = prev
+      if (document.body) document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
   }, [kioskLightboxOpen, kioskCount])
@@ -1056,7 +1056,7 @@ function TableKioskSection() {
       </div>
 
       {kioskLightboxOpen &&
-        typeof document !== 'undefined' &&
+        typeof document !== 'undefined' && document.body &&
         createPortal(
           <div
             className="fixed inset-0 z-[9999] flex items-center justify-center bg-black p-0 sm:bg-black/90 sm:p-6"

@@ -60,14 +60,14 @@ export const WHY_VYSION_HARDWARE_VIDEOS: HardwareVideoConfig[] = [
 
 function useHardwareEnlargeLock(expanded: boolean, onClose: () => void) {
   useEffect(() => {
-    if (!expanded) return
+    if (!expanded || !document.body) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = ''
+      if (document.body) document.body.style.overflow = ''
       window.removeEventListener('keydown', onKey)
     }
   }, [expanded, onClose])
@@ -94,7 +94,7 @@ export function HardwareEnlargeModal({
 
   useHardwareEnlargeLock(open, onClose)
 
-  if (!mounted || !open) return null
+  if (!mounted || !open || !document.body) return null
 
   return createPortal(
     <div

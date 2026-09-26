@@ -573,7 +573,7 @@ function PricingSection() {
   const anyModalOpen = modulesOpen || retailOpen
 
   useEffect(() => {
-    if (!anyModalOpen) return
+    if (!anyModalOpen || !document.body) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
@@ -583,13 +583,13 @@ function PricingSection() {
     }
     window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = prev
+      if (document.body) document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
   }, [anyModalOpen, modulesOpen, retailOpen])
 
   const modulesModal =
-    modulesOpen && typeof document !== 'undefined'
+    modulesOpen && typeof document !== 'undefined' && document.body
       ? createPortal(
           <div
             role="dialog"
@@ -663,7 +663,7 @@ function PricingSection() {
       : null
 
   const retailModal =
-    retailOpen && typeof document !== 'undefined'
+    retailOpen && typeof document !== 'undefined' && document.body
       ? createPortal(
           <div
             role="dialog"
