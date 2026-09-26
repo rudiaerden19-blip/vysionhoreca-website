@@ -68,6 +68,7 @@ import {
   resolveRetailSkuForGoodsReceipt,
   resolveRetailSkuLookup,
   searchRetailSkus,
+  filterRetailSkusForLiveSearch,
   retailSkuInStock,
   type RetailCartLine,
   type RetailPosSku,
@@ -304,6 +305,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [articleSearchActive, setArticleSearchActive] = useState(false)
   /** Meerdere treffers na «Zoeken». Eén treffer gaat meteen in de mand. */
   const [articleSearchResults, setArticleSearchResults] = useState<RetailPosSku[]>([])
+  /** Lijst onder het zoekveld, al vanaf de eerste letter. */
+  const [liveSearchHits, setLiveSearchHits] = useState<RetailPosSku[]>([])
   const [articleSearchModalOpen, setArticleSearchModalOpen] = useState(false)
   const [priceFixSku, setPriceFixSku] = useState<RetailPosSku | null>(null)
   const [priceFixName, setPriceFixName] = useState('')
@@ -449,6 +452,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const closeArticleSearchKeyboard = useCallback(() => {
     setArticleSearchActive(false)
+    setLiveSearchHits([])
     const el = scanRef.current
     if (el) applyArticleSearchDomInactive(el)
     el?.blur()
@@ -1556,6 +1560,31 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
     setArticleSearchResults(hits)
     setArticleSearchModalOpen(true)
+    finishArticleSearchUi()
+  }
+
+  function refreshLiveSearch(query: string) {
+    const q = query.trim()
+    if (mode !== 'sales' || q.length < 1) {
+      setLiveSearchHits([])
+      return
+    }
+    setLiveSearchHits(filterRetailSkusForLiveSearch(skusRef.current, q))
+  }
+
+  function pickLiveArticle(sku: RetailPosSku) {
+    playClick()
+    setLiveSearchHits([])
+    const opensPriceFix = sku.price <= 0 && retailSkuInStock(sku, 1)
+    addToCart(sku, 1)
+    if (opensPriceFix) {
+      setScanValue('')
+      setArticleSearchActive(false)
+      const el = scanRef.current
+      if (el) applyArticleSearchDomInactive(el)
+      el?.blur()
+      return
+    }
     finishArticleSearchUi()
   }
 
@@ -2677,9 +2706,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
               aria-label={t('retailKassaPage.scanPlaceholder')}
             />
+            <div className="relative shrink-0">
             <form
               onSubmit={onScanSubmit}
-              className={`shrink-0 flex items-center gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
+              className={`flex items-center gap-2 border-b px-3 pt-2 pb-2 sm:px-4 ${KASSA_POS_RULE_BLACK}`}
             >
               <input
                 ref={scanRef}
@@ -2690,7 +2720,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 data-retail-article-search
                 placeholder={t('retailKassaPage.scanPlaceholder')}
                 value={scanValue}
-                onChange={(e) => setScanValue(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setScanValue(value)
+                  refreshLiveSearch(value)
+                }}
                 onFocus={() => {
                   if (!articleSearchActiveRef.current) openArticleSearchKeyboard()
                 }}
@@ -2748,6 +2782,36 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 {t('retailKassaPage.addOk')}
               </button>
             </form>
+            {articleSearchActive && liveSearchHits.length > 0 ? (
+              <div
+                className="absolute left-3 right-3 top-full z-40 mt-1 max-h-[min(22rem,50vh)] overflow-y-auto overscroll-y-contain rounded-xl border border-black/20 bg-white shadow-2xl"
+                data-testid="retail-live-search-list"
+              >
+                <p className="sticky top-0 border-b border-black/10 bg-white px-3 py-2 text-xs text-black/60">
+                  {t('retailKassaPage.searchMultipleHint')}
+                </p>
+                {liveSearchHits.map((sku) => (
+                  <button
+                    key={sku.lineKey}
+                    type="button"
+                    className="flex min-h-12 w-full items-center gap-3 border-b border-black/5 px-3 py-2.5 text-left touch-manipulation last:border-b-0 hover:bg-neutral-100"
+                    onPointerDown={(e) => {
+                      e.preventDefault()
+                      pickLiveArticle(sku)
+                    }}
+                  >
+                    <span className="min-w-0 flex-1 truncate font-semibold text-black">{sku.name}</span>
+                    <span className="shrink-0 font-mono text-xs text-black/50">
+                      {sku.barcode || sku.article_number || ''}
+                    </span>
+                    <span className="shrink-0 tabular-nums font-semibold text-black">
+                      €{sku.price.toFixed(2)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            </div>
 
             {linkedStoreCredit ? (
               <div

@@ -7,6 +7,7 @@ import {
   resolveRetailSkuForGoodsReceipt,
   resolveRetailSkuLookup,
   searchRetailSkus,
+  filterRetailSkusForLiveSearch,
   retailSkuInStock,
   type RetailCartLine,
   type RetailPosSku,
@@ -25,6 +26,7 @@ export {
   resolveRetailSkuForGoodsReceipt,
   resolveRetailSkuLookup,
   searchRetailSkus,
+  filterRetailSkusForLiveSearch,
   retailSkuInStock,
 } from '@/lib/retail-pos-catalog'
 

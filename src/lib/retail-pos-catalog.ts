@@ -239,6 +239,28 @@ export function searchRetailSkus(
   return hits.slice(0, Math.max(1, limit))
 }
 
+/** Namen terwijl je typt: al vanaf 1 letter, treffers die zo beginnen eerst. */
+export function filterRetailSkusForLiveSearch(
+  skus: RetailPosSku[],
+  raw: string,
+  limit = 200,
+): RetailPosSku[] {
+  const q = raw.trim().toLowerCase()
+  if (q.length < 1) return []
+  const hits = skus.filter(
+    (s) =>
+      s.name.toLowerCase().includes(q) ||
+      (s.article_number != null && s.article_number.toLowerCase().includes(q)),
+  )
+  hits.sort((a, b) => {
+    const aStart = a.name.toLowerCase().startsWith(q) ? 0 : 1
+    const bStart = b.name.toLowerCase().startsWith(q) ? 0 : 1
+    if (aStart !== bStart) return aStart - bStart
+    return a.name.localeCompare(b.name, 'nl')
+  })
+  return hits.slice(0, Math.max(1, limit))
+}
+
 export type RetailScanPayload = {
   lookupCode: string
   quantity: number
