@@ -5,6 +5,7 @@ import { normalizeCategoryVatPercent } from '@/lib/order-vat'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 import type { RetailReceiptI18n } from '@/lib/retail-kassa-receipt'
 import { formatStoreDisplayName } from '@/lib/retail-kassa/receipt-layout'
+import { retailItemPromoNote } from '@/lib/retail-promo'
 
 const MM = 2.834645669
 const PAGE_W = 80 * MM
@@ -74,7 +75,7 @@ function itemsGrossIncl(order: KassaLastOrderReceipt): number {
     Math.round(
       order.items.reduce((s, i) => {
         const choicesTotal = (i.choices || []).reduce((c, ch) => c + ch.price, 0)
-        return s + (i.product.price + choicesTotal) * i.quantity
+        return s + retailItemPromoNote(i.product, i.quantity, choicesTotal, { thirdFree: '', line: '' }).payable
       }, 0) * 100,
     ) / 100
   )
@@ -212,14 +213,20 @@ export function buildRetailKassaReceiptPdfBuffer(opts: {
 
     for (const item of order.items) {
       const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-      const lineTotal = (item.product.price + choicesTotal) * item.quantity
+      const charge = retailItemPromoNote(item.product, item.quantity, choicesTotal, {
+        thirdFree: labels.promoThirdFree || 'derde gratis',
+        line: labels.promoLine || '{buy}+{free} · {count} gratis',
+      })
       y = rowLeftRight(
         doc,
         y,
         `${item.quantity}x ${capitalizeProductName(item.product.name)}`,
-        formatEuro(lineTotal),
+        formatEuro(charge.payable),
         10,
       )
+      if (charge.note) {
+        y = textBlock(doc, y, charge.note, { fontSize: 9 })
+      }
     }
 
     if (discountEuro > 0.009) {

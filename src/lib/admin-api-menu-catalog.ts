@@ -286,10 +286,18 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     }
   }
 
-  const persist = async (opts: { includeZoom: boolean; includeRetailPackaging: boolean }) => {
-    const { retail_sale_unit, retail_unit_quantity, ...baseWithoutRetailPackaging } =
+  const persist = async (opts: {
+    includeZoom: boolean
+    includeRetailPackaging: boolean
+    includeRetailPromo: boolean
+  }) => {
+    const { retail_sale_unit, retail_unit_quantity, retail_promo_buy, retail_promo_free, ...baseWithoutRetailExtras } =
       baseProduct as MenuProduct
-    const core = opts.includeRetailPackaging ? baseProduct : baseWithoutRetailPackaging
+    const core = {
+      ...baseWithoutRetailExtras,
+      ...(opts.includeRetailPackaging ? { retail_sale_unit, retail_unit_quantity } : {}),
+      ...(opts.includeRetailPromo ? { retail_promo_buy, retail_promo_free } : {}),
+    }
     const fullProduct = {
       ...core,
       ...(is_promo !== undefined && { is_promo }),
@@ -312,30 +320,68 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
 
   const isMissingRetailPackagingColumn = (msg: string) =>
     /retail_sale_unit|retail_unit_quantity/i.test(msg)
+  const isMissingRetailPromoColumn = (msg: string) =>
+    /retail_promo_buy|retail_promo_free/i.test(msg)
 
   /** Zelfde als categorieën: geen blind upsert — id wordt door de proxy gestript → zou dubbele rijen geven. */
-  let r = await persist({ includeZoom: true, includeRetailPackaging: true })
+  let r = await persist({ includeZoom: true, includeRetailPackaging: true, includeRetailPromo: true })
 
   if (r.ok) {
     return wrapOk(r.data)
   }
 
+  if (isMissingRetailPromoColumn(r.error || '')) {
+    const wantsPromo = product.retail_promo_buy != null || product.retail_promo_free != null
+    if (!wantsPromo) {
+      const rPromo = await persist({
+        includeZoom: true,
+        includeRetailPackaging: true,
+        includeRetailPromo: false,
+      })
+      if (rPromo.ok) return wrapOk(rPromo.data)
+      r = rPromo
+    }
+  }
+
   if (isMissingRetailPackagingColumn(r.error || '')) {
-    const rRetail = await persist({ includeZoom: true, includeRetailPackaging: false })
+    const rRetail = await persist({
+      includeZoom: true,
+      includeRetailPackaging: false,
+      includeRetailPromo: !isMissingRetailPromoColumn(r.error || ''),
+    })
     if (rRetail.ok) return wrapOk(rRetail.data)
     r = rRetail
   }
 
   // Fallback: kolom kassa_image_zoom mist nog in DB? probeer zonder.
   if (/kassa_image_zoom/i.test(r.error || '')) {
-    const r2 = await persist({ includeZoom: false, includeRetailPackaging: true })
+    const r2 = await persist({
+      includeZoom: false,
+      includeRetailPackaging: true,
+      includeRetailPromo: true,
+    })
     if (r2.ok) return wrapOk(r2.data)
-    if (isMissingRetailPackagingColumn(r2.error || '')) {
-      const r3 = await persist({ includeZoom: false, includeRetailPackaging: false })
+    if (isMissingRetailPromoColumn(r2.error || '')) {
+      const rPromo = await persist({
+        includeZoom: false,
+        includeRetailPackaging: true,
+        includeRetailPromo: false,
+      })
+      if (rPromo.ok) return wrapOk(rPromo.data)
+      r = rPromo
+    } else {
+      r = r2
+    }
+    if (isMissingRetailPackagingColumn(r.error || '')) {
+      const r3 = await persist({
+        includeZoom: false,
+        includeRetailPackaging: false,
+        includeRetailPromo: false,
+      })
       if (r3.ok) return wrapOk(r3.data)
       return { data: null, error: r3.error }
     }
-    return { data: null, error: r2.error }
+    return { data: null, error: r.error }
   }
 
   console.error('Error saving menu product:', r.error)

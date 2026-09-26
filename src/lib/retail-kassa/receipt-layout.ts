@@ -1,8 +1,9 @@
 import type { TenantSettings } from '@/lib/admin-api'
-import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
+import type { KassaCartItem, KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { normalizeCategoryVatPercent } from '@/lib/order-vat'
 import { escapeReceiptHtml } from '@/lib/print-receipt-html'
 import type { RetailReceiptI18n } from '@/lib/retail-kassa-receipt'
+import { retailItemPromoNote } from '@/lib/retail-promo'
 
 export const RETAIL_THERMAL_W = 42
 
@@ -132,13 +133,20 @@ function thermalSectionTitle(title: string, lines: string[]): void {
   lines.push('')
 }
 
+function promoTemplates(labels?: RetailReceiptI18n): { thirdFree: string; line: string } {
+  return {
+    thirdFree: labels?.promoThirdFree || 'derde gratis',
+    line: labels?.promoLine || '{buy}+{free} · {count} gratis',
+  }
+}
+
+function itemCharge(item: KassaCartItem, labels?: RetailReceiptI18n) {
+  const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+  return retailItemPromoNote(item.product, item.quantity, choicesTotal, promoTemplates(labels))
+}
+
 function itemsGrossIncl(order: KassaLastOrderReceipt): number {
-  return Math.round(
-    order.items.reduce((s, i) => {
-      const choicesTotal = (i.choices || []).reduce((c, ch) => c + ch.price, 0)
-      return s + (i.product.price + choicesTotal) * i.quantity
-    }, 0) * 100,
-  ) / 100
+  return Math.round(order.items.reduce((s, i) => s + itemCharge(i).payable, 0) * 100) / 100
 }
 
 function buildTotals(
@@ -217,31 +225,38 @@ function appendHelpedByThermal(
   lines.push(thermalCenterPlain(thermalPlainLine(staffFirstName(raw))))
 }
 
-function appendItemsThermal(order: KassaLastOrderReceipt, lines: string[]): void {
+function appendItemsThermal(
+  order: KassaLastOrderReceipt,
+  lines: string[],
+  labels?: RetailReceiptI18n,
+): void {
   for (const item of order.items) {
-    const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
-    const unitIncl = item.product.price + choicesTotal
-    const lineTotal = unitIncl * item.quantity
-    lines.push(thermalItemRow(item.quantity, item.product.name, lineTotal))
+    const charge = itemCharge(item, labels)
+    lines.push(thermalItemRow(item.quantity, item.product.name, charge.payable))
+    if (charge.note) {
+      const note = thermalPlainLine(charge.note)
+      if (note) lines.push(`  ${note}`.slice(0, RETAIL_THERMAL_W))
+    }
     for (const c of item.choices || []) {
       lines.push(`  + ${capitalizeProductName(c.choiceName)}`.slice(0, RETAIL_THERMAL_W))
     }
   }
 }
 
-function appendItemsHtml(order: KassaLastOrderReceipt): string {
+function appendItemsHtml(order: KassaLastOrderReceipt, labels?: RetailReceiptI18n): string {
   return order.items
     .map((i) => {
-      const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
-      const unitIncl = i.product.price + choicesTotal
-      const lineTotal = unitIncl * i.quantity
+      const charge = itemCharge(i, labels)
       const extras = (i.choices || [])
         .map(
           (c) =>
             `<div class="retail-item-extra">+ ${escapeReceiptHtml(capitalizeProductName(c.choiceName))}</div>`,
         )
         .join('')
-      return `<div class="retail-item"><span>${i.quantity}x ${escapeReceiptHtml(capitalizeProductName(i.product.name))}</span><span class="amt item-price-right">${formatEuroHtml(lineTotal)}</span></div>${extras}`
+      const note = charge.note
+        ? `<div class="retail-item-extra">${escapeReceiptHtml(charge.note)}</div>`
+        : ''
+      return `<div class="retail-item"><span>${i.quantity}x ${escapeReceiptHtml(capitalizeProductName(i.product.name))}</span><span class="amt item-price-right">${formatEuroHtml(charge.payable)}</span></div>${note}${extras}`
     })
     .join('')
 }
@@ -299,7 +314,7 @@ export function buildRetailThermalBonLines(opts: {
   lines.push(thermalPadRow(`${labels.receiptBonNrPrefix}${receiptRefDisplay}`, dateStr))
   thermalSectionTitle(labels.sectionOrderBar, lines)
 
-  appendItemsThermal(order, lines)
+  appendItemsThermal(order, lines, labels)
   if (discountEuro > 0.009) {
     lines.push('')
     lines.push(thermalPadMoney(labels.receiptDiscount, -discountEuro))
@@ -420,7 +435,7 @@ export function buildRetailKassaReceiptHtmlBody(opts: {
         <span>${escapeReceiptHtml(dateStr)}</span>
       </div>
       ${blackBarHtml(labels.sectionOrderBar)}
-      ${appendItemsHtml(order)}
+      ${appendItemsHtml(order, labels)}
       ${
         discountEuro > 0.009
           ? `<div class="money-row"><span class="label-strong">${escapeReceiptHtml(labels.receiptDiscount)}</span><span class="amt">-${formatEuroHtml(discountEuro)}</span></div>`

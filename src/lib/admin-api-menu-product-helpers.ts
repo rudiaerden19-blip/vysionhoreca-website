@@ -34,6 +34,9 @@ export interface MenuProduct {
   retail_sale_unit?: 'stuk' |  'doos' |  'bak' |  'pallet'| null
   /** Retail: bv. 24 flesjes in deze doos (informatief + bon). */
   retail_unit_quantity?: number | null
+  /** Retail: koop zoveel, dan is het volgende aantal gratis (2 + 1). */
+  retail_promo_buy?: number | null
+  retail_promo_free?: number | null
 }
 
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65

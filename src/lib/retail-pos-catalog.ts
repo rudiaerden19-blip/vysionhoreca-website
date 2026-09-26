@@ -18,6 +18,9 @@ export type RetailPosSku = {
   stock_quantity: number
   low_stock_threshold: number
   category_id: string | null
+  /** Koop X, Y gratis. Null = geen promo. */
+  promoBuy?: number | null
+  promoFree?: number | null
 }
 
 export type RetailCartLine = {
@@ -27,6 +30,7 @@ export type RetailCartLine = {
 
 const PRODUCT_SELECT =
   'id, name, description, price, image_url, category_id, article_number, barcode, size_label, color_label, track_stock, stock_quantity, low_stock_threshold'
+const PRODUCT_SELECT_PROMO = `${PRODUCT_SELECT}, retail_promo_buy, retail_promo_free`
 
 const VARIANT_SELECT =
   'id, product_id, article_number, barcode, size_label, color_label, price_override, track_stock, stock_quantity, low_stock_threshold, is_active, sort_order'
@@ -45,6 +49,8 @@ type ProductRow = {
   track_stock: boolean | null
   stock_quantity: number | null
   low_stock_threshold: number | null
+  retail_promo_buy?: number | null
+  retail_promo_free?: number | null
 }
 
 type VariantRow = {
@@ -60,6 +66,15 @@ type VariantRow = {
   low_stock_threshold: number
   is_active: boolean
   sort_order: number
+}
+
+function promoFields(row: ProductRow): { promoBuy: number | null; promoFree: number | null } {
+  const buy = Math.floor(Number(row.retail_promo_buy))
+  const free = Math.floor(Number(row.retail_promo_free))
+  if (!Number.isFinite(buy) || !Number.isFinite(free) || buy < 1 || free < 1) {
+    return { promoBuy: null, promoFree: null }
+  }
+  return { promoBuy: buy, promoFree: free }
 }
 
 function formatSkuName(base: string, size: string | null, color: string | null): string {
@@ -100,6 +115,7 @@ export function buildRetailSkusFromRows(products: ProductRow[], variants: Varian
           stock_quantity: Number(v.stock_quantity) || 0,
           low_stock_threshold: Number(v.low_stock_threshold) || 5,
           category_id: p.category_id,
+          ...promoFields(p),
         })
       }
     } else {
@@ -119,6 +135,7 @@ export function buildRetailSkusFromRows(products: ProductRow[], variants: Varian
         stock_quantity: Number(p.stock_quantity) || 0,
         low_stock_threshold: Number(p.low_stock_threshold) || 5,
         category_id: p.category_id,
+        ...promoFields(p),
       })
     }
   }
@@ -127,15 +144,28 @@ export function buildRetailSkusFromRows(products: ProductRow[], variants: Varian
 
 async function fetchRetailPosSkusFromDb(tenantSlug: string): Promise<RetailPosSku[]> {
   if (!supabase) return []
-  const [prodRes, varRes] = await Promise.all([
+  const variantQuery = supabase
+    .from('menu_product_variants')
+    .select(VARIANT_SELECT)
+    .eq('tenant_slug', tenantSlug)
+  const [promoRes, varRes] = await Promise.all([
     supabase
       .from('menu_products')
-      .select(PRODUCT_SELECT)
+      .select(PRODUCT_SELECT_PROMO)
       .eq('tenant_slug', tenantSlug)
       .eq('is_active', true)
       .order('name'),
-    supabase.from('menu_product_variants').select(VARIANT_SELECT).eq('tenant_slug', tenantSlug),
+    variantQuery,
   ])
+  const prodRes =
+    promoRes.error && /retail_promo_buy|retail_promo_free/i.test(promoRes.error.message)
+      ? await supabase
+          .from('menu_products')
+          .select(PRODUCT_SELECT)
+          .eq('tenant_slug', tenantSlug)
+          .eq('is_active', true)
+          .order('name')
+      : promoRes
   if (prodRes.error) {
     console.warn('[retail-pos] products:', prodRes.error.message)
     return []

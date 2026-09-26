@@ -8,6 +8,7 @@ import {
   printReceiptHtmlDocument,
 } from '@/lib/print-receipt-html'
 import type { RetailCartLine } from '@/lib/retail-kassa-pos'
+import { parseRetailPromo, retailPromoChargeableTotal } from '@/lib/retail-promo'
 import {
   buildRetailKassaReceiptHtmlBody,
   buildRetailThermalBonLines as buildRetailThermalBonLinesCore,
@@ -63,6 +64,8 @@ export type RetailReceiptI18n = {
   vatColIncl: string
   thanksFarewell: string
   receiptDiscount: string
+  promoThirdFree?: string
+  promoLine?: string
 }
 
 function retailLineToCartItem(line: RetailCartLine): KassaCartItem {
@@ -83,6 +86,8 @@ function retailLineToCartItem(line: RetailCartLine): KassaCartItem {
       barcode: line.sku.barcode,
       size_label: line.sku.size_label,
       color_label: line.sku.color_label,
+      retail_promo_buy: line.sku.promoBuy ?? null,
+      retail_promo_free: line.sku.promoFree ?? null,
     },
     quantity: line.quantity,
     cartKey: line.sku.lineKey,
@@ -98,7 +103,19 @@ export function buildRetailLastOrderReceipt(
   loyaltyDiscountEuro?: number,
   helpedByStaffName?: string | null,
 ): KassaLastOrderReceipt {
-  const gross = Math.round(lines.reduce((s, l) => s + l.sku.price * l.quantity, 0) * 100) / 100
+  const gross =
+    Math.round(
+      lines.reduce(
+        (s, l) =>
+          s +
+          retailPromoChargeableTotal(
+            l.sku.price,
+            l.quantity,
+            parseRetailPromo(l.sku.promoBuy, l.sku.promoFree),
+          ),
+        0,
+      ) * 100,
+    ) / 100
   const discount = Math.round(Math.min(Math.max(0, loyaltyDiscountEuro ?? 0), gross) * 100) / 100
   const total = Math.round((gross - discount) * 100) / 100
   const vatRate = normalizeCategoryVatPercent(tenantDefaultBtw, 21)

@@ -573,6 +573,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       catalog_mode: mode,
       retail_sale_unit: 'stuk',
       retail_unit_quantity: undefined,
+      retail_promo_buy: undefined,
+      retail_promo_free: undefined,
     })
     setSelectedOptionIds([])
     setPriceInputStr('')
@@ -658,12 +660,34 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       }
 
       const saveMode = forcedCatalogMode ?? catalogMode
+      let promoBuy: number | null = null
+      let promoFree: number | null = null
       if (saveMode === 'retail') {
         const bc = normalizeProductBarcodeScan(formData.barcode || '')
         if (!bc) {
           setError(t('adminPages.producten.barcodeRequired'))
           setSaving(false)
           return
+        }
+        const buyRaw = formData.retail_promo_buy
+        const freeRaw = formData.retail_promo_free
+        const buySet = buyRaw != null && String(buyRaw) !== ''
+        const freeSet = freeRaw != null && String(freeRaw) !== ''
+        if (buySet !== freeSet) {
+          setError(t('adminPages.producten.retailPromoPairRequired'))
+          setSaving(false)
+          return
+        }
+        if (buySet && freeSet) {
+          const buy = Math.floor(Number(buyRaw))
+          const free = Math.floor(Number(freeRaw))
+          if (buy < 1 || free < 1 || buy > 99 || free > 99) {
+            setError(t('adminPages.producten.retailPromoPairRequired'))
+            setSaving(false)
+            return
+          }
+          promoBuy = buy
+          promoFree = free
         }
       }
 
@@ -714,6 +738,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 return n > 0 ? n : null
               })()
             : null,
+        retail_promo_buy: saveMode === 'retail' ? promoBuy : null,
+        retail_promo_free: saveMode === 'retail' ? promoFree : null,
       }
 
       const { data: result, error: saveError } = await saveMenuProduct(productData)
@@ -1442,6 +1468,64 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           <p className="mt-1 text-xs text-gray-500">
                             {t('adminPages.producten.retailUnitQuantityHint')}
                           </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-xl border border-gray-100 bg-gray-50/80 p-4">
+                        <div className="sm:col-span-2">
+                          <p className="text-sm font-medium text-gray-700">
+                            {t('adminPages.producten.retailPromoTitle')}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {t('adminPages.producten.retailPromoHint')}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailPromoBuy')}
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="off"
+                            data-no-capitalize="true"
+                            value={
+                              formData.retail_promo_buy != null ? String(formData.retail_promo_buy) : ''
+                            }
+                            onChange={(e) => {
+                              const raw = e.target.value.trim()
+                              if (raw !== '' && !/^\d*$/.test(raw)) return
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_promo_buy: raw ? Math.min(99, parseInt(raw, 10) || 0) : undefined,
+                              }))
+                            }}
+                            className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base touch-manipulation"
+                            placeholder="2"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailPromoFree')}
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="off"
+                            data-no-capitalize="true"
+                            value={
+                              formData.retail_promo_free != null ? String(formData.retail_promo_free) : ''
+                            }
+                            onChange={(e) => {
+                              const raw = e.target.value.trim()
+                              if (raw !== '' && !/^\d*$/.test(raw)) return
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_promo_free: raw ? Math.min(99, parseInt(raw, 10) || 0) : undefined,
+                              }))
+                            }}
+                            className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base touch-manipulation"
+                            placeholder="1"
+                          />
                         </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">

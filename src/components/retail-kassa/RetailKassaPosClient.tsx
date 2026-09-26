@@ -76,6 +76,12 @@ import {
 import { patchSkuInList, planRetailSaleStockWrites } from '@/lib/retail-pos-catalog'
 import { createRetailWedgeSession, normalizeRetailWedgeCode } from '@/lib/retail-barcode-wedge'
 import {
+  formatRetailPromoReceiptNote,
+  parseRetailPromo,
+  retailPromoChargeableTotal,
+  retailPromoFreeCount,
+} from '@/lib/retail-promo'
+import {
   parseRetailCsvText,
   parseRetailExcelBuffer,
   type RetailImportRow,
@@ -538,7 +544,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }, [langOpen])
 
   const cartTotal = useMemo(
-    () => cart.reduce((s, l) => s + l.sku.price * l.quantity, 0),
+    () =>
+      cart.reduce(
+        (s, l) =>
+          s +
+          retailPromoChargeableTotal(
+            l.sku.price,
+            l.quantity,
+            parseRetailPromo(l.sku.promoBuy, l.sku.promoFree),
+          ),
+        0,
+      ),
     [cart],
   )
 
@@ -663,6 +679,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       vatColIncl: t('retailKassaPage.vatColIncl'),
       thanksFarewell: t('retailKassaPage.thanksFarewell'),
       receiptDiscount: t('retailKassaPage.receiptDiscount'),
+      promoThirdFree: t('retailKassaPage.promoThirdFree'),
+      promoLine: t('retailKassaPage.promoLine'),
     }),
     [t],
   )
@@ -780,7 +798,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       (sku.track_stock ? String(sku.stock_quantity) : t('retailKassaPage.stockNotTracked'))
     const qty = Math.max(1, opts?.quantity ?? 1)
     const name = qty > 1 ? `${sku.name} × ${qty}`: sku.name
-    const lineTotal = sku.price * qty
+    const promo = parseRetailPromo(sku.promoBuy, sku.promoFree)
+    const lineTotal = retailPromoChargeableTotal(sku.price, qty, promo)
+    const freeQty = retailPromoFreeCount(qty, promo)
+    const promoNote =
+      promo && freeQty > 0
+        ? formatRetailPromoReceiptNote(promo.buy, promo.free, freeQty, {
+            thirdFree: t('retailKassaPage.promoThirdFree'),
+            line: t('retailKassaPage.promoLine'),
+          })
+        : null
     const selected = selectedListLineKey === key
     return (
       <div
@@ -807,7 +834,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         <span className="truncate text-black/75">{sku.size_label || '—'}</span>
         <span className="truncate text-black/75">{sku.color_label || '—'}</span>
         <span className="truncate tabular-nums text-black/75">{stock}</span>
-        <span className="truncate tabular-nums font-semibold text-black">€{lineTotal.toFixed(2)}</span>
+        <span className="truncate tabular-nums font-semibold text-black">
+          €{lineTotal.toFixed(2)}
+          {promoNote ? <span className="block text-[10px] font-semibold text-emerald-700">{promoNote}</span> : null}
+        </span>
         {opts?.onRemove ? (
           <button
             type="button"
@@ -3549,6 +3579,21 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         <p className="truncate text-sm font-semibold text-black">{l.sku.name}</p>
                         <p className="text-xs tabular-nums text-black/70">
                           €{l.sku.price.toFixed(2)} × {l.quantity}
+                          {(() => {
+                            const promo = parseRetailPromo(l.sku.promoBuy, l.sku.promoFree)
+                            const freeQty = retailPromoFreeCount(l.quantity, promo)
+                            if (!promo || freeQty < 1) return null
+                            const note = formatRetailPromoReceiptNote(promo.buy, promo.free, freeQty, {
+                              thirdFree: t('retailKassaPage.promoThirdFree'),
+                              line: t('retailKassaPage.promoLine'),
+                            })
+                            const payable = retailPromoChargeableTotal(l.sku.price, l.quantity, promo)
+                            return (
+                              <span className="block font-semibold text-emerald-700">
+                                {note} · €{payable.toFixed(2)}
+                              </span>
+                            )
+                          })()}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>

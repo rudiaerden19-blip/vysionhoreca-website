@@ -95,5 +95,7 @@ export function retailReceiptI18nForLocale(locale: string): RetailReceiptI18n {
     vatColIncl: retail.vatColIncl ?? 'Incl.:',
     thanksFarewell: retail.thanksFarewell ?? 'Tot ziens!',
     receiptDiscount: retail.receiptDiscount ?? 'Korting',
+    promoThirdFree: retail.promoThirdFree ?? 'derde gratis',
+    promoLine: retail.promoLine ?? '{buy}+{free} · {count} gratis',
   }
 }

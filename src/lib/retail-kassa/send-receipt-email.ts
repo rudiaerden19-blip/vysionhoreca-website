@@ -11,6 +11,7 @@ import {
 import { createMailTransporter, type TenantSmtpConfig } from '@/lib/retail-loyalty/tenant-smtp'
 import { formatFromAddress, transactionalMailHeaders } from '@/lib/retail-loyalty/transactional-email'
 import { logger } from '@/lib/logger'
+import { retailItemPromoNote } from '@/lib/retail-promo'
 
 async function loadTenantContextForReceiptEmail(
   supabase: SupabaseClient,
@@ -112,8 +113,12 @@ function buildReceiptPlainText(
   lines.push('')
   for (const i of order.items) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
-    const lineTotal = (i.product.price + choicesTotal) * i.quantity
-    lines.push(`${i.quantity}x ${i.product.name}  €${lineTotal.toFixed(2)}`)
+    const charge = retailItemPromoNote(i.product, i.quantity, choicesTotal, {
+      thirdFree: labels.promoThirdFree || 'derde gratis',
+      line: labels.promoLine || '{buy}+{free} · {count} gratis',
+    })
+    lines.push(`${i.quantity}x ${i.product.name}  €${charge.payable.toFixed(2)}`)
+    if (charge.note) lines.push(`  ${charge.note}`)
   }
   lines.push('', `${labels.total}  €${order.total.toFixed(2)}`, '')
   lines.push(labels.thanks)
