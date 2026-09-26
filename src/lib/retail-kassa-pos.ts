@@ -220,15 +220,23 @@ export async function completeRetailSale(
     }
   }
 
-  for (const line of lines) {
-    if (!line.sku.track_stock) continue
-    const nextQty = Math.max(0, line.sku.stock_quantity - line.quantity)
-    await updateSkuStock(tenantSlug, line.sku, nextQty, undefined, { skipCatalogRefresh: true })
-  }
-  invalidateRetailPosSkuCache(tenantSlug)
-
   syncZReportAfterOrderSafe(tenantSlug, createdAt.toISOString())
   return { ok: true, orderNumber, orderId }
+}
+
+/** Absolute voorraad wegschrijven nadat de bon al getoond is. Geen catalogus-refresh. */
+export async function commitRetailStockQty(
+  tenantSlug: string,
+  sku: RetailPosSku,
+  nextQty: number,
+): Promise<boolean> {
+  const res = await updateSkuStock(tenantSlug, sku, nextQty, undefined, { skipCatalogRefresh: true })
+  if (!res.ok) {
+    console.warn('[retail-kassa] voorraad niet bijgewerkt', sku.lineKey, res.error)
+    return false
+  }
+  invalidateRetailPosSkuCache(tenantSlug)
+  return true
 }
 
 /** @deprecated gebruik completeRetailSale */

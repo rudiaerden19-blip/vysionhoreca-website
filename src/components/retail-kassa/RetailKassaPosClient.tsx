@@ -58,6 +58,7 @@ import {
 import {
   applyRetailGoodsReceipt,
   applyRetailStockScanIncrement,
+  commitRetailStockQty,
   completeRetailSale,
   createRetailSkuFromScan,
   fetchRetailPosSkus,
@@ -71,7 +72,7 @@ import {
   type RetailCartLine,
   type RetailPosSku,
 } from '@/lib/retail-kassa-pos'
-import { patchSkuInList } from '@/lib/retail-pos-catalog'
+import { patchSkuInList, planRetailSaleStockWrites } from '@/lib/retail-pos-catalog'
 import { createRetailWedgeSession, normalizeRetailWedgeCode } from '@/lib/retail-barcode-wedge'
 import {
   parseRetailCsvText,
@@ -313,6 +314,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const priceFixNameInputRef = useRef<HTMLInputElement>(null)
   const priceFixInputRef = useRef<HTMLInputElement>(null)
   const skusRef = useRef<RetailPosSku[]>([])
+  const payLockRef = useRef(false)
+  const stockSyncChainRef = useRef(Promise.resolve())
+  const stockSyncGenRef = useRef(0)
   const stockBusyRef = useRef(false)
   const csvImportInputRef = useRef<HTMLInputElement>(null)
   const excelImportInputRef = useRef<HTMLInputElement>(null)
@@ -361,6 +365,10 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     skusRef.current = skus
   }, [skus])
+
+  useEffect(() => {
+    if (cart.length === 0) payLockRef.current = false
+  }, [cart.length])
 
   useEffect(() => {
     return () => {
@@ -1739,14 +1747,40 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     }
   }
 
+  function syncSoldStockInBackground(lines: RetailCartLine[]) {
+    const planned = planRetailSaleStockWrites(skusRef.current, lines)
+    skusRef.current = planned.catalog
+    setSkus(planned.catalog)
+    const gen = ++stockSyncGenRef.current
+    stockSyncChainRef.current = stockSyncChainRef.current
+      .then(async () => {
+        let ok = true
+        for (const write of planned.writes) {
+          const wrote = await commitRetailStockQty(tenant, write.sku, write.nextQty)
+          if (!wrote) ok = false
+        }
+        if (!ok || gen !== stockSyncGenRef.current) return
+        try {
+          const list = await fetchRetailPosSkus(tenant, { fresh: true })
+          if (gen !== stockSyncGenRef.current) return
+          setSkus(list)
+          skusRef.current = list
+        } catch (err) {
+          console.warn('[retail-kassa] catalogus na verkoop', err)
+        }
+      })
+      .catch((err) => {
+        console.warn('[retail-kassa] voorraad na verkoop', err)
+      })
+  }
+
   async function completePayment(
     method: KassaPaymentMethod,
     splitAmounts?: { cash: number; card: number },
   ) {
-    if (cart.length === 0 || paying) return
+    if (cart.length === 0 || paying || payLockRef.current) return
     if (blockSaleWithoutStaffIfNeeded()) return
     const linesSnapshot = [...cart]
-    const grossTotal = linesSnapshot.reduce((s, l) => s + l.sku.price * l.quantity, 0)
     const discountEuro =
       loyaltyRedeemPoints > 0
         ? computeRetailLoyaltyRedeemEuroDiscount(
@@ -1761,95 +1795,109 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const saleCustomerEmail = linkedLoyaltyMember?.email?.trim().toLowerCase() || null
     const redeemPointsForSale =
       loyaltyMemberId && loyaltyRedeemPoints > 0 ? loyaltyRedeemPoints : 0
+    payLockRef.current = true
     setPaying(true)
-    const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts, {
-      loyaltyMemberId,
-      loyaltyDiscountEuro: discountEuro,
-      loyaltyRedeemPoints: redeemPointsForSale,
-      kassaStaffId: activeKassaStaff?.id ?? null,
-      storeCreditId: linkedStoreCredit?.id ?? null,
-      storeCreditEuro: storeCreditEuro > 0 ? storeCreditEuro : undefined,
-    })
-    setPaying(false)
-    setShowPaymentModal(false)
-    setShowSplitModal(false)
-    if (!res.ok) {
-      alert(t('retailKassaPage.payError'))
-      return
-    }
-    const orderNumber = res.orderNumber ?? 0
+    let paid = false
+    try {
+      const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts, {
+        loyaltyMemberId,
+        loyaltyDiscountEuro: discountEuro,
+        loyaltyRedeemPoints: redeemPointsForSale,
+        kassaStaffId: activeKassaStaff?.id ?? null,
+        storeCreditId: linkedStoreCredit?.id ?? null,
+        storeCreditEuro: storeCreditEuro > 0 ? storeCreditEuro : undefined,
+      })
+      setShowPaymentModal(false)
+      setShowSplitModal(false)
+      if (!res.ok) {
+        alert(t('retailKassaPage.payError'))
+        return
+      }
+      const orderNumber = res.orderNumber ?? 0
 
-    let retailLoyaltyOnReceipt: KassaLastOrderReceipt['retailLoyalty'] | undefined
-    if (loyaltyMemberId && loyaltyMemberSnapshot) {
-      try {
-        const settleRes = await authFetch('/api/retail/loyalty/settle', {
-          method: 'POST',
-          body: JSON.stringify({
-            tenantSlug: tenant,
-            memberId: loyaltyMemberId,
-            orderTotal,
-            orderNumber: orderNumber > 0 ? orderNumber : undefined,
-            redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
-          }),
-        })
-        const settleJson = (await settleRes.json()) as {
-          ok?: boolean
-          balance?: number
-          earned?: number
-          redeemed?: number
+      const receipt = buildRetailLastOrderReceipt(
+        linesSnapshot,
+        method,
+        orderNumber,
+        tenantInfo?.btw_percentage ?? 21,
+        splitAmounts,
+        discountEuro > 0 ? discountEuro : undefined,
+        activeKassaStaff?.name ?? null,
+      )
+      if (loyaltyMemberSnapshot) {
+        const memberLabel =
+          loyaltyMemberSnapshot.display_name?.trim() ||
+          loyaltyMemberSnapshot.customer_name?.trim() ||
+          loyaltyMemberSnapshot.card_code
+        receipt.retailLoyalty = {
+          memberLabel,
+          pointsEarned: 0,
+          pointsRedeemed: redeemPointsForSale,
+          pointsBalance: loyaltyMemberSnapshot.points_balance,
         }
-        if (settleJson.ok && settleJson.balance != null) {
-          retailLoyaltyOnReceipt = {
-            memberLabel:
-              loyaltyMemberSnapshot.display_name?.trim() || loyaltyMemberSnapshot.card_code,
-            pointsEarned: settleJson.earned ?? 0,
-            pointsRedeemed: settleJson.redeemed ?? 0,
-            pointsBalance: settleJson.balance,
+      }
+      const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot)
+      if (customerInvoice) {
+        receipt.retailCustomerInvoice = customerInvoice
+      }
+      setLastOrderReceipt(receipt)
+      setLastSaleCustomerEmail(saleCustomerEmail && saleCustomerEmail.includes('@') ? saleCustomerEmail : null)
+      setLoyaltyRedeemPoints(0)
+      setLinkedLoyaltyMember(null)
+      setLinkedStoreCredit(null)
+      setCart([])
+      paid = true
+      setSelectedListLineKey(null)
+      setLastScannedSku(null)
+      setShowSuccessModal(true)
+      focusBarcodeCapture()
+      syncSoldStockInBackground(linesSnapshot)
+
+      if (loyaltyMemberId && loyaltyMemberSnapshot && orderNumber > 0) {
+        const memberLabel =
+          loyaltyMemberSnapshot.display_name?.trim() ||
+          loyaltyMemberSnapshot.customer_name?.trim() ||
+          loyaltyMemberSnapshot.card_code
+        void (async () => {
+          try {
+            const settleRes = await authFetch('/api/retail/loyalty/settle', {
+              method: 'POST',
+              body: JSON.stringify({
+                tenantSlug: tenant,
+                memberId: loyaltyMemberId,
+                orderTotal,
+                orderNumber,
+                redeemPoints: redeemPointsForSale > 0 ? redeemPointsForSale : undefined,
+              }),
+            })
+            const settleJson = (await settleRes.json()) as {
+              ok?: boolean
+              balance?: number
+              earned?: number
+              redeemed?: number
+            }
+            if (!settleJson.ok || settleJson.balance == null) return
+            setLastOrderReceipt((prev) => {
+              if (!prev || prev.orderNumber !== orderNumber) return prev
+              return {
+                ...prev,
+                retailLoyalty: {
+                  memberLabel,
+                  pointsEarned: settleJson.earned ?? 0,
+                  pointsRedeemed: settleJson.redeemed ?? 0,
+                  pointsBalance: settleJson.balance as number,
+                },
+              }
+            })
+          } catch {
+            /* bon blijft op de stand van vóór de punten */
           }
-        }
-      } catch {
-        /* bon zonder loyaliteitblok als settle faalt */
+        })()
       }
+    } finally {
+      if (!paid) payLockRef.current = false
+      setPaying(false)
     }
-
-    const receipt = buildRetailLastOrderReceipt(
-      linesSnapshot,
-      method,
-      orderNumber,
-      tenantInfo?.btw_percentage ?? 21,
-      splitAmounts,
-      discountEuro > 0 ? discountEuro : undefined,
-      activeKassaStaff?.name ?? null,
-    )
-    if (retailLoyaltyOnReceipt) {
-      receipt.retailLoyalty = retailLoyaltyOnReceipt
-    } else if (loyaltyMemberSnapshot) {
-      const memberLabel =
-        loyaltyMemberSnapshot.display_name?.trim() ||
-        loyaltyMemberSnapshot.customer_name?.trim() ||
-        loyaltyMemberSnapshot.card_code
-      receipt.retailLoyalty = {
-        memberLabel,
-        pointsEarned: 0,
-        pointsRedeemed: redeemPointsForSale,
-        pointsBalance: loyaltyMemberSnapshot.points_balance,
-      }
-    }
-    const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot)
-    if (customerInvoice) {
-      receipt.retailCustomerInvoice = customerInvoice
-    }
-    setLastOrderReceipt(receipt)
-    setLastSaleCustomerEmail(saleCustomerEmail && saleCustomerEmail.includes('@') ? saleCustomerEmail : null)
-    setLoyaltyRedeemPoints(0)
-    setLinkedLoyaltyMember(null)
-    setLinkedStoreCredit(null)
-    setCart([])
-    setSelectedListLineKey(null)
-    setLastScannedSku(null)
-    setShowSuccessModal(true)
-    focusBarcodeCapture()
-    void reload({ fresh: true })
   }
 
   const performLogout = () => {

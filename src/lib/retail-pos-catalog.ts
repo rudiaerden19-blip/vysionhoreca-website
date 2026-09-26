@@ -336,3 +336,21 @@ export function retailSkuInStock(sku: RetailPosSku, addQty: number): boolean {
 export function patchSkuInList(skus: RetailPosSku[], next: RetailPosSku): RetailPosSku[] {
   return skus.map((s) => (s.lineKey === next.lineKey ? next : s))
 }
+
+/** Voorraad na een verkoop: lokale stand meteen omlaag, server schrijft die absolute aantallen later. */
+export function planRetailSaleStockWrites(
+  catalog: RetailPosSku[],
+  lines: RetailCartLine[],
+): { catalog: RetailPosSku[]; writes: { sku: RetailPosSku; nextQty: number }[] } {
+  let nextCatalog = catalog
+  const writes: { sku: RetailPosSku; nextQty: number }[] = []
+  for (const line of lines) {
+    if (!line.sku.track_stock || line.quantity <= 0) continue
+    const current = nextCatalog.find((s) => s.lineKey === line.sku.lineKey) ?? line.sku
+    const nextQty = Math.max(0, current.stock_quantity - line.quantity)
+    const next: RetailPosSku = { ...current, stock_quantity: nextQty, track_stock: true }
+    nextCatalog = patchSkuInList(nextCatalog, next)
+    writes.push({ sku: next, nextQty })
+  }
+  return { catalog: nextCatalog, writes }
+}
