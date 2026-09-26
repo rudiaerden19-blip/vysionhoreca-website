@@ -16,6 +16,7 @@ import {
   useKassaUiLayoutSync,
 } from '@/lib/kassa-register-ui-dark-preference'
 import {
+  RETAIL_GRAY_BTN_FACE,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutChromeBtnClass,
   kassaLayoutHamburgerMenuHeaderBg,
@@ -3008,7 +3009,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         key={key}
                         type="button"
                         data-retail-numpad-key={key}
-                        className={ui.numpadKeyNum}
+                        className={
+                          kassaLayout === 'light'
+                            ? ui.numpadKeyNum
+                            : `${RETAIL_GRAY_BTN_FACE} min-h-[2.75rem] font-bold text-xl touch-manipulation select-none`
+                        }
                       >
                         {key}
                       </button>

@@ -7,14 +7,18 @@ import {
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
-  kassaPosButtonClass,
   kassaPosCheckoutButtonClass,
-  kassaPosQuickMenuPanelButtonClass,
   kassaPosRaisedStripClass,
   type KassaPosChromeLook,
 } from '@/lib/kassa-pos-surface'
 
-/** Retail Light: website-blauw (`--primary`). Klassiek blijft gunmetal. Horeca-kassa gebruikt deze constants niet. */
+/** Retail-knoppen op donkere layouts: lichter grijs dan het espresso-vlak. Alleen winkelkassa. */
+export const RETAIL_GRAY_BTN_FACE =
+  'rounded-xl border border-[#6a6a6a] bg-[#5a5a5a] text-[#f3f3f3] shadow-[0_3px_8px_rgba(0,0,0,0.4)] hover:bg-[#686868] active:bg-[#4e4e4e]'
+export const RETAIL_GRAY_BTN_FACE_ON =
+  'rounded-xl border border-[#8d8d8d] bg-[#707070] text-white shadow-[0_3px_8px_rgba(0,0,0,0.4)] ring-2 ring-white/65 hover:bg-[#7a7a7a]'
+
+/** Retail Light: website-blauw (`--primary`). Horeca-kassa gebruikt deze constants niet. */
 export const KASSA_LIGHT_BTN_FACE = 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
 export const KASSA_LIGHT_BTN_FACE_ON =
   'bg-[#3C4D6B] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]'
@@ -50,23 +54,17 @@ export function kassaLayoutHeaderBarClass(layout: KassaUiLayoutId): string {
 }
 
 export function kassaLayoutChromeBtnClass(layout: KassaUiLayoutId, selected: boolean): string {
-  if (kassaUiLayoutUsesPosLuxury(layout)) {
-    return kassaPosButtonClass(selected, kassaLayoutPosChrome(layout))
-  }
   if (layout === 'light') {
     return `rounded-xl ${selected ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
   }
-  return `rounded-xl ${selected ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
+  return selected ? RETAIL_GRAY_BTN_FACE_ON : RETAIL_GRAY_BTN_FACE
 }
 
 export function kassaLayoutQuickMenuTileClass(layout: KassaUiLayoutId): string {
-  if (kassaUiLayoutUsesPosLuxury(layout)) {
-    return kassaPosQuickMenuPanelButtonClass(kassaLayoutPosChrome(layout))
+  if (layout === 'light') {
+    return `rounded-xl ${KASSA_LIGHT_BTN_FACE} ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`
   }
-  if (layout === 'dark') {
-    return `rounded-xl ${KASSA_CLASSIC_ACTION_BTN_FACE} active:brightness-95`
-  }
-  return `rounded-xl ${KASSA_LIGHT_BTN_FACE} ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`
+  return RETAIL_GRAY_BTN_FACE
 }
 
 export function kassaLayoutCheckoutBtnClass(layout: KassaUiLayoutId): string {
@@ -98,8 +96,8 @@ export function kassaLayoutHamburgerMenuHeaderBg(layout: KassaUiLayoutId): strin
 export function kassaLayoutHeaderQuickLinkClass(layout: KassaUiLayoutId): string {
   const shell =
     'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
-  if (kassaUiLayoutUsesPosLuxury(layout)) {
-    return `${shell} ${kassaPosButtonClass(false, kassaLayoutPosChrome(layout))}`
+  if (kassaUiLayoutUsesPosLuxury(layout) || layout === 'dark') {
+    return `${shell} ${RETAIL_GRAY_BTN_FACE}`
   }
   if (layout === 'light') {
     return `${shell} rounded-xl font-bold ${KASSA_LIGHT_BTN_FACE}`
