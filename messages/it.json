@@ -6176,6 +6176,11 @@
       "sm_retail_kassa_producten": "Articoli",
       "sm_retail_product_intake": "Scan with phone",
       "sm_retail_loyalty": "Tessera negozio e punti",
+      "sm_retail_aankoop": "Prezzo d'acquisto e marca",
+      "sm_retail_barcodes": "Codici extra",
+      "sm_retail_stock_log": "Storico magazzino",
+      "sm_retail_suppliers": "Fornitori",
+      "sm_retail_purchase_orders": "Ordini d'acquisto",
       "sm_voorraad_beheer": "Gestione magazzino",
       "sm_voorraad_producten": "Articoli"
     }
@@ -6410,6 +6415,10 @@
     "loyaltyLinked": "Tessera: {name}",
     "loyaltyPointsBalance": "{points} punti",
     "loyaltyUnlink": "Scollega",
+    "lineDiscount": "Sconto articolo",
+    "ticketDiscount": "Sconto scontrino",
+    "invoiceButton": "Fattura",
+    "giftCardLinked": "Buono regalo €{amount}",
     "loyaltyEarnedToast": "+{points} punti — saldo {balance}",
     "trayTileLoyaltyAdmin": "Crea carta cliente",
     "loyaltyRedeemOpen": "Usa punti",

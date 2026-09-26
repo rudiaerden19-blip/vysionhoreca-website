@@ -700,6 +700,20 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     return validOrders.filter(o => new Date(o.created_at) >= from)
   }, [validOrders, lastZGeneratedAt])
 
+  const xVat = useMemo(
+    () =>
+      aggregateZReportVatFromOrderRows(
+        xOrders.map((o) => ({
+          total: o.total,
+          items: (o as { items?: unknown }).items,
+          order_type: o.order_type,
+        })),
+        tenantInfo?.btw_percentage ?? 6,
+        vatContext,
+      ),
+    [xOrders, tenantInfo?.btw_percentage, vatContext],
+  )
+
   const xData = useMemo(() => {
     const total = xOrders.reduce((s,o)=>s+o.total,0)
     let cash = 0
@@ -709,10 +723,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       cash += d.cash
       card += d.card + d.online
     }
-    const tax = xOrders.reduce((s,o)=>s+o.tax,0)
+    const tax = xVat.totalTax
     const discounts = xOrders.reduce((s,o)=>s+(o.discount_amount||0),0)
     return { count:xOrders.length, total, cash, card, tax, discounts, expectedCash: openingCash+cash }
-  }, [xOrders, openingCash])
+  }, [xOrders, openingCash, xVat.totalTax])
 
   // ── Z-rapport genereren ──
   const generateZReport = async () => {
@@ -997,7 +1011,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   // ── X-rapport printen ──
   const printXReport = () => {
-    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const vatRows = [
+      xVat.tax_low ? `<div class="row"><span>BTW 6%</span><span>${fmt(xVat.tax_low)}</span></div>` : '',
+      xVat.tax_mid ? `<div class="row"><span>BTW 9% / 12%</span><span>${fmt(xVat.tax_mid)}</span></div>` : '',
+      xVat.tax_high ? `<div class="row"><span>BTW 21%</span><span>${fmt(xVat.tax_high)}</span></div>` : '',
+    ].join('')
     const html = `<!DOCTYPE html><html><head><title>X-Rapport</title>
     <style>body{font-family:'Courier New',monospace;font-size:13px;max-width:400px;margin:0 auto;padding:20px}
     h1{font-size:18px;text-align:center;border-bottom:2px solid #000;padding-bottom:8px}
@@ -1014,8 +1032,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     <div class="row"><span> Contant</span><span>${fmt(xData.cash)}</span></div>
     <div class="row"><span> PIN/Kaart</span><span>${fmt(xData.card)}</span></div>
     <div class="divider"></div>
-    <div class="row"><span>Excl. BTW</span><span>${fmt(xData.total-xData.tax)}</span></div>
-    <div class="row"><span>BTW ${vatRate}%</span><span>${fmt(xData.tax)}</span></div>
+    <div class="row"><span>Excl. BTW</span><span>${fmt(xVat.subtotalExcl)}</span></div>
+    ${vatRows || `<div class="row"><span>BTW</span><span>${fmt(xVat.totalTax)}</span></div>`}
     <div class="divider"></div>
     <div class="row total"><span>TOTAAL</span><span>${fmt(xData.total)}</span></div>
     <div class="divider"></div>
@@ -1432,7 +1450,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <p className="text-sm text-gray-400 mb-2">BTW Totaal</p>
-                <p className="text-2xl font-bold text-gray-900">{fmt(xData.tax)}</p>
+                <p className="text-2xl font-bold text-gray-900">{fmt(xVat.totalTax)}</p>
+                <p className="mt-2 text-xs text-gray-500">
+                  6% {fmt(xVat.tax_low)} · 9/12% {fmt(xVat.tax_mid)} · 21% {fmt(xVat.tax_high)}
+                </p>
               </div>
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <p className="text-sm text-gray-400 mb-2">Kortingen</p>

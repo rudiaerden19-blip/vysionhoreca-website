@@ -16,6 +16,8 @@ import {
 import { authFetch } from '@/lib/auth-headers'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { allocateRetailPromoCharges } from '@/lib/retail-promo'
+import { priceRetailSale, type RetailDiscount, type RetailSalePrice } from '@/lib/retail-sale-pricing'
+import { normalizeCategoryVatPercent } from '@/lib/order-vat'
 import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import type { RetailImportRow } from '@/lib/retail-product-import'
 
@@ -107,22 +109,17 @@ async function updateSkuStock(
   return updated ? { ok: true, sku: updated } : { ok: true, sku }
 }
 
-export async function completeRetailSale(
-  tenantSlug: string,
+export function priceRetailCart(
   lines: RetailCartLine[],
-  method: KassaPaymentMethod,
-  splitAmounts?: { cash: number; card: number },
   options?: {
-    loyaltyMemberId?: string | null
     loyaltyDiscountEuro?: number
-    loyaltyRedeemPoints?: number
-    kassaStaffId?: string | null
-    storeCreditId?: string | null
     storeCreditEuro?: number
+    giftCardEuro?: number
+    customerPercent?: number
+    ticketDiscount?: RetailDiscount | null
+    tenantVatRate?: number
   },
-): Promise<{ ok: boolean; orderNumber?: number; orderId?: string; error?: string }> {
-  if (lines.length === 0) return { ok: false, error: 'empty_cart'}
-
+): RetailSalePrice {
   const promoCharges = allocateRetailPromoCharges(
     lines.map((l) => ({
       key: l.sku.lineKey,
@@ -136,14 +133,62 @@ export async function completeRetailSale(
       promoPartnerId: l.sku.promoPartnerId,
     })),
   )
-  const grossTotal = lines.reduce((s, l) => s + (promoCharges.get(l.sku.lineKey)?.payable ?? 0), 0)
-  const loyaltyDiscountRaw = Math.max(0, options?.loyaltyDiscountEuro ?? 0)
-  const afterLoyalty = Math.max(0, grossTotal - loyaltyDiscountRaw)
-  const creditRaw = Math.max(0, options?.storeCreditEuro ?? 0)
-  const creditApplied = Math.round(Math.min(creditRaw, afterLoyalty) * 100) / 100
-  const discount = Math.round(Math.min(loyaltyDiscountRaw, grossTotal) * 100) / 100
-  const totalDiscount = Math.round((discount + creditApplied) * 100) / 100
-  const roundedTotal = Math.round((grossTotal - totalDiscount) * 100) / 100
+  const fallbackRate = normalizeCategoryVatPercent(options?.tenantVatRate ?? 21, 21)
+  return priceRetailSale(
+    lines.map((l) => ({
+      key: l.sku.lineKey,
+      payableAfterPromo: promoCharges.get(l.sku.lineKey)?.payable ?? 0,
+      vatRate: normalizeCategoryVatPercent(l.sku.vatRate ?? fallbackRate, fallbackRate),
+      lineDiscount: l.lineDiscount,
+    })),
+    {
+      customerPercent: options?.customerPercent,
+      ticketDiscount: options?.ticketDiscount,
+      loyaltyEuro: options?.loyaltyDiscountEuro,
+      creditEuro: (options?.storeCreditEuro ?? 0) + (options?.giftCardEuro ?? 0),
+    },
+  )
+}
+
+export async function completeRetailSale(
+  tenantSlug: string,
+  lines: RetailCartLine[],
+  method: KassaPaymentMethod,
+  splitAmounts?: { cash: number; card: number },
+  options?: {
+    loyaltyMemberId?: string | null
+    loyaltyDiscountEuro?: number
+    loyaltyRedeemPoints?: number
+    kassaStaffId?: string | null
+    storeCreditId?: string | null
+    storeCreditEuro?: number
+    giftCardId?: string | null
+    giftCardEuro?: number
+    customerPercent?: number
+    ticketDiscount?: RetailDiscount | null
+    tenantVatRate?: number
+    invoiceNumber?: string | null
+  },
+): Promise<{ ok: boolean; orderNumber?: number; orderId?: string; error?: string; priced?: RetailSalePrice }> {
+  if (lines.length === 0) return { ok: false, error: 'empty_cart'}
+
+  const beforeCredit = priceRetailCart(lines, {
+    ...options,
+    storeCreditEuro: 0,
+    giftCardEuro: 0,
+  })
+  const storeApplied =
+    Math.round(Math.min(Math.max(0, options?.storeCreditEuro ?? 0), beforeCredit.total) * 100) / 100
+  const giftApplied =
+    Math.round(
+      Math.min(Math.max(0, options?.giftCardEuro ?? 0), Math.max(0, beforeCredit.total - storeApplied)) * 100,
+    ) / 100
+  const priced = priceRetailCart(lines, {
+    ...options,
+    storeCreditEuro: storeApplied,
+    giftCardEuro: giftApplied,
+  })
+  const roundedTotal = priced.total
 
   if (method === 'SPLIT') {
     const sc = splitAmounts?.cash ?? 0
@@ -153,8 +198,8 @@ export async function completeRetailSale(
     }
   }
 
-  const subtotal = Math.round((roundedTotal / 1.21) * 100) / 100
-  const tax = Math.round((roundedTotal - subtotal) * 100) / 100
+  const subtotal = priced.subtotalExcl
+  const tax = priced.totalTax
   const createdAt = new Date()
   const kassa_client_uuid =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -172,21 +217,26 @@ export async function completeRetailSale(
     subtotal,
     tax,
     total: roundedTotal,
-    discount_amount: totalDiscount > 0 ? totalDiscount : 0,
-    items: lines.map((l) => ({
-      product_id: l.sku.productId,
-      variant_id: l.sku.variantId,
-      name: l.sku.name,
-      price: l.sku.price,
-      quantity: l.quantity,
-      promo_buy: l.sku.promoBuy ?? null,
-      promo_free: l.sku.promoFree ?? null,
-      line_total: promoCharges.get(l.sku.lineKey)?.payable ?? 0,
-      article_number: l.sku.article_number,
-      barcode: l.sku.barcode,
-      size_label: l.sku.size_label,
-      color_label: l.sku.color_label,
-    })),
+    discount_amount: priced.discountEuro > 0 ? priced.discountEuro : 0,
+    items: lines.map((l) => {
+      const row = priced.lines.find((p) => p.key === l.sku.lineKey)
+      return {
+        product_id: l.sku.productId,
+        variant_id: l.sku.variantId,
+        category_id: l.sku.category_id,
+        name: l.sku.name,
+        price: l.sku.price,
+        quantity: l.quantity,
+        promo_buy: l.sku.promoBuy ?? null,
+        promo_free: l.sku.promoFree ?? null,
+        line_total: row?.payable ?? 0,
+        btw_percentage: row?.vatRate ?? normalizeCategoryVatPercent(options?.tenantVatRate ?? 21, 21),
+        article_number: l.sku.article_number,
+        barcode: l.sku.barcode,
+        size_label: l.sku.size_label,
+        color_label: l.sku.color_label,
+      }
+    }),
     created_at: createdAt.toISOString(),
   }
 
@@ -205,11 +255,21 @@ export async function completeRetailSale(
     orderPayload.payment_split_cash = Math.round(splitAmounts.cash * 100) / 100
     orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
   }
+  if (options?.invoiceNumber) {
+    orderPayload.retail_invoice_number = options.invoiceNumber
+  }
 
-  const insRes = await adminDb.insert('orders', orderPayload, {
+  let insRes = await adminDb.insert('orders', orderPayload, {
     tenantSlug,
     select: 'id, order_number',
   })
+  if (!insRes.ok && options?.invoiceNumber && /retail_invoice_number/i.test(insRes.error || '')) {
+    delete orderPayload.retail_invoice_number
+    insRes = await adminDb.insert('orders', orderPayload, {
+      tenantSlug,
+      select: 'id, order_number',
+    })
+  }
 
   if (!insRes.ok) {
     return { ok: false, error: insRes.error || 'insert_failed'}
@@ -222,13 +282,13 @@ export async function completeRetailSale(
   const orderNumber = row?.order_number != null ? Number(row.order_number) : undefined
   const orderId = row?.id
 
-  if (creditApplied > 0 && options?.storeCreditId && orderId && orderNumber) {
+  if (storeApplied > 0 && options?.storeCreditId && orderId && orderNumber) {
     const redeemRes = await authFetch('/api/retail/store-credit/redeem', {
       method: 'POST',
       body: JSON.stringify({
         tenantSlug,
         creditId: options.storeCreditId,
-        amount: creditApplied,
+        amount: storeApplied,
         orderId,
         orderNumber,
       }),
@@ -239,8 +299,24 @@ export async function completeRetailSale(
     }
   }
 
+  if (giftApplied > 0 && options?.giftCardId && orderId) {
+    const giftRes = await authFetch('/api/retail/backoffice', {
+      method: 'POST',
+      body: JSON.stringify({
+        op: 'gift.redeem',
+        tenantSlug,
+        giftCardId: options.giftCardId,
+        amount: giftApplied,
+      }),
+    })
+    const giftJson = (await giftRes.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+    if (!giftRes.ok || !giftJson.ok) {
+      return { ok: false, error: giftJson.error || 'gift_card_redeem_failed', orderNumber, orderId, priced }
+    }
+  }
+
   syncZReportAfterOrderSafe(tenantSlug, createdAt.toISOString())
-  return { ok: true, orderNumber, orderId }
+  return { ok: true, orderNumber, orderId, priced }
 }
 
 /** Absolute voorraad wegschrijven nadat de bon al getoond is. Geen catalogus-refresh. */

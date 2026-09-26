@@ -270,6 +270,17 @@ export function isTenantSubmenuEffectiveOn(
     if (enabledJson.sm_retail_kassa_producten === true) return true
     if (enabledJson['retail-kassa'] === true) return true
   }
+  if (
+    subId === 'sm_retail_aankoop' ||
+    subId === 'sm_retail_barcodes' ||
+    subId === 'sm_retail_stock_log' ||
+    subId === 'sm_retail_suppliers' ||
+    subId === 'sm_retail_purchase_orders'
+  ) {
+    if (enabledJson[subId] === false) return false
+    if (enabledJson['retail-kassa'] === true || enabledJson.sm_retail_kassa_pos === true) return true
+  }
+  if (retailBackofficeSubmenuVisible(subId, enabledJson)) return true
   /** Op rekening: alleen expliciet aan via admin-slider (geen default voor alle kassa-zaken). */
   if (subId === 'sm_kassa_op_rekening') {
     if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return false
@@ -291,6 +302,26 @@ export function boekhoudingSubmenuVisible(
   if (enabledJson.sm_inst_boekhouding === false) return false
   if (enabledJson.sm_inst_boekhouding === true) return true
   return enabledJson.instellingen === true || enabledJson.sm_inst_betaling === true
+}
+
+const RETAIL_BACKOFFICE_SUBMENUS = [
+  'sm_retail_aankoop',
+  'sm_retail_barcodes',
+  'sm_retail_stock_log',
+  'sm_retail_suppliers',
+  'sm_retail_purchase_orders',
+] as const
+
+/** Nieuwe winkelmenu's volgen de winkelkassa zolang ze niet expliciet uit staan. */
+export function retailBackofficeSubmenuVisible(
+  subId: string,
+  enabledJson: Record<string, boolean> | null | undefined,
+): boolean {
+  if (!RETAIL_BACKOFFICE_SUBMENUS.includes(subId as (typeof RETAIL_BACKOFFICE_SUBMENUS)[number])) return false
+  if (!enabledJson) return false
+  if (enabledJson[subId] === false) return false
+  if (enabledJson[subId] === true) return true
+  return enabledJson['retail-kassa'] === true || enabledJson.sm_retail_kassa_pos === true
 }
 
 export function kasboekSubmenuVisible(
@@ -479,7 +510,7 @@ export function submenuParentAllowedForSubmenuId(
       moduleAccess.kassa || moduleAccess['retail-kassa'] || moduleAccess.voorraad
     )
   }
-  if (subId === 'sm_retail_loyalty') {
+  if (subId === 'sm_retail_loyalty' || retailBackofficeSubmenuVisible(subId, { 'retail-kassa': true })) {
     return moduleAccess['retail-kassa']
   }
   if (
@@ -507,7 +538,15 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
 
   if (rest === '/' || rest === '') return { kind: 'always'}
   if (rest.startsWith('/welkom')) return { kind: 'always'}
-  if (rest.startsWith('/retail-kassa') || rest.startsWith('/retail-loyalty')) {
+  if (
+    rest.startsWith('/retail-kassa') ||
+    rest.startsWith('/retail-loyalty') ||
+    rest.startsWith('/retail-aankoop') ||
+    rest.startsWith('/retail-barcodes') ||
+    rest.startsWith('/retail-voorraadlog') ||
+    rest.startsWith('/retail-leveranciers') ||
+    rest.startsWith('/retail-bestelbonnen')
+  ) {
     return { kind: 'module', module: 'retail-kassa'}
   }
   if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa'}

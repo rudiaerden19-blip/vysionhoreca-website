@@ -22,7 +22,7 @@ const SETTINGS_SELECT =
 const MEMBER_SELECT =
   'id, tenant_slug, card_code, display_name, phone, email, shop_customer_id, points_balance, is_active'
 const MEMBER_PROFILE_SELECT =
-  `${MEMBER_SELECT}, first_name, last_name, address, postal_code, city, btw_number`
+  `${MEMBER_SELECT}, first_name, last_name, address, postal_code, city, btw_number, discount_percent`
 
 export async function getRetailLoyaltySettings(tenantSlug: string): Promise<RetailLoyaltySettings> {
   const supabase = getServerSupabaseClient()
@@ -229,6 +229,7 @@ export async function listRetailLoyaltyCardHolders(
     postal_code?: string | null
     city?: string | null
     btw_number?: string | null
+    discount_percent?: number | null
   }
 
   let memberQuery = supabase
@@ -239,7 +240,7 @@ export async function listRetailLoyaltyCardHolders(
   const profileRes = await memberQuery.order('display_name', { ascending: true }).limit(400)
   let rows = (profileRes.data ?? null) as LoyaltyListRow[] | null
   let error = profileRes.error
-  if (error && /first_name|last_name|address|postal_code|city|btw_number/i.test(error.message)) {
+  if (error && /first_name|last_name|address|postal_code|city|btw_number|discount_percent/i.test(error.message)) {
     let fallback = supabase
       .from('retail_loyalty_members')
       .select(MEMBER_SELECT)
@@ -292,6 +293,7 @@ export async function listRetailLoyaltyCardHolders(
       postal_code?: string | null
       city?: string | null
       btw_number?: string | null
+      discount_percent?: number | null
     }
     const split = splitCustomerFullName(customer?.name || row.display_name)
     const firstName = profile.first_name?.trim() || split.firstName
@@ -311,6 +313,10 @@ export async function listRetailLoyaltyCardHolders(
       customer_postal_code: profile.postal_code?.trim() || customer?.postal_code || null,
       customer_city: profile.city?.trim() || customer?.city || null,
       customer_btw_number: profile.btw_number?.trim() || customer?.btw_number?.trim() || null,
+      discount_percent:
+        profile.discount_percent == null || profile.discount_percent === ('' as unknown)
+          ? null
+          : Number(profile.discount_percent) || 0,
       is_active: row.is_active !== false,
     }
   })
@@ -860,6 +866,7 @@ export async function updateRetailLoyaltyMember(
     postal_code?: string | null
     city?: string | null
     btw_number?: string | null
+    discount_percent?: number | null
     is_active?: boolean
   },
 ): Promise<{ ok: boolean; error?: string }> {
@@ -894,6 +901,10 @@ export async function updateRetailLoyaltyMember(
     row.email = patch.email?.trim().toLowerCase() || null
   }
   if (patch.is_active !== undefined) row.is_active = patch.is_active
+  if (patch.discount_percent !== undefined) {
+    const pct = Number(patch.discount_percent)
+    row.discount_percent = Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : null
+  }
 
   const touchesCustomerFile =
     hasNameParts ||
@@ -975,7 +986,7 @@ export async function updateRetailLoyaltyMember(
     .update(row)
     .eq('tenant_slug', tenantSlug)
     .eq('id', memberId)
-  if (error && /first_name|last_name|address|postal_code|city|btw_number/i.test(error.message)) {
+  if (error && /first_name|last_name|address|postal_code|city|btw_number|discount_percent/i.test(error.message)) {
     const {
       first_name: _first,
       last_name: _last,
@@ -983,6 +994,7 @@ export async function updateRetailLoyaltyMember(
       postal_code: _postal,
       city: _city,
       btw_number: _btw,
+      discount_percent: _discount,
       ...withoutProfile
     } = row
     const again = await supabase

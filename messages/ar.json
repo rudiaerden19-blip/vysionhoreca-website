@@ -6176,6 +6176,11 @@
       "sm_retail_kassa_producten": "المنتجات",
       "sm_retail_product_intake": "Scan with phone",
       "sm_retail_loyalty": "Store pass & points",
+      "sm_retail_aankoop": "سعر الشراء والعلامة",
+      "sm_retail_barcodes": "رموز إضافية",
+      "sm_retail_stock_log": "سجل المخزون",
+      "sm_retail_suppliers": "الموردون",
+      "sm_retail_purchase_orders": "أوامر الشراء",
       "sm_voorraad_beheer": "إدارة المخزون",
       "sm_voorraad_producten": "المنتجات"
     }
@@ -6410,6 +6415,10 @@
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",
+    "lineDiscount": "خصم الصنف",
+    "ticketDiscount": "خصم الإيصال",
+    "invoiceButton": "فاتورة",
+    "giftCardLinked": "بطاقة هدية €{amount}",
     "loyaltyEarnedToast": "+{points} points — balance {balance}",
     "trayTileLoyaltyAdmin": "إنشاء بطاقة عميل",
     "loyaltyRedeemOpen": "Redeem points",

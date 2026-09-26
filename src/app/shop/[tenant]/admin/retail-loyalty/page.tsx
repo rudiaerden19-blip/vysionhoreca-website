@@ -42,6 +42,12 @@ function MemberManagePanel({
   const [postalCode, setPostalCode] = useState(member.customer_postal_code ?? '')
   const [city, setCity] = useState(member.customer_city ?? '')
   const [btwNumber, setBtwNumber] = useState(member.customer_btw_number ?? '')
+  const [discountPercent, setDiscountPercent] = useState(
+    member.discount_percent != null ? String(member.discount_percent) : '',
+  )
+  const [purchases, setPurchases] = useState<
+    { order_number?: number; total?: number; created_at?: string; retail_invoice_number?: string | null }[]
+  >([])
   const [saving, setSaving] = useState(false)
   const [adjustDelta, setAdjustDelta] = useState('')
   const [adjustNote, setAdjustNote] = useState('')
@@ -57,6 +63,15 @@ function MemberManagePanel({
     setPostalCode(member.customer_postal_code ?? '')
     setCity(member.customer_city ?? '')
     setBtwNumber(member.customer_btw_number ?? '')
+    setDiscountPercent(member.discount_percent != null ? String(member.discount_percent) : '')
+    void authFetch(
+      `/api/retail/backoffice?tenant=${encodeURIComponent(tenant)}&op=purchases&memberId=${encodeURIComponent(member.id)}`,
+    )
+      .then((r) => r.json())
+      .then((j: { orders?: { order_number?: number; total?: number; created_at?: string; retail_invoice_number?: string | null }[] }) =>
+        setPurchases(j.orders || []),
+      )
+      .catch(() => setPurchases([]))
   }, [
     member.id,
     member.customer_name,
@@ -87,6 +102,7 @@ function MemberManagePanel({
           postal_code: postalCode.trim() || null,
           city: city.trim() || null,
           btw_number: btwNumber.trim() || null,
+          discount_percent: discountPercent.trim() === '' ? null : Number(discountPercent.replace(',', '.')),
         }),
       })
       const json = (await res.json()) as { ok?: boolean }
@@ -199,6 +215,14 @@ function MemberManagePanel({
             className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
           />
           <input
+            type="text"
+            inputMode="decimal"
+            value={discountPercent}
+            onChange={(e) => setDiscountPercent(e.target.value)}
+            placeholder="Klantkorting %"
+            className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
+          />
+          <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -221,6 +245,19 @@ function MemberManagePanel({
         >
           {saving ? t('retailLoyalty.saving') : t('retailLoyalty.saveMember')}
         </button>
+        <div>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Aankopen</p>
+          <ul className="space-y-1 text-sm text-gray-700">
+            {purchases.length === 0 ? <li>Nog geen verkopen op deze kaart.</li> : null}
+            {purchases.map((order, i) => (
+              <li key={`${order.order_number}-${i}`}>
+                {order.created_at ? new Date(order.created_at).toLocaleString('nl-BE') : ''} · bon {order.order_number ?? '—'} · €
+                {Number(order.total || 0).toFixed(2)}
+                {order.retail_invoice_number ? ` · factuur ${order.retail_invoice_number}` : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div>

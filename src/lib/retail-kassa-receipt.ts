@@ -9,6 +9,7 @@ import {
 } from '@/lib/print-receipt-html'
 import type { RetailCartLine } from '@/lib/retail-kassa-pos'
 import { allocateRetailPromoCharges } from '@/lib/retail-promo'
+import type { RetailSalePrice } from '@/lib/retail-sale-pricing'
 import {
   buildRetailKassaReceiptHtmlBody,
   buildRetailThermalBonLines as buildRetailThermalBonLinesCore,
@@ -103,6 +104,7 @@ export function buildRetailLastOrderReceipt(
   splitAmounts?: { cash: number; card: number },
   loyaltyDiscountEuro?: number,
   helpedByStaffName?: string | null,
+  priced?: RetailSalePrice | null,
 ): KassaLastOrderReceipt {
   const promoCharges = allocateRetailPromoCharges(
     lines.map((l) => ({
@@ -119,10 +121,16 @@ export function buildRetailLastOrderReceipt(
   )
   const gross = Math.round(lines.reduce((s, l) => s + (promoCharges.get(l.sku.lineKey)?.payable ?? 0), 0) * 100) / 100
   const discount = Math.round(Math.min(Math.max(0, loyaltyDiscountEuro ?? 0), gross) * 100) / 100
-  const total = Math.round((gross - discount) * 100) / 100
+  const total = priced ? priced.total : Math.round((gross - discount) * 100) / 100
   const vatRate = normalizeCategoryVatPercent(tenantDefaultBtw, 21)
-  const subtotal = Math.round((total / (1 + vatRate / 100)) * 100) / 100
-  const tax = Math.round((total - subtotal) * 100) / 100
+  const subtotal = priced
+    ? priced.subtotalExcl
+    : Math.round((total / (1 + vatRate / 100)) * 100) / 100
+  const tax = priced ? priced.totalTax : Math.round((total - subtotal) * 100) / 100
+  const vatSplit =
+    priced && priced.vatSplit.length > 0
+      ? priced.vatSplit
+      : [{ rate: vatRate, baseExcl: subtotal, tax }]
   return {
     orderNumber,
     items: lines.map((line) =>
@@ -131,7 +139,7 @@ export function buildRetailLastOrderReceipt(
     total,
     subtotalExclVat: subtotal,
     totalTax: tax,
-    vatSplit: [{ rate: vatRate, baseExcl: subtotal, tax }],
+    vatSplit,
     paymentMethod: method,
     splitCash: method === 'SPLIT'? splitAmounts?.cash : undefined,
     splitCard: method === 'SPLIT'? splitAmounts?.card : undefined,

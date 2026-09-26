@@ -34,4 +34,5 @@ export type RetailLoyaltyMemberPos = RetailLoyaltyMemberPublic & {
   customer_postal_code?: string | null
   customer_city?: string | null
   customer_btw_number?: string | null
+  discount_percent?: number | null
 }

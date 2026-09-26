@@ -60,6 +60,7 @@ import {
   applyRetailStockScanIncrement,
   commitRetailStockQty,
   completeRetailSale,
+  priceRetailCart,
   createRetailSkuFromScan,
   fetchRetailPosSkus,
   importRetailProductsBatch,
@@ -100,6 +101,10 @@ import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
+import { resolveVatRateForOrderItem } from '@/lib/order-vat'
+import { buildZReportVatContext } from '@/lib/z-report-vat-context'
+import { supabase } from '@/lib/supabase'
+import type { RetailDiscount } from '@/lib/retail-sale-pricing'
 import { extractRetailLoyaltyScanCode } from '@/lib/retail-loyalty/card-code'
 import {
   retailCardHolderMatchesQuery,
@@ -377,6 +382,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [loyaltyRedeemModalOpen, setLoyaltyRedeemModalOpen] = useState(false)
   const [loyaltyRedeemDraft, setLoyaltyRedeemDraft] = useState('')
   const [linkedStoreCredit, setLinkedStoreCredit] = useState<RetailStoreCreditPos | null>(null)
+  const [linkedGiftCard, setLinkedGiftCard] = useState<{
+    id: string
+    code: string
+    remaining_amount: number
+  } | null>(null)
+  const [ticketDiscount, setTicketDiscount] = useState<RetailDiscount | null>(null)
+  const [wantInvoice, setWantInvoice] = useState(false)
+  const [discountOpen, setDiscountOpen] = useState<null | 'line' | 'ticket'>(null)
+  const [discountKind, setDiscountKind] = useState<'percent' | 'amount'>('percent')
+  const [discountDraft, setDiscountDraft] = useState('')
+  const [saleCategories, setSaleCategories] = useState<
+    { id?: string | null; name?: string | null; default_btw_percentage?: number | null }[]
+  >([])
   const [exchangeOrderNumberDraft, setExchangeOrderNumberDraft] = useState('')
   const [exchangeOrderLines, setExchangeOrderLines] = useState<RetailOrderLineForReturn[] | null>(
     null,
@@ -390,6 +408,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const list = await fetchRetailPosSkus(tenant, options?.fresh ? { fresh: true } : undefined)
     setSkus(list)
     skusRef.current = list
+    if (supabase) {
+      const { data } = await supabase
+        .from('menu_categories')
+        .select('id, name, default_btw_percentage')
+        .eq('tenant_slug', tenant)
+      if (data) setSaleCategories(data)
+    }
     setLoading(false)
   }, [tenant])
 
@@ -584,15 +609,65 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
 
   const storeCreditEuro = useMemo(() => {
     if (!linkedStoreCredit) return 0
-    const afterLoyalty = Math.max(0, cartTotal - loyaltyDiscountEuro)
-    const cap = Math.min(linkedStoreCredit.amount_remaining, afterLoyalty)
-    return Math.round(cap * 100) / 100
-  }, [cartTotal, loyaltyDiscountEuro, linkedStoreCredit])
+    return Math.round(Math.max(0, linkedStoreCredit.amount_remaining) * 100) / 100
+  }, [linkedStoreCredit])
 
-  const payTotal = useMemo(
-    () => Math.round(Math.max(0, cartTotal - loyaltyDiscountEuro - storeCreditEuro) * 100) / 100,
-    [cartTotal, loyaltyDiscountEuro, storeCreditEuro],
+  const saleVatContext = useMemo(
+    () =>
+      buildZReportVatContext(
+        saleCategories,
+        skus.map((sku) => ({ id: sku.productId, category_id: sku.category_id, name: sku.name })),
+        tenantInfo?.country,
+        tenantInfo?.btw_number,
+        tenantInfo?.btw_percentage,
+      ),
+    [saleCategories, skus, tenantInfo],
   )
+
+  const cartForPrice = useMemo(
+    () =>
+      cart.map((line) => ({
+        ...line,
+        sku: {
+          ...line.sku,
+          vatRate: resolveVatRateForOrderItem(
+            {
+              name: line.sku.name,
+              product_id: line.sku.productId,
+              category_id: line.sku.category_id,
+            },
+            tenantInfo?.btw_percentage ?? 21,
+            'TAKEAWAY',
+            saleVatContext,
+          ),
+        },
+      })),
+    [cart, saleVatContext, tenantInfo?.btw_percentage],
+  )
+
+  const customerPercent = Number(linkedLoyaltyMember?.discount_percent) || 0
+  const salePrice = useMemo(
+    () =>
+      priceRetailCart(cartForPrice, {
+        loyaltyDiscountEuro,
+        storeCreditEuro,
+        giftCardEuro: linkedGiftCard?.remaining_amount ?? 0,
+        customerPercent,
+        ticketDiscount,
+        tenantVatRate: tenantInfo?.btw_percentage ?? 21,
+      }),
+    [
+      cartForPrice,
+      loyaltyDiscountEuro,
+      storeCreditEuro,
+      linkedGiftCard,
+      customerPercent,
+      ticketDiscount,
+      tenantInfo?.btw_percentage,
+    ],
+  )
+
+  const payTotal = salePrice.total
 
   const exchangeCreditIssueTotal = useMemo(() => {
     if (!exchangeOrderLines) return 0
@@ -1476,6 +1551,22 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       stockBusyRef.current = true
       setStockBusy(true)
       try {
+        const known = resolveRetailSkuLookup(skusRef.current, trimmed)
+        if (known) {
+          addToCart(known, 1)
+          return
+        }
+        const giftRes = await authFetch(
+          `/api/retail/backoffice?tenant=${encodeURIComponent(tenant)}&op=gift&code=${encodeURIComponent(trimmed)}`,
+        )
+        const gift = (await giftRes.json()) as {
+          ok?: boolean
+          card?: { id: string; code: string; remaining_amount: number }
+        }
+        if (gift.ok && gift.card) {
+          setLinkedGiftCard(gift.card)
+          return
+        }
         const hit = await resolveOrImportSku(trimmed)
         if (hit) addToCart(hit, 1)
         else alert(t('retailKassaPage.autoScanImportError'))
@@ -1509,6 +1600,23 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         }
         replaceSkuInCatalog(res.sku)
         pushStockActivity(res.sku, 1, 'stockCount')
+        void authFetch('/api/retail/backoffice', {
+          method: 'POST',
+          body: JSON.stringify({
+            op: 'stock.record',
+            tenantSlug: tenant,
+            lines: [{
+              productId: res.sku.productId,
+              variantId: res.sku.variantId,
+              skuName: res.sku.name,
+              reason: 'count',
+              delta: 1,
+              quantityAfter: res.sku.stock_quantity,
+              quantityBefore: res.sku.stock_quantity - 1,
+              lowStockThreshold: res.sku.low_stock_threshold,
+            }],
+          }),
+        }).catch(() => undefined)
       } else {
         const res = await applyRetailGoodsReceipt(tenant, hit, payload)
         if (!res.ok || !res.sku) {
@@ -1517,6 +1625,23 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         }
         replaceSkuInCatalog(res.sku)
         pushStockActivity(res.sku, payload.quantity, 'goodsReceipt')
+        void authFetch('/api/retail/backoffice', {
+          method: 'POST',
+          body: JSON.stringify({
+            op: 'stock.record',
+            tenantSlug: tenant,
+            lines: [{
+              productId: res.sku.productId,
+              variantId: res.sku.variantId,
+              skuName: res.sku.name,
+              reason: 'goods_receipt',
+              delta: payload.quantity,
+              quantityAfter: res.sku.stock_quantity,
+              quantityBefore: res.sku.stock_quantity - payload.quantity,
+              lowStockThreshold: res.sku.low_stock_threshold,
+            }],
+          }),
+        }).catch(() => undefined)
       }
     } finally {
       settleBarcodeScan()
@@ -1704,6 +1829,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     if (cart.length === 0) return
     playClick()
     setCart([])
+    setTicketDiscount(null)
     setSelectedListLineKey(null)
     setLastScannedSku(null)
     setPriceFixSku(null)
@@ -1973,10 +2099,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setDraftBonPrinting(true)
     try {
       const draftOrder = buildRetailLastOrderReceipt(
-        cart,
+        cartForPrice,
         'CARD',
         0,
         tenantInfo?.btw_percentage ?? 21,
+        undefined,
+        undefined,
+        null,
+        salePrice,
       )
       await printRetailReceipt(draftOrder, true)
     } finally {
@@ -1996,6 +2126,25 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         for (const write of planned.writes) {
           const wrote = await commitRetailStockQty(tenant, write.sku, write.nextQty)
           if (!wrote) ok = false
+        }
+        if (ok) {
+          void authFetch('/api/retail/backoffice', {
+            method: 'POST',
+            body: JSON.stringify({
+              op: 'stock.record',
+              tenantSlug: tenant,
+              lines: planned.writes.map((write) => ({
+                productId: write.sku.productId,
+                variantId: write.sku.variantId,
+                skuName: write.sku.name,
+                reason: 'sale',
+                delta: write.delta,
+                quantityAfter: write.nextQty,
+                quantityBefore: write.nextQty - write.delta,
+                lowStockThreshold: write.sku.low_stock_threshold,
+              })),
+            }),
+          }).catch(() => undefined)
         }
         if (!ok || gen !== stockSyncGenRef.current) return
         try {
@@ -2018,7 +2167,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   ) {
     if (cart.length === 0 || paying || payLockRef.current) return
     if (blockSaleWithoutStaffIfNeeded()) return
-    const linesSnapshot = [...cart]
+    const linesSnapshot = cartForPrice.map((line) => ({ ...line, sku: { ...line.sku } }))
     const discountEuro =
       loyaltyRedeemPoints > 0
         ? computeRetailLoyaltyRedeemEuroDiscount(
@@ -2037,6 +2186,15 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setPaying(true)
     let paid = false
     try {
+      let invoiceNumber: string | null = null
+      if (wantInvoice) {
+        const invRes = await authFetch('/api/retail/backoffice', {
+          method: 'POST',
+          body: JSON.stringify({ op: 'invoice.next', tenantSlug: tenant }),
+        })
+        const inv = (await invRes.json()) as { ok?: boolean; number?: string }
+        if (inv.ok && inv.number) invoiceNumber = inv.number
+      }
       const res = await completeRetailSale(tenant, linesSnapshot, method, splitAmounts, {
         loyaltyMemberId,
         loyaltyDiscountEuro: discountEuro,
@@ -2044,6 +2202,12 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         kassaStaffId: activeKassaStaff?.id ?? null,
         storeCreditId: linkedStoreCredit?.id ?? null,
         storeCreditEuro: storeCreditEuro > 0 ? storeCreditEuro : undefined,
+        giftCardId: linkedGiftCard?.id ?? null,
+        giftCardEuro: linkedGiftCard?.remaining_amount,
+        customerPercent,
+        ticketDiscount,
+        tenantVatRate: tenantInfo?.btw_percentage ?? 21,
+        invoiceNumber,
       })
       setShowPaymentModal(false)
       setShowSplitModal(false)
@@ -2059,8 +2223,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         orderNumber,
         tenantInfo?.btw_percentage ?? 21,
         splitAmounts,
-        discountEuro > 0 ? discountEuro : undefined,
+        undefined,
         activeKassaStaff?.name ?? null,
+        res.priced,
       )
       if (loyaltyMemberSnapshot) {
         const memberLabel =
@@ -2074,15 +2239,25 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
           pointsBalance: loyaltyMemberSnapshot.points_balance,
         }
       }
-      const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot)
-      if (customerInvoice) {
+      if (wantInvoice) {
+        const customerInvoice = retailCustomerInvoiceFromLoyaltyMember(loyaltyMemberSnapshot) || {
+          name:
+            loyaltyMemberSnapshot?.customer_name?.trim() ||
+            loyaltyMemberSnapshot?.display_name?.trim() ||
+            'Factuur',
+          vatNumber: loyaltyMemberSnapshot?.customer_btw_number?.trim() || '',
+        }
         receipt.retailCustomerInvoice = customerInvoice
+        if (invoiceNumber) receipt.checkoutReference = invoiceNumber
       }
       setLastOrderReceipt(receipt)
       setLastSaleCustomerEmail(saleCustomerEmail && saleCustomerEmail.includes('@') ? saleCustomerEmail : null)
       setLoyaltyRedeemPoints(0)
       setLinkedLoyaltyMember(null)
       setLinkedStoreCredit(null)
+      setLinkedGiftCard(null)
+      setTicketDiscount(null)
+      setWantInvoice(false)
       setCart([])
       paid = true
       setSelectedListLineKey(null)
@@ -3264,6 +3439,22 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               </div>
             ) : null}
 
+            {linkedGiftCard ? (
+              <div className={`mx-3 mb-1 shrink-0 rounded-lg border border-amber-300/40 px-3 py-2 sm:mx-4 ${kassaRecessTrayClass}`}>
+                <p className="text-sm font-semibold text-amber-100">
+                  {t('retailKassaPage.giftCardLinked').replace('{amount}', linkedGiftCard.remaining_amount.toFixed(2))}
+                </p>
+                <p className="text-xs text-white/60">{linkedGiftCard.code}</p>
+                <button
+                  type="button"
+                  className="mt-1 text-xs font-semibold text-white/80 underline"
+                  onClick={() => setLinkedGiftCard(null)}
+                >
+                  {t('retailKassaPage.storeCreditUnlink')}
+                </button>
+              </div>
+            ) : null}
+
             {loyaltyEnabled && loyaltyScanFeedback ? (
               <div
                 role="alert"
@@ -3724,9 +3915,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                     }`}
                   >
                     {mode === 'sales'
-                      ? loyaltyDiscountEuro > 0 || storeCreditEuro > 0
-                        ? `€${payTotal.toFixed(2)}`
-                        : `€${cartTotal.toFixed(2)}`
+                      ? `€${payTotal.toFixed(2)}`
                       : mode === 'exchangeCredit'
                         ? `€${exchangeCreditIssueTotal.toFixed(2)}`
                         : String(stockActivity.reduce((s, r) => s + r.delta, 0))}
@@ -3748,6 +3937,72 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </p>
                 ) : null}
               </div>
+              {mode === 'sales' ? (
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    disabled={!selectedListLineKey}
+                    onClick={() => {
+                      setDiscountOpen('line')
+                      setDiscountDraft('')
+                    }}
+                    className={`px-2 py-2 text-xs font-bold ${kassaLayoutChromeBtnClass(kassaLayout, false)}`}
+                  >
+                    {t('retailKassaPage.lineDiscount')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={cart.length === 0}
+                    onClick={() => {
+                      setDiscountOpen('ticket')
+                      setDiscountDraft('')
+                    }}
+                    className={`px-2 py-2 text-xs font-bold ${kassaLayoutChromeBtnClass(kassaLayout, false)}`}
+                  >
+                    {t('retailKassaPage.ticketDiscount')}
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={wantInvoice}
+                    onClick={() => setWantInvoice((v) => !v)}
+                    className={`px-2 py-2 text-xs font-bold ${kassaLayoutChromeBtnClass(kassaLayout, wantInvoice)}`}
+                  >
+                    {t('retailKassaPage.invoiceButton')}
+                  </button>
+                </div>
+              ) : null}
+              {discountOpen ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <button type="button" className="rounded-lg bg-white/10 px-2 py-1 text-xs text-white" onClick={() => setDiscountKind('percent')}>%</button>
+                  <button type="button" className="rounded-lg bg-white/10 px-2 py-1 text-xs text-white" onClick={() => setDiscountKind('amount')}>€</button>
+                  <input
+                    value={discountDraft}
+                    onChange={(e) => setDiscountDraft(e.target.value)}
+                    inputMode="decimal"
+                    className="w-24 rounded-lg px-2 py-1 text-black"
+                  />
+                  <button
+                    type="button"
+                    className="rounded-lg bg-white px-3 py-1 text-xs font-bold text-black"
+                    onClick={() => {
+                      const value = Number(discountDraft.replace(',', '.'))
+                      if (!Number.isFinite(value) || value <= 0) return
+                      const discount: RetailDiscount = { kind: discountKind, value }
+                      if (discountOpen === 'ticket') setTicketDiscount(discount)
+                      else if (selectedListLineKey) {
+                        setCart((prev) =>
+                          prev.map((line) =>
+                            line.sku.lineKey === selectedListLineKey ? { ...line, lineDiscount: discount } : line,
+                          ),
+                        )
+                      }
+                      setDiscountOpen(null)
+                    }}
+                  >
+                    OK
+                  </button>
+                </div>
+              ) : null}
               <div className="grid grid-cols-3 touch-manipulation select-none gap-3">
                 {mode === 'sales'? (
                   <>

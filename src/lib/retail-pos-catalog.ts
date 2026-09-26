@@ -18,6 +18,9 @@ export type RetailPosSku = {
   stock_quantity: number
   low_stock_threshold: number
   category_id: string | null
+  /** Tarief dat de kassa op deze regel rekent. Leeg = tarief van de zaak. */
+  vatRate?: number | null
+  extraBarcodes?: string[]
   /** Koop X, Y gratis. Null = geen promo. */
   promoBuy?: number | null
   promoFree?: number | null
@@ -29,6 +32,7 @@ export type RetailPosSku = {
 export type RetailCartLine = {
   sku: RetailPosSku
   quantity: number
+  lineDiscount?: { kind: 'percent' | 'amount'; value: number } | null
 }
 
 const PRODUCT_SELECT =
@@ -192,10 +196,26 @@ async function fetchRetailPosSkusFromDb(tenantSlug: string): Promise<RetailPosSk
   if (varRes.error) {
     console.warn('[retail-pos] variants:', varRes.error.message)
   }
-  return buildRetailSkusFromRows(
+  const skus = buildRetailSkusFromRows(
     (prodRes.data || []) as ProductRow[],
     (varRes.data || []) as VariantRow[],
   )
+  const extra = await supabase
+    .from('retail_product_barcodes')
+    .select('product_id, variant_id, barcode')
+    .eq('tenant_slug', tenantSlug)
+  if (extra.error) return skus
+  for (const row of extra.data ?? []) {
+    const code = String(row.barcode || '').trim()
+    if (!code) continue
+    for (const sku of skus) {
+      if (sku.productId !== row.product_id) continue
+      if (row.variant_id && sku.variantId !== row.variant_id) continue
+      if (!row.variant_id && sku.variantId) continue
+      sku.extraBarcodes = [...(sku.extraBarcodes ?? []), code]
+    }
+  }
+  return skus
 }
 
 export function invalidateRetailPosSkuCache(tenantSlug: string): void {
@@ -247,7 +267,8 @@ export function retailBarcodeLookupCandidates(raw: string): string[] {
 function skuMatchesCode(sku: RetailPosSku, lowerCode: string): boolean {
   return (
     (!!sku.barcode && sku.barcode.toLowerCase() === lowerCode) ||
-    (!!sku.article_number && sku.article_number.toLowerCase() === lowerCode)
+    (!!sku.article_number && sku.article_number.toLowerCase() === lowerCode) ||
+    (sku.extraBarcodes ?? []).some((code) => code.toLowerCase() === lowerCode)
   )
 }
 
@@ -412,16 +433,16 @@ export function patchSkuInList(skus: RetailPosSku[], next: RetailPosSku): Retail
 export function planRetailSaleStockWrites(
   catalog: RetailPosSku[],
   lines: RetailCartLine[],
-): { catalog: RetailPosSku[]; writes: { sku: RetailPosSku; nextQty: number }[] } {
+): { catalog: RetailPosSku[]; writes: { sku: RetailPosSku; nextQty: number; delta: number }[] } {
   let nextCatalog = catalog
-  const writes: { sku: RetailPosSku; nextQty: number }[] = []
+  const writes: { sku: RetailPosSku; nextQty: number; delta: number }[] = []
   for (const line of lines) {
     if (!line.sku.track_stock || line.quantity <= 0) continue
     const current = nextCatalog.find((s) => s.lineKey === line.sku.lineKey) ?? line.sku
     const nextQty = Math.max(0, current.stock_quantity - line.quantity)
     const next: RetailPosSku = { ...current, stock_quantity: nextQty, track_stock: true }
     nextCatalog = patchSkuInList(nextCatalog, next)
-    writes.push({ sku: next, nextQty })
+    writes.push({ sku: next, nextQty, delta: nextQty - current.stock_quantity })
   }
   return { catalog: nextCatalog, writes }
 }

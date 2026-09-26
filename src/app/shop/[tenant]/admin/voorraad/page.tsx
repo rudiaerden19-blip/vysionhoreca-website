@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { authFetch } from '@/lib/auth-headers'
 import { adminDb } from '@/lib/admin-db-client'
 import { getMenuCategories, MenuCategory } from '@/lib/admin-api'
 import { buildRetailSkusFromRows, type RetailPosSku } from '@/lib/retail-pos-catalog'
@@ -111,6 +112,29 @@ export default function VoorraadPage({ params }: { params: { tenant: string } })
     if (!r.ok) {
       alert(`${t('stockPage.saveFailed')}: ${r.error}`)
     } else {
+      if (patch.stock_quantity != null) {
+        const next = Number(patch.stock_quantity)
+        const delta = next - sku.stock_quantity
+        if (delta !== 0) {
+          void authFetch('/api/retail/backoffice', {
+            method: 'POST',
+            body: JSON.stringify({
+              op: 'stock.record',
+              tenantSlug: tenant,
+              lines: [{
+                productId: sku.productId,
+                variantId: sku.variantId,
+                skuName: sku.name,
+                reason: 'correction',
+                delta,
+                quantityAfter: next,
+                quantityBefore: sku.stock_quantity,
+                lowStockThreshold: Number(patch.low_stock_threshold ?? sku.low_stock_threshold),
+              }],
+            }),
+          }).catch(() => undefined)
+        }
+      }
       await loadData()
     }
     setSaving(null)

@@ -6176,6 +6176,11 @@
       "sm_retail_kassa_producten": "商品",
       "sm_retail_product_intake": "Scan with phone",
       "sm_retail_loyalty": "Store pass & points",
+      "sm_retail_aankoop": "仕入価格とブランド",
+      "sm_retail_barcodes": "追加バーコード",
+      "sm_retail_stock_log": "在庫履歴",
+      "sm_retail_suppliers": "仕入先",
+      "sm_retail_purchase_orders": "発注書",
       "sm_voorraad_beheer": "在庫管理",
       "sm_voorraad_producten": "商品"
     }
@@ -6410,6 +6415,10 @@
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",
+    "lineDiscount": "商品割引",
+    "ticketDiscount": "レシート割引",
+    "invoiceButton": "請求書",
+    "giftCardLinked": "ギフトカード €{amount}",
     "loyaltyEarnedToast": "+{points} points — balance {balance}",
     "trayTileLoyaltyAdmin": "顧客カードを作成",
     "loyaltyRedeemOpen": "Redeem points",

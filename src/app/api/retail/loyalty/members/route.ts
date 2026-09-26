@@ -54,6 +54,7 @@ const PatchSchema = z.object({
   postal_code: z.string().max(20).nullable().optional(),
   city: z.string().max(255).nullable().optional(),
   btw_number: z.string().max(50).nullable().optional(),
+  discount_percent: z.number().min(0).max(100).nullable().optional(),
   is_active: z.boolean().optional(),
 })
 
@@ -135,6 +136,7 @@ export async function PATCH(req: NextRequest) {
     postal_code,
     city,
     btw_number,
+    discount_percent,
     is_active,
   } = parsed.data
   const access = await verifyTenantOrSuperAdmin(req, tenantSlug)
@@ -152,6 +154,7 @@ export async function PATCH(req: NextRequest) {
     postal_code,
     city,
     btw_number,
+    discount_percent,
     is_active,
   })
   if (!res.ok) {

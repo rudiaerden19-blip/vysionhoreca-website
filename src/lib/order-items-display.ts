@@ -51,6 +51,11 @@ export function orderItemLineTotalEur(item: unknown): number {
   if (!item || typeof item !== 'object') return 0
   const o = item as Record<string, unknown>
   const q = Number(o.quantity) || 1
+  const lineTotal = o.line_total
+  if (typeof lineTotal === 'number' && Number.isFinite(lineTotal)) return lineTotal
+  if (typeof lineTotal === 'string' && lineTotal.trim() !== '' && Number.isFinite(Number(lineTotal))) {
+    return Number(lineTotal)
+  }
   const tp = o.total_price
   if (tp != null && !Number.isNaN(Number(tp))) return Number(tp)
 

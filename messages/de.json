@@ -6199,6 +6199,11 @@
       "sm_retail_kassa_producten": "Artikel",
       "sm_retail_product_intake": "Mit Handy scannen",
       "sm_retail_loyalty": "Shopkarte & Punkte",
+      "sm_retail_aankoop": "Einkaufspreis und Marke",
+      "sm_retail_barcodes": "Extra-Barcodes",
+      "sm_retail_stock_log": "Bestandsverlauf",
+      "sm_retail_suppliers": "Lieferanten",
+      "sm_retail_purchase_orders": "Bestellungen",
       "sm_voorraad_beheer": "Lagerverwaltung",
       "sm_voorraad_producten": "Artikel"
     }
@@ -6433,6 +6438,10 @@
     "loyaltyLinked": "Karte: {name}",
     "loyaltyPointsBalance": "{points} Punkte",
     "loyaltyUnlink": "Trennen",
+    "lineDiscount": "Artikelrabatt",
+    "ticketDiscount": "Bonrabatt",
+    "invoiceButton": "Rechnung",
+    "giftCardLinked": "Gutschein €{amount}",
     "loyaltyEarnedToast": "+{points} Punkte — Stand {balance}",
     "trayTileLoyaltyAdmin": "Kundenkarte anlegen",
     "loyaltyRedeemOpen": "Punkte einlösen",

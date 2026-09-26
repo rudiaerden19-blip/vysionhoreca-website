@@ -6176,6 +6176,11 @@
       "sm_retail_kassa_producten": "商品",
       "sm_retail_product_intake": "Scan with phone",
       "sm_retail_loyalty": "Store pass & points",
+      "sm_retail_aankoop": "进价和品牌",
+      "sm_retail_barcodes": "额外条码",
+      "sm_retail_stock_log": "库存记录",
+      "sm_retail_suppliers": "供应商",
+      "sm_retail_purchase_orders": "采购单",
       "sm_voorraad_beheer": "库存管理",
       "sm_voorraad_producten": "商品"
     }
@@ -6410,6 +6415,10 @@
     "loyaltyLinked": "Pass: {name}",
     "loyaltyPointsBalance": "{points} points",
     "loyaltyUnlink": "Unlink",
+    "lineDiscount": "单品折扣",
+    "ticketDiscount": "整单折扣",
+    "invoiceButton": "发票",
+    "giftCardLinked": "礼品卡 €{amount}",
     "loyaltyEarnedToast": "+{points} points — balance {balance}",
     "trayTileLoyaltyAdmin": "创建客户卡",
     "loyaltyRedeemOpen": "Redeem points",

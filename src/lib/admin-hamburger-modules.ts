@@ -10,6 +10,7 @@ import {
   isTenantSubmenuEffectiveOn,
   boekhoudingSubmenuVisible,
   kasboekSubmenuVisible,
+  retailBackofficeSubmenuVisible,
   parseEnabledModulesJson,
   submenuParentAllowedForSubmenuId,
   TENANT_MODULE_IDS,
@@ -295,6 +296,41 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           label: 'Winkelpas',
           labelKey: itemLabelKey('sm_retail_loyalty'),
           href: `${baseUrl}/retail-loyalty`,
+        },
+        {
+          id: 'sm_retail_aankoop',
+          icon: '',
+          label: 'Aankoopprijs en merk',
+          labelKey: itemLabelKey('sm_retail_aankoop'),
+          href: `${baseUrl}/retail-aankoop`,
+        },
+        {
+          id: 'sm_retail_barcodes',
+          icon: '',
+          label: 'Extra barcodes',
+          labelKey: itemLabelKey('sm_retail_barcodes'),
+          href: `${baseUrl}/retail-barcodes`,
+        },
+        {
+          id: 'sm_retail_stock_log',
+          icon: '',
+          label: 'Voorraadgeschiedenis',
+          labelKey: itemLabelKey('sm_retail_stock_log'),
+          href: `${baseUrl}/retail-voorraadlog`,
+        },
+        {
+          id: 'sm_retail_suppliers',
+          icon: '',
+          label: 'Leveranciers',
+          labelKey: itemLabelKey('sm_retail_suppliers'),
+          href: `${baseUrl}/retail-leveranciers`,
+        },
+        {
+          id: 'sm_retail_purchase_orders',
+          icon: '',
+          label: 'Bestelbonnen',
+          labelKey: itemLabelKey('sm_retail_purchase_orders'),
+          href: `${baseUrl}/retail-bestelbonnen`,
         },
       ],
     },
@@ -800,6 +836,17 @@ export function isAdminSubmenuEnabled(
     ) {
       return true
     }
+    if (
+      (subId === 'sm_retail_aankoop' ||
+        subId === 'sm_retail_barcodes' ||
+        subId === 'sm_retail_stock_log' ||
+        subId === 'sm_retail_suppliers' ||
+        subId === 'sm_retail_purchase_orders') &&
+      enabledJson[subId] !== false &&
+      (enabledJson['retail-kassa'] === true || enabledJson.sm_retail_kassa_pos === true)
+    ) {
+      return true
+    }
     if (subId === 'sm_kassa_op_rekening') {
       return enabledJson.sm_kassa_op_rekening === true
     }
@@ -890,6 +937,17 @@ export function hasShopAdminPathAccess(
     }
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true
+    if (
+      (subId === 'sm_retail_aankoop' ||
+        subId === 'sm_retail_barcodes' ||
+        subId === 'sm_retail_stock_log' ||
+        subId === 'sm_retail_suppliers' ||
+        subId === 'sm_retail_purchase_orders') &&
+      enabledModulesJson[subId] !== false &&
+      (enabledModulesJson['retail-kassa'] === true || enabledModulesJson.sm_retail_kassa_pos === true)
+    ) {
+      return true
+    }
     return false
   }
   const gate = adminPathToModule(pathname, tenantSlug)
@@ -957,6 +1015,17 @@ export function filterHamburgerModulesForAccess(
             item.id === 'sm_retail_product_intake' &&
             (enabledModulesJson.sm_retail_kassa_producten === true ||
               enabledModulesJson['retail-kassa'] === true)
+          ) {
+            return true
+          }
+          if (
+            (item.id === 'sm_retail_aankoop' ||
+              item.id === 'sm_retail_barcodes' ||
+              item.id === 'sm_retail_stock_log' ||
+              item.id === 'sm_retail_suppliers' ||
+              item.id === 'sm_retail_purchase_orders') &&
+            enabledModulesJson[item.id] !== false &&
+            (enabledModulesJson['retail-kassa'] === true || enabledModulesJson.sm_retail_kassa_pos === true)
           ) {
             return true
           }
