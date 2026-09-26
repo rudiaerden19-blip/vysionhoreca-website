@@ -228,8 +228,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const scanRef = useRef<HTMLInputElement>(null)
   const articleSearchActiveRef = useRef(false)
   const barcodeCaptureRef = useRef<HTMLInputElement>(null)
-  /** Tik op een knop mag het scanveld niet meteen terugpakken (anders slikt iPad de klik). */
-  const barcodeTapGuardRef = useRef(false)
   const scanBarRef = useRef<HTMLDivElement>(null)
   const cartScrollRef = useRef<HTMLDivElement>(null)
   const listScrollTargetRef = useRef<string | null>(null)
@@ -1818,13 +1816,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       className="relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
       data-testid="retail-kassa-app"
       data-kassa-layout={kassaLayout}
-      onPointerDownCapture={(e) => {
-        const node = e.target
-        if (!(node instanceof Element)) return
-        const control = node.closest('button, a, input, textarea, select, label, [role="button"]')
-        if (!control || control === barcodeCaptureRef.current) return
-        barcodeTapGuardRef.current = true
-      }}
     >
       {kassaLayout === 'luxe' ? (
         <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
@@ -2541,35 +2532,17 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <input
               ref={barcodeCaptureRef}
               type="text"
-              inputMode="none"
               tabIndex={-1}
               autoComplete="off"
               aria-hidden
               onKeyDown={onBarcodeWedgeKeyDown}
-              onBlur={(e) => {
+              onBlur={() => {
                 if (priceFixSku || articleSearchActiveRef.current) return
                 if (stockBusyRef.current) return
-                const next = e.relatedTarget
-                if (
-                  next instanceof Element &&
-                  next.closest('button, a, input, textarea, select, [role="button"]')
-                ) {
-                  return
-                }
                 const ae = document.activeElement
                 if (ae === scanRef.current) return
                 if (ae && ae !== document.body && ae !== barcodeCaptureRef.current) return
-                window.setTimeout(() => {
-                  if (barcodeTapGuardRef.current) {
-                    barcodeTapGuardRef.current = false
-                    window.setTimeout(() => {
-                      if (articleSearchActiveRef.current) return
-                      focusBarcodeCapture()
-                    }, 280)
-                    return
-                  }
-                  releaseScanFocus()
-                }, 80)
+                window.setTimeout(() => releaseScanFocus(), 80)
               }}
               className="fixed left-0 top-0 h-px w-px opacity-0 overflow-hidden"
               aria-label={t('retailKassaPage.scanPlaceholder')}
