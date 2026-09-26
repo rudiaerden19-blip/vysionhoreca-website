@@ -883,6 +883,14 @@ export async function deleteRetailLoyaltyMember(
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, error: 'db_unavailable'}
 
+  const { data: existing, error: loadErr } = await supabase
+    .from('retail_loyalty_members')
+    .select('id, shop_customer_id')
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', memberId)
+    .maybeSingle()
+  if (loadErr || !existing) return { ok: false, error: loadErr?.message || 'member_not_found' }
+
   const { error } = await supabase
     .from('retail_loyalty_members')
     .delete()
@@ -890,6 +898,24 @@ export async function deleteRetailLoyaltyMember(
     .eq('id', memberId)
 
   if (error) return { ok: false, error: error.message }
+
+  const customerId = existing.shop_customer_id
+  if (!customerId) return { ok: true }
+
+  const { count, error: countError } = await supabase
+    .from('retail_loyalty_members')
+    .select('id', { count: 'exact', head: true })
+    .eq('tenant_slug', tenantSlug)
+    .eq('shop_customer_id', customerId)
+  if (countError) return { ok: false, error: countError.message }
+  if (count) return { ok: true }
+
+  const { error: customerError } = await supabase
+    .from('shop_customers')
+    .delete()
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', customerId)
+  if (customerError) return { ok: false, error: customerError.message }
   return { ok: true }
 }
 

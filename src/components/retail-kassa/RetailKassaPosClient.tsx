@@ -94,7 +94,10 @@ import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
 import { extractRetailLoyaltyScanCode } from '@/lib/retail-loyalty/card-code'
-import { retailCardHolderMatchesQuery } from '@/lib/retail-loyalty/card-holder-search'
+import {
+  retailCardHolderMatchesQuery,
+  splitCustomerFullName,
+} from '@/lib/retail-loyalty/card-holder-search'
 import { isRetailStoreCreditScan } from '@/lib/retail-store-credit/code'
 import type { RetailOrderLineForReturn, RetailStoreCreditPos } from '@/lib/retail-store-credit/types'
 import {
@@ -348,6 +351,19 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [customerQuery, setCustomerQuery] = useState('')
   const [cardHolders, setCardHolders] = useState<RetailLoyaltyMemberPos[]>([])
   const [customerListLoading, setCustomerListLoading] = useState(false)
+  const [customerDeletingId, setCustomerDeletingId] = useState<string | null>(null)
+  const [customerEditSaving, setCustomerEditSaving] = useState(false)
+  const [customerEdit, setCustomerEdit] = useState<{
+    memberId: string
+    firstName: string
+    lastName: string
+    street: string
+    postalCode: string
+    city: string
+    btwNumber: string
+    phone: string
+    email: string
+  } | null>(null)
   const [loyaltyScanFeedback, setLoyaltyScanFeedback] = useState<string | null>(null)
   const loyaltyScanFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [loyaltyRedeemPoints, setLoyaltyRedeemPoints] = useState(0)
@@ -1205,9 +1221,97 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setLoyaltyRedeemPoints(0)
     setCustomerListOpen(false)
     setCustomerQuery('')
+    setCustomerEdit(null)
     if (mode !== 'sales') switchMode('sales')
     else playClick()
     flashAddOkButton()
+  }
+
+  function openCustomerEdit(member: RetailLoyaltyMemberPos) {
+    playClick()
+    const parts = splitCustomerFullName(member.customer_name || member.display_name)
+    setCustomerEdit({
+      memberId: member.id,
+      firstName: parts.firstName,
+      lastName: parts.lastName,
+      street: member.customer_address ?? '',
+      postalCode: member.customer_postal_code ?? '',
+      city: member.customer_city ?? '',
+      btwNumber: member.customer_btw_number ?? '',
+      phone: member.phone ?? '',
+      email: member.email ?? '',
+    })
+  }
+
+  async function saveCustomerEdit() {
+    if (!customerEdit) return
+    setCustomerEditSaving(true)
+    try {
+      const res = await authFetch('/api/retail/loyalty/members', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          tenantSlug: tenant,
+          memberId: customerEdit.memberId,
+          first_name: customerEdit.firstName.trim(),
+          last_name: customerEdit.lastName.trim(),
+          phone: customerEdit.phone.trim() || null,
+          email: customerEdit.email.trim() || null,
+          address: customerEdit.street.trim() || null,
+          postal_code: customerEdit.postalCode.trim() || null,
+          city: customerEdit.city.trim() || null,
+          btw_number: customerEdit.btwNumber.trim() || null,
+        }),
+      })
+      const json = (await res.json()) as { ok?: boolean }
+      if (!res.ok || !json.ok) {
+        alert(t('retailKassaPage.customersSaveError'))
+        return
+      }
+      const memberId = customerEdit.memberId
+      setCustomerEdit(null)
+      const listRes = await authFetch(
+        `/api/retail/loyalty/members?tenant=${encodeURIComponent(tenant)}`,
+      )
+      const data = (await listRes.json()) as { ok?: boolean; members?: RetailLoyaltyMemberPos[] }
+      const next = listRes.ok && data.ok && Array.isArray(data.members) ? data.members : cardHolders
+      setCardHolders(next)
+      const fresh = next.find((row) => row.id === memberId)
+      setLinkedLoyaltyMember((current) =>
+        current?.id === memberId ? fresh ?? current : current,
+      )
+    } catch {
+      alert(t('retailKassaPage.customersSaveError'))
+    } finally {
+      setCustomerEditSaving(false)
+    }
+  }
+
+  async function deleteCardHolder(member: RetailLoyaltyMemberPos) {
+    const name = cardHolderLabel(member)
+    if (!window.confirm(t('retailKassaPage.customersDeleteConfirm').replace('{name}', name))) return
+    playClick()
+    setCustomerDeletingId(member.id)
+    try {
+      const res = await authFetch('/api/retail/loyalty/members', {
+        method: 'DELETE',
+        body: JSON.stringify({ tenantSlug: tenant, memberId: member.id }),
+      })
+      const json = (await res.json()) as { ok?: boolean }
+      if (!res.ok || !json.ok) {
+        alert(t('retailKassaPage.customersDeleteError'))
+        return
+      }
+      setCardHolders((list) => list.filter((row) => row.id !== member.id))
+      if (customerEdit?.memberId === member.id) setCustomerEdit(null)
+      if (linkedLoyaltyMember?.id === member.id) {
+        setLinkedLoyaltyMember(null)
+        setLoyaltyRedeemPoints(0)
+      }
+    } catch {
+      alert(t('retailKassaPage.customersDeleteError'))
+    } finally {
+      setCustomerDeletingId(null)
+    }
   }
 
   function cardHolderLabel(member: RetailLoyaltyMemberPos): string {
@@ -2352,6 +2456,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                 onClick={() => {
                   playClick()
                   setCustomerListOpen(false)
+                  setCustomerEdit(null)
                 }}
               >
                 {t('common.close')}
@@ -2371,6 +2476,128 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               />
             </form>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-3 pb-3">
+              {customerEdit ? (
+                <form
+                  className="mb-3 rounded-xl bg-white p-3"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    void saveCustomerEdit()
+                  }}
+                >
+                  <p className="mb-2 text-base font-bold text-black">
+                    {t('retailKassaPage.customersEditTitle')}
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      type="text"
+                      value={customerEdit.firstName}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, firstName: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldFirstName')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black"
+                    />
+                    <input
+                      type="text"
+                      value={customerEdit.lastName}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, lastName: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldLastName')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black"
+                    />
+                    <input
+                      type="text"
+                      value={customerEdit.street}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, street: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldStreet')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black sm:col-span-2"
+                    />
+                    <input
+                      type="text"
+                      value={customerEdit.postalCode}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, postalCode: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldPostalCode')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black"
+                    />
+                    <input
+                      type="text"
+                      value={customerEdit.city}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) => (draft ? { ...draft, city: e.target.value } : draft))
+                      }
+                      placeholder={t('retailLoyalty.fieldCity')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black"
+                    />
+                    <input
+                      type="text"
+                      value={customerEdit.btwNumber}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, btwNumber: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldBtwNumber')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black sm:col-span-2"
+                    />
+                    <input
+                      type="tel"
+                      value={customerEdit.phone}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, phone: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldPhone')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black"
+                    />
+                    <input
+                      type="email"
+                      value={customerEdit.email}
+                      onChange={(e) =>
+                        setCustomerEdit((draft) =>
+                          draft ? { ...draft, email: e.target.value } : draft,
+                        )
+                      }
+                      placeholder={t('retailLoyalty.fieldEmail')}
+                      className="rounded-lg border border-black/15 px-3 py-2 text-sm text-black"
+                    />
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      type="submit"
+                      disabled={customerEditSaving}
+                      className="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white touch-manipulation disabled:opacity-50"
+                    >
+                      {customerEditSaving
+                        ? t('retailKassaPage.customersSaving')
+                        : t('retailKassaPage.customersSave')}
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg bg-neutral-200 px-4 py-2.5 text-sm font-bold text-black touch-manipulation"
+                      onClick={() => {
+                        playClick()
+                        setCustomerEdit(null)
+                      }}
+                    >
+                      {t('common.close')}
+                    </button>
+                  </div>
+                </form>
+              ) : null}
               {customerListLoading ? (
                 <p className="px-2 py-6 text-sm text-white/70">{t('retailKassaPage.customersLoading')}</p>
               ) : visibleCardHolders.length === 0 ? (
@@ -2382,33 +2609,54 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                       .filter((part) => part && part.trim())
                       .join(', ')
                     return (
-                      <button
+                      <div
                         key={member.id}
-                        type="button"
-                        className="rounded-xl bg-white px-3 py-3 text-left touch-manipulation"
-                        onClick={() => pickCardHolder(member)}
+                        className="flex items-stretch gap-2 rounded-xl bg-white px-3 py-3"
                       >
-                        <span className="block truncate text-base font-semibold text-black">
-                          {cardHolderLabel(member)}
-                        </span>
-                        {place ? (
-                          <span className="mt-0.5 block truncate text-sm text-black/70">{place}</span>
-                        ) : null}
-                        <span className="mt-0.5 block truncate text-xs text-black/55">
-                          {[
-                            member.customer_btw_number
-                              ? t('retailKassaPage.customersVat').replace('{vat}', member.customer_btw_number)
-                              : null,
-                            member.phone,
-                            t('retailKassaPage.customersPoints').replace(
-                              '{points}',
-                              String(member.points_balance),
-                            ),
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </span>
-                      </button>
+                        <button
+                          type="button"
+                          className="min-w-0 flex-1 text-left touch-manipulation"
+                          onClick={() => pickCardHolder(member)}
+                        >
+                          <span className="block truncate text-base font-semibold text-black">
+                            {cardHolderLabel(member)}
+                          </span>
+                          {place ? (
+                            <span className="mt-0.5 block truncate text-sm text-black/70">{place}</span>
+                          ) : null}
+                          <span className="mt-0.5 block truncate text-xs text-black/55">
+                            {[
+                              member.customer_btw_number
+                                ? t('retailKassaPage.customersVat').replace('{vat}', member.customer_btw_number)
+                                : null,
+                              member.phone,
+                              t('retailKassaPage.customersPoints').replace(
+                                '{points}',
+                                String(member.points_balance),
+                              ),
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </span>
+                        </button>
+                        <div className="flex shrink-0 flex-col justify-center gap-2">
+                          <button
+                            type="button"
+                            className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white touch-manipulation"
+                            onClick={() => openCustomerEdit(member)}
+                          >
+                            {t('retailKassaPage.customersEdit')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={customerDeletingId === member.id}
+                            className="rounded-lg bg-red-600 px-3 py-2 text-sm font-bold text-white touch-manipulation disabled:opacity-50"
+                            onClick={() => void deleteCardHolder(member)}
+                          >
+                            {t('retailKassaPage.customersDelete')}
+                          </button>
+                        </div>
+                      </div>
                     )
                   })}
                 </div>
