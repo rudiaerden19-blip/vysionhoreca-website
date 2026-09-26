@@ -2171,7 +2171,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .channel(`kassa_open_orders_${tenant}`)
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'orders', filter: `tenant_slug=eq.${tenant}`},
-        () => {
+        (payload) => {
+          const change = payload as unknown as { new?: OpenTableOrderRow; old?: OpenTableOrderRow }
+          const row = change.new?.status || change.new?.order_type ? change.new : change.old
+          if (row && (row.status || row.order_type) && !isDineInOpenTableDraftRow(row)) return
           void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
         }
       )
@@ -2182,7 +2185,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, applyOpenOrdersFromServerRows])
 
   /** Als WebSockets/realtime op een werkstation vastzitten (firewall, slaapstand, print-kiosk),
-   *  halen we dezelfde bron nog eens binnen bij terugkeren naar het venster + periodiek. */
+   *  halen we tafels opnieuw binnen als het venster weer actief wordt. Geen vaste klok. */
   useEffect(() => {
     const pullOpenOrders = () => {
       void fetchOpenTableOrdersForTenant(tenant).then(applyOpenOrdersFromServerRows)
@@ -2250,21 +2253,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     document.addEventListener('visibilitychange', onActive)
     window.addEventListener('focus', onActive)
-    let timerFloor: number | null = null
-    if (kassaFloorPlanEnabled) {
-      timerFloor = window.setInterval(() => {
-        if (document.visibilityState === 'visible') pullFloorAndDecor()
-      }, 45_000)
-    }
-    const timerOrders = window.setInterval(() => {
-      if (document.visibilityState === 'visible') pullOpenOrders()
-    }, 12_000)
 
     return () => {
       document.removeEventListener('visibilitychange', onActive)
       window.removeEventListener('focus', onActive)
-      if (timerFloor !== null) window.clearInterval(timerFloor)
-      window.clearInterval(timerOrders)
     }
   }, [tenant, kassaFloorPlanEnabled, applyOpenOrdersFromServerRows, applyKassaFloorPlanTablesPayload])
 
