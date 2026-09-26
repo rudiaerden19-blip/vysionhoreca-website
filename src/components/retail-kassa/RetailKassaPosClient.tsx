@@ -72,6 +72,7 @@ import {
   type RetailPosSku,
 } from '@/lib/retail-kassa-pos'
 import { patchSkuInList } from '@/lib/retail-pos-catalog'
+import { createRetailWedgeSession, normalizeRetailWedgeCode } from '@/lib/retail-barcode-wedge'
 import {
   parseRetailCsvText,
   parseRetailExcelBuffer,
@@ -228,6 +229,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const scanRef = useRef<HTMLInputElement>(null)
   const articleSearchActiveRef = useRef(false)
   const barcodeCaptureRef = useRef<HTMLInputElement>(null)
+  const scanQueueRef = useRef<string[]>([])
+  const recentWedgeRef = useRef<{ code: string; at: number }>({ code: '', at: 0 })
+  const acceptRetailScanRef = useRef<(code: string) => void>(() => {})
   const scanBarRef = useRef<HTMLDivElement>(null)
   const cartScrollRef = useRef<HTMLDivElement>(null)
   const listScrollTargetRef = useRef<string | null>(null)
@@ -1206,10 +1210,33 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     setLoyaltyRedeemDraft('')
   }
 
-  async function processBarcode(code: string) {
-    const trimmed = code.trim()
+  function settleBarcodeScan() {
+    stockBusyRef.current = false
+    setStockBusy(false)
+    releaseScanFocus()
+    const next = scanQueueRef.current.shift()
+    if (next) void processBarcode(next)
+  }
+
+  function acceptRetailScan(code: string) {
+    const trimmed = normalizeRetailWedgeCode(code)
     if (!trimmed) return
-    if (stockBusyRef.current) return
+    const now = Date.now()
+    if (trimmed === recentWedgeRef.current.code && now - recentWedgeRef.current.at < 700) return
+    recentWedgeRef.current = { code: trimmed, at: now }
+    if (barcodeCaptureRef.current) barcodeCaptureRef.current.value = ''
+    void processBarcode(trimmed)
+  }
+  acceptRetailScanRef.current = acceptRetailScan
+
+  async function processBarcode(code: string) {
+    const trimmed = normalizeRetailWedgeCode(code)
+    if (!trimmed) return
+    if (stockBusyRef.current) {
+      const queued = scanQueueRef.current
+      if (queued[queued.length - 1] !== trimmed) queued.push(trimmed)
+      return
+    }
 
     const loyaltyCode =
       mode === 'sales' && loyaltyEnabled ? extractRetailLoyaltyScanCode(trimmed) : null
@@ -1220,9 +1247,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       try {
         await linkLoyaltyCardFromScan(trimmed)
       } finally {
-        stockBusyRef.current = false
-        setStockBusy(false)
-        releaseScanFocus()
+        settleBarcodeScan()
       }
       return
     }
@@ -1233,9 +1258,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       try {
         await linkStoreCreditFromScan(trimmed)
       } finally {
-        stockBusyRef.current = false
-        setStockBusy(false)
-        releaseScanFocus()
+        settleBarcodeScan()
       }
       return
     }
@@ -1249,9 +1272,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         if (hit) addToCart(hit, 1)
         else alert(t('retailKassaPage.autoScanImportError'))
       } finally {
-        stockBusyRef.current = false
-        setStockBusy(false)
-        releaseScanFocus()
+        settleBarcodeScan()
       }
       return
     }
@@ -1269,6 +1290,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       return
     }
 
+    stockBusyRef.current = true
     setStockBusy(true)
     try {
       if (mode === 'stockCount') {
@@ -1289,9 +1311,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
         pushStockActivity(res.sku, payload.quantity, 'goodsReceipt')
       }
     } finally {
-      stockBusyRef.current = false
-      setStockBusy(false)
-      releaseScanFocus()
+      settleBarcodeScan()
     }
   }
 
@@ -1576,12 +1596,43 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function onBarcodeWedgeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== 'Enter') return
+    if (e.key !== 'Enter' && e.key !== 'Tab' && e.key !== 'NumpadEnter') return
     e.preventDefault()
     const v = e.currentTarget.value
     e.currentTarget.value = ''
-    void processBarcode(v)
+    acceptRetailScan(v)
   }
+
+  useEffect(() => {
+    const session = createRetailWedgeSession({
+      onScan: (code) => acceptRetailScanRef.current(code),
+    })
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return
+      const target = e.target
+      if (target instanceof HTMLElement && target !== barcodeCaptureRef.current) {
+        const typing =
+          target instanceof HTMLTextAreaElement ||
+          target.isContentEditable ||
+          (target instanceof HTMLInputElement &&
+            !(
+              target.hasAttribute('data-retail-article-search') &&
+              target.readOnly &&
+              !articleSearchActiveRef.current
+            ))
+        if (typing) return
+      }
+      const result = session.pushKey(e.key)
+      if (result === 'ignore') return
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => {
+      session.dispose()
+      window.removeEventListener('keydown', onKey, true)
+    }
+  }, [])
 
   function openImportPreview(rows: RetailImportRow[]) {
     if (rows.length === 0) {
