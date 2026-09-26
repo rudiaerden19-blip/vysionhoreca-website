@@ -662,6 +662,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       const saveMode = forcedCatalogMode ?? catalogMode
       let promoBuy: number | null = null
       let promoFree: number | null = null
+      let promoFrom: string | null = null
+      let promoUntil: string | null = null
+      let promoPartner: string | null = null
       if (saveMode === 'retail') {
         const bc = normalizeProductBarcodeScan(formData.barcode || '')
         if (!bc) {
@@ -688,6 +691,20 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           }
           promoBuy = buy
           promoFree = free
+        }
+        promoFrom = (formData.retail_promo_from || '').slice(0, 10) || null
+        promoUntil = (formData.retail_promo_until || '').slice(0, 10) || null
+        promoPartner = formData.retail_promo_partner_id || null
+        if (promoPartner === editingProduct?.id) promoPartner = null
+        if ((promoFrom || promoUntil || promoPartner) && (promoBuy == null || promoFree == null)) {
+          setError(t('adminPages.producten.retailPromoPairRequired'))
+          setSaving(false)
+          return
+        }
+        if (promoFrom && promoUntil && promoFrom > promoUntil) {
+          setError(t('adminPages.producten.retailPromoDateOrder'))
+          setSaving(false)
+          return
         }
       }
 
@@ -740,6 +757,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             : null,
         retail_promo_buy: saveMode === 'retail' ? promoBuy : null,
         retail_promo_free: saveMode === 'retail' ? promoFree : null,
+        retail_promo_from: saveMode === 'retail' ? promoFrom : null,
+        retail_promo_until: saveMode === 'retail' ? promoUntil : null,
+        retail_promo_partner_id: saveMode === 'retail' ? promoPartner : null,
       }
 
       const { data: result, error: saveError } = await saveMenuProduct(productData)
@@ -747,6 +767,29 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       if (!result) {
         setError(saveError || t('adminPages.producten.saveFailed'))
         return
+      }
+
+      if (saveMode === 'retail' && result.id) {
+        const previousPartner = editingProduct?.retail_promo_partner_id || null
+        if (previousPartner && previousPartner !== promoPartner) {
+          const oldPartner = products.find((p) => p.id === previousPartner)
+          if (oldPartner) {
+            await saveMenuProduct({ ...oldPartner, retail_promo_partner_id: null })
+          }
+        }
+        if (promoPartner) {
+          const partner = products.find((p) => p.id === promoPartner)
+          if (partner) {
+            await saveMenuProduct({
+              ...partner,
+              retail_promo_buy: promoBuy,
+              retail_promo_free: promoFree,
+              retail_promo_from: promoFrom,
+              retail_promo_until: promoUntil,
+              retail_promo_partner_id: result.id,
+            })
+          }
+        }
       }
 
       if (result.id && saveMode === 'horeca') {
@@ -1526,6 +1569,67 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base touch-manipulation"
                             placeholder="1"
                           />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailPromoFrom')}
+                          </label>
+                          <input
+                            type="date"
+                            value={(formData.retail_promo_from || '').slice(0, 10)}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_promo_from: e.target.value || null,
+                              }))
+                            }
+                            className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailPromoUntil')}
+                          </label>
+                          <input
+                            type="date"
+                            value={(formData.retail_promo_until || '').slice(0, 10)}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_promo_until: e.target.value || null,
+                              }))
+                            }
+                            className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('adminPages.producten.retailPromoPartner')}
+                          </label>
+                          <select
+                            value={formData.retail_promo_partner_id || ''}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                retail_promo_partner_id: e.target.value || null,
+                              }))
+                            }
+                            className="w-full min-h-[44px] px-3 py-2.5 border border-gray-200 rounded-xl bg-white text-base"
+                          >
+                            <option value="">{t('adminPages.producten.retailPromoPartnerNone')}</option>
+                            {products
+                              .filter(
+                                (p) =>
+                                  p.id &&
+                                  p.id !== editingProduct?.id &&
+                                  (p.catalog_mode === 'retail' || !!p.barcode),
+                              )
+                              .map((p) => (
+                                <option key={p.id} value={p.id}>
+                                  {p.name}
+                                </option>
+                              ))}
+                          </select>
                         </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">

@@ -162,6 +162,8 @@ export function RetailLoyaltyNewPassPanel({
         body: JSON.stringify({
           tenantSlug: tenant,
           display_name: displayName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
           phone: phone.trim() || undefined,
           email: email.trim(),
           address: street.trim() ? capitalizeCustomerWords(street.trim()) : undefined,

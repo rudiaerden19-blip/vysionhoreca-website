@@ -21,6 +21,9 @@ export type RetailPosSku = {
   /** Koop X, Y gratis. Null = geen promo. */
   promoBuy?: number | null
   promoFree?: number | null
+  promoFrom?: string | null
+  promoUntil?: string | null
+  promoPartnerId?: string | null
 }
 
 export type RetailCartLine = {
@@ -30,7 +33,7 @@ export type RetailCartLine = {
 
 const PRODUCT_SELECT =
   'id, name, description, price, image_url, category_id, article_number, barcode, size_label, color_label, track_stock, stock_quantity, low_stock_threshold'
-const PRODUCT_SELECT_PROMO = `${PRODUCT_SELECT}, retail_promo_buy, retail_promo_free`
+const PRODUCT_SELECT_PROMO = `${PRODUCT_SELECT}, retail_promo_buy, retail_promo_free, retail_promo_from, retail_promo_until, retail_promo_partner_id`
 
 const VARIANT_SELECT =
   'id, product_id, article_number, barcode, size_label, color_label, price_override, track_stock, stock_quantity, low_stock_threshold, is_active, sort_order'
@@ -51,6 +54,9 @@ type ProductRow = {
   low_stock_threshold: number | null
   retail_promo_buy?: number | null
   retail_promo_free?: number | null
+  retail_promo_from?: string | null
+  retail_promo_until?: string | null
+  retail_promo_partner_id?: string | null
 }
 
 type VariantRow = {
@@ -68,13 +74,23 @@ type VariantRow = {
   sort_order: number
 }
 
-function promoFields(row: ProductRow): { promoBuy: number | null; promoFree: number | null } {
+function promoFields(row: ProductRow): {
+  promoBuy: number | null
+  promoFree: number | null
+  promoFrom: string | null
+  promoUntil: string | null
+  promoPartnerId: string | null
+} {
   const buy = Math.floor(Number(row.retail_promo_buy))
   const free = Math.floor(Number(row.retail_promo_free))
-  if (!Number.isFinite(buy) || !Number.isFinite(free) || buy < 1 || free < 1) {
-    return { promoBuy: null, promoFree: null }
+  const active = Number.isFinite(buy) && Number.isFinite(free) && buy >= 1 && free >= 1
+  return {
+    promoBuy: active ? buy : null,
+    promoFree: active ? free : null,
+    promoFrom: row.retail_promo_from ? String(row.retail_promo_from).slice(0, 10) : null,
+    promoUntil: row.retail_promo_until ? String(row.retail_promo_until).slice(0, 10) : null,
+    promoPartnerId: row.retail_promo_partner_id || null,
   }
-  return { promoBuy: buy, promoFree: free }
 }
 
 function formatSkuName(base: string, size: string | null, color: string | null): string {
@@ -158,7 +174,10 @@ async function fetchRetailPosSkusFromDb(tenantSlug: string): Promise<RetailPosSk
     variantQuery,
   ])
   const prodRes =
-    promoRes.error && /retail_promo_buy|retail_promo_free/i.test(promoRes.error.message)
+    promoRes.error &&
+    /retail_promo_buy|retail_promo_free|retail_promo_from|retail_promo_until|retail_promo_partner_id/i.test(
+      promoRes.error.message,
+    )
       ? await supabase
           .from('menu_products')
           .select(PRODUCT_SELECT)

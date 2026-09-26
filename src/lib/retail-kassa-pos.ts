@@ -15,7 +15,7 @@ import {
 } from '@/lib/retail-pos-catalog'
 import { authFetch } from '@/lib/auth-headers'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
-import { parseRetailPromo, retailPromoChargeableTotal } from '@/lib/retail-promo'
+import { allocateRetailPromoCharges } from '@/lib/retail-promo'
 import type { KassaPaymentMethod } from '@/lib/kassa-cart-types'
 import type { RetailImportRow } from '@/lib/retail-product-import'
 
@@ -123,16 +123,20 @@ export async function completeRetailSale(
 ): Promise<{ ok: boolean; orderNumber?: number; orderId?: string; error?: string }> {
   if (lines.length === 0) return { ok: false, error: 'empty_cart'}
 
-  const grossTotal = lines.reduce(
-    (s, l) =>
-      s +
-      retailPromoChargeableTotal(
-        l.sku.price,
-        l.quantity,
-        parseRetailPromo(l.sku.promoBuy, l.sku.promoFree),
-      ),
-    0,
+  const promoCharges = allocateRetailPromoCharges(
+    lines.map((l) => ({
+      key: l.sku.lineKey,
+      productId: l.sku.productId,
+      unitPrice: l.sku.price,
+      quantity: l.quantity,
+      promoBuy: l.sku.promoBuy,
+      promoFree: l.sku.promoFree,
+      promoFrom: l.sku.promoFrom,
+      promoUntil: l.sku.promoUntil,
+      promoPartnerId: l.sku.promoPartnerId,
+    })),
   )
+  const grossTotal = lines.reduce((s, l) => s + (promoCharges.get(l.sku.lineKey)?.payable ?? 0), 0)
   const loyaltyDiscountRaw = Math.max(0, options?.loyaltyDiscountEuro ?? 0)
   const afterLoyalty = Math.max(0, grossTotal - loyaltyDiscountRaw)
   const creditRaw = Math.max(0, options?.storeCreditEuro ?? 0)
@@ -177,11 +181,7 @@ export async function completeRetailSale(
       quantity: l.quantity,
       promo_buy: l.sku.promoBuy ?? null,
       promo_free: l.sku.promoFree ?? null,
-      line_total: retailPromoChargeableTotal(
-        l.sku.price,
-        l.quantity,
-        parseRetailPromo(l.sku.promoBuy, l.sku.promoFree),
-      ),
+      line_total: promoCharges.get(l.sku.lineKey)?.payable ?? 0,
       article_number: l.sku.article_number,
       barcode: l.sku.barcode,
       size_label: l.sku.size_label,

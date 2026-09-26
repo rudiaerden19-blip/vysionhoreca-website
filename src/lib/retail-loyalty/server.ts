@@ -5,7 +5,11 @@ import {
   maxRetailLoyaltyRedeemPoints,
 } from '@/lib/retail-loyalty/redeem-math'
 import { sendRetailLoyaltyPassEmail } from '@/lib/retail-loyalty/send-pass-email'
-import { retailCardHolderMatchesQuery } from '@/lib/retail-loyalty/card-holder-search'
+import {
+  joinCustomerFullName,
+  retailCardHolderMatchesQuery,
+  splitCustomerFullName,
+} from '@/lib/retail-loyalty/card-holder-search'
 import type { RetailLoyaltyMemberPos, RetailLoyaltyMemberPublic, RetailLoyaltySettings } from '@/lib/retail-loyalty/types'
 import {
   capitalizeCustomerWords,
@@ -17,6 +21,8 @@ const SETTINGS_SELECT =
   'tenant_slug, enabled, points_per_euro, min_order_total_for_points, redeem_enabled, redeem_points_per_euro'
 const MEMBER_SELECT =
   'id, tenant_slug, card_code, display_name, phone, email, shop_customer_id, points_balance, is_active'
+const MEMBER_PROFILE_SELECT =
+  `${MEMBER_SELECT}, first_name, last_name, address, postal_code, city, btw_number`
 
 export async function getRetailLoyaltySettings(tenantSlug: string): Promise<RetailLoyaltySettings> {
   const supabase = getServerSupabaseClient()
@@ -208,14 +214,41 @@ export async function listRetailLoyaltyCardHolders(
   const supabase = getServerSupabaseClient()
   if (!supabase) return { ok: false, members: [], error: 'db_unavailable' }
 
+  type LoyaltyListRow = {
+    id: string
+    card_code: string
+    display_name: string | null
+    phone: string | null
+    email: string | null
+    shop_customer_id: string | null
+    points_balance: number | null
+    is_active: boolean | null
+    first_name?: string | null
+    last_name?: string | null
+    address?: string | null
+    postal_code?: string | null
+    city?: string | null
+    btw_number?: string | null
+  }
+
   let memberQuery = supabase
     .from('retail_loyalty_members')
-    .select(MEMBER_SELECT)
+    .select(MEMBER_PROFILE_SELECT)
     .eq('tenant_slug', tenantSlug)
   if (!opts?.includeInactive) memberQuery = memberQuery.eq('is_active', true)
-  const { data: rows, error } = await memberQuery
-    .order('display_name', { ascending: true })
-    .limit(400)
+  const profileRes = await memberQuery.order('display_name', { ascending: true }).limit(400)
+  let rows = (profileRes.data ?? null) as LoyaltyListRow[] | null
+  let error = profileRes.error
+  if (error && /first_name|last_name|address|postal_code|city|btw_number/i.test(error.message)) {
+    let fallback = supabase
+      .from('retail_loyalty_members')
+      .select(MEMBER_SELECT)
+      .eq('tenant_slug', tenantSlug)
+    if (!opts?.includeInactive) fallback = fallback.eq('is_active', true)
+    const again = await fallback.order('display_name', { ascending: true }).limit(400)
+    rows = (again.data ?? null) as LoyaltyListRow[] | null
+    error = again.error
+  }
 
   if (error) return { ok: false, members: [], error: error.message }
 
@@ -252,6 +285,18 @@ export async function listRetailLoyaltyCardHolders(
 
   const members: RetailLoyaltyCardHolderRow[] = (rows ?? []).map((row) => {
     const customer = row.shop_customer_id ? customerById.get(row.shop_customer_id) : undefined
+    const profile = row as typeof row & {
+      first_name?: string | null
+      last_name?: string | null
+      address?: string | null
+      postal_code?: string | null
+      city?: string | null
+      btw_number?: string | null
+    }
+    const split = splitCustomerFullName(customer?.name || row.display_name)
+    const firstName = profile.first_name?.trim() || split.firstName
+    const lastName = profile.last_name?.trim() || split.lastName
+    const fullName = joinCustomerFullName(firstName, lastName)
     return {
       id: row.id,
       card_code: row.card_code,
@@ -259,11 +304,13 @@ export async function listRetailLoyaltyCardHolders(
       phone: row.phone ?? customer?.phone ?? null,
       points_balance: Number(row.points_balance) || 0,
       email: row.email ?? customer?.email ?? null,
-      customer_name: customer?.name ?? row.display_name ?? null,
-      customer_address: customer?.address ?? null,
-      customer_postal_code: customer?.postal_code ?? null,
-      customer_city: customer?.city ?? null,
-      customer_btw_number: customer?.btw_number?.trim() || null,
+      first_name: firstName || null,
+      last_name: lastName || null,
+      customer_name: fullName || customer?.name || row.display_name || null,
+      customer_address: profile.address?.trim() || customer?.address || null,
+      customer_postal_code: profile.postal_code?.trim() || customer?.postal_code || null,
+      customer_city: profile.city?.trim() || customer?.city || null,
+      customer_btw_number: profile.btw_number?.trim() || customer?.btw_number?.trim() || null,
       is_active: row.is_active !== false,
     }
   })
@@ -454,6 +501,8 @@ export async function createRetailLoyaltyMember(
   tenantSlug: string,
   input: {
     display_name?: string
+    first_name?: string
+    last_name?: string
     phone?: string
     email?: string
     address?: string
@@ -585,18 +634,49 @@ export async function createRetailLoyaltyMember(
   }
   if (!cardCode) return { ok: false, error: 'card_generate_failed'}
 
-  const { data, error } = await supabase
+  const nameParts = splitCustomerFullName(input.display_name)
+  const firstName = input.first_name?.trim()
+    ? capitalizeCustomerWords(input.first_name.trim())
+    : nameParts.firstName
+  const lastName = input.last_name?.trim()
+    ? capitalizeCustomerWords(input.last_name.trim())
+    : nameParts.lastName
+  const profile = {
+    first_name: firstName || null,
+    last_name: lastName || null,
+    address: input.address?.trim() ? capitalizeCustomerWords(input.address.trim()) : null,
+    postal_code: input.postal_code?.trim() || null,
+    city: input.city?.trim() ? capitalizeCustomerWords(input.city.trim()) : null,
+    btw_number: input.btw_number?.trim() ? normalizeCustomerBtwNumber(input.btw_number) || null : null,
+  }
+  let inserted = await supabase
     .from('retail_loyalty_members')
     .insert({
       tenant_slug: tenantSlug,
       card_code: cardCode,
-      display_name: capitalizeCustomerWords(input.display_name?.trim() ?? '') || null,
+      display_name: capitalizeCustomerWords(input.display_name?.trim() ?? '') || joinCustomerFullName(firstName, lastName) || null,
       phone: input.phone?.trim() || null,
       email: emailNorm || null,
       shop_customer_id: shopCustomerId ?? null,
+      ...profile,
     })
     .select(MEMBER_SELECT)
     .single()
+  if (inserted.error && /first_name|last_name|address|postal_code|city|btw_number/i.test(inserted.error.message)) {
+    inserted = await supabase
+      .from('retail_loyalty_members')
+      .insert({
+        tenant_slug: tenantSlug,
+        card_code: cardCode,
+        display_name: capitalizeCustomerWords(input.display_name?.trim() ?? '') || null,
+        phone: input.phone?.trim() || null,
+        email: emailNorm || null,
+        shop_customer_id: shopCustomerId ?? null,
+      })
+      .select(MEMBER_SELECT)
+      .single()
+  }
+  const { data, error } = inserted
 
   if (error || !data) return { ok: false, error: error?.message || 'insert_failed'}
 
@@ -797,10 +877,11 @@ export async function updateRetailLoyaltyMember(
   const row: Record<string, unknown> = { updated_at: new Date().toISOString() }
   const hasNameParts = patch.first_name !== undefined || patch.last_name !== undefined
   if (hasNameParts) {
-    const full = capitalizeCustomerWords(
-      `${patch.first_name ?? ''} ${patch.last_name ?? ''}`.trim(),
-    )
-    row.display_name = full || null
+    const first = patch.first_name?.trim() ? capitalizeCustomerWords(patch.first_name.trim()) : ''
+    const last = patch.last_name?.trim() ? capitalizeCustomerWords(patch.last_name.trim()) : ''
+    row.first_name = first || null
+    row.last_name = last || null
+    row.display_name = joinCustomerFullName(first, last) || null
   } else if (patch.display_name !== undefined) {
     row.display_name = patch.display_name?.trim()
       ? capitalizeCustomerWords(patch.display_name.trim())
@@ -843,14 +924,37 @@ export async function updateRetailLoyaltyMember(
       customerPatch.city = patch.city?.trim() ? capitalizeCustomerWords(patch.city.trim()) : null
     }
     if (patch.btw_number !== undefined) customerPatch.btw_number = btw_number
+    if (patch.address !== undefined) {
+      row.address = patch.address?.trim() ? capitalizeCustomerWords(patch.address.trim()) : null
+    }
+    if (patch.postal_code !== undefined) row.postal_code = patch.postal_code?.trim() || null
+    if (patch.city !== undefined) {
+      row.city = patch.city?.trim() ? capitalizeCustomerWords(patch.city.trim()) : null
+    }
+    if (patch.btw_number !== undefined) row.btw_number = btw_number
+    if (hasNameParts) {
+      customerPatch.first_name = row.first_name
+      customerPatch.last_name = row.last_name
+    }
 
     if (existing.shop_customer_id) {
-      const { error: customerError } = await supabase
+      let customerResult = await supabase
         .from('shop_customers')
         .update(customerPatch)
         .eq('tenant_slug', tenantSlug)
         .eq('id', existing.shop_customer_id)
-      if (customerError) return { ok: false, error: customerError.message }
+      if (
+        customerResult.error &&
+        /first_name|last_name/i.test(customerResult.error.message)
+      ) {
+        const { first_name: _first, last_name: _last, ...withoutNames } = customerPatch
+        customerResult = await supabase
+          .from('shop_customers')
+          .update(withoutNames)
+          .eq('tenant_slug', tenantSlug)
+          .eq('id', existing.shop_customer_id)
+      }
+      if (customerResult.error) return { ok: false, error: customerResult.error.message }
     } else if (email.includes('@') && name) {
       const saved = await upsertShopCustomerForLoyalty(tenantSlug, {
         name,
@@ -866,11 +970,28 @@ export async function updateRetailLoyaltyMember(
     }
   }
 
-  const { error } = await supabase
+  let { error } = await supabase
     .from('retail_loyalty_members')
     .update(row)
     .eq('tenant_slug', tenantSlug)
     .eq('id', memberId)
+  if (error && /first_name|last_name|address|postal_code|city|btw_number/i.test(error.message)) {
+    const {
+      first_name: _first,
+      last_name: _last,
+      address: _address,
+      postal_code: _postal,
+      city: _city,
+      btw_number: _btw,
+      ...withoutProfile
+    } = row
+    const again = await supabase
+      .from('retail_loyalty_members')
+      .update(withoutProfile)
+      .eq('tenant_slug', tenantSlug)
+      .eq('id', memberId)
+    error = again.error
+  }
 
   if (error) return { ok: false, error: error.message }
   return { ok: true }

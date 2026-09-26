@@ -20,6 +20,8 @@ export function joinCustomerFullName(firstName: string, lastName: string): strin
 /** Velden waarop de kassalijst «Klanten» zoekt. */
 export type RetailCardHolderSearchFields = {
   display_name?: string | null
+  first_name?: string | null
+  last_name?: string | null
   customer_name?: string | null
   phone?: string | null
   email?: string | null
@@ -39,6 +41,8 @@ export function retailCardHolderMatchesQuery(
   if (tokens.length === 0) return true
   const hay = [
     row.display_name,
+    row.first_name,
+    row.last_name,
     row.customer_name,
     row.phone,
     row.email,

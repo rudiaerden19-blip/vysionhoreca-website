@@ -49,8 +49,8 @@ function MemberManagePanel({
 
   useEffect(() => {
     const parts = splitCustomerFullName(member.customer_name || member.display_name)
-    setFirstName(parts.firstName)
-    setLastName(parts.lastName)
+    setFirstName(member.first_name?.trim() || parts.firstName)
+    setLastName(member.last_name?.trim() || parts.lastName)
     setPhone(member.phone ?? '')
     setEmail(member.email ?? '')
     setStreet(member.customer_address ?? '')
@@ -61,6 +61,8 @@ function MemberManagePanel({
     member.id,
     member.customer_name,
     member.display_name,
+    member.first_name,
+    member.last_name,
     member.phone,
     member.email,
     member.customer_address,

@@ -37,6 +37,11 @@ export interface MenuProduct {
   /** Retail: koop zoveel, dan is het volgende aantal gratis (2 + 1). */
   retail_promo_buy?: number | null
   retail_promo_free?: number | null
+  retail_promo_from?: string | null
+  retail_promo_until?: string | null
+  retail_promo_partner_id?: string | null
+  /** Alleen op de bon: hoeveel stuks van deze regel gratis zijn na samen tellen. */
+  retail_promo_free_assigned?: number | null
 }
 
 export const KASSA_PRODUCT_IMAGE_ZOOM_MIN = 0.65

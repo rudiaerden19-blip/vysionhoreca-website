@@ -76,6 +76,7 @@ import {
 import { patchSkuInList, planRetailSaleStockWrites } from '@/lib/retail-pos-catalog'
 import { createRetailWedgeSession, normalizeRetailWedgeCode } from '@/lib/retail-barcode-wedge'
 import {
+  allocateRetailPromoCharges,
   formatRetailPromoReceiptNote,
   parseRetailPromo,
   retailPromoChargeableTotal,
@@ -543,19 +544,26 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [langOpen])
 
-  const cartTotal = useMemo(
+  const promoCharges = useMemo(
     () =>
-      cart.reduce(
-        (s, l) =>
-          s +
-          retailPromoChargeableTotal(
-            l.sku.price,
-            l.quantity,
-            parseRetailPromo(l.sku.promoBuy, l.sku.promoFree),
-          ),
-        0,
+      allocateRetailPromoCharges(
+        cart.map((l) => ({
+          key: l.sku.lineKey,
+          productId: l.sku.productId,
+          unitPrice: l.sku.price,
+          quantity: l.quantity,
+          promoBuy: l.sku.promoBuy,
+          promoFree: l.sku.promoFree,
+          promoFrom: l.sku.promoFrom,
+          promoUntil: l.sku.promoUntil,
+          promoPartnerId: l.sku.promoPartnerId,
+        })),
       ),
     [cart],
+  )
+  const cartTotal = useMemo(
+    () => cart.reduce((s, l) => s + (promoCharges.get(l.sku.lineKey)?.payable ?? 0), 0),
+    [cart, promoCharges],
   )
 
   const loyaltyDiscountEuro = useMemo(() => {
@@ -799,8 +807,9 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const qty = Math.max(1, opts?.quantity ?? 1)
     const name = qty > 1 ? `${sku.name} × ${qty}`: sku.name
     const promo = parseRetailPromo(sku.promoBuy, sku.promoFree)
-    const lineTotal = retailPromoChargeableTotal(sku.price, qty, promo)
-    const freeQty = retailPromoFreeCount(qty, promo)
+    const pooled = opts?.quantity != null ? promoCharges.get(key) : undefined
+    const lineTotal = pooled ? pooled.payable : retailPromoChargeableTotal(sku.price, qty, promo)
+    const freeQty = pooled ? pooled.freeQty : retailPromoFreeCount(qty, promo)
     const promoNote =
       promo && freeQty > 0
         ? formatRetailPromoReceiptNote(promo.buy, promo.free, freeQty, {
@@ -1262,8 +1271,8 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     const parts = splitCustomerFullName(member.customer_name || member.display_name)
     setCustomerEdit({
       memberId: member.id,
-      firstName: parts.firstName,
-      lastName: parts.lastName,
+      firstName: member.first_name?.trim() || parts.firstName,
+      lastName: member.last_name?.trim() || parts.lastName,
       street: member.customer_address ?? '',
       postalCode: member.customer_postal_code ?? '',
       city: member.customer_city ?? '',
@@ -3580,17 +3589,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                         <p className="text-xs tabular-nums text-black/70">
                           €{l.sku.price.toFixed(2)} × {l.quantity}
                           {(() => {
+                            const charge = promoCharges.get(l.sku.lineKey)
                             const promo = parseRetailPromo(l.sku.promoBuy, l.sku.promoFree)
-                            const freeQty = retailPromoFreeCount(l.quantity, promo)
-                            if (!promo || freeQty < 1) return null
-                            const note = formatRetailPromoReceiptNote(promo.buy, promo.free, freeQty, {
+                            if (!charge || !promo || charge.freeQty < 1) return null
+                            const note = formatRetailPromoReceiptNote(promo.buy, promo.free, charge.freeQty, {
                               thirdFree: t('retailKassaPage.promoThirdFree'),
                               line: t('retailKassaPage.promoLine'),
                             })
-                            const payable = retailPromoChargeableTotal(l.sku.price, l.quantity, promo)
                             return (
                               <span className="block font-semibold text-emerald-700">
-                                {note} · €{payable.toFixed(2)}
+                                {note} · €{charge.payable.toFixed(2)}
                               </span>
                             )
                           })()}

@@ -8,7 +8,7 @@ import {
   printReceiptHtmlDocument,
 } from '@/lib/print-receipt-html'
 import type { RetailCartLine } from '@/lib/retail-kassa-pos'
-import { parseRetailPromo, retailPromoChargeableTotal } from '@/lib/retail-promo'
+import { allocateRetailPromoCharges } from '@/lib/retail-promo'
 import {
   buildRetailKassaReceiptHtmlBody,
   buildRetailThermalBonLines as buildRetailThermalBonLinesCore,
@@ -68,7 +68,7 @@ export type RetailReceiptI18n = {
   promoLine?: string
 }
 
-function retailLineToCartItem(line: RetailCartLine): KassaCartItem {
+function retailLineToCartItem(line: RetailCartLine, freeAssigned = 0): KassaCartItem {
   return {
     product: {
       tenant_slug: '',
@@ -88,6 +88,7 @@ function retailLineToCartItem(line: RetailCartLine): KassaCartItem {
       color_label: line.sku.color_label,
       retail_promo_buy: line.sku.promoBuy ?? null,
       retail_promo_free: line.sku.promoFree ?? null,
+      retail_promo_free_assigned: freeAssigned,
     },
     quantity: line.quantity,
     cartKey: line.sku.lineKey,
@@ -103,19 +104,20 @@ export function buildRetailLastOrderReceipt(
   loyaltyDiscountEuro?: number,
   helpedByStaffName?: string | null,
 ): KassaLastOrderReceipt {
-  const gross =
-    Math.round(
-      lines.reduce(
-        (s, l) =>
-          s +
-          retailPromoChargeableTotal(
-            l.sku.price,
-            l.quantity,
-            parseRetailPromo(l.sku.promoBuy, l.sku.promoFree),
-          ),
-        0,
-      ) * 100,
-    ) / 100
+  const promoCharges = allocateRetailPromoCharges(
+    lines.map((l) => ({
+      key: l.sku.lineKey,
+      productId: l.sku.productId,
+      unitPrice: l.sku.price,
+      quantity: l.quantity,
+      promoBuy: l.sku.promoBuy,
+      promoFree: l.sku.promoFree,
+      promoFrom: l.sku.promoFrom,
+      promoUntil: l.sku.promoUntil,
+      promoPartnerId: l.sku.promoPartnerId,
+    })),
+  )
+  const gross = Math.round(lines.reduce((s, l) => s + (promoCharges.get(l.sku.lineKey)?.payable ?? 0), 0) * 100) / 100
   const discount = Math.round(Math.min(Math.max(0, loyaltyDiscountEuro ?? 0), gross) * 100) / 100
   const total = Math.round((gross - discount) * 100) / 100
   const vatRate = normalizeCategoryVatPercent(tenantDefaultBtw, 21)
@@ -123,7 +125,9 @@ export function buildRetailLastOrderReceipt(
   const tax = Math.round((total - subtotal) * 100) / 100
   return {
     orderNumber,
-    items: lines.map(retailLineToCartItem),
+    items: lines.map((line) =>
+      retailLineToCartItem(line, promoCharges.get(line.sku.lineKey)?.freeQty ?? 0),
+    ),
     total,
     subtotalExclVat: subtotal,
     totalTax: tax,

@@ -291,12 +291,28 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
     includeRetailPackaging: boolean
     includeRetailPromo: boolean
   }) => {
-    const { retail_sale_unit, retail_unit_quantity, retail_promo_buy, retail_promo_free, ...baseWithoutRetailExtras } =
-      baseProduct as MenuProduct
+    const {
+      retail_sale_unit,
+      retail_unit_quantity,
+      retail_promo_buy,
+      retail_promo_free,
+      retail_promo_from,
+      retail_promo_until,
+      retail_promo_partner_id,
+      ...baseWithoutRetailExtras
+    } = baseProduct as MenuProduct
     const core = {
       ...baseWithoutRetailExtras,
       ...(opts.includeRetailPackaging ? { retail_sale_unit, retail_unit_quantity } : {}),
-      ...(opts.includeRetailPromo ? { retail_promo_buy, retail_promo_free } : {}),
+      ...(opts.includeRetailPromo
+        ? {
+            retail_promo_buy,
+            retail_promo_free,
+            retail_promo_from,
+            retail_promo_until,
+            retail_promo_partner_id,
+          }
+        : {}),
     }
     const fullProduct = {
       ...core,
@@ -321,7 +337,7 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
   const isMissingRetailPackagingColumn = (msg: string) =>
     /retail_sale_unit|retail_unit_quantity/i.test(msg)
   const isMissingRetailPromoColumn = (msg: string) =>
-    /retail_promo_buy|retail_promo_free/i.test(msg)
+    /retail_promo_buy|retail_promo_free|retail_promo_from|retail_promo_until|retail_promo_partner_id/i.test(msg)
 
   /** Zelfde als categorieën: geen blind upsert — id wordt door de proxy gestript → zou dubbele rijen geven. */
   let r = await persist({ includeZoom: true, includeRetailPackaging: true, includeRetailPromo: true })
@@ -331,7 +347,12 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
   }
 
   if (isMissingRetailPromoColumn(r.error || '')) {
-    const wantsPromo = product.retail_promo_buy != null || product.retail_promo_free != null
+    const wantsPromo =
+      product.retail_promo_buy != null ||
+      product.retail_promo_free != null ||
+      product.retail_promo_from != null ||
+      product.retail_promo_until != null ||
+      product.retail_promo_partner_id != null
     if (!wantsPromo) {
       const rPromo = await persist({
         includeZoom: true,

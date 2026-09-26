@@ -28,6 +28,8 @@ export type RetailLoyaltyMemberPublic = Pick<
 export type RetailLoyaltyMemberPos = RetailLoyaltyMemberPublic & {
   email: string | null
   customer_name?: string | null
+  first_name?: string | null
+  last_name?: string | null
   customer_address?: string | null
   customer_postal_code?: string | null
   customer_city?: string | null
