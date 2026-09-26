@@ -364,7 +364,7 @@ const KASSA_HEADER_QUICK_LINK_LABEL = 'min-w-0 max-w-full truncate text-[11px] l
 /** Light mode — middelgrijs (niet zwart zoals Klassiek #2d2d2d). */
 const KASSA_LIGHT_BTN_FACE = 'bg-[#4a4a4a] text-white hover:bg-[#5a5a5a]'
 const KASSA_LIGHT_BTN_FACE_ON =
-  'bg-[#4a4a4a] text-white outline outline-[3px] outline-white outline-offset-[-3px]'
+  'bg-[#4a4a4a] text-white outline outline-[3px] outline-[#3C4D6B] outline-offset-2'
 const KASSA_LIGHT_HEADER_QUICK_LINK_BTN =
   `inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl font-bold transition-colors min-h-[2.15rem] px-2 py-1.5 sm:min-h-[2.35rem] sm:px-2.5 ${KASSA_LIGHT_BTN_FACE}`
 
