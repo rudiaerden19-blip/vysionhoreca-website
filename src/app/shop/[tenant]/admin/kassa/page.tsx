@@ -5315,7 +5315,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className="flex min-h-0 min-w-0 flex-1 items-center justify-start gap-1 overflow-hidden sm:gap-1.5"
+            className={`flex min-h-0 min-w-0 flex-1 items-center justify-start ${
+              kassaWide15Chrome
+                ? 'flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+                : 'flex-nowrap gap-1.5 sm:gap-2'
+            }`}
           >
 
           {effectiveAccess.reservaties && (
