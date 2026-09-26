@@ -320,6 +320,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importBusy, setImportBusy] = useState(false)
   const [importHighlight, setImportHighlight] = useState<'csv' |  'excel'| null>(null)
+  const [quickMenuOpen, setQuickMenuOpen] = useState(true)
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   const [numpadValue, setNumpadValue] = useState('')
   const [addOkFlash, setAddOkFlash] = useState(false)
@@ -2890,14 +2891,31 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </div>
 
             <div
-              className={`flex shrink-0 items-start gap-1.5 border-t py-1 pl-2 pr-2 sm:gap-2 sm:pl-3 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`}
+              className={`flex shrink-0 items-stretch gap-1.5 border-t py-1 pl-2 pr-2 sm:gap-2 sm:pl-3 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`}
             >
+              <button
+                type="button"
+                aria-pressed={quickMenuOpen}
+                data-testid="retail-quick-menu-toggle"
+                onClick={() => {
+                  playClick()
+                  setQuickMenuOpen((open) => !open)
+                }}
+                className={`flex w-[4.5rem] shrink-0 items-center justify-center px-1 text-center text-[11px] font-bold leading-tight sm:w-[5rem] sm:text-xs ${
+                  quickMenuOpen ? 'min-h-[4.25rem] sm:min-h-[4.5rem]' : 'min-h-[2.75rem]'
+                } ${kassaLayoutChromeBtnClass(kassaLayout, quickMenuOpen)}`}
+              >
+                {t('kassaApp.quickMenu')}
+              </button>
+              {quickMenuOpen ? (
               <div
                 className="grid min-w-0 flex-1 items-stretch gap-1.5 overflow-hidden [grid-template-columns:repeat(auto-fit,minmax(min(100%,5.75rem),1fr))] sm:gap-2"
                 data-testid="retail-plate-tiles"
               >
                 {renderRetailPlateTiles()}
               </div>
+              ) : null}
+              {quickMenuOpen ? (
               <div
                 className={`size-[4.25rem] shrink-0 overflow-hidden rounded-lg border sm:size-[4.5rem] ${KASSA_POS_RULE_BLACK} bg-black/20`}
                 data-testid="retail-last-scan-thumb"
@@ -2920,6 +2938,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
                   </div>
                 )}
               </div>
+              ) : null}
             </div>
           </div>
 
