@@ -120,7 +120,8 @@ import { useKassaStaffClockPos } from '@/lib/use-kassa-staff-clock-pos'
 
 const KASSA_HEADER_QUICK_LINK_LABEL = 'text-[11px] leading-snug sm:text-xs'
 
-const RETAIL_TRAY_TILE_SIZE_CLASS = 'size-[4cm]'
+const RETAIL_TRAY_TILE_SIZE_CLASS =
+  'flex h-full min-h-[4.25rem] w-full min-w-0 items-center justify-center overflow-hidden break-words px-1 py-1 text-center text-[11px] font-bold leading-tight sm:min-h-[4.5rem] sm:px-1.5 sm:text-xs'
 
 type RetailGrayTrayTile =
   | { key: string; kind: 'logout'; labelKey: string; submenuIds: string[] }
@@ -970,7 +971,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   }
 
   function renderRetailPlateTiles() {
-    const tileClass = `${kassaLayoutQuickMenuTileClass(kassaLayout)} ${RETAIL_TRAY_TILE_SIZE_CLASS} flex shrink-0 touch-manipulation select-none flex-col items-center justify-center px-2 py-2 text-center text-[13px] font-bold leading-[1.15] sm:text-sm sm:leading-snug`
+    const tileClass = `${kassaLayoutQuickMenuTileClass(kassaLayout)} ${RETAIL_TRAY_TILE_SIZE_CLASS} touch-manipulation select-none`
     return RETAIL_GRAY_TRAY_TILES.map((tile) => {
       const label = t(tile.labelKey)
       if (tile.kind === 'loyaltyNoCard') {
@@ -2827,16 +2828,16 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             </div>
 
             <div
-              className={`flex shrink-0 items-center gap-2 border-t py-1 pl-3 pr-2 sm:gap-2.5 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`}
+              className={`flex shrink-0 items-start gap-1.5 border-t py-1 pl-2 pr-2 sm:gap-2 sm:pl-3 sm:pr-3 ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`}
             >
               <div
-                className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto sm:gap-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="grid min-w-0 flex-1 items-stretch gap-1.5 overflow-hidden [grid-template-columns:repeat(auto-fit,minmax(min(100%,5.75rem),1fr))] sm:gap-2"
                 data-testid="retail-plate-tiles"
               >
                 {renderRetailPlateTiles()}
               </div>
               <div
-                className={`size-[4cm] shrink-0 overflow-hidden rounded-lg border ${KASSA_POS_RULE_BLACK} bg-black/20`}
+                className={`size-[4.25rem] shrink-0 overflow-hidden rounded-lg border sm:size-[4.5rem] ${KASSA_POS_RULE_BLACK} bg-black/20`}
                 data-testid="retail-last-scan-thumb"
               >
                 {selectedPreviewSku?.image_url?.trim() ? (
