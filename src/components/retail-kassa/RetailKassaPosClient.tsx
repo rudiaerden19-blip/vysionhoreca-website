@@ -2478,6 +2478,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-3 pb-3">
               {customerEdit ? (
                 <form
+                  data-vysion-light-form
                   className="mb-3 rounded-xl bg-white p-3"
                   onSubmit={(e) => {
                     e.preventDefault()
