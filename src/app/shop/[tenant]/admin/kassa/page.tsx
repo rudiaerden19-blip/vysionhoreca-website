@@ -3708,25 +3708,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (Math.abs(total - sc - sd) > 0.02) return
     }
 
-    invalidateMenuCategoriesCache(tenant)
-    cache.invalidate(cacheKey('menu_products', tenant))
-    let freshVatLookup = categoryVatLookup
-    let freshProductCategoryById = productCategoryById
-    let freshProds = products
-    try {
-      const [freshCatsRaw, freshProdsRaw] = await Promise.all([
-        getMenuCategories(tenant),
-        getMenuProducts(tenant),
-      ])
-      const freshCats = dedupeCatalogById(freshCatsRaw.filter((c) => c.is_active))
-      freshProds = dedupeCatalogById(freshProdsRaw.filter((p) => p.is_active))
-      freshVatLookup = buildCategoryVatLookupForJurisdiction(freshCats, tenantCountry)
-      freshProductCategoryById = buildProductCategoryLookup(freshProds)
-      setCategories(freshCats)
-      setProducts(freshProds)
-    } catch {
-      /* offline: bestaande lookup */
-    }
+    const freshVatLookup = categoryVatLookup
+    const freshProductCategoryById = productCategoryById
+    const freshProds = products
     const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
       resolveVatPercentForCartLine(
@@ -3933,6 +3917,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowPaymentModal(false)
     setShowSplitModal(false)
     setShowSuccessModal(true)
+    void loadMenu({ silent: true })
   }
 
   const printReceipt = async (
