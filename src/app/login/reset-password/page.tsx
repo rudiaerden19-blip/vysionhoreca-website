@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { clearRememberedOwnerLoginPassword } from '@/lib/auth-headers'
 
 function ResetPasswordContent() {
   const router = useRouter()
@@ -71,6 +72,7 @@ function ResetPasswordContent() {
       if (!response.ok) {
         setError(data.error || 'Er is een fout opgetreden')
       } else {
+        clearRememberedOwnerLoginPassword()
         setSuccess(true)
       }
     } catch {

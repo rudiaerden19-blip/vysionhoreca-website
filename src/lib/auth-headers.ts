@@ -230,6 +230,16 @@ export function readRememberedOwnerLoginPassword(): string {
   }
 }
 
+/** Na wachtwoord-reset: oude opgeslagen zaak-wachtwoord op dit apparaat wissen. */
+export function clearRememberedOwnerLoginPassword(): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(OWNER_LAST_LOGIN_PASSWORD_KEY)
+  } catch {
+    /* private mode */
+  }
+}
+
 /**
  * Valideer `next`na login: alleen intern pad onder /shop/{slug}/ (geen open redirect).
  */

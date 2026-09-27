@@ -64,19 +64,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash new password with bcrypt
+    const normalizedEmail = String(resetToken.email || '').trim().toLowerCase()
+
+    const { data: profile, error: profileError } = await supabase
+      .from('business_profiles')
+      .select('id, email')
+      .eq('email', normalizedEmail)
+      .maybeSingle()
+
+    if (profileError) {
+      console.error('Failed to load profile for reset:', profileError)
+      return NextResponse.json(
+        { error: 'Kon account niet vinden. Neem contact op met support.'},
+        { status: 500 }
+      )
+    }
+
+    if (!profile?.id) {
+      console.error('Password reset: no business_profiles row for', normalizedEmail)
+      return NextResponse.json(
+        { error: 'Geen zaak-account gevonden voor deze reset. Neem contact op met support.'},
+        { status: 400 }
+      )
+    }
+
     const passwordHash = await bcrypt.hash(password, 12)
 
-    // Update password in business_profiles
-    const { error: updateError } = await supabase
+    const { data: updatedRow, error: updateError } = await supabase
       .from('business_profiles')
-      .update({ 
+      .update({
         password_hash: passwordHash,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        ...(profile.email !== normalizedEmail ? { email: normalizedEmail } : {}),
       })
-      .eq('email', resetToken.email)
+      .eq('id', profile.id)
+      .select('id')
+      .maybeSingle()
 
-    if (updateError) {
+    if (updateError || !updatedRow?.id) {
       console.error('Failed to update password:', updateError)
       return NextResponse.json(
         { error: 'Kon wachtwoord niet updaten. Probeer opnieuw.'},
