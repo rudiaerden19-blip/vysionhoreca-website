@@ -16,6 +16,7 @@ export function KassaPaymentModal({
   open,
   total,
   options,
+  payBusy = false,
   onClose,
   onPay,
   onOpenSplit,
@@ -24,6 +25,7 @@ export function KassaPaymentModal({
   open: boolean
   total: number
   options: readonly KassaPayOption[]
+  payBusy?: boolean
   onClose: () => void
   onPay: (method: KassaQuickPayMethod) => void
   onOpenSplit: () => void
@@ -64,8 +66,9 @@ export function KassaPaymentModal({
               <button
                 key={pm.method}
                 type="button"
+                disabled={payBusy}
                 onClick={() => onPay(pm.method)}
-                className={btnTile}
+                className={`${btnTile} disabled:opacity-40 disabled:pointer-events-none disabled:scale-100`}
                 style={{ borderColor: pm.color }}
               >
                 <span style={{ color: pm.color }}>{pm.label}</span>
@@ -73,8 +76,9 @@ export function KassaPaymentModal({
             ))}
             <button
               type="button"
+              disabled={payBusy}
               onClick={onOpenSplit}
-              className={`col-span-2 ${btnTile}`}
+              className={`col-span-2 ${btnTile} disabled:opacity-40 disabled:pointer-events-none disabled:scale-100`}
               style={{ borderColor: '#8b5cf6'}}
             >
               <span style={{ color: '#8b5cf6'}}>{t('kassaApp.splitPay')}</span>

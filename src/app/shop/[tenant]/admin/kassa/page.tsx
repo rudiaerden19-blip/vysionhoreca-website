@@ -1777,6 +1777,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [tenantDefaultBtw, tenantCountry],
   )
   const requestCheckout = useCallback(() => {
+    if (payInFlightRef.current) return
     scheduleKassaTapSound(playCheckout)
     if (checkoutVatMode === 'dine_in') {
       setOrderType('DINE_IN')
@@ -2540,6 +2541,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showSplitModal, setShowSplitModal] = useState(false)
   /** Blokkeer een tweede afrekenen tot de mand leeg is of de bon mislukt. */
   const payInFlightRef = useRef(false)
+  const [payInFlight, setPayInFlight] = useState(false)
+  const releasePayInFlight = useCallback(() => {
+    payInFlightRef.current = false
+    setPayInFlight(false)
+  }, [])
+  const lockPayInFlight = useCallback((): boolean => {
+    if (payInFlightRef.current) return false
+    payInFlightRef.current = true
+    setPayInFlight(true)
+    return true
+  }, [])
   /** BroadcastChannel-sessie voor tweede scherm (klant); optioneel — geen impact zonder token */
   const [customerDisplayToken, setCustomerDisplayToken] = useState<string | null>(null)
   /** Korte bedankmelding op klantscherm na betaling */
@@ -3121,7 +3133,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [activeTableSlotKey, parkedOnTableLines, cart, products])
 
   useEffect(() => {
-    if (billLines.length === 0) payInFlightRef.current = false
+    if (billLines.length === 0) {
+      payInFlightRef.current = false
+      setPayInFlight(false)
+    }
   }, [billLines.length])
 
   const sidebarShowsOrderPanel = kassaSidebarShowsOrderLinePanel({
@@ -3694,7 +3709,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     splitAmounts?: { cash: number; card: number },
   ) => {
     if (billLines.length === 0) return
-    if (payInFlightRef.current) return
+    if (!lockPayInFlight()) return
 
     const dineInSettleAtCheckout =
       orderType === 'DINE_IN' && tableNumber.trim()
@@ -3704,7 +3719,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (method === 'SPLIT') {
       const sc = splitAmounts?.cash ?? 0
       const sd = splitAmounts?.card ?? 0
-      if (Math.abs(total - sc - sd) > 0.02) return
+      if (Math.abs(total - sc - sd) > 0.02) {
+        releasePayInFlight()
+        return
+      }
     }
 
     const freshVatLookup = categoryVatLookup
@@ -3782,7 +3800,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       orderPayload.payment_split_card = Math.round(splitAmounts.card * 100) / 100
     }
 
-    payInFlightRef.current = true
     let holdLockUntilCartClears = false
     const dismissUnsavedReceipt = () => {
       setShowSuccessModal(false)
@@ -3942,7 +3959,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       dismissUnsavedReceipt()
       alert(`${t('kassaApp.orderPersistFailedTitle')}\n\n${t('kassaApp.orderPersistFailedBody')}`)
     } finally {
-      if (!holdLockUntilCartClears) payInFlightRef.current = false
+      if (!holdLockUntilCartClears) releasePayInFlight()
     }
   }
 
@@ -6496,7 +6513,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   if (billLines.length === 0) return
                   requestCheckout()
                 }}
-                disabled={billLines.length === 0}
+                disabled={billLines.length === 0 || payInFlight}
                 className={`flex min-w-0 flex-1 items-center justify-center ${kassaPosCheckoutButtonClass(posChrome)} ${
                   kassaWide15Chrome ? 'min-h-[2.75rem] py-2 text-sm' : kassaCompactChrome ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
                 }`}
@@ -6700,7 +6717,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   if (billLines.length === 0) return
                   requestCheckout()
                 }}
-                disabled={billLines.length === 0}
+                disabled={billLines.length === 0 || payInFlight}
                 className={`flex min-w-0 flex-1 items-center justify-center rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 ${
                   kassaWide15Chrome ? 'min-h-[2.6rem] py-1.5 text-sm' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
@@ -7027,8 +7044,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         open={showPaymentModal}
         total={total}
         options={paymentMethodOptions}
-        onClose={() => setShowPaymentModal(false)}
+        payBusy={payInFlight}
+        onClose={() => {
+          if (payInFlight) return
+          setShowPaymentModal(false)
+        }}
         onPay={(method) => {
+          if (payInFlight) return
           if (kassaCardPayGoesToCloudTerminal(method, paymentTerminals)) {
             setTerminalPayMethod(method === 'BANCONTACT' ? 'BANCONTACT' : 'CARD')
             setShowPaymentModal(false)
@@ -7038,6 +7060,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           void completePayment(method)
         }}
         onOpenSplit={() => {
+          if (payInFlight) return
           setSplitCash(0)
           setSplitCard(total)
           setShowSplitModal(true)
@@ -7070,11 +7093,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         splitCard={splitCard}
         setSplitCash={setSplitCash}
         setSplitCard={setSplitCard}
+        payBusy={payInFlight}
         onCloseBack={() => {
+          if (payInFlight) return
           setShowSplitModal(false)
           setShowPaymentModal(true)
         }}
-        onConfirm={() => void completePayment('SPLIT', { cash: splitCash, card: splitCard })}
+        onConfirm={() => {
+          if (payInFlight) return
+          void completePayment('SPLIT', { cash: splitCash, card: splitCard })
+        }}
         appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
 

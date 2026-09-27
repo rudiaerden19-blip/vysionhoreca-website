@@ -10,6 +10,7 @@ export function KassaSplitPaymentModal({
   splitCard,
   setSplitCash,
   setSplitCard,
+  payBusy = false,
   onCloseBack,
   onConfirm,
   appearance = 'light',
@@ -20,6 +21,7 @@ export function KassaSplitPaymentModal({
   splitCard: number
   setSplitCash: (n: number) => void
   setSplitCard: (n: number) => void
+  payBusy?: boolean
   onCloseBack: () => void
   onConfirm: () => void
   appearance?: 'light' |  'dark'
@@ -129,9 +131,9 @@ export function KassaSplitPaymentModal({
           <button
             type="button"
             onClick={() => {
-              if (balanced) onConfirm()
+              if (balanced && !payBusy) onConfirm()
             }}
-            disabled={!balanced}
+            disabled={!balanced || payBusy}
             className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {t('kassaApp.splitConfirm').replace('{amount}', (splitCash + splitCard).toFixed(2))}
