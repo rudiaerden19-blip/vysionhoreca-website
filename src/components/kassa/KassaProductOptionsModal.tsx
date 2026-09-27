@@ -86,7 +86,13 @@ export function KassaProductOptionsModal({
           {model.options.map((option) => (
             <div key={option.id}>
               <div className="flex items-center gap-2 mb-3">
-                <p className={dark ? 'font-bold text-base text-zinc-100': 'font-bold text-base text-gray-900'}>
+                <p
+                  className={
+                    dark
+                      ? 'font-bold text-base uppercase tracking-wide text-[#6dd5ff]'
+                      : 'font-bold text-base uppercase tracking-wide text-[#3C4D6B]'
+                  }
+                >
                   {option.name}
                 </p>
                 {option.required && (
