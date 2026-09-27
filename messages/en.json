@@ -2960,6 +2960,7 @@
       "singleChoice": " Single choice",
       "multipleChoice": " Multiple choices",
       "dragToSort": "drag ⠿ to sort",
+      "dragBlocksToSort": "Drag a whole block by ⠿ up or down — e.g. put «Without» above «Extra sauce». Applies on POS and webshop.",
       "free": "Free",
       "confirmDelete": "Are you sure you want to delete this option? All choices will also be deleted.",
       "deleteFailed": "Delete failed",

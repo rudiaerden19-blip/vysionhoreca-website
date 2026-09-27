@@ -2624,6 +2624,7 @@
       "singleChoice": " Scelta singola",
       "multipleChoice": " Scelte multiple",
       "dragToSort": "trascina ⠿ per ordinare",
+      "dragBlocksToSort": "Trascina l’intero blocco con ⠿ — es. « Senza » sopra « Salsa extra ». Vale in cassa e webshop.",
       "free": "Gratis",
       "confirmDelete": "Eliminare questa opzione? Verranno rimosse anche tutte le scelte.",
       "deleteFailed": "Eliminazione non riuscita",

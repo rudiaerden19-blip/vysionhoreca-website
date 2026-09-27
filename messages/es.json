@@ -2624,6 +2624,7 @@
       "singleChoice": " Elección única",
       "multipleChoice": " Varias opciones",
       "dragToSort": "arrastre ⠿ para ordenar",
+      "dragBlocksToSort": "Arrastre un bloque entero con ⠿ — p. ej. « Sin » encima de « Salsa extra ». Vale en TPV y web.",
       "free": "Gratis",
       "confirmDelete": "¿Eliminar esta opción? Todas las elecciones también se eliminarán.",
       "deleteFailed": "Error al eliminar",

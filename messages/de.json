@@ -2124,6 +2124,7 @@
       "singleChoice": " Einfachauswahl",
       "multipleChoice": " Mehrfachauswahl",
       "dragToSort": "ziehen ⠿ zum Verschieben",
+      "dragBlocksToSort": "Ganzen Block per ⠿ nach oben/unten ziehen — z. B. «Ohne» über «Extra Soße». Gilt an Kasse und Webshop.",
       "free": "Kostenlos",
       "confirmDelete": "Diese Option löschen? Alle Auswahlmöglichkeiten werden ebenfalls entfernt.",
       "deleteFailed": "Löschen fehlgeschlagen",

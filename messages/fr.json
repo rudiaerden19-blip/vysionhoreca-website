@@ -2124,6 +2124,7 @@
       "singleChoice": " Choix unique",
       "multipleChoice": " Choix multiples",
       "dragToSort": "glisser ⠿ pour déplacer",
+      "dragBlocksToSort": "Glissez un bloc entier avec ⠿ — ex. « Sans » au-dessus de « Sauce extra ». Valable caisse et webshop.",
       "free": "Gratuit",
       "confirmDelete": "Supprimer cette option ? Tous les choix seront aussi supprimés.",
       "deleteFailed": "Échec de la suppression",

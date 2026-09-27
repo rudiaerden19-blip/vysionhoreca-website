@@ -17,6 +17,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { 
   getProductOptions, 
   saveProductOption, 
+  saveProductOptionSortOrders,
   deleteProductOption, 
   ProductOption, 
   ProductOptionChoice 
@@ -28,6 +29,110 @@ import {
   useAdminCatalogDragSensors,
 } from '@/lib/admin-dnd-sensors'
 import { AdminIconClose, AdminIconPencil, AdminIconPlus, AdminIconTrash } from '@/lib/admin-action-icons'
+
+function SortableOptionBlock({
+  option,
+  onEdit,
+  onDelete,
+  t,
+}: {
+  option: ProductOption
+  onEdit: () => void
+  onDelete: () => void
+  t: (key: string) => string
+}) {
+  const id = option.id!
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.85 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white rounded-2xl p-6 shadow-sm ${isDragging ? 'z-50 ring-2 ring-blue-400' : ''}`}
+    >
+      <div className="flex items-start gap-3 mb-4">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="touch-manipulation mt-1 p-2 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing shrink-0"
+          title={t('adminPages.opties.dragBlocksToSort')}
+          aria-label={t('adminPages.opties.dragBlocksToSort')}
+        >
+          ⠿
+        </button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className="font-semibold text-lg text-gray-900">{option.name}</h3>
+              <div className="flex gap-2 mt-1 flex-wrap">
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  option.type === 'single' 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'bg-purple-100 text-purple-700'
+                }`}>
+                  {option.type === 'single'? t('adminPages.opties.singleChoice') : t('adminPages.opties.multipleChoice')}
+                </span>
+                {option.required && (
+                  <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
+                    {t('adminPages.opties.required')}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button 
+                onClick={onEdit}
+                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                title={t('adminPages.common.edit')}
+                aria-label={t('adminPages.common.edit')}
+              >
+                <AdminIconPencil className="h-5 w-5 text-gray-700" />
+              </button>
+              <button 
+                onClick={onDelete}
+                className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
+                title={t('adminPages.common.delete')}
+                aria-label={t('adminPages.common.delete')}
+              >
+                <AdminIconTrash className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2 pl-11">
+        {option.choices?.map((choice) => (
+          <div 
+            key={choice.id}
+            className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
+          >
+            <span className="text-gray-700">{choice.name}</span>
+            {choice.price > 0 ? (
+              <span className="font-medium text-blue-600">
+                {`+€${choice.price.toFixed(2)}`}
+              </span>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // Sortable Choice Component
 function SortableChoice({ 
@@ -152,6 +257,30 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
   const sensors = useAdminCatalogDragSensors()
 
   // Handle drag end for choices
+  const handleOptionBlockDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = options.findIndex((o) => o.id === active.id)
+    const newIndex = options.findIndex((o) => o.id === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    const reordered = arrayMove(options, oldIndex, newIndex).map((o, i) => ({
+      ...o,
+      sort_order: i,
+    }))
+    setOptions(reordered)
+
+    const ok = await saveProductOptionSortOrders(
+      params.tenant,
+      reordered.map((o) => o.id!).filter(Boolean),
+    )
+    if (!ok) {
+      setError(t('adminPages.opties.saveFailed'))
+      await loadOptions()
+    }
+  }
+
   const handleChoiceDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
@@ -341,71 +470,31 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
       )}
 
       {/* Options List */}
-      <div className="space-y-4">
-        {options.map((option, index) => (
-          <motion.div
-            key={option.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-sm"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-lg text-gray-900">{option.name}</h3>
-                <div className="flex gap-2 mt-1">
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    option.type === 'single' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-purple-100 text-purple-700'
-                  }`}>
-                    {option.type === 'single'? t('adminPages.opties.singleChoice') : t('adminPages.opties.multipleChoice')}
-                  </span>
-                  {option.required && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
-                      {t('adminPages.opties.required')}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => openEditModal(option)}
-                  className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                  title={t('adminPages.common.edit')}
-                  aria-label={t('adminPages.common.edit')}
-                >
-                  <AdminIconPencil className="h-5 w-5 text-gray-700" />
-                </button>
-                <button 
-                  onClick={() => handleDelete(option.id!)}
-                  className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
-                  title={t('adminPages.common.delete')}
-                  aria-label={t('adminPages.common.delete')}
-                >
-                  <AdminIconTrash className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-              {option.choices?.map((choice) => (
-                <div 
-                  key={choice.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
-                >
-                  <span className="text-gray-700">{choice.name}</span>
-                  {choice.price > 0 ? (
-                  <span className="font-medium text-blue-600">
-                    {`+€${choice.price.toFixed(2)}`}
-                  </span>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {options.length > 0 && (
+        <p className="text-sm text-gray-500 mb-3">{t('adminPages.opties.dragBlocksToSort')}</p>
+      )}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleOptionBlockDragEnd}
+      >
+        <SortableContext
+          items={options.map((o) => o.id!).filter(Boolean)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-4">
+            {options.map((option) => (
+              <SortableOptionBlock
+                key={option.id}
+                option={option}
+                onEdit={() => openEditModal(option)}
+                onDelete={() => handleDelete(option.id!)}
+                t={t}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {/* Empty State */}
       {options.length === 0 && (

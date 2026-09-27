@@ -728,6 +728,29 @@ export async function saveProductOption(option: ProductOption): Promise<ProductO
   return { ...saved, choices: savedChoices }
 }
 
+/** Volgorde van optie-blokken (kassa / webshop) — alleen sort_order bijwerken. */
+export async function saveProductOptionSortOrders(
+  tenantSlug: string,
+  orderedOptionIds: string[],
+): Promise<boolean> {
+  if (!tenantSlug || orderedOptionIds.length === 0) return true
+  const results = await Promise.all(
+    orderedOptionIds.map((id, sort_order) =>
+      adminDb.update(
+        'product_options',
+        { sort_order },
+        { id, tenant_slug: tenantSlug },
+        { tenantSlug },
+      ),
+    ),
+  )
+  if (results.some((r) => !r.ok)) {
+    console.error('Error saving product option sort order:', results.find((r) => !r.ok)?.error)
+    return false
+  }
+  return true
+}
+
 export async function deleteProductOption(id: string, tenantSlug: string): Promise<boolean> {
   if (!tenantSlug) {
     console.error('deleteProductOption: tenantSlug verplicht')

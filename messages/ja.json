@@ -2624,6 +2624,7 @@
       "singleChoice": " 単一選択",
       "multipleChoice": " 複数選択",
       "dragToSort": "⠿ をドラッグして並べ替え",
+      "dragBlocksToSort": "⠿ でブロック全体を上下にドラッグ（例：「なし」を「追加ソース」の上に）。レジとウェブショップに反映。",
       "free": "無料",
       "confirmDelete": "このオプションを削除しますか？選択肢もすべて削除されます。",
       "deleteFailed": "削除に失敗しました",

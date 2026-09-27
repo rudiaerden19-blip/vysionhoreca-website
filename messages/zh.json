@@ -2624,6 +2624,7 @@
       "singleChoice": " 单选",
       "multipleChoice": " 多选",
       "dragToSort": "拖动 ⠿ 排序",
+      "dragBlocksToSort": "用 ⠿ 拖动整个区块上下排序（例如「不要」放在「额外酱」上方）。适用于收银和网店。",
       "free": "免费",
       "confirmDelete": "确定删除此选项？所有选项值也将被删除。",
       "deleteFailed": "删除失败",
