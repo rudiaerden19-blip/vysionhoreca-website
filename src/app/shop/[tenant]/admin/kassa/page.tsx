@@ -989,6 +989,8 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
 
 /** Unieke sleutel per afgeronde verkoop — zonder tijdstip (dat kan per render/build verschillen). */
 function kassaPaidReceiptGuardKey(order: KassaLastOrderReceipt): string {
+  const uuid = String(order.kassaClientUuid ?? '').trim()
+  if (uuid) return uuid
   const ref = String(order.checkoutReference ?? '').trim()
   const cents = Math.round(order.total * 100)
   return `${order.orderNumber}|${ref}|${cents}`
@@ -2645,6 +2647,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     inFlight: boolean
     printedOkOnce: boolean
   }>({ key: null, inFlight: false, printedOkOnce: false })
+  /** Eén auto-bon per afgeronde verkoop (zelfde sleutel als print-dedupe). */
+  const autoPrintPaidReceiptKeyRef = useRef<string | null>(null)
 
   const draftReceiptPrintGuardRef = useRef<{
     inFlight: boolean
@@ -3707,9 +3711,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const completePayment = async (
     method: PaymentMethodType,
     splitAmounts?: { cash: number; card: number },
+    opts?: { preLocked?: boolean },
   ) => {
-    if (billLines.length === 0) return
-    if (!lockPayInFlight()) return
+    if (billLines.length === 0) {
+      if (opts?.preLocked) releasePayInFlight()
+      return
+    }
+    if (!opts?.preLocked && !lockPayInFlight()) return
+
+    const createdAt = new Date()
+    const kassa_client_uuid =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${tenant}-${createdAt.getTime()}-${Math.random().toString(36).slice(2, 12)}`
+    const shortRef = kassa_client_uuid.replace(/-/g, '').slice(-10).toUpperCase()
 
     const dineInSettleAtCheckout =
       orderType === 'DINE_IN' && tableNumber.trim()
@@ -3724,6 +3739,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return
       }
     }
+
+    flushSync(() => {
+      setShowPaymentModal(false)
+      setShowSplitModal(false)
+    })
 
     const freshVatLookup = categoryVatLookup
     const freshProductCategoryById = productCategoryById
@@ -3745,13 +3765,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const subtotal = vatSplit.subtotalExcl
     const tax = vatSplit.totalTax
-    const createdAt = new Date()
-    const kassa_client_uuid =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `${tenant}-${createdAt.getTime()}-${Math.random().toString(36).slice(2, 12)}`
-
-    const shortRef = kassa_client_uuid.replace(/-/g, '').slice(-10).toUpperCase()
 
     const receiptTable = kassaReceiptTableNumber(orderType, tableNumber)
     const customerTableLabel = receiptTable
@@ -3822,29 +3835,33 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : undefined,
     })
 
-    setLastOrder({
-      orderNumber: 0,
-      items: sortKassaCartLinesByMenuCategory([...billLines], categories),
-      total,
-      vatSplit: vatSplit.byRate.map((l) => ({
-        rate: l.rate,
-        baseExcl: l.baseExcl,
-        tax: l.tax,
-      })),
-      subtotalExclVat: Math.round(subtotal * 100) / 100,
-      totalTax: Math.round(tax * 100) / 100,
-      paymentMethod: method,
-      splitCash: method === 'SPLIT'? splitAmounts?.cash : undefined,
-      splitCard: method === 'SPLIT'? splitAmounts?.card : undefined,
-      orderType,
-      tableNumber: receiptTable,
-      floorPlanZone: receiptTable ? dineInFloorZone : undefined,
-      createdAt,
-      helpedByStaffName: activeKassaStaff?.name?.trim() || null,
+    flushSync(() => {
+      setLastOrder({
+        orderNumber: 0,
+        kassaClientUuid: kassa_client_uuid,
+        checkoutReference: shortRef,
+        items: sortKassaCartLinesByMenuCategory([...billLines], categories),
+        total,
+        vatSplit: vatSplit.byRate.map((l) => ({
+          rate: l.rate,
+          baseExcl: l.baseExcl,
+          tax: l.tax,
+        })),
+        subtotalExclVat: Math.round(subtotal * 100) / 100,
+        totalTax: Math.round(tax * 100) / 100,
+        paymentMethod: method,
+        splitCash: method === 'SPLIT'? splitAmounts?.cash : undefined,
+        splitCard: method === 'SPLIT'? splitAmounts?.card : undefined,
+        orderType,
+        tableNumber: receiptTable,
+        floorPlanZone: receiptTable ? dineInFloorZone : undefined,
+        createdAt,
+        helpedByStaffName: activeKassaStaff?.name?.trim() || null,
+      })
+      setShowSuccessModal(true)
     })
-    setShowPaymentModal(false)
-    setShowSplitModal(false)
-    setShowSuccessModal(true)
+    playCashRegister()
+    setTimeout(() => playSuccess(), 400)
 
     try {
     const insRes = await adminDb.insert(
@@ -3865,8 +3882,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const finishSuccessPath = () => {
       syncZReportAfterOrderSafe(tenant, createdAt.toISOString())
-      playCashRegister()
-      setTimeout(() => playSuccess(), 400)
     }
 
     if (insRes.ok && insertedRow?.order_number != null) {
@@ -3924,8 +3939,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
       queuedOffline = true
       alert(`${t('kassaApp.offlineModeActive')}\n\n${t('kassaApp.offlineOrderQueuedAlert').replace('{ref}', shortRef)}`)
-      playCashRegister()
-      setTimeout(() => playSuccess(), 400)
     } else {
       console.error('Kassa: admin order insert error:', insRes.error)
       dismissUnsavedReceipt()
@@ -4422,6 +4435,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       else if (!barKitchenDelta) draftReceiptPrintGuardRef.current.inFlight = false
     }
   }
+
+  const paidReceiptAutoPrintKey =
+    showSuccessModal && lastOrder ? kassaPaidReceiptGuardKey(lastOrder) : null
+
+  useEffect(() => {
+    if (!paidReceiptAutoPrintKey || !lastOrder) return
+    if (autoPrintPaidReceiptKeyRef.current === paidReceiptAutoPrintKey) return
+    autoPrintPaidReceiptKeyRef.current = paidReceiptAutoPrintKey
+    void printReceipt(lastOrder)
+  }, [paidReceiptAutoPrintKey, lastOrder])
 
   flushBarDeltaSlipRef.current = (zone, tblNr, fullTableLines, slipOpts) => {
     void (async () => {
@@ -7050,17 +7073,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowPaymentModal(false)
         }}
         onPay={(method) => {
-          if (payInFlight) return
+          if (payInFlightRef.current) return
           if (kassaCardPayGoesToCloudTerminal(method, paymentTerminals)) {
             setTerminalPayMethod(method === 'BANCONTACT' ? 'BANCONTACT' : 'CARD')
             setShowPaymentModal(false)
             setShowTerminalPayModal(true)
             return
           }
-          void completePayment(method)
+          if (!lockPayInFlight()) return
+          void completePayment(method, undefined, { preLocked: true })
         }}
         onOpenSplit={() => {
-          if (payInFlight) return
+          if (payInFlightRef.current) return
           setSplitCash(0)
           setSplitCard(total)
           setShowSplitModal(true)
@@ -7078,7 +7102,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
         onSucceeded={() => {
           setShowTerminalPayModal(false)
-          void completePayment(terminalPayMethod)
+          if (!lockPayInFlight()) return
+          void completePayment(terminalPayMethod, undefined, { preLocked: true })
         }}
         onCancelBack={() => {
           setShowTerminalPayModal(false)
@@ -7100,8 +7125,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowPaymentModal(true)
         }}
         onConfirm={() => {
-          if (payInFlight) return
-          void completePayment('SPLIT', { cash: splitCash, card: splitCard })
+          if (payInFlightRef.current) return
+          if (!lockPayInFlight()) return
+          void completePayment('SPLIT', { cash: splitCash, card: splitCard }, { preLocked: true })
         }}
         appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
@@ -7192,10 +7218,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           order={lastOrder}
           tenantInfo={tenantInfo}
           locale={locale}
-          onClose={() => setShowSuccessModal(false)}
+          onClose={() => {
+            setShowSuccessModal(false)
+            autoPrintPaidReceiptKeyRef.current = null
+          }}
           printDisabled={
             successReceiptPrintBusy ||
-            (lastOrder.orderNumber <= 0 && !lastOrder.checkoutReference)
+            (lastOrder.orderNumber <= 0 &&
+              !lastOrder.checkoutReference &&
+              !lastOrder.kassaClientUuid)
           }
           onPrint={async () => {
             setShowSuccessModal(false)

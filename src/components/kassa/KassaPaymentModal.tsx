@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
@@ -33,6 +34,13 @@ export function KassaPaymentModal({
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
+  const [optimisticPayBusy, setOptimisticPayBusy] = useState(false)
+  const payLocked = payBusy || optimisticPayBusy
+
+  useEffect(() => {
+    if (!open) setOptimisticPayBusy(false)
+  }, [open])
+
   if (!open) return null
 
   const card = dark
@@ -66,8 +74,12 @@ export function KassaPaymentModal({
               <button
                 key={pm.method}
                 type="button"
-                disabled={payBusy}
-                onClick={() => onPay(pm.method)}
+                disabled={payLocked}
+                onClick={() => {
+                  if (payLocked) return
+                  setOptimisticPayBusy(true)
+                  onPay(pm.method)
+                }}
                 className={`${btnTile} disabled:opacity-40 disabled:pointer-events-none disabled:scale-100`}
                 style={{ borderColor: pm.color }}
               >
@@ -76,8 +88,11 @@ export function KassaPaymentModal({
             ))}
             <button
               type="button"
-              disabled={payBusy}
-              onClick={onOpenSplit}
+              disabled={payLocked}
+              onClick={() => {
+                if (payLocked) return
+                onOpenSplit()
+              }}
               className={`col-span-2 ${btnTile} disabled:opacity-40 disabled:pointer-events-none disabled:scale-100`}
               style={{ borderColor: '#8b5cf6'}}
             >

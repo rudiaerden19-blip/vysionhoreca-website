@@ -52,6 +52,8 @@ export interface KassaReceiptRetailLoyalty {
 
 export interface KassaLastOrderReceipt {
   orderNumber: number
+  /** Idempotente kassa-verkoop — bon-dedupe vóór order_number uit DB. */
+  kassaClientUuid?: string
   checkoutReference?: string
   items: KassaCartItem[]
   total: number

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
@@ -28,6 +29,13 @@ export function KassaSplitPaymentModal({
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
+  const [optimisticConfirmBusy, setOptimisticConfirmBusy] = useState(false)
+  const confirmLocked = payBusy || optimisticConfirmBusy
+
+  useEffect(() => {
+    if (!open) setOptimisticConfirmBusy(false)
+  }, [open])
+
   if (!open) return null
 
   const balanced = Math.abs(total - splitCash - splitCard) < 0.01
@@ -131,9 +139,11 @@ export function KassaSplitPaymentModal({
           <button
             type="button"
             onClick={() => {
-              if (balanced && !payBusy) onConfirm()
+              if (!balanced || confirmLocked) return
+              setOptimisticConfirmBusy(true)
+              onConfirm()
             }}
-            disabled={!balanced || payBusy}
+            disabled={!balanced || confirmLocked}
             className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {t('kassaApp.splitConfirm').replace('{amount}', (splitCash + splitCard).toFixed(2))}
