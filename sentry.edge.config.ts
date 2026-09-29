@@ -4,11 +4,14 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { getSentryTracesSampleRate } from "@/lib/sentry-traces-sample-rate";
+import { sentryDropDemoResetTransaction } from "@/lib/sentry-ignore-demo-routes";
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
   tracesSampleRate: getSentryTracesSampleRate(),
+
+  beforeSendTransaction: sentryDropDemoResetTransaction,
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
