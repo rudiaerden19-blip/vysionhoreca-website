@@ -581,17 +581,7 @@ export function VysionMusicClient({
         </div>
       </div>
 
-      <div className={styles.statusBar}>
-        {snapshot?.zoneName ? (
-          <>
-            {snapshot.zoneName}
-            {snapshot.deviceName ? ` · ${snapshot.deviceName}` : ''}
-            {snapshot.online ? ` · ${t('vysionMusic.online')}` : ` · ${t('vysionMusic.offline')}`}
-          </>
-        ) : (
-          t('vysionMusic.loading')
-        )}
-      </div>
+      <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
     </div>
   )
 }

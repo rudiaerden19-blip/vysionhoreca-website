@@ -6829,6 +6829,7 @@
     "errorLoad": "Kon muziekstatus niet laden.",
     "errorControl": "Bediening mislukt.",
     "errorNetwork": "Netwerkfout.",
-    "errorDismiss": "Melding sluiten"
+    "errorDismiss": "Melding sluiten",
+    "statusFooter": "Vysion Music @ 2026"
   }
 }

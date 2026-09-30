@@ -6829,6 +6829,7 @@
     "errorLoad": "Could not load music status.",
     "errorControl": "Control failed.",
     "errorNetwork": "Network error.",
-    "errorDismiss": "Dismiss message"
+    "errorDismiss": "Dismiss message",
+    "statusFooter": "Vysion Music @ 2026"
   }
 }
