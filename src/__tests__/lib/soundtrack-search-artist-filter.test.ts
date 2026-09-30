@@ -52,4 +52,10 @@ describe('soundtrack search artist filter', () => {
   it('matches ABBA artist for abba query', () => {
     expect(trackArtistMatchesQuery('ABBA', 'Abba')).toBe(true)
   })
+
+  it('matches K3 strictly and rejects unrelated K artists', () => {
+    expect(trackArtistMatchesQuery('K3', 'K3')).toBe(true)
+    expect(trackArtistMatchesQuery('Kaifi Khalil', 'K3')).toBe(false)
+    expect(trackArtistMatchesQuery('Kontakt', 'K3')).toBe(false)
+  })
 })

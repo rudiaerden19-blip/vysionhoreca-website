@@ -10,6 +10,17 @@ export function trackArtistMatchesQuery(artist: string, query: string): boolean 
   const a = artist.trim().toLowerCase()
   const q = query.trim().toLowerCase()
   if (!a || !q) return false
+  /* K3, U2: geen brede regex op korte codes — voorkomt rare Soundtrack-treffers. */
+  if (q.length <= 3) {
+    if (a === q) return true
+    if (a.startsWith(`${q} `)) return true
+    if (a.startsWith(`${q}&`) || a.startsWith(`${q}(`)) return true
+    if (a.startsWith(q)) {
+      const next = a.charAt(q.length)
+      if (!next || !/[a-z0-9]/i.test(next)) return true
+    }
+    return false
+  }
   if (a === q) return true
   if (a.startsWith(`${q} `)) return true
   if (a.startsWith(q)) {
