@@ -170,7 +170,16 @@ export function VysionMusicClient({
   const progressPct = durationMs > 0 ? (progressMs / durationMs) * 100 : 0
   const isPlaying = snapshot?.playbackState === 'playing'
   const { date: clockDate, time: clockTime } = formatClock(clock, locale)
-  const coverUrl = nowTrack?.imageUrl
+  const [coverBroken, setCoverBroken] = useState(false)
+  useEffect(() => {
+    setCoverBroken(false)
+  }, [nowTrack?.imageUrl, nowTrack?.id])
+
+  const coverSrc = useMemo(() => {
+    const raw = nowTrack?.imageUrl?.trim()
+    if (!raw || coverBroken) return null
+    return `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
+  }, [nowTrack?.imageUrl, coverBroken, nowTrack?.id])
 
   const playlistRows = useMemo(
     () => (snapshot?.playlist ?? []).filter((r) => r.name !== '—'),
@@ -228,9 +237,15 @@ export function VysionMusicClient({
       ) : null}
 
       <section className={styles.nowPlaying}>
-        {coverUrl ? (
+        {coverSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={coverUrl} alt="" className={styles.cover} />
+          <img
+            src={coverSrc}
+            alt=""
+            className={styles.cover}
+            referrerPolicy="no-referrer"
+            onError={() => setCoverBroken(true)}
+          />
         ) : (
           <div className={styles.coverPlaceholder} aria-hidden />
         )}
