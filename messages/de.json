@@ -6893,6 +6893,7 @@
     "errorControl": "Steuerung fehlgeschlagen.",
     "errorNetwork": "Netzwerkfehler.",
     "resultsPrefix": "ERGEBNISSE",
-    "errorDismiss": "Dismiss"
+    "errorDismiss": "Dismiss",
+    "statusFooter": "Vysion Music @ 2026"
   }
 }

@@ -6870,6 +6870,7 @@
     "errorControl": "فشل التحكم.",
     "errorNetwork": "خطأ في الشبكة.",
     "resultsPrefix": "نتائج",
-    "errorDismiss": "Dismiss"
+    "errorDismiss": "Dismiss",
+    "statusFooter": "Vysion Music @ 2026"
   }
 }

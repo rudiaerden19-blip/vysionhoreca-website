@@ -6870,6 +6870,7 @@
     "errorControl": "Comando non riuscito.",
     "errorNetwork": "Errore di rete.",
     "resultsPrefix": "RISULTATI",
-    "errorDismiss": "Dismiss"
+    "errorDismiss": "Dismiss",
+    "statusFooter": "Vysion Music @ 2026"
   }
 }
