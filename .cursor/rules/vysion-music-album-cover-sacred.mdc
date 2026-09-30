@@ -1,0 +1,39 @@
+---
+description: HEILIG — Vysion Music albumcover NU SPEELT; niet wijzigen zonder expliciete opdracht
+alwaysApply: true
+---
+
+# Vysion Music — albumcover (HEILIG)
+
+**Eigenaar:** goedgekeurde weergave van de hoes in NU SPEELT. **Geen agent wijzigt dit** tenzij de gebruiker in **dezelfde opdracht** expliciet schrijft dat de **albumcover / albumfoto / cover** **mag** worden aangepast.
+
+## Verboden paden (geen writes)
+
+- `src/components/vysion-music/vysion-music.module.css` — alleen als het `.coverFrame`, `.cover`, `.coverPlaceholder` of `--vm-cover-size` / cover-gerelateerde vars raakt → **stop**, tenzij expliciet vrijgegeven
+- `src/components/vysion-music/VysionMusicClient.tsx` — cover markup (`coverFrame`, `coverSrc`, `coverBroken`, `<img className={styles.cover}>`)
+- `src/lib/soundtrack/soundtrack-album-art.ts`
+- `src/app/api/soundtrack/cover/route.ts`
+- `src/__tests__/lib/soundtrack-album-art.test.ts`
+
+## Vastgelegd gedrag (niet “verbeteren”)
+
+1. **URL:** `soundtrackAlbumArtUrl` — soundcdn `/k/W/H/soundtrack:artwork:…` → vierkant `max(W,H)` zelfde artwork-id.
+2. **Proxy:** `/api/soundtrack/cover?url=` — alleen `i.soundcdn.com`, bytes ongewijzigd doorgeven.
+3. **CSS:** vast vierkant `--vm-cover-size`; img **gecentreerd**, `object-fit: contain`, **geen** crop/`cover` op de hoes.
+4. **Geen** `object-fit: cover`, geen aspect-ratio frame die de hoes uitrekt, geen URL-crop naar “banner”.
+
+## Wel toegestaan zonder cover-opdracht
+
+- Transport, volume, zoeken, playlist, play-flow, layout NU SPEELT **zonder** cover-CSS/markup/URL-helper te raken.
+- Andere bestanden onder `src/components/vysion-music/` als diff **geen** cover-regels touched.
+
+## Verplicht vóór commit als cover wél expliciet vrijgegeven is
+
+```bash
+npm test -- --testPathPatterns=soundtrack-album-art
+npx tsc --noEmit
+```
+
+## Git staging
+
+- `git diff` op bovenstaande paden moet **leeg** zijn bij taken die **niet** over albumcover gaan.
