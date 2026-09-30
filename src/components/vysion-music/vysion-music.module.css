@@ -469,24 +469,6 @@
   background: var(--vm-accent);
 }
 
-.volumeSliderVertical::-webkit-slider-runnable-track {
-  background: linear-gradient(
-    to right,
-    #1f2937 0%,
-    #1f2937 calc(100% - var(--vm-vol-pct, 50%)),
-    var(--vm-accent) calc(100% - var(--vm-vol-pct, 50%)),
-    var(--vm-accent) 100%
-  );
-}
-
-.volumeSliderVertical::-moz-range-track {
-  background: #1f2937;
-}
-
-.volumeSliderVertical::-moz-range-progress {
-  border-radius: 0 999px 999px 0;
-}
-
 .volumeSlider::-moz-range-thumb {
   width: var(--vm-volume-thumb);
   height: var(--vm-volume-thumb);
