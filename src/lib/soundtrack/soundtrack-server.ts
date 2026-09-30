@@ -13,6 +13,11 @@ const API_URL = 'https://api.soundtrackyourbrand.com/v2'
 /** Standaard crossfade in Soundtrack-player (zone settings + skip). */
 export const VYSION_MUSIC_CROSSFADE_SECONDS = 6
 
+/** Artiest-zoek: volledige catalogus (Soundtrack-paginatie), geen cap op ~40. */
+export const SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS = 3000
+const SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PER_QUERY = 120
+const SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS = 200
+
 /** Soundtrack `Volume` scalar: 0–16 (niet 0–100). UI gebruikt 0–100%. */
 const SOUNDTRACK_VOLUME_MAX = 16
 
@@ -595,38 +600,31 @@ function ingestArtistScopedSearchPage(
   return dedupeSearchTrackRows(out)
 }
 
-/** Snelle artiest-zoek: parallel eerste page, weinig extra pagina’s. */
+/** Artiest-zoek: alle Soundtrack-pagina’s per variant tot catalogus op is. */
 async function collectArtistScopedTrackSearch(
   artistQuery: string,
   maxResults: number,
   pageSize: number,
 ): Promise<SoundtrackTrackRow[]> {
   const q = artistQuery.trim()
-  const firstPageSize = Math.min(pageSize, 36)
-  const enoughResults = Math.min(maxResults, 28)
   let collected: SoundtrackTrackRow[] = []
 
   const discoveryQueries = artistDiscoverySearchQueries(q)
   const firstPages = await Promise.all(
-    discoveryQueries.map((searchQ) =>
-      fetchSoundtrackTrackSearchPage(searchQ, firstPageSize, null),
-    ),
+    discoveryQueries.map((searchQ) => fetchSoundtrackTrackSearchPage(searchQ, pageSize, null)),
   )
   for (const data of firstPages) {
     collected = ingestArtistScopedSearchPage(data, q, collected)
-    if (collected.length >= enoughResults) {
-      return collected.slice(0, maxResults)
-    }
   }
 
-  const maxExtraPages = collected.length === 0 ? 4 : 2
-  for (let vi = 0; vi < discoveryQueries.length && collected.length < enoughResults; vi++) {
+  for (let vi = 0; vi < discoveryQueries.length; vi++) {
+    if (collected.length >= maxResults) break
     let after = firstPages[vi]?.search?.pageInfo?.endCursor ?? null
-    for (let page = 0; page < maxExtraPages && collected.length < enoughResults; page++) {
+    for (let page = 0; page < SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PER_QUERY - 1; page++) {
+      if (collected.length >= maxResults) break
       if (!after) break
       const data = await fetchSoundtrackTrackSearchPage(discoveryQueries[vi], pageSize, after)
       collected = ingestArtistScopedSearchPage(data, q, collected)
-      if (collected.length >= maxResults) return collected.slice(0, maxResults)
       const pi = data.search?.pageInfo
       if (!pi?.hasNextPage || !pi.endCursor) break
       after = pi.endCursor
@@ -636,25 +634,29 @@ async function collectArtistScopedTrackSearch(
   return collected.slice(0, maxResults)
 }
 
-/** Soundtrack search met paginatie — geen hard cap op 12; catalog ≠ volledige discografie. */
+/** Soundtrack search met paginatie; artiest-query → volledige gefilterde lijst. */
 export async function soundtrackSearchTracks(
   query: string,
   opts?: { maxResults?: number; pageSize?: number },
 ): Promise<SoundtrackTrackRow[]> {
   const q = query.trim()
   if (!q) return []
-  const maxResults = Math.min(Math.max(opts?.maxResults ?? 80, 1), 120)
+  const artistOnly = prefersArtistOnlySearchResults(q)
+  const defaultMax = artistOnly ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS : 80
+  const hardCap = artistOnly ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS : SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS
+  const maxResults = Math.min(Math.max(opts?.maxResults ?? defaultMax, 1), hardCap)
   const pageSize = Math.min(Math.max(opts?.pageSize ?? 50, 1), 50)
 
-  if (prefersArtistOnlySearchResults(q)) {
-    return collectArtistScopedTrackSearch(q, Math.min(maxResults, 50), pageSize)
+  if (artistOnly) {
+    return collectArtistScopedTrackSearch(q, maxResults, pageSize)
   }
 
   let collected: SoundtrackTrackRow[] = []
   let artistScoped: SoundtrackTrackRow[] | null = null
   let after: string | null = null
 
-  for (let page = 0; page < 8; page++) {
+  const maxPages = 24
+  for (let page = 0; page < maxPages; page++) {
     const data = await fetchSoundtrackTrackSearchPage(q, pageSize, after)
 
     for (const edge of data.search?.edges ?? []) {

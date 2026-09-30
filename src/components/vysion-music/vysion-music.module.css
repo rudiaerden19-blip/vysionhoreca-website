@@ -21,8 +21,8 @@
   /* Transport / thumb: grijs glas (geen blauw) */
   --vm-glass-rim: rgba(164, 174, 188, 0.68);
   --vm-glass-rim-deep: rgba(22, 30, 42, 0.97);
-  --vm-glass-glow: rgba(0, 0, 0, 0.4);
-  --vm-glass-shadow-grey: rgba(110, 118, 130, 0.52);
+  --vm-glass-shadow-blue: rgba(0, 132, 255, 0.22);
+  --vm-glass-shadow-blue-soft: rgba(0, 90, 180, 0.14);
   --vm-panel: #0c1018;
   --vm-panel-border: #1a2333;
   --vm-row-active: var(--vm-accent-panel);
@@ -389,10 +389,9 @@
   -webkit-tap-highlight-color: transparent;
   box-shadow:
     0 0 0 1px var(--vm-glass-rim),
-    0 0 0 2.5px var(--vm-glass-rim-deep),
-    0 6px 18px var(--vm-glass-glow),
-    0 10px 26px var(--vm-glass-shadow-grey),
-    0 4px 14px rgba(0, 0, 0, 0.38);
+    0 0 0 2px var(--vm-glass-rim-deep),
+    0 3px 10px var(--vm-glass-shadow-blue),
+    0 1px 4px var(--vm-glass-shadow-blue-soft);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -462,11 +461,10 @@
 .transportBtn:not(:disabled):active,
 .transportPrimary:not(:disabled):active {
   box-shadow:
-    0 0 0 1px rgba(120, 170, 230, 0.55),
-    0 0 0 2.5px var(--vm-glass-rim-deep),
-    inset 0 6px 18px rgba(0, 20, 50, 0.75),
-    0 6px 18px var(--vm-glass-shadow-grey),
-    0 2px 8px rgba(0, 0, 0, 0.35);
+    0 0 0 1px rgba(0, 132, 255, 0.42),
+    0 0 0 2px var(--vm-glass-rim-deep),
+    inset 0 4px 12px rgba(0, 20, 50, 0.55),
+    0 2px 8px var(--vm-glass-shadow-blue-soft);
 }
 
 .glassActionBtn:not(:disabled):active {
@@ -502,7 +500,7 @@
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
   color: var(--vm-glass-emblem);
-  filter: drop-shadow(0 1px 2px rgba(0, 12, 30, 0.55));
+  filter: drop-shadow(0 1px 1px rgba(0, 100, 200, 0.28));
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -513,7 +511,7 @@
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
   color: var(--vm-glass-emblem);
-  filter: drop-shadow(0 1px 2px rgba(0, 12, 30, 0.55));
+  filter: drop-shadow(0 1px 1px rgba(0, 100, 200, 0.28));
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -860,9 +858,8 @@
   overflow: hidden;
   box-shadow:
     0 0 0 1px var(--vm-glass-rim),
-    0 0 0 2.5px var(--vm-glass-rim-deep),
-    0 5px 14px var(--vm-glass-glow),
-    0 3px 10px rgba(0, 0, 0, 0.38);
+    0 0 0 2px var(--vm-glass-rim-deep),
+    0 2px 8px var(--vm-glass-shadow-blue-soft);
   pointer-events: none;
   z-index: 3;
   transition: none;
@@ -1001,7 +998,7 @@
   box-shadow:
     0 0 0 1px var(--vm-glass-rim),
     0 0 0 2px var(--vm-glass-rim-deep),
-    0 4px 12px var(--vm-glass-glow);
+    0 2px 7px var(--vm-glass-shadow-blue-soft);
 }
 
 .rowPlay::before {
@@ -1035,9 +1032,9 @@
 
 .listRowActive .rowPlay {
   box-shadow:
-    0 0 0 1.5px rgba(176, 186, 200, 0.75),
-    0 0 0 2.5px var(--vm-glass-rim-deep),
-    0 4px 12px var(--vm-glass-glow);
+    0 0 0 1.5px rgba(0, 132, 255, 0.38),
+    0 0 0 2px var(--vm-glass-rim-deep),
+    0 2px 7px var(--vm-glass-shadow-blue-soft);
 }
 
 .rowPlayIcon {
@@ -1056,10 +1053,10 @@
 .listRow:not(:disabled):active .rowPlay {
   transform: scale(0.88);
   box-shadow:
-    0 0 0 1px rgba(130, 142, 158, 0.48),
+    0 0 0 1px rgba(0, 132, 255, 0.32),
     0 0 0 2px var(--vm-glass-rim-deep),
-    inset 0 4px 12px rgba(0, 0, 0, 0.72),
-    0 1px 4px rgba(0, 0, 0, 0.35);
+    inset 0 3px 10px rgba(0, 20, 50, 0.5),
+    0 1px 4px var(--vm-glass-shadow-blue-soft);
 }
 
 .listRow:not(:disabled):active .rowPlay::before {

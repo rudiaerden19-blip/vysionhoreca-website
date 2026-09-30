@@ -11,6 +11,8 @@ import {
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
+/** Artiest-zoek kan veel Soundtrack-pagina’s ophalen (U2, …). */
+export const maxDuration = 60
 
 type RouteContext = { params: { tenant: string } }
 
