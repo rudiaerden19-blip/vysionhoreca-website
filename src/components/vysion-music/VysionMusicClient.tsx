@@ -13,20 +13,7 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
-
-const VOLUME_SPEAKER_SRC = '/images/vysion-music/speaker-emoji.svg'
-
-function VolumeSpeakerArt({ large }: { large?: boolean }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={VOLUME_SPEAKER_SRC}
-      alt=""
-      draggable={false}
-      className={large ? styles.volumeSpeakerImgLarge : styles.volumeSpeakerImg}
-    />
-  )
-}
+import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import styles from './vysion-music.module.css'
 
 const VM_ICON_STROKE = 2.35

@@ -421,6 +421,18 @@
   user-select: none;
 }
 
+.volumeSpeakerNative {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', emoji;
+  font-size: clamp(1.55rem, 2.2vw, 1.85rem);
+  line-height: 1;
+}
+
+.volumeSpeakerNativeLarge {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', emoji;
+  font-size: clamp(2.35rem, 3.8vw, 2.85rem);
+  line-height: 1;
+}
+
 .volumeSliderWrap {
   flex: 1 1 auto;
   display: flex;
