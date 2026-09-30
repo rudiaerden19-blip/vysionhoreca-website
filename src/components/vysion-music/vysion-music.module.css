@@ -490,7 +490,7 @@
   width: clamp(1.45rem, 2.4vw, 1.75rem);
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
-  color: var(--vm-glass-emblem);
+  color: var(--vm-accent);
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -500,7 +500,7 @@
   width: clamp(2rem, 3.2vw, 2.35rem);
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
-  color: var(--vm-glass-emblem);
+  color: var(--vm-accent);
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -524,7 +524,7 @@
 
 .transportBtn:not(:disabled):active .transportIcon {
   transform: scale(0.92);
-  color: var(--vm-glass-emblem-active);
+  color: #5cb8ff;
 }
 
 .transportPrimary {
@@ -603,7 +603,7 @@
 
 .transportPrimary:not(:disabled):active .transportIconPrimary {
   transform: scale(0.9);
-  color: var(--vm-glass-emblem-active);
+  color: #5cb8ff;
 }
 
 .volumeColumn {
