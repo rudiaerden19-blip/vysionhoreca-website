@@ -6871,9 +6871,9 @@
   },
   "vysionMusic": {
     "backToKassa": "Kasse",
-    "nowPlaying": "JETZT",
+    "nowPlaying": "spielt gerade ab",
     "switchingTrack": "WECHSELN…",
-    "playlistTitle": "WIEDERGABELISTE (JETZT)",
+    "playlistTitle": "WIEDERGABELISTE",
     "searchPlaceholder": "Suchen…",
     "searchClear": "Löschen",
     "resultsEmpty": "ERGEBNISSE",

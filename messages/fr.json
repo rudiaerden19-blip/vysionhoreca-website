@@ -6871,9 +6871,9 @@
   },
   "vysionMusic": {
     "backToKassa": "Caisse",
-    "nowPlaying": "EN COURS",
+    "nowPlaying": "en cours de lecture",
     "switchingTrack": "CHANGEMENT…",
-    "playlistTitle": "LISTE (EN COURS)",
+    "playlistTitle": "LISTE DE LECTURE",
     "searchPlaceholder": "Rechercher…",
     "searchClear": "Effacer",
     "resultsEmpty": "RÉSULTATS",

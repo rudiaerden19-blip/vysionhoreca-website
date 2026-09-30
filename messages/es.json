@@ -6848,9 +6848,9 @@
   },
   "vysionMusic": {
     "backToKassa": "Caja",
-    "nowPlaying": "AHORA SUENA",
+    "nowPlaying": "reproduciendo ahora",
     "switchingTrack": "CAMBIANDO…",
-    "playlistTitle": "LISTA (AHORA)",
+    "playlistTitle": "LISTA DE REPRODUCCIÓN",
     "searchPlaceholder": "Buscar…",
     "searchClear": "Borrar",
     "resultsEmpty": "RESULTADOS",

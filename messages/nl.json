@@ -6807,9 +6807,9 @@
   },
   "vysionMusic": {
     "backToKassa": "Kassa",
-    "nowPlaying": "NU SPEELT",
+    "nowPlaying": "speelt nu af",
     "switchingTrack": "BEZIG MET WISSELEN…",
-    "playlistTitle": "AFSPEELLIJST (NU AAN HET SPELEN)",
+    "playlistTitle": "AFSPEELLIJST",
     "searchPlaceholder": "Zoeken…",
     "searchClear": "Wissen",
     "resultsPrefix": "RESULTATEN",
