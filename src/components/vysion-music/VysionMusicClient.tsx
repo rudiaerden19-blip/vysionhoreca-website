@@ -83,6 +83,18 @@ export function VysionMusicClient({
 
   const apiBase = `/api/soundtrack/${encodeURIComponent(tenant)}`
 
+  const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const volumeDraggingRef = useRef(false)
+
+  const mergeSnapshot = useCallback((snap: Snapshot) => {
+    setSnapshot((prev) => {
+      if (volumeDraggingRef.current && prev) {
+        return { ...snap, volume: prev.volume }
+      }
+      return snap
+    })
+  }, [])
+
   const loadSnapshot = useCallback(async () => {
     try {
       const res = await fetch(apiBase, { headers: getAuthHeaders(), cache: 'no-store' })
@@ -91,11 +103,11 @@ export function VysionMusicClient({
         setError(json.error || t('vysionMusic.errorLoad'))
         return
       }
-      if (json.snapshot) setSnapshot(json.snapshot)
+      if (json.snapshot) mergeSnapshot(json.snapshot)
     } catch {
       setError(t('vysionMusic.errorNetwork'))
     }
-  }, [apiBase, t])
+  }, [apiBase, mergeSnapshot, t])
 
   const runSearch = useCallback(
     async (q: string) => {
@@ -168,7 +180,7 @@ export function VysionMusicClient({
           }
         } else {
           if (!(opts?.silent && op === 'setVolume')) setError(null)
-          if (json.snapshot) setSnapshot(json.snapshot)
+          if (json.snapshot) mergeSnapshot(json.snapshot)
         }
       } catch {
         if (!(opts?.silent && op === 'setVolume')) {
@@ -178,10 +190,9 @@ export function VysionMusicClient({
         if (!opts?.silent) setBusy(false)
       }
     },
-    [apiBase, t],
+    [apiBase, mergeSnapshot, t],
   )
 
-  const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const syncVolume = useCallback(
     (v: number, immediate?: boolean) => {
       if (volumeSyncTimer.current) clearTimeout(volumeSyncTimer.current)
@@ -398,9 +409,11 @@ export function VysionMusicClient({
                 value={snapshot?.volume ?? 0}
                 disabled={busy}
                 ariaLabel={t('vysionMusic.volume')}
+                onDragChange={(dragging) => {
+                  volumeDraggingRef.current = dragging
+                }}
                 onChange={(v) => {
                   setSnapshot((s) => (s ? { ...s, volume: v } : s))
-                  syncVolume(v)
                 }}
                 onCommit={(v) => syncVolume(v, true)}
               />

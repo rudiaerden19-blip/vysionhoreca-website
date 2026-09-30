@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { quantizeVolumeUiPercent } from '@/lib/soundtrack/soundtrack-server'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import styles from './vysion-music.module.css'
 
-function clampVolume(n: number): number {
+function clampUiPercent(n: number): number {
   return Math.round(Math.min(100, Math.max(0, n)))
 }
 
@@ -11,90 +12,157 @@ export function VolumeSliderVertical({
   value,
   onChange,
   onCommit,
+  onDragChange,
   ariaLabel,
   disabled,
 }: {
   value: number
   onChange: (v: number) => void
   onCommit?: (v: number) => void
+  onDragChange?: (dragging: boolean) => void
   ariaLabel: string
   disabled?: boolean
 }) {
-  const trackRef = useRef<HTMLDivElement>(null)
-  const railRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
+  const draggingRef = useRef(false)
+  const activePointerRef = useRef<number | null>(null)
+  const [dragValue, setDragValue] = useState<number | null>(null)
 
-  const valueFromClientY = useCallback((clientY: number): number => {
-    const rail = railRef.current
-    if (!rail) return 0
-    const r = rail.getBoundingClientRect()
-    if (r.height <= 0) return 0
-    const y = clientY - r.top
-    const ratio = 1 - y / r.height
-    return clampVolume(ratio * 100)
-  }, [])
+  const shown = dragValue ?? quantizeVolumeUiPercent(value)
+
+  useEffect(() => {
+    if (!draggingRef.current) setDragValue(null)
+  }, [value])
+
+  const rawFromClientY = useCallback((clientY: number): number => {
+    const inner = innerRef.current
+    if (!inner) return clampUiPercent(value)
+    const r = inner.getBoundingClientRect()
+    if (r.height <= 1) return clampUiPercent(value)
+    const fromBottom = (r.bottom - clientY) / r.height
+    return clampUiPercent(fromBottom * 100)
+  }, [value])
 
   const applyAt = useCallback(
     (clientY: number) => {
-      const v = valueFromClientY(clientY)
+      const v = rawFromClientY(clientY)
+      setDragValue(v)
       onChange(v)
       return v
     },
-    [onChange, valueFromClientY],
+    [onChange, rawFromClientY],
   )
+
+  const finishDrag = useCallback(
+    (clientY: number | null) => {
+      if (!draggingRef.current) return
+      draggingRef.current = false
+      activePointerRef.current = null
+      onDragChange?.(false)
+
+      const raw =
+        clientY != null ? rawFromClientY(clientY) : dragValue ?? clampUiPercent(value)
+      const committed = quantizeVolumeUiPercent(raw)
+      setDragValue(null)
+      onChange(committed)
+      onCommit?.(committed)
+    },
+    [dragValue, onChange, onCommit, onDragChange, rawFromClientY, value],
+  )
+
+  useEffect(() => {
+    const onWinPointerMove = (e: PointerEvent) => {
+      if (!draggingRef.current) return
+      if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return
+      e.preventDefault()
+      applyAt(e.clientY)
+    }
+
+    const onWinPointerEnd = (e: PointerEvent) => {
+      if (!draggingRef.current) return
+      if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return
+      e.preventDefault()
+      finishDrag(e.clientY)
+    }
+
+    window.addEventListener('pointermove', onWinPointerMove, { passive: false })
+    window.addEventListener('pointerup', onWinPointerEnd, { passive: false })
+    window.addEventListener('pointercancel', onWinPointerEnd, { passive: false })
+
+    return () => {
+      window.removeEventListener('pointermove', onWinPointerMove)
+      window.removeEventListener('pointerup', onWinPointerEnd)
+      window.removeEventListener('pointercancel', onWinPointerEnd)
+    }
+  }, [applyAt, finishDrag])
+
+  const fillPct = `${shown}%`
+  const thumbBottom = `${shown}%`
 
   return (
     <div
-      ref={trackRef}
       className={styles.volumeTrack}
-      style={{ ['--vm-vol' as string]: String(value) }}
       role="slider"
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={value}
-      aria-valuetext={`${value}%`}
+      aria-valuenow={shown}
+      aria-valuetext={`${shown}%`}
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={(e) => {
         if (disabled) return
-        let next = value
-        if (e.key === 'ArrowUp' || e.key === 'PageUp') next = value + (e.shiftKey ? 1 : 5)
-        else if (e.key === 'ArrowDown' || e.key === 'PageDown') next = value - (e.shiftKey ? 1 : 5)
+        const step = e.shiftKey ? 1 : 5
+        let next = shown
+        if (e.key === 'ArrowUp' || e.key === 'PageUp') next = shown + step
+        else if (e.key === 'ArrowDown' || e.key === 'PageDown') next = shown - step
         else if (e.key === 'Home') next = 0
         else if (e.key === 'End') next = 100
         else return
         e.preventDefault()
-        const v = clampVolume(next)
+        const v = quantizeVolumeUiPercent(next)
         onChange(v)
         onCommit?.(v)
       }}
       onPointerDown={(e) => {
         if (disabled) return
         e.preventDefault()
-        e.currentTarget.setPointerCapture(e.pointerId)
+        e.stopPropagation()
+        draggingRef.current = true
+        activePointerRef.current = e.pointerId
+        onDragChange?.(true)
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId)
+        } catch {
+          /* Windows touch: window listeners vangen move/end */
+        }
         applyAt(e.clientY)
       }}
       onPointerMove={(e) => {
-        if (disabled || !e.currentTarget.hasPointerCapture(e.pointerId)) return
+        if (disabled || !draggingRef.current) return
+        if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return
         e.preventDefault()
         applyAt(e.clientY)
       }}
       onPointerUp={(e) => {
-        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return
+        if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return
         e.preventDefault()
-        const v = applyAt(e.clientY)
-        onCommit?.(v)
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      }}
-      onPointerCancel={(e) => {
-        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-          e.currentTarget.releasePointerCapture(e.pointerId)
+        finishDrag(e.clientY)
+        try {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId)
+          }
+        } catch {
+          /* ignore */
         }
       }}
     >
-      <div ref={railRef} className={styles.volumeTrackRail} aria-hidden />
-      <div className={styles.volumeTrackFill} aria-hidden />
-      <div className={styles.volumeTrackThumb} aria-hidden />
+      <div ref={innerRef} className={styles.volumeTrackInner}>
+        <div className={styles.volumeTrackHit} aria-hidden />
+        <div className={styles.volumeTrackRail} aria-hidden />
+        <div className={styles.volumeTrackFill} style={{ height: fillPct }} aria-hidden />
+        <div className={styles.volumeTrackThumb} style={{ bottom: thumbBottom }} aria-hidden />
+      </div>
     </div>
   )
 }

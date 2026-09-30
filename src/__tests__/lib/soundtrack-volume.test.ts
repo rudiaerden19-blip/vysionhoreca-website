@@ -1,4 +1,5 @@
 import {
+  quantizeVolumeUiPercent,
   soundtrackApiVolumeToUiPercent,
   soundtrackUiPercentToApiVolume,
 } from '@/lib/soundtrack/soundtrack-server'
@@ -19,5 +20,12 @@ describe('soundtrack volume mapping', () => {
   it('clamps out of range', () => {
     expect(soundtrackUiPercentToApiVolume(150)).toBe(16)
     expect(soundtrackApiVolumeToUiPercent(99)).toBe(100)
+  })
+
+  it('quantizes UI to 17 steps', () => {
+    expect(quantizeVolumeUiPercent(0)).toBe(0)
+    expect(quantizeVolumeUiPercent(100)).toBe(100)
+    expect(quantizeVolumeUiPercent(44)).toBe(44)
+    expect(quantizeVolumeUiPercent(45)).toBe(44)
   })
 })

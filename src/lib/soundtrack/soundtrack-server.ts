@@ -17,6 +17,13 @@ export function soundtrackUiPercentToApiVolume(uiPercent: number): number {
   return Math.round((pct / 100) * SOUNDTRACK_VOLUME_MAX)
 }
 
+/** UI-slider in 17 vaste standen (Soundtrack 0–16), voorkomt springende thumb. */
+export function quantizeVolumeUiPercent(uiPercent: number): number {
+  const pct = Math.min(100, Math.max(0, uiPercent))
+  const step = Math.round((pct / 100) * SOUNDTRACK_VOLUME_MAX)
+  return Math.round((step / SOUNDTRACK_VOLUME_MAX) * 100)
+}
+
 export class SoundtrackConfigError extends Error {
   constructor(message: string) {
     super(message)
@@ -334,7 +341,7 @@ export async function fetchSoundtrackPlayerSnapshot(
     playbackState: sz.playback?.state ?? 'stopped',
     volume:
       typeof sz.playback?.volume === 'number'
-        ? soundtrackApiVolumeToUiPercent(sz.playback.volume)
+        ? quantizeVolumeUiPercent(soundtrackApiVolumeToUiPercent(sz.playback.volume))
         : 0,
     nowPlaying: {
       track: nowTrack,
