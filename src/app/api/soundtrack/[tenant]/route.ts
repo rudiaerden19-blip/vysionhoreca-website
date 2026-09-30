@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     const q = request.nextUrl.searchParams.get('q')
     if (q != null && q !== '') {
-      const tracks = await soundtrackSearchTracks(q, 12)
+      const tracks = await soundtrackSearchTracks(q)
       return NextResponse.json({ ok: true, search: { query: q, tracks } })
     }
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)

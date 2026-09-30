@@ -328,37 +328,85 @@ export async function fetchSoundtrackPlayerSnapshot(
   }
 }
 
-export async function soundtrackSearchTracks(query: string, first = 10): Promise<SoundtrackTrackRow[]> {
+function dedupeSearchTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
+  const seenId = new Set<string>()
+  const seenTitle = new Set<string>()
+  const out: SoundtrackTrackRow[] = []
+  for (const row of rows) {
+    if (seenId.has(row.id)) continue
+    seenId.add(row.id)
+    const titleKey = `${row.name.trim().toLowerCase()}|${row.artist.trim().toLowerCase()}`
+    if (seenTitle.has(titleKey)) continue
+    seenTitle.add(titleKey)
+    out.push(row)
+  }
+  return out
+}
+
+/** Soundtrack search met paginatie — geen hard cap op 12; catalog ≠ volledige discografie. */
+export async function soundtrackSearchTracks(
+  query: string,
+  opts?: { maxResults?: number; pageSize?: number },
+): Promise<SoundtrackTrackRow[]> {
   const q = query.trim()
   if (!q) return []
-  const data = await soundtrackGraphql<{
+  const maxResults = Math.min(Math.max(opts?.maxResults ?? 80, 1), 120)
+  const pageSize = Math.min(Math.max(opts?.pageSize ?? 50, 1), 50)
+
+  type SearchPage = {
     search: {
-      edges: { node: { __typename: string; id?: string; name?: string; duration?: number; artists?: { name: string }[]; album?: { image: { url: string } | null } | null } }[]
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+      edges: {
+        node: {
+          __typename: string
+          id?: string
+          name?: string
+          duration?: number
+          artists?: { name: string }[]
+          album?: { image: { url: string; width?: number; height?: number } | null } | null
+        }
+      }[]
     }
-  }>(
-    `query($q: String!, $first: Int!) {
-      search(query: $q, type: track, first: $first) {
-        edges {
-          node {
-            __typename
-            ... on Track {
-              id name duration
-              artists { name }
-              album { image { url width height } }
+  }
+
+  let collected: SoundtrackTrackRow[] = []
+  let after: string | null = null
+
+  for (let page = 0; page < 8 && collected.length < maxResults; page++) {
+    const data: SearchPage = await soundtrackGraphql<SearchPage>(
+      `query($q: String!, $first: Int!, $after: String) {
+        search(query: $q, type: track, first: $first, after: $after) {
+          pageInfo { hasNextPage endCursor }
+          edges {
+            node {
+              __typename
+              ... on Track {
+                id name duration
+                artists { name }
+                album { image { url width height } }
+              }
             }
           }
         }
-      }
-    }`,
-    { q, first },
-  )
-  const out: SoundtrackTrackRow[] = []
-  for (const edge of data.search?.edges ?? []) {
-    if (edge.node.__typename !== 'Track') continue
-    const row = mapTrack(edge.node)
-    if (row) out.push(row)
+      }`,
+      { q, first: pageSize, after },
+    )
+
+    for (const edge of data.search?.edges ?? []) {
+      if (edge.node.__typename !== 'Track') continue
+      const row = mapTrack(edge.node)
+      if (row) collected.push(row)
+    }
+
+    collected = dedupeSearchTrackRows(collected)
+
+    if (collected.length >= maxResults) break
+    const pi: SearchPage['search']['pageInfo'] | undefined = data.search?.pageInfo
+    if (!pi?.hasNextPage || !pi.endCursor) break
+    after = pi.endCursor
   }
-  return out
+
+  return collected.slice(0, maxResults)
 }
 
 export async function soundtrackControl(
