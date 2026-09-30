@@ -24,20 +24,93 @@ function soundtrackToken(): string {
   return t
 }
 
+const zoneIdByNameCache = new Map<string, string>()
+
+async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string> {
+  const needle = zoneName.trim()
+  if (!needle) throw new SoundtrackConfigError('Empty Soundtrack zone name')
+  const cacheKey = needle.toLowerCase()
+  const cached = zoneIdByNameCache.get(cacheKey)
+  if (cached) return cached
+
+  const data = await soundtrackGraphql<{
+    me: {
+      accounts: {
+        edges: {
+          node: {
+            locations: {
+              edges: {
+                node: {
+                  soundZones: { edges: { node: { id: string; name: string } }[] }
+                }
+              }[]
+            }
+          }
+        }[]
+      }
+    }
+  }>(`query {
+    me {
+      ... on PublicAPIClient {
+        accounts(first: 25) {
+          edges {
+            node {
+              locations(first: 50) {
+                edges {
+                  node {
+                    soundZones(first: 50) {
+                      edges { node { id name } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`)
+
+  const accounts = data.me?.accounts?.edges ?? []
+  for (const ae of accounts) {
+    for (const le of ae.node.locations?.edges ?? []) {
+      for (const se of le.node.soundZones?.edges ?? []) {
+        const z = se.node
+        if (z.name.trim() === needle) {
+          zoneIdByNameCache.set(cacheKey, z.id)
+          return z.id
+        }
+      }
+    }
+  }
+  throw new SoundtrackConfigError(`Soundtrack zone not found: ${needle}`)
+}
+
 export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<string> {
-  const fromEnv = (process.env.SOUNDTRACK_DEFAULT_SOUND_ZONE_ID || '').trim()
+  const fromEnvId = (process.env.SOUNDTRACK_DEFAULT_SOUND_ZONE_ID || '').trim()
+  const fromEnvName = (process.env.SOUNDTRACK_DEFAULT_ZONE_NAME || '').trim()
+
   const supabase = getServerSupabaseClient()
   if (supabase) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('tenant_settings')
-      .select('soundtrack_sound_zone_id')
+      .select('soundtrack_sound_zone_id, soundtrack_zone_name')
       .eq('tenant_slug', tenantSlug)
       .maybeSingle()
-    const fromTenant = (data?.soundtrack_sound_zone_id as string | null)?.trim()
-    if (fromTenant) return fromTenant
+    if (!error && data) {
+      const fromTenantId = (data.soundtrack_sound_zone_id as string | null | undefined)?.trim()
+      if (fromTenantId) return fromTenantId
+      const fromTenantName = (data.soundtrack_zone_name as string | null | undefined)?.trim()
+      if (fromTenantName) return resolveSoundZoneIdByDisplayName(fromTenantName)
+    }
   }
-  if (fromEnv) return fromEnv
-  throw new SoundtrackConfigError('No Soundtrack sound zone configured for this tenant')
+
+  if (fromEnvId) return fromEnvId
+  if (fromEnvName) return resolveSoundZoneIdByDisplayName(fromEnvName)
+
+  throw new SoundtrackConfigError(
+    'No Soundtrack sound zone configured for this tenant (set tenant_settings or SOUNDTRACK_DEFAULT_SOUND_ZONE_ID / SOUNDTRACK_DEFAULT_ZONE_NAME on Vercel)',
+  )
 }
 
 export async function soundtrackGraphql<T = Record<string, unknown>>(
