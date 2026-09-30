@@ -416,8 +416,17 @@
   white-space: nowrap;
 }
 
-.glassActionBtn:active {
-  transform: scale(0.97);
+.glassActionBtn:not(:disabled):active {
+  transform: scale(0.96);
+  box-shadow:
+    0 0 0 2px rgba(55, 72, 92, 0.95),
+    0 0 0 3px rgba(22, 32, 48, 0.98),
+    inset 0 4px 14px rgba(0, 0, 0, 0.72),
+    0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.glassActionBtn:not(:disabled):active::before {
+  filter: brightness(0.72);
 }
 
 .transportBtn {
@@ -473,7 +482,8 @@
   width: clamp(1.45rem, 2.4vw, 1.75rem);
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
-  color: var(--vm-text-accent);
+  color: var(--vm-accent);
+  transition: color 0.1s ease, transform 0.12s ease;
 }
 
 .transportIconPrimary {
@@ -482,7 +492,8 @@
   width: clamp(2rem, 3.2vw, 2.35rem);
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
-  color: #ffffff;
+  color: var(--vm-accent);
+  transition: color 0.1s ease, transform 0.12s ease;
 }
 
 .transportBtn:disabled {
@@ -491,7 +502,21 @@
 }
 
 .transportBtn:not(:disabled):active {
-  transform: scale(0.94);
+  transform: scale(0.9);
+  box-shadow:
+    0 0 0 2px rgba(55, 72, 92, 0.95),
+    0 0 0 3px rgba(22, 32, 48, 0.98),
+    inset 0 5px 16px rgba(0, 0, 0, 0.75),
+    0 1px 6px rgba(0, 0, 0, 0.28);
+}
+
+.transportBtn:not(:disabled):active::before {
+  filter: brightness(0.68);
+}
+
+.transportBtn:not(:disabled):active .transportIcon {
+  transform: scale(0.92);
+  color: #5cb8ff;
 }
 
 .transportPrimary {
@@ -555,12 +580,22 @@
 }
 
 .transportPrimary:not(:disabled):active {
-  transform: scale(0.94);
+  transform: scale(0.9);
   box-shadow:
     0 0 0 2px rgba(186, 204, 228, 0.55),
     0 0 0 4px rgba(22, 38, 62, 0.95),
-    0 0 22px rgba(var(--vm-text-accent-rgb), 0.48),
-    0 8px 20px rgba(var(--vm-text-accent-rgb), 0.35);
+    inset 0 6px 18px rgba(0, 0, 0, 0.55),
+    0 0 14px rgba(var(--vm-text-accent-rgb), 0.35),
+    0 4px 14px rgba(var(--vm-text-accent-rgb), 0.28);
+}
+
+.transportPrimary:not(:disabled):active::before {
+  filter: brightness(0.75);
+}
+
+.transportPrimary:not(:disabled):active .transportIconPrimary {
+  transform: scale(0.9);
+  color: #5cb8ff;
 }
 
 .volumeColumn {
@@ -869,11 +904,30 @@
   z-index: 1;
   width: 0.72rem;
   height: 0.72rem;
-  color: var(--vm-text-accent);
+  color: var(--vm-accent);
+  transition: color 0.1s ease, transform 0.12s ease;
 }
 
 .listRowActive .rowPlayIcon {
-  color: var(--vm-text-accent);
+  color: var(--vm-accent);
+}
+
+.listRow:not(:disabled):active .rowPlay {
+  transform: scale(0.88);
+  box-shadow:
+    0 0 0 1px rgba(186, 204, 228, 0.45),
+    0 0 0 2px rgba(28, 40, 58, 0.92),
+    inset 0 4px 12px rgba(0, 0, 0, 0.72),
+    0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+.listRow:not(:disabled):active .rowPlay::before {
+  filter: brightness(0.7);
+}
+
+.listRow:not(:disabled):active .rowPlayIcon {
+  transform: scale(0.9);
+  color: #5cb8ff;
 }
 
 .rowTitle {
