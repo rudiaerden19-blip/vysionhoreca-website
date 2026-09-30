@@ -15,6 +15,8 @@
   --vm-volume-track-h: 0.48rem;
   --vm-volume-thumb: 1.55rem;
   --vm-volume-block-w: clamp(12.5rem, 21vw, 17.5rem);
+  --vm-panel-gap: 0.85rem;
+  --vm-panel-pad-x: 1.25rem;
   min-height: 100vh;
   min-height: 100dvh;
   height: 100dvh;
@@ -156,14 +158,34 @@
 
 .nowPlaying {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 1.25rem 1.75rem;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--vm-panel-gap);
   flex: 0 0 auto;
   min-height: var(--vm-now-band-h);
-  padding: 1rem 2rem 1rem 1.35rem;
+  padding: 1rem var(--vm-panel-pad-x) 0.85rem;
   align-items: center;
   border-bottom: 1px solid var(--vm-panel-border);
   box-sizing: border-box;
+}
+
+/* Zelfde middenlijn als playlist | zoeken — 4 denkbeeldige vakken */
+.nowLeft {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  align-items: center;
+}
+
+.nowRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .coverFrame {
@@ -263,10 +285,11 @@
 }
 
 .controlsBlock {
-  justify-self: end;
-  align-self: center;
-  flex-shrink: 0;
-  max-width: min(46vw, 34rem);
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .controlsRow {
@@ -274,8 +297,9 @@
   flex-direction: row;
   align-items: center;
   flex-wrap: nowrap;
+  justify-content: center;
   gap: clamp(0.85rem, 1.75vw, 1.5rem);
-  transform: translateX(-2cm);
+  max-width: 100%;
 }
 
 .transport {
@@ -422,8 +446,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: minmax(0, 1fr);
-  gap: 0.85rem;
-  padding: 0.85rem 1.25rem 0.9rem;
+  gap: var(--vm-panel-gap);
+  padding: 0.85rem var(--vm-panel-pad-x) 0.9rem;
 }
 
 .panel {
@@ -606,6 +630,13 @@
   .nowPlaying {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+  .nowLeft {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  .nowRight {
+    justify-content: center;
   }
   .controlsBlock {
     justify-self: center;

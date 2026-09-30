@@ -291,36 +291,39 @@ export function VysionMusicClient({
       ) : null}
 
       <section className={styles.nowPlaying}>
-        <div className={styles.coverFrame}>
-          {coverSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={coverSrc}
-              alt=""
-              className={styles.cover}
-              referrerPolicy="no-referrer"
-              onError={() => setCoverBroken(true)}
-            />
-          ) : (
-            <div className={styles.coverPlaceholder} aria-hidden />
-          )}
-        </div>
-        <div className={styles.trackMain}>
-          <div className={styles.nowLabel}>
-            {switchingTrack ? t('vysionMusic.switchingTrack') : t('vysionMusic.nowPlaying')}
+        <div className={styles.nowLeft}>
+          <div className={styles.coverFrame}>
+            {coverSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverSrc}
+                alt=""
+                className={styles.cover}
+                referrerPolicy="no-referrer"
+                onError={() => setCoverBroken(true)}
+              />
+            ) : (
+              <div className={styles.coverPlaceholder} aria-hidden />
+            )}
           </div>
-          <h1 className={styles.trackTitle}>{nowTrack?.name ?? '—'}</h1>
-          <p className={styles.trackArtist}>{nowTrack?.artist ?? '—'}</p>
-          <div className={styles.progressRow}>
-            <span className={styles.timeLabel}>{formatMs(progressMs)}</span>
-            <div className={styles.progressTrack}>
-              <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
+          <div className={styles.trackMain}>
+            <div className={styles.nowLabel}>
+              {switchingTrack ? t('vysionMusic.switchingTrack') : t('vysionMusic.nowPlaying')}
             </div>
-            <span className={styles.timeLabel}>{formatMs(durationMs)}</span>
+            <h1 className={styles.trackTitle}>{nowTrack?.name ?? '—'}</h1>
+            <p className={styles.trackArtist}>{nowTrack?.artist ?? '—'}</p>
+            <div className={styles.progressRow}>
+              <span className={styles.timeLabel}>{formatMs(progressMs)}</span>
+              <div className={styles.progressTrack}>
+                <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
+              </div>
+              <span className={styles.timeLabel}>{formatMs(durationMs)}</span>
+            </div>
           </div>
         </div>
-        <div className={styles.controlsBlock}>
-          <div className={styles.controlsRow}>
+        <div className={styles.nowRight}>
+          <div className={styles.controlsBlock}>
+            <div className={styles.controlsRow}>
             <div className={styles.transport}>
               <button
                 type="button"
@@ -387,6 +390,7 @@ export function VysionMusicClient({
               <span className={styles.volumePct}>{snapshot?.volume ?? 0}%</span>
             </div>
           </div>
+        </div>
         </div>
       </section>
 
