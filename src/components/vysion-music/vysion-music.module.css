@@ -7,9 +7,9 @@
   --vm-panel-border: #1a2333;
   --vm-row-active: rgba(0, 150, 255, 0.22);
   --vm-control-face: #141a24;
-  --vm-cover-size: clamp(9.5rem, 18vh, 12.25rem);
-  --vm-now-min-h: clamp(13.5rem, 34vh, 18.5rem);
-  --vm-columns-max-h: clamp(14rem, 40vh, 21rem);
+  --vm-cover-size: clamp(8.75rem, 15vh, 11rem);
+  --vm-now-min-h: clamp(11.5rem, 28vh, 15.5rem);
+  --vm-columns-max-h: clamp(15rem, 46vh, 24rem);
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--vm-bg);
@@ -150,9 +150,9 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 1.35rem 2rem;
-  flex: 1.15 1 auto;
+  flex: 0.95 1 auto;
   min-height: var(--vm-now-min-h);
-  padding: 1.35rem 1.75rem 1.15rem;
+  padding: 1rem 1.5rem 0.85rem;
   align-items: center;
   border-bottom: 1px solid var(--vm-panel-border);
 }
@@ -185,7 +185,7 @@
 }
 
 .trackTitle {
-  font-size: clamp(1.85rem, 3.2vw, 2.55rem);
+  font-size: clamp(1.65rem, 2.8vw, 2.15rem);
   font-weight: 800;
   line-height: 1.08;
   margin: 0 0 0.35rem;
@@ -195,7 +195,7 @@
   color: var(--vm-accent);
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   font-weight: 600;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.75rem;
 }
 
 .progressRow {
@@ -243,8 +243,8 @@
 }
 
 .transportBtn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: var(--vm-control-face);
@@ -262,8 +262,8 @@
 }
 
 .transportPrimary {
-  width: 68px;
-  height: 68px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: none;
   background: var(--vm-accent);
@@ -303,7 +303,7 @@
 }
 
 .columns {
-  flex: 1.05 1 auto;
+  flex: 1.2 1 auto;
   max-height: var(--vm-columns-max-h);
   display: grid;
   grid-template-columns: 1fr 1fr;
