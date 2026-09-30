@@ -7,8 +7,8 @@
   --vm-panel-border: #1a2333;
   --vm-row-active: rgba(0, 150, 255, 0.22);
   --vm-control-face: #141a24;
-  --vm-cover-size: clamp(7.5rem, 12vh, 9.5rem);
-  --vm-now-min-h: clamp(10rem, 24vh, 13.5rem);
+  --vm-cover-size: clamp(10.25rem, 22vh, 14.5rem);
+  --vm-now-min-h: clamp(11.25rem, 26vh, 16.25rem);
   --vm-columns-max-h: clamp(16rem, 48vh, 25rem);
   /* Touch: grote knoppen binnen dezelfde now-playing band (afb. 3) */
   --vm-transport-secondary: clamp(3.5rem, 7.2vh, 4.5rem);
