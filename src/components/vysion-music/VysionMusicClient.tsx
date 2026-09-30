@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import styles from './vysion-music.module.css'
@@ -12,6 +12,8 @@ type TrackRow = {
   artist: string
   durationMs: number
   imageUrl: string | null
+  imageWidth?: number | null
+  imageHeight?: number | null
 }
 
 type Snapshot = {
@@ -245,8 +247,10 @@ export function VysionMusicClient({
   const isPlaying = snapshot?.playbackState === 'playing'
   const { date: clockDate, time: clockTime } = formatClock(clock, locale)
   const [coverBroken, setCoverBroken] = useState(false)
+  const [coverNatural, setCoverNatural] = useState<{ w: number; h: number } | null>(null)
   useEffect(() => {
     setCoverBroken(false)
+    setCoverNatural(null)
   }, [nowTrack?.imageUrl, nowTrack?.id])
 
   const coverSrc = useMemo(() => {
@@ -311,18 +315,37 @@ export function VysionMusicClient({
       ) : null}
 
       <section className={styles.nowPlaying}>
-        {coverSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={coverSrc}
-            alt=""
-            className={styles.cover}
-            referrerPolicy="no-referrer"
-            onError={() => setCoverBroken(true)}
-          />
-        ) : (
-          <div className={styles.coverPlaceholder} aria-hidden />
-        )}
+        <div
+          className={styles.coverFrame}
+          style={
+            coverNatural && coverNatural.w > 0 && coverNatural.h > 0
+              ? ({ ['--cover-aspect' as string]: `${coverNatural.w / coverNatural.h}` } as CSSProperties)
+              : nowTrack?.imageWidth && nowTrack?.imageHeight
+                ? ({
+                    ['--cover-aspect' as string]: `${nowTrack.imageWidth / nowTrack.imageHeight}`,
+                  } as CSSProperties)
+                : undefined
+          }
+        >
+          {coverSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverSrc}
+              alt=""
+              className={styles.cover}
+              referrerPolicy="no-referrer"
+              onError={() => setCoverBroken(true)}
+              onLoad={(e) => {
+                const el = e.currentTarget
+                if (el.naturalWidth > 0 && el.naturalHeight > 0) {
+                  setCoverNatural({ w: el.naturalWidth, h: el.naturalHeight })
+                }
+              }}
+            />
+          ) : (
+            <div className={styles.coverPlaceholder} aria-hidden />
+          )}
+        </div>
         <div className={styles.trackMain}>
           <div className={styles.nowLabel}>
             {switchingTrack ? t('vysionMusic.switchingTrack') : t('vysionMusic.nowPlaying')}

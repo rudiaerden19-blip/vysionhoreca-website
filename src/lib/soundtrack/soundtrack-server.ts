@@ -1,3 +1,5 @@
+import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
+
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 const API_URL = 'https://api.soundtrackyourbrand.com/v2'
@@ -161,6 +163,8 @@ export type SoundtrackTrackRow = {
   artist: string
   durationMs: number
   imageUrl: string | null
+  imageWidth: number | null
+  imageHeight: number | null
 }
 
 export type SoundtrackPlayerSnapshot = {
@@ -186,19 +190,30 @@ function mapTrack(
         name?: string
         artists?: { name?: string }[]
         duration?: number
-        album?: { image?: { url?: string } | null } | null
+        album?: {
+          image?: { url?: string; width?: number; height?: number } | null
+        } | null
       }
     | null
     | undefined,
   fallbackId = '',
 ): SoundtrackTrackRow | null {
   if (!track?.name) return null
+  const img = track.album?.image
+  const imageWidth = typeof img?.width === 'number' && img.width > 0 ? img.width : null
+  const imageHeight = typeof img?.height === 'number' && img.height > 0 ? img.height : null
+  const imageUrl = soundtrackAlbumArtUrl(img?.url ?? null, {
+    width: imageWidth,
+    height: imageHeight,
+  })
   return {
     id: track.id || fallbackId,
     name: track.name,
     artist: track.artists?.[0]?.name || '—',
     durationMs: typeof track.duration === 'number' ? track.duration : 0,
-    imageUrl: track.album?.image?.url ?? null,
+    imageUrl,
+    imageWidth,
+    imageHeight,
   }
 }
 
@@ -211,7 +226,7 @@ export async function fetchSoundtrackPlayerSnapshot(
   const historyBlock =
     historyFirst > 0
       ? `playbackHistory(first: ${historyFirst}) {
-          edges { node { track { id name duration artists { name } album { image { url } } } } }
+          edges { node { track { id name duration artists { name } album { image { url width height } } } } }
         }`
       : ''
   const data = await soundtrackGraphql<{
@@ -293,6 +308,8 @@ export async function fetchSoundtrackPlayerSnapshot(
         artist: '—',
         durationMs: 0,
         imageUrl: null,
+        imageWidth: null,
+        imageHeight: null,
       })
     }
   }
@@ -330,7 +347,7 @@ export async function soundtrackSearchTracks(query: string, first = 10): Promise
             ... on Track {
               id name duration
               artists { name }
-              album { image { url } }
+              album { image { url width height } }
             }
           }
         }
