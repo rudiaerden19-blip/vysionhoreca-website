@@ -619,15 +619,18 @@ async function collectArtistScopedTrackSearch(
     }
   }
 
-  let after = firstPages[0]?.search?.pageInfo?.endCursor ?? null
-  for (let page = 1; page < 3 && collected.length < enoughResults; page++) {
-    if (!after) break
-    const data = await fetchSoundtrackTrackSearchPage(q, pageSize, after)
-    collected = ingestArtistScopedSearchPage(data, q, collected)
-    if (collected.length >= maxResults) break
-    const pi = data.search?.pageInfo
-    if (!pi?.hasNextPage || !pi.endCursor) break
-    after = pi.endCursor
+  const maxExtraPages = collected.length === 0 ? 4 : 2
+  for (let vi = 0; vi < discoveryQueries.length && collected.length < enoughResults; vi++) {
+    let after = firstPages[vi]?.search?.pageInfo?.endCursor ?? null
+    for (let page = 0; page < maxExtraPages && collected.length < enoughResults; page++) {
+      if (!after) break
+      const data = await fetchSoundtrackTrackSearchPage(discoveryQueries[vi], pageSize, after)
+      collected = ingestArtistScopedSearchPage(data, q, collected)
+      if (collected.length >= maxResults) return collected.slice(0, maxResults)
+      const pi = data.search?.pageInfo
+      if (!pi?.hasNextPage || !pi.endCursor) break
+      after = pi.endCursor
+    }
   }
 
   return collected.slice(0, maxResults)
@@ -675,8 +678,9 @@ export async function soundtrackSearchTracks(
     after = pi.endCursor
   }
 
-  const finalRows = artistScoped ?? collected
-  return finalRows.slice(0, maxResults)
+  if (artistScoped) return artistScoped.slice(0, maxResults)
+  if (prefersArtistOnlySearchResults(q)) return []
+  return collected.slice(0, maxResults)
 }
 
 async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {

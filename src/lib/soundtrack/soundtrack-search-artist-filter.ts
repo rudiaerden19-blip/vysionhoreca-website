@@ -54,7 +54,20 @@ export function trackArtistNamesMatchQuery(
 export function artistDiscoverySearchQueries(query: string): string[] {
   const q = query.trim()
   if (!q) return []
-  const out = [q]
-  if (!q.startsWith('"')) out.push(`"${q}"`)
+  const seen = new Set<string>()
+  const out: string[] = []
+  const add = (s: string) => {
+    const t = s.trim()
+    if (!t || seen.has(t)) return
+    seen.add(t)
+    out.push(t)
+  }
+  add(q)
+  add(q.toUpperCase())
+  if (q.length >= 2) {
+    add(q.charAt(0).toUpperCase() + q.slice(1).toLowerCase())
+  }
+  add(`"${q}"`)
+  add(`"${q.toUpperCase()}"`)
   return out
 }

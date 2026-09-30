@@ -14,6 +14,10 @@ import {
   VmStop,
 } from './VysionMusicIcons'
 import {
+  filterTracksByArtistQuery,
+  prefersArtistOnlySearchResults,
+} from '@/lib/soundtrack/soundtrack-search-artist-filter'
+import {
   VYSION_MUSIC_TRACK_FADE_MS,
   trackIdentity,
 } from '@/lib/vysion-music-track-fade'
@@ -95,6 +99,7 @@ export function VysionMusicClient({
   const nowLeftRef = useRef<HTMLDivElement>(null)
   const volumeUiRef = useRef(0)
   const lastTrackKeyRef = useRef('')
+  const searchRequestId = useRef(0)
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
     setSnapshot((prev) => {
@@ -127,7 +132,9 @@ export function VysionMusicClient({
         setSearchLoading(false)
         return
       }
+      const reqId = ++searchRequestId.current
       setSearchLoading(true)
+      setSearchResults([])
       try {
         const res = await fetch(`${apiBase}?q=${encodeURIComponent(trimmed)}`, {
           headers: getAuthHeaders(),
@@ -137,15 +144,21 @@ export function VysionMusicClient({
           search?: { tracks: TrackRow[] }
           error?: string
         }
+        if (reqId !== searchRequestId.current) return
         if (!res.ok) {
           setSearchResults([])
           return
         }
-        setSearchResults(json.search?.tracks ?? [])
+        let tracks = json.search?.tracks ?? []
+        if (prefersArtistOnlySearchResults(trimmed)) {
+          tracks = filterTracksByArtistQuery(tracks, trimmed)
+        }
+        setSearchResults(tracks)
       } catch {
+        if (reqId !== searchRequestId.current) return
         setSearchResults([])
       } finally {
-        setSearchLoading(false)
+        if (reqId === searchRequestId.current) setSearchLoading(false)
       }
     },
     [apiBase],

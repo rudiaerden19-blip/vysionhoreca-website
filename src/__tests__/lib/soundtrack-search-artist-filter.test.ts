@@ -43,6 +43,13 @@ describe('soundtrack search artist filter', () => {
   })
 
   it('builds discovery query variants', () => {
-    expect(artistDiscoverySearchQueries('U2')).toEqual(['U2', '"U2"'])
+    const abba = artistDiscoverySearchQueries('Abba')
+    expect(abba).toContain('Abba')
+    expect(abba).toContain('ABBA')
+    expect(abba).toContain('"ABBA"')
+  })
+
+  it('matches ABBA artist for abba query', () => {
+    expect(trackArtistMatchesQuery('ABBA', 'Abba')).toBe(true)
   })
 })
