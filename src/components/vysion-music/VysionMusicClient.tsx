@@ -90,10 +90,9 @@ export function VysionMusicClient({
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeDraggingRef = useRef(false)
   const playlistPanelRef = useRef<HTMLDivElement>(null)
-  const displayTrackRef = useRef<TrackRow | null>(null)
-  const fadeTimerRef = useRef<number | null>(null)
-  const [displayTrack, setDisplayTrack] = useState<TrackRow | null>(null)
-  const [trackPanelOpacity, setTrackPanelOpacity] = useState(1)
+  const nowLeftRef = useRef<HTMLDivElement>(null)
+  const volumeUiRef = useRef(0)
+  const lastTrackKeyRef = useRef('')
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
     setSnapshot((prev) => {
@@ -169,40 +168,27 @@ export function VysionMusicClient({
     return () => window.clearTimeout(id)
   }, [searchQuery, runSearch])
 
-  const armTrackFadeOut = useCallback(() => {
-    setTrackPanelOpacity(0)
-  }, [])
+  const uiFadeHalfMs = VYSION_MUSIC_TRACK_FADE_MS / 2
 
-  const applyTrackCrossfade = useCallback(
-    (next: TrackRow) => {
-      const curKey = trackIdentity(displayTrackRef.current)
-      const nextKey = trackIdentity(next)
-      if (!nextKey) return
+  const startUiFadeOut = useCallback(() => {
+    const el = nowLeftRef.current
+    if (!el) return
+    void el.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: uiFadeHalfMs,
+      easing: 'ease-in-out',
+      fill: 'forwards',
+    })
+  }, [uiFadeHalfMs])
 
-      if (!curKey) {
-        setDisplayTrack(next)
-        setTrackPanelOpacity(1)
-        return
-      }
-
-      if (curKey === nextKey) {
-        setDisplayTrack(next)
-        setTrackPanelOpacity(1)
-        return
-      }
-
-      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current)
-      setTrackPanelOpacity(0)
-      fadeTimerRef.current = window.setTimeout(() => {
-        fadeTimerRef.current = null
-        setDisplayTrack(next)
-        requestAnimationFrame(() => setTrackPanelOpacity(1))
-      }, VYSION_MUSIC_TRACK_FADE_MS)
-    },
-    [],
-  )
-
-  displayTrackRef.current = displayTrack
+  const finishUiFadeIn = useCallback(() => {
+    const el = nowLeftRef.current
+    if (!el) return
+    void el.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: uiFadeHalfMs,
+      easing: 'ease-in-out',
+      fill: 'forwards',
+    })
+  }, [uiFadeHalfMs])
 
   const control = useCallback(
     async (
@@ -210,15 +196,19 @@ export function VysionMusicClient({
       extra?: { volume?: number; trackId?: string },
       opts?: { silent?: boolean },
     ) => {
-      if (!opts?.silent && (op === 'skipNext' || op === 'playTrack')) {
-        armTrackFadeOut()
-      }
+      const fadeOp = op === 'skipNext' || op === 'playTrack'
+      if (!opts?.silent && fadeOp) startUiFadeOut()
       if (!opts?.silent) setBusy(true)
       try {
         const res = await fetch(apiBase, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ op, ...extra }),
+          body: JSON.stringify({
+            op,
+            trackId: extra?.trackId,
+            volume: fadeOp ? volumeUiRef.current : extra?.volume,
+            audioFade: fadeOp,
+          }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
         if (!res.ok) {
@@ -237,7 +227,7 @@ export function VysionMusicClient({
         if (!opts?.silent) setBusy(false)
       }
     },
-    [apiBase, armTrackFadeOut, mergeSnapshot, t],
+    [apiBase, mergeSnapshot, startUiFadeOut, t],
   )
 
   const syncVolume = useCallback(
@@ -260,13 +250,18 @@ export function VysionMusicClient({
     async (row: TrackRow) => {
       if (!row.id || row.id.startsWith('placeholder')) return
       setError(null)
-      armTrackFadeOut()
+      startUiFadeOut()
       setSwitchingTrack(true)
       try {
         const res = await fetch(apiBase, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ op: 'playTrack', trackId: row.id }),
+          body: JSON.stringify({
+            op: 'playTrack',
+            trackId: row.id,
+            volume: volumeUiRef.current,
+            audioFade: true,
+          }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
         if (!res.ok) {
@@ -283,29 +278,24 @@ export function VysionMusicClient({
         window.setTimeout(() => void loadSnapshot(), 2200)
       }
     },
-    [apiBase, armTrackFadeOut, loadSnapshot, t],
+    [apiBase, loadSnapshot, startUiFadeOut, t],
   )
 
   const nowTrack = snapshot?.nowPlaying.track
+  volumeUiRef.current = snapshot?.volume ?? 0
 
   const nowTrackId = nowTrack?.id
   const nowTrackName = nowTrack?.name
   const nowTrackArtist = nowTrack?.artist
 
   useEffect(() => {
-    if (!nowTrack) {
-      setDisplayTrack(null)
-      setTrackPanelOpacity(1)
-      return
+    const key = trackIdentity(nowTrack)
+    if (!key) return
+    if (lastTrackKeyRef.current && lastTrackKeyRef.current !== key) {
+      finishUiFadeIn()
     }
-    applyTrackCrossfade(nowTrack)
-  }, [nowTrackId, nowTrackName, nowTrackArtist, nowTrack, applyTrackCrossfade])
-
-  useEffect(() => {
-    return () => {
-      if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current)
-    }
-  }, [])
+    lastTrackKeyRef.current = key
+  }, [nowTrackId, nowTrackName, nowTrackArtist, finishUiFadeIn, nowTrack])
   const durationMs = nowTrack?.durationMs ?? 0
   let progressMs = snapshot?.nowPlaying.progressMs ?? 0
   if (snapshot?.playbackState === 'playing' && snapshot.nowPlaying.startedAt && durationMs) {
@@ -322,13 +312,13 @@ export function VysionMusicClient({
   const [coverBroken, setCoverBroken] = useState(false)
   useEffect(() => {
     setCoverBroken(false)
-  }, [displayTrack?.imageUrl, displayTrack?.id])
+  }, [nowTrack?.imageUrl, nowTrack?.id])
 
   const coverSrc = useMemo(() => {
-    const raw = displayTrack?.imageUrl?.trim()
+    const raw = nowTrack?.imageUrl?.trim()
     if (!raw || coverBroken) return null
     return `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
-  }, [displayTrack?.imageUrl, coverBroken, displayTrack?.id])
+  }, [nowTrack?.imageUrl, coverBroken, nowTrack?.id])
 
   const playlistRows = useMemo(
     () => (snapshot?.playlist ?? []).filter((r) => r.name !== '—'),
@@ -386,7 +376,7 @@ export function VysionMusicClient({
       ) : null}
 
       <section className={styles.nowPlaying}>
-        <div className={styles.nowLeft} style={{ opacity: trackPanelOpacity }}>
+        <div className={styles.nowLeft} ref={nowLeftRef}>
           <div className={styles.coverFrame}>
             {coverSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -405,8 +395,8 @@ export function VysionMusicClient({
             <div className={styles.nowLabel}>
               {switchingTrack ? t('vysionMusic.switchingTrack') : t('vysionMusic.nowPlaying')}
             </div>
-            <h1 className={styles.trackTitle}>{displayTrack?.name ?? '—'}</h1>
-            <p className={styles.trackArtist}>{displayTrack?.artist ?? '—'}</p>
+            <h1 className={styles.trackTitle}>{nowTrack?.name ?? '—'}</h1>
+            <p className={styles.trackArtist}>{nowTrack?.artist ?? '—'}</p>
             <div className={styles.progressRow}>
               <span className={styles.timeLabel}>{formatMs(progressMs)}</span>
               <div className={styles.progressTrack}>

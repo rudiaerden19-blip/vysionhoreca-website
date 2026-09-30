@@ -49,9 +49,14 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
   }
 
-  let body: { op?: string; volume?: number; trackId?: string }
+  let body: { op?: string; volume?: number; trackId?: string; audioFade?: boolean }
   try {
-    body = (await request.json()) as { op?: string; volume?: number; trackId?: string }
+    body = (await request.json()) as {
+      op?: string
+      volume?: number
+      trackId?: string
+      audioFade?: boolean
+    }
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
@@ -65,9 +70,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     await ensureSoundZoneCrossfadeSettings(zoneId)
+    const fadeOps = op === 'skipNext' || op === 'playTrack'
     await soundtrackControl(zoneId, op as (typeof allowed)[number], {
-      volume: body.volume,
+      volume: op === 'setVolume' ? body.volume : undefined,
       trackId: body.trackId,
+      volumeUi: fadeOps && typeof body.volume === 'number' ? body.volume : undefined,
+      audioFade: fadeOps && body.audioFade !== false,
     })
     if (op === 'playTrack') {
       await new Promise((r) => setTimeout(r, 500))
