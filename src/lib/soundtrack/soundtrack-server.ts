@@ -360,9 +360,21 @@ export async function soundtrackControl(
     case 'playTrack': {
       const trackId = opts?.trackId?.trim()
       if (!trackId) throw new SoundtrackApiError('trackId required')
+      if (trackId.startsWith('placeholder-')) {
+        throw new SoundtrackApiError('Track not available')
+      }
       await soundtrackGraphql(
-        `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { playFrom { __typename } } }`,
-        { input: { soundZone: zoneId, source: { track: trackId } } },
+        `mutation($input: SoundZoneQueueTracksInput!) {
+          soundZoneQueueTracks(input: $input) { __typename }
+        }`,
+        {
+          input: {
+            soundZone: zoneId,
+            tracks: [trackId],
+            immediate: true,
+            clearQueuedTracks: true,
+          },
+        },
       )
       return
     }

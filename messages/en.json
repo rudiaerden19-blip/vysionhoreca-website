@@ -6823,6 +6823,7 @@
     "loading": "Loading…",
     "errorLoad": "Could not load music status.",
     "errorControl": "Control failed.",
-    "errorNetwork": "Network error."
+    "errorNetwork": "Network error.",
+    "errorDismiss": "Dismiss message"
   }
 }

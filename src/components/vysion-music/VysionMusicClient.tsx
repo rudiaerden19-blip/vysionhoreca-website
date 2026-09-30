@@ -75,7 +75,6 @@ export function VysionMusicClient({
         setError(json.error || t('vysionMusic.errorLoad'))
         return
       }
-      setError(null)
       if (json.snapshot) setSnapshot(json.snapshot)
     } catch {
       setError(t('vysionMusic.errorNetwork'))
@@ -214,7 +213,19 @@ export function VysionMusicClient({
         </div>
       </header>
 
-      {error ? <div className={styles.errorBanner}>{error}</div> : null}
+      {error ? (
+        <div className={styles.errorBanner} role="alert">
+          <span className={styles.errorBannerText}>{error}</span>
+          <button
+            type="button"
+            className={styles.errorDismiss}
+            aria-label={t('vysionMusic.errorDismiss')}
+            onClick={() => setError(null)}
+          >
+            ×
+          </button>
+        </div>
+      ) : null}
 
       <section className={styles.nowPlaying}>
         {coverUrl ? (
@@ -306,7 +317,7 @@ export function VysionMusicClient({
         <div className={styles.panel}>
           <div className={styles.panelTitle}>{t('vysionMusic.playlistTitle')}</div>
           <div className={styles.list}>
-            {(playlistRows.length ? playlistRows : snapshot?.playlist ?? []).map((row, idx) => {
+            {playlistRows.map((row, idx) => {
               const active = nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
               return (
                 <button

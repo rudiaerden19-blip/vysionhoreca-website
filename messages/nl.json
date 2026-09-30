@@ -6823,6 +6823,7 @@
     "loading": "Laden…",
     "errorLoad": "Kon muziekstatus niet laden.",
     "errorControl": "Bediening mislukt.",
-    "errorNetwork": "Netwerkfout."
+    "errorNetwork": "Netwerkfout.",
+    "errorDismiss": "Melding sluiten"
   }
 }

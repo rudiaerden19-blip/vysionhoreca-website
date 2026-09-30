@@ -6864,6 +6864,7 @@
     "errorLoad": "状態を読み込めませんでした。",
     "errorControl": "操作に失敗しました。",
     "errorNetwork": "ネットワークエラー。",
-    "resultsPrefix": "結果"
+    "resultsPrefix": "結果",
+    "errorDismiss": "Dismiss"
   }
 }

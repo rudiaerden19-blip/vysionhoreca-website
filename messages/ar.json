@@ -6864,6 +6864,7 @@
     "errorLoad": "تعذر تحميل الحالة.",
     "errorControl": "فشل التحكم.",
     "errorNetwork": "خطأ في الشبكة.",
-    "resultsPrefix": "نتائج"
+    "resultsPrefix": "نتائج",
+    "errorDismiss": "Dismiss"
   }
 }

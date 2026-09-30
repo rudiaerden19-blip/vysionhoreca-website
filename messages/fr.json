@@ -6887,6 +6887,7 @@
     "errorLoad": "Impossible de charger le statut.",
     "errorControl": "Échec de la commande.",
     "errorNetwork": "Erreur réseau.",
-    "resultsPrefix": "RÉSULTATS"
+    "resultsPrefix": "RÉSULTATS",
+    "errorDismiss": "Dismiss"
   }
 }

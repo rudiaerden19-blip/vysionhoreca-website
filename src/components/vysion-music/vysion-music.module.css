@@ -428,10 +428,32 @@
 }
 
 .errorBanner {
-  background: rgba(220, 38, 38, 0.15);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(220, 38, 38, 0.25);
   color: #fecaca;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(248, 113, 113, 0.35);
+}
+
+.errorBannerText {
+  flex: 1;
+  user-select: text;
+  word-break: break-word;
+}
+
+.errorDismiss {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #fecaca;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.25rem;
 }
 
 @media (max-width: 900px) {

@@ -6864,6 +6864,7 @@
     "errorLoad": "无法加载状态。",
     "errorControl": "控制失败。",
     "errorNetwork": "网络错误。",
-    "resultsPrefix": "结果"
+    "resultsPrefix": "结果",
+    "errorDismiss": "Dismiss"
   }
 }
