@@ -22,6 +22,7 @@
   --vm-glass-rim: rgba(164, 174, 188, 0.68);
   --vm-glass-rim-deep: rgba(22, 30, 42, 0.97);
   --vm-glass-glow: rgba(0, 0, 0, 0.4);
+  --vm-glass-shadow-grey: rgba(110, 118, 130, 0.52);
   --vm-panel: #0c1018;
   --vm-panel-border: #1a2333;
   --vm-row-active: var(--vm-accent-panel);
@@ -390,6 +391,7 @@
     0 0 0 1px var(--vm-glass-rim),
     0 0 0 2.5px var(--vm-glass-rim-deep),
     0 6px 18px var(--vm-glass-glow),
+    0 10px 26px var(--vm-glass-shadow-grey),
     0 4px 14px rgba(0, 0, 0, 0.38);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
