@@ -1,3 +1,10 @@
+/** Korte zoekterm → artiest verwacht (U2, Elvis, …), geen brede track-mix. */
+export function prefersArtistOnlySearchResults(query: string): boolean {
+  const q = query.trim()
+  if (q.length < 2 || q.length > 50) return false
+  return q.split(/\s+/).filter(Boolean).length <= 4
+}
+
 /** Track hoort bij zoekterm als artiest (bv. «elvis» → Elvis Presley, «u2» → U2). */
 export function trackArtistMatchesQuery(artist: string, query: string): boolean {
   const a = artist.trim().toLowerCase()
@@ -33,4 +40,21 @@ export function pickArtistScopedSearchResults<T extends { artist: string }>(
 ): T[] | null {
   const scoped = filterTracksByArtistQuery(rows, query)
   return scoped.length > 0 ? scoped : null
+}
+
+export function trackArtistNamesMatchQuery(
+  artistNames: string[] | undefined | null,
+  query: string,
+): boolean {
+  if (!artistNames?.length) return false
+  return artistNames.some((name) => trackArtistMatchesQuery(name, query))
+}
+
+/** Extra Soundtrack-zoekstrings om artiest-catalogus te raken. */
+export function artistDiscoverySearchQueries(query: string): string[] {
+  const q = query.trim()
+  if (!q) return []
+  const out = [q]
+  if (!q.startsWith('"')) out.push(`"${q}"`)
+  return out
 }

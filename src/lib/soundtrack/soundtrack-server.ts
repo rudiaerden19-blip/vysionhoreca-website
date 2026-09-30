@@ -1,4 +1,9 @@
-import { pickArtistScopedSearchResults } from '@/lib/soundtrack/soundtrack-search-artist-filter'
+import {
+  artistDiscoverySearchQueries,
+  prefersArtistOnlySearchResults,
+  trackArtistMatchesQuery,
+  trackArtistNamesMatchQuery,
+} from '@/lib/soundtrack/soundtrack-search-artist-filter'
 import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
 
 import { getServerSupabaseClient } from '@/lib/supabase-server'
@@ -375,6 +380,7 @@ function mapTrack(
       }
     | null
     | undefined,
+  artistQuery?: string,
 ): SoundtrackTrackRow | null {
   const id = track?.id?.trim()
   if (!track?.name || !id) return null
@@ -382,10 +388,17 @@ function mapTrack(
   const imageWidth = typeof img?.width === 'number' && img.width > 0 ? img.width : null
   const imageHeight = typeof img?.height === 'number' && img.height > 0 ? img.height : null
   const imageUrl = soundtrackAlbumArtUrl(img?.url ?? null)
+  const artistNames =
+    track.artists?.map((a) => a.name?.trim()).filter((n): n is string => Boolean(n)) ?? []
+  let artist = artistNames[0] || '—'
+  if (artistQuery) {
+    const matched = artistNames.find((n) => trackArtistMatchesQuery(n, artistQuery))
+    if (matched) artist = matched
+  }
   return {
     id,
     name: track.name,
-    artist: track.artists?.[0]?.name || '—',
+    artist,
     durationMs: typeof track.duration === 'number' ? track.duration : 0,
     imageUrl,
     imageWidth,
@@ -525,6 +538,82 @@ function dedupeSearchTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[]
   return out
 }
 
+type SoundtrackTrackSearchNode = {
+  __typename: string
+  id?: string
+  name?: string
+  duration?: number
+  artists?: { name: string }[]
+  album?: { image: { url: string; width?: number; height?: number } | null } | null
+}
+
+type SoundtrackTrackSearchPage = {
+  search: {
+    pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    edges: { node: SoundtrackTrackSearchNode }[]
+  }
+}
+
+async function fetchSoundtrackTrackSearchPage(
+  searchQuery: string,
+  pageSize: number,
+  after: string | null,
+): Promise<SoundtrackTrackSearchPage> {
+  return soundtrackGraphql<SoundtrackTrackSearchPage>(
+    `query($q: String!, $first: Int!, $after: String) {
+      search(query: $q, type: track, first: $first, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        edges {
+          node {
+            __typename
+            ... on Track {
+              id name duration
+              artists { name }
+              album { image { url width height } }
+            }
+          }
+        }
+      }
+    }`,
+    { q: searchQuery, first: pageSize, after },
+  )
+}
+
+async function collectArtistScopedTrackSearch(
+  artistQuery: string,
+  maxResults: number,
+  pageSize: number,
+): Promise<SoundtrackTrackRow[]> {
+  const q = artistQuery.trim()
+  let collected: SoundtrackTrackRow[] = []
+
+  for (const searchQ of artistDiscoverySearchQueries(q)) {
+    let after: string | null = null
+    for (let page = 0; page < 8; page++) {
+      const data = await fetchSoundtrackTrackSearchPage(searchQ, pageSize, after)
+
+      for (const edge of data.search?.edges ?? []) {
+        if (edge.node.__typename !== 'Track') continue
+        if (!trackArtistNamesMatchQuery(edge.node.artists?.map((a) => a.name), q)) {
+          continue
+        }
+        const row = mapTrack(edge.node, q)
+        if (row) collected.push(row)
+      }
+
+      collected = dedupeSearchTrackRows(collected)
+      if (collected.length >= maxResults) return collected.slice(0, maxResults)
+
+      const pi = data.search?.pageInfo
+      if (!pi?.hasNextPage || !pi.endCursor) break
+      after = pi.endCursor
+    }
+    if (collected.length >= maxResults) break
+  }
+
+  return collected.slice(0, maxResults)
+}
+
 /** Soundtrack search met paginatie — geen hard cap op 12; catalog ≠ volledige discografie. */
 export async function soundtrackSearchTracks(
   query: string,
@@ -535,20 +624,8 @@ export async function soundtrackSearchTracks(
   const maxResults = Math.min(Math.max(opts?.maxResults ?? 80, 1), 120)
   const pageSize = Math.min(Math.max(opts?.pageSize ?? 50, 1), 50)
 
-  type SearchPage = {
-    search: {
-      pageInfo: { hasNextPage: boolean; endCursor: string | null }
-      edges: {
-        node: {
-          __typename: string
-          id?: string
-          name?: string
-          duration?: number
-          artists?: { name: string }[]
-          album?: { image: { url: string; width?: number; height?: number } | null } | null
-        }
-      }[]
-    }
+  if (prefersArtistOnlySearchResults(q)) {
+    return collectArtistScopedTrackSearch(q, maxResults, pageSize)
   }
 
   let collected: SoundtrackTrackRow[] = []
@@ -556,24 +633,7 @@ export async function soundtrackSearchTracks(
   let after: string | null = null
 
   for (let page = 0; page < 8; page++) {
-    const data: SearchPage = await soundtrackGraphql<SearchPage>(
-      `query($q: String!, $first: Int!, $after: String) {
-        search(query: $q, type: track, first: $first, after: $after) {
-          pageInfo { hasNextPage endCursor }
-          edges {
-            node {
-              __typename
-              ... on Track {
-                id name duration
-                artists { name }
-                album { image { url width height } }
-              }
-            }
-          }
-        }
-      }`,
-      { q, first: pageSize, after },
-    )
+    const data = await fetchSoundtrackTrackSearchPage(q, pageSize, after)
 
     for (const edge of data.search?.edges ?? []) {
       if (edge.node.__typename !== 'Track') continue
@@ -583,15 +643,15 @@ export async function soundtrackSearchTracks(
 
     collected = dedupeSearchTrackRows(collected)
 
-    const scoped = pickArtistScopedSearchResults(collected, q)
-    if (scoped) {
+    const scoped = collected.filter((r) => trackArtistMatchesQuery(r.artist, q))
+    if (scoped.length > 0) {
       artistScoped = scoped
       if (artistScoped.length >= maxResults) break
     } else if (collected.length >= maxResults) {
       break
     }
 
-    const pi: SearchPage['search']['pageInfo'] | undefined = data.search?.pageInfo
+    const pi = data.search?.pageInfo
     if (!pi?.hasNextPage || !pi.endCursor) break
     after = pi.endCursor
   }

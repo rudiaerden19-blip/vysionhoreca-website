@@ -1,7 +1,10 @@
 import {
+  artistDiscoverySearchQueries,
   filterTracksByArtistQuery,
   pickArtistScopedSearchResults,
+  prefersArtistOnlySearchResults,
   trackArtistMatchesQuery,
+  trackArtistNamesMatchQuery,
 } from '@/lib/soundtrack/soundtrack-search-artist-filter'
 
 describe('soundtrack search artist filter', () => {
@@ -27,5 +30,19 @@ describe('soundtrack search artist filter', () => {
 
   it('returns null when no artist matches (song-title search)', () => {
     expect(pickArtistScopedSearchResults(rows, 'One')).toBeNull()
+  })
+
+  it('treats short queries as artist-only search', () => {
+    expect(prefersArtistOnlySearchResults('U2')).toBe(true)
+    expect(prefersArtistOnlySearchResults('Elvis Presley')).toBe(true)
+    expect(prefersArtistOnlySearchResults('a very long song title search phrase')).toBe(false)
+  })
+
+  it('matches any credited artist on the track', () => {
+    expect(trackArtistNamesMatchQuery(['Josh Butler', 'U2'], 'u2')).toBe(true)
+  })
+
+  it('builds discovery query variants', () => {
+    expect(artistDiscoverySearchQueries('U2')).toEqual(['U2', '"U2"'])
   })
 })
