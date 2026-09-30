@@ -4,7 +4,20 @@ import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import {
+  VmEllipsisVertical,
+  VmPause,
+  VmPlay,
+  VmSettings,
+  VmSkipBack,
+  VmSkipForward,
+  VmStop,
+  VmVolume1,
+  VmVolume2,
+} from './VysionMusicIcons'
 import styles from './vysion-music.module.css'
+
+const VM_ICON_STROKE = 2.35
 
 type TrackRow = {
   id: string
@@ -271,7 +284,7 @@ export function VysionMusicClient({
             <div className={styles.clockTime}>{clockTime}</div>
           </div>
           <span className={styles.settingsBtn} aria-hidden>
-            ⚙
+            <VmSettings strokeWidth={VM_ICON_STROKE} />
           </span>
         </div>
       </header>
@@ -337,7 +350,7 @@ export function VysionMusicClient({
                   if (prev?.id) void control('playTrack', { trackId: prev.id })
                 }}
               >
-                ⏮
+                <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
               <button
                 type="button"
@@ -346,7 +359,11 @@ export function VysionMusicClient({
                 aria-label={isPlaying ? t('vysionMusic.pause') : t('vysionMusic.play')}
                 onClick={() => void control(isPlaying ? 'pause' : 'play')}
               >
-                {isPlaying ? '⏸' : '▶'}
+                {isPlaying ? (
+                  <VmPause className={styles.transportIconPrimary} strokeWidth={VM_ICON_STROKE} />
+                ) : (
+                  <VmPlay className={styles.transportIconPrimary} filled strokeWidth={VM_ICON_STROKE} />
+                )}
               </button>
               <button
                 type="button"
@@ -355,7 +372,7 @@ export function VysionMusicClient({
                 aria-label={t('vysionMusic.stop')}
                 onClick={() => void control('stop')}
               >
-                ⏹
+                <VmStop className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
               <button
                 type="button"
@@ -364,13 +381,13 @@ export function VysionMusicClient({
                 aria-label={t('vysionMusic.next')}
                 onClick={() => void control('skipNext')}
               >
-                ⏭
+                <VmSkipForward className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
             </div>
           </div>
           <div className={styles.volumeColumn}>
             <span className={styles.volumeIconLarge} aria-hidden>
-              🔊
+              <VmVolume2 strokeWidth={VM_ICON_STROKE} />
             </span>
             <div className={styles.volumeSliderWrap}>
               <input
@@ -391,7 +408,7 @@ export function VysionMusicClient({
               />
             </div>
             <span className={styles.volumeIcon} aria-hidden>
-              🔊
+              <VmVolume1 strokeWidth={VM_ICON_STROKE} />
             </span>
           </div>
         </div>
@@ -413,13 +430,13 @@ export function VysionMusicClient({
                 >
                   <span className={styles.rowNum}>{idx + 1}</span>
                   <span className={styles.rowPlay} aria-hidden>
-                    ▶
+                    <VmPlay filled strokeWidth={VM_ICON_STROKE} />
                   </span>
                   <span className={styles.rowTitle}>{row.name}</span>
                   <span className={styles.rowArtist}>{row.artist}</span>
                   <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
                   <span className={styles.rowMenu} aria-hidden>
-                    ⋮
+                    <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
                   </span>
                 </button>
               )
@@ -464,13 +481,13 @@ export function VysionMusicClient({
               >
                 <span className={styles.rowNum}>{idx + 1}</span>
                 <span className={styles.rowPlay} aria-hidden>
-                  ▶
+                  <VmPlay filled strokeWidth={VM_ICON_STROKE} />
                 </span>
                 <span className={styles.rowTitle}>{row.name}</span>
                 <span className={styles.rowArtist}>{row.artist}</span>
                 <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
                 <span className={styles.rowMenu} aria-hidden>
-                  ⋮
+                  <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
                 </span>
               </button>
             ))}

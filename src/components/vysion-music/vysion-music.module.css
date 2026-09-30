@@ -150,10 +150,17 @@
   background: transparent;
   border: none;
   color: var(--vm-muted);
-  font-size: 1.35rem;
   cursor: default;
   opacity: 0.5;
   padding: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settingsBtn svg {
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
 .nowPlaying {
@@ -328,14 +335,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
   line-height: 1;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-.nowRight .transportBtn {
-  font-size: clamp(1.45rem, 2.4vw, 1.75rem);
+.transportIcon {
+  width: clamp(1.45rem, 2.4vw, 1.75rem);
+  height: clamp(1.45rem, 2.4vw, 1.75rem);
+  flex-shrink: 0;
+}
+
+.transportIconPrimary {
+  width: clamp(2rem, 3.2vw, 2.35rem);
+  height: clamp(2rem, 3.2vw, 2.35rem);
+  flex-shrink: 0;
 }
 
 .transportBtn:disabled {
@@ -356,15 +370,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.85rem;
   line-height: 1;
   box-shadow: 0 0 22px rgba(0, 150, 255, 0.45);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-}
-
-.nowRight .transportPrimary {
-  font-size: clamp(2rem, 3.2vw, 2.35rem);
 }
 
 .volumeColumn {
@@ -379,21 +388,32 @@
 }
 
 .volumeIcon {
-  color: var(--vm-text);
-  font-size: 1.85rem;
+  color: var(--vm-muted);
   line-height: 1;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.nowRight .volumeIcon {
-  font-size: clamp(1.55rem, 2.2vw, 1.85rem);
+.volumeIcon svg {
+  width: clamp(1.55rem, 2.2vw, 1.85rem);
+  height: clamp(1.55rem, 2.2vw, 1.85rem);
 }
 
 .volumeIconLarge {
-  color: var(--vm-text);
+  color: var(--vm-accent);
   line-height: 1;
   flex-shrink: 0;
-  font-size: clamp(2.35rem, 3.8vw, 2.85rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(0, 150, 255, 0.45));
+}
+
+.volumeIconLarge svg {
+  width: clamp(2.35rem, 3.8vw, 2.85rem);
+  height: clamp(2.35rem, 3.8vw, 2.85rem);
 }
 
 .volumeSliderWrap {
@@ -562,8 +582,15 @@
 
 .rowPlay {
   color: var(--vm-accent);
-  font-size: 0.75rem;
   text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rowPlay svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .rowTitle {
@@ -589,8 +616,15 @@
 .rowMenu {
   color: var(--vm-muted);
   text-align: center;
-  font-size: 1.1rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rowMenu svg {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .searchWrap {
