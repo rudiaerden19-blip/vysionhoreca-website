@@ -66,6 +66,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
       volume: body.volume,
       trackId: body.trackId,
     })
+    if (op === 'playTrack') {
+      await new Promise((r) => setTimeout(r, 500))
+    }
     const snapshot =
       op === 'playTrack'
         ? await fetchSoundtrackPlayerSnapshot(zoneId, { historyFirst: 0, padPlaylist: false })

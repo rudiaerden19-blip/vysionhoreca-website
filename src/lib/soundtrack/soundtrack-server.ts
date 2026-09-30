@@ -400,11 +400,23 @@ export async function soundtrackControl(
       if (trackId.startsWith('placeholder-')) {
         throw new SoundtrackApiError('Track not available')
       }
+      // setPlayFrom.source = Playlist/Schedule/Soundtrack — géén Track-id → Validation failed
       await soundtrackGraphql(
-        `mutation($input: SetPlayFromInput!) {
-          setPlayFrom(input: $input) { playFrom { __typename } }
+        `mutation($input: SoundZoneQueueTracksInput!) {
+          soundZoneQueueTracks(input: $input) { __typename }
         }`,
-        { input: { soundZone: zoneId, source: trackId } },
+        {
+          input: {
+            soundZone: zoneId,
+            tracks: [trackId],
+            immediate: true,
+            clearQueuedTracks: true,
+          },
+        },
+      )
+      await soundtrackGraphql(
+        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+        { input: { soundZone: zoneId } },
       )
       return
     }
