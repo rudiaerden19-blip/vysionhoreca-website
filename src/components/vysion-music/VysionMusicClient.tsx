@@ -12,9 +12,21 @@ import {
   VmSkipBack,
   VmSkipForward,
   VmStop,
-  VmVolume1,
-  VmVolume2,
 } from './VysionMusicIcons'
+
+const VOLUME_SPEAKER_SRC = '/images/vysion-music/speaker-emoji.svg'
+
+function VolumeSpeakerArt({ large }: { large?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={VOLUME_SPEAKER_SRC}
+      alt=""
+      draggable={false}
+      className={large ? styles.volumeSpeakerImgLarge : styles.volumeSpeakerImg}
+    />
+  )
+}
 import styles from './vysion-music.module.css'
 
 const VM_ICON_STROKE = 2.35
@@ -387,7 +399,7 @@ export function VysionMusicClient({
           </div>
           <div className={styles.volumeColumn}>
             <span className={styles.volumeIconLarge} aria-hidden>
-              <VmVolume2 strokeWidth={VM_ICON_STROKE} />
+              <VolumeSpeakerArt large />
             </span>
             <div className={styles.volumeSliderWrap}>
               <input
@@ -408,7 +420,7 @@ export function VysionMusicClient({
               />
             </div>
             <span className={styles.volumeIcon} aria-hidden>
-              <VmVolume1 strokeWidth={VM_ICON_STROKE} />
+              <VolumeSpeakerArt />
             </span>
           </div>
         </div>

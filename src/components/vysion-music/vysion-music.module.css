@@ -388,32 +388,37 @@
 }
 
 .volumeIcon {
-  color: var(--vm-muted);
   line-height: 1;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.volumeIcon svg {
-  width: clamp(1.55rem, 2.2vw, 1.85rem);
-  height: clamp(1.55rem, 2.2vw, 1.85rem);
 }
 
 .volumeIconLarge {
-  color: var(--vm-accent);
   line-height: 1;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 8px rgba(0, 150, 255, 0.45));
 }
 
-.volumeIconLarge svg {
+.volumeSpeakerImg {
+  width: clamp(1.55rem, 2.2vw, 1.85rem);
+  height: clamp(1.55rem, 2.2vw, 1.85rem);
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.volumeSpeakerImgLarge {
   width: clamp(2.35rem, 3.8vw, 2.85rem);
   height: clamp(2.35rem, 3.8vw, 2.85rem);
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .volumeSliderWrap {
