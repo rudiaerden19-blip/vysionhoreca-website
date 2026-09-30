@@ -1,11 +1,18 @@
 .root {
   --vm-bg: #050505;
+  /* Mockup / afb 4 — één blauw overal (slider, logo, knoppen, pijltjes) */
   --vm-accent: #0096ff;
+  --vm-accent-rgb: 0, 150, 255;
+  --vm-accent-soft: #33abff;
+  --vm-accent-deep: #0077cc;
+  --vm-accent-deeper: #005a99;
+  --vm-accent-panel: #0d2844;
+  --vm-accent-track-off: #1a3550;
   --vm-text: #ffffff;
   --vm-muted: #9ca3af;
   --vm-panel: #0c1018;
   --vm-panel-border: #1a2333;
-  --vm-row-active: rgba(0, 150, 255, 0.22);
+  --vm-row-active: var(--vm-accent-panel);
   --vm-control-face: #141a24;
   /* Vaste rem — geen vh (voorkomt layout-shift bij touch/zoom) */
   --vm-now-band-h: 18rem;
@@ -337,7 +344,7 @@
   border: none;
   padding: 0;
   background: transparent;
-  color: #9ae6ff;
+  color: var(--vm-accent-soft);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -348,8 +355,8 @@
   box-shadow:
     0 0 0 2px rgba(186, 204, 228, 0.55),
     0 0 0 3px rgba(28, 40, 58, 0.95),
-    0 6px 22px rgba(0, 130, 255, 0.42),
-    0 2px 10px rgba(0, 160, 255, 0.28);
+    0 6px 22px rgba(var(--vm-accent-rgb), 0.42),
+    0 2px 10px rgba(var(--vm-accent-rgb), 0.28);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -380,8 +387,9 @@
   width: clamp(1.45rem, 2.4vw, 1.75rem);
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
-  color: #8fdcff;
-  filter: drop-shadow(0 0 5px rgba(0, 185, 255, 0.95)) drop-shadow(0 0 12px rgba(0, 140, 255, 0.55));
+  color: var(--vm-accent);
+  filter: drop-shadow(0 0 5px rgba(var(--vm-accent-rgb), 0.95))
+    drop-shadow(0 0 12px rgba(var(--vm-accent-rgb), 0.55));
 }
 
 .transportIconPrimary {
@@ -391,7 +399,8 @@
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
   color: #ffffff;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.65)) drop-shadow(0 0 14px rgba(0, 210, 255, 0.9));
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.65))
+    drop-shadow(0 0 14px rgba(var(--vm-accent-rgb), 0.9));
 }
 
 .transportBtn:disabled {
@@ -425,9 +434,9 @@
   box-shadow:
     0 0 0 2px rgba(210, 228, 255, 0.72),
     0 0 0 4px rgba(22, 38, 62, 0.95),
-    0 0 36px rgba(0, 160, 255, 0.78),
-    0 0 18px rgba(0, 190, 255, 0.62),
-    0 10px 28px rgba(0, 110, 230, 0.5);
+    0 0 36px rgba(var(--vm-accent-rgb), 0.78),
+    0 0 18px rgba(var(--vm-accent-rgb), 0.62),
+    0 10px 28px rgba(var(--vm-accent-rgb), 0.5);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -439,7 +448,13 @@
   border-radius: 50%;
   background:
     radial-gradient(ellipse 92% 58% at 50% 6%, rgba(255, 255, 255, 0.5), transparent 48%),
-    radial-gradient(circle at 50% 58%, #0088ee 0%, #00a8ff 38%, #0066bb 72%, #004488 100%);
+    radial-gradient(
+      circle at 50% 58%,
+      var(--vm-accent-deep) 0%,
+      var(--vm-accent) 38%,
+      var(--vm-accent-deeper) 72%,
+      #003d66 100%
+    );
 }
 
 .transportPrimary::after {
@@ -462,8 +477,8 @@
   box-shadow:
     0 0 0 2px rgba(210, 228, 255, 0.72),
     0 0 0 4px rgba(22, 38, 62, 0.95),
-    0 0 28px rgba(0, 160, 255, 0.65),
-    0 8px 22px rgba(0, 110, 230, 0.42);
+    0 0 28px rgba(var(--vm-accent-rgb), 0.65),
+    0 8px 22px rgba(var(--vm-accent-rgb), 0.42);
 }
 
 .volumeColumn {
@@ -584,7 +599,7 @@
   width: var(--vm-volume-track-h);
   transform: translateX(-50%);
   border-radius: 999px;
-  background: #1f2937;
+  background: var(--vm-accent-track-off);
   pointer-events: none;
   z-index: 0;
 }
@@ -713,8 +728,8 @@
   box-shadow:
     0 0 0 1px rgba(186, 204, 228, 0.45),
     0 0 0 2px rgba(28, 40, 58, 0.92),
-    0 4px 14px rgba(0, 130, 255, 0.32),
-    0 1px 6px rgba(0, 160, 255, 0.22);
+    0 4px 14px rgba(var(--vm-accent-rgb), 0.32),
+    0 1px 6px rgba(var(--vm-accent-rgb), 0.22);
 }
 
 .rowPlay::before {
@@ -740,10 +755,10 @@
 
 .listRowActive .rowPlay {
   box-shadow:
-    0 0 0 2px rgba(0, 195, 255, 0.95),
+    0 0 0 2px rgba(var(--vm-accent-rgb), 0.95),
     0 0 0 3px rgba(186, 204, 228, 0.55),
-    0 0 18px rgba(0, 160, 255, 0.72),
-    0 0 8px rgba(0, 190, 255, 0.55);
+    0 0 18px rgba(var(--vm-accent-rgb), 0.72),
+    0 0 8px rgba(var(--vm-accent-rgb), 0.55);
 }
 
 .rowPlayIcon {
@@ -751,13 +766,15 @@
   z-index: 1;
   width: 0.72rem;
   height: 0.72rem;
-  color: #8fdcff;
-  filter: drop-shadow(0 0 4px rgba(0, 185, 255, 0.95)) drop-shadow(0 0 8px rgba(0, 140, 255, 0.5));
+  color: var(--vm-accent);
+  filter: drop-shadow(0 0 4px rgba(var(--vm-accent-rgb), 0.95))
+    drop-shadow(0 0 8px rgba(var(--vm-accent-rgb), 0.5));
 }
 
 .listRowActive .rowPlayIcon {
-  color: #e8f7ff;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.55)) drop-shadow(0 0 10px rgba(0, 210, 255, 0.85));
+  color: var(--vm-accent-soft);
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.55))
+    drop-shadow(0 0 10px rgba(var(--vm-accent-rgb), 0.85));
 }
 
 .rowTitle {
