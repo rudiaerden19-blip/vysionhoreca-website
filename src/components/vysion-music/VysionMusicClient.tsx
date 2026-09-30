@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import styles from './vysion-music.module.css'
@@ -146,8 +146,12 @@ export function VysionMusicClient({
   }, [searchQuery, runSearch])
 
   const control = useCallback(
-    async (op: string, extra?: { volume?: number; trackId?: string }) => {
-      setBusy(true)
+    async (
+      op: string,
+      extra?: { volume?: number; trackId?: string },
+      opts?: { silent?: boolean },
+    ) => {
+      if (!opts?.silent) setBusy(true)
       try {
         const res = await fetch(apiBase, {
           method: 'POST',
@@ -164,11 +168,28 @@ export function VysionMusicClient({
       } catch {
         setError(t('vysionMusic.errorNetwork'))
       } finally {
-        setBusy(false)
+        if (!opts?.silent) setBusy(false)
       }
     },
     [apiBase, t],
   )
+
+  const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const syncVolume = useCallback(
+    (v: number, immediate?: boolean) => {
+      if (volumeSyncTimer.current) clearTimeout(volumeSyncTimer.current)
+      const send = () => void control('setVolume', { volume: v }, { silent: true })
+      if (immediate) send()
+      else volumeSyncTimer.current = setTimeout(send, 320)
+    },
+    [control],
+  )
+
+  useEffect(() => {
+    return () => {
+      if (volumeSyncTimer.current) clearTimeout(volumeSyncTimer.current)
+    }
+  }, [])
 
   const playTrackRow = useCallback(
     async (row: TrackRow) => {
@@ -317,68 +338,72 @@ export function VysionMusicClient({
           </div>
         </div>
         <div className={styles.controlsBlock}>
-          <div className={styles.transport}>
-            <button
-              type="button"
-              className={styles.transportBtn}
-              disabled={busy}
-              aria-label={t('vysionMusic.prev')}
-              onClick={() => {
-                const rows = playlistRows
-                if (!nowTrack || rows.length < 2) return
-                const idx = rows.findIndex((r) => r.id === nowTrack.id && r.name === nowTrack.name)
-                const prev = idx > 0 ? rows[idx - 1] : rows[0]
-                if (prev?.id) void control('playTrack', { trackId: prev.id })
-              }}
-            >
-              ⏮
-            </button>
-            <button
-              type="button"
-              className={styles.transportPrimary}
-              disabled={busy}
-              aria-label={isPlaying ? t('vysionMusic.pause') : t('vysionMusic.play')}
-              onClick={() => void control(isPlaying ? 'pause' : 'play')}
-            >
-              {isPlaying ? '⏸' : '▶'}
-            </button>
-            <button
-              type="button"
-              className={styles.transportBtn}
-              disabled={busy}
-              aria-label={t('vysionMusic.stop')}
-              onClick={() => void control('stop')}
-            >
-              ⏹
-            </button>
-            <button
-              type="button"
-              className={styles.transportBtn}
-              disabled={busy}
-              aria-label={t('vysionMusic.next')}
-              onClick={() => void control('skipNext')}
-            >
-              ⏭
-            </button>
-          </div>
-          <div className={styles.volumeRow}>
-            <span className={styles.volumeIcon} aria-hidden>
-              🔊
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={snapshot?.volume ?? 0}
-              className={styles.volumeSlider}
-              onChange={(e) => {
-                const v = Number(e.target.value)
-                setSnapshot((s) => (s ? { ...s, volume: v } : s))
-              }}
-              onMouseUp={(e) => void control('setVolume', { volume: Number(e.currentTarget.value) })}
-              onTouchEnd={(e) => void control('setVolume', { volume: Number(e.currentTarget.value) })}
-            />
-            <span className={styles.volumePct}>{snapshot?.volume ?? 0}%</span>
+          <div className={styles.controlsRow}>
+            <div className={styles.transport}>
+              <button
+                type="button"
+                className={styles.transportBtn}
+                disabled={busy}
+                aria-label={t('vysionMusic.prev')}
+                onClick={() => {
+                  const rows = playlistRows
+                  if (!nowTrack || rows.length < 2) return
+                  const idx = rows.findIndex((r) => r.id === nowTrack.id && r.name === nowTrack.name)
+                  const prev = idx > 0 ? rows[idx - 1] : rows[0]
+                  if (prev?.id) void control('playTrack', { trackId: prev.id })
+                }}
+              >
+                ⏮
+              </button>
+              <button
+                type="button"
+                className={styles.transportPrimary}
+                disabled={busy}
+                aria-label={isPlaying ? t('vysionMusic.pause') : t('vysionMusic.play')}
+                onClick={() => void control(isPlaying ? 'pause' : 'play')}
+              >
+                {isPlaying ? '⏸' : '▶'}
+              </button>
+              <button
+                type="button"
+                className={styles.transportBtn}
+                disabled={busy}
+                aria-label={t('vysionMusic.stop')}
+                onClick={() => void control('stop')}
+              >
+                ⏹
+              </button>
+              <button
+                type="button"
+                className={styles.transportBtn}
+                disabled={busy}
+                aria-label={t('vysionMusic.next')}
+                onClick={() => void control('skipNext')}
+              >
+                ⏭
+              </button>
+            </div>
+            <div className={styles.volumeRow}>
+              <span className={styles.volumeIcon} aria-hidden>
+                🔊
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={snapshot?.volume ?? 0}
+                className={styles.volumeSlider}
+                style={{ ['--vm-vol-pct' as string]: `${snapshot?.volume ?? 0}%` }}
+                aria-label={t('vysionMusic.volume')}
+                onChange={(e) => {
+                  const v = Number(e.target.value)
+                  setSnapshot((s) => (s ? { ...s, volume: v } : s))
+                  syncVolume(v)
+                }}
+                onPointerUp={(e) => syncVolume(Number(e.currentTarget.value), true)}
+              />
+              <span className={styles.volumePct}>{snapshot?.volume ?? 0}%</span>
+            </div>
           </div>
         </div>
       </section>

@@ -6819,6 +6819,7 @@
     "stop": "Stop",
     "prev": "Previous",
     "next": "Next",
+    "volume": "Volume",
     "online": "online",
     "offline": "offline",
     "loading": "Loading…",

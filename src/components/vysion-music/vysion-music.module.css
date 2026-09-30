@@ -11,8 +11,10 @@
   --vm-now-min-h: clamp(11.25rem, 26vh, 16.25rem);
   --vm-columns-max-h: clamp(16rem, 48vh, 25rem);
   /* Touch: grote knoppen binnen dezelfde now-playing band (afb. 3) */
-  --vm-transport-secondary: clamp(3.5rem, 7.2vh, 4.5rem);
-  --vm-transport-primary: clamp(4.65rem, 9.8vh, 5.85rem);
+  --vm-transport-secondary: clamp(3.75rem, 7.8vh, 4.75rem);
+  --vm-transport-primary: clamp(4.85rem, 10.5vh, 6.1rem);
+  --vm-volume-track-h: clamp(0.45rem, 0.9vh, 0.55rem);
+  --vm-volume-thumb: clamp(1.35rem, 2.8vh, 1.65rem);
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--vm-bg);
@@ -151,11 +153,11 @@
 
 .nowPlaying {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1.35rem 2rem;
+  grid-template-columns: auto minmax(0, 36rem) minmax(0, 1fr);
+  gap: 1.1rem 1.35rem;
   flex: 0.95 1 auto;
   min-height: var(--vm-now-min-h);
-  padding: 1rem 1.5rem 0.85rem;
+  padding: 1rem 1.25rem 0.85rem;
   align-items: center;
   border-bottom: 1px solid var(--vm-panel-border);
 }
@@ -231,20 +233,26 @@
 }
 
 .controlsBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
+  justify-self: start;
+  align-self: center;
   min-width: 0;
-  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.controlsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: clamp(1.1rem, 2.4vw, 2.25rem);
 }
 
 .transport {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(0.55rem, 1.2vw, 1rem);
+  justify-content: flex-start;
+  flex-shrink: 0;
+  gap: clamp(0.65rem, 1.35vw, 1.15rem);
 }
 
 .transportBtn {
@@ -253,8 +261,8 @@
   min-width: var(--vm-transport-secondary);
   min-height: var(--vm-transport-secondary);
   border-radius: 50%;
-  border: none;
-  background: var(--vm-control-face);
+  border: 2px solid #3d4f66;
+  background: rgba(12, 16, 24, 0.65);
   color: var(--vm-text);
   cursor: pointer;
   display: flex;
@@ -294,31 +302,87 @@
 .volumeRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  width: min(100%, 20rem);
-  margin-top: 0.05rem;
+  gap: clamp(0.55rem, 1vw, 0.85rem);
+  flex: 1 1 auto;
+  min-width: clamp(11rem, 26vw, 22rem);
+  max-width: 28rem;
+  padding: 0.35rem 0;
 }
 
 .volumeIcon {
-  color: var(--vm-muted);
-  font-size: 1.1rem;
+  color: var(--vm-text);
+  font-size: clamp(1.35rem, 2.6vh, 1.75rem);
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .volumeSlider {
-  flex: 1;
-  accent-color: var(--vm-accent);
-  height: 6px;
-  min-height: 28px;
+  flex: 1 1 auto;
+  min-width: 6rem;
+  margin: 0;
+  padding: 0.85rem 0;
   cursor: pointer;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  height: var(--vm-volume-track-h);
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 999px;
+  outline: none;
+}
+
+.volumeSlider::-webkit-slider-runnable-track {
+  height: var(--vm-volume-track-h);
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--vm-accent) 0%,
+    var(--vm-accent) var(--vm-vol-pct, 50%),
+    #1f2937 var(--vm-vol-pct, 50%),
+    #1f2937 100%
+  );
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--vm-volume-thumb);
+  height: var(--vm-volume-thumb);
+  margin-top: calc((var(--vm-volume-track-h) - var(--vm-volume-thumb)) / 2);
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+}
+
+.volumeSlider::-moz-range-track {
+  height: var(--vm-volume-track-h);
+  border-radius: 999px;
+  background: #1f2937;
+}
+
+.volumeSlider::-moz-range-progress {
+  height: var(--vm-volume-track-h);
+  border-radius: 999px 0 0 999px;
+  background: var(--vm-accent);
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: var(--vm-volume-thumb);
+  height: var(--vm-volume-thumb);
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
 }
 
 .volumePct {
-  font-size: 0.85rem;
+  font-size: clamp(0.95rem, 1.8vh, 1.15rem);
   color: var(--vm-muted);
-  min-width: 2.5rem;
+  min-width: 3rem;
   text-align: right;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .columns {
@@ -487,6 +551,19 @@
   .nowPlaying {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+  .controlsBlock {
+    justify-self: center;
+    width: 100%;
+  }
+  .controlsRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .volumeRow {
+    width: min(100%, 22rem);
+    min-width: 0;
   }
   .trackMain {
     display: flex;
