@@ -282,7 +282,7 @@ export function VysionMusicClient({
               <span />
               <span />
             </span>
-            {t('vysionMusic.backToKassa')}
+            <span className={styles.menuBtnLabel}>{t('vysionMusic.backToKassa')}</span>
           </Link>
         </div>
         <div className={styles.brand}>

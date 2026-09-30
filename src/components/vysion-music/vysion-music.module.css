@@ -88,6 +88,11 @@
   border-radius: 1px;
 }
 
+/* Alleen «Kassa» verschuiven; hamburger blijft */
+.menuBtnLabel {
+  margin-left: 2cm;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -140,10 +145,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transform: translateX(-3cm);
 }
 
 .clockBlock {
   line-height: 1.15;
+  transform: translateX(-2cm);
 }
 
 .clockDate {
@@ -163,15 +170,19 @@
   color: var(--vm-muted);
   cursor: default;
   opacity: 0.5;
-  padding: 0.25rem;
+  padding: 0;
+  margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
 }
 
 .settingsBtn svg {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.95rem;
+  height: 1.95rem;
+  display: block;
 }
 
 .nowPlaying {
