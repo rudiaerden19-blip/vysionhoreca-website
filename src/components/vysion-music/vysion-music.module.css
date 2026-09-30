@@ -32,7 +32,7 @@
   --vm-volume-block-w: clamp(12.5rem, 21vw, 17.5rem);
   --vm-panel-gap: 0.85rem;
   --vm-panel-pad-x: 1.25rem;
-  --vm-track-crossfade: 3s;
+  --vm-track-crossfade: 6s;
   min-height: 100vh;
   min-height: 100dvh;
   height: 100dvh;

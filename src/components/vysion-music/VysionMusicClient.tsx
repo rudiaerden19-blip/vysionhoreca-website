@@ -168,27 +168,15 @@ export function VysionMusicClient({
     return () => window.clearTimeout(id)
   }, [searchQuery, runSearch])
 
-  const uiFadeHalfMs = VYSION_MUSIC_TRACK_FADE_MS / 2
-
-  const startUiFadeOut = useCallback(() => {
-    const el = nowLeftRef.current
-    if (!el) return
-    void el.animate([{ opacity: 1 }, { opacity: 0 }], {
-      duration: uiFadeHalfMs,
-      easing: 'ease-in-out',
-      fill: 'forwards',
-    })
-  }, [uiFadeHalfMs])
-
   const finishUiFadeIn = useCallback(() => {
     const el = nowLeftRef.current
     if (!el) return
-    void el.animate([{ opacity: 0 }, { opacity: 1 }], {
-      duration: uiFadeHalfMs,
+    void el.animate([{ opacity: 0.15 }, { opacity: 1 }], {
+      duration: VYSION_MUSIC_TRACK_FADE_MS,
       easing: 'ease-in-out',
       fill: 'forwards',
     })
-  }, [uiFadeHalfMs])
+  }, [])
 
   const control = useCallback(
     async (
@@ -196,8 +184,6 @@ export function VysionMusicClient({
       extra?: { volume?: number; trackId?: string },
       opts?: { silent?: boolean },
     ) => {
-      const fadeOp = op === 'skipNext' || op === 'playTrack'
-      if (!opts?.silent && fadeOp) startUiFadeOut()
       if (!opts?.silent) setBusy(true)
       try {
         const res = await fetch(apiBase, {
@@ -206,8 +192,7 @@ export function VysionMusicClient({
           body: JSON.stringify({
             op,
             trackId: extra?.trackId,
-            volume: fadeOp ? volumeUiRef.current : extra?.volume,
-            audioFade: fadeOp,
+            volume: extra?.volume,
           }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
@@ -227,7 +212,7 @@ export function VysionMusicClient({
         if (!opts?.silent) setBusy(false)
       }
     },
-    [apiBase, mergeSnapshot, startUiFadeOut, t],
+    [apiBase, mergeSnapshot, t],
   )
 
   const syncVolume = useCallback(
@@ -250,7 +235,6 @@ export function VysionMusicClient({
     async (row: TrackRow) => {
       if (!row.id || row.id.startsWith('placeholder')) return
       setError(null)
-      startUiFadeOut()
       setSwitchingTrack(true)
       try {
         const res = await fetch(apiBase, {
@@ -259,8 +243,6 @@ export function VysionMusicClient({
           body: JSON.stringify({
             op: 'playTrack',
             trackId: row.id,
-            volume: volumeUiRef.current,
-            audioFade: true,
           }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
@@ -274,11 +256,12 @@ export function VysionMusicClient({
         setError(t('vysionMusic.errorNetwork'))
       } finally {
         setSwitchingTrack(false)
-        window.setTimeout(() => void loadSnapshot(), 700)
-        window.setTimeout(() => void loadSnapshot(), 2200)
+        window.setTimeout(() => void loadSnapshot(), 800)
+        window.setTimeout(() => void loadSnapshot(), 3200)
+        window.setTimeout(() => void loadSnapshot(), 6500)
       }
     },
-    [apiBase, loadSnapshot, startUiFadeOut, t],
+    [apiBase, loadSnapshot, t],
   )
 
   const nowTrack = snapshot?.nowPlaying.track

@@ -5,23 +5,23 @@ import {
 } from '@/lib/soundtrack/soundtrack-server'
 
 describe('soundtrack crossfade settings', () => {
-  it('uses 3 second default', () => {
-    expect(VYSION_MUSIC_CROSSFADE_SECONDS).toBe(3)
+  it('uses 6 second default', () => {
+    expect(VYSION_MUSIC_CROSSFADE_SECONDS).toBe(6)
   })
 
-  it('matches when zone has 3s crossfade enabled', () => {
+  it('matches when zone has 6s crossfade enabled', () => {
     expect(
       soundtrackCrossfadeSettingsMatch({
         crossfade: true,
-        crossfadeLength: 3,
+        crossfadeLength: 6,
         crossfadeOnSkip: true,
       }),
     ).toBe(true)
   })
 
   it('normalizes millisecond crossfade length from API', () => {
-    expect(soundtrackCrossfadeLengthToSeconds(3000)).toBe(3)
-    expect(soundtrackCrossfadeLengthToSeconds(3)).toBe(3)
+    expect(soundtrackCrossfadeLengthToSeconds(6000)).toBe(6)
+    expect(soundtrackCrossfadeLengthToSeconds(6)).toBe(6)
   })
 
   it('does not match wrong length or disabled skip crossfade', () => {
@@ -35,7 +35,7 @@ describe('soundtrack crossfade settings', () => {
     expect(
       soundtrackCrossfadeSettingsMatch({
         crossfade: true,
-        crossfadeLength: 3,
+        crossfadeLength: 6,
         crossfadeOnSkip: false,
       }),
     ).toBe(false)

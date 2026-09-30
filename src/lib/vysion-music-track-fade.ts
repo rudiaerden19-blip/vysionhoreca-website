@@ -5,7 +5,7 @@ export type TrackFadeFields = {
 }
 
 /** Zelfde duur als Soundtrack zone crossfade + CSS `--vm-track-crossfade`. */
-export const VYSION_MUSIC_TRACK_FADE_MS = 3000
+export const VYSION_MUSIC_TRACK_FADE_MS = 6000
 
 export function trackIdentity(t: TrackFadeFields | null | undefined): string {
   if (!t) return ''

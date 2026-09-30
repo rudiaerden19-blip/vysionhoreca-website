@@ -5,7 +5,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 const API_URL = 'https://api.soundtrackyourbrand.com/v2'
 
 /** Standaard crossfade in Soundtrack-player (zone settings + skip). */
-export const VYSION_MUSIC_CROSSFADE_SECONDS = 3
+export const VYSION_MUSIC_CROSSFADE_SECONDS = 6
 
 /** Soundtrack `Volume` scalar: 0–16 (niet 0–100). UI gebruikt 0–100%. */
 const SOUNDTRACK_VOLUME_MAX = 16
@@ -142,7 +142,7 @@ async function writeSoundZoneCrossfadeSettings(
     : new SoundtrackApiError('Soundtrack crossfade settings were not applied')
 }
 
-/** Zet 3s crossfade op de zone (player in zaak); cached per zone per process. */
+/** Zet zone-crossfade op de player in zaak; cached per zone per process. */
 export async function ensureSoundZoneCrossfadeSettings(
   zoneId: string,
   seconds: number = VYSION_MUSIC_CROSSFADE_SECONDS,
@@ -171,7 +171,7 @@ async function setSoundZoneVolumeUi(zoneId: string, uiPercent: number): Promise<
   )
 }
 
-/** 3s hoorbare fade: helft uit, actie, helft terug (Soundtrack volume 0–16). */
+/** Volume-ramp (0–16 UI). Niet gebruiken bij trackwissel — dat breekt Soundtrack-crossfade. */
 export async function rampSoundZoneVolumeUi(
   zoneId: string,
   fromUi: number,
@@ -590,13 +590,50 @@ export async function soundtrackSearchTracks(
   return collected.slice(0, maxResults)
 }
 
+async function fetchSoundZonePlaybackState(zoneId: string): Promise<{
+  state: string
+  currentTrackId: string | null
+}> {
+  const data = await soundtrackGraphql<{
+    soundZone: {
+      playback: { state: string } | null
+      nowPlaying: { track: { id: string } | null } | null
+    } | null
+  }>(
+    `query($id: ID!) {
+      soundZone(id: $id) {
+        playback { state }
+        nowPlaying { track { id } }
+      }
+    }`,
+    { id: zoneId },
+  )
+  return {
+    state: data.soundZone?.playback?.state ?? 'stopped',
+    currentTrackId: data.soundZone?.nowPlaying?.track?.id ?? null,
+  }
+}
+
+async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
+  await soundtrackGraphql(
+    `mutation($input: SkipTracksInput!) {
+      skipTracks(input: $input) { __typename }
+    }`,
+    {
+      input: {
+        soundZone: zoneId,
+        tracksToSkip: 1,
+        crossfade: true,
+      },
+    },
+  )
+}
+
 export async function soundtrackControl(
   zoneId: string,
   op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack',
-  opts?: { volume?: number; trackId?: string; volumeUi?: number; audioFade?: boolean },
+  opts?: { volume?: number; trackId?: string },
 ): Promise<void> {
-  const fadeUi =
-    opts?.audioFade && typeof opts.volumeUi === 'number' ? opts.volumeUi : undefined
   switch (op) {
     case 'play':
       await soundtrackGraphql(
@@ -611,25 +648,9 @@ export async function soundtrackControl(
         { input: { soundZone: zoneId } },
       )
       return
-    case 'skipNext': {
-      const skip = async () => {
-        await soundtrackGraphql(
-          `mutation($input: SkipTracksInput!) {
-            skipTracks(input: $input) { __typename }
-          }`,
-          {
-            input: {
-              soundZone: zoneId,
-              tracksToSkip: 1,
-              crossfade: true,
-            },
-          },
-        )
-      }
-      if (fadeUi != null) await withSoundtrackAudioFade(zoneId, fadeUi, skip)
-      else await skip()
+    case 'skipNext':
+      await skipSoundZoneTracksWithCrossfade(zoneId)
       return
-    }
     case 'setVolume': {
       const ui = typeof opts?.volume === 'number' ? opts.volume : 0
       const volume = soundtrackUiPercentToApiVolume(ui)
@@ -645,27 +666,32 @@ export async function soundtrackControl(
       if (trackId.startsWith('placeholder-')) {
         throw new SoundtrackApiError('Track not available')
       }
-      const playQueued = async () => {
-        await soundtrackGraphql(
-          `mutation($input: SoundZoneQueueTracksInput!) {
-            soundZoneQueueTracks(input: $input) { __typename }
-          }`,
-          {
-            input: {
-              soundZone: zoneId,
-              tracks: [trackId],
-              immediate: true,
-              clearQueuedTracks: true,
-            },
+      const { state, currentTrackId } = await fetchSoundZonePlaybackState(zoneId)
+      await soundtrackGraphql(
+        `mutation($input: SoundZoneQueueTracksInput!) {
+          soundZoneQueueTracks(input: $input) { __typename }
+        }`,
+        {
+          input: {
+            soundZone: zoneId,
+            tracks: [trackId],
+            immediate: true,
+            clearQueuedTracks: true,
           },
-        )
+        },
+      )
+      const crossfadeToQueued =
+        currentTrackId != null &&
+        currentTrackId !== trackId &&
+        (state === 'playing' || state === 'paused')
+      if (crossfadeToQueued) {
+        await skipSoundZoneTracksWithCrossfade(zoneId)
+      } else {
         await soundtrackGraphql(
           `mutation($input: PlayInput!) { play(input: $input) { status } }`,
           { input: { soundZone: zoneId } },
         )
       }
-      if (fadeUi != null) await withSoundtrackAudioFade(zoneId, fadeUi, playQueued)
-      else await playQueued()
       return
     }
     default:
