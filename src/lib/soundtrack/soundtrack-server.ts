@@ -196,15 +196,15 @@ function mapTrack(
       }
     | null
     | undefined,
-  fallbackId = '',
 ): SoundtrackTrackRow | null {
-  if (!track?.name) return null
+  const id = track?.id?.trim()
+  if (!track?.name || !id) return null
   const img = track.album?.image
   const imageWidth = typeof img?.width === 'number' && img.width > 0 ? img.width : null
   const imageHeight = typeof img?.height === 'number' && img.height > 0 ? img.height : null
   const imageUrl = soundtrackAlbumArtUrl(img?.url ?? null)
   return {
-    id: track.id || fallbackId,
+    id,
     name: track.name,
     artist: track.artists?.[0]?.name || '—',
     durationMs: typeof track.duration === 'number' ? track.duration : 0,
@@ -401,17 +401,10 @@ export async function soundtrackControl(
         throw new SoundtrackApiError('Track not available')
       }
       await soundtrackGraphql(
-        `mutation($input: SoundZoneQueueTracksInput!) {
-          soundZoneQueueTracks(input: $input) { __typename }
+        `mutation($input: SetPlayFromInput!) {
+          setPlayFrom(input: $input) { playFrom { __typename } }
         }`,
-        {
-          input: {
-            soundZone: zoneId,
-            tracks: [trackId],
-            immediate: true,
-            clearQueuedTracks: true,
-          },
-        },
+        { input: { soundZone: zoneId, source: trackId } },
       )
       return
     }

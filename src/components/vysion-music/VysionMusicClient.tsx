@@ -38,18 +38,6 @@ function formatMs(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-function applyOptimisticTrack(snapshot: Snapshot, row: TrackRow): Snapshot {
-  return {
-    ...snapshot,
-    playbackState: 'playing',
-    nowPlaying: {
-      track: row,
-      startedAt: new Date().toISOString(),
-      progressMs: 0,
-    },
-  }
-}
-
 function formatClock(now: Date, locale: string): { date: string; time: string } {
   const date = now.toLocaleDateString(locale, {
     weekday: 'short',
@@ -198,7 +186,6 @@ export function VysionMusicClient({
       if (!row.id || row.id.startsWith('placeholder')) return
       setError(null)
       setSwitchingTrack(true)
-      setSnapshot((s) => (s ? applyOptimisticTrack(s, row) : s))
       try {
         const res = await fetch(apiBase, {
           method: 'POST',
@@ -210,16 +197,7 @@ export function VysionMusicClient({
           setError(json.error || t('vysionMusic.errorControl'))
         } else {
           setError(null)
-          if (json.snapshot) {
-            setSnapshot((prev) => {
-              if (!prev) return json.snapshot!
-              const keepPlaylist = prev.playlist.filter((p) => !p.id.startsWith('placeholder'))
-              return {
-                ...json.snapshot!,
-                playlist: keepPlaylist.length > 1 ? keepPlaylist : json.snapshot!.playlist,
-              }
-            })
-          }
+          if (json.snapshot) setSnapshot(json.snapshot)
         }
       } catch {
         setError(t('vysionMusic.errorNetwork'))
@@ -467,9 +445,13 @@ export function VysionMusicClient({
           <div className={styles.list}>
             {searchResults.map((row, idx) => (
               <button
-                key={row.id}
+                key={`${row.id}-${idx}-${row.name}`}
                 type="button"
-                className={styles.listRow}
+                className={`${styles.listRow} ${
+                  nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
+                    ? styles.listRowActive
+                    : ''
+                }`}
                 disabled={switchingTrack}
                 onClick={() => void playTrackRow(row)}
               >
