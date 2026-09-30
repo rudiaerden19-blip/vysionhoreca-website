@@ -59,16 +59,23 @@ export type SoundtrackCrossfadeSettings = {
   crossfadeOnSkip: boolean
 }
 
+/** Soundtrack kan crossfadeLength in seconden of milliseconden teruggeven. */
+export function soundtrackCrossfadeLengthToSeconds(
+  value: number | null | undefined,
+): number | null {
+  if (value == null || Number.isNaN(Number(value))) return null
+  const n = Number(value)
+  if (n > 60) return n / 1000
+  return n
+}
+
 export function soundtrackCrossfadeSettingsMatch(
   current: Partial<SoundtrackCrossfadeSettings> | null | undefined,
   seconds: number = VYSION_MUSIC_CROSSFADE_SECONDS,
 ): boolean {
   if (!current) return false
-  return (
-    current.crossfade === true &&
-    current.crossfadeOnSkip === true &&
-    Number(current.crossfadeLength) === seconds
-  )
+  const len = soundtrackCrossfadeLengthToSeconds(current.crossfadeLength)
+  return current.crossfade === true && current.crossfadeOnSkip === true && len === seconds
 }
 
 async function fetchSoundZoneCrossfadeSettings(
@@ -128,10 +135,14 @@ export async function ensureSoundZoneCrossfadeSettings(
           },
         },
       )
+      const after = await fetchSoundZoneCrossfadeSettings(zoneId)
+      if (!soundtrackCrossfadeSettingsMatch(after, seconds)) {
+        throw new SoundtrackApiError('Soundtrack crossfade settings were not applied')
+      }
     }
     crossfadeEnsuredZoneIds.add(key)
-  } catch {
-    // Geen hard fail op snapshot — player blijft werken zonder zone-tweak
+  } catch (e) {
+    console.error('[soundtrack] ensureSoundZoneCrossfadeSettings failed', zoneId, e)
   }
 }
 

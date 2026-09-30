@@ -210,22 +210,8 @@
   max-width: 100%;
   overflow: hidden;
   align-items: center;
-}
-
-@keyframes vmTrackCrossfade {
-  0% {
-    opacity: 1;
-  }
-  45% {
-    opacity: 0.12;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.nowLeftTrackCrossfade {
-  animation: vmTrackCrossfade var(--vm-track-crossfade) ease-in-out;
+  transition: opacity var(--vm-track-crossfade) ease-in-out;
+  will-change: opacity;
 }
 
 .nowRight {

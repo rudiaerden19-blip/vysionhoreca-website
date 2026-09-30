@@ -1,5 +1,6 @@
 import {
   VYSION_MUSIC_CROSSFADE_SECONDS,
+  soundtrackCrossfadeLengthToSeconds,
   soundtrackCrossfadeSettingsMatch,
 } from '@/lib/soundtrack/soundtrack-server'
 
@@ -16,6 +17,11 @@ describe('soundtrack crossfade settings', () => {
         crossfadeOnSkip: true,
       }),
     ).toBe(true)
+  })
+
+  it('normalizes millisecond crossfade length from API', () => {
+    expect(soundtrackCrossfadeLengthToSeconds(3000)).toBe(3)
+    expect(soundtrackCrossfadeLengthToSeconds(3)).toBe(3)
   })
 
   it('does not match wrong length or disabled skip crossfade', () => {
