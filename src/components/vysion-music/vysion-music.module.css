@@ -195,7 +195,7 @@
   gap: 0.25rem;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
   /* Touch targets binnen rechter 50%-kolom */
   --vm-transport-secondary: clamp(3.85rem, 6.2vw, 4.65rem);
   --vm-transport-primary: clamp(5.1rem, 8.8vw, 6rem);
@@ -310,6 +310,8 @@
 
 .nowRight .controlsBlock {
   transform: translateY(-1.5rem);
+  padding: 0.35rem 0.5rem;
+  overflow: visible;
 }
 
 .transport {
@@ -325,14 +327,17 @@
 }
 
 .transportBtn {
+  position: relative;
+  isolation: isolate;
   width: var(--vm-transport-secondary);
   height: var(--vm-transport-secondary);
   min-width: var(--vm-transport-secondary);
   min-height: var(--vm-transport-secondary);
   border-radius: 50%;
-  border: 2px solid #3d4f66;
-  background: rgba(12, 16, 24, 0.65);
-  color: var(--vm-text);
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: #9ae6ff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -340,18 +345,53 @@
   line-height: 1;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 2px rgba(186, 204, 228, 0.55),
+    0 0 0 3px rgba(28, 40, 58, 0.95),
+    0 6px 22px rgba(0, 130, 255, 0.42),
+    0 2px 10px rgba(0, 160, 255, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.transportBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 8%, rgba(255, 255, 255, 0.38), transparent 52%),
+    radial-gradient(circle at 50% 62%, #0b1524 0%, #162a42 42%, #070d16 100%);
+}
+
+.transportBtn::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  z-index: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
 }
 
 .transportIcon {
+  position: relative;
+  z-index: 1;
   width: clamp(1.45rem, 2.4vw, 1.75rem);
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
+  color: #8fdcff;
+  filter: drop-shadow(0 0 5px rgba(0, 185, 255, 0.95)) drop-shadow(0 0 12px rgba(0, 140, 255, 0.55));
 }
 
 .transportIconPrimary {
+  position: relative;
+  z-index: 1;
   width: clamp(2rem, 3.2vw, 2.35rem);
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
+  color: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.65)) drop-shadow(0 0 14px rgba(0, 210, 255, 0.9));
 }
 
 .transportBtn:disabled {
@@ -359,23 +399,71 @@
   cursor: not-allowed;
 }
 
+.transportBtn:not(:disabled):active {
+  transform: scale(0.94);
+}
+
 .transportPrimary {
+  position: relative;
+  isolation: isolate;
   width: var(--vm-transport-primary);
   height: var(--vm-transport-primary);
   min-width: var(--vm-transport-primary);
   min-height: var(--vm-transport-primary);
   border-radius: 50%;
   border: none;
-  background: var(--vm-accent);
+  padding: 0;
+  background: transparent;
   color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  box-shadow: 0 0 22px rgba(0, 150, 255, 0.45);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 2px rgba(210, 228, 255, 0.72),
+    0 0 0 4px rgba(22, 38, 62, 0.95),
+    0 0 36px rgba(0, 160, 255, 0.78),
+    0 0 18px rgba(0, 190, 255, 0.62),
+    0 10px 28px rgba(0, 110, 230, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.transportPrimary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 92% 58% at 50% 6%, rgba(255, 255, 255, 0.5), transparent 48%),
+    radial-gradient(circle at 50% 58%, #0088ee 0%, #00a8ff 38%, #0066bb 72%, #004488 100%);
+}
+
+.transportPrimary::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  z-index: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 2px 10px rgba(0, 40, 90, 0.45);
+  pointer-events: none;
+}
+
+.transportPrimary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.transportPrimary:not(:disabled):active {
+  transform: scale(0.94);
+  box-shadow:
+    0 0 0 2px rgba(210, 228, 255, 0.72),
+    0 0 0 4px rgba(22, 38, 62, 0.95),
+    0 0 28px rgba(0, 160, 255, 0.65),
+    0 8px 22px rgba(0, 110, 230, 0.42);
 }
 
 .volumeColumn {
