@@ -361,7 +361,7 @@ export async function soundtrackControl(
       const trackId = opts?.trackId?.trim()
       if (!trackId) throw new SoundtrackApiError('trackId required')
       await soundtrackGraphql(
-        `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { soundZone { id } } }`,
+        `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { playFrom { __typename } } }`,
         { input: { soundZone: zoneId, source: { track: trackId } } },
       )
       return
