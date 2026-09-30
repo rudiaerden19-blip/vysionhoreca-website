@@ -13,6 +13,7 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
+import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import styles from './vysion-music.module.css'
 
@@ -389,21 +390,15 @@ export function VysionMusicClient({
               <VolumeSpeakerArt large />
             </span>
             <div className={styles.volumeSliderWrap}>
-              <input
-                type="range"
-                min={0}
-                max={100}
+              <VolumeSliderVertical
                 value={snapshot?.volume ?? 0}
-                className={`${styles.volumeSlider} ${styles.volumeSliderVertical}`}
-                style={{ ['--vm-vol-pct' as string]: `${snapshot?.volume ?? 0}%` }}
-                aria-label={t('vysionMusic.volume')}
-                aria-valuetext={`${snapshot?.volume ?? 0}%`}
-                onChange={(e) => {
-                  const v = Number(e.target.value)
+                disabled={busy}
+                ariaLabel={t('vysionMusic.volume')}
+                onChange={(v) => {
                   setSnapshot((s) => (s ? { ...s, volume: v } : s))
                   syncVolume(v)
                 }}
-                onPointerUp={(e) => syncVolume(Number(e.currentTarget.value), true)}
+                onCommit={(v) => syncVolume(v, true)}
               />
             </div>
             <span className={styles.volumeIcon} aria-hidden>
