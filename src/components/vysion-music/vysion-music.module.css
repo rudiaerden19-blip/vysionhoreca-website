@@ -465,6 +465,7 @@
     0 0 0 1px rgba(120, 170, 230, 0.55),
     0 0 0 2.5px var(--vm-glass-rim-deep),
     inset 0 6px 18px rgba(0, 20, 50, 0.75),
+    0 6px 18px var(--vm-glass-shadow-grey),
     0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
