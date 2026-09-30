@@ -359,6 +359,7 @@
   align-items: stretch;
   justify-content: space-between;
   gap: clamp(0.35rem, 1.1vw, 0.6rem);
+  margin-top: 2cm;
 }
 
 .glassActionBtn {
@@ -867,6 +868,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
   box-shadow:
     0 0 0 1px rgba(186, 204, 228, 0.45),
     0 0 0 2px rgba(28, 40, 58, 0.92),
