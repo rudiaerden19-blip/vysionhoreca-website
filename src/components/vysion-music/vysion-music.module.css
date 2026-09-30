@@ -9,7 +9,6 @@
   --vm-control-face: #141a24;
   --vm-cover-size: clamp(10.25rem, 22vh, 14.5rem);
   --vm-now-min-h: clamp(11.25rem, 26vh, 16.25rem);
-  --vm-columns-max-h: clamp(16rem, 48vh, 25rem);
   /* Touch: grote knoppen binnen dezelfde now-playing band (afb. 3) */
   --vm-transport-secondary: clamp(3.75rem, 7.8vh, 4.75rem);
   --vm-transport-primary: clamp(4.85rem, 10.5vh, 6.1rem);
@@ -17,6 +16,8 @@
   --vm-volume-thumb: clamp(1.35rem, 2.8vh, 1.65rem);
   min-height: 100vh;
   min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
   background: var(--vm-bg);
   color: var(--vm-text);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -155,7 +156,7 @@
   display: grid;
   grid-template-columns: auto minmax(0, 36rem) minmax(0, 1fr);
   gap: 1.1rem 1.35rem;
-  flex: 0.95 1 auto;
+  flex: 0 0 auto;
   min-height: var(--vm-now-min-h);
   padding: 1rem 1.25rem 0.85rem;
   align-items: center;
@@ -404,13 +405,14 @@
 }
 
 .columns {
-  flex: 1.2 1 auto;
-  max-height: var(--vm-columns-max-h);
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: 0.85rem;
   padding: 0.85rem 1.25rem 0.9rem;
-  min-height: 0;
 }
 
 .panel {
@@ -420,6 +422,8 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
 }
 
@@ -430,12 +434,31 @@
   letter-spacing: 0.08em;
   padding: 0.65rem 0.9rem 0.55rem;
   border-bottom: 1px solid var(--vm-panel-border);
+  flex-shrink: 0;
 }
 
 .list {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   padding: 0.25rem 0;
+}
+
+.list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 999px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .listRow {
@@ -498,6 +521,7 @@
 
 .searchWrap {
   padding: 0.55rem 0.85rem 0.35rem;
+  flex-shrink: 0;
 }
 
 .searchInput {
@@ -530,6 +554,7 @@
 }
 
 .statusBar {
+  flex-shrink: 0;
   padding: 0.35rem 1rem;
   font-size: 0.75rem;
   color: var(--vm-muted);
