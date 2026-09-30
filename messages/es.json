@@ -6849,6 +6849,7 @@
   "vysionMusic": {
     "backToKassa": "Caja",
     "nowPlaying": "AHORA SUENA",
+    "switchingTrack": "CAMBIANDO…",
     "playlistTitle": "LISTA (AHORA)",
     "searchPlaceholder": "Buscar…",
     "searchClear": "Borrar",

@@ -6849,6 +6849,7 @@
   "vysionMusic": {
     "backToKassa": "الكassa",
     "nowPlaying": "يُشغَّل الآن",
+    "switchingTrack": "جارٍ التبديل…",
     "playlistTitle": "قائمة التشغيل",
     "searchPlaceholder": "بحث…",
     "searchClear": "مسح",

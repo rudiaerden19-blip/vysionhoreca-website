@@ -25,6 +25,7 @@ function soundtrackToken(): string {
 }
 
 const zoneIdByNameCache = new Map<string, string>()
+const zoneIdByTenantCache = new Map<string, string>()
 
 async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string> {
   const needle = zoneName.trim()
@@ -87,9 +88,13 @@ async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string
 }
 
 export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<string> {
+  const cached = zoneIdByTenantCache.get(tenantSlug)
+  if (cached) return cached
+
   const fromEnvId = (process.env.SOUNDTRACK_DEFAULT_SOUND_ZONE_ID || '').trim()
   const fromEnvName = (process.env.SOUNDTRACK_DEFAULT_ZONE_NAME || '').trim()
 
+  let resolved = ''
   const supabase = getServerSupabaseClient()
   if (supabase) {
     const { data, error } = await supabase
@@ -99,18 +104,25 @@ export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<s
       .maybeSingle()
     if (!error && data) {
       const fromTenantId = (data.soundtrack_sound_zone_id as string | null | undefined)?.trim()
-      if (fromTenantId) return fromTenantId
-      const fromTenantName = (data.soundtrack_zone_name as string | null | undefined)?.trim()
-      if (fromTenantName) return resolveSoundZoneIdByDisplayName(fromTenantName)
+      if (fromTenantId) resolved = fromTenantId
+      else {
+        const fromTenantName = (data.soundtrack_zone_name as string | null | undefined)?.trim()
+        if (fromTenantName) resolved = await resolveSoundZoneIdByDisplayName(fromTenantName)
+      }
     }
   }
 
-  if (fromEnvId) return fromEnvId
-  if (fromEnvName) return resolveSoundZoneIdByDisplayName(fromEnvName)
+  if (!resolved && fromEnvId) resolved = fromEnvId
+  if (!resolved && fromEnvName) resolved = await resolveSoundZoneIdByDisplayName(fromEnvName)
 
-  throw new SoundtrackConfigError(
-    'No Soundtrack sound zone configured for this tenant (set tenant_settings or SOUNDTRACK_DEFAULT_SOUND_ZONE_ID / SOUNDTRACK_DEFAULT_ZONE_NAME on Vercel)',
-  )
+  if (!resolved) {
+    throw new SoundtrackConfigError(
+      'No Soundtrack sound zone configured for this tenant (set tenant_settings or SOUNDTRACK_DEFAULT_SOUND_ZONE_ID / SOUNDTRACK_DEFAULT_ZONE_NAME on Vercel)',
+    )
+  }
+
+  zoneIdByTenantCache.set(tenantSlug, resolved)
+  return resolved
 }
 
 export async function soundtrackGraphql<T = Record<string, unknown>>(
@@ -190,7 +202,18 @@ function mapTrack(
   }
 }
 
-export async function fetchSoundtrackPlayerSnapshot(zoneId: string): Promise<SoundtrackPlayerSnapshot> {
+export async function fetchSoundtrackPlayerSnapshot(
+  zoneId: string,
+  opts?: { historyFirst?: number; padPlaylist?: boolean },
+): Promise<SoundtrackPlayerSnapshot> {
+  const historyFirst = opts?.historyFirst ?? 10
+  const padPlaylist = opts?.padPlaylist ?? true
+  const historyBlock =
+    historyFirst > 0
+      ? `playbackHistory(first: ${historyFirst}) {
+          edges { node { track { id name duration artists { name } album { image { url } } } } }
+        }`
+      : ''
   const data = await soundtrackGraphql<{
     soundZone: {
       id: string
@@ -227,9 +250,7 @@ export async function fetchSoundtrackPlayerSnapshot(zoneId: string): Promise<Sou
             album { image { url width height } }
           }
         }
-        playbackHistory(first: 20) {
-          edges { node { track { id name duration artists { name } } } }
-        }
+        ${historyBlock}
       }
     }`,
     { id: zoneId },
@@ -264,14 +285,16 @@ export async function fetchSoundtrackPlayerSnapshot(zoneId: string): Promise<Sou
     playlist.push(row)
     if (playlist.length >= 10) break
   }
-  while (playlist.length < 10) {
-    playlist.push({
-      id: `placeholder-${playlist.length}`,
-      name: '—',
-      artist: '—',
-      durationMs: 0,
-      imageUrl: null,
-    })
+  if (padPlaylist) {
+    while (playlist.length < 10) {
+      playlist.push({
+        id: `placeholder-${playlist.length}`,
+        name: '—',
+        artist: '—',
+        durationMs: 0,
+        imageUrl: null,
+      })
+    }
   }
 
   return {

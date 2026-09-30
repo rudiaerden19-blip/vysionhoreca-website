@@ -6872,6 +6872,7 @@
   "vysionMusic": {
     "backToKassa": "Caisse",
     "nowPlaying": "EN COURS",
+    "switchingTrack": "CHANGEMENT…",
     "playlistTitle": "LISTE (EN COURS)",
     "searchPlaceholder": "Rechercher…",
     "searchClear": "Effacer",

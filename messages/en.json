@@ -6808,6 +6808,7 @@
   "vysionMusic": {
     "backToKassa": "POS",
     "nowPlaying": "NOW PLAYING",
+    "switchingTrack": "SWITCHING…",
     "playlistTitle": "PLAYLIST (NOW PLAYING)",
     "searchPlaceholder": "Search…",
     "searchClear": "Clear",

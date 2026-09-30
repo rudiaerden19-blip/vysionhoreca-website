@@ -36,6 +36,18 @@ function formatMs(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+function applyOptimisticTrack(snapshot: Snapshot, row: TrackRow): Snapshot {
+  return {
+    ...snapshot,
+    playbackState: 'playing',
+    nowPlaying: {
+      track: row,
+      startedAt: new Date().toISOString(),
+      progressMs: 0,
+    },
+  }
+}
+
 function formatClock(now: Date, locale: string): { date: string; time: string } {
   const date = now.toLocaleDateString(locale, {
     weekday: 'short',
@@ -62,6 +74,7 @@ export function VysionMusicClient({
   const [searchResults, setSearchResults] = useState<TrackRow[]>([])
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [switchingTrack, setSwitchingTrack] = useState(false)
   const [clock, setClock] = useState(() => new Date())
   const [tick, setTick] = useState(0)
 
@@ -111,9 +124,10 @@ export function VysionMusicClient({
 
   useEffect(() => {
     void loadSnapshot()
-    const id = window.setInterval(() => void loadSnapshot(), 8000)
+    const ms = switchingTrack ? 2000 : 6000
+    const id = window.setInterval(() => void loadSnapshot(), ms)
     return () => window.clearInterval(id)
-  }, [loadSnapshot])
+  }, [loadSnapshot, switchingTrack])
 
   useEffect(() => {
     const id = window.setInterval(() => setClock(new Date()), 30_000)
@@ -154,6 +168,45 @@ export function VysionMusicClient({
       }
     },
     [apiBase, t],
+  )
+
+  const playTrackRow = useCallback(
+    async (row: TrackRow) => {
+      if (!row.id || row.id.startsWith('placeholder')) return
+      setError(null)
+      setSwitchingTrack(true)
+      setSnapshot((s) => (s ? applyOptimisticTrack(s, row) : s))
+      try {
+        const res = await fetch(apiBase, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ op: 'playTrack', trackId: row.id }),
+        })
+        const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
+        if (!res.ok) {
+          setError(json.error || t('vysionMusic.errorControl'))
+        } else {
+          setError(null)
+          if (json.snapshot) {
+            setSnapshot((prev) => {
+              if (!prev) return json.snapshot!
+              const keepPlaylist = prev.playlist.filter((p) => !p.id.startsWith('placeholder'))
+              return {
+                ...json.snapshot!,
+                playlist: keepPlaylist.length > 1 ? keepPlaylist : json.snapshot!.playlist,
+              }
+            })
+          }
+        }
+      } catch {
+        setError(t('vysionMusic.errorNetwork'))
+      } finally {
+        setSwitchingTrack(false)
+        window.setTimeout(() => void loadSnapshot(), 700)
+        window.setTimeout(() => void loadSnapshot(), 2200)
+      }
+    },
+    [apiBase, loadSnapshot, t],
   )
 
   const nowTrack = snapshot?.nowPlaying.track
@@ -250,7 +303,9 @@ export function VysionMusicClient({
           <div className={styles.coverPlaceholder} aria-hidden />
         )}
         <div className={styles.trackMain}>
-          <div className={styles.nowLabel}>{t('vysionMusic.nowPlaying')}</div>
+          <div className={styles.nowLabel}>
+            {switchingTrack ? t('vysionMusic.switchingTrack') : t('vysionMusic.nowPlaying')}
+          </div>
           <h1 className={styles.trackTitle}>{nowTrack?.name ?? '—'}</h1>
           <p className={styles.trackArtist}>{nowTrack?.artist ?? '—'}</p>
           <div className={styles.progressRow}>
@@ -339,8 +394,8 @@ export function VysionMusicClient({
                   key={`${row.id}-${idx}`}
                   type="button"
                   className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
-                  disabled={busy || !row.id || row.id.startsWith('placeholder')}
-                  onClick={() => row.id && void control('playTrack', { trackId: row.id })}
+                  disabled={switchingTrack || !row.id || row.id.startsWith('placeholder')}
+                  onClick={() => void playTrackRow(row)}
                 >
                   <span className={styles.rowNum}>{idx + 1}</span>
                   <span className={styles.rowPlay} aria-hidden>
@@ -386,8 +441,8 @@ export function VysionMusicClient({
                 key={row.id}
                 type="button"
                 className={styles.listRow}
-                disabled={busy}
-                onClick={() => void control('playTrack', { trackId: row.id })}
+                disabled={switchingTrack}
+                onClick={() => void playTrackRow(row)}
               >
                 <span className={styles.rowNum}>{idx + 1}</span>
                 <span className={styles.rowPlay} aria-hidden>

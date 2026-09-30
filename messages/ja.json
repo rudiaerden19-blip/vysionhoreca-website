@@ -6849,6 +6849,7 @@
   "vysionMusic": {
     "backToKassa": "レジ",
     "nowPlaying": "再生中",
+    "switchingTrack": "切り替え中…",
     "playlistTitle": "プレイリスト（再生中）",
     "searchPlaceholder": "検索…",
     "searchClear": "クリア",

@@ -6872,6 +6872,7 @@
   "vysionMusic": {
     "backToKassa": "Kasse",
     "nowPlaying": "JETZT",
+    "switchingTrack": "WECHSELN…",
     "playlistTitle": "WIEDERGABELISTE (JETZT)",
     "searchPlaceholder": "Suchen…",
     "searchClear": "Löschen",

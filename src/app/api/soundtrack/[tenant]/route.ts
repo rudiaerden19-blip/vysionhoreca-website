@@ -66,7 +66,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
       volume: body.volume,
       trackId: body.trackId,
     })
-    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    const snapshot =
+      op === 'playTrack'
+        ? await fetchSoundtrackPlayerSnapshot(zoneId, { historyFirst: 0, padPlaylist: false })
+        : await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {

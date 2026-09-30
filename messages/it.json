@@ -6849,6 +6849,7 @@
   "vysionMusic": {
     "backToKassa": "Cassa",
     "nowPlaying": "IN RIPRODUZIONE",
+    "switchingTrack": "CAMBIO…",
     "playlistTitle": "PLAYLIST (IN CORSO)",
     "searchPlaceholder": "Cerca…",
     "searchClear": "Cancella",

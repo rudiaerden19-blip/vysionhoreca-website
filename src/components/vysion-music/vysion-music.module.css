@@ -7,9 +7,9 @@
   --vm-panel-border: #1a2333;
   --vm-row-active: rgba(0, 150, 255, 0.22);
   --vm-control-face: #141a24;
-  --vm-cover-size: clamp(8.75rem, 15vh, 11rem);
-  --vm-now-min-h: clamp(11.5rem, 28vh, 15.5rem);
-  --vm-columns-max-h: clamp(15rem, 46vh, 24rem);
+  --vm-cover-size: clamp(7.5rem, 12vh, 9.5rem);
+  --vm-now-min-h: clamp(10rem, 24vh, 13.5rem);
+  --vm-columns-max-h: clamp(16rem, 48vh, 25rem);
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--vm-bg);
