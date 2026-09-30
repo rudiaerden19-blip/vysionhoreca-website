@@ -202,10 +202,7 @@ function mapTrack(
   const img = track.album?.image
   const imageWidth = typeof img?.width === 'number' && img.width > 0 ? img.width : null
   const imageHeight = typeof img?.height === 'number' && img.height > 0 ? img.height : null
-  const imageUrl = soundtrackAlbumArtUrl(img?.url ?? null, {
-    width: imageWidth,
-    height: imageHeight,
-  })
+  const imageUrl = soundtrackAlbumArtUrl(img?.url ?? null)
   return {
     id: track.id || fallbackId,
     name: track.name,
