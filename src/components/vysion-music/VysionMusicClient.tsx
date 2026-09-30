@@ -323,7 +323,6 @@ export function VysionMusicClient({
         </div>
         <div className={styles.nowRight}>
           <div className={styles.controlsBlock}>
-            <div className={styles.controlsRow}>
             <div className={styles.transport}>
               <button
                 type="button"
@@ -368,18 +367,21 @@ export function VysionMusicClient({
                 ⏭
               </button>
             </div>
-            <div className={styles.volumeRow}>
-              <span className={styles.volumeIcon} aria-hidden>
-                🔊
-              </span>
+          </div>
+          <div className={styles.volumeColumn}>
+            <span className={styles.volumeIconLarge} aria-hidden>
+              🔊
+            </span>
+            <div className={styles.volumeSliderWrap}>
               <input
                 type="range"
                 min={0}
                 max={100}
                 value={snapshot?.volume ?? 0}
-                className={styles.volumeSlider}
+                className={`${styles.volumeSlider} ${styles.volumeSliderVertical}`}
                 style={{ ['--vm-vol-pct' as string]: `${snapshot?.volume ?? 0}%` }}
                 aria-label={t('vysionMusic.volume')}
+                aria-valuetext={`${snapshot?.volume ?? 0}%`}
                 onChange={(e) => {
                   const v = Number(e.target.value)
                   setSnapshot((s) => (s ? { ...s, volume: v } : s))
@@ -387,10 +389,11 @@ export function VysionMusicClient({
                 }}
                 onPointerUp={(e) => syncVolume(Number(e.currentTarget.value), true)}
               />
-              <span className={styles.volumePct}>{snapshot?.volume ?? 0}%</span>
             </div>
+            <span className={styles.volumeIcon} aria-hidden>
+              🔊
+            </span>
           </div>
-        </div>
         </div>
       </section>
 
