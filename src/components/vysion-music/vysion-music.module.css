@@ -18,6 +18,10 @@
   /* Alleen pill-knoppen (Afspeellijst, …) — grijs, niet te licht */
   --vm-glass-emblem: #7a8490;
   --vm-glass-emblem-active: #959ea8;
+  /* Transport: dik blauw glas (mockup / glassmorphism) */
+  --vm-glass-rim: rgba(152, 198, 255, 0.78);
+  --vm-glass-rim-deep: rgba(18, 42, 78, 0.96);
+  --vm-glass-glow: rgba(0, 132, 255, 0.42);
   --vm-panel: #0c1018;
   --vm-panel-border: #1a2333;
   --vm-row-active: var(--vm-accent-panel);
@@ -440,6 +444,7 @@
 .transportBtn {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
   width: var(--vm-transport-secondary);
   height: var(--vm-transport-secondary);
   min-width: var(--vm-transport-secondary);
@@ -457,9 +462,10 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   box-shadow:
-    0 0 0 2px rgba(55, 72, 92, 0.95),
-    0 0 0 3px rgba(22, 32, 48, 0.98),
-    0 4px 16px rgba(0, 0, 0, 0.45);
+    0 0 0 1px var(--vm-glass-rim),
+    0 0 0 2.5px var(--vm-glass-rim-deep),
+    0 6px 18px var(--vm-glass-glow),
+    0 4px 14px rgba(0, 0, 0, 0.38);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -470,18 +476,32 @@
   z-index: 0;
   border-radius: 50%;
   background:
-    radial-gradient(ellipse 90% 55% at 50% 8%, rgba(255, 255, 255, 0.38), transparent 52%),
-    radial-gradient(circle at 50% 62%, #0b1524 0%, #162a42 42%, #070d16 100%);
+    radial-gradient(ellipse 100% 48% at 50% 0%, rgba(255, 255, 255, 0.82), transparent 58%),
+    radial-gradient(ellipse 75% 42% at 50% 16%, rgba(186, 224, 255, 0.42), transparent 62%),
+    radial-gradient(circle at 50% 118%, rgba(0, 50, 110, 0.55), transparent 48%),
+    radial-gradient(
+      circle at 50% 58%,
+      rgba(0, 132, 255, 0.58) 0%,
+      rgba(0, 95, 195, 0.62) 38%,
+      rgba(0, 45, 105, 0.82) 72%,
+      rgba(0, 18, 48, 0.94) 100%
+    );
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
 }
 
 .transportBtn::after {
   content: '';
   position: absolute;
-  inset: 3px;
+  inset: 2px;
   z-index: 0;
   border-radius: 50%;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.55);
   pointer-events: none;
+  box-shadow:
+    inset 0 2px 14px rgba(255, 255, 255, 0.28),
+    inset 0 -10px 18px rgba(0, 15, 45, 0.72),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: radial-gradient(ellipse 85% 38% at 50% 102%, rgba(255, 255, 255, 0.07), transparent 68%);
 }
 
 .transportIcon {
@@ -491,6 +511,7 @@
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
   color: var(--vm-glass-emblem);
+  filter: drop-shadow(0 1px 2px rgba(0, 12, 30, 0.55));
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -501,6 +522,7 @@
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
   color: var(--vm-glass-emblem);
+  filter: drop-shadow(0 1px 2px rgba(0, 12, 30, 0.55));
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -512,14 +534,14 @@
 .transportBtn:not(:disabled):active {
   transform: scale(0.9);
   box-shadow:
-    0 0 0 2px rgba(55, 72, 92, 0.95),
-    0 0 0 3px rgba(22, 32, 48, 0.98),
-    inset 0 5px 16px rgba(0, 0, 0, 0.75),
-    0 1px 6px rgba(0, 0, 0, 0.28);
+    0 0 0 1px rgba(120, 170, 230, 0.55),
+    0 0 0 2.5px var(--vm-glass-rim-deep),
+    inset 0 6px 18px rgba(0, 20, 50, 0.75),
+    0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .transportBtn:not(:disabled):active::before {
-  filter: brightness(0.68);
+  filter: brightness(0.78) saturate(1.1);
 }
 
 .transportBtn:not(:disabled):active .transportIcon {
@@ -530,6 +552,7 @@
 .transportPrimary {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
   width: var(--vm-transport-primary);
   height: var(--vm-transport-primary);
   min-width: var(--vm-transport-primary);
@@ -547,9 +570,11 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   box-shadow:
-    0 0 0 2px rgba(55, 72, 92, 0.95),
-    0 0 0 3px rgba(22, 32, 48, 0.98),
-    0 4px 16px rgba(0, 0, 0, 0.45);
+    0 0 0 1.5px rgba(178, 215, 255, 0.88),
+    0 0 0 3px var(--vm-glass-rim-deep),
+    0 0 24px rgba(0, 132, 255, 0.52),
+    0 8px 26px var(--vm-glass-glow),
+    0 4px 16px rgba(0, 0, 0, 0.38);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -560,8 +585,18 @@
   z-index: 0;
   border-radius: 50%;
   background:
-    radial-gradient(ellipse 90% 55% at 50% 8%, rgba(255, 255, 255, 0.38), transparent 52%),
-    radial-gradient(circle at 50% 62%, #0b1524 0%, #162a42 42%, #070d16 100%);
+    radial-gradient(ellipse 100% 50% at 50% -2%, rgba(255, 255, 255, 0.9), transparent 56%),
+    radial-gradient(ellipse 80% 44% at 50% 14%, rgba(200, 232, 255, 0.48), transparent 64%),
+    radial-gradient(circle at 50% 120%, rgba(0, 55, 120, 0.5), transparent 50%),
+    radial-gradient(
+      circle at 50% 56%,
+      rgba(30, 150, 255, 0.65) 0%,
+      rgba(0, 110, 210, 0.68) 40%,
+      rgba(0, 50, 115, 0.85) 74%,
+      rgba(0, 20, 52, 0.95) 100%
+    );
+  -webkit-backdrop-filter: blur(12px) saturate(1.45);
+  backdrop-filter: blur(12px) saturate(1.45);
 }
 
 .transportPrimary::after {
@@ -570,8 +605,12 @@
   inset: 3px;
   z-index: 0;
   border-radius: 50%;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.55);
   pointer-events: none;
+  box-shadow:
+    inset 0 3px 16px rgba(255, 255, 255, 0.32),
+    inset 0 -12px 22px rgba(0, 12, 40, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  background: radial-gradient(ellipse 88% 40% at 50% 104%, rgba(255, 255, 255, 0.09), transparent 70%);
 }
 
 .transportPrimary:disabled {
@@ -582,14 +621,15 @@
 .transportPrimary:not(:disabled):active {
   transform: scale(0.9);
   box-shadow:
-    0 0 0 2px rgba(55, 72, 92, 0.95),
-    0 0 0 3px rgba(22, 32, 48, 0.98),
-    inset 0 5px 16px rgba(0, 0, 0, 0.75),
-    0 1px 6px rgba(0, 0, 0, 0.28);
+    0 0 0 1.5px rgba(140, 185, 240, 0.6),
+    0 0 0 3px var(--vm-glass-rim-deep),
+    0 0 14px rgba(0, 132, 255, 0.35),
+    inset 0 7px 20px rgba(0, 18, 45, 0.78),
+    0 2px 8px rgba(0, 0, 0, 0.32);
 }
 
 .transportPrimary:not(:disabled):active::before {
-  filter: brightness(0.68);
+  filter: brightness(0.8) saturate(1.08);
 }
 
 .transportPrimary:not(:disabled):active .transportIconPrimary {
@@ -875,16 +915,18 @@
   border-radius: 50%;
   isolation: isolate;
   background: transparent;
+  overflow: hidden;
   box-shadow:
-    0 0 0 1px rgba(55, 72, 92, 0.95),
-    0 0 0 2px rgba(22, 32, 48, 0.98),
-    0 3px 10px rgba(0, 0, 0, 0.45);
+    0 0 0 1px var(--vm-glass-rim),
+    0 0 0 2.5px var(--vm-glass-rim-deep),
+    0 5px 14px var(--vm-glass-glow),
+    0 3px 10px rgba(0, 0, 0, 0.38);
   pointer-events: none;
   z-index: 3;
   transition: none;
 }
 
-/* Zelfde glazige koepel als transportSecundair — diameter blijft --vm-volume-thumb */
+/* Zelfde glazige koepel als transport — diameter blijft --vm-volume-thumb */
 .volumeTrackThumb::before {
   content: '';
   position: absolute;
@@ -892,8 +934,18 @@
   z-index: 0;
   border-radius: 50%;
   background:
-    radial-gradient(ellipse 90% 55% at 50% 8%, rgba(255, 255, 255, 0.38), transparent 52%),
-    radial-gradient(circle at 50% 62%, #0b1524 0%, #162a42 42%, #070d16 100%);
+    radial-gradient(ellipse 100% 48% at 50% 0%, rgba(255, 255, 255, 0.82), transparent 58%),
+    radial-gradient(ellipse 75% 42% at 50% 16%, rgba(186, 224, 255, 0.42), transparent 62%),
+    radial-gradient(circle at 50% 118%, rgba(0, 50, 110, 0.55), transparent 48%),
+    radial-gradient(
+      circle at 50% 58%,
+      rgba(0, 132, 255, 0.58) 0%,
+      rgba(0, 95, 195, 0.62) 38%,
+      rgba(0, 45, 105, 0.82) 72%,
+      rgba(0, 18, 48, 0.94) 100%
+    );
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  backdrop-filter: blur(10px) saturate(1.4);
 }
 
 .volumeTrackThumb::after {
@@ -902,8 +954,11 @@
   inset: 2px;
   z-index: 0;
   border-radius: 50%;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
   pointer-events: none;
+  box-shadow:
+    inset 0 2px 12px rgba(255, 255, 255, 0.26),
+    inset 0 -8px 14px rgba(0, 15, 45, 0.68),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .columns {
