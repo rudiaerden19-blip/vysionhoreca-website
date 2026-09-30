@@ -85,6 +85,7 @@ export function VysionMusicClient({
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeDraggingRef = useRef(false)
+  const playlistPanelRef = useRef<HTMLDivElement>(null)
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
     setSnapshot((prev) => {
@@ -399,6 +400,23 @@ export function VysionMusicClient({
                 <VmSkipForward className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
             </div>
+            <div className={styles.transportActionsRow}>
+              <button
+                type="button"
+                className={styles.glassActionBtn}
+                onClick={() =>
+                  playlistPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                }
+              >
+                <span>{t('vysionMusic.actionPlaylist')}</span>
+              </button>
+              <button type="button" className={styles.glassActionBtn}>
+                <span>{t('vysionMusic.actionNewList')}</span>
+              </button>
+              <button type="button" className={styles.glassActionBtn}>
+                <span>{t('vysionMusic.actionSpotifyImport')}</span>
+              </button>
+            </div>
           </div>
           <div className={styles.volumeColumn}>
             <span className={styles.volumeIconLarge} aria-hidden>
@@ -426,7 +444,7 @@ export function VysionMusicClient({
       </section>
 
       <div className={styles.columns}>
-        <div className={styles.panel}>
+        <div className={styles.panel} ref={playlistPanelRef}>
           <div className={styles.panelTitle}>{t('vysionMusic.playlistTitle')}</div>
           <div className={styles.list}>
             {playlistRows.map((row, idx) => {
