@@ -1,10 +1,10 @@
 .root {
   --vm-bg: #050505;
-  /* Laatste mockup — #0095ff (geen licht-cyan) */
-  --vm-accent: #0095ff;
-  --vm-accent-rgb: 0, 149, 255;
-  --vm-accent-deep: #007acc;
-  --vm-accent-deeper: #005c99;
+  /* Mockup-blauw — dieper dan sky/cyan (#0095ff), geen glow-lichtblauw */
+  --vm-accent: #0078d4;
+  --vm-accent-rgb: 0, 120, 212;
+  --vm-accent-deep: #0062ad;
+  --vm-accent-deeper: #004d88;
   --vm-accent-panel: #152738;
   --vm-accent-track-off: #1a2f45;
   --vm-icon-on-dark: #f4f8fc;
@@ -387,7 +387,6 @@
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
   color: var(--vm-accent);
-  filter: drop-shadow(0 0 6px rgba(var(--vm-accent-rgb), 0.65));
 }
 
 .transportIconPrimary {
@@ -397,8 +396,6 @@
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
   color: #ffffff;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.65))
-    drop-shadow(0 0 14px rgba(var(--vm-accent-rgb), 0.9));
 }
 
 .transportBtn:disabled {
@@ -510,18 +507,34 @@
   justify-content: center;
 }
 
-.volumeSpeakerSvg {
+.volumeSpeakerImg {
   width: clamp(1.55rem, 2.2vw, 1.85rem);
   height: clamp(1.55rem, 2.2vw, 1.85rem);
-  color: var(--vm-accent);
   display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
-.volumeSpeakerSvgLarge {
+.volumeSpeakerImgLarge {
   width: clamp(2.35rem, 3.8vw, 2.85rem);
   height: clamp(2.35rem, 3.8vw, 2.85rem);
-  color: var(--vm-accent);
   display: block;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.volumeSpeakerNative {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', emoji;
+  font-size: clamp(1.55rem, 2.2vw, 1.85rem);
+  line-height: 1;
+}
+
+.volumeSpeakerNativeLarge {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', emoji;
+  font-size: clamp(2.35rem, 3.8vw, 2.85rem);
+  line-height: 1;
 }
 
 .volumeSliderWrap {
@@ -607,9 +620,7 @@
   transform: translate(-50%, 50%);
   border-radius: 50%;
   background: #ffffff;
-  box-shadow:
-    0 0 0 2px rgba(0, 0, 0, 0.4),
-    0 0 10px rgba(var(--vm-accent-rgb), 0.35);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   z-index: 3;
   transition: none;
@@ -737,9 +748,7 @@
 }
 
 .listRowActive .rowPlay {
-  box-shadow:
-    0 0 0 2px var(--vm-accent),
-    0 0 16px rgba(var(--vm-accent-rgb), 0.55);
+  box-shadow: 0 0 0 2px var(--vm-accent);
 }
 
 .rowPlayIcon {
@@ -752,7 +761,6 @@
 
 .listRowActive .rowPlayIcon {
   color: var(--vm-accent);
-  filter: drop-shadow(0 0 6px rgba(var(--vm-accent-rgb), 0.75));
 }
 
 .rowTitle {

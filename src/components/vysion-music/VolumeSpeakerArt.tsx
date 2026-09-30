@@ -1,22 +1,47 @@
 'use client'
 
-import { VmVolume1, VmVolume2 } from './VysionMusicIcons'
+import { useEffect, useState } from 'react'
 import styles from './vysion-music.module.css'
 
-const VM_ICON_STROKE = 2.35
+/** Windows-kassa: vaste PNG. Mac/iOS: systeem-🔊 (Apple Color Emoji). */
+const WIN_SPEAKER_SRC = '/images/vysion-music/speaker-emoji-win.png'
 
-/** Zelfde mockup-blauw (#0095ff) op Mac en Windows — geen emoji/PNG. */
+function useMacStyleVolumeEmoji(): boolean | null {
+  const [macStyle, setMacStyle] = useState<boolean | null>(null)
+  useEffect(() => {
+    const p = navigator.platform ?? ''
+    const ua = navigator.userAgent ?? ''
+    const apple =
+      /Mac|iPhone|iPad|iPod/i.test(p) || /Mac OS X|iPhone|iPad/i.test(ua)
+    setMacStyle(apple)
+  }, [])
+  return macStyle
+}
+
 export function VolumeSpeakerArt({ large }: { large?: boolean }) {
+  const macStyle = useMacStyleVolumeEmoji()
   const wrapClass = large ? styles.volumeIconLarge : styles.volumeIcon
-  const iconClass = large ? styles.volumeSpeakerSvgLarge : styles.volumeSpeakerSvg
+
+  if (macStyle === true) {
+    return (
+      <span
+        className={`${wrapClass} ${large ? styles.volumeSpeakerNativeLarge : styles.volumeSpeakerNative}`}
+        aria-hidden
+      >
+        🔊
+      </span>
+    )
+  }
 
   return (
     <span className={wrapClass} aria-hidden>
-      {large ? (
-        <VmVolume2 className={iconClass} strokeWidth={VM_ICON_STROKE} />
-      ) : (
-        <VmVolume1 className={iconClass} strokeWidth={VM_ICON_STROKE} />
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={WIN_SPEAKER_SRC}
+        alt=""
+        draggable={false}
+        className={large ? styles.volumeSpeakerImgLarge : styles.volumeSpeakerImg}
+      />
     </span>
   )
 }
