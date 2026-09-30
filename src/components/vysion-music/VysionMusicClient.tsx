@@ -428,7 +428,7 @@ export function VysionMusicClient({
                 >
                   <span className={styles.rowNum}>{idx + 1}</span>
                   <span className={styles.rowPlay} aria-hidden>
-                    <VmPlay filled strokeWidth={VM_ICON_STROKE} />
+                    <VmPlay className={styles.rowPlayIcon} filled strokeWidth={0} />
                   </span>
                   <span className={styles.rowTitle}>{row.name}</span>
                   <span className={styles.rowArtist}>{row.artist}</span>
@@ -479,7 +479,7 @@ export function VysionMusicClient({
               >
                 <span className={styles.rowNum}>{idx + 1}</span>
                 <span className={styles.rowPlay} aria-hidden>
-                  <VmPlay filled strokeWidth={VM_ICON_STROKE} />
+                  <VmPlay className={styles.rowPlayIcon} filled strokeWidth={0} />
                 </span>
                 <span className={styles.rowTitle}>{row.name}</span>
                 <span className={styles.rowArtist}>{row.artist}</span>
