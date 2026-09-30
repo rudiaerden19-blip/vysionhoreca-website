@@ -163,13 +163,17 @@ export function VysionMusicClient({
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
         if (!res.ok) {
-          setError(json.error || t('vysionMusic.errorControl'))
+          if (!(opts?.silent && op === 'setVolume')) {
+            setError(json.error || t('vysionMusic.errorControl'))
+          }
         } else {
-          setError(null)
+          if (!(opts?.silent && op === 'setVolume')) setError(null)
           if (json.snapshot) setSnapshot(json.snapshot)
         }
       } catch {
-        setError(t('vysionMusic.errorNetwork'))
+        if (!(opts?.silent && op === 'setVolume')) {
+          setError(t('vysionMusic.errorNetwork'))
+        }
       } finally {
         if (!opts?.silent) setBusy(false)
       }

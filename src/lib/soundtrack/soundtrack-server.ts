@@ -4,6 +4,19 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 const API_URL = 'https://api.soundtrackyourbrand.com/v2'
 
+/** Soundtrack `Volume` scalar: 0–16 (niet 0–100). UI gebruikt 0–100%. */
+const SOUNDTRACK_VOLUME_MAX = 16
+
+export function soundtrackApiVolumeToUiPercent(apiVolume: number): number {
+  const v = Math.min(SOUNDTRACK_VOLUME_MAX, Math.max(0, apiVolume))
+  return Math.round((v / SOUNDTRACK_VOLUME_MAX) * 100)
+}
+
+export function soundtrackUiPercentToApiVolume(uiPercent: number): number {
+  const pct = Math.min(100, Math.max(0, uiPercent))
+  return Math.round((pct / 100) * SOUNDTRACK_VOLUME_MAX)
+}
+
 export class SoundtrackConfigError extends Error {
   constructor(message: string) {
     super(message)
@@ -174,6 +187,7 @@ export type SoundtrackPlayerSnapshot = {
   isPaired: boolean
   deviceName: string | null
   playbackState: string
+  /** 0–100 voor UI (gemapt van Soundtrack 0–16). */
   volume: number
   nowPlaying: {
     track: SoundtrackTrackRow | null
@@ -318,7 +332,10 @@ export async function fetchSoundtrackPlayerSnapshot(
     isPaired: sz.isPaired,
     deviceName: sz.device?.name ?? null,
     playbackState: sz.playback?.state ?? 'stopped',
-    volume: typeof sz.playback?.volume === 'number' ? sz.playback.volume : 0,
+    volume:
+      typeof sz.playback?.volume === 'number'
+        ? soundtrackApiVolumeToUiPercent(sz.playback.volume)
+        : 0,
     nowPlaying: {
       track: nowTrack,
       startedAt,
@@ -435,7 +452,8 @@ export async function soundtrackControl(
       )
       return
     case 'setVolume': {
-      const volume = typeof opts?.volume === 'number' ? opts.volume : 0
+      const ui = typeof opts?.volume === 'number' ? opts.volume : 0
+      const volume = soundtrackUiPercentToApiVolume(ui)
       await soundtrackGraphql(
         `mutation($input: SetVolumeInput!) { setVolume(input: $input) { status volume } }`,
         { input: { soundZone: zoneId, volume } },
