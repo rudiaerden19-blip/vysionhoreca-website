@@ -612,6 +612,139 @@
   overscroll-behavior: contain;
 }
 
+.volumeControlsRow {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 0;
+  max-height: calc(var(--vm-now-band-h) - 5.5rem);
+}
+
+.vuMeter {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex-shrink: 0;
+  width: clamp(3.35rem, 5.5vw, 4.1rem);
+  padding: 0.2rem 0.15rem 0.55rem;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #2a3038 0%, #1a1f26 48%, #12161c 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.65),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.vuMeterFace {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 0.22rem;
+  justify-content: center;
+  align-items: stretch;
+  padding: 0.15rem 0.1rem;
+  border-radius: 2px;
+  background: #0a0c10;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+
+.vuChannel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.08rem;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.vuSegment {
+  flex: 1 1 0;
+  min-height: 0.28rem;
+  border-radius: 1px;
+  transition: opacity 0.045s linear;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.vuSegmentGreen {
+  background: #1a3d22;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 6px rgba(34, 197, 94, 0.35);
+}
+
+.vuSegmentYellow {
+  background: #4a3a0f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 6px rgba(250, 204, 21, 0.35);
+}
+
+.vuSegmentRed {
+  background: #4a1a14;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 6px rgba(248, 113, 113, 0.35);
+}
+
+.vuSegmentLit.vuSegmentGreen {
+  background: #22c55e;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 8px rgba(34, 197, 94, 0.75);
+}
+
+.vuSegmentLit.vuSegmentYellow {
+  background: #facc15;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 8px rgba(250, 204, 21, 0.75);
+}
+
+.vuSegmentLit.vuSegmentRed {
+  background: #f87171;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 10px rgba(248, 113, 113, 0.85);
+}
+
+.vuMeterScaleLeft,
+.vuMeterScaleRight {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.38rem;
+  line-height: 1;
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+  padding: 0.2rem 0;
+  user-select: none;
+}
+
+.vuMeterScaleLeft {
+  padding-right: 0.12rem;
+  text-align: right;
+}
+
+.vuMeterScaleRight {
+  padding-left: 0.12rem;
+  text-align: left;
+}
+
+.vuMeterDb {
+  position: absolute;
+  bottom: 0.12rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.42rem;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  user-select: none;
+}
+
 .volumeIcon {
   line-height: 1;
   flex-shrink: 0;

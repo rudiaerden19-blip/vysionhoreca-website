@@ -19,6 +19,7 @@ import {
 } from '@/lib/vysion-music-track-fade'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
+import { VuMeterStereo } from './VuMeterStereo'
 import styles from './vysion-music.module.css'
 
 const VM_ICON_STROKE = 2.35
@@ -461,19 +462,26 @@ export function VysionMusicClient({
             <span className={styles.volumeIconLarge} aria-hidden>
               <VolumeSpeakerArt large />
             </span>
-            <div className={styles.volumeSliderWrap}>
-              <VolumeSliderVertical
-                value={snapshot?.volume ?? 0}
-                disabled={busy}
-                ariaLabel={t('vysionMusic.volume')}
-                onDragChange={(dragging) => {
-                  volumeDraggingRef.current = dragging
-                }}
-                onChange={(v) => {
-                  setSnapshot((s) => (s ? { ...s, volume: v } : s))
-                }}
-                onCommit={(v) => syncVolume(v, true)}
+            <div className={styles.volumeControlsRow}>
+              <VuMeterStereo
+                playing={isPlaying}
+                volumePercent={snapshot?.volume ?? 0}
+                trackKey={trackIdentity(nowTrack)}
               />
+              <div className={styles.volumeSliderWrap}>
+                <VolumeSliderVertical
+                  value={snapshot?.volume ?? 0}
+                  disabled={busy}
+                  ariaLabel={t('vysionMusic.volume')}
+                  onDragChange={(dragging) => {
+                    volumeDraggingRef.current = dragging
+                  }}
+                  onChange={(v) => {
+                    setSnapshot((s) => (s ? { ...s, volume: v } : s))
+                  }}
+                  onCommit={(v) => syncVolume(v, true)}
+                />
+              </div>
             </div>
             <span className={styles.volumeIcon} aria-hidden>
               <VolumeSpeakerArt />
