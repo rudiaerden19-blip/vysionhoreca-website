@@ -12,9 +12,9 @@
   --vm-cover-size: calc(var(--vm-now-band-h) - 2rem);
   --vm-transport-secondary: 3.375rem;
   --vm-transport-primary: 4.5rem;
-  --vm-volume-track-h: 0.32rem;
-  --vm-volume-thumb: 1.125rem;
-  --vm-volume-block-w: clamp(10.5rem, 17vw, 14.5rem);
+  --vm-volume-track-h: 0.48rem;
+  --vm-volume-thumb: 1.55rem;
+  --vm-volume-block-w: clamp(12.5rem, 21vw, 17.5rem);
   min-height: 100vh;
   min-height: 100dvh;
   height: 100dvh;
@@ -199,6 +199,8 @@
 
 .trackMain {
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .nowLabel {
@@ -214,6 +216,10 @@
   font-weight: 800;
   line-height: 1.08;
   margin: 0 0 0.35rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .trackArtist {
@@ -221,13 +227,17 @@
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   font-weight: 600;
   margin: 0 0 0.75rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .progressRow {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  max-width: min(36rem, 58vw);
+  max-width: 100%;
 }
 
 .timeLabel {
@@ -264,7 +274,8 @@
   flex-direction: row;
   align-items: center;
   flex-wrap: nowrap;
-  gap: clamp(1rem, 2vw, 1.85rem);
+  gap: clamp(0.85rem, 1.75vw, 1.5rem);
+  transform: translateX(-2cm);
 }
 
 .transport {
@@ -273,7 +284,6 @@
   justify-content: center;
   flex-shrink: 0;
   gap: 0.75rem;
-  transform: translateX(-2cm);
 }
 
 .transportBtn {
@@ -331,16 +341,16 @@
 
 .volumeIcon {
   color: var(--vm-text);
-  font-size: 1.25rem;
+  font-size: 1.85rem;
   line-height: 1;
   flex-shrink: 0;
 }
 
 .volumeSlider {
   flex: 1 1 auto;
-  min-width: 6rem;
+  min-width: 7rem;
   margin: 0;
-  padding: 0.85rem 0;
+  padding: 1rem 0;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -397,9 +407,9 @@
 }
 
 .volumePct {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--vm-muted);
-  min-width: 2.75rem;
+  min-width: 2.85rem;
   text-align: right;
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
