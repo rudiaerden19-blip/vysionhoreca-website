@@ -375,23 +375,15 @@
   margin-top: 2cm;
 }
 
-.glassActionBtn {
+/* Gedeeld blauw glas — pill-tekstknoppen + transport (zelfde oppervlak) */
+.glassActionBtn,
+.transportBtn,
+.transportPrimary {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  flex: 1 1 0;
-  min-width: 0;
-  min-height: 2.7rem;
-  padding: 0.5rem 0.4rem;
   border: none;
-  border-radius: 999px;
   background: transparent;
-  color: var(--vm-glass-emblem);
-  font-size: clamp(0.62rem, 1.25vw, 0.76rem);
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  line-height: 1.15;
-  cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   box-shadow:
@@ -402,7 +394,9 @@
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.glassActionBtn::before {
+.glassActionBtn::before,
+.transportBtn::before,
+.transportPrimary::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -423,7 +417,9 @@
   backdrop-filter: blur(10px) saturate(1.4);
 }
 
-.glassActionBtn::after {
+.glassActionBtn::after,
+.transportBtn::after,
+.transportPrimary::after {
   content: '';
   position: absolute;
   inset: 2px;
@@ -437,6 +433,20 @@
   background: radial-gradient(ellipse 85% 38% at 50% 102%, rgba(255, 255, 255, 0.07), transparent 68%);
 }
 
+.glassActionBtn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 2.7rem;
+  padding: 0.5rem 0.4rem;
+  border-radius: 999px;
+  color: var(--vm-glass-emblem);
+  font-size: clamp(0.62rem, 1.25vw, 0.76rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  cursor: pointer;
+}
+
 .glassActionBtn span {
   position: relative;
   z-index: 1;
@@ -446,9 +456,9 @@
   white-space: nowrap;
 }
 
-.glassActionBtn:not(:disabled):active {
-  transform: scale(0.96);
-  color: var(--vm-glass-emblem-active);
+.glassActionBtn:not(:disabled):active,
+.transportBtn:not(:disabled):active,
+.transportPrimary:not(:disabled):active {
   box-shadow:
     0 0 0 1px rgba(120, 170, 230, 0.55),
     0 0 0 2.5px var(--vm-glass-rim-deep),
@@ -456,71 +466,30 @@
     0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-.glassActionBtn:not(:disabled):active::before {
+.glassActionBtn:not(:disabled):active {
+  transform: scale(0.96);
+  color: var(--vm-glass-emblem-active);
+}
+
+.glassActionBtn:not(:disabled):active::before,
+.transportBtn:not(:disabled):active::before,
+.transportPrimary:not(:disabled):active::before {
   filter: brightness(0.78) saturate(1.1);
 }
 
 .transportBtn {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
   width: var(--vm-transport-secondary);
   height: var(--vm-transport-secondary);
   min-width: var(--vm-transport-secondary);
   min-height: var(--vm-transport-secondary);
   border-radius: 50%;
-  border: none;
   padding: 0;
-  background: transparent;
   color: var(--vm-icon-on-dark);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow:
-    0 0 0 1px var(--vm-glass-rim),
-    0 0 0 2.5px var(--vm-glass-rim-deep),
-    0 6px 18px var(--vm-glass-glow),
-    0 4px 14px rgba(0, 0, 0, 0.38);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.transportBtn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse 100% 48% at 50% 0%, rgba(255, 255, 255, 0.78), transparent 58%),
-    radial-gradient(ellipse 75% 42% at 50% 16%, rgba(210, 218, 228, 0.3), transparent 62%),
-    radial-gradient(circle at 50% 118%, rgba(18, 24, 32, 0.55), transparent 48%),
-    radial-gradient(
-      circle at 50% 58%,
-      rgba(92, 102, 116, 0.74) 0%,
-      rgba(62, 72, 86, 0.8) 38%,
-      rgba(36, 44, 56, 0.92) 72%,
-      rgba(14, 18, 24, 0.97) 100%
-    );
-  -webkit-backdrop-filter: blur(10px) saturate(0.82);
-  backdrop-filter: blur(10px) saturate(0.82);
-}
-
-.transportBtn::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  z-index: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  box-shadow:
-    inset 0 2px 14px rgba(255, 255, 255, 0.24),
-    inset 0 -10px 18px rgba(0, 0, 0, 0.62),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-  background: radial-gradient(ellipse 85% 38% at 50% 102%, rgba(255, 255, 255, 0.07), transparent 68%);
 }
 
 .transportIcon {
@@ -552,15 +521,6 @@
 
 .transportBtn:not(:disabled):active {
   transform: scale(0.9);
-  box-shadow:
-    0 0 0 1px rgba(130, 142, 158, 0.5),
-    0 0 0 2.5px var(--vm-glass-rim-deep),
-    inset 0 6px 18px rgba(0, 0, 0, 0.72),
-    0 2px 8px rgba(0, 0, 0, 0.35);
-}
-
-.transportBtn:not(:disabled):active::before {
-  filter: brightness(0.78) saturate(0.9);
 }
 
 .transportBtn:not(:disabled):active .transportIcon {
@@ -569,66 +529,18 @@
 }
 
 .transportPrimary {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
   width: var(--vm-transport-primary);
   height: var(--vm-transport-primary);
   min-width: var(--vm-transport-primary);
   min-height: var(--vm-transport-primary);
   border-radius: 50%;
-  border: none;
   padding: 0;
-  background: transparent;
   color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow:
-    0 0 0 1.5px rgba(176, 186, 200, 0.78),
-    0 0 0 3px var(--vm-glass-rim-deep),
-    0 8px 22px var(--vm-glass-glow),
-    0 4px 16px rgba(0, 0, 0, 0.38);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.transportPrimary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse 100% 50% at 50% -2%, rgba(255, 255, 255, 0.86), transparent 56%),
-    radial-gradient(ellipse 80% 44% at 50% 14%, rgba(218, 224, 232, 0.34), transparent 64%),
-    radial-gradient(circle at 50% 120%, rgba(20, 26, 34, 0.52), transparent 50%),
-    radial-gradient(
-      circle at 50% 56%,
-      rgba(102, 112, 126, 0.78) 0%,
-      rgba(68, 78, 92, 0.82) 40%,
-      rgba(40, 48, 60, 0.93) 74%,
-      rgba(16, 20, 28, 0.98) 100%
-    );
-  -webkit-backdrop-filter: blur(12px) saturate(0.85);
-  backdrop-filter: blur(12px) saturate(0.85);
-}
-
-.transportPrimary::after {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  z-index: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  box-shadow:
-    inset 0 3px 16px rgba(255, 255, 255, 0.28),
-    inset 0 -12px 22px rgba(0, 0, 0, 0.68),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  background: radial-gradient(ellipse 88% 40% at 50% 104%, rgba(255, 255, 255, 0.09), transparent 70%);
 }
 
 .transportPrimary:disabled {
@@ -638,15 +550,6 @@
 
 .transportPrimary:not(:disabled):active {
   transform: scale(0.9);
-  box-shadow:
-    0 0 0 1.5px rgba(130, 142, 158, 0.55),
-    0 0 0 3px var(--vm-glass-rim-deep),
-    inset 0 7px 20px rgba(0, 0, 0, 0.75),
-    0 2px 8px rgba(0, 0, 0, 0.32);
-}
-
-.transportPrimary:not(:disabled):active::before {
-  filter: brightness(0.8) saturate(0.88);
 }
 
 .transportPrimary:not(:disabled):active .transportIconPrimary {
