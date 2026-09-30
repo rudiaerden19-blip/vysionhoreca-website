@@ -15,6 +15,9 @@
   --vm-icon-on-dark: #f4f8fc;
   --vm-text: #ffffff;
   --vm-muted: #9ca3af;
+  /* Tekst + iconen op glazen knoppen — grijs, niet te licht */
+  --vm-glass-emblem: #7a8490;
+  --vm-glass-emblem-active: #959ea8;
   --vm-panel: #0c1018;
   --vm-panel-border: #1a2333;
   --vm-row-active: var(--vm-accent-panel);
@@ -375,7 +378,7 @@
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: var(--vm-text-accent);
+  color: var(--vm-glass-emblem);
   font-size: clamp(0.62rem, 1.25vw, 0.76rem);
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -422,6 +425,7 @@
 
 .glassActionBtn:not(:disabled):active {
   transform: scale(0.96);
+  color: var(--vm-glass-emblem-active);
   box-shadow:
     0 0 0 2px rgba(55, 72, 92, 0.95),
     0 0 0 3px rgba(22, 32, 48, 0.98),
@@ -486,7 +490,7 @@
   width: clamp(1.45rem, 2.4vw, 1.75rem);
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
-  color: var(--vm-accent);
+  color: var(--vm-glass-emblem);
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -496,7 +500,7 @@
   width: clamp(2rem, 3.2vw, 2.35rem);
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
-  color: var(--vm-accent);
+  color: var(--vm-glass-emblem);
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -520,7 +524,7 @@
 
 .transportBtn:not(:disabled):active .transportIcon {
   transform: scale(0.92);
-  color: #5cb8ff;
+  color: var(--vm-glass-emblem-active);
 }
 
 .transportPrimary {
@@ -599,7 +603,7 @@
 
 .transportPrimary:not(:disabled):active .transportIconPrimary {
   transform: scale(0.9);
-  color: #5cb8ff;
+  color: var(--vm-glass-emblem-active);
 }
 
 .volumeColumn {
@@ -909,12 +913,12 @@
   z-index: 1;
   width: 0.72rem;
   height: 0.72rem;
-  color: var(--vm-accent);
+  color: var(--vm-glass-emblem);
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
 .listRowActive .rowPlayIcon {
-  color: var(--vm-accent);
+  color: var(--vm-glass-emblem);
 }
 
 .listRow:not(:disabled):active .rowPlay {
@@ -932,7 +936,7 @@
 
 .listRow:not(:disabled):active .rowPlayIcon {
   transform: scale(0.9);
-  color: #5cb8ff;
+  color: var(--vm-glass-emblem-active);
 }
 
 .rowTitle {
