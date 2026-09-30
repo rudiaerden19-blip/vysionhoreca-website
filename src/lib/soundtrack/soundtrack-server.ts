@@ -590,30 +590,6 @@ export async function soundtrackSearchTracks(
   return collected.slice(0, maxResults)
 }
 
-async function fetchSoundZonePlaybackState(zoneId: string): Promise<{
-  state: string
-  currentTrackId: string | null
-}> {
-  const data = await soundtrackGraphql<{
-    soundZone: {
-      playback: { state: string } | null
-      nowPlaying: { track: { id: string } | null } | null
-    } | null
-  }>(
-    `query($id: ID!) {
-      soundZone(id: $id) {
-        playback { state }
-        nowPlaying { track { id } }
-      }
-    }`,
-    { id: zoneId },
-  )
-  return {
-    state: data.soundZone?.playback?.state ?? 'stopped',
-    currentTrackId: data.soundZone?.nowPlaying?.track?.id ?? null,
-  }
-}
-
 async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
   await soundtrackGraphql(
     `mutation($input: SkipTracksInput!) {
@@ -666,7 +642,8 @@ export async function soundtrackControl(
       if (trackId.startsWith('placeholder-')) {
         throw new SoundtrackApiError('Track not available')
       }
-      const { state, currentTrackId } = await fetchSoundZonePlaybackState(zoneId)
+      // Nooit skipTracks hier: skip gaat naar volgende station-/playlist-track, niet naar
+      // de zojuist gequeue'de zoekresultaat-track.
       await soundtrackGraphql(
         `mutation($input: SoundZoneQueueTracksInput!) {
           soundZoneQueueTracks(input: $input) { __typename }
@@ -680,18 +657,10 @@ export async function soundtrackControl(
           },
         },
       )
-      const crossfadeToQueued =
-        currentTrackId != null &&
-        currentTrackId !== trackId &&
-        (state === 'playing' || state === 'paused')
-      if (crossfadeToQueued) {
-        await skipSoundZoneTracksWithCrossfade(zoneId)
-      } else {
-        await soundtrackGraphql(
-          `mutation($input: PlayInput!) { play(input: $input) { status } }`,
-          { input: { soundZone: zoneId } },
-        )
-      }
+      await soundtrackGraphql(
+        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+        { input: { soundZone: zoneId } },
+      )
       return
     }
     default:
