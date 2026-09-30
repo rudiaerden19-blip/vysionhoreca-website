@@ -4,6 +4,9 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 const API_URL = 'https://api.soundtrackyourbrand.com/v2'
 
+/** Standaard crossfade in Soundtrack-player (zone settings + skip). */
+export const VYSION_MUSIC_CROSSFADE_SECONDS = 3
+
 /** Soundtrack `Volume` scalar: 0–16 (niet 0–100). UI gebruikt 0–100%. */
 const SOUNDTRACK_VOLUME_MAX = 16
 
@@ -48,6 +51,89 @@ function soundtrackToken(): string {
 
 const zoneIdByNameCache = new Map<string, string>()
 const zoneIdByTenantCache = new Map<string, string>()
+const crossfadeEnsuredZoneIds = new Set<string>()
+
+export type SoundtrackCrossfadeSettings = {
+  crossfade: boolean
+  crossfadeLength: number | null
+  crossfadeOnSkip: boolean
+}
+
+export function soundtrackCrossfadeSettingsMatch(
+  current: Partial<SoundtrackCrossfadeSettings> | null | undefined,
+  seconds: number = VYSION_MUSIC_CROSSFADE_SECONDS,
+): boolean {
+  if (!current) return false
+  return (
+    current.crossfade === true &&
+    current.crossfadeOnSkip === true &&
+    Number(current.crossfadeLength) === seconds
+  )
+}
+
+async function fetchSoundZoneCrossfadeSettings(
+  zoneId: string,
+): Promise<SoundtrackCrossfadeSettings | null> {
+  const data = await soundtrackGraphql<{
+    soundZone: {
+      settings: {
+        crossfade: boolean
+        crossfadeLength: number | null
+        crossfadeOnSkip: boolean
+      } | null
+    } | null
+  }>(
+    `query($id: ID!) {
+      soundZone(id: $id) {
+        settings { crossfade crossfadeLength crossfadeOnSkip }
+      }
+    }`,
+    { id: zoneId },
+  )
+  const s = data.soundZone?.settings
+  if (!s) return null
+  return {
+    crossfade: Boolean(s.crossfade),
+    crossfadeLength:
+      s.crossfadeLength == null || s.crossfadeLength === undefined
+        ? null
+        : Number(s.crossfadeLength),
+    crossfadeOnSkip: Boolean(s.crossfadeOnSkip),
+  }
+}
+
+/** Zet 3s crossfade op de zone (player in zaak); cached per zone per process. */
+export async function ensureSoundZoneCrossfadeSettings(
+  zoneId: string,
+  seconds: number = VYSION_MUSIC_CROSSFADE_SECONDS,
+): Promise<void> {
+  const key = `${zoneId}:${seconds}`
+  if (crossfadeEnsuredZoneIds.has(key)) return
+
+  try {
+    const current = await fetchSoundZoneCrossfadeSettings(zoneId)
+    if (!soundtrackCrossfadeSettingsMatch(current, seconds)) {
+      await soundtrackGraphql(
+        `mutation($input: SoundZoneUpdateSettingsInput!) {
+          soundZoneUpdateSettings(input: $input) { __typename }
+        }`,
+        {
+          input: {
+            soundZones: [zoneId],
+            settings: {
+              crossfade: true,
+              crossfadeLength: seconds,
+              crossfadeOnSkip: true,
+            },
+          },
+        },
+      )
+    }
+    crossfadeEnsuredZoneIds.add(key)
+  } catch {
+    // Geen hard fail op snapshot — player blijft werken zonder zone-tweak
+  }
+}
 
 async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string> {
   const needle = zoneName.trim()
@@ -454,8 +540,16 @@ export async function soundtrackControl(
       return
     case 'skipNext':
       await soundtrackGraphql(
-        `mutation($input: SkipTrackInput!) { skipTrack(input: $input) { status } }`,
-        { input: { soundZone: zoneId } },
+        `mutation($input: SkipTracksInput!) {
+          skipTracks(input: $input) { __typename }
+        }`,
+        {
+          input: {
+            soundZone: zoneId,
+            tracksToSkip: 1,
+            crossfade: true,
+          },
+        },
       )
       return
     case 'setVolume': {

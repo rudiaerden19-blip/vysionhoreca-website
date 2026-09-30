@@ -86,6 +86,8 @@ export function VysionMusicClient({
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeDraggingRef = useRef(false)
   const playlistPanelRef = useRef<HTMLDivElement>(null)
+  const trackIdForFadeRef = useRef<string | null>(null)
+  const [trackFadePulse, setTrackFadePulse] = useState(0)
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
     setSnapshot((prev) => {
@@ -240,6 +242,14 @@ export function VysionMusicClient({
   )
 
   const nowTrack = snapshot?.nowPlaying.track
+
+  useEffect(() => {
+    const id = nowTrack?.id ?? ''
+    if (trackIdForFadeRef.current !== null && trackIdForFadeRef.current !== id && id) {
+      setTrackFadePulse((n) => n + 1)
+    }
+    trackIdForFadeRef.current = id || null
+  }, [nowTrack?.id])
   const durationMs = nowTrack?.durationMs ?? 0
   let progressMs = snapshot?.nowPlaying.progressMs ?? 0
   if (snapshot?.playbackState === 'playing' && snapshot.nowPlaying.startedAt && durationMs) {
@@ -320,7 +330,10 @@ export function VysionMusicClient({
       ) : null}
 
       <section className={styles.nowPlaying}>
-        <div className={styles.nowLeft}>
+        <div
+          key={trackFadePulse}
+          className={`${styles.nowLeft} ${trackFadePulse > 0 ? styles.nowLeftTrackCrossfade : ''}`}
+        >
           <div className={styles.coverFrame}>
             {coverSrc ? (
               // eslint-disable-next-line @next/next/no-img-element

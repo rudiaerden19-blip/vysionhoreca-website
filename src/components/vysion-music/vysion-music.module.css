@@ -29,6 +29,7 @@
   --vm-volume-block-w: clamp(12.5rem, 21vw, 17.5rem);
   --vm-panel-gap: 0.85rem;
   --vm-panel-pad-x: 1.25rem;
+  --vm-track-crossfade: 3s;
   min-height: 100vh;
   min-height: 100dvh;
   height: 100dvh;
@@ -209,6 +210,22 @@
   max-width: 100%;
   overflow: hidden;
   align-items: center;
+}
+
+@keyframes vmTrackCrossfade {
+  0% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.12;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.nowLeftTrackCrossfade {
+  animation: vmTrackCrossfade var(--vm-track-crossfade) ease-in-out;
 }
 
 .nowRight {

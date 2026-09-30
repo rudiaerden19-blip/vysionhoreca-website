@@ -3,6 +3,7 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import {
   SoundtrackApiError,
   SoundtrackConfigError,
+  ensureSoundZoneCrossfadeSettings,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneIdForTenant,
   soundtrackControl,
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    await ensureSoundZoneCrossfadeSettings(zoneId)
     const q = request.nextUrl.searchParams.get('q')
     if (q != null && q !== '') {
       const tracks = await soundtrackSearchTracks(q)
@@ -62,6 +64,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    await ensureSoundZoneCrossfadeSettings(zoneId)
     await soundtrackControl(zoneId, op as (typeof allowed)[number], {
       volume: body.volume,
       trackId: body.trackId,
