@@ -1,0 +1,36 @@
+/** Track hoort bij zoekterm als artiest (bv. «elvis» → Elvis Presley, «u2» → U2). */
+export function trackArtistMatchesQuery(artist: string, query: string): boolean {
+  const a = artist.trim().toLowerCase()
+  const q = query.trim().toLowerCase()
+  if (!a || !q) return false
+  if (a === q) return true
+  if (a.startsWith(`${q} `)) return true
+  if (a.startsWith(q)) {
+    const next = a.charAt(q.length)
+    if (!next || next === ' ' || next === '&' || next === '(') return true
+  }
+  const qWords = q.split(/\s+/).filter(Boolean)
+  const aWords = a.split(/\s+/).filter(Boolean)
+  if (qWords.length === 1 && aWords[0] === qWords[0]) return true
+  if (qWords.length > 1 && a.startsWith(q)) return true
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`(^|[\\s(&])${escaped}($|[\\s)&.,])`, 'i').test(artist)
+}
+
+export function filterTracksByArtistQuery<T extends { artist: string }>(
+  rows: T[],
+  query: string,
+): T[] {
+  const q = query.trim()
+  if (!q) return rows
+  return rows.filter((r) => trackArtistMatchesQuery(r.artist, q))
+}
+
+/** Als er treffers op artiest zijn: alleen die tonen (geen andere artiesten bovenaan). */
+export function pickArtistScopedSearchResults<T extends { artist: string }>(
+  rows: T[],
+  query: string,
+): T[] | null {
+  const scoped = filterTracksByArtistQuery(rows, query)
+  return scoped.length > 0 ? scoped : null
+}

@@ -1,3 +1,4 @@
+import { pickArtistScopedSearchResults } from '@/lib/soundtrack/soundtrack-search-artist-filter'
 import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
 
 import { getServerSupabaseClient } from '@/lib/supabase-server'
@@ -551,9 +552,10 @@ export async function soundtrackSearchTracks(
   }
 
   let collected: SoundtrackTrackRow[] = []
+  let artistScoped: SoundtrackTrackRow[] | null = null
   let after: string | null = null
 
-  for (let page = 0; page < 8 && collected.length < maxResults; page++) {
+  for (let page = 0; page < 8; page++) {
     const data: SearchPage = await soundtrackGraphql<SearchPage>(
       `query($q: String!, $first: Int!, $after: String) {
         search(query: $q, type: track, first: $first, after: $after) {
@@ -581,13 +583,21 @@ export async function soundtrackSearchTracks(
 
     collected = dedupeSearchTrackRows(collected)
 
-    if (collected.length >= maxResults) break
+    const scoped = pickArtistScopedSearchResults(collected, q)
+    if (scoped) {
+      artistScoped = scoped
+      if (artistScoped.length >= maxResults) break
+    } else if (collected.length >= maxResults) {
+      break
+    }
+
     const pi: SearchPage['search']['pageInfo'] | undefined = data.search?.pageInfo
     if (!pi?.hasNextPage || !pi.endCursor) break
     after = pi.endCursor
   }
 
-  return collected.slice(0, maxResults)
+  const finalRows = artistScoped ?? collected
+  return finalRows.slice(0, maxResults)
 }
 
 async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
