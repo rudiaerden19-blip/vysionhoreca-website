@@ -10,6 +10,9 @@
   --vm-cover-size: clamp(7.5rem, 12vh, 9.5rem);
   --vm-now-min-h: clamp(10rem, 24vh, 13.5rem);
   --vm-columns-max-h: clamp(16rem, 48vh, 25rem);
+  /* Touch: grote knoppen binnen dezelfde now-playing band (afb. 3) */
+  --vm-transport-secondary: clamp(3.5rem, 7.2vh, 4.5rem);
+  --vm-transport-primary: clamp(4.65rem, 9.8vh, 5.85rem);
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--vm-bg);
@@ -232,19 +235,23 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  min-width: 16rem;
+  gap: 0.4rem;
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 .transport {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  justify-content: center;
+  gap: clamp(0.55rem, 1.2vw, 1rem);
 }
 
 .transportBtn {
-  width: 44px;
-  height: 44px;
+  width: var(--vm-transport-secondary);
+  height: var(--vm-transport-secondary);
+  min-width: var(--vm-transport-secondary);
+  min-height: var(--vm-transport-secondary);
   border-radius: 50%;
   border: none;
   background: var(--vm-control-face);
@@ -253,7 +260,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: clamp(1.35rem, 2.6vh, 1.85rem);
+  line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .transportBtn:disabled {
@@ -262,8 +272,10 @@
 }
 
 .transportPrimary {
-  width: 60px;
-  height: 60px;
+  width: var(--vm-transport-primary);
+  height: var(--vm-transport-primary);
+  min-width: var(--vm-transport-primary);
+  min-height: var(--vm-transport-primary);
   border-radius: 50%;
   border: none;
   background: var(--vm-accent);
@@ -272,15 +284,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.65rem;
+  font-size: clamp(1.85rem, 3.6vh, 2.45rem);
+  line-height: 1;
   box-shadow: 0 0 28px rgba(0, 150, 255, 0.4);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .volumeRow {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  min-width: 220px;
+  gap: 0.5rem;
+  width: min(100%, 20rem);
+  margin-top: 0.05rem;
 }
 
 .volumeIcon {
@@ -291,7 +307,10 @@
 .volumeSlider {
   flex: 1;
   accent-color: var(--vm-accent);
-  height: 4px;
+  height: 6px;
+  min-height: 28px;
+  cursor: pointer;
+  touch-action: manipulation;
 }
 
 .volumePct {
