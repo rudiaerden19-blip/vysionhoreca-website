@@ -80,6 +80,7 @@ export function VysionMusicClient({
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<TrackRow[]>([])
+  const [searchLoading, setSearchLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [switchingTrack, setSwitchingTrack] = useState(false)
@@ -123,8 +124,10 @@ export function VysionMusicClient({
       const trimmed = q.trim()
       if (!trimmed) {
         setSearchResults([])
+        setSearchLoading(false)
         return
       }
+      setSearchLoading(true)
       try {
         const res = await fetch(`${apiBase}?q=${encodeURIComponent(trimmed)}`, {
           headers: getAuthHeaders(),
@@ -141,6 +144,8 @@ export function VysionMusicClient({
         setSearchResults(json.search?.tracks ?? [])
       } catch {
         setSearchResults([])
+      } finally {
+        setSearchLoading(false)
       }
     },
     [apiBase],
@@ -165,7 +170,7 @@ export function VysionMusicClient({
   }, [snapshot?.playbackState, snapshot?.nowPlaying.startedAt])
 
   useEffect(() => {
-    const id = window.setTimeout(() => void runSearch(searchQuery), 350)
+    const id = window.setTimeout(() => void runSearch(searchQuery), 180)
     return () => window.clearTimeout(id)
   }, [searchQuery, runSearch])
 
@@ -544,6 +549,9 @@ export function VysionMusicClient({
             </div>
           </div>
           <div className={styles.panelTitle}>{resultsTitle}</div>
+          {searchLoading && searchQuery.trim() ? (
+            <p className={styles.searchLoading}>{t('vysionMusic.loading')}</p>
+          ) : null}
           <div className={styles.list}>
             {searchResults.map((row, idx) => (
               <button

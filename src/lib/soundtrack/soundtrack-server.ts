@@ -579,36 +579,55 @@ async function fetchSoundtrackTrackSearchPage(
   )
 }
 
+function ingestArtistScopedSearchPage(
+  data: SoundtrackTrackSearchPage,
+  artistQuery: string,
+  collected: SoundtrackTrackRow[],
+): SoundtrackTrackRow[] {
+  const q = artistQuery.trim()
+  let out = collected
+  for (const edge of data.search?.edges ?? []) {
+    if (edge.node.__typename !== 'Track') continue
+    if (!trackArtistNamesMatchQuery(edge.node.artists?.map((a) => a.name), q)) continue
+    const row = mapTrack(edge.node, q)
+    if (row) out.push(row)
+  }
+  return dedupeSearchTrackRows(out)
+}
+
+/** Snelle artiest-zoek: parallel eerste page, weinig extra pagina’s. */
 async function collectArtistScopedTrackSearch(
   artistQuery: string,
   maxResults: number,
   pageSize: number,
 ): Promise<SoundtrackTrackRow[]> {
   const q = artistQuery.trim()
+  const firstPageSize = Math.min(pageSize, 36)
+  const enoughResults = Math.min(maxResults, 28)
   let collected: SoundtrackTrackRow[] = []
 
-  for (const searchQ of artistDiscoverySearchQueries(q)) {
-    let after: string | null = null
-    for (let page = 0; page < 8; page++) {
-      const data = await fetchSoundtrackTrackSearchPage(searchQ, pageSize, after)
-
-      for (const edge of data.search?.edges ?? []) {
-        if (edge.node.__typename !== 'Track') continue
-        if (!trackArtistNamesMatchQuery(edge.node.artists?.map((a) => a.name), q)) {
-          continue
-        }
-        const row = mapTrack(edge.node, q)
-        if (row) collected.push(row)
-      }
-
-      collected = dedupeSearchTrackRows(collected)
-      if (collected.length >= maxResults) return collected.slice(0, maxResults)
-
-      const pi = data.search?.pageInfo
-      if (!pi?.hasNextPage || !pi.endCursor) break
-      after = pi.endCursor
+  const discoveryQueries = artistDiscoverySearchQueries(q)
+  const firstPages = await Promise.all(
+    discoveryQueries.map((searchQ) =>
+      fetchSoundtrackTrackSearchPage(searchQ, firstPageSize, null),
+    ),
+  )
+  for (const data of firstPages) {
+    collected = ingestArtistScopedSearchPage(data, q, collected)
+    if (collected.length >= enoughResults) {
+      return collected.slice(0, maxResults)
     }
+  }
+
+  let after = firstPages[0]?.search?.pageInfo?.endCursor ?? null
+  for (let page = 1; page < 3 && collected.length < enoughResults; page++) {
+    if (!after) break
+    const data = await fetchSoundtrackTrackSearchPage(q, pageSize, after)
+    collected = ingestArtistScopedSearchPage(data, q, collected)
     if (collected.length >= maxResults) break
+    const pi = data.search?.pageInfo
+    if (!pi?.hasNextPage || !pi.endCursor) break
+    after = pi.endCursor
   }
 
   return collected.slice(0, maxResults)
@@ -625,7 +644,7 @@ export async function soundtrackSearchTracks(
   const pageSize = Math.min(Math.max(opts?.pageSize ?? 50, 1), 50)
 
   if (prefersArtistOnlySearchResults(q)) {
-    return collectArtistScopedTrackSearch(q, maxResults, pageSize)
+    return collectArtistScopedTrackSearch(q, Math.min(maxResults, 50), pageSize)
   }
 
   let collected: SoundtrackTrackRow[] = []

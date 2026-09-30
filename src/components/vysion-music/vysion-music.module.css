@@ -693,7 +693,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-size: 0.42rem;
+  font-size: 0.4rem;
   line-height: 1;
   color: #6b7280;
   font-variant-numeric: tabular-nums;
@@ -1105,6 +1105,13 @@
 .searchWrap {
   padding: 0.55rem 0.85rem 0.35rem;
   flex-shrink: 0;
+}
+
+.searchLoading {
+  margin: 0;
+  padding: 0 0.85rem 0.35rem;
+  font-size: 0.78rem;
+  color: var(--vm-muted);
 }
 
 .searchInput {
