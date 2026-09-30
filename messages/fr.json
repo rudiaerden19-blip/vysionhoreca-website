@@ -3001,6 +3001,7 @@
     "quickMenuOpeningHours": "Horaires",
     "quickMenuShopProfile": "Profil établissement",
     "quickMenuOrders": "Commandes",
+    "quickMenuMusic": "Musique",
     "quickMenuOpenDrawer": "Ouvrir le tiroir",
     "parkedOnTableSection": "Déjà à la table",
     "cartNewLinesSection": "Nouvelle commande",
@@ -6160,6 +6161,7 @@
       "sm_kassa_labels": "Étiquettes",
       "sm_kassa_terminal": "Terminal caisse",
       "sm_kassa_op_rekening": "À crédit",
+      "sm_kassa_muziek": "Musique (Vysion Music)",
       "sm_online_status": "En ligne marche/arrêt",
       "sm_online_klanten": "Clients",
       "sm_online_beloningen": "Récompenses",
@@ -6866,5 +6868,25 @@
         "5": "Caisse, carte et rapports sur un écran"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "Caisse",
+    "nowPlaying": "EN COURS",
+    "playlistTitle": "LISTE (EN COURS)",
+    "searchPlaceholder": "Rechercher…",
+    "searchClear": "Effacer",
+    "resultsEmpty": "RÉSULTATS",
+    "play": "Lecture",
+    "pause": "Pause",
+    "stop": "Stop",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "online": "en ligne",
+    "offline": "hors ligne",
+    "loading": "Chargement…",
+    "errorLoad": "Impossible de charger le statut.",
+    "errorControl": "Échec de la commande.",
+    "errorNetwork": "Erreur réseau.",
+    "resultsPrefix": "RÉSULTATS"
   }
 }

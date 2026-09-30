@@ -260,6 +260,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_kassa_op_rekening'),
           href: `${baseUrl}/op-rekening`,
         },
+        {
+          id: 'sm_kassa_muziek',
+          icon: '',
+          label: 'Muziek',
+          labelKey: itemLabelKey('sm_kassa_muziek'),
+          href: `${baseUrl}/music`,
+        },
       ],
     },
     {
@@ -850,6 +857,10 @@ export function isAdminSubmenuEnabled(
     if (subId === 'sm_kassa_op_rekening') {
       return enabledJson.sm_kassa_op_rekening === true
     }
+    if (subId === 'sm_kassa_muziek') {
+      if (enabledJson.sm_kassa_muziek === false) return false
+      return isHorecaKassaPosScreenEnabled(moduleAccess) || enabledJson.sm_kassa_muziek === true
+    }
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledJson)) return true
     return false
@@ -937,6 +948,10 @@ export function hasShopAdminPathAccess(
     }
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true
+    if (subId === 'sm_kassa_muziek') {
+      if (enabledModulesJson.sm_kassa_muziek === false) return false
+      return isHorecaKassaPosScreenEnabled(moduleAccess)
+    }
     if (
       (subId === 'sm_retail_aankoop' ||
         subId === 'sm_retail_barcodes' ||
@@ -1031,6 +1046,10 @@ export function filterHamburgerModulesForAccess(
           }
           if (item.id === 'sm_kassa_op_rekening') {
             return enabledModulesJson.sm_kassa_op_rekening === true
+          }
+          if (item.id === 'sm_kassa_muziek') {
+            if (enabledModulesJson.sm_kassa_muziek === false) return false
+            return isHorecaKassaPosScreenEnabled(effectiveAccess)
           }
           if (item.id === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
           if (item.id === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true

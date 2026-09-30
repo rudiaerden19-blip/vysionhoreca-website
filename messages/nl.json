@@ -4084,6 +4084,7 @@
     "quickMenuOpeningHours": "Openingsuren",
     "quickMenuShopProfile": "Zaak profiel",
     "quickMenuOrders": "Bestellingen",
+    "quickMenuMusic": "Muziek",
     "quickMenuOpenDrawer": "Lade openen",
     "parkedOnTableSection": "Al op tafel",
     "cartNewLinesSection": "Nieuwe bestelling",
@@ -6096,6 +6097,7 @@
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "Kassa-terminal",
       "sm_kassa_op_rekening": "Op rekening",
+      "sm_kassa_muziek": "Muziek (Vysion Music)",
       "sm_online_status": "Online Aan/Uitzetten",
       "sm_online_klanten": "Klanten",
       "sm_online_beloningen": "Beloningen",
@@ -6802,5 +6804,25 @@
         "5": "Afrekenen, PIN en rapporten in één scherm"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "Kassa",
+    "nowPlaying": "NU SPEELT",
+    "playlistTitle": "AFSPEELLIJST (NU AAN HET SPELEN)",
+    "searchPlaceholder": "Zoeken…",
+    "searchClear": "Wissen",
+    "resultsPrefix": "RESULTATEN",
+    "resultsEmpty": "RESULTATEN",
+    "play": "Afspelen",
+    "pause": "Pauzeren",
+    "stop": "Stop",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "online": "online",
+    "offline": "offline",
+    "loading": "Laden…",
+    "errorLoad": "Kon muziekstatus niet laden.",
+    "errorControl": "Bediening mislukt.",
+    "errorNetwork": "Netwerkfout."
   }
 }

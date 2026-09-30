@@ -3501,6 +3501,7 @@
     "quickMenuOpeningHours": "ساعات العمل",
     "quickMenuShopProfile": "ملف المنشأة",
     "quickMenuOrders": "الطلبات",
+    "quickMenuMusic": "موسيقى",
     "quickMenuOpenDrawer": "فتح الدرج",
     "parkedOnTableSection": "على الطاولة مسبقاً",
     "cartNewLinesSection": "طلب جديد",
@@ -6137,6 +6138,7 @@
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "طرفية نقطة البيع",
       "sm_kassa_op_rekening": "على الحساب",
+      "sm_kassa_muziek": "موسيقى (Vysion Music)",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",
@@ -6843,5 +6845,25 @@
         "5": "Checkout, card and reports on one screen"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "الكassa",
+    "nowPlaying": "يُشغَّل الآن",
+    "playlistTitle": "قائمة التشغيل",
+    "searchPlaceholder": "بحث…",
+    "searchClear": "مسح",
+    "resultsEmpty": "نتائج",
+    "play": "تشغيل",
+    "pause": "إيقاف مؤقت",
+    "stop": "إيقاف",
+    "prev": "السابق",
+    "next": "التالي",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "loading": "جاري التحميل…",
+    "errorLoad": "تعذر تحميل الحالة.",
+    "errorControl": "فشل التحكم.",
+    "errorNetwork": "خطأ في الشبكة.",
+    "resultsPrefix": "نتائج"
   }
 }

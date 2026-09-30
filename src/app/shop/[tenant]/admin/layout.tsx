@@ -15,6 +15,7 @@ import {
   isRetailKassaPosScreenEnabled,
   isShopAdminKassaPosPath,
   isShopAdminRetailKassaPosPath,
+  isShopAdminVysionMusicPath,
   normalizeShopAdminPathname,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
@@ -76,7 +77,8 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
   const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
   const isRetailKassaPos = isShopAdminRetailKassaPosPath(adminPath, params.tenant)
-  const isAnyKassaPos = isHorecaKassaPos || isRetailKassaPos
+  const isVysionMusic = isShopAdminVysionMusicPath(adminPath, params.tenant)
+  const isAnyKassaPos = isHorecaKassaPos || isRetailKassaPos || isVysionMusic
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
@@ -389,6 +391,20 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     (adminAccess === 'verifying' && ownerSessionFreshOnClient)
 
   const renderKassaPosChildren = () => {
+    if (isVysionMusic) {
+      if (demoPublicUnauthenticated) return <>{children}</>
+      if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return <>{children}</>
+      if (!modulesLoading && !isAdminSubmenuEnabled('sm_kassa_muziek', params.tenant, moduleAccess, enabledModulesJson)) {
+        return (
+          <RedirectToFirstAccessibleModule
+            tenant={params.tenant}
+            access={moduleAccess}
+            enabledModulesJson={enabledModulesJson}
+          />
+        )
+      }
+      return <>{children}</>
+    }
     if (isHorecaKassaPos) {
       if (demoPublicUnauthenticated) {
         return <>{children}</>

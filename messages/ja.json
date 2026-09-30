@@ -3501,6 +3501,7 @@
     "quickMenuOpeningHours": "営業時間",
     "quickMenuShopProfile": "店舗プロフィール",
     "quickMenuOrders": "注文",
+    "quickMenuMusic": "音楽",
     "quickMenuOpenDrawer": "ドロワーを開く",
     "parkedOnTableSection": "テーブル済み",
     "cartNewLinesSection": "新規注文",
@@ -6137,6 +6138,7 @@
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "レジ端末",
       "sm_kassa_op_rekening": "掛け売り",
+      "sm_kassa_muziek": "音楽 (Vysion Music)",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",
@@ -6843,5 +6845,25 @@
         "5": "Checkout, card and reports on one screen"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "レジ",
+    "nowPlaying": "再生中",
+    "playlistTitle": "プレイリスト（再生中）",
+    "searchPlaceholder": "検索…",
+    "searchClear": "クリア",
+    "resultsEmpty": "結果",
+    "play": "再生",
+    "pause": "一時停止",
+    "stop": "停止",
+    "prev": "前へ",
+    "next": "次へ",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "loading": "読み込み中…",
+    "errorLoad": "状態を読み込めませんでした。",
+    "errorControl": "操作に失敗しました。",
+    "errorNetwork": "ネットワークエラー。",
+    "resultsPrefix": "結果"
   }
 }

@@ -3001,6 +3001,7 @@
     "quickMenuOpeningHours": "Öffnungszeiten",
     "quickMenuShopProfile": "Betriebsprofil",
     "quickMenuOrders": "Bestellungen",
+    "quickMenuMusic": "Musik",
     "quickMenuOpenDrawer": "Schublade öffnen",
     "parkedOnTableSection": "Bereits am Tisch",
     "cartNewLinesSection": "Neue Bestellung",
@@ -6160,6 +6161,7 @@
       "sm_kassa_labels": "Etiketten",
       "sm_kassa_terminal": "Kassen-Terminal",
       "sm_kassa_op_rekening": "Auf Rechnung",
+      "sm_kassa_muziek": "Musik (Vysion Music)",
       "sm_online_status": "Online ein/aus",
       "sm_online_klanten": "Kunden",
       "sm_online_beloningen": "Prämien",
@@ -6866,5 +6868,25 @@
         "5": "Kasse, Karte und Berichte auf einem Bildschirm"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "Kasse",
+    "nowPlaying": "JETZT",
+    "playlistTitle": "WIEDERGABELISTE (JETZT)",
+    "searchPlaceholder": "Suchen…",
+    "searchClear": "Löschen",
+    "resultsEmpty": "ERGEBNISSE",
+    "play": "Wiedergabe",
+    "pause": "Pause",
+    "stop": "Stop",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "online": "online",
+    "offline": "offline",
+    "loading": "Laden…",
+    "errorLoad": "Status konnte nicht geladen werden.",
+    "errorControl": "Steuerung fehlgeschlagen.",
+    "errorNetwork": "Netzwerkfehler.",
+    "resultsPrefix": "ERGEBNISSE"
   }
 }

@@ -286,6 +286,12 @@ export function isTenantSubmenuEffectiveOn(
     if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return false
     return enabledJson.sm_kassa_op_rekening === true
   }
+  /** Vysion Music — aan op kassa-POS tenzij expliciet uit. */
+  if (subId === 'sm_kassa_muziek') {
+    if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return parentModuleOn
+    if (enabledJson.sm_kassa_muziek === false) return false
+    return parentModuleOn
+  }
   if (subId === 'sm_rpt_kasboek') return kasboekSubmenuVisible(enabledJson)
   if (subId === 'sm_inst_boekhouding') return boekhoudingSubmenuVisible(enabledJson)
   return false
@@ -397,8 +403,16 @@ export function isShopAdminRetailKassaPosPath(pathnameNormalized: string, tenant
 export function isShopAdminAnyPosPath(pathnameNormalized: string, tenantSlug: string): boolean {
   return (
     isShopAdminKassaPosPath(pathnameNormalized, tenantSlug) ||
-    isShopAdminRetailKassaPosPath(pathnameNormalized, tenantSlug)
+    isShopAdminRetailKassaPosPath(pathnameNormalized, tenantSlug) ||
+    isShopAdminVysionMusicPath(pathnameNormalized, tenantSlug)
   )
+}
+
+/** Vysion Music — fullscreen player (zelfde chrome-gedrag als kassa-POS). */
+export function isShopAdminVysionMusicPath(pathnameNormalized: string, tenantSlug: string): boolean {
+  const base = `/shop/${tenantSlug}/admin/music`
+  const p = pathnameNormalized.split('?')[0].replace(/\/+$/, '')
+  return p === base
 }
 
 /**
@@ -549,6 +563,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   ) {
     return { kind: 'module', module: 'retail-kassa'}
   }
+  if (rest.startsWith('/music')) return { kind: 'module', module: 'kassa'}
   if (rest.startsWith('/kassa-terminal')) return { kind: 'module', module: 'kassa'}
   if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa'}
   if (rest.startsWith('/voorraad')) return { kind: 'module', module: 'voorraad'}

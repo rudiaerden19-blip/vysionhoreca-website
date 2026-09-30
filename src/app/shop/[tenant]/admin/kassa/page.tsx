@@ -4881,6 +4881,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           href: `${baseUrl}/bestellingen`,
           submenuId: 'sm_orders_bestellingen',
         },
+        {
+          key: 'music',
+          labelKey: 'kassaApp.quickMenuMusic',
+          kind: 'nav' as const,
+          href: `${baseUrl}/music`,
+          submenuId: 'sm_kassa_muziek',
+        },
       ],
     [baseUrl, kassaNameAccountV2],
   )

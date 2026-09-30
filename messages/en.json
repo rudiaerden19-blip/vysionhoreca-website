@@ -4084,6 +4084,7 @@
     "quickMenuOpeningHours": "Opening hours",
     "quickMenuShopProfile": "Business profile",
     "quickMenuOrders": "Orders",
+    "quickMenuMusic": "Music",
     "quickMenuOpenDrawer": "Open drawer",
     "parkedOnTableSection": "Already on table",
     "cartNewLinesSection": "New order",
@@ -6096,6 +6097,7 @@
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "POS terminal",
       "sm_kassa_op_rekening": "On account",
+      "sm_kassa_muziek": "Music (Vysion Music)",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",
@@ -6802,5 +6804,25 @@
         "5": "Checkout, card and reports on one screen"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "POS",
+    "nowPlaying": "NOW PLAYING",
+    "playlistTitle": "PLAYLIST (NOW PLAYING)",
+    "searchPlaceholder": "Search…",
+    "searchClear": "Clear",
+    "resultsPrefix": "RESULTS",
+    "resultsEmpty": "RESULTS",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "prev": "Previous",
+    "next": "Next",
+    "online": "online",
+    "offline": "offline",
+    "loading": "Loading…",
+    "errorLoad": "Could not load music status.",
+    "errorControl": "Control failed.",
+    "errorNetwork": "Network error."
   }
 }

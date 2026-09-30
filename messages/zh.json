@@ -3501,6 +3501,7 @@
     "quickMenuOpeningHours": "营业时间",
     "quickMenuShopProfile": "店铺资料",
     "quickMenuOrders": "订单",
+    "quickMenuMusic": "音乐",
     "quickMenuOpenDrawer": "打开钱箱",
     "parkedOnTableSection": "已在餐桌",
     "cartNewLinesSection": "新点单",
@@ -6137,6 +6138,7 @@
       "sm_kassa_labels": "Labels",
       "sm_kassa_terminal": "收银终端",
       "sm_kassa_op_rekening": "记账",
+      "sm_kassa_muziek": "音乐 (Vysion Music)",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Customers",
       "sm_online_beloningen": "Rewards",
@@ -6843,5 +6845,25 @@
         "5": "Checkout, card and reports on one screen"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "收银",
+    "nowPlaying": "正在播放",
+    "playlistTitle": "播放列表（当前）",
+    "searchPlaceholder": "搜索…",
+    "searchClear": "清除",
+    "resultsEmpty": "结果",
+    "play": "播放",
+    "pause": "暂停",
+    "stop": "停止",
+    "prev": "上一首",
+    "next": "下一首",
+    "online": "在线",
+    "offline": "离线",
+    "loading": "加载中…",
+    "errorLoad": "无法加载状态。",
+    "errorControl": "控制失败。",
+    "errorNetwork": "网络错误。",
+    "resultsPrefix": "结果"
   }
 }

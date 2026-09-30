@@ -3501,6 +3501,7 @@
     "quickMenuOpeningHours": "Horario",
     "quickMenuShopProfile": "Perfil del local",
     "quickMenuOrders": "Pedidos",
+    "quickMenuMusic": "Música",
     "quickMenuOpenDrawer": "Abrir cajón",
     "parkedOnTableSection": "Ya en la mesa",
     "cartNewLinesSection": "Nuevo pedido",
@@ -6137,6 +6138,7 @@
       "sm_kassa_labels": "Etiquetas",
       "sm_kassa_terminal": "Terminal TPV",
       "sm_kassa_op_rekening": "A cuenta",
+      "sm_kassa_muziek": "Música (Vysion Music)",
       "sm_online_status": "Online on/off",
       "sm_online_klanten": "Clientes",
       "sm_online_beloningen": "Recompensas",
@@ -6843,5 +6845,25 @@
         "5": "Caja, tarjeta e informes en una pantalla"
       }
     }
+  },
+  "vysionMusic": {
+    "backToKassa": "Caja",
+    "nowPlaying": "AHORA SUENA",
+    "playlistTitle": "LISTA (AHORA)",
+    "searchPlaceholder": "Buscar…",
+    "searchClear": "Borrar",
+    "resultsEmpty": "RESULTADOS",
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "stop": "Detener",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "online": "en línea",
+    "offline": "desconectado",
+    "loading": "Cargando…",
+    "errorLoad": "No se pudo cargar el estado.",
+    "errorControl": "Control fallido.",
+    "errorNetwork": "Error de red.",
+    "resultsPrefix": "RESULTADOS"
   }
 }
