@@ -1,12 +1,14 @@
 .root {
   --vm-bg: #050505;
-  /* Mockup-blauw — dieper dan sky/cyan (#0095ff), geen glow-lichtblauw */
-  --vm-accent: #0078d4;
-  --vm-accent-rgb: 0, 120, 212;
-  --vm-accent-deep: #0062ad;
-  --vm-accent-deeper: #004d88;
-  --vm-accent-panel: #152738;
-  --vm-accent-track-off: #1a2f45;
+  /* Accent = Elvis/mockup (#0084ff). Afb.2 = rij/panel (#192837). Geen cyan-glow. */
+  --vm-accent: #0084ff;
+  --vm-accent-rgb: 0, 132, 255;
+  --vm-accent-deep: #006ccc;
+  --vm-accent-deeper: #005499;
+  --vm-accent-panel: #192837;
+  /* Koppen / logo-tekst (mockup staal #152738) — niet voor knoppen/slider */
+  --vm-text-accent: #152738;
+  --vm-accent-track-off: #243648;
   --vm-icon-on-dark: #f4f8fc;
   --vm-text: #ffffff;
   --vm-muted: #9ca3af;
@@ -104,7 +106,7 @@
   display: inline-flex;
   width: 1.05em;
   height: 1.05em;
-  border: 2px solid var(--vm-accent);
+  border: 2px solid var(--vm-text-accent);
   border-radius: 50%;
   vertical-align: middle;
   margin: 0 0.02em;
@@ -119,7 +121,7 @@
 
 .brandMusic {
   font-size: 1.35rem;
-  color: var(--vm-accent);
+  color: var(--vm-text-accent);
   font-weight: 700;
 }
 
@@ -249,7 +251,7 @@
 }
 
 .nowLabel {
-  color: var(--vm-accent);
+  color: var(--vm-text-accent);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -268,7 +270,7 @@
 }
 
 .trackArtist {
-  color: var(--vm-accent);
+  color: var(--vm-text-accent);
   font-size: clamp(1.15rem, 2vw, 1.45rem);
   font-weight: 600;
   margin: 0 0 0.75rem;
@@ -650,7 +652,7 @@
 }
 
 .panelTitle {
-  color: var(--vm-accent);
+  color: var(--vm-text-accent);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
