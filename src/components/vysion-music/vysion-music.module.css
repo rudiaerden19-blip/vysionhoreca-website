@@ -166,7 +166,8 @@
   width: var(--vm-cover-size);
   height: var(--vm-cover-size);
   border-radius: 4px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   background: #1e293b;
 }
 
