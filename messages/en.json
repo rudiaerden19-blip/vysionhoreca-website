@@ -5305,7 +5305,8 @@
     "create": "Create",
     "free": "FREE",
     "loading": "Loading...",
-    "confirmDeletePromo": "Are you sure you want to delete this promotion?"
+    "confirmDeletePromo": "Are you sure you want to delete this promotion?",
+    "saveFailed": "Could not save promotion. Please try again."
   },
   "reviewsPage": {
     "average": "Average",

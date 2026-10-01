@@ -5029,7 +5029,8 @@
     "create": "Créer",
     "free": "GRATUIT",
     "loading": "Chargement...",
-    "confirmDeletePromo": "Supprimer cette promotion ?"
+    "confirmDeletePromo": "Supprimer cette promotion ?",
+    "saveFailed": "Enregistrement impossible. Réessayez."
   },
   "reviewsPage": {
     "average": "Moyenne",

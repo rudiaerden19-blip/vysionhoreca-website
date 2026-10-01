@@ -61,7 +61,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   }
 
   const handleToggle = async (id: string, currentActive: boolean) => {
-    const success = await togglePromotionActive(id, !currentActive)
+    const success = await togglePromotionActive(id, params.tenant, !currentActive)
     if (success) {
       setPromos(prev => prev.map(p => 
         p.id === id ? { ...p, is_active: !currentActive } : p
@@ -72,7 +72,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   const handleDelete = async (id: string) => {
     if (!(await ask(t('promotiesPage.confirmDeletePromo')))) return
 
-    const success = await deletePromotion(id)
+    const success = await deletePromotion(id, params.tenant)
     if (success) {
       setPromos(prev => prev.filter(p => p.id !== id))
     }
@@ -151,6 +151,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       }
       setShowModal(false)
       setEditingPromo(null)
+    } else {
+      alert(t('promotiesPage.saveFailed'))
     }
     setSaving(false)
   }

@@ -5029,7 +5029,8 @@
     "create": "Erstellen",
     "free": "GRATIS",
     "loading": "Wird geladen...",
-    "confirmDeletePromo": "Diese Promotion wirklich löschen?"
+    "confirmDeletePromo": "Diese Promotion wirklich löschen?",
+    "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen."
   },
   "reviewsPage": {
     "average": "Durchschnitt",

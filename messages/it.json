@@ -5006,7 +5006,8 @@
     "create": "Crea",
     "free": "GRATIS",
     "loading": "Caricamento...",
-    "confirmDeletePromo": "Eliminare questa promozione?"
+    "confirmDeletePromo": "Eliminare questa promozione?",
+    "saveFailed": "Impossibile salvare la promozione. Riprova."
   },
   "reviewsPage": {
     "average": "Media",

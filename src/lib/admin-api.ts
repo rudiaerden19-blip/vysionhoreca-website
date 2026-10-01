@@ -1072,17 +1072,17 @@ export interface Promotion {
 }
 
 export async function getPromotions(tenantSlug: string): Promise<Promotion[]> {
-  const { data, error } = await supabase
-    .from('promotions')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('created_at', { ascending: false })
-  
-  if (error) {
-    console.error('Error fetching promotions:', error)
+  const r = await adminDb.select<Promotion[]>('promotions', {
+    tenantSlug,
+    select: '*',
+    match: { tenant_slug: tenantSlug },
+    order: { column: 'created_at', ascending: false },
+  })
+  if (!r.ok) {
+    console.error('Error fetching promotions:', r.error)
     return []
   }
-  return data || []
+  return r.data || []
 }
 
 // Haal alleen actieve promoties op voor de shop (niet verlopen)
@@ -1105,92 +1105,86 @@ export async function getActivePromotions(tenantSlug: string, signal?: AbortSign
   return data || []
 }
 
-export async function savePromotion(promotion: Promotion): Promise<Promotion | null> {
-  if (promotion.id) {
-    // Update existing
-    const { data, error } = await supabase
-      .from('promotions')
-      .update({
-        name: promotion.name,
-        description: promotion.description || null,
-        image_url: promotion.image_url || null,
-        code: promotion.code ? promotion.code.toUpperCase() : null,
-        type: promotion.type,
-        value: promotion.value,
-        product_id: promotion.product_id || null,
-        free_item_id: promotion.free_item_id,
-        min_order_amount: promotion.min_order_amount,
-        max_discount: promotion.max_discount,
-        max_usage: promotion.max_usage,
-        max_usage_per_customer: promotion.max_usage_per_customer,
-        is_active: promotion.is_active,
-        starts_at: promotion.starts_at,
-        expires_at: promotion.expires_at,
-      })
-      .eq('id', promotion.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating promotion:', error)
-      return null
-    }
-    return data
-  } else {
-    // Create new
-    const { data, error } = await supabase
-      .from('promotions')
-      .insert({
-        tenant_slug: promotion.tenant_slug,
-        name: promotion.name,
-        description: promotion.description || null,
-        image_url: promotion.image_url || null,
-        code: promotion.code ? promotion.code.toUpperCase() : null,
-        type: promotion.type,
-        value: promotion.value,
-        product_id: promotion.product_id || null,
-        free_item_id: promotion.free_item_id,
-        min_order_amount: promotion.min_order_amount,
-        max_discount: promotion.max_discount,
-        usage_count: 0,
-        max_usage: promotion.max_usage,
-        max_usage_per_customer: promotion.max_usage_per_customer,
-        is_active: true,
-        starts_at: promotion.starts_at,
-        expires_at: promotion.expires_at,
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating promotion:', error)
-      return null
-    }
-    return data
+function promotionWritePayload(promotion: Promotion, forInsert: boolean): Record<string, unknown> {
+  const base: Record<string, unknown> = {
+    name: promotion.name,
+    description: promotion.description || null,
+    image_url: promotion.image_url || null,
+    code: promotion.code ? promotion.code.toUpperCase() : null,
+    type: promotion.type,
+    value: promotion.value,
+    product_id: promotion.product_id || null,
+    free_item_id: promotion.free_item_id || null,
+    min_order_amount: promotion.min_order_amount ?? 0,
+    max_discount: promotion.max_discount ?? null,
+    max_usage: promotion.max_usage ?? null,
+    max_usage_per_customer: promotion.max_usage_per_customer ?? 1,
+    is_active: forInsert ? (promotion.is_active ?? true) : promotion.is_active,
+    starts_at: promotion.starts_at ?? null,
+    expires_at: promotion.expires_at || null,
   }
+  if (forInsert) {
+    base.usage_count = 0
+    base.tenant_slug = promotion.tenant_slug
+  }
+  return base
 }
 
-export async function togglePromotionActive(id: string, isActive: boolean): Promise<boolean> {
-  const { error } = await supabase
-    .from('promotions')
-    .update({ is_active: isActive })
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error toggling promotion:', error)
+function firstAdminDbRow<T>(data: T | T[] | undefined | null): T | null {
+  if (data == null) return null
+  return Array.isArray(data) ? data[0] ?? null : data
+}
+
+export async function savePromotion(promotion: Promotion): Promise<Promotion | null> {
+  const tenantSlug = promotion.tenant_slug
+  if (promotion.id) {
+    const r = await adminDb.update<Promotion[]>(
+      'promotions',
+      { ...promotionWritePayload(promotion, false), updated_at: new Date().toISOString() },
+      { id: promotion.id, tenant_slug: tenantSlug },
+      { tenantSlug, select: '*' },
+    )
+    if (!r.ok) {
+      console.error('Error updating promotion:', r.error)
+      return null
+    }
+    return firstAdminDbRow(r.data)
+  }
+
+  const r = await adminDb.insert<Promotion[]>(
+    'promotions',
+    promotionWritePayload(promotion, true),
+    { tenantSlug, select: '*' },
+  )
+  if (!r.ok) {
+    console.error('Error creating promotion:', r.error)
+    return null
+  }
+  return firstAdminDbRow(r.data)
+}
+
+export async function togglePromotionActive(
+  id: string,
+  tenantSlug: string,
+  isActive: boolean,
+): Promise<boolean> {
+  const r = await adminDb.update(
+    'promotions',
+    { is_active: isActive, updated_at: new Date().toISOString() },
+    { id, tenant_slug: tenantSlug },
+    { tenantSlug },
+  )
+  if (!r.ok) {
+    console.error('Error toggling promotion:', r.error)
     return false
   }
   return true
 }
 
-export async function deletePromotion(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('promotions')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting promotion:', error)
+export async function deletePromotion(id: string, tenantSlug: string): Promise<boolean> {
+  const r = await adminDb.delete('promotions', { id, tenant_slug: tenantSlug }, { tenantSlug })
+  if (!r.ok) {
+    console.error('Error deleting promotion:', r.error)
     return false
   }
   return true

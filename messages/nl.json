@@ -5305,7 +5305,8 @@
     "create": "Aanmaken",
     "free": "GRATIS",
     "loading": "Laden...",
-    "confirmDeletePromo": "Weet je zeker dat je deze promotie wilt verwijderen?"
+    "confirmDeletePromo": "Weet je zeker dat je deze promotie wilt verwijderen?",
+    "saveFailed": "Opslaan mislukt. Probeer het opnieuw."
   },
   "reviewsPage": {
     "average": "Gemiddeld",

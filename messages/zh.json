@@ -5006,7 +5006,8 @@
     "create": "创建",
     "free": "免费",
     "loading": "加载中...",
-    "confirmDeletePromo": "确定要删除此促销吗？"
+    "confirmDeletePromo": "确定要删除此促销吗？",
+    "saveFailed": "无法保存促销，请重试。"
   },
   "reviewsPage": {
     "average": "平均",

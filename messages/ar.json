@@ -5006,7 +5006,8 @@
     "create": "إنشاء",
     "free": "مجاني",
     "loading": "جاري التحميل...",
-    "confirmDeletePromo": "هل تريد حذف هذا العرض الترويجي؟"
+    "confirmDeletePromo": "هل تريد حذف هذا العرض الترويجي؟",
+    "saveFailed": "تعذّر حفظ العرض. حاول مرة أخرى."
   },
   "reviewsPage": {
     "average": "المعدل",
