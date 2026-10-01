@@ -82,3 +82,17 @@ export function artistDiscoverySearchQueries(query: string): string[] {
   add(`"${q.toUpperCase()}"`)
   return out
 }
+
+/** Snelle eerste paint — max 2 parallelle Soundtrack-calls (geen 6×). */
+export function artistQuickDiscoverySearchQueries(query: string): string[] {
+  const q = query.trim()
+  if (!q) return []
+  const out: string[] = [q]
+  if (q.length >= 2) {
+    const titled = q.charAt(0).toUpperCase() + q.slice(1).toLowerCase()
+    if (titled !== q) out.push(titled)
+  }
+  const upper = q.toUpperCase()
+  if (upper !== q && !out.includes(upper)) out.push(upper)
+  return out.slice(0, 2)
+}

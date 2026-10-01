@@ -1,5 +1,6 @@
 import {
   artistDiscoverySearchQueries,
+  artistQuickDiscoverySearchQueries,
   filterTracksByArtistQuery,
   pickArtistScopedSearchResults,
   prefersArtistOnlySearchResults,
@@ -47,6 +48,11 @@ describe('soundtrack search artist filter', () => {
     expect(abba).toContain('Abba')
     expect(abba).toContain('ABBA')
     expect(abba).toContain('"ABBA"')
+  })
+
+  it('builds at most two quick discovery queries', () => {
+    expect(artistQuickDiscoverySearchQueries('u2')).toEqual(['u2', 'U2'])
+    expect(artistQuickDiscoverySearchQueries('Elvis').length).toBeLessThanOrEqual(2)
   })
 
   it('matches ABBA artist for abba query', () => {

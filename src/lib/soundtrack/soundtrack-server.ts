@@ -1,5 +1,6 @@
 import {
   artistDiscoverySearchQueries,
+  artistQuickDiscoverySearchQueries,
   prefersArtistOnlySearchResults,
   trackArtistMatchesQuery,
   trackArtistNamesMatchQuery,
@@ -16,7 +17,7 @@ export const VYSION_MUSIC_CROSSFADE_SECONDS = 6
 /** Artiest-zoek: volledige catalogus via `full`-scope; `quick` = eerste scherm snel. */
 export const SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS = 3000
 const SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PRIMARY = 100
-const SOUNDTRACK_ARTIST_SEARCH_QUICK_EXTRA_PAGES = 6
+const SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE = 36
 const SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS = 200
 
 export type SoundtrackArtistSearchMode = 'quick' | 'full'
@@ -613,20 +614,25 @@ async function collectArtistScopedTrackSearch(
   const q = artistQuery.trim()
   let collected: SoundtrackTrackRow[] = []
 
-  const discoveryQueries = artistDiscoverySearchQueries(q)
+  const discoveryQueries =
+    mode === 'quick' ? artistQuickDiscoverySearchQueries(q) : artistDiscoverySearchQueries(q)
+  const firstPageSize = mode === 'quick' ? SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE : pageSize
   const firstPages = await Promise.all(
-    discoveryQueries.map((searchQ) => fetchSoundtrackTrackSearchPage(searchQ, pageSize, null)),
+    discoveryQueries.map((searchQ) =>
+      fetchSoundtrackTrackSearchPage(searchQ, firstPageSize, null),
+    ),
   )
   for (const data of firstPages) {
     collected = ingestArtistScopedSearchPage(data, q, collected)
   }
 
+  if (mode === 'quick') {
+    return collected.slice(0, maxResults)
+  }
+
   const primaryQ = discoveryQueries[0] ?? q
   let after = firstPages[0]?.search?.pageInfo?.endCursor ?? null
-  const maxExtraPages =
-    mode === 'quick'
-      ? SOUNDTRACK_ARTIST_SEARCH_QUICK_EXTRA_PAGES
-      : SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PRIMARY
+  const maxExtraPages = SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PRIMARY
 
   for (let page = 0; page < maxExtraPages; page++) {
     if (collected.length >= maxResults) break
@@ -667,9 +673,10 @@ export async function soundtrackSearchTracks(
   let artistScoped: SoundtrackTrackRow[] | null = null
   let after: string | null = null
 
-  const maxPages = 24
+  const maxPages = artistSearchMode === 'quick' ? 1 : 24
+  const generalPageSize = artistSearchMode === 'quick' ? SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE : pageSize
   for (let page = 0; page < maxPages; page++) {
-    const data = await fetchSoundtrackTrackSearchPage(q, pageSize, after)
+    const data = await fetchSoundtrackTrackSearchPage(q, generalPageSize, after)
 
     for (const edge of data.search?.edges ?? []) {
       if (edge.node.__typename !== 'Track') continue

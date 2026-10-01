@@ -225,7 +225,7 @@ export function VysionMusicClient({
       setSearchLoadingMore(false)
       return
     }
-    const id = window.setTimeout(() => void runSearch(trimmed), 220)
+    const id = window.setTimeout(() => void runSearch(trimmed), 100)
     return () => {
       window.clearTimeout(id)
       searchRequestId.current += 1
