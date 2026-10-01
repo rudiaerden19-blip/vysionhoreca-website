@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { safeSessionStorageGet, safeSessionStorageSet } from '@/lib/safe-browser-storage'
 
 export function PageViewTracker() {
   const pathname = usePathname()
@@ -13,10 +14,9 @@ export function PageViewTracker() {
       return
     }
 
-    // Prevent duplicate tracking in same session using sessionStorage
     const sessionKey = `tracked_${pathname}`
-    if (typeof window !== 'undefined' && sessionStorage.getItem(sessionKey)) {
-      return // Already tracked this page in this session
+    if (safeSessionStorageGet(sessionKey)) {
+      return
     }
 
     // Track page view
@@ -32,8 +32,8 @@ export function PageViewTracker() {
         })
         
         // Mark as tracked in session if successful
-        if (response.ok && typeof window !== 'undefined') {
-          sessionStorage.setItem(sessionKey, 'true')
+        if (response.ok) {
+          safeSessionStorageSet(sessionKey, 'true')
         }
       } catch (error) {
         // Silently fail - analytics shouldn't break the site

@@ -4,6 +4,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { getSentryTracesSampleRate } from "@/lib/sentry-traces-sample-rate";
+import { isSessionStorageAccessDeniedError } from "@/lib/safe-browser-storage";
 
 /** Chromium / service worker / extension noise; not actionable app code (no match in repo or deps). */
 function isMatchingIdUpdateNoise(value: unknown): boolean {
@@ -105,6 +106,9 @@ Sentry.init({
   ],
 
   beforeSend(event, hint) {
+    if (isSessionStorageAccessDeniedError(hint.originalException)) {
+      return null;
+    }
     if (isBenignAbortError(hint.originalException)) {
       return null;
     }
@@ -130,6 +134,15 @@ Sentry.init({
       /not a child of this node/i.test(val)
     ) {
       return null;
+    }
+    if (typ === "SecurityError" && typeof val === "string") {
+      if (isSessionStorageAccessDeniedError(val)) {
+        return null;
+      }
+      // Safari / embedded webview bij geblokkeerde storage (zelfde klasse als sessionStorage-deny).
+      if (/^The request was denied\.?$/i.test(val.trim())) {
+        return null;
+      }
     }
     return event;
   },
