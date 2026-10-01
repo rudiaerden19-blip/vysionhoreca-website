@@ -8,11 +8,38 @@ export type WebshopCartLineForPromo = {
   quantity: number
 }
 
+export function normalizePromoProductId(id: string | undefined | null): string {
+  return (id ?? '').trim().toLowerCase()
+}
+
+/** Admin date input (YYYY-MM-DD) → geldig t/m einde van die kalenderdag UTC. */
+export function parsePromotionExpiryDate(expiresAt: string | undefined | null): Date | null {
+  if (!expiresAt?.trim()) return null
+  const t = expiresAt.trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) {
+    return new Date(`${t}T23:59:59.999Z`)
+  }
+  const d = new Date(t)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
+export function promotionExpiresAtEndOfDayIso(dateYmd: string): string {
+  const t = dateYmd.trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(t)) {
+    return `${t}T23:59:59.999Z`
+  }
+  return t
+}
+
 function promoIsCurrentlyValid(promo: Promotion, subtotal: number, now: Date): boolean {
   if (promo.is_active === false) return false
   if (promo.min_order_amount && subtotal < promo.min_order_amount) return false
-  if (promo.expires_at && new Date(promo.expires_at) < now) return false
-  if (promo.starts_at && new Date(promo.starts_at) > now) return false
+  const exp = parsePromotionExpiryDate(promo.expires_at)
+  if (exp && exp < now) return false
+  if (promo.starts_at) {
+    const start = new Date(promo.starts_at)
+    if (!Number.isNaN(start.getTime()) && start.getTime() > now.getTime() + 1000) return false
+  }
   return true
 }
 
@@ -40,9 +67,15 @@ function discountOnProductBase(promo: Promotion, baseSubtotal: number, lineQty: 
   return 0
 }
 
+function cartLinesForPromo(cart: WebshopCartLineForPromo[], productId: string): WebshopCartLineForPromo[] {
+  const want = normalizePromoProductId(productId)
+  if (!want) return []
+  return cart.filter((line) => normalizePromoProductId(line.id) === want)
+}
+
 /**
  * Automatische korting uit actieve tenant-promoties (geen kortingscode).
- * Percentage/fixed/fixedPrice: alleen op gekoppeld product_id, korting op basisprijs — geen opties, geen andere artikelen.
+ * Alleen promoties met product_id voor die tenant; korting op basisprijs van dat product.
  */
 export function calculateAutomaticPromotionDiscount(
   cart: WebshopCartLineForPromo[],
@@ -60,12 +93,10 @@ export function calculateAutomaticPromotionDiscount(
     if (promo.tenant_slug !== tenant) continue
     if (!promoIsCurrentlyValid(promo, subtotal, now)) continue
 
-    if (!promo.product_id) {
-      // Geen auto-korting op hele mand — voorkomt 50% op snacks; order-korting via kortingscode.
-      continue
-    }
+    const productId = promo.product_id?.trim()
+    if (!productId) continue
 
-    const matching = cart.filter((line) => line.id === promo.product_id)
+    const matching = cartLinesForPromo(cart, productId)
     const baseSubtotal = matching.reduce((s, line) => s + lineBaseSubtotal(line), 0)
     const lineQty = matching.reduce((s, line) => s + line.quantity, 0)
     totalDiscount += discountOnProductBase(promo, baseSubtotal, lineQty)

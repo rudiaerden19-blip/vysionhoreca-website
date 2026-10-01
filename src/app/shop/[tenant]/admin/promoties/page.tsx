@@ -114,8 +114,12 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       return
     }
     
-    // Bij fixedPrice moet een product gekozen zijn
-    if (formData.type === 'fixedPrice' && !formData.product_id) {
+    if (
+      (formData.type === 'fixedPrice' ||
+        formData.type === 'percentage' ||
+        formData.type === 'fixed') &&
+      !formData.product_id
+    ) {
       alert(t('promotiesPage.productRequired'))
       return
     }

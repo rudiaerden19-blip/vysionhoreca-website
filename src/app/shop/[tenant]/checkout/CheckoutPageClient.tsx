@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
@@ -18,10 +18,7 @@ import {
   getBelgiumDateString,
   addDaysToBelgiumYMD,
   isDateInExceptionalClosing,
-  getActivePromotions,
-  Promotion,
 } from '@/lib/admin-api'
-import { calculateAutomaticPromotionDiscount } from '@/lib/webshop-promotion-discount'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import {
@@ -90,7 +87,7 @@ export default function CheckoutPageClient({
   const [promoCode, setPromoCode] = useState('')
   const [promoCodeDiscount, setPromoCodeDiscount] = useState(0)
   const [promoError, setPromoError] = useState('')
-  const [activePromotions, setActivePromotions] = useState<Promotion[]>([])
+  const [autoPromoDiscount, setAutoPromoDiscount] = useState(0)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState<number | null>(null)
   const [earnedPoints, setEarnedPoints] = useState(0)
@@ -154,7 +151,7 @@ export default function CheckoutPageClient({
   }, [params.tenant])
 
   useEffect(() => {
-    setActivePromotions([])
+    setAutoPromoDiscount(0)
     setPromoCodeDiscount(0)
     void (async () => {
       await migrateLegacyWebshopLocalStorage(params.tenant)
@@ -196,13 +193,6 @@ export default function CheckoutPageClient({
     setDeliverySettings(delivery)
     setShopStatus(status)
     setExceptionalClosings(closings || [])
-
-    if (tenant?.promotions_enabled !== false) {
-      const promos = await getActivePromotions(params.tenant)
-      setActivePromotions(promos.filter((p) => p.tenant_slug === params.tenant))
-    } else {
-      setActivePromotions([])
-    }
 
     // Eerste beschikbare dag (Brussels) die niet in een uitzonderlijke sluiting valt
     setScheduledDate(firstAvailableScheduledDate(status, closings || []))
@@ -282,12 +272,43 @@ export default function CheckoutPageClient({
 
   const subtotal = cart.reduce((sum, item) => sum + item.totalPrice * item.quantity, 0)
   const deliveryFee = orderType === 'delivery'? (deliverySettings?.delivery_fee || 0) : 0
-  const autoPromoDiscount = useMemo(() => {
-    if (tenantSettings?.promotions_enabled === false || activePromotions.length === 0) return 0
-    const forTenant = activePromotions.filter((p) => p.tenant_slug === params.tenant)
-    if (forTenant.length === 0) return 0
-    return calculateAutomaticPromotionDiscount(cart, forTenant, subtotal, params.tenant)
-  }, [cart, activePromotions, subtotal, tenantSettings?.promotions_enabled, params.tenant])
+  useEffect(() => {
+    if (cart.length === 0 || tenantSettings?.promotions_enabled === false) {
+      setAutoPromoDiscount(0)
+      return
+    }
+    const ac = new AbortController()
+    void (async () => {
+      try {
+        const res = await fetch(
+          `/api/shop/${encodeURIComponent(params.tenant)}/promotion-discount`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store',
+            body: JSON.stringify({
+              cart: cart.map((c) => ({
+                id: c.id,
+                price: c.price,
+                totalPrice: c.totalPrice,
+                quantity: c.quantity,
+              })),
+            }),
+            signal: ac.signal,
+          },
+        )
+        const json = (await res.json()) as { discount?: number }
+        if (!ac.signal.aborted) {
+          setAutoPromoDiscount(Number(json.discount) || 0)
+        }
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return
+        if (!ac.signal.aborted) setAutoPromoDiscount(0)
+      }
+    })()
+    return () => ac.abort()
+  }, [cart, params.tenant, tenantSettings?.promotions_enabled])
+
   const discount = promoCodeDiscount > 0 ? promoCodeDiscount : autoPromoDiscount
   const total = subtotal + deliveryFee - discount
 
@@ -419,6 +440,8 @@ export default function CheckoutPageClient({
           })),
           subtotal: subtotal,
           delivery_fee: orderType === 'delivery'? (deliverySettings?.delivery_fee || 0) : 0,
+          discount_amount: discount > 0 ? discount : 0,
+          discount_code: promoCodeDiscount > 0 && promoCode ? promoCode.toUpperCase() : null,
           tax: 0,
           total: total,
           payment_method: paymentMethod === 'cash'? 'cash': 'online',

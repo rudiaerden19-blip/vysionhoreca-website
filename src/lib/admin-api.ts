@@ -5,6 +5,7 @@ import { buildDefaultDeliverySettingsRow } from '@/lib/tenant-defaults'
 import bcrypt from 'bcryptjs'
 import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api-internal'
 import { adminDb } from './admin-db-client'
+import { promotionExpiresAtEndOfDayIso } from '@/lib/webshop-promotion-discount'
 
 // Belgium calendar / Z-rapport bounds — single implementation in `belgium-date-bounds.ts`
 // (light routes import that module directly to avoid pulling in admin-api).
@@ -1121,7 +1122,9 @@ function promotionWritePayload(promotion: Promotion, forInsert: boolean): Record
     max_usage_per_customer: promotion.max_usage_per_customer ?? 1,
     is_active: forInsert ? (promotion.is_active ?? true) : promotion.is_active,
     starts_at: promotion.starts_at ?? null,
-    expires_at: promotion.expires_at || null,
+    expires_at: promotion.expires_at
+      ? promotionExpiresAtEndOfDayIso(String(promotion.expires_at).slice(0, 10))
+      : null,
   }
   if (forInsert) {
     base.usage_count = 0
