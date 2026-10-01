@@ -426,7 +426,7 @@ export default function MenuPageClient({
       
       setOptionsByProductId(optionsMap)
       setProductsWithOptions(Object.keys(optionsMap).filter(id => (optionsMap[id]?.length ?? 0) > 0))
-      setPromotions(promotionsData)
+      setPromotions(promotionsData.filter((p) => p.tenant_slug === params.tenant))
       setPromotionsEnabled(tenantData?.promotions_enabled !== false)
       
       // Check of tenant bestaat - redirect naar niet gevonden als tenantData null is
