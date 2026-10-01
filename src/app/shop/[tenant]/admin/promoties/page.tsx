@@ -3,7 +3,20 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion, getTenantSettings, saveTenantSettings, getMenuProducts, MenuProduct } from '@/lib/admin-api'
+import {
+  getPromotions,
+  savePromotion,
+  togglePromotionActive,
+  deletePromotion,
+  Promotion,
+  getTenantSettings,
+  saveTenantSettings,
+  getMenuProducts,
+  getMenuCategories,
+  MenuProduct,
+  MenuCategory,
+} from '@/lib/admin-api'
+import { promotionTargetProductIds } from '@/lib/webshop-promotion-discount'
 import MediaPicker from '@/components/MediaPicker'
 import Image from 'next/image'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
@@ -13,6 +26,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [promos, setPromos] = useState<Promotion[]>([])
   const [products, setProducts] = useState<MenuProduct[]>([])
+  const [categories, setCategories] = useState<MenuCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingPromo, setEditingPromo] = useState<Promotion | null>(null)
@@ -24,7 +38,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     image_url: '',
     type: 'fixedPrice'as 'percentage' |  'fixed' |  'freeItem' |  'fixedPrice',
     value: 2,
-    product_id: '',
+    product_ids: [] as string[],
     min_order_amount: 0,
     expires_at: '',
   })
@@ -38,14 +52,16 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     setLoading(true)
     
     // Laad promoties, producten en instellingen
-    const [promosData, productsData, settings] = await Promise.all([
+    const [promosData, productsData, categoriesData, settings] = await Promise.all([
       getPromotions(params.tenant),
       getMenuProducts(params.tenant),
+      getMenuCategories(params.tenant),
       getTenantSettings(params.tenant)
     ])
     
     setPromos(promosData)
     setProducts(productsData.filter(p => p.is_active))
+    setCategories(categoriesData.filter(c => c.is_active))
     setPromotionsEnabled(settings?.promotions_enabled !== false) // Default true
     setLoading(false)
   }
@@ -86,7 +102,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       image_url: '',
       type: 'fixedPrice',
       value: 2,
-      product_id: '',
+      product_ids: [] as string[],
       min_order_amount: 0,
       expires_at: '',
     })
@@ -101,7 +117,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       image_url: promo.image_url || '',
       type: promo.type,
       value: promo.value,
-      product_id: promo.product_id || '',
+      product_ids: promotionTargetProductIds(promo),
       min_order_amount: promo.min_order_amount || 0,
       expires_at: promo.expires_at ? promo.expires_at.split('T')[0] : '',
     })
@@ -118,7 +134,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       (formData.type === 'fixedPrice' ||
         formData.type === 'percentage' ||
         formData.type === 'fixed') &&
-      !formData.product_id
+      formData.product_ids.length === 0
     ) {
       alert(t('promotiesPage.productRequired'))
       return
@@ -126,8 +142,15 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     
     setSaving(true)
     
-    // Vind product naam voor weergave
-    const selectedProduct = products.find(p => p.id === formData.product_id)
+    const selectedProducts = products.filter((p) => p.id && formData.product_ids.includes(p.id))
+    const selectedProduct = selectedProducts[0]
+    const productLabel =
+      selectedProducts.length === 1
+        ? selectedProducts[0]?.name
+        : t('promotiesPage.productsSelectedCount').replace(
+            '{count}',
+            String(selectedProducts.length),
+          )
     
     const promoData: Promotion = {
       id: editingPromo?.id,
@@ -137,8 +160,9 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       image_url: formData.image_url || selectedProduct?.image_url, // Gebruik product foto als geen foto
       type: formData.type,
       value: formData.value,
-      product_id: formData.product_id || undefined,
-      product_name: selectedProduct?.name,
+      product_ids: formData.product_ids,
+      product_id: formData.product_ids[0] || undefined,
+      product_name: productLabel,
       min_order_amount: formData.min_order_amount,
       max_usage_per_customer: 1,
       usage_count: editingPromo?.usage_count || 0,
@@ -476,36 +500,129 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   </div>
                 </div>
 
-                {/* Product koppelen — percentage/fixed op één artikel; leeg = hele bestelling (percentage/fixed) */}
                 {(formData.type === 'fixedPrice' || formData.type === 'percentage' || formData.type === 'fixed') && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('promotiesPage.chooseProduct')}
-                      {formData.type === 'fixedPrice' ? <span className="text-red-500"> *</span> : null}
+                      {t('promotiesPage.chooseProducts')}
+                      <span className="text-red-500"> *</span>
                     </label>
-                    <select
-                      value={formData.product_id}
-                      onChange={(e) => {
-                        const product = products.find(p => p.id === e.target.value)
-                        setFormData(prev => ({ 
-                          ...prev, 
-                          product_id: e.target.value,
-                          name: prev.name || (product ? `${product.name} actie`: ''),
-                          image_url: prev.image_url || product?.image_url || ''
-                        }))
-                      }}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">{t('promotiesPage.selectProduct')}</option>
-                      {products.map(product => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} (normaal €{product.price.toFixed(2)})
-                        </option>
-                      ))}
-                    </select>
-                    {formData.product_id && (
-                      <p className="text-xs text-green-600 mt-1">
-                         {t('promotiesPage.productSelected')}
+                    <p className="text-xs text-gray-500 mb-3">{t('promotiesPage.chooseProductsHint')}</p>
+                    <div className="max-h-56 overflow-y-auto border border-gray-200 rounded-xl divide-y divide-gray-100">
+                      {categories.map((cat) => {
+                        const catProducts = products.filter((p) => p.category_id === cat.id)
+                        if (catProducts.length === 0) return null
+                        const catIds = catProducts.map((p) => p.id!).filter(Boolean)
+                        const allInCat = catIds.every((id) => formData.product_ids.includes(id))
+                        return (
+                          <div key={cat.id} className="p-3">
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <span className="text-sm font-semibold text-gray-800">{cat.name}</span>
+                              <button
+                                type="button"
+                                className="text-xs font-medium text-blue-600 hover:text-blue-800 shrink-0"
+                                onClick={() => {
+                                  setFormData((prev) => {
+                                    const next = new Set(prev.product_ids)
+                                    if (allInCat) {
+                                      catIds.forEach((id) => next.delete(id))
+                                    } else {
+                                      catIds.forEach((id) => next.add(id))
+                                    }
+                                    return { ...prev, product_ids: [...next] }
+                                  })
+                                }}
+                              >
+                                {allInCat
+                                  ? t('promotiesPage.deselectCategory')
+                                  : t('promotiesPage.selectAllInCategory').replace('{category}', cat.name)}
+                              </button>
+                            </div>
+                            <div className="space-y-1.5">
+                              {catProducts.map((product) => {
+                                const pid = product.id!
+                                const checked = formData.product_ids.includes(pid)
+                                return (
+                                  <label
+                                    key={pid}
+                                    className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() => {
+                                        setFormData((prev) => {
+                                          const next = checked
+                                            ? prev.product_ids.filter((id) => id !== pid)
+                                            : [...prev.product_ids, pid]
+                                          const first = products.find((p) => p.id === next[0])
+                                          return {
+                                            ...prev,
+                                            product_ids: next,
+                                            name:
+                                              prev.name ||
+                                              (first && next.length === 1 ? `${first.name} actie` : prev.name),
+                                            image_url: prev.image_url || first?.image_url || '',
+                                          }
+                                        })
+                                      }}
+                                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span>
+                                      {product.name}{' '}
+                                      <span className="text-gray-400">
+                                        (€{product.price.toFixed(2)})
+                                      </span>
+                                    </span>
+                                  </label>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {products.filter((p) => !p.category_id).length > 0 && (
+                        <div className="p-3">
+                          <span className="text-sm font-semibold text-gray-800 block mb-2">
+                            {t('promotiesPage.uncategorizedProducts')}
+                          </span>
+                          <div className="space-y-1.5">
+                            {products
+                              .filter((p) => !p.category_id)
+                              .map((product) => {
+                                const pid = product.id!
+                                const checked = formData.product_ids.includes(pid)
+                                return (
+                                  <label
+                                    key={pid}
+                                    className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() => {
+                                        setFormData((prev) => ({
+                                          ...prev,
+                                          product_ids: checked
+                                            ? prev.product_ids.filter((id) => id !== pid)
+                                            : [...prev.product_ids, pid],
+                                        }))
+                                      }}
+                                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span>{product.name}</span>
+                                  </label>
+                                )
+                              })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {formData.product_ids.length > 0 && (
+                      <p className="text-xs text-green-600 mt-2">
+                        {t('promotiesPage.productsSelectedCount').replace(
+                          '{count}',
+                          String(formData.product_ids.length),
+                        )}
                       </p>
                     )}
                   </div>

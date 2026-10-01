@@ -17,6 +17,22 @@ const basePromo = (over: Partial<Promotion>): Promotion => ({
 })
 
 describe('calculateAutomaticPromotionDiscount', () => {
+  it('past percentage toe op meerdere gekoppelde producten', () => {
+    const promos = [
+      basePromo({
+        product_ids: ['klein-f', 'groot-f'],
+        value: 50,
+        type: 'percentage',
+      }),
+    ]
+    const cart = [
+      { id: 'klein-f', price: 3, totalPrice: 3.6, quantity: 1 },
+      { id: 'groot-f', price: 4, totalPrice: 4, quantity: 1 },
+      { id: 'snack', price: 2.8, totalPrice: 2.8, quantity: 1 },
+    ]
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 10.4, 'any-tenant')).toBe(3.5)
+  })
+
   it('past percentage alleen toe op basisprijs van gekoppeld product', () => {
     const promos = [basePromo({ product_id: 'friet-id', value: 50, type: 'percentage' })]
     const cart = [
@@ -42,6 +58,12 @@ describe('calculateAutomaticPromotionDiscount', () => {
     const promos = [basePromo({ product_id: 'f', type: 'fixedPrice', value: 2 })]
     const cart = [{ id: 'f', price: 3, totalPrice: 3.5, quantity: 1 }]
     expect(calculateAutomaticPromotionDiscount(cart, promos, 3.5, 'any-tenant')).toBe(1)
+  })
+
+  it('matcht tenant_slug met en zonder streepjes', () => {
+    const promos = [basePromo({ tenant_slug: 'frituurconfortje', product_id: 'f', value: 50 })]
+    const cart = [{ id: 'f', price: 4, totalPrice: 4, quantity: 1 }]
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 4, 'frituur-confortje')).toBe(2)
   })
 
   it('negeert promoties van andere tenants', () => {

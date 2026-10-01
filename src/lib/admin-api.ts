@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api-internal'
 import { adminDb } from './admin-db-client'
 import { promotionExpiresAtEndOfDayIso } from '@/lib/webshop-promotion-discount'
+import { tenantSlugQueryVariants } from '@/lib/tenant-slug-variants'
 
 // Belgium calendar / Z-rapport bounds — single implementation in `belgium-date-bounds.ts`
 // (light routes import that module directly to avoid pulling in admin-api).
@@ -1057,7 +1058,9 @@ export interface Promotion {
   image_url?: string // Foto van de aanbieding
   type: 'percentage' |  'fixed' |  'freeItem' |  'fixedPrice'// fixedPrice = vaste prijs voor product
   value: number // Bij fixedPrice = de nieuwe prijs (bijv. 2 voor €2)
-  product_id?: string // Gekoppeld product
+  product_id?: string // Gekoppeld product (legacy / eerste van product_ids)
+  /** Meerdere menu_products (bv. alle frietmaten). */
+  product_ids?: string[]
   product_name?: string // Naam van gekoppeld product (voor weergave)
   free_item_id?: string
   min_order_amount: number
@@ -1072,27 +1075,46 @@ export interface Promotion {
   updated_at?: string
 }
 
+function normalizePromotionRow(row: Promotion): Promotion {
+  const raw = row.product_ids
+  let product_ids: string[] | undefined
+  if (Array.isArray(raw)) {
+    product_ids = raw.map((id) => String(id).trim()).filter(Boolean)
+  }
+  if (!product_ids?.length && row.product_id) {
+    product_ids = [row.product_id]
+  }
+  return { ...row, product_ids }
+}
+
 export async function getPromotions(tenantSlug: string): Promise<Promotion[]> {
+  const variants = tenantSlugQueryVariants(tenantSlug)
   const r = await adminDb.select<Promotion[]>('promotions', {
     tenantSlug,
     select: '*',
-    match: { tenant_slug: tenantSlug },
+    in: { tenant_slug: variants },
     order: { column: 'created_at', ascending: false },
   })
   if (!r.ok) {
     console.error('Error fetching promotions:', r.error)
     return []
   }
-  return r.data || []
+  const rows = r.data || []
+  const byId = new Map<string, Promotion>()
+  for (const row of rows) {
+    if (row.id) byId.set(row.id, normalizePromotionRow(row))
+  }
+  return [...byId.values()]
 }
 
 // Haal alleen actieve promoties op voor de shop (niet verlopen)
 export async function getActivePromotions(tenantSlug: string, signal?: AbortSignal): Promise<Promotion[]> {
   const now = new Date().toISOString()
+  const slugVariants = tenantSlugQueryVariants(tenantSlug)
   const base = supabase
     .from('promotions')
     .select('*')
-    .eq('tenant_slug', tenantSlug)
+    .in('tenant_slug', slugVariants)
     .eq('is_active', true)
     .or(`expires_at.is.null,expires_at.gt.${now}`)
     .order('created_at', { ascending: false })
@@ -1107,6 +1129,11 @@ export async function getActivePromotions(tenantSlug: string, signal?: AbortSign
 }
 
 function promotionWritePayload(promotion: Promotion, forInsert: boolean): Record<string, unknown> {
+  const productIds = (promotion.product_ids ?? [])
+    .map((id) => id?.trim())
+    .filter(Boolean) as string[]
+  const primaryProductId = productIds[0] ?? promotion.product_id?.trim() ?? null
+
   const base: Record<string, unknown> = {
     name: promotion.name,
     description: promotion.description || null,
@@ -1114,7 +1141,8 @@ function promotionWritePayload(promotion: Promotion, forInsert: boolean): Record
     code: promotion.code ? promotion.code.toUpperCase() : null,
     type: promotion.type,
     value: promotion.value,
-    product_id: promotion.product_id || null,
+    product_id: primaryProductId,
+    product_ids: productIds.length > 0 ? productIds : primaryProductId ? [primaryProductId] : [],
     free_item_id: promotion.free_item_id || null,
     min_order_amount: promotion.min_order_amount ?? 0,
     max_discount: promotion.max_discount ?? null,

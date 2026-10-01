@@ -4,6 +4,7 @@ import {
   calculateAutomaticPromotionDiscount,
   type WebshopCartLineForPromo,
 } from '@/lib/webshop-promotion-discount'
+import { tenantSlugQueryVariants } from '@/lib/tenant-slug-variants'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,20 +34,28 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ discount: 0, promoCount: 0 })
   }
 
-  const { data: settings } = await supabase
-    .from('tenant_settings')
-    .select('promotions_enabled')
-    .eq('tenant_slug', tenantSlug)
-    .maybeSingle()
+  const slugVariants = tenantSlugQueryVariants(tenantSlug)
+  let promotionsEnabled = true
+  for (const slug of slugVariants) {
+    const { data: settings } = await supabase
+      .from('tenant_settings')
+      .select('promotions_enabled')
+      .eq('tenant_slug', slug)
+      .maybeSingle()
+    if (settings) {
+      promotionsEnabled = settings.promotions_enabled !== false
+      break
+    }
+  }
 
-  if (settings?.promotions_enabled === false) {
+  if (!promotionsEnabled) {
     return NextResponse.json({ discount: 0, promoCount: 0 })
   }
 
   const { data: promos, error } = await supabase
     .from('promotions')
     .select('*')
-    .eq('tenant_slug', tenantSlug)
+    .in('tenant_slug', slugVariants)
     .eq('is_active', true)
 
   if (error) {

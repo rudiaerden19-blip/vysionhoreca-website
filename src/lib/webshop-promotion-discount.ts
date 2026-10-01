@@ -1,4 +1,5 @@
 import type { Promotion } from '@/lib/admin-api'
+import { tenantSlugsMatch } from '@/lib/tenant-slug-variants'
 
 export type WebshopCartLineForPromo = {
   id: string
@@ -67,10 +68,21 @@ function discountOnProductBase(promo: Promotion, baseSubtotal: number, lineQty: 
   return 0
 }
 
-function cartLinesForPromo(cart: WebshopCartLineForPromo[], productId: string): WebshopCartLineForPromo[] {
-  const want = normalizePromoProductId(productId)
-  if (!want) return []
-  return cart.filter((line) => normalizePromoProductId(line.id) === want)
+/** Gekoppelde producten: product_ids (meerdere) of legacy product_id. */
+export function promotionTargetProductIds(promo: Promotion): string[] {
+  const fromArray = (promo.product_ids ?? []).map((id) => id?.trim()).filter(Boolean) as string[]
+  if (fromArray.length > 0) return fromArray
+  const single = promo.product_id?.trim()
+  return single ? [single] : []
+}
+
+function cartLinesForPromoProducts(
+  cart: WebshopCartLineForPromo[],
+  productIds: string[],
+): WebshopCartLineForPromo[] {
+  if (!productIds.length) return []
+  const wants = new Set(productIds.map((id) => normalizePromoProductId(id)))
+  return cart.filter((line) => wants.has(normalizePromoProductId(line.id)))
 }
 
 /**
@@ -90,16 +102,25 @@ export function calculateAutomaticPromotionDiscount(
   let totalDiscount = 0
 
   for (const promo of promotions) {
-    if (promo.tenant_slug !== tenant) continue
+    if (!tenantSlugsMatch(promo.tenant_slug, tenant)) continue
     if (!promoIsCurrentlyValid(promo, subtotal, now)) continue
 
-    const productId = promo.product_id?.trim()
-    if (!productId) continue
+    const targetIds = promotionTargetProductIds(promo)
+    if (targetIds.length === 0) continue
 
-    const matching = cartLinesForPromo(cart, productId)
-    const baseSubtotal = matching.reduce((s, line) => s + lineBaseSubtotal(line), 0)
-    const lineQty = matching.reduce((s, line) => s + line.quantity, 0)
-    totalDiscount += discountOnProductBase(promo, baseSubtotal, lineQty)
+    const matching = cartLinesForPromoProducts(cart, targetIds)
+    if (matching.length === 0) continue
+
+    if (promo.type === 'fixedPrice') {
+      for (const line of matching) {
+        const base = lineBaseSubtotal(line)
+        totalDiscount += discountOnProductBase(promo, base, line.quantity)
+      }
+    } else {
+      const baseSubtotal = matching.reduce((s, line) => s + lineBaseSubtotal(line), 0)
+      const lineQty = matching.reduce((s, line) => s + line.quantity, 0)
+      totalDiscount += discountOnProductBase(promo, baseSubtotal, lineQty)
+    }
   }
 
   return Math.min(Math.round(totalDiscount * 100) / 100, subtotal)
