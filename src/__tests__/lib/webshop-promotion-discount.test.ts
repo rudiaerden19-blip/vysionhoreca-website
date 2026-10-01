@@ -20,24 +20,30 @@ describe('calculateAutomaticPromotionDiscount', () => {
       { id: 'friet-id', price: 3, totalPrice: 3.6, quantity: 1 },
       { id: 'snack-id', price: 3, totalPrice: 3, quantity: 1 },
     ]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 6.6)).toBe(1.5)
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 6.6, 'any-tenant')).toBe(1.5)
   })
 
   it('past geen order-brede percentage auto-korting toe zonder product_id', () => {
     const promos = [basePromo({ value: 50, type: 'percentage' })]
     const cart = [{ id: 'a', price: 10, totalPrice: 10, quantity: 1 }]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 10)).toBe(0)
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 10, 'any-tenant')).toBe(0)
   })
 
   it('respecteert min_order_amount', () => {
     const promos = [basePromo({ product_id: 'x', min_order_amount: 20, value: 50 })]
     const cart = [{ id: 'x', price: 4, totalPrice: 4, quantity: 1 }]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 4)).toBe(0)
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 4, 'any-tenant')).toBe(0)
   })
 
   it('fixedPrice korting alleen op productbasis', () => {
     const promos = [basePromo({ product_id: 'f', type: 'fixedPrice', value: 2 })]
     const cart = [{ id: 'f', price: 3, totalPrice: 3.5, quantity: 1 }]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 3.5)).toBe(1)
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 3.5, 'any-tenant')).toBe(1)
+  })
+
+  it('negeert promoties van andere tenants', () => {
+    const promos = [basePromo({ tenant_slug: 'other-zaak', product_id: 'f', value: 50 })]
+    const cart = [{ id: 'f', price: 4, totalPrice: 4, quantity: 1 }]
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 4, 'mijn-zaak')).toBe(0)
   })
 })

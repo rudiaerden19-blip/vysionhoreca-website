@@ -154,6 +154,8 @@ export default function CheckoutPageClient({
   }, [params.tenant])
 
   useEffect(() => {
+    setActivePromotions([])
+    setPromoCodeDiscount(0)
     void (async () => {
       await migrateLegacyWebshopLocalStorage(params.tenant)
       await loadData()
@@ -197,7 +199,7 @@ export default function CheckoutPageClient({
 
     if (tenant?.promotions_enabled !== false) {
       const promos = await getActivePromotions(params.tenant)
-      setActivePromotions(promos)
+      setActivePromotions(promos.filter((p) => p.tenant_slug === params.tenant))
     } else {
       setActivePromotions([])
     }
@@ -282,8 +284,10 @@ export default function CheckoutPageClient({
   const deliveryFee = orderType === 'delivery'? (deliverySettings?.delivery_fee || 0) : 0
   const autoPromoDiscount = useMemo(() => {
     if (tenantSettings?.promotions_enabled === false || activePromotions.length === 0) return 0
-    return calculateAutomaticPromotionDiscount(cart, activePromotions, subtotal)
-  }, [cart, activePromotions, subtotal, tenantSettings?.promotions_enabled])
+    const forTenant = activePromotions.filter((p) => p.tenant_slug === params.tenant)
+    if (forTenant.length === 0) return 0
+    return calculateAutomaticPromotionDiscount(cart, forTenant, subtotal, params.tenant)
+  }, [cart, activePromotions, subtotal, tenantSettings?.promotions_enabled, params.tenant])
   const discount = promoCodeDiscount > 0 ? promoCodeDiscount : autoPromoDiscount
   const total = subtotal + deliveryFee - discount
 

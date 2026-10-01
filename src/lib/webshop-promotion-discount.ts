@@ -48,13 +48,16 @@ export function calculateAutomaticPromotionDiscount(
   cart: WebshopCartLineForPromo[],
   promotions: Promotion[],
   subtotal: number,
+  tenantSlug: string,
   now: Date = new Date(),
 ): number {
-  if (!promotions.length || subtotal <= 0 || cart.length === 0) return 0
+  const tenant = tenantSlug.trim()
+  if (!tenant || !promotions.length || subtotal <= 0 || cart.length === 0) return 0
 
   let totalDiscount = 0
 
   for (const promo of promotions) {
+    if (promo.tenant_slug !== tenant) continue
     if (!promoIsCurrentlyValid(promo, subtotal, now)) continue
 
     if (!promo.product_id) {
