@@ -13,10 +13,13 @@ const API_URL = 'https://api.soundtrackyourbrand.com/v2'
 /** Standaard crossfade in Soundtrack-player (zone settings + skip). */
 export const VYSION_MUSIC_CROSSFADE_SECONDS = 6
 
-/** Artiest-zoek: volledige catalogus (Soundtrack-paginatie), geen cap op ~40. */
+/** Artiest-zoek: volledige catalogus via `full`-scope; `quick` = eerste scherm snel. */
 export const SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS = 3000
-const SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PER_QUERY = 120
+const SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PRIMARY = 100
+const SOUNDTRACK_ARTIST_SEARCH_QUICK_EXTRA_PAGES = 6
 const SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS = 200
+
+export type SoundtrackArtistSearchMode = 'quick' | 'full'
 
 /** Soundtrack `Volume` scalar: 0–16 (niet 0–100). UI gebruikt 0–100%. */
 const SOUNDTRACK_VOLUME_MAX = 16
@@ -600,11 +603,12 @@ function ingestArtistScopedSearchPage(
   return dedupeSearchTrackRows(out)
 }
 
-/** Artiest-zoek: alle Soundtrack-pagina’s per variant tot catalogus op is. */
+/** Artiest-zoek: parallel eerste pages; diep alleen primaire query (niet 6×120 calls). */
 async function collectArtistScopedTrackSearch(
   artistQuery: string,
   maxResults: number,
   pageSize: number,
+  mode: SoundtrackArtistSearchMode,
 ): Promise<SoundtrackTrackRow[]> {
   const q = artistQuery.trim()
   let collected: SoundtrackTrackRow[] = []
@@ -617,18 +621,21 @@ async function collectArtistScopedTrackSearch(
     collected = ingestArtistScopedSearchPage(data, q, collected)
   }
 
-  for (let vi = 0; vi < discoveryQueries.length; vi++) {
+  const primaryQ = discoveryQueries[0] ?? q
+  let after = firstPages[0]?.search?.pageInfo?.endCursor ?? null
+  const maxExtraPages =
+    mode === 'quick'
+      ? SOUNDTRACK_ARTIST_SEARCH_QUICK_EXTRA_PAGES
+      : SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PRIMARY
+
+  for (let page = 0; page < maxExtraPages; page++) {
     if (collected.length >= maxResults) break
-    let after = firstPages[vi]?.search?.pageInfo?.endCursor ?? null
-    for (let page = 0; page < SOUNDTRACK_ARTIST_SEARCH_MAX_PAGES_PER_QUERY - 1; page++) {
-      if (collected.length >= maxResults) break
-      if (!after) break
-      const data = await fetchSoundtrackTrackSearchPage(discoveryQueries[vi], pageSize, after)
-      collected = ingestArtistScopedSearchPage(data, q, collected)
-      const pi = data.search?.pageInfo
-      if (!pi?.hasNextPage || !pi.endCursor) break
-      after = pi.endCursor
-    }
+    if (!after) break
+    const data = await fetchSoundtrackTrackSearchPage(primaryQ, pageSize, after)
+    collected = ingestArtistScopedSearchPage(data, q, collected)
+    const pi = data.search?.pageInfo
+    if (!pi?.hasNextPage || !pi.endCursor) break
+    after = pi.endCursor
   }
 
   return collected.slice(0, maxResults)
@@ -637,7 +644,11 @@ async function collectArtistScopedTrackSearch(
 /** Soundtrack search met paginatie; artiest-query → volledige gefilterde lijst. */
 export async function soundtrackSearchTracks(
   query: string,
-  opts?: { maxResults?: number; pageSize?: number },
+  opts?: {
+    maxResults?: number
+    pageSize?: number
+    artistSearchMode?: SoundtrackArtistSearchMode
+  },
 ): Promise<SoundtrackTrackRow[]> {
   const q = query.trim()
   if (!q) return []
@@ -646,9 +657,10 @@ export async function soundtrackSearchTracks(
   const hardCap = artistOnly ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS : SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS
   const maxResults = Math.min(Math.max(opts?.maxResults ?? defaultMax, 1), hardCap)
   const pageSize = Math.min(Math.max(opts?.pageSize ?? 50, 1), 50)
+  const artistSearchMode = opts?.artistSearchMode ?? 'quick'
 
   if (artistOnly) {
-    return collectArtistScopedTrackSearch(q, maxResults, pageSize)
+    return collectArtistScopedTrackSearch(q, maxResults, pageSize, artistSearchMode)
   }
 
   let collected: SoundtrackTrackRow[] = []

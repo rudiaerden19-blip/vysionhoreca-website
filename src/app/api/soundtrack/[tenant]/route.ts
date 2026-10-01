@@ -24,13 +24,16 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
-    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-    await ensureSoundZoneCrossfadeSettings(zoneId)
     const q = request.nextUrl.searchParams.get('q')
     if (q != null && q !== '') {
-      const tracks = await soundtrackSearchTracks(q)
+      const scope = request.nextUrl.searchParams.get('scope')
+      const artistSearchMode = scope === 'full' ? 'full' : 'quick'
+      const tracks = await soundtrackSearchTracks(q, { artistSearchMode })
       return NextResponse.json({ ok: true, search: { query: q, tracks } })
     }
+
+    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    await ensureSoundZoneCrossfadeSettings(zoneId)
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, snapshot })
   } catch (e) {

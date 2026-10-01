@@ -85,6 +85,7 @@ export function VysionMusicClient({
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<TrackRow[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
+  const [searchLoadingMore, setSearchLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [switchingTrack, setSwitchingTrack] = useState(false)
@@ -136,42 +137,61 @@ export function VysionMusicClient({
       if (!trimmed) {
         setSearchResults([])
         setSearchLoading(false)
+        setSearchLoadingMore(false)
         return
       }
 
       const reqId = ++searchRequestId.current
       setSearchLoading(true)
+      setSearchLoadingMore(false)
       setSearchResults([])
 
       const stillCurrent = () =>
         reqId === searchRequestId.current && trimmed === searchQueryRef.current.trim()
 
-      try {
-        const res = await fetch(`${apiBase}?q=${encodeURIComponent(trimmed)}`, {
-          headers: getAuthHeaders(),
-          cache: 'no-store',
-          signal: ac.signal,
-        })
+      const fetchScope = async (scope: 'quick' | 'full') => {
+        const res = await fetch(
+          `${apiBase}?q=${encodeURIComponent(trimmed)}&scope=${scope}`,
+          {
+            headers: getAuthHeaders(),
+            cache: 'no-store',
+            signal: ac.signal,
+          },
+        )
         const json = (await res.json()) as {
           search?: { tracks: TrackRow[] }
           error?: string
         }
-        if (!stillCurrent()) return
-        if (!res.ok) {
-          setSearchResults([])
-          return
-        }
+        if (!stillCurrent()) return null
+        if (!res.ok) return []
         let tracks = json.search?.tracks ?? []
         if (prefersArtistOnlySearchResults(trimmed)) {
           tracks = filterTracksByArtistQuery(tracks, trimmed)
         }
-        setSearchResults(tracks)
+        return tracks
+      }
+
+      try {
+        const quickTracks = await fetchScope('quick')
+        if (quickTracks == null) return
+        setSearchResults(quickTracks)
+        setSearchLoading(false)
+
+        if (prefersArtistOnlySearchResults(trimmed)) {
+          setSearchLoadingMore(true)
+          const fullTracks = await fetchScope('full')
+          if (fullTracks == null) return
+          setSearchResults(fullTracks)
+        }
       } catch (e) {
         if (e instanceof DOMException && e.name === 'AbortError') return
         if (!stillCurrent()) return
         setSearchResults([])
       } finally {
-        if (stillCurrent()) setSearchLoading(false)
+        if (stillCurrent()) {
+          setSearchLoading(false)
+          setSearchLoadingMore(false)
+        }
       }
     },
     [apiBase],
@@ -202,6 +222,7 @@ export function VysionMusicClient({
       searchAbortRef.current?.abort()
       setSearchResults([])
       setSearchLoading(false)
+      setSearchLoadingMore(false)
       return
     }
     const id = window.setTimeout(() => void runSearch(trimmed), 220)
@@ -587,7 +608,7 @@ export function VysionMusicClient({
             </div>
           </div>
           <div className={styles.panelTitle}>{resultsTitle}</div>
-          {searchLoading && searchQuery.trim() ? (
+          {searchLoading && searchQuery.trim() && searchResults.length === 0 ? (
             <p className={styles.searchLoading}>{t('vysionMusic.loading')}</p>
           ) : null}
           <div className={styles.list}>
@@ -616,6 +637,9 @@ export function VysionMusicClient({
               </button>
             ))}
           </div>
+          {searchLoadingMore && searchQuery.trim() ? (
+            <p className={styles.searchLoadingMore}>{t('vysionMusic.loading')}</p>
+          ) : null}
         </div>
       </div>
 

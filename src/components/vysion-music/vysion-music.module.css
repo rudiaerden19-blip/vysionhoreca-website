@@ -1105,6 +1105,15 @@
   color: var(--vm-muted);
 }
 
+.searchLoadingMore {
+  margin: 0;
+  padding: 0.35rem 0.85rem 0.55rem;
+  font-size: 0.72rem;
+  color: var(--vm-muted);
+  text-align: center;
+  flex-shrink: 0;
+}
+
 .searchInput {
   width: 100%;
   border: none;
