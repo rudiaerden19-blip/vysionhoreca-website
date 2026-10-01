@@ -364,6 +364,7 @@
 
 .nowRight .transport {
   gap: clamp(0.55rem, 1vw, 0.8rem);
+  margin-top: 1cm;
 }
 
 .transportActionsRow {
@@ -373,7 +374,8 @@
   align-items: stretch;
   justify-content: space-between;
   gap: clamp(0.35rem, 1.1vw, 0.6rem);
-  margin-top: 2cm;
+  /* 1cm i.p.v. 2cm: tekst-pills blijven op plek als transport 1cm zakt */
+  margin-top: 1cm;
 }
 
 /* Grijs glas — zelfde oppervlak als rij-play (.rowPlay); rij-play zelf niet wijzigen */
