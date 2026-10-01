@@ -4378,6 +4378,7 @@
     "promoCode": "Codice promo",
     "apply": "Applica",
     "discountApplied": "Sconto applicato!",
+    "promoAutoApplied": "Promozione applicata automaticamente",
     "invalidCode": "Codice promo non valido",
     "codeExpired": "Questo codice è scaduto",
     "minOrderNotReached": "Importo minimo €{amount} non raggiunto",

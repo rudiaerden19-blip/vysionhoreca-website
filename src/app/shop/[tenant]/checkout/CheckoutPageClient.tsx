@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
@@ -18,7 +18,10 @@ import {
   getBelgiumDateString,
   addDaysToBelgiumYMD,
   isDateInExceptionalClosing,
+  getActivePromotions,
+  Promotion,
 } from '@/lib/admin-api'
+import { calculateAutomaticPromotionDiscount } from '@/lib/webshop-promotion-discount'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import {
@@ -85,8 +88,9 @@ export default function CheckoutPageClient({
     notes: '',
   })
   const [promoCode, setPromoCode] = useState('')
-  const [promoDiscount, setPromoDiscount] = useState(0)
+  const [promoCodeDiscount, setPromoCodeDiscount] = useState(0)
   const [promoError, setPromoError] = useState('')
+  const [activePromotions, setActivePromotions] = useState<Promotion[]>([])
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState<number | null>(null)
   const [earnedPoints, setEarnedPoints] = useState(0)
@@ -191,6 +195,13 @@ export default function CheckoutPageClient({
     setShopStatus(status)
     setExceptionalClosings(closings || [])
 
+    if (tenant?.promotions_enabled !== false) {
+      const promos = await getActivePromotions(params.tenant)
+      setActivePromotions(promos)
+    } else {
+      setActivePromotions([])
+    }
+
     // Eerste beschikbare dag (Brussels) die niet in een uitzonderlijke sluiting valt
     setScheduledDate(firstAvailableScheduledDate(status, closings || []))
     
@@ -269,7 +280,11 @@ export default function CheckoutPageClient({
 
   const subtotal = cart.reduce((sum, item) => sum + item.totalPrice * item.quantity, 0)
   const deliveryFee = orderType === 'delivery'? (deliverySettings?.delivery_fee || 0) : 0
-  const discount = promoDiscount
+  const autoPromoDiscount = useMemo(() => {
+    if (tenantSettings?.promotions_enabled === false || activePromotions.length === 0) return 0
+    return calculateAutomaticPromotionDiscount(cart, activePromotions, subtotal)
+  }, [cart, activePromotions, subtotal, tenantSettings?.promotions_enabled])
+  const discount = promoCodeDiscount > 0 ? promoCodeDiscount : autoPromoDiscount
   const total = subtotal + deliveryFee - discount
 
   const canSubmit = () => {
@@ -318,21 +333,21 @@ export default function CheckoutPageClient({
     
     if (error || !data) {
       setPromoError(t('checkoutPage.invalidCode'))
-      setPromoDiscount(0)
+      setPromoCodeDiscount(0)
       return
     }
     
     // Check min order
     if (data.min_order_amount && subtotal < data.min_order_amount) {
       setPromoError(t('checkoutPage.minOrderNotReached').replace('{amount}', data.min_order_amount.toFixed(2)))
-      setPromoDiscount(0)
+      setPromoCodeDiscount(0)
       return
     }
     
     // Check expiry
     if (data.expires_at && new Date(data.expires_at) < new Date()) {
       setPromoError(t('checkoutPage.codeExpired'))
-      setPromoDiscount(0)
+      setPromoCodeDiscount(0)
       return
     }
     
@@ -347,7 +362,7 @@ export default function CheckoutPageClient({
       discountAmount = data.value
     }
     
-    setPromoDiscount(discountAmount)
+    setPromoCodeDiscount(discountAmount)
     setPromoError('')
   }
 
@@ -414,7 +429,7 @@ export default function CheckoutPageClient({
       }
       
       // Update promo usage if used
-      if (promoDiscount > 0 && promoCode) {
+      if (discount > 0 && promoCode) {
         await supabase
           .from('promotions')
           .update({ usage_count: supabase.rpc('increment_usage') })
@@ -994,7 +1009,12 @@ export default function CheckoutPageClient({
                   </button>
                 </div>
                 {promoError && <p className="text-red-500 text-sm mt-2">{promoError}</p>}
-                {promoDiscount > 0 && <p className="text-green-600 text-sm mt-2"> {t('checkoutPage.discountApplied')}</p>}
+                {promoCodeDiscount > 0 && (
+                  <p className="text-green-600 text-sm mt-2">{t('checkoutPage.discountApplied')}</p>
+                )}
+                {promoCodeDiscount === 0 && autoPromoDiscount > 0 && (
+                  <p className="text-green-600 text-sm mt-2">{t('checkoutPage.promoAutoApplied')}</p>
+                )}
               </div>
 
               {/* Totals */}

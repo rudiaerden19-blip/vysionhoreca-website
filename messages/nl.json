@@ -4926,6 +4926,7 @@
     "promoCode": "Kortingscode",
     "apply": "Toepassen",
     "discountApplied": "Korting toegepast!",
+    "promoAutoApplied": "Actiepromotie automatisch toegepast",
     "invalidCode": "Ongeldige kortingscode",
     "codeExpired": "Deze code is verlopen",
     "minOrderNotReached": "Minimumbedrag €{amount} niet bereikt",

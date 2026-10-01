@@ -4926,6 +4926,7 @@
     "promoCode": "Promo code",
     "apply": "Apply",
     "discountApplied": "Discount applied!",
+    "promoAutoApplied": "Promotion applied automatically",
     "invalidCode": "Invalid promo code",
     "codeExpired": "This code has expired",
     "minOrderNotReached": "Minimum amount €{amount} not reached",

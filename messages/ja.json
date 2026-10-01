@@ -4378,6 +4378,7 @@
     "promoCode": "プロモーションコード",
     "apply": "適用",
     "discountApplied": "割引適用済み！",
+    "promoAutoApplied": "プロモーションが自動適用されました",
     "invalidCode": "無効なコード",
     "codeExpired": "このコードは期限切れです",
     "minOrderNotReached": "最低金額 €{amount} に達していません",

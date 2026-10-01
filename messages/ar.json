@@ -4378,6 +4378,7 @@
     "promoCode": "رمز ترويجي",
     "apply": "تطبيق",
     "discountApplied": "تم تطبيق الخصم!",
+    "promoAutoApplied": "تم تطبيق العرض تلقائياً",
     "invalidCode": "رمز ترويجي غير صالح",
     "codeExpired": "انتهت صلاحية هذا الرمز",
     "minOrderNotReached": "لم يتم الوصول للحد الأدنى €{amount}",

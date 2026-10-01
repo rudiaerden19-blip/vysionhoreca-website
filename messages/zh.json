@@ -4378,6 +4378,7 @@
     "promoCode": "优惠码",
     "apply": "应用",
     "discountApplied": "优惠已应用！",
+    "promoAutoApplied": "已自动应用促销",
     "invalidCode": "无效的优惠码",
     "codeExpired": "此优惠码已过期",
     "minOrderNotReached": "未达到最低金额 €{amount}",

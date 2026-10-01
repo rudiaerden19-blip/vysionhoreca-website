@@ -472,11 +472,12 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   </div>
                 </div>
 
-                {/* Product selectie - alleen voor fixedPrice */}
-                {formData.type === 'fixedPrice' && (
+                {/* Product koppelen — percentage/fixed op één artikel; leeg = hele bestelling (percentage/fixed) */}
+                {(formData.type === 'fixedPrice' || formData.type === 'percentage' || formData.type === 'fixed') && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('promotiesPage.chooseProduct')} <span className="text-red-500">*</span>
+                      {t('promotiesPage.chooseProduct')}
+                      {formData.type === 'fixedPrice' ? <span className="text-red-500"> *</span> : null}
                     </label>
                     <select
                       value={formData.product_id}

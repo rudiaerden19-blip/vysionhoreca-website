@@ -863,17 +863,38 @@ export default function MenuPageClient({
                   <div
                     key={promo.id}
                     onClick={() => {
-                      if (linkedProduct && promo.type === 'fixedPrice') {
-                        const promoItem: MenuItem = { ...linkedProduct, name: promo.name, price: promoPrice, is_promo: true }
+                      if (!linkedProduct) return
+                      if (promo.type === 'fixedPrice' || promo.type === 'percentage' || promo.type === 'fixed') {
+                        const unitPrice =
+                          promo.type === 'fixedPrice'
+                            ? promo.value
+                            : promo.type === 'percentage'
+                              ? linkedProduct.price * (1 - promo.value / 100)
+                              : Math.max(0, linkedProduct.price - promo.value)
+                        const promoItem: MenuItem = {
+                          ...linkedProduct,
+                          name: promo.name,
+                          price: unitPrice,
+                          is_promo: true,
+                        }
                         setCart(prev => {
-                          const existing = prev.find(c => c.item.id === linkedProduct.id && c.item.price === promoPrice)
-                          if (existing) return prev.map(c => c.item.id === linkedProduct.id && c.item.price === promoPrice ? { ...c, quantity: c.quantity + 1 } : c)
-                          return [...prev, { item: promoItem, quantity: 1, selectedOptions: [], totalPrice: promoPrice }]
+                          const existing = prev.find(
+                            (c) => c.item.id === linkedProduct.id && c.totalPrice === unitPrice,
+                          )
+                          if (existing) {
+                            return prev.map((c) =>
+                              c === existing ? { ...c, quantity: c.quantity + 1 } : c,
+                            )
+                          }
+                          return [
+                            ...prev,
+                            { item: promoItem, quantity: 1, selectedOptions: [], totalPrice: unitPrice },
+                          ]
                         })
                         setCartOpen(true)
                       }
                     }}
-                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${lite ? '' : `${theme.cardHover} transition-all`} ${linkedProduct ? 'cursor-pointer touch-manipulation': ''} ${!lite && linkedProduct ? 'active:scale-[0.98]': ''}`}
+                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${lite ? '' : `${theme.cardHover} transition-all`} ${linkedProduct && (promo.type === 'fixedPrice' || promo.type === 'percentage' || promo.type === 'fixed') ? 'cursor-pointer touch-manipulation' : ''} ${!lite && linkedProduct && (promo.type === 'fixedPrice' || promo.type === 'percentage' || promo.type === 'fixed') ? 'active:scale-[0.98]' : ''}`}
                   >
                     <div className={`relative h-48 sm:h-52 lg:h-44 xl:h-40 overflow-hidden ${theme.imageBg}`}>
                       {promo.image_url ? (

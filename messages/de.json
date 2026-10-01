@@ -3878,6 +3878,7 @@
     "promoCode": "Rabattcode",
     "apply": "Anwenden",
     "discountApplied": "Rabatt angewendet!",
+    "promoAutoApplied": "Aktion automatisch angewendet",
     "invalidCode": "Ungültiger Rabattcode",
     "codeExpired": "Dieser Code ist abgelaufen",
     "minOrderNotReached": "Mindestbetrag €{amount} nicht erreicht",
