@@ -14,27 +14,30 @@ const basePromo = (over: Partial<Promotion>): Promotion => ({
 })
 
 describe('calculateAutomaticPromotionDiscount', () => {
-  it('past percentage toe op gekoppeld product', () => {
+  it('past percentage alleen toe op basisprijs van gekoppeld product', () => {
     const promos = [basePromo({ product_id: 'friet-id', value: 50, type: 'percentage' })]
-    const cart = [{ id: 'friet-id', totalPrice: 4.1, quantity: 1 }]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 4.1)).toBe(2.05)
+    const cart = [
+      { id: 'friet-id', price: 3, totalPrice: 3.6, quantity: 1 },
+      { id: 'snack-id', price: 3, totalPrice: 3, quantity: 1 },
+    ]
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 6.6)).toBe(1.5)
   })
 
-  it('past percentage toe op hele mand zonder product_id', () => {
-    const promos = [basePromo({ value: 10, type: 'percentage' })]
-    const cart = [{ id: 'a', totalPrice: 10, quantity: 1 }]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 10)).toBe(1)
+  it('past geen order-brede percentage auto-korting toe zonder product_id', () => {
+    const promos = [basePromo({ value: 50, type: 'percentage' })]
+    const cart = [{ id: 'a', price: 10, totalPrice: 10, quantity: 1 }]
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 10)).toBe(0)
   })
 
   it('respecteert min_order_amount', () => {
-    const promos = [basePromo({ min_order_amount: 20, value: 50 })]
-    const cart = [{ id: 'x', totalPrice: 4, quantity: 1 }]
+    const promos = [basePromo({ product_id: 'x', min_order_amount: 20, value: 50 })]
+    const cart = [{ id: 'x', price: 4, totalPrice: 4, quantity: 1 }]
     expect(calculateAutomaticPromotionDiscount(cart, promos, 4)).toBe(0)
   })
 
-  it('kapt korting af op subtotaal', () => {
-    const promos = [basePromo({ value: 100, type: 'percentage' })]
-    const cart = [{ id: 'x', totalPrice: 5, quantity: 1 }]
-    expect(calculateAutomaticPromotionDiscount(cart, promos, 5)).toBe(5)
+  it('fixedPrice korting alleen op productbasis', () => {
+    const promos = [basePromo({ product_id: 'f', type: 'fixedPrice', value: 2 })]
+    const cart = [{ id: 'f', price: 3, totalPrice: 3.5, quantity: 1 }]
+    expect(calculateAutomaticPromotionDiscount(cart, promos, 3.5)).toBe(1)
   })
 })
