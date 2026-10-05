@@ -1,5 +1,6 @@
 'use client'
 
+import './kassa-help-modal-bounds.css'
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'

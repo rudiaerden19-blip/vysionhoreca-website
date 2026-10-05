@@ -1,4 +1,7 @@
-/** Admin-modals: bij open help-video alleen over de POS-kolom (linker helft), niet onder het paneel. */
+/**
+ * Admin-modals: expliciete overlay-class (zie ook admin/kassa-help-modal-bounds.css
+ * voor alle `.fixed.inset-0` wanneer `html[data-kassa-help-open]`).
+ */
 const OVERLAY_BASE =
   'fixed z-[140] flex items-center justify-center bg-black/60 p-4 vysion-admin-modal-overlay'
 

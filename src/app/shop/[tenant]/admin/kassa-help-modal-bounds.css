@@ -1,0 +1,8 @@
+/**
+ * Help-video open = admin in linker helft. fixed inset-0-modals/portals zitten op body
+ * maar moeten niet onder het help-paneel vallen (z-[30] sibling rechts).
+ */
+html[data-kassa-help-open='1'] .fixed.inset-0 {
+  right: 50vw !important;
+  left: 0 !important;
+}
