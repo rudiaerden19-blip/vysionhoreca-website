@@ -9,6 +9,7 @@ import {
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
+import { kassaHelpVideoFillScale } from '@/lib/kassa-help-video-fill-scale'
 
 type Props = {
   tenantSlug: string
@@ -148,16 +149,40 @@ function TopicPlayer({
   onBackToList: () => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [fillScale, setFillScale] = useState(1)
   const step = topic.steps[stepIndex]
   const hint = step ? t(step.hintKey) : ''
   const stepLabel = t('kassaApp.helpVideoStepLabel')
     .replace('{current}', String(stepIndex + 1))
     .replace('{total}', String(topic.steps.length))
 
+  const recomputeFillScale = useCallback(() => {
+    const stage = stageRef.current
+    const video = videoRef.current
+    if (!stage || !video?.videoWidth) return
+    setFillScale(
+      kassaHelpVideoFillScale(
+        stage.clientWidth,
+        stage.clientHeight,
+        video.videoWidth,
+        video.videoHeight,
+      ),
+    )
+  }, [])
+
   useEffect(() => {
     if (!videoSrc || videoFailed) return
     playHelpVideo(videoRef.current)
   }, [videoSrc, videoFailed, stepIndex])
+
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage || !videoSrc || videoFailed) return
+    const ro = new ResizeObserver(() => recomputeFillScale())
+    ro.observe(stage)
+    return () => ro.disconnect()
+  }, [videoSrc, videoFailed, recomputeFillScale])
 
   const enterFullscreen = () => {
     const el = videoRef.current
@@ -183,24 +208,38 @@ function TopicPlayer({
         ) : null}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-2 sm:px-3">
+      <div
+        ref={stageRef}
+        className="relative min-h-0 flex-1 overflow-hidden px-2 sm:px-3"
+      >
         {videoSrc && !videoFailed ? (
-          <div className="w-full overflow-hidden rounded-lg ring-1 ring-white/10 sm:rounded-xl">
-            <video
-              ref={videoRef}
-              key={videoSrc}
-              className="block h-auto w-full max-w-full bg-black"
-              src={videoSrc}
-              controls
-              autoPlay
-              playsInline
-              preload="auto"
-              onLoadedMetadata={(e) => playHelpVideo(e.currentTarget)}
-              onError={onVideoError}
-            />
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            <div
+              className="w-full max-w-full will-change-transform"
+              style={{
+                transform: `scale(${fillScale})`,
+                transformOrigin: 'center center',
+              }}
+            >
+              <video
+                ref={videoRef}
+                key={videoSrc}
+                className="block h-auto w-full bg-black"
+                src={videoSrc}
+                controls
+                autoPlay
+                playsInline
+                preload="auto"
+                onLoadedMetadata={(e) => {
+                  playHelpVideo(e.currentTarget)
+                  recomputeFillScale()
+                }}
+                onError={onVideoError}
+              />
+            </div>
           </div>
         ) : (
-          <div className="flex min-h-[8rem] flex-col items-center justify-center gap-2 rounded-xl bg-white/5 p-4 text-center text-sm text-white/70">
+          <div className="flex h-full min-h-[8rem] flex-col items-center justify-center gap-2 rounded-xl bg-white/5 p-4 text-center text-sm text-white/70">
             <span>{t('kassaApp.helpVideoNoVideoYet')}</span>
           </div>
         )}
