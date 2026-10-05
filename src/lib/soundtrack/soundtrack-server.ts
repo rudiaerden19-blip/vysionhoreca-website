@@ -745,18 +745,6 @@ async function queueTracksOnSoundZone(
   )
 }
 
-async function playQueuedTracksOnSoundZone(zoneId: string, trackIds: string[]): Promise<void> {
-  const filtered = trackIds
-    .map((id) => id.trim())
-    .filter((id) => id && !id.startsWith('placeholder-'))
-  if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
-  await queueTracksOnSoundZone(zoneId, filtered, true)
-  await soundtrackGraphql(
-    `mutation($input: PlayInput!) { play(input: $input) { status } }`,
-    { input: { soundZone: zoneId } },
-  )
-}
-
 export async function soundtrackControl(
   zoneId: string,
   op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack' | 'playPlaylist',
@@ -811,19 +799,17 @@ export async function soundtrackControl(
     }
     case 'playPlaylist': {
       const trackIds = opts?.trackIds ?? []
-      try {
-        const { syncManualPlaylistToSoundtrackLibrary, playSoundtrackPlaylistOnZone } =
-          await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
-        const sourceId = await syncManualPlaylistToSoundtrackLibrary({
-          name: opts?.playlistName ?? '',
-          trackIds,
-          soundtrackPlaylistId: opts?.soundtrackPlaylistId ?? null,
-        })
-        await playSoundtrackPlaylistOnZone(zoneId, sourceId)
-      } catch (manualErr) {
-        console.error('[soundtrack] playPlaylist sync failed, fallback to queue', manualErr)
-        await playQueuedTracksOnSoundZone(zoneId, trackIds)
-      }
+      const filtered = trackIds
+        .map((id) => id.trim())
+        .filter((id) => id && !id.startsWith('placeholder-'))
+      if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
+
+      // Direct afspelen: queue + play (zelfde bewezen pad als playTrack).
+      await queueTracksOnSoundZone(zoneId, filtered, true)
+      await soundtrackGraphql(
+        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+        { input: { soundZone: zoneId } },
+      )
       return
     }
     default:

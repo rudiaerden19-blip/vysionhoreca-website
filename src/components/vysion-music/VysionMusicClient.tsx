@@ -792,14 +792,28 @@ export function VysionMusicClient({
             trackIds: ids,
             playlistName,
             soundtrackPlaylistId: savedSoundtrackPlaylistId,
+            vysionPlaylistId: savedPlaylistId,
           }),
         })
-        const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
+        const json = (await res.json()) as {
+          snapshot?: Snapshot
+          error?: string
+          code?: string
+          soundtrackPlaylistId?: string
+        }
         if (!res.ok) {
           setError(json.error || t('vysionMusic.errorControl'))
         } else {
           setError(null)
           if (json.snapshot) setSnapshot(json.snapshot)
+          if (json.soundtrackPlaylistId && savedPlaylistId) {
+            pinSavedPlaylistView(
+              savedPlaylistId,
+              savedPlaylistName,
+              tracks,
+              json.soundtrackPlaylistId,
+            )
+          }
         }
       } catch {
         setError(t('vysionMusic.errorNetwork'))
@@ -813,7 +827,9 @@ export function VysionMusicClient({
       apiBase,
       draftName,
       loadSnapshot,
+      pinSavedPlaylistView,
       restoreSavedPlaylistView,
+      savedPlaylistId,
       savedPlaylistName,
       savedSoundtrackPlaylistId,
       t,

@@ -1,47 +1,51 @@
 import { SoundtrackApiError, soundtrackGraphql } from '@/lib/soundtrack/soundtrack-server'
 
-let soundtrackAccountIdCache: string | null = null
-let soundtrackMusicLibraryIdCache: string | null = null
+export type SoundtrackAccountContext = {
+  accountId: string
+  musicLibraryId: string
+}
+
+const accountContextByZoneCache = new Map<string, SoundtrackAccountContext>()
 
 function filterTrackIds(trackIds: string[]): string[] {
   return trackIds.map((id) => id.trim()).filter((id) => id && !id.startsWith('placeholder-'))
 }
 
-async function fetchSoundtrackAccountId(): Promise<string> {
-  if (soundtrackAccountIdCache) return soundtrackAccountIdCache
-  const data = await soundtrackGraphql<{
-    me: { accounts: { edges: { node: { id: string } }[] } }
-  }>(`query {
-    me {
-      ... on PublicAPIClient {
-        accounts(first: 1) {
-          edges { node { id } }
-        }
-      }
-    }
-  }`)
-  const id = data.me?.accounts?.edges?.[0]?.node?.id?.trim()
-  if (!id) throw new SoundtrackApiError('Soundtrack account not found')
-  soundtrackAccountIdCache = id
-  return id
-}
+/** Account + music library van de zone (niet “eerste account” van de API-token). */
+export async function resolveSoundtrackAccountContextForZone(
+  zoneId: string,
+): Promise<SoundtrackAccountContext> {
+  const key = zoneId.trim()
+  const cached = accountContextByZoneCache.get(key)
+  if (cached) return cached
 
-async function fetchAccountMusicLibraryId(accountId: string): Promise<string> {
-  if (soundtrackMusicLibraryIdCache) return soundtrackMusicLibraryIdCache
   const data = await soundtrackGraphql<{
-    account: { musicLibrary: { id: string } | null } | null
+    soundZone: {
+      account: { id: string; musicLibrary: { id: string } | null } | null
+    } | null
   }>(
     `query($id: ID!) {
-      account(id: $id) {
-        musicLibrary { id }
+      soundZone(id: $id) {
+        account {
+          id
+          musicLibrary { id }
+        }
       }
     }`,
-    { id: accountId },
+    { id: key },
   )
-  const libId = data.account?.musicLibrary?.id?.trim()
-  if (!libId) throw new SoundtrackApiError('Soundtrack music library not found')
-  soundtrackMusicLibraryIdCache = libId
-  return libId
+
+  const accountId = data.soundZone?.account?.id?.trim()
+  const musicLibraryId = data.soundZone?.account?.musicLibrary?.id?.trim()
+  if (!accountId || !musicLibraryId) {
+    throw new SoundtrackApiError(
+      'Soundtrack account or music library not found for this sound zone',
+    )
+  }
+
+  const ctx = { accountId, musicLibraryId }
+  accountContextByZoneCache.set(key, ctx)
+  return ctx
 }
 
 async function ensurePlaylistInMusicLibrary(
@@ -89,41 +93,35 @@ async function fetchPlaylistSnapshotAndTrackCount(
   }
 }
 
-/** Maakt/werkt manual playlist bij en zet in account music library (zichtbaar in Soundtrack-app). */
-export async function syncManualPlaylistToSoundtrackLibrary(input: {
-  name: string
-  trackIds: string[]
-  soundtrackPlaylistId?: string | null
-}): Promise<string> {
-  const filtered = filterTrackIds(input.trackIds)
-  if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
-
-  const accountId = await fetchSoundtrackAccountId()
-  const musicLibraryId = await fetchAccountMusicLibraryId(accountId)
-  const name = (input.name.trim() || 'Vysion afspeellijst').slice(0, 120)
-
-  let playlistId = input.soundtrackPlaylistId?.trim() || ''
-
-  if (!playlistId) {
-    const created = await soundtrackGraphql<{ createManualPlaylist: { id: string } }>(
-      `mutation($input: CreateManualPlaylistInput!) {
-        createManualPlaylist(input: $input) { id }
-      }`,
-      {
-        input: {
-          ownerId: accountId,
-          name,
-          trackIds: filtered,
-          playbackMode: 'linear',
-        },
+async function createManualPlaylistInLibrary(
+  ctx: SoundtrackAccountContext,
+  name: string,
+  trackIds: string[],
+): Promise<string> {
+  const created = await soundtrackGraphql<{ createManualPlaylist: { id: string } }>(
+    `mutation($input: CreateManualPlaylistInput!) {
+      createManualPlaylist(input: $input) { id }
+    }`,
+    {
+      input: {
+        ownerId: ctx.accountId,
+        name,
+        trackIds,
+        playbackMode: 'linear',
       },
-    )
-    playlistId = created.createManualPlaylist?.id?.trim() || ''
-    if (!playlistId) throw new SoundtrackApiError('Soundtrack playlist create failed')
-    await ensurePlaylistInMusicLibrary(musicLibraryId, playlistId)
-    return playlistId
-  }
+    },
+  )
+  const playlistId = created.createManualPlaylist?.id?.trim() || ''
+  if (!playlistId) throw new SoundtrackApiError('Soundtrack playlist create failed')
+  await ensurePlaylistInMusicLibrary(ctx.musicLibraryId, playlistId)
+  return playlistId
+}
 
+async function updateManualPlaylistTracks(
+  playlistId: string,
+  name: string,
+  trackIds: string[],
+): Promise<void> {
   await soundtrackGraphql(
     `mutation($input: UpdateManualPlaylistInfoInput!) {
       updateManualPlaylist(input: $input) { id }
@@ -142,13 +140,39 @@ export async function syncManualPlaylistToSoundtrackLibrary(input: {
         snapshot: snapshot ?? undefined,
         start: 0,
         length: trackCount,
-        trackIds: filtered,
+        trackIds,
       },
     },
   )
+}
 
-  await ensurePlaylistInMusicLibrary(musicLibraryId, playlistId)
-  return playlistId
+/** Manual playlist in de music library van de zone (zichtbaar in Soundtrack-app). */
+export async function syncManualPlaylistToSoundtrackLibrary(input: {
+  zoneId: string
+  name: string
+  trackIds: string[]
+  soundtrackPlaylistId?: string | null
+}): Promise<string> {
+  const filtered = filterTrackIds(input.trackIds)
+  if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
+
+  const ctx = await resolveSoundtrackAccountContextForZone(input.zoneId)
+  const name = (input.name.trim() || 'Vysion afspeellijst').slice(0, 120)
+
+  let playlistId = input.soundtrackPlaylistId?.trim() || ''
+
+  if (!playlistId) {
+    return createManualPlaylistInLibrary(ctx, name, filtered)
+  }
+
+  try {
+    await updateManualPlaylistTracks(playlistId, name, filtered)
+    await ensurePlaylistInMusicLibrary(ctx.musicLibraryId, playlistId)
+    return playlistId
+  } catch (updateErr) {
+    console.warn('[soundtrack] playlist update failed, recreating manual playlist', updateErr)
+    return createManualPlaylistInLibrary(ctx, name, filtered)
+  }
 }
 
 export async function playSoundtrackPlaylistOnZone(

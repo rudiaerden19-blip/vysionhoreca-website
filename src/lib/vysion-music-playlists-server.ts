@@ -1,4 +1,5 @@
 import { syncManualPlaylistToSoundtrackLibrary } from '@/lib/soundtrack/soundtrack-manual-playlist-sync'
+import { resolveSoundZoneIdForTenant } from '@/lib/soundtrack/soundtrack-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export type VysionMusicPlaylistTrackPayload = {
@@ -60,7 +61,22 @@ function isMissingSoundtrackPlaylistIdColumn(message: string | undefined): boole
   return message.includes('soundtrack_playlist_id')
 }
 
-async function persistSoundtrackPlaylistId(
+async function syncTracksToSoundtrackForTenant(
+  tenantSlug: string,
+  name: string,
+  trackIds: string[],
+  soundtrackPlaylistId: string | null,
+): Promise<string> {
+  const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+  return syncManualPlaylistToSoundtrackLibrary({
+    zoneId,
+    name,
+    trackIds,
+    soundtrackPlaylistId,
+  })
+}
+
+export async function persistVysionPlaylistSoundtrackId(
   tenantSlug: string,
   playlistId: string,
   soundtrackPlaylistId: string,
@@ -106,11 +122,14 @@ export async function syncVysionMusicPlaylistToSoundtrack(
       if (fbErr || !fallback) throw new VysionMusicPlaylistError(fbErr?.message || 'Not found', 500)
       const detail = await getVysionMusicPlaylist(tenantSlug, playlistId)
       if (!detail) throw new VysionMusicPlaylistError('Playlist not found', 404)
-      return syncManualPlaylistToSoundtrackLibrary({
-        name: detail.name,
-        trackIds: detail.tracks.map((t) => t.id),
-        soundtrackPlaylistId: null,
-      })
+      const soundtrackId = await syncTracksToSoundtrackForTenant(
+        tenantSlug,
+        detail.name,
+        detail.tracks.map((t) => t.id),
+        null,
+      )
+      await persistVysionPlaylistSoundtrackId(tenantSlug, playlistId, soundtrackId)
+      return soundtrackId
     }
     throw new VysionMusicPlaylistError(error.message, 500)
   }
@@ -120,12 +139,13 @@ export async function syncVysionMusicPlaylistToSoundtrack(
   if (!detail) throw new VysionMusicPlaylistError('Playlist not found', 404)
 
   try {
-    const soundtrackId = await syncManualPlaylistToSoundtrackLibrary({
-      name: detail.name,
-      trackIds: detail.tracks.map((t) => t.id),
-      soundtrackPlaylistId: (row.soundtrack_playlist_id as string | null) ?? null,
-    })
-    await persistSoundtrackPlaylistId(tenantSlug, playlistId, soundtrackId)
+    const soundtrackId = await syncTracksToSoundtrackForTenant(
+      tenantSlug,
+      detail.name,
+      detail.tracks.map((t) => t.id),
+      (row.soundtrack_playlist_id as string | null) ?? null,
+    )
+    await persistVysionPlaylistSoundtrackId(tenantSlug, playlistId, soundtrackId)
     return soundtrackId
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Soundtrack sync failed'
@@ -364,12 +384,13 @@ export async function saveVysionMusicPlaylist(
   if (tracksErr) throw new VysionMusicPlaylistError(tracksErr.message, 500)
 
   try {
-    const soundtrackId = await syncManualPlaylistToSoundtrackLibrary({
+    const soundtrackId = await syncTracksToSoundtrackForTenant(
+      tenantSlug,
       name,
-      trackIds: input.tracks.map((t) => t.id),
-      soundtrackPlaylistId: existingSoundtrackPlaylistId,
-    })
-    await persistSoundtrackPlaylistId(tenantSlug, playlistId, soundtrackId)
+      input.tracks.map((t) => t.id),
+      existingSoundtrackPlaylistId,
+    )
+    await persistVysionPlaylistSoundtrackId(tenantSlug, playlistId, soundtrackId)
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Soundtrack sync failed'
     throw new VysionMusicPlaylistError(

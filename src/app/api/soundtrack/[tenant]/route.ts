@@ -61,6 +61,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     trackIds?: string[]
     playlistName?: string
     soundtrackPlaylistId?: string | null
+    vysionPlaylistId?: string | null
   }
   try {
     body = (await request.json()) as {
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       trackIds?: string[]
       playlistName?: string
       soundtrackPlaylistId?: string | null
+      vysionPlaylistId?: string | null
     }
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -106,7 +108,38 @@ export async function POST(request: NextRequest, context: RouteContext) {
       op === 'playTrack' || op === 'playPlaylist'
         ? await fetchSoundtrackPlayerSnapshot(zoneId, { historyFirst: 0, padPlaylist: false })
         : await fetchSoundtrackPlayerSnapshot(zoneId)
-    return NextResponse.json({ ok: true, snapshot })
+
+    let soundtrackPlaylistId: string | undefined
+    if (op === 'playPlaylist' && body.trackIds?.length) {
+      try {
+        const { syncManualPlaylistToSoundtrackLibrary } =
+          await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
+        soundtrackPlaylistId = await syncManualPlaylistToSoundtrackLibrary({
+          zoneId,
+          name: body.playlistName ?? '',
+          trackIds: body.trackIds,
+          soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
+        })
+        const vysionPlaylistId = body.vysionPlaylistId?.trim()
+        if (vysionPlaylistId && soundtrackPlaylistId) {
+          const { persistVysionPlaylistSoundtrackId } =
+            await import('@/lib/vysion-music-playlists-server')
+          await persistVysionPlaylistSoundtrackId(
+            tenantSlug,
+            vysionPlaylistId,
+            soundtrackPlaylistId,
+          )
+        }
+      } catch (syncErr) {
+        console.warn('[soundtrack] playPlaylist library sync failed', syncErr)
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      snapshot,
+      ...(soundtrackPlaylistId ? { soundtrackPlaylistId } : {}),
+    })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
