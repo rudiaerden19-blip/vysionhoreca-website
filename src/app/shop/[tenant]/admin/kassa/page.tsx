@@ -5227,7 +5227,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ) : null}
       <div
         className={`relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
-          kassaHelpOpen ? 'w-[60%] max-w-[60%] shrink-0' : 'w-full flex-1 min-w-0'
+          kassaHelpOpen ? 'w-[50%] max-w-[50%] shrink-0' : 'w-full flex-1 min-w-0'
         }`}
       >
       <LogoutSoftwareConfirmModal

@@ -67,7 +67,7 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
 
   return (
     <aside
-      className="flex min-h-0 w-[40%] shrink-0 flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl"
+      className="flex min-h-0 w-[50%] max-w-[50%] shrink-0 flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl"
       data-testid="kassa-help-panel"
       aria-label={t('kassaApp.helpVideoPanelTitle')}
     >
@@ -164,35 +164,32 @@ function TopicPlayer({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <p className="shrink-0 px-3 pt-1.5 text-xs text-white/60 sm:px-4">{stepLabel}</p>
+      <p className="shrink-0 px-2 pt-1 text-[11px] text-white/60 sm:px-3">{stepLabel}</p>
 
-      <div className="flex min-h-0 flex-1 flex-col justify-center px-2 py-1 sm:px-3">
+      <div className="relative mx-1 min-h-0 flex-1 sm:mx-2">
         {videoSrc && !videoFailed ? (
-          /* Volle paneelbreedte, hoogte 16:9 — geen leeg zwart flex-vak met mini-video */
-          <div className="relative w-full overflow-hidden rounded-xl bg-black shadow-lg">
-            <div className="relative w-full pt-[56.25%]">
-              <video
-                ref={videoRef}
-                key={videoSrc}
-                className="absolute inset-0 size-full object-contain"
-                src={videoSrc}
-                controls
-                autoPlay
-                playsInline
-                preload="auto"
-                onLoadedData={(e) => playHelpVideo(e.currentTarget)}
-                onError={onVideoError}
-              />
-            </div>
+          <div className="absolute inset-0 overflow-hidden rounded-lg bg-black shadow-lg sm:rounded-xl">
+            <video
+              ref={videoRef}
+              key={videoSrc}
+              className="size-full object-contain"
+              src={videoSrc}
+              controls
+              autoPlay
+              playsInline
+              preload="auto"
+              onLoadedData={(e) => playHelpVideo(e.currentTarget)}
+              onError={onVideoError}
+            />
           </div>
         ) : (
-          <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
             <span>{t('kassaApp.helpVideoNoVideoYet')}</span>
           </div>
         )}
       </div>
 
-      <div className="max-h-[4.5rem] shrink-0 overflow-y-auto px-3 py-2 text-xs leading-snug text-white/80 sm:px-4 sm:text-sm">
+      <div className="line-clamp-2 shrink-0 px-2 py-1 text-[11px] leading-snug text-white/75 sm:px-3 sm:text-xs">
         {hint}
       </div>
 
