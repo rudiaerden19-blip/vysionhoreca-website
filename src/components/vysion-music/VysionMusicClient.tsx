@@ -642,15 +642,20 @@ export function VysionMusicClient({
   )
 
   const playPlaylistTracks = useCallback(
-    async (tracks: TrackRow[]) => {
+    async (tracks: TrackRow[], nameOverride?: string) => {
       const ids = tracks.map((r) => r.id).filter((id) => id && !id.startsWith('placeholder'))
       if (ids.length === 0) return
+      const playlistName =
+        nameOverride?.trim() ||
+        savedPlaylistName.trim() ||
+        draftName.trim() ||
+        t('vysionMusic.playlistTitle')
       setSwitchingTrack(true)
       try {
         const res = await fetch(apiBase, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ op: 'playPlaylist', trackIds: ids }),
+          body: JSON.stringify({ op: 'playPlaylist', trackIds: ids, playlistName }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
         if (!res.ok) {
@@ -667,7 +672,16 @@ export function VysionMusicClient({
         window.setTimeout(() => void loadSnapshot(), 800)
       }
     },
-    [apiBase, loadSnapshot, t],
+    [apiBase, draftName, loadSnapshot, savedPlaylistName, t],
+  )
+
+  const playSavedPlaylistFromRow = useCallback(
+    (row: TrackRow, rows: TrackRow[]) => {
+      const start = rows.findIndex((r) => r.id === row.id && r.name === row.name)
+      const slice = start >= 0 ? rows.slice(start) : [row]
+      void playPlaylistTracks(slice)
+    },
+    [playPlaylistTracks],
   )
 
   const handleLeftPanelDrop = useCallback(
@@ -1015,7 +1029,11 @@ export function VysionMusicClient({
                     type="button"
                     className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                     disabled={switchingTrack || !row.id || row.id.startsWith('placeholder')}
-                    onClick={() => void playTrackRow(row)}
+                    onClick={() =>
+                      leftPanelMode === 'saved'
+                        ? playSavedPlaylistFromRow(row, savedPlaylistTracks)
+                        : void playTrackRow(row)
+                    }
                   >
                     <span className={styles.rowNum}>{idx + 1}</span>
                     <span className={styles.rowPlay} aria-hidden>

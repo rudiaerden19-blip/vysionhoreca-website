@@ -723,6 +723,79 @@ async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
   )
 }
 
+let soundtrackAccountIdCache: string | null = null
+
+async function fetchSoundtrackAccountId(): Promise<string> {
+  if (soundtrackAccountIdCache) return soundtrackAccountIdCache
+  const data = await soundtrackGraphql<{
+    me: {
+      accounts: { edges: { node: { id: string } }[] }
+    }
+  }>(`query {
+    me {
+      ... on PublicAPIClient {
+        accounts(first: 1) {
+          edges { node { id } }
+        }
+      }
+    }
+  }`)
+  const id = data.me?.accounts?.edges?.[0]?.node?.id?.trim()
+  if (!id) throw new SoundtrackApiError('Soundtrack account not found')
+  soundtrackAccountIdCache = id
+  return id
+}
+
+/** Volledige afspeellijst lineair — queue alleen is onbetrouwbaar t.o.v. schedule. */
+async function playManualPlaylistOnSoundZone(
+  zoneId: string,
+  trackIds: string[],
+  playlistName: string,
+): Promise<void> {
+  const filtered = trackIds.map((id) => id.trim()).filter((id) => id && !id.startsWith('placeholder-'))
+  if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
+
+  const accountId = await fetchSoundtrackAccountId()
+  const name = (playlistName.trim() || 'Vysion afspeellijst').slice(0, 120)
+
+  const created = await soundtrackGraphql<{ createManualPlaylist: { id: string } }>(
+    `mutation($input: CreateManualPlaylistInput!) {
+      createManualPlaylist(input: $input) { id }
+    }`,
+    {
+      input: {
+        ownerId: accountId,
+        name,
+        trackIds: filtered,
+        playbackMode: 'linear',
+      },
+    },
+  )
+  const sourceId = created.createManualPlaylist?.id?.trim()
+  if (!sourceId) throw new SoundtrackApiError('Soundtrack playlist create failed')
+
+  await soundtrackGraphql(
+    `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
+    { input: { soundZone: zoneId, source: sourceId } },
+  )
+
+  try {
+    await soundtrackGraphql(
+      `mutation($input: SoundZoneSetPlaybackOrderInput!) {
+        soundZoneSetPlaybackOrder(input: $input) { __typename }
+      }`,
+      { input: { soundZone: zoneId, playbackOrder: 'LINEAR' } },
+    )
+  } catch {
+    /* Niet elke context ondersteunt playback order na manual playlist. */
+  }
+
+  await soundtrackGraphql(
+    `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+    { input: { soundZone: zoneId } },
+  )
+}
+
 async function queueTracksOnSoundZone(
   zoneId: string,
   trackIds: string[],
@@ -748,7 +821,7 @@ async function queueTracksOnSoundZone(
 export async function soundtrackControl(
   zoneId: string,
   op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack' | 'playPlaylist',
-  opts?: { volume?: number; trackId?: string; trackIds?: string[] },
+  opts?: { volume?: number; trackId?: string; trackIds?: string[]; playlistName?: string },
 ): Promise<void> {
   switch (op) {
     case 'play':
@@ -793,13 +866,7 @@ export async function soundtrackControl(
     }
     case 'playPlaylist': {
       const trackIds = opts?.trackIds ?? []
-      const filtered = trackIds.filter((id) => id && !id.startsWith('placeholder-'))
-      if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
-      await queueTracksOnSoundZone(zoneId, filtered, true)
-      await soundtrackGraphql(
-        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
-        { input: { soundZone: zoneId } },
-      )
+      await playManualPlaylistOnSoundZone(zoneId, trackIds, opts?.playlistName ?? '')
       return
     }
     default:
