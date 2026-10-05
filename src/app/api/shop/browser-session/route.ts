@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import {
+  readWebshopBrowserSessionToken,
+  resolveWebshopTenantSlug,
+  tenantSlugQueryVariants,
+  webshopBrowserSessionCookieName,
+} from '@/lib/webshop-tenant-slug'
 
 export const dynamic = 'force-dynamic'
-
-function cookieName(tenantSlug: string): string {
-  return `vysion_wbs_${tenantSlug.replace(/[^a-zA-Z0-9_-]/g, '_')}`
-}
 
 function cookiePath(_tenantSlug: string): string {
   // Path moet `/` zijn: op *.ordervysion.com staat de URL op `/menu`, `/checkout` (rewrite),
@@ -31,12 +33,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'server_config' }, { status: 500 })
   }
 
-  const tenant_slug = request.nextUrl.searchParams.get('tenant_slug')?.trim()
-  if (!tenant_slug) {
+  const tenantInput = request.nextUrl.searchParams.get('tenant_slug')?.trim()
+  if (!tenantInput) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const token = request.cookies.get(cookieName(tenant_slug))?.value?.trim()
+  const tenant_slug = await resolveWebshopTenantSlug(supabase, tenantInput)
+
+  const token = readWebshopBrowserSessionToken(request, tenantInput)
   if (!token) {
     return NextResponse.json({
       ok: true,
@@ -46,19 +50,24 @@ export async function GET(request: NextRequest) {
     })
   }
 
-  const { data, error } = await supabase
-    .from('webshop_browser_sessions')
-    .select('cart_items, whatsapp_phone, shop_customer_id')
-    .eq('tenant_slug', tenant_slug)
-    .eq('session_token', token)
-    .maybeSingle()
-
-  if (error) {
-    console.error('[shop/browser-session] GET', error)
-    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+  let row: SessionRow | null = null
+  const slugCandidates = [...new Set([tenant_slug, ...tenantSlugQueryVariants(tenantInput)])]
+  for (const slug of slugCandidates) {
+    const { data, error } = await supabase
+      .from('webshop_browser_sessions')
+      .select('cart_items, whatsapp_phone, shop_customer_id')
+      .eq('tenant_slug', slug)
+      .eq('session_token', token)
+      .maybeSingle()
+    if (error) {
+      console.error('[shop/browser-session] GET', error)
+      return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+    }
+    if (data) {
+      row = data as SessionRow
+      break
+    }
   }
-
-  const row = data as SessionRow | null
   return NextResponse.json({
     ok: true,
     cart: normalizeCart(row?.cart_items),
@@ -85,25 +94,35 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const tenant_slug = body.tenant_slug?.trim()
-  if (!tenant_slug) {
+  const tenantInput = body.tenant_slug?.trim()
+  if (!tenantInput) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const cName = cookieName(tenant_slug)
-  let token = request.cookies.get(cName)?.value?.trim()
+  const tenant_slug = await resolveWebshopTenantSlug(supabase, tenantInput)
+
+  const cName = webshopBrowserSessionCookieName(tenantInput)
+  let token = readWebshopBrowserSessionToken(request, tenantInput)
   if (!token) {
     token = crypto.randomUUID()
   }
 
-  const { data: existing } = await supabase
-    .from('webshop_browser_sessions')
-    .select('cart_items, whatsapp_phone, shop_customer_id')
-    .eq('tenant_slug', tenant_slug)
-    .eq('session_token', token)
-    .maybeSingle()
+  let existing: SessionRow | null = null
+  const slugCandidates = [...new Set([tenant_slug, ...tenantSlugQueryVariants(tenantInput)])]
+  for (const slug of slugCandidates) {
+    const { data } = await supabase
+      .from('webshop_browser_sessions')
+      .select('cart_items, whatsapp_phone, shop_customer_id')
+      .eq('tenant_slug', slug)
+      .eq('session_token', token)
+      .maybeSingle()
+    if (data) {
+      existing = data as SessionRow
+      break
+    }
+  }
 
-  const prev = (existing as SessionRow | null) ?? {
+  const prev = existing ?? {
     cart_items: [],
     whatsapp_phone: null,
     shop_customer_id: null,
@@ -140,7 +159,7 @@ export async function PATCH(request: NextRequest) {
     path: cookiePath(tenant_slug),
     maxAge: 60 * 60 * 24 * 30,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: request.nextUrl.protocol === 'https:',
   })
   return res
 }

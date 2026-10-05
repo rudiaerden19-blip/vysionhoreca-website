@@ -3989,6 +3989,7 @@
     "confirmPasswordRequired": "Bitte bestätige dein Passwort",
     "passwordsMismatch": "Passwörter stimmen nicht überein",
     "registrationFailed": "Registrierung fehlgeschlagen",
+    "sessionSaveFailed": "Sitzung konnte nicht gespeichert werden. Bitte erneut anmelden.",
     "myAccount": "Mein Konto",
     "logout": "Abmelden",
     "loyaltyPoints": "Treuepunkte",

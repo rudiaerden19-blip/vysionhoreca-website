@@ -4489,6 +4489,7 @@
     "confirmPasswordRequired": "Confirma tu contraseña",
     "passwordsMismatch": "Las contraseñas no coinciden",
     "registrationFailed": "Error en el registro",
+    "sessionSaveFailed": "No se pudo guardar la sesión. Intente iniciar sesión de nuevo.",
     "myAccount": "Mi Cuenta",
     "logout": "Cerrar sesión",
     "loyaltyPoints": "Puntos de fidelidad",

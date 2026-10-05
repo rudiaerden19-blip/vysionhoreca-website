@@ -4489,6 +4489,7 @@
     "confirmPasswordRequired": "パスワードを確認してください",
     "passwordsMismatch": "パスワードが一致しません",
     "registrationFailed": "登録に失敗しました",
+    "sessionSaveFailed": "セッションを保存できませんでした。再度ログインしてください。",
     "myAccount": "マイアカウント",
     "logout": "ログアウト",
     "loyaltyPoints": "ポイント",

@@ -122,8 +122,15 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
       formData.city
     )
     
-    if (result.success && result.customer) {
-      await patchWebshopBrowserSession(params.tenant, { shop_customer_id: result.customer.id! })
+    if (result.success && result.customer?.id) {
+      const sessionSaved = await patchWebshopBrowserSession(params.tenant, {
+        shop_customer_id: result.customer.id,
+      })
+      if (!sessionSaved) {
+        setGeneralError(t('accountPage.sessionSaveFailed') || 'Account aangemaakt, maar sessie kon niet worden opgeslagen. Log in met je wachtwoord.')
+        setSubmitting(false)
+        return
+      }
       assignTenantHref(params.tenant, '/account')
     } else {
       setGeneralError(result.error || t('accountPage.registrationFailed'))

@@ -5037,6 +5037,7 @@
     "confirmPasswordRequired": "Bevestig je wachtwoord",
     "passwordsMismatch": "Wachtwoorden komen niet overeen",
     "registrationFailed": "Registratie mislukt",
+    "sessionSaveFailed": "Sessie kon niet worden opgeslagen. Probeer opnieuw in te loggen.",
     "myAccount": "Mijn Account",
     "logout": "Uitloggen",
     "loyaltyPoints": "Spaarpunten",

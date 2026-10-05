@@ -1,9 +1,10 @@
 import type { NextRequest } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-
-export function webshopBrowserSessionCookieName(tenantSlug: string): string {
-  return `vysion_wbs_${tenantSlug.replace(/[^a-zA-Z0-9_-]/g, '_')}`
-}
+import {
+  readWebshopBrowserSessionToken,
+  resolveWebshopTenantSlug,
+  tenantSlugQueryVariants,
+} from '@/lib/webshop-tenant-slug'
 
 /** Klant-id uit httpOnly webshop-sessie (zelfde cookie als /api/shop/browser-session). */
 export async function resolveShopCustomerIdFromRequest(
@@ -13,16 +14,23 @@ export async function resolveShopCustomerIdFromRequest(
   const supabase = getServerSupabaseClient()
   if (!supabase) return null
 
-  const token = request.cookies.get(webshopBrowserSessionCookieName(tenantSlug))?.value?.trim()
+  const token = readWebshopBrowserSessionToken(request, tenantSlug)
   if (!token) return null
 
-  const { data, error } = await supabase
-    .from('webshop_browser_sessions')
-    .select('shop_customer_id')
-    .eq('tenant_slug', tenantSlug)
-    .eq('session_token', token)
-    .maybeSingle()
+  const canonical = await resolveWebshopTenantSlug(supabase, tenantSlug)
+  const slugCandidates = [...new Set([canonical, ...tenantSlugQueryVariants(tenantSlug)])]
 
-  if (error || !data?.shop_customer_id) return null
-  return String(data.shop_customer_id)
+  for (const slug of slugCandidates) {
+    const { data, error } = await supabase
+      .from('webshop_browser_sessions')
+      .select('shop_customer_id')
+      .eq('tenant_slug', slug)
+      .eq('session_token', token)
+      .maybeSingle()
+
+    if (error) continue
+    if (data?.shop_customer_id) return String(data.shop_customer_id)
+  }
+
+  return null
 }

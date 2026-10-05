@@ -4489,6 +4489,7 @@
     "confirmPasswordRequired": "请确认您的密码",
     "passwordsMismatch": "两次密码不一致",
     "registrationFailed": "注册失败",
+    "sessionSaveFailed": "无法保存会话，请重新登录。",
     "myAccount": "我的账户",
     "logout": "退出登录",
     "loyaltyPoints": "积分",

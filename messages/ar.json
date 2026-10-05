@@ -4489,6 +4489,7 @@
     "confirmPasswordRequired": "يرجى تأكيد كلمة المرور",
     "passwordsMismatch": "كلمات المرور غير متطابقة",
     "registrationFailed": "فشل التسجيل",
+    "sessionSaveFailed": "تعذر حفظ الجلسة. يرجى تسجيل الدخول مرة أخرى.",
     "myAccount": "حسابي",
     "logout": "تسجيل الخروج",
     "loyaltyPoints": "نقاط الولاء",

@@ -3989,6 +3989,7 @@
     "confirmPasswordRequired": "Veuillez confirmer votre mot de passe",
     "passwordsMismatch": "Les mots de passe ne correspondent pas",
     "registrationFailed": "Échec de l'inscription",
+    "sessionSaveFailed": "Impossible d'enregistrer la session. Veuillez vous reconnecter.",
     "myAccount": "Mon Compte",
     "logout": "Se déconnecter",
     "loyaltyPoints": "Points de fidélité",

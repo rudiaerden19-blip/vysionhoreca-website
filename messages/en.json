@@ -5037,6 +5037,7 @@
     "confirmPasswordRequired": "Please confirm your password",
     "passwordsMismatch": "Passwords do not match",
     "registrationFailed": "Registration failed",
+    "sessionSaveFailed": "Could not save your session. Please try logging in again.",
     "myAccount": "My Account",
     "logout": "Log out",
     "loyaltyPoints": "Loyalty points",

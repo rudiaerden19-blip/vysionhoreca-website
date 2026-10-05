@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { verifyPassword, needsHashUpgrade, type Customer } from '@/lib/admin-api'
+import { resolveWebshopTenantSlug, tenantSlugQueryVariants } from '@/lib/webshop-tenant-slug'
 
 const PUBLIC_CUSTOMER_COLUMNS =
   'id,tenant_slug,email,name,phone,address,postal_code,city,loyalty_points,total_spent,total_orders,is_active,email_verified,created_at,updated_at,last_login,first_name,last_name'
@@ -34,10 +35,13 @@ export async function registerShopCustomerServer(
     return { ok: false, error: 'bad_request' }
   }
 
+  const canonicalSlug = await resolveWebshopTenantSlug(supabase, tenantSlug)
+  const slugVariants = [...new Set([canonicalSlug, ...tenantSlugQueryVariants(tenantSlug)])]
+
   const { data: existing } = await supabase
     .from('shop_customers')
     .select('id')
-    .eq('tenant_slug', tenantSlug)
+    .in('tenant_slug', slugVariants)
     .eq('email', email)
     .maybeSingle()
 
@@ -50,7 +54,7 @@ export async function registerShopCustomerServer(
   const { data, error } = await supabase
     .from('shop_customers')
     .insert({
-      tenant_slug: tenantSlug,
+      tenant_slug: canonicalSlug,
       email,
       password_hash,
       name: input.name.trim(),
@@ -82,10 +86,13 @@ export async function loginShopCustomerServer(
   password: string,
 ): Promise<{ ok: true; customer: PublicShopCustomer } | { ok: false; error: string }> {
   const email = emailRaw.trim().toLowerCase()
+  const canonicalSlug = await resolveWebshopTenantSlug(supabase, tenantSlug)
+  const slugVariants = [...new Set([canonicalSlug, ...tenantSlugQueryVariants(tenantSlug)])]
+
   const { data, error } = await supabase
     .from('shop_customers')
     .select('*')
-    .eq('tenant_slug', tenantSlug)
+    .in('tenant_slug', slugVariants)
     .eq('email', email)
     .maybeSingle()
 
@@ -116,10 +123,13 @@ export async function getShopCustomerByIdServer(
   tenantSlug: string,
   customerId: string,
 ): Promise<PublicShopCustomer | null> {
+  const canonicalSlug = await resolveWebshopTenantSlug(supabase, tenantSlug)
+  const slugVariants = [...new Set([canonicalSlug, ...tenantSlugQueryVariants(tenantSlug)])]
+
   const { data, error } = await supabase
     .from('shop_customers')
     .select(PUBLIC_CUSTOMER_COLUMNS)
-    .eq('tenant_slug', tenantSlug)
+    .in('tenant_slug', slugVariants)
     .eq('id', customerId)
     .maybeSingle()
 
