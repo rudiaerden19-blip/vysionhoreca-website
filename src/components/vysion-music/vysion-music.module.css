@@ -1320,6 +1320,68 @@
   background: rgba(220, 38, 38, 0.15);
 }
 
+.listRowEdit {
+  cursor: default;
+  pointer-events: auto;
+  grid-template-columns: 1.75rem 1fr 1fr 3rem 1.75rem;
+}
+
+.listRowSavedSort {
+  cursor: default;
+  pointer-events: auto;
+}
+
+.listRowDragHandle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.85rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  color: inherit;
+  font: inherit;
+}
+
+.listRowDragHandle:active {
+  cursor: grabbing;
+}
+
+.listRowReorderCol {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.05rem;
+}
+
+.listRowMoveBtn {
+  width: 1.55rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.listRowMoveBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.listRowMoveBtn:not(:disabled):hover {
+  border-color: rgba(148, 163, 184, 0.65);
+  color: #fff;
+}
+
 .playlistModalBackdrop {
   position: fixed;
   inset: 0;

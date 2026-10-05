@@ -31,6 +31,7 @@ import {
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
+import { VysionMusicPlaylistDraftList } from './VysionMusicPlaylistDraftList'
 import { VysionMusicPlaylistsModal } from './VysionMusicPlaylistsModal'
 import { VysionMusicSpotifyImportModal } from './VysionMusicSpotifyImportModal'
 import type { VysionMusicPlaylistSummary } from '@/lib/vysion-music-playlists-server'
@@ -605,6 +606,47 @@ export function VysionMusicClient({
     setDraftTracks(savedPlaylistTracks)
   }, [savedPlaylistId, savedPlaylistName, savedPlaylistTracks])
 
+  const persistSavedPlaylistOrder = useCallback(
+    async (tracks: TrackRow[]) => {
+      const id = savedPlaylistId
+      const name = savedPlaylistName.trim()
+      if (!id || !name || tracks.length === 0) return
+      setSavedPlaylistTracks(tracks)
+      pinSavedPlaylistView(id, name, tracks)
+      try {
+        const res = await fetch(playlistsApiBase, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({
+            id,
+            name,
+            tracks: tracks.map((t) => ({
+              id: t.id,
+              name: t.name,
+              artist: t.artist,
+              durationMs: t.durationMs,
+              imageUrl: t.imageUrl,
+            })),
+          }),
+        })
+        const json = (await res.json()) as {
+          playlist?: { id: string; name: string; tracks: TrackRow[] }
+          error?: string
+          code?: string
+        }
+        if (!res.ok || !json.playlist) {
+          setError(mapPlaylistApiError(json, t, 'vysionMusic.playlistSaveFailed'))
+          return
+        }
+        setError(null)
+        pinSavedPlaylistView(json.playlist.id, json.playlist.name, json.playlist.tracks)
+      } catch {
+        setError(t('vysionMusic.errorNetwork'))
+      }
+    },
+    [pinSavedPlaylistView, playlistsApiBase, savedPlaylistId, savedPlaylistName, t],
+  )
+
   const saveDraftPlaylist = useCallback(async () => {
     const name = draftName.trim()
     if (!name || draftTracks.length === 0) return
@@ -1075,47 +1117,60 @@ export function VysionMusicClient({
             savedPlaylistTracks.length === 0 ? (
               <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistModalEmpty')}</p>
             ) : null}
-            {!savedPlaylistLoading &&
-            leftPanelRows.map((row, idx) => {
-              const active = nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
-              return (
-                <div key={`${row.id}-${idx}`} className={styles.listRowWrap}>
-                  <button
-                    type="button"
-                    className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
-                    disabled={switchingTrack || !row.id || row.id.startsWith('placeholder')}
-                    onClick={() =>
-                      showingSavedPlaylist
-                        ? playSavedPlaylistFromRow(row, savedPlaylistTracks)
-                        : void playTrackRow(row)
-                    }
-                  >
-                    <span className={styles.rowNum}>{idx + 1}</span>
-                    <span className={styles.rowPlay} aria-hidden>
-                      <VmPlay className={styles.rowPlayIcon} filled strokeWidth={0} />
-                    </span>
-                    <span className={styles.rowTitle}>{row.name}</span>
-                    <span className={styles.rowArtist}>{row.artist}</span>
-                    <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
-                    <span className={styles.rowMenu} aria-hidden>
-                      <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
-                    </span>
-                  </button>
-                  {leftPanelMode === 'edit' ? (
-                    <button
-                      type="button"
-                      className={styles.listRowRemove}
-                      aria-label={t('vysionMusic.playlistRemoveTrack')}
-                      onClick={() =>
-                        setDraftTracks((prev) => prev.filter((_, i) => i !== idx))
-                      }
-                    >
-                      ×
-                    </button>
-                  ) : null}
-                </div>
-              )
-            })}
+            {!savedPlaylistLoading && leftPanelMode === 'edit' && draftTracks.length > 0 ? (
+              <VysionMusicPlaylistDraftList
+                mode="edit"
+                tracks={draftTracks}
+                onChange={setDraftTracks}
+                moveUpLabel={t('vysionMusic.playlistMoveUp')}
+                moveDownLabel={t('vysionMusic.playlistMoveDown')}
+                dragLabel={t('vysionMusic.playlistDragReorder')}
+                removeLabel={t('vysionMusic.playlistRemoveTrack')}
+              />
+            ) : null}
+            {!savedPlaylistLoading && showingSavedPlaylist ? (
+              <VysionMusicPlaylistDraftList
+                mode="saved"
+                tracks={savedPlaylistTracks}
+                onChange={(next) => void persistSavedPlaylistOrder(next)}
+                moveUpLabel={t('vysionMusic.playlistMoveUp')}
+                moveDownLabel={t('vysionMusic.playlistMoveDown')}
+                dragLabel={t('vysionMusic.playlistDragReorder')}
+                switchingTrack={switchingTrack}
+                nowTrackId={nowTrack?.id}
+                nowTrackName={nowTrack?.name}
+                onPlayRow={(row) => playSavedPlaylistFromRow(row, savedPlaylistTracks)}
+              />
+            ) : null}
+            {!savedPlaylistLoading && leftPanelMode !== 'edit' && !showingSavedPlaylist
+              ? leftPanelRows.map((row, idx) => {
+                  const active =
+                    nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
+                  return (
+                    <div key={`${row.id}-${idx}`} className={styles.listRowWrap}>
+                      <button
+                        type="button"
+                        className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
+                        disabled={
+                          switchingTrack || !row.id || row.id.startsWith('placeholder')
+                        }
+                        onClick={() => void playTrackRow(row)}
+                      >
+                        <span className={styles.rowNum}>{idx + 1}</span>
+                        <span className={styles.rowPlay} aria-hidden>
+                          <VmPlay className={styles.rowPlayIcon} filled strokeWidth={0} />
+                        </span>
+                        <span className={styles.rowTitle}>{row.name}</span>
+                        <span className={styles.rowArtist}>{row.artist}</span>
+                        <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
+                        <span className={styles.rowMenu} aria-hidden>
+                          <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
+                        </span>
+                      </button>
+                    </div>
+                  )
+                })
+              : null}
           </div>
         </div>
         <div className={styles.panel}>
