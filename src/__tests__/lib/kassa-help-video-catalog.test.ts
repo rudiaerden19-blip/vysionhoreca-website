@@ -18,6 +18,67 @@ describe('kassa-help-video-catalog', () => {
     }
   })
 
+  it('pincode and inventory match Desktop file order', () => {
+    expect(findKassaHelpTopic('pincode')?.steps.map((s) => s.videoPath)).toEqual([
+      'kassa-help/pincode/01.mp4',
+    ])
+    expect(findKassaHelpTopic('inventory')?.steps.map((s) => s.videoPath)).toEqual([
+      'kassa-help/inventory/01.mp4',
+      'kassa-help/inventory/02.mp4',
+    ])
+  })
+
+  it('reports uses Desktop raportages.mp4 as 01.mp4', () => {
+    const topic = findKassaHelpTopic('reports')
+    expect(topic?.steps.map((s) => s.videoPath)).toEqual(['kassa-help/reports/01.mp4'])
+  })
+
+  it('rewards uses single Desktop video 1.mp4 as 01.mp4', () => {
+    const topic = findKassaHelpTopic('rewards')
+    expect(topic?.steps.map((s) => s.videoPath)).toEqual(['kassa-help/rewards/01.mp4'])
+  })
+
+  it('online-toggle videos stay in Desktop order (1.mp4 then 2.mp4)', () => {
+    const topic = findKassaHelpTopic('online-toggle')
+    expect(topic?.steps.map((s) => s.videoPath)).toEqual([
+      'kassa-help/online-toggle/01.mp4',
+      'kassa-help/online-toggle/02.mp4',
+    ])
+  })
+
+  it('options-extras videos stay in Desktop order (1.mp4 through 5.mp4)', () => {
+    const topic = findKassaHelpTopic('options-extras')
+    expect(topic?.steps.map((s) => s.videoPath)).toEqual([
+      'kassa-help/options-extras/01.mp4',
+      'kassa-help/options-extras/02.mp4',
+      'kassa-help/options-extras/03.mp4',
+      'kassa-help/options-extras/04.mp4',
+      'kassa-help/options-extras/05.mp4',
+    ])
+  })
+
+  it('add-product videos stay in Desktop order (1.mp4 through 5.mp4)', () => {
+    const topic = findKassaHelpTopic('add-product')
+    expect(topic?.steps.map((s) => s.videoPath)).toEqual([
+      'kassa-help/add-product/01.mp4',
+      'kassa-help/add-product/02.mp4',
+      'kassa-help/add-product/03.mp4',
+      'kassa-help/add-product/04.mp4',
+      'kassa-help/add-product/05.mp4',
+    ])
+  })
+
+  it('add-category videos stay in Desktop source order (intro then 2–5)', () => {
+    const topic = findKassaHelpTopic('add-category')
+    expect(topic?.steps.map((s) => s.videoPath)).toEqual([
+      'kassa-help/add-category/01.mp4',
+      'kassa-help/add-category/02.mp4',
+      'kassa-help/add-category/03.mp4',
+      'kassa-help/add-category/04.mp4',
+      'kassa-help/add-category/05.mp4',
+    ])
+  })
+
   it('findKassaHelpTopic resolves ids', () => {
     const first = KASSA_HELP_VIDEO_TOPICS[0]
     expect(findKassaHelpTopic(first.id)).toEqual(first)

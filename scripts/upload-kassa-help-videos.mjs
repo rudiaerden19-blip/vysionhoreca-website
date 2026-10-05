@@ -16,14 +16,17 @@ const PRODUCTEN = path.join(DESKTOP, 'PRODUCTEN CATEGORIEN EN OPTIES')
 const MANIFEST = [
   {
     topicId: 'pincode',
+    // Eén video: 1.mp4 → 01.mp4
     files: [{ local: path.join(DESKTOP, 'PIN WIJZIGEN', '1.mp4'), storage: 'kassa-help/pincode/01.mp4' }],
   },
   {
     topicId: 'rewards',
+    // Eén video: 1.mp4 → 01.mp4
     files: [{ local: path.join(DESKTOP, 'BELONINGEN', '1.mp4'), storage: 'kassa-help/rewards/01.mp4' }],
   },
   {
     topicId: 'online-toggle',
+    // Volgorde = 1.mp4 → 2.mp4. Niet hersorteren.
     files: [
       { local: path.join(DESKTOP, 'ONLINE AAN UIT ZETTEN', '1.mp4'), storage: 'kassa-help/online-toggle/01.mp4' },
       { local: path.join(DESKTOP, 'ONLINE AAN UIT ZETTEN', '2.mp4'), storage: 'kassa-help/online-toggle/02.mp4' },
@@ -31,6 +34,7 @@ const MANIFEST = [
   },
   {
     topicId: 'inventory',
+    // Volgorde = 1.mp4 → 2.mp4. Niet hersorteren.
     files: [
       { local: path.join(DESKTOP, 'VOORAAD BEHEER', '1.mp4'), storage: 'kassa-help/inventory/01.mp4' },
       { local: path.join(DESKTOP, 'VOORAAD BEHEER', '2.mp4'), storage: 'kassa-help/inventory/02.mp4' },
@@ -38,20 +42,16 @@ const MANIFEST = [
   },
   {
     topicId: 'reports',
+    // Eén video: raportages.mp4 → 01.mp4 (bestandsnaam behouden op Desktop)
     files: [
-      {
-        local: path.join(DESKTOP, 'RAPPORTEN', 'raportages.mp4'),
-        storage: 'kassa-help/reports/01.mp4',
-      },
+      { local: path.join(DESKTOP, 'RAPPORTEN', 'raportages.mp4'), storage: 'kassa-help/reports/01.mp4' },
     ],
   },
   {
     topicId: 'add-category',
+    // Volgorde = afspeelvolgorde in kassa (stap 1 → 5). Niet hersorteren.
     files: [
-      {
-        local: path.join(PRODUCTEN, 'categorieen', 'intro 1 .mp4'),
-        storage: 'kassa-help/add-category/01.mp4',
-      },
+      { local: path.join(PRODUCTEN, 'categorieen', 'intro 1 .mp4'), storage: 'kassa-help/add-category/01.mp4' },
       { local: path.join(PRODUCTEN, 'categorieen', '2.mp4'), storage: 'kassa-help/add-category/02.mp4' },
       { local: path.join(PRODUCTEN, 'categorieen', '3.mp4'), storage: 'kassa-help/add-category/03.mp4' },
       { local: path.join(PRODUCTEN, 'categorieen', '4.mp4'), storage: 'kassa-help/add-category/04.mp4' },
@@ -60,17 +60,25 @@ const MANIFEST = [
   },
   {
     topicId: 'add-product',
-    files: [1, 2, 3, 4, 5].map((n) => ({
-      local: path.join(PRODUCTEN, 'product toevoegen ', `${n}.mp4`),
-      storage: `kassa-help/add-product/${String(n).padStart(2, '0')}.mp4`,
-    })),
+    // Volgorde = 1.mp4 → 5.mp4 (map heet «product toevoegen » met spatie). Niet hersorteren.
+    files: [
+      { local: path.join(PRODUCTEN, 'product toevoegen ', '1.mp4'), storage: 'kassa-help/add-product/01.mp4' },
+      { local: path.join(PRODUCTEN, 'product toevoegen ', '2.mp4'), storage: 'kassa-help/add-product/02.mp4' },
+      { local: path.join(PRODUCTEN, 'product toevoegen ', '3.mp4'), storage: 'kassa-help/add-product/03.mp4' },
+      { local: path.join(PRODUCTEN, 'product toevoegen ', '4.mp4'), storage: 'kassa-help/add-product/04.mp4' },
+      { local: path.join(PRODUCTEN, 'product toevoegen ', '5.mp4'), storage: 'kassa-help/add-product/05.mp4' },
+    ],
   },
   {
     topicId: 'options-extras',
-    files: [1, 2, 3, 4, 5].map((n) => ({
-      local: path.join(PRODUCTEN, 'opties&extras', `${n}.mp4`),
-      storage: `kassa-help/options-extras/${String(n).padStart(2, '0')}.mp4`,
-    })),
+    // Volgorde = 1.mp4 → 5.mp4 (map opties&extras). Niet hersorteren.
+    files: [
+      { local: path.join(PRODUCTEN, 'opties&extras', '1.mp4'), storage: 'kassa-help/options-extras/01.mp4' },
+      { local: path.join(PRODUCTEN, 'opties&extras', '2.mp4'), storage: 'kassa-help/options-extras/02.mp4' },
+      { local: path.join(PRODUCTEN, 'opties&extras', '3.mp4'), storage: 'kassa-help/options-extras/03.mp4' },
+      { local: path.join(PRODUCTEN, 'opties&extras', '4.mp4'), storage: 'kassa-help/options-extras/04.mp4' },
+      { local: path.join(PRODUCTEN, 'opties&extras', '5.mp4'), storage: 'kassa-help/options-extras/05.mp4' },
+    ],
   },
 ]
 
