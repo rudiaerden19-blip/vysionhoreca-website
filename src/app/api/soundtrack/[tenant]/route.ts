@@ -54,19 +54,28 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
   }
 
-  let body: { op?: string; volume?: number; trackId?: string }
+  let body: { op?: string; volume?: number; trackId?: string; trackIds?: string[] }
   try {
     body = (await request.json()) as {
       op?: string
       volume?: number
       trackId?: string
+      trackIds?: string[]
     }
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
   const op = body.op
-  const allowed = ['play', 'pause', 'skipNext', 'stop', 'setVolume', 'playTrack'] as const
+  const allowed = [
+    'play',
+    'pause',
+    'skipNext',
+    'stop',
+    'setVolume',
+    'playTrack',
+    'playPlaylist',
+  ] as const
   if (!op || !allowed.includes(op as (typeof allowed)[number])) {
     return NextResponse.json({ error: 'Invalid op' }, { status: 400 })
   }
@@ -77,12 +86,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
     await soundtrackControl(zoneId, op as (typeof allowed)[number], {
       volume: op === 'setVolume' ? body.volume : undefined,
       trackId: body.trackId,
+      trackIds: body.trackIds,
     })
-    if (op === 'playTrack') {
+    if (op === 'playTrack' || op === 'playPlaylist') {
       await new Promise((r) => setTimeout(r, 500))
     }
     const snapshot =
-      op === 'playTrack'
+      op === 'playTrack' || op === 'playPlaylist'
         ? await fetchSoundtrackPlayerSnapshot(zoneId, { historyFirst: 0, padPlaylist: false })
         : await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, snapshot })

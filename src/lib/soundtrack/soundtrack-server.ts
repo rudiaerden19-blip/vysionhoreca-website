@@ -723,10 +723,32 @@ async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
   )
 }
 
+async function queueTracksOnSoundZone(
+  zoneId: string,
+  trackIds: string[],
+  clearQueuedTracks: boolean,
+): Promise<void> {
+  const ids = trackIds.map((id) => id.trim()).filter(Boolean)
+  if (ids.length === 0) throw new SoundtrackApiError('trackIds required')
+  await soundtrackGraphql(
+    `mutation($input: SoundZoneQueueTracksInput!) {
+      soundZoneQueueTracks(input: $input) { __typename }
+    }`,
+    {
+      input: {
+        soundZone: zoneId,
+        tracks: ids,
+        immediate: true,
+        clearQueuedTracks,
+      },
+    },
+  )
+}
+
 export async function soundtrackControl(
   zoneId: string,
-  op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack',
-  opts?: { volume?: number; trackId?: string },
+  op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack' | 'playPlaylist',
+  opts?: { volume?: number; trackId?: string; trackIds?: string[] },
 ): Promise<void> {
   switch (op) {
     case 'play':
@@ -762,19 +784,18 @@ export async function soundtrackControl(
       }
       // Nooit skipTracks hier: skip gaat naar volgende station-/playlist-track, niet naar
       // de zojuist gequeue'de zoekresultaat-track.
+      await queueTracksOnSoundZone(zoneId, [trackId], true)
       await soundtrackGraphql(
-        `mutation($input: SoundZoneQueueTracksInput!) {
-          soundZoneQueueTracks(input: $input) { __typename }
-        }`,
-        {
-          input: {
-            soundZone: zoneId,
-            tracks: [trackId],
-            immediate: true,
-            clearQueuedTracks: true,
-          },
-        },
+        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+        { input: { soundZone: zoneId } },
       )
+      return
+    }
+    case 'playPlaylist': {
+      const trackIds = opts?.trackIds ?? []
+      const filtered = trackIds.filter((id) => id && !id.startsWith('placeholder-'))
+      if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
+      await queueTracksOnSoundZone(zoneId, filtered, true)
       await soundtrackGraphql(
         `mutation($input: PlayInput!) { play(input: $input) { status } }`,
         { input: { soundZone: zoneId } },

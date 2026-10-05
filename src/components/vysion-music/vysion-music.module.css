@@ -1200,6 +1200,237 @@
   padding: 0 0.25rem;
 }
 
+.panelTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-right: 0.85rem;
+}
+
+.panelTitleActions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.panelMiniBtn,
+.panelMiniBtnPrimary {
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.55);
+  color: #93c5fd;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.panelMiniBtnPrimary {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.35);
+  color: #eff6ff;
+}
+
+.panelMiniBtn:disabled,
+.panelMiniBtnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.playlistEditBar {
+  padding: 0 0.85rem 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.playlistNameInput {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.88rem;
+  background: rgba(15, 23, 42, 0.65);
+  color: #f8fafc;
+}
+
+.playlistEditActions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.playlistDropHint,
+.playlistEmptyDrop {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--vm-muted);
+}
+
+.playlistEmptyDrop {
+  padding: 0.75rem 0.85rem;
+  text-align: center;
+}
+
+.listDropTarget {
+  min-height: 6rem;
+  border-radius: 8px;
+  transition: outline-color 0.15s ease;
+}
+
+.listDropTargetActive {
+  outline: 2px dashed #2563eb;
+  outline-offset: -2px;
+}
+
+.listRowDraggable {
+  cursor: grab;
+}
+
+.listRowDraggable:active {
+  cursor: grabbing;
+}
+
+.listRowWrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+}
+
+.listRowWrap .listRow {
+  flex: 1;
+  min-width: 0;
+}
+
+.listRowRemove {
+  flex-shrink: 0;
+  align-self: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.listRowRemove:hover {
+  color: #fecaca;
+  background: rgba(220, 38, 38, 0.15);
+}
+
+.playlistModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.playlistModal {
+  width: min(28rem, 100%);
+  max-height: min(70vh, 32rem);
+  overflow: auto;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+.playlistModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--vm-panel-border);
+}
+
+.playlistModalTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.playlistModalClose {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.playlistModalHint {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--vm-muted);
+}
+
+.playlistModalList {
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 0;
+}
+
+.playlistModalItem {
+  display: flex;
+  align-items: stretch;
+  gap: 0.25rem;
+  padding: 0 0.5rem;
+}
+
+.playlistModalSelect {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #e2e8f0;
+}
+
+.playlistModalSelect:hover {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.playlistModalName {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.playlistModalMeta {
+  font-size: 0.72rem;
+  color: var(--vm-muted);
+}
+
+.playlistModalDelete {
+  align-self: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.playlistModalDelete:hover {
+  color: #fecaca;
+  background: rgba(220, 38, 38, 0.15);
+}
+
 @media (max-width: 900px) {
   .nowPlaying {
     grid-template-columns: 1fr;

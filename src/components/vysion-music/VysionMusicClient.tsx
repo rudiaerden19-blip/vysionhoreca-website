@@ -1,7 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type DragEvent,
+} from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import {
@@ -24,7 +31,12 @@ import {
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
+import { VysionMusicPlaylistsModal } from './VysionMusicPlaylistsModal'
+import type { VysionMusicPlaylistSummary } from '@/lib/vysion-music-playlists-server'
+import { readDragTrack, writeDragTrack } from '@/lib/vysion-music-drag-track'
 import styles from './vysion-music.module.css'
+
+type LeftPanelMode = 'live' | 'edit' | 'saved'
 
 const VM_ICON_STROKE = 2.35
 
@@ -91,8 +103,21 @@ export function VysionMusicClient({
   const [switchingTrack, setSwitchingTrack] = useState(false)
   const [clock, setClock] = useState(() => new Date())
   const [tick, setTick] = useState(0)
+  const [leftPanelMode, setLeftPanelMode] = useState<LeftPanelMode>('live')
+  const [draftName, setDraftName] = useState('')
+  const [draftTracks, setDraftTracks] = useState<TrackRow[]>([])
+  const [draftPlaylistId, setDraftPlaylistId] = useState<string | null>(null)
+  const [savedPlaylistName, setSavedPlaylistName] = useState('')
+  const [savedPlaylistTracks, setSavedPlaylistTracks] = useState<TrackRow[]>([])
+  const [savedPlaylistId, setSavedPlaylistId] = useState<string | null>(null)
+  const [playlistsOpen, setPlaylistsOpen] = useState(false)
+  const [playlistsLoading, setPlaylistsLoading] = useState(false)
+  const [savedPlaylists, setSavedPlaylists] = useState<VysionMusicPlaylistSummary[]>([])
+  const [leftDropActive, setLeftDropActive] = useState(false)
+  const [savingPlaylist, setSavingPlaylist] = useState(false)
 
   const apiBase = `/api/soundtrack/${encodeURIComponent(tenant)}`
+  const playlistsApiBase = `${apiBase}/playlists`
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeDraggingRef = useRef(false)
@@ -262,7 +287,7 @@ export function VysionMusicClient({
   const control = useCallback(
     async (
       op: string,
-      extra?: { volume?: number; trackId?: string },
+      extra?: { volume?: number; trackId?: string; trackIds?: string[] },
       opts?: { silent?: boolean },
     ) => {
       if (!opts?.silent) setBusy(true)
@@ -273,6 +298,7 @@ export function VysionMusicClient({
           body: JSON.stringify({
             op,
             trackId: extra?.trackId,
+            trackIds: extra?.trackIds,
             volume: extra?.volume,
           }),
         })
@@ -345,6 +371,227 @@ export function VysionMusicClient({
     [apiBase, loadSnapshot, t],
   )
 
+  const scrollToPlaylistPanel = useCallback(() => {
+    playlistPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [])
+
+  const addTrackToDraft = useCallback((row: TrackRow) => {
+    if (!row.id || row.id.startsWith('placeholder')) return
+    setDraftTracks((prev) => {
+      if (prev.some((t) => t.id === row.id)) return prev
+      return [...prev, row]
+    })
+  }, [])
+
+  const startNewPlaylist = useCallback(() => {
+    setLeftPanelMode('edit')
+    setDraftPlaylistId(null)
+    setDraftName('')
+    setDraftTracks([])
+    scrollToPlaylistPanel()
+  }, [scrollToPlaylistPanel])
+
+  const cancelPlaylistEdit = useCallback(() => {
+    setLeftPanelMode('live')
+    setDraftPlaylistId(null)
+    setDraftName('')
+    setDraftTracks([])
+  }, [])
+
+  const fetchSavedPlaylists = useCallback(async () => {
+    setPlaylistsLoading(true)
+    try {
+      const res = await fetch(playlistsApiBase, {
+        headers: getAuthHeaders(),
+        cache: 'no-store',
+      })
+      const json = (await res.json()) as {
+        playlists?: VysionMusicPlaylistSummary[]
+        error?: string
+      }
+      if (!res.ok) {
+        setError(json.error || t('vysionMusic.playlistLoadFailed'))
+        setSavedPlaylists([])
+        return
+      }
+      setSavedPlaylists(json.playlists ?? [])
+    } catch {
+      setError(t('vysionMusic.errorNetwork'))
+      setSavedPlaylists([])
+    } finally {
+      setPlaylistsLoading(false)
+    }
+  }, [playlistsApiBase, t])
+
+  const openPlaylistsModal = useCallback(() => {
+    setPlaylistsOpen(true)
+    void fetchSavedPlaylists()
+  }, [fetchSavedPlaylists])
+
+  const loadSavedPlaylistIntoPanel = useCallback(
+    async (playlistId: string) => {
+      setPlaylistsOpen(false)
+      scrollToPlaylistPanel()
+      try {
+        const res = await fetch(`${playlistsApiBase}/${encodeURIComponent(playlistId)}`, {
+          headers: getAuthHeaders(),
+          cache: 'no-store',
+        })
+        const json = (await res.json()) as {
+          playlist?: {
+            id: string
+            name: string
+            tracks: TrackRow[]
+          }
+          error?: string
+        }
+        if (!res.ok || !json.playlist) {
+          setError(json.error || t('vysionMusic.playlistLoadFailed'))
+          return
+        }
+        setLeftPanelMode('saved')
+        setSavedPlaylistId(json.playlist.id)
+        setSavedPlaylistName(json.playlist.name)
+        setSavedPlaylistTracks(json.playlist.tracks)
+      } catch {
+        setError(t('vysionMusic.errorNetwork'))
+      }
+    },
+    [playlistsApiBase, scrollToPlaylistPanel, t],
+  )
+
+  const editSavedPlaylist = useCallback(() => {
+    if (!savedPlaylistId) return
+    setLeftPanelMode('edit')
+    setDraftPlaylistId(savedPlaylistId)
+    setDraftName(savedPlaylistName)
+    setDraftTracks(savedPlaylistTracks)
+  }, [savedPlaylistId, savedPlaylistName, savedPlaylistTracks])
+
+  const saveDraftPlaylist = useCallback(async () => {
+    const name = draftName.trim()
+    if (!name || draftTracks.length === 0) return
+    setSavingPlaylist(true)
+    try {
+      const res = await fetch(playlistsApiBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({
+          id: draftPlaylistId,
+          name,
+          tracks: draftTracks.map((t) => ({
+            id: t.id,
+            name: t.name,
+            artist: t.artist,
+            durationMs: t.durationMs,
+            imageUrl: t.imageUrl,
+          })),
+        }),
+      })
+      const json = (await res.json()) as {
+        playlist?: { id: string; name: string; tracks: TrackRow[] }
+        error?: string
+      }
+      if (!res.ok || !json.playlist) {
+        setError(json.error || t('vysionMusic.playlistSaveFailed'))
+        return
+      }
+      setError(null)
+      setLeftPanelMode('saved')
+      setSavedPlaylistId(json.playlist.id)
+      setSavedPlaylistName(json.playlist.name)
+      setSavedPlaylistTracks(json.playlist.tracks)
+      setDraftPlaylistId(null)
+      setDraftName('')
+      setDraftTracks([])
+      void fetchSavedPlaylists()
+    } catch {
+      setError(t('vysionMusic.errorNetwork'))
+    } finally {
+      setSavingPlaylist(false)
+    }
+  }, [
+    draftName,
+    draftPlaylistId,
+    draftTracks,
+    fetchSavedPlaylists,
+    playlistsApiBase,
+    t,
+  ])
+
+  const deleteSavedPlaylist = useCallback(
+    async (playlistId: string) => {
+      try {
+        const res = await fetch(`${playlistsApiBase}/${encodeURIComponent(playlistId)}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+        })
+        if (!res.ok) {
+          const json = (await res.json()) as { error?: string }
+          setError(json.error || t('vysionMusic.playlistDeleteFailed'))
+          return
+        }
+        if (savedPlaylistId === playlistId) {
+          setLeftPanelMode('live')
+          setSavedPlaylistId(null)
+          setSavedPlaylistTracks([])
+          setSavedPlaylistName('')
+        }
+        void fetchSavedPlaylists()
+      } catch {
+        setError(t('vysionMusic.errorNetwork'))
+      }
+    },
+    [fetchSavedPlaylists, playlistsApiBase, savedPlaylistId, t],
+  )
+
+  const playPlaylistTracks = useCallback(
+    async (tracks: TrackRow[]) => {
+      const ids = tracks.map((r) => r.id).filter((id) => id && !id.startsWith('placeholder'))
+      if (ids.length === 0) return
+      setSwitchingTrack(true)
+      try {
+        const res = await fetch(apiBase, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ op: 'playPlaylist', trackIds: ids }),
+        })
+        const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
+        if (!res.ok) {
+          setError(json.error || t('vysionMusic.errorControl'))
+        } else {
+          setError(null)
+          if (json.snapshot) setSnapshot(json.snapshot)
+          setLeftPanelMode('live')
+        }
+      } catch {
+        setError(t('vysionMusic.errorNetwork'))
+      } finally {
+        setSwitchingTrack(false)
+        window.setTimeout(() => void loadSnapshot(), 800)
+      }
+    },
+    [apiBase, loadSnapshot, t],
+  )
+
+  const handleLeftPanelDrop = useCallback(
+    (e: DragEvent) => {
+      e.preventDefault()
+      setLeftDropActive(false)
+      if (leftPanelMode !== 'edit') return
+      const track = readDragTrack(e.dataTransfer)
+      if (!track) return
+      addTrackToDraft({
+        id: track.id,
+        name: track.name,
+        artist: track.artist,
+        durationMs: track.durationMs,
+        imageUrl: track.imageUrl,
+      })
+    },
+    [addTrackToDraft, leftPanelMode],
+  )
+
   const nowTrack = snapshot?.nowPlaying.track
   volumeUiRef.current = snapshot?.volume ?? 0
 
@@ -388,6 +635,20 @@ export function VysionMusicClient({
     () => (snapshot?.playlist ?? []).filter((r) => r.name !== '—'),
     [snapshot?.playlist],
   )
+
+  const leftPanelTitle =
+    leftPanelMode === 'edit'
+      ? t('vysionMusic.playlistEditTitle')
+      : leftPanelMode === 'saved'
+        ? savedPlaylistName || t('vysionMusic.playlistTitle')
+        : t('vysionMusic.playlistTitle')
+
+  const leftPanelRows =
+    leftPanelMode === 'edit'
+      ? draftTracks
+      : leftPanelMode === 'saved'
+        ? savedPlaylistTracks
+        : playlistRows
 
   const resultsTitle = searchQuery.trim()
     ? `${t('vysionMusic.resultsPrefix')} – ${searchQuery.trim().toUpperCase()}`
@@ -524,16 +785,22 @@ export function VysionMusicClient({
               <button
                 type="button"
                 className={styles.glassActionBtn}
-                onClick={() =>
-                  playlistPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                }
+                onClick={() => openPlaylistsModal()}
               >
                 <span>{t('vysionMusic.actionPlaylist')}</span>
               </button>
-              <button type="button" className={styles.glassActionBtn}>
+              <button
+                type="button"
+                className={styles.glassActionBtn}
+                onClick={() => startNewPlaylist()}
+              >
                 <span>{t('vysionMusic.actionNewList')}</span>
               </button>
-              <button type="button" className={styles.glassActionBtn}>
+              <button
+                type="button"
+                className={styles.glassActionBtn}
+                onClick={() => setError(t('vysionMusic.playlistSpotifySoon'))}
+              >
                 <span>{t('vysionMusic.actionSpotifyImport')}</span>
               </button>
             </div>
@@ -574,29 +841,110 @@ export function VysionMusicClient({
 
       <div className={styles.columns}>
         <div className={styles.panel} ref={playlistPanelRef}>
-          <div className={styles.panelTitle}>{t('vysionMusic.playlistTitle')}</div>
-          <div className={styles.list}>
-            {playlistRows.map((row, idx) => {
+          <div className={styles.panelTitleRow}>
+            <div className={styles.panelTitle}>{leftPanelTitle}</div>
+            {leftPanelMode === 'saved' && savedPlaylistTracks.length > 0 ? (
+              <div className={styles.panelTitleActions}>
+                <button
+                  type="button"
+                  className={styles.panelMiniBtn}
+                  disabled={busy || switchingTrack}
+                  onClick={() => void playPlaylistTracks(savedPlaylistTracks)}
+                >
+                  {t('vysionMusic.playlistPlay')}
+                </button>
+                <button
+                  type="button"
+                  className={styles.panelMiniBtn}
+                  onClick={() => editSavedPlaylist()}
+                >
+                  {t('vysionMusic.playlistEdit')}
+                </button>
+              </div>
+            ) : null}
+          </div>
+          {leftPanelMode === 'edit' ? (
+            <div className={styles.playlistEditBar}>
+              <input
+                className={styles.playlistNameInput}
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                placeholder={t('vysionMusic.playlistNamePlaceholder')}
+                aria-label={t('vysionMusic.playlistNamePlaceholder')}
+              />
+              <div className={styles.playlistEditActions}>
+                <button
+                  type="button"
+                  className={styles.panelMiniBtnPrimary}
+                  disabled={
+                    savingPlaylist || !draftName.trim() || draftTracks.length === 0
+                  }
+                  onClick={() => void saveDraftPlaylist()}
+                >
+                  {savingPlaylist ? t('vysionMusic.loading') : t('vysionMusic.playlistSave')}
+                </button>
+                <button
+                  type="button"
+                  className={styles.panelMiniBtn}
+                  disabled={savingPlaylist}
+                  onClick={() => cancelPlaylistEdit()}
+                >
+                  {t('vysionMusic.playlistCancel')}
+                </button>
+              </div>
+              <p className={styles.playlistDropHint}>{t('vysionMusic.playlistDropHint')}</p>
+            </div>
+          ) : null}
+          <div
+            className={`${styles.list} ${leftPanelMode === 'edit' ? styles.listDropTarget : ''} ${
+              leftDropActive ? styles.listDropTargetActive : ''
+            }`}
+            onDragOver={(e) => {
+              if (leftPanelMode !== 'edit') return
+              e.preventDefault()
+              e.dataTransfer.dropEffect = 'copy'
+              setLeftDropActive(true)
+            }}
+            onDragLeave={() => setLeftDropActive(false)}
+            onDrop={handleLeftPanelDrop}
+          >
+            {leftPanelMode === 'edit' && draftTracks.length === 0 ? (
+              <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistEmptyDrop')}</p>
+            ) : null}
+            {leftPanelRows.map((row, idx) => {
               const active = nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
               return (
-                <button
-                  key={`${row.id}-${idx}`}
-                  type="button"
-                  className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
-                  disabled={switchingTrack || !row.id || row.id.startsWith('placeholder')}
-                  onClick={() => void playTrackRow(row)}
-                >
-                  <span className={styles.rowNum}>{idx + 1}</span>
-                  <span className={styles.rowPlay} aria-hidden>
-                    <VmPlay className={styles.rowPlayIcon} filled strokeWidth={0} />
-                  </span>
-                  <span className={styles.rowTitle}>{row.name}</span>
-                  <span className={styles.rowArtist}>{row.artist}</span>
-                  <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
-                  <span className={styles.rowMenu} aria-hidden>
-                    <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
-                  </span>
-                </button>
+                <div key={`${row.id}-${idx}`} className={styles.listRowWrap}>
+                  <button
+                    type="button"
+                    className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
+                    disabled={switchingTrack || !row.id || row.id.startsWith('placeholder')}
+                    onClick={() => void playTrackRow(row)}
+                  >
+                    <span className={styles.rowNum}>{idx + 1}</span>
+                    <span className={styles.rowPlay} aria-hidden>
+                      <VmPlay className={styles.rowPlayIcon} filled strokeWidth={0} />
+                    </span>
+                    <span className={styles.rowTitle}>{row.name}</span>
+                    <span className={styles.rowArtist}>{row.artist}</span>
+                    <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
+                    <span className={styles.rowMenu} aria-hidden>
+                      <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
+                    </span>
+                  </button>
+                  {leftPanelMode === 'edit' ? (
+                    <button
+                      type="button"
+                      className={styles.listRowRemove}
+                      aria-label={t('vysionMusic.playlistRemoveTrack')}
+                      onClick={() =>
+                        setDraftTracks((prev) => prev.filter((_, i) => i !== idx))
+                      }
+                    >
+                      ×
+                    </button>
+                  ) : null}
+                </div>
               )
             })}
           </div>
@@ -639,12 +987,26 @@ export function VysionMusicClient({
               <button
                 key={`${row.id}-${idx}-${row.name}`}
                 type="button"
-                className={`${styles.listRow} ${
+                draggable={leftPanelMode === 'edit' && !switchingTrack}
+                className={`${styles.listRow} ${styles.listRowDraggable} ${
                   nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
                     ? styles.listRowActive
                     : ''
                 }`}
                 disabled={switchingTrack}
+                onDragStart={(e) => {
+                  if (leftPanelMode !== 'edit') {
+                    e.preventDefault()
+                    return
+                  }
+                  writeDragTrack(e.dataTransfer, {
+                    id: row.id,
+                    name: row.name,
+                    artist: row.artist,
+                    durationMs: row.durationMs,
+                    imageUrl: row.imageUrl ?? null,
+                  })
+                }}
                 onClick={() => void playTrackRow(row)}
               >
                 <span className={styles.rowNum}>{idx + 1}</span>
@@ -665,6 +1027,15 @@ export function VysionMusicClient({
           ) : null}
         </div>
       </div>
+
+      <VysionMusicPlaylistsModal
+        open={playlistsOpen}
+        loading={playlistsLoading}
+        playlists={savedPlaylists}
+        onClose={() => setPlaylistsOpen(false)}
+        onSelect={(id) => void loadSavedPlaylistIntoPanel(id)}
+        onDelete={(id) => void deleteSavedPlaylist(id)}
+      />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
     </div>
