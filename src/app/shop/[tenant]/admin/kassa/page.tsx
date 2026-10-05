@@ -5464,7 +5464,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => setKassaHelpOpen(true)}
-            className={headerQuickLinkBtnClass}
+            className={`${headerQuickLinkBtnClass} bg-red-600 text-white shadow-sm ring-1 ring-red-400/50 hover:bg-red-500 active:bg-red-700 ${
+              kassaHelpOpen ? 'ring-2 ring-white/60' : ''
+            }`}
             title={t('kassaApp.helpVideoButton')}
           >
             <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.helpVideoButton')}</span>
