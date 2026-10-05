@@ -9,6 +9,7 @@ import {
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
 import { KASSA_HELP_PANEL_COLUMN_CLASS } from '@/lib/kassa-help-panel-layout'
+import { kassaHelpVideoMaxCssSize } from '@/lib/kassa-help-video-display'
 
 type Props = {
   /** Gereserveerd voor tenant-specifieke video’s later */
@@ -152,6 +153,7 @@ function TopicPlayer({
   onBackToList: () => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [intrinsicSize, setIntrinsicSize] = useState<{ w: number; h: number } | null>(null)
   const step = topic.steps[stepIndex]
   const hint = step ? t(step.hintKey) : ''
   const stepLabel = t('kassaApp.helpVideoStepLabel')
@@ -159,9 +161,17 @@ function TopicPlayer({
     .replace('{total}', String(topic.steps.length))
 
   useEffect(() => {
+    setIntrinsicSize(null)
+  }, [videoSrc])
+
+  useEffect(() => {
     if (!videoSrc || videoFailed) return
     playHelpVideo(videoRef.current)
-  }, [videoSrc, videoFailed, stepIndex])
+  }, [videoSrc, videoFailed, stepIndex, intrinsicSize])
+
+  const sharpCap = intrinsicSize
+    ? kassaHelpVideoMaxCssSize(intrinsicSize.w, intrinsicSize.h)
+    : null
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -169,17 +179,33 @@ function TopicPlayer({
 
       <div className="relative mx-1 min-h-0 flex-1 sm:mx-2">
         {videoSrc && !videoFailed ? (
-          <div className="absolute inset-0 overflow-hidden rounded-lg bg-black shadow-lg sm:rounded-xl">
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg bg-black shadow-lg sm:rounded-xl">
             <video
               ref={videoRef}
               key={videoSrc}
-              className="size-full object-contain"
+              className="max-h-full max-w-full object-contain [transform:translateZ(0)]"
+              width={intrinsicSize?.w}
+              height={intrinsicSize?.h}
+              style={
+                sharpCap
+                  ? {
+                      maxWidth: `min(100%, ${sharpCap.maxWidthPx}px)`,
+                      maxHeight: `min(100%, ${sharpCap.maxHeightPx}px)`,
+                      width: 'auto',
+                      height: 'auto',
+                    }
+                  : { maxWidth: '100%', maxHeight: '100%' }
+              }
               src={videoSrc}
               controls
               autoPlay
               playsInline
               preload="auto"
-              onLoadedData={(e) => playHelpVideo(e.currentTarget)}
+              onLoadedMetadata={(e) => {
+                const v = e.currentTarget
+                setIntrinsicSize({ w: v.videoWidth, h: v.videoHeight })
+                playHelpVideo(v)
+              }}
               onError={onVideoError}
             />
           </div>
