@@ -82,9 +82,9 @@ const MANIFEST = [
   },
 ]
 
-function loadEnvLocal() {
-  const envPath = path.join(process.cwd(), '.env.local')
-  if (!fs.existsSync(envPath)) throw new Error('Geen .env.local — Supabase-keys nodig')
+function loadEnvFile(relPath) {
+  const envPath = path.join(process.cwd(), relPath)
+  if (!fs.existsSync(envPath)) return
   for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
     const trimmed = line.trim()
     if (!trimmed || trimmed.startsWith('#')) continue
@@ -99,11 +99,46 @@ function loadEnvLocal() {
   }
 }
 
+/** `.env.local` eerst, daarna `.env.vercel.local` (overschrijft placeholders). */
+function loadEnv() {
+  loadEnvFile('.env.local')
+  loadEnvFile('.env.vercel.local')
+}
+
+const HELP_VIDEO_BUCKET = 'kassa-help'
+
+function storageObjectKey(storagePath) {
+  return storagePath.replace(/^kassa-help\//, '')
+}
+
+async function ensureHelpVideoBucket(supabase) {
+  const { data: buckets, error: listErr } = await supabase.storage.listBuckets()
+  if (listErr) throw listErr
+  const exists = buckets?.some((b) => b.name === HELP_VIDEO_BUCKET)
+  const opts = {
+    public: true,
+    allowedMimeTypes: ['video/mp4'],
+  }
+  if (!exists) {
+    const { error } = await supabase.storage.createBucket(HELP_VIDEO_BUCKET, opts)
+    if (error) throw new Error(`Bucket aanmaken mislukt: ${error.message}`)
+    console.log(`Bucket "${HELP_VIDEO_BUCKET}" aangemaakt (public, video/mp4).`)
+    return
+  }
+  const { error } = await supabase.storage.updateBucket(HELP_VIDEO_BUCKET, opts)
+  if (error) {
+    console.warn(`Bucket update warning (upload gaat door): ${error.message}`)
+  }
+}
+
 async function main() {
-  loadEnvLocal()
+  loadEnv()
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) throw new Error('NEXT_PUBLIC_SUPABASE_URL of SUPABASE_SERVICE_ROLE_KEY ontbreekt')
+  if (/VERVANG-DIT/i.test(key)) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is nog placeholder — vul .env.vercel.local of .env.local in')
+  }
 
   const filterTopic = process.argv[2] || null
   const entries = filterTopic ? MANIFEST.filter((m) => m.topicId === filterTopic) : MANIFEST
@@ -112,6 +147,8 @@ async function main() {
   }
 
   const supabase = createClient(url, key)
+  await ensureHelpVideoBucket(supabase)
+
   let ok = 0
   let fail = 0
 
@@ -123,7 +160,8 @@ async function main() {
         continue
       }
       const body = fs.readFileSync(local)
-      const { error } = await supabase.storage.from('media').upload(storage, body, {
+      const objectKey = storageObjectKey(storage)
+      const { error } = await supabase.storage.from(HELP_VIDEO_BUCKET).upload(objectKey, body, {
         contentType: 'video/mp4',
         upsert: true,
         cacheControl: '3600',

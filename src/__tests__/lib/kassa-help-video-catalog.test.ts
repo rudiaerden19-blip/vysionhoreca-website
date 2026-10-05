@@ -1,5 +1,6 @@
 import {
   KASSA_HELP_VIDEO_TOPICS,
+  KASSA_HELP_VIDEO_STORAGE_BUCKET,
   findKassaHelpTopic,
   kassaHelpVideoPublicUrl,
 } from '@/lib/kassa-help-video-catalog'
@@ -89,7 +90,7 @@ describe('kassa-help-video-catalog', () => {
     const prev = process.env.NEXT_PUBLIC_SUPABASE_URL
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co'
     expect(kassaHelpVideoPublicUrl('kassa-help/add-category/01.mp4')).toBe(
-      'https://example.supabase.co/storage/v1/object/public/media/kassa-help/add-category/01.mp4',
+      `https://example.supabase.co/storage/v1/object/public/${KASSA_HELP_VIDEO_STORAGE_BUCKET}/add-category/01.mp4`,
     )
     process.env.NEXT_PUBLIC_SUPABASE_URL = prev
   })

@@ -134,11 +134,15 @@ export const KASSA_HELP_VIDEO_TOPICS: KassaHelpVideoTopic[] = [
   },
 ]
 
+/** Public bucket voor help-mp4 (apart van `media` dat vaak geen video/mp4 toelaat). */
+export const KASSA_HELP_VIDEO_STORAGE_BUCKET = 'kassa-help'
+
 export function kassaHelpVideoPublicUrl(storagePath: string): string | null {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')
-  const path = storagePath.replace(/^\//, '')
-  if (!base || !path) return null
-  return `${base}/storage/v1/object/public/media/${path}`
+  if (!base || !storagePath) return null
+  const objectKey = storagePath.replace(/^\/?kassa-help\//, '')
+  if (!objectKey) return null
+  return `${base}/storage/v1/object/public/${KASSA_HELP_VIDEO_STORAGE_BUCKET}/${objectKey}`
 }
 
 export function findKassaHelpTopic(topicId: string): KassaHelpVideoTopic | undefined {
