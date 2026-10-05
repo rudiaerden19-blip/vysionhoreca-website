@@ -1122,8 +1122,6 @@ export function VysionMusicClient({
                 mode="edit"
                 tracks={draftTracks}
                 onChange={setDraftTracks}
-                moveUpLabel={t('vysionMusic.playlistMoveUp')}
-                moveDownLabel={t('vysionMusic.playlistMoveDown')}
                 dragLabel={t('vysionMusic.playlistDragReorder')}
                 removeLabel={t('vysionMusic.playlistRemoveTrack')}
               />
@@ -1133,8 +1131,6 @@ export function VysionMusicClient({
                 mode="saved"
                 tracks={savedPlaylistTracks}
                 onChange={(next) => void persistSavedPlaylistOrder(next)}
-                moveUpLabel={t('vysionMusic.playlistMoveUp')}
-                moveDownLabel={t('vysionMusic.playlistMoveDown')}
                 dragLabel={t('vysionMusic.playlistDragReorder')}
                 switchingTrack={switchingTrack}
                 nowTrackId={nowTrack?.id}

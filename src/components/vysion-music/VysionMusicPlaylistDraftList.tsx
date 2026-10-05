@@ -38,26 +38,26 @@ function formatMs(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+function DragGrip() {
+  return (
+    <span className={styles.listRowGripIcon} aria-hidden>
+      ⠿
+    </span>
+  )
+}
+
 function SortableEditRow({
   id,
   index,
   row,
-  total,
   onRemove,
-  onMove,
-  moveUpLabel,
-  moveDownLabel,
   dragLabel,
   removeLabel,
 }: {
   id: string
   index: number
   row: PlaylistDraftTrackRow
-  total: number
   onRemove: () => void
-  onMove: (dir: -1 | 1) => void
-  moveUpLabel: string
-  moveDownLabel: string
   dragLabel: string
   removeLabel: string
 }) {
@@ -73,22 +73,25 @@ function SortableEditRow({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.88 : 1,
-    zIndex: isDragging ? 2 : undefined,
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={styles.listRowWrap}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${styles.listRowWrap} ${isDragging ? styles.listRowWrapDragging : ''}`}
+    >
+      <button
+        type="button"
+        className={styles.listRowGrip}
+        aria-label={dragLabel}
+        {...attributes}
+        {...listeners}
+      >
+        <DragGrip />
+      </button>
       <div className={`${styles.listRow} ${styles.listRowEdit}`}>
-        <button
-          type="button"
-          className={styles.listRowDragHandle}
-          aria-label={dragLabel}
-          {...attributes}
-          {...listeners}
-        >
-          <span className={styles.rowNum}>{index + 1}</span>
-        </button>
+        <span className={styles.rowNum}>{index + 1}</span>
         <span className={styles.rowTitle}>{row.name}</span>
         <span className={styles.rowArtist}>{row.artist}</span>
         <span className={styles.rowDur}>{formatMs(row.durationMs)}</span>
@@ -96,13 +99,6 @@ function SortableEditRow({
           <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
         </span>
       </div>
-      <ReorderButtons
-        index={index}
-        total={total}
-        moveUpLabel={moveUpLabel}
-        moveDownLabel={moveDownLabel}
-        onMove={onMove}
-      />
       <button
         type="button"
         className={styles.listRowRemove}
@@ -115,66 +111,21 @@ function SortableEditRow({
   )
 }
 
-function ReorderButtons({
-  index,
-  total,
-  moveUpLabel,
-  moveDownLabel,
-  onMove,
-}: {
-  index: number
-  total: number
-  moveUpLabel: string
-  moveDownLabel: string
-  onMove: (dir: -1 | 1) => void
-}) {
-  return (
-    <div className={styles.listRowReorderCol}>
-      <button
-        type="button"
-        className={styles.listRowMoveBtn}
-        disabled={index <= 0}
-        aria-label={moveUpLabel}
-        onClick={() => onMove(-1)}
-      >
-        ↑
-      </button>
-      <button
-        type="button"
-        className={styles.listRowMoveBtn}
-        disabled={index >= total - 1}
-        aria-label={moveDownLabel}
-        onClick={() => onMove(1)}
-      >
-        ↓
-      </button>
-    </div>
-  )
-}
-
 function SortableSavedRow({
   id,
   index,
   row,
-  total,
   active,
   disabled,
-  onMove,
   onPlay,
-  moveUpLabel,
-  moveDownLabel,
   dragLabel,
 }: {
   id: string
   index: number
   row: PlaylistDraftTrackRow
-  total: number
   active: boolean
   disabled: boolean
-  onMove: (dir: -1 | 1) => void
   onPlay: () => void
-  moveUpLabel: string
-  moveDownLabel: string
   dragLabel: string
 }) {
   const {
@@ -189,26 +140,29 @@ function SortableSavedRow({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.88 : 1,
-    zIndex: isDragging ? 2 : undefined,
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={styles.listRowWrap}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${styles.listRowWrap} ${isDragging ? styles.listRowWrapDragging : ''}`}
+    >
+      <button
+        type="button"
+        className={styles.listRowGrip}
+        aria-label={dragLabel}
+        {...attributes}
+        {...listeners}
+      >
+        <DragGrip />
+      </button>
       <div
         className={`${styles.listRow} ${styles.listRowSavedSort} ${
           active ? styles.listRowActive : ''
         }`}
       >
-        <button
-          type="button"
-          className={styles.listRowDragHandle}
-          aria-label={dragLabel}
-          {...attributes}
-          {...listeners}
-        >
-          <span className={styles.rowNum}>{index + 1}</span>
-        </button>
+        <span className={styles.rowNum}>{index + 1}</span>
         <button
           type="button"
           className={styles.rowPlay}
@@ -228,13 +182,6 @@ function SortableSavedRow({
           <VmEllipsisVertical strokeWidth={VM_ICON_STROKE} />
         </span>
       </div>
-      <ReorderButtons
-        index={index}
-        total={total}
-        moveUpLabel={moveUpLabel}
-        moveDownLabel={moveDownLabel}
-        onMove={onMove}
-      />
     </div>
   )
 }
@@ -243,8 +190,6 @@ export function VysionMusicPlaylistDraftList({
   mode,
   tracks,
   onChange,
-  moveUpLabel,
-  moveDownLabel,
   dragLabel,
   removeLabel,
   switchingTrack,
@@ -255,8 +200,6 @@ export function VysionMusicPlaylistDraftList({
   mode: 'edit' | 'saved'
   tracks: PlaylistDraftTrackRow[]
   onChange: (next: PlaylistDraftTrackRow[]) => void
-  moveUpLabel: string
-  moveDownLabel: string
   dragLabel: string
   removeLabel?: string
   switchingTrack?: boolean
@@ -280,12 +223,6 @@ export function VysionMusicPlaylistDraftList({
     applyReorder(from, to)
   }
 
-  const moveAt = (index: number, dir: -1 | 1) => {
-    const to = index + dir
-    if (to < 0 || to >= tracks.length) return
-    applyReorder(index, to)
-  }
-
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
       <SortableContext items={sortIds} strategy={verticalListSortingStrategy}>
@@ -296,11 +233,7 @@ export function VysionMusicPlaylistDraftList({
               id={sortIds[idx]}
               index={idx}
               row={row}
-              total={tracks.length}
               onRemove={() => onChange(tracks.filter((_, i) => i !== idx))}
-              onMove={(dir) => moveAt(idx, dir)}
-              moveUpLabel={moveUpLabel}
-              moveDownLabel={moveDownLabel}
               dragLabel={dragLabel}
               removeLabel={removeLabel ?? ''}
             />
@@ -310,7 +243,6 @@ export function VysionMusicPlaylistDraftList({
               id={sortIds[idx]}
               index={idx}
               row={row}
-              total={tracks.length}
               active={Boolean(
                 nowTrackId &&
                   nowTrackName &&
@@ -320,10 +252,7 @@ export function VysionMusicPlaylistDraftList({
               disabled={
                 Boolean(switchingTrack) || !row.id || row.id.startsWith('placeholder')
               }
-              onMove={(dir) => moveAt(idx, dir)}
               onPlay={() => onPlayRow?.(row)}
-              moveUpLabel={moveUpLabel}
-              moveDownLabel={moveDownLabel}
               dragLabel={dragLabel}
             />
           ),
