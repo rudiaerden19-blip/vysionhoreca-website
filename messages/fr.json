@@ -6952,6 +6952,7 @@
     "playlistEmptyDrop": "Déposez des titres ici",
     "playlistTracksLabel": "titres",
     "playlistTablesMissing": "Les listes ne sont pas encore activées en base. Exécutez supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql dans l’éditeur SQL Supabase.",
+    "soundtrackSyncFailed": "Impossible de synchroniser la liste avec Soundtrack. Vérifiez SOUNDTRACK_API_BASIC et les droits sur les playlists manuelles.",
     "playlistLoadFailed": "Impossible de charger les listes.",
     "playlistSaveFailed": "Enregistrement impossible.",
     "playlistDeleteFailed": "Suppression impossible.",

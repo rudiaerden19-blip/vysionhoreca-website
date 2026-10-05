@@ -60,6 +60,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     trackId?: string
     trackIds?: string[]
     playlistName?: string
+    soundtrackPlaylistId?: string | null
   }
   try {
     body = (await request.json()) as {
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       trackId?: string
       trackIds?: string[]
       playlistName?: string
+      soundtrackPlaylistId?: string | null
     }
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -95,6 +97,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       trackId: body.trackId,
       trackIds: body.trackIds,
       playlistName: body.playlistName,
+      soundtrackPlaylistId: body.soundtrackPlaylistId,
     })
     if (op === 'playTrack' || op === 'playPlaylist') {
       await new Promise((r) => setTimeout(r, op === 'playPlaylist' ? 1200 : 500))

@@ -1,3 +1,4 @@
+import { syncManualPlaylistToSoundtrackLibrary } from '@/lib/soundtrack/soundtrack-manual-playlist-sync'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export type VysionMusicPlaylistTrackPayload = {
@@ -19,8 +20,11 @@ export type VysionMusicPlaylistDetail = {
   id: string
   name: string
   updatedAt: string
+  soundtrackPlaylistId: string | null
   tracks: VysionMusicPlaylistTrackPayload[]
 }
+
+export const VYSION_MUSIC_PLAYLIST_SOUNDTRACK_SYNC_FAILED_CODE = 'soundtrack_sync_failed'
 
 export class VysionMusicPlaylistError extends Error {
   status: number
@@ -49,6 +53,84 @@ function isMissingTableError(message: string | undefined): boolean {
     message.includes('vysion_music_playlists') &&
     (message.includes('does not exist') || message.includes('schema cache'))
   )
+}
+
+function isMissingSoundtrackPlaylistIdColumn(message: string | undefined): boolean {
+  if (!message) return false
+  return message.includes('soundtrack_playlist_id')
+}
+
+async function persistSoundtrackPlaylistId(
+  tenantSlug: string,
+  playlistId: string,
+  soundtrackPlaylistId: string,
+): Promise<void> {
+  const supabase = requireDb()
+  const { error } = await supabase
+    .from('vysion_music_playlists')
+    .update({ soundtrack_playlist_id: soundtrackPlaylistId })
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', playlistId)
+  if (error && !isMissingSoundtrackPlaylistIdColumn(error.message)) {
+    throw new VysionMusicPlaylistError(error.message, 500)
+  }
+}
+
+export async function syncVysionMusicPlaylistToSoundtrack(
+  tenantSlug: string,
+  playlistId: string,
+): Promise<string> {
+  const supabase = requireDb()
+  const { data: row, error } = await supabase
+    .from('vysion_music_playlists')
+    .select('id, name, soundtrack_playlist_id')
+    .eq('tenant_slug', tenantSlug)
+    .eq('id', playlistId)
+    .maybeSingle()
+
+  if (error) {
+    if (isMissingTableError(error.message)) {
+      throw new VysionMusicPlaylistError(
+        'Playlist tables not migrated',
+        503,
+        VYSION_MUSIC_PLAYLIST_TABLES_MISSING_CODE,
+      )
+    }
+    if (isMissingSoundtrackPlaylistIdColumn(error.message)) {
+      const { data: fallback, error: fbErr } = await supabase
+        .from('vysion_music_playlists')
+        .select('id, name')
+        .eq('tenant_slug', tenantSlug)
+        .eq('id', playlistId)
+        .maybeSingle()
+      if (fbErr || !fallback) throw new VysionMusicPlaylistError(fbErr?.message || 'Not found', 500)
+      const detail = await getVysionMusicPlaylist(tenantSlug, playlistId)
+      if (!detail) throw new VysionMusicPlaylistError('Playlist not found', 404)
+      return syncManualPlaylistToSoundtrackLibrary({
+        name: detail.name,
+        trackIds: detail.tracks.map((t) => t.id),
+        soundtrackPlaylistId: null,
+      })
+    }
+    throw new VysionMusicPlaylistError(error.message, 500)
+  }
+  if (!row) throw new VysionMusicPlaylistError('Playlist not found', 404)
+
+  const detail = await getVysionMusicPlaylist(tenantSlug, playlistId)
+  if (!detail) throw new VysionMusicPlaylistError('Playlist not found', 404)
+
+  try {
+    const soundtrackId = await syncManualPlaylistToSoundtrackLibrary({
+      name: detail.name,
+      trackIds: detail.tracks.map((t) => t.id),
+      soundtrackPlaylistId: (row.soundtrack_playlist_id as string | null) ?? null,
+    })
+    await persistSoundtrackPlaylistId(tenantSlug, playlistId, soundtrackId)
+    return soundtrackId
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Soundtrack sync failed'
+    throw new VysionMusicPlaylistError(msg, 502, VYSION_MUSIC_PLAYLIST_SOUNDTRACK_SYNC_FAILED_CODE)
+  }
 }
 
 export async function listVysionMusicPlaylists(
@@ -105,12 +187,37 @@ export async function getVysionMusicPlaylist(
   playlistId: string,
 ): Promise<VysionMusicPlaylistDetail | null> {
   const supabase = requireDb()
-  const { data: playlist, error } = await supabase
+  let soundtrackPlaylistId: string | null = null
+  type PlaylistRow = {
+    id: string
+    name: string
+    updated_at: string
+    soundtrack_playlist_id?: string | null
+  }
+
+  let playlist: PlaylistRow | null = null
+  let error: { message: string } | null = null
+
+  const primary = await supabase
     .from('vysion_music_playlists')
-    .select('id, name, updated_at')
+    .select('id, name, updated_at, soundtrack_playlist_id')
     .eq('tenant_slug', tenantSlug)
     .eq('id', playlistId)
     .maybeSingle()
+
+  if (primary.error && isMissingSoundtrackPlaylistIdColumn(primary.error.message)) {
+    const fallback = await supabase
+      .from('vysion_music_playlists')
+      .select('id, name, updated_at')
+      .eq('tenant_slug', tenantSlug)
+      .eq('id', playlistId)
+      .maybeSingle()
+    playlist = (fallback.data as PlaylistRow | null) ?? null
+    error = fallback.error
+  } else {
+    playlist = (primary.data as PlaylistRow | null) ?? null
+    error = primary.error
+  }
 
   if (error) {
     if (isMissingTableError(error.message)) {
@@ -123,6 +230,11 @@ export async function getVysionMusicPlaylist(
     throw new VysionMusicPlaylistError(error.message, 500)
   }
   if (!playlist) return null
+
+  soundtrackPlaylistId =
+    typeof playlist.soundtrack_playlist_id === 'string'
+      ? playlist.soundtrack_playlist_id.trim() || null
+      : null
 
   const { data: tracks, error: trackErr } = await supabase
     .from('vysion_music_playlist_tracks')
@@ -139,6 +251,7 @@ export async function getVysionMusicPlaylist(
     id: playlist.id as string,
     name: (playlist.name as string) || '',
     updatedAt: (playlist.updated_at as string) || new Date().toISOString(),
+    soundtrackPlaylistId,
     tracks: (tracks ?? []).map((t) => ({
       id: t.soundtrack_track_id as string,
       name: (t.name as string) || '',
@@ -167,15 +280,40 @@ export async function saveVysionMusicPlaylist(
   const now = new Date().toISOString()
   let playlistId = input.id?.trim() || ''
 
+  let existingSoundtrackPlaylistId: string | null = null
+
   if (playlistId) {
-    const { data: existing, error: exErr } = await supabase
+    type ExistingRow = { id: string; soundtrack_playlist_id?: string | null }
+    let existing: ExistingRow | null = null
+    let exErr: { message: string } | null = null
+
+    const primaryEx = await supabase
       .from('vysion_music_playlists')
-      .select('id')
+      .select('id, soundtrack_playlist_id')
       .eq('tenant_slug', tenantSlug)
       .eq('id', playlistId)
       .maybeSingle()
+
+    if (primaryEx.error && isMissingSoundtrackPlaylistIdColumn(primaryEx.error.message)) {
+      const fb = await supabase
+        .from('vysion_music_playlists')
+        .select('id')
+        .eq('tenant_slug', tenantSlug)
+        .eq('id', playlistId)
+        .maybeSingle()
+      existing = (fb.data as ExistingRow | null) ?? null
+      exErr = fb.error
+    } else {
+      existing = (primaryEx.data as ExistingRow | null) ?? null
+      exErr = primaryEx.error
+    }
+
     if (exErr) throw new VysionMusicPlaylistError(exErr.message, 500)
     if (!existing) throw new VysionMusicPlaylistError('Playlist not found', 404)
+    existingSoundtrackPlaylistId =
+      typeof existing.soundtrack_playlist_id === 'string'
+        ? existing.soundtrack_playlist_id.trim() || null
+        : null
 
     const { error: updErr } = await supabase
       .from('vysion_music_playlists')
@@ -224,6 +362,22 @@ export async function saveVysionMusicPlaylist(
     .from('vysion_music_playlist_tracks')
     .insert(trackRows)
   if (tracksErr) throw new VysionMusicPlaylistError(tracksErr.message, 500)
+
+  try {
+    const soundtrackId = await syncManualPlaylistToSoundtrackLibrary({
+      name,
+      trackIds: input.tracks.map((t) => t.id),
+      soundtrackPlaylistId: existingSoundtrackPlaylistId,
+    })
+    await persistSoundtrackPlaylistId(tenantSlug, playlistId, soundtrackId)
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Soundtrack sync failed'
+    throw new VysionMusicPlaylistError(
+      msg,
+      502,
+      VYSION_MUSIC_PLAYLIST_SOUNDTRACK_SYNC_FAILED_CODE,
+    )
+  }
 
   const detail = await getVysionMusicPlaylist(tenantSlug, playlistId)
   if (!detail) throw new VysionMusicPlaylistError('Save failed', 500)

@@ -30,3 +30,6 @@ CREATE INDEX IF NOT EXISTS idx_vysion_music_playlist_tracks_playlist
 
 ALTER TABLE public.vysion_music_playlists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vysion_music_playlist_tracks ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.vysion_music_playlists
+  ADD COLUMN IF NOT EXISTS soundtrack_playlist_id TEXT;

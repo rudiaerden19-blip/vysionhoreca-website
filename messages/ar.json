@@ -6929,6 +6929,7 @@
     "playlistEmptyDrop": "أفلت المقاطع هنا",
     "playlistTracksLabel": "مقطع",
     "playlistTablesMissing": "قوائم التشغيل غير مفعّلة في قاعدة البيانات بعد. نفّذ supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql في محرر SQL في Supabase.",
+    "soundtrackSyncFailed": "تعذّرت مزامنة القائمة مع Soundtrack. تحقق من SOUNDTRACK_API_BASIC وصلاحيات القوائم اليدوية.",
     "playlistLoadFailed": "تعذر تحميل القوائم.",
     "playlistSaveFailed": "تعذر الحفظ.",
     "playlistDeleteFailed": "تعذر الحذف.",

@@ -6929,6 +6929,7 @@
     "playlistEmptyDrop": "Trascina i brani qui",
     "playlistTracksLabel": "brani",
     "playlistTablesMissing": "Le playlist non sono ancora attive nel database. Esegui supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql nell’editor SQL di Supabase.",
+    "soundtrackSyncFailed": "Impossibile sincronizzare la playlist con Soundtrack. Controlla SOUNDTRACK_API_BASIC e i permessi sulle playlist manuali.",
     "playlistLoadFailed": "Impossibile caricare le playlist.",
     "playlistSaveFailed": "Salvataggio non riuscito.",
     "playlistDeleteFailed": "Eliminazione non riuscita.",

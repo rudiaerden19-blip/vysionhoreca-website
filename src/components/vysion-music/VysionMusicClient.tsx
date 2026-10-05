@@ -82,6 +82,9 @@ function mapPlaylistApiError(
   if (json.code === 'playlist_tables_missing') {
     return t('vysionMusic.playlistTablesMissing')
   }
+  if (json.code === 'soundtrack_sync_failed') {
+    return t('vysionMusic.soundtrackSyncFailed')
+  }
   return json.error || t(fallbackKey)
 }
 
@@ -139,6 +142,9 @@ export function VysionMusicClient({
   const [savedPlaylistName, setSavedPlaylistName] = useState('')
   const [savedPlaylistTracks, setSavedPlaylistTracks] = useState<TrackRow[]>([])
   const [savedPlaylistId, setSavedPlaylistId] = useState<string | null>(null)
+  const [savedSoundtrackPlaylistId, setSavedSoundtrackPlaylistId] = useState<string | null>(
+    null,
+  )
   const [savedPlaylistLoading, setSavedPlaylistLoading] = useState(false)
   const [playlistsOpen, setPlaylistsOpen] = useState(false)
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
@@ -173,15 +179,22 @@ export function VysionMusicClient({
     id: string
     name: string
     tracks: TrackRow[]
+    soundtrackPlaylistId: string | null
   } | null>(null)
   searchQueryRef.current = searchQuery
 
   const pinSavedPlaylistView = useCallback(
-    (id: string, name: string, tracks: TrackRow[]) => {
-      savedPlaylistViewRef.current = { id, name, tracks }
+    (
+      id: string,
+      name: string,
+      tracks: TrackRow[],
+      soundtrackPlaylistId: string | null = null,
+    ) => {
+      savedPlaylistViewRef.current = { id, name, tracks, soundtrackPlaylistId }
       setSavedPlaylistId(id)
       setSavedPlaylistName(name)
       setSavedPlaylistTracks(tracks)
+      setSavedSoundtrackPlaylistId(soundtrackPlaylistId)
       setLeftPanelMode('saved')
     },
     [],
@@ -194,6 +207,7 @@ export function VysionMusicClient({
     setSavedPlaylistId(pin.id)
     setSavedPlaylistName(pin.name)
     setSavedPlaylistTracks(pin.tracks)
+    setSavedSoundtrackPlaylistId(pin.soundtrackPlaylistId)
   }, [])
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
@@ -568,6 +582,7 @@ export function VysionMusicClient({
           playlist?: {
             id: string
             name: string
+            soundtrackPlaylistId?: string | null
             tracks: TrackRow[]
           }
           error?: string
@@ -583,13 +598,19 @@ export function VysionMusicClient({
           return
         }
         setError(null)
-        pinSavedPlaylistView(json.playlist.id, json.playlist.name, json.playlist.tracks)
+        pinSavedPlaylistView(
+          json.playlist.id,
+          json.playlist.name,
+          json.playlist.tracks,
+          json.playlist.soundtrackPlaylistId ?? null,
+        )
       } catch {
         setError(t('vysionMusic.errorNetwork'))
         savedPlaylistViewRef.current = null
         setLeftPanelMode('live')
         setSavedPlaylistId(null)
         setSavedPlaylistName('')
+        setSavedSoundtrackPlaylistId(null)
         setPlaylistsOpen(true)
       } finally {
         setSavedPlaylistLoading(false)
@@ -612,7 +633,7 @@ export function VysionMusicClient({
       const name = savedPlaylistName.trim()
       if (!id || !name || tracks.length === 0) return
       setSavedPlaylistTracks(tracks)
-      pinSavedPlaylistView(id, name, tracks)
+      pinSavedPlaylistView(id, name, tracks, savedSoundtrackPlaylistId)
       try {
         const res = await fetch(playlistsApiBase, {
           method: 'POST',
@@ -630,7 +651,12 @@ export function VysionMusicClient({
           }),
         })
         const json = (await res.json()) as {
-          playlist?: { id: string; name: string; tracks: TrackRow[] }
+          playlist?: {
+            id: string
+            name: string
+            soundtrackPlaylistId?: string | null
+            tracks: TrackRow[]
+          }
           error?: string
           code?: string
         }
@@ -639,12 +665,24 @@ export function VysionMusicClient({
           return
         }
         setError(null)
-        pinSavedPlaylistView(json.playlist.id, json.playlist.name, json.playlist.tracks)
+        pinSavedPlaylistView(
+          json.playlist.id,
+          json.playlist.name,
+          json.playlist.tracks,
+          json.playlist.soundtrackPlaylistId ?? null,
+        )
       } catch {
         setError(t('vysionMusic.errorNetwork'))
       }
     },
-    [pinSavedPlaylistView, playlistsApiBase, savedPlaylistId, savedPlaylistName, t],
+    [
+      pinSavedPlaylistView,
+      playlistsApiBase,
+      savedPlaylistId,
+      savedPlaylistName,
+      savedSoundtrackPlaylistId,
+      t,
+    ],
   )
 
   const saveDraftPlaylist = useCallback(async () => {
@@ -668,7 +706,12 @@ export function VysionMusicClient({
         }),
       })
       const json = (await res.json()) as {
-        playlist?: { id: string; name: string; tracks: TrackRow[] }
+        playlist?: {
+          id: string
+          name: string
+          soundtrackPlaylistId?: string | null
+          tracks: TrackRow[]
+        }
         error?: string
         code?: string
       }
@@ -677,7 +720,12 @@ export function VysionMusicClient({
         return
       }
       setError(null)
-      pinSavedPlaylistView(json.playlist.id, json.playlist.name, json.playlist.tracks)
+      pinSavedPlaylistView(
+        json.playlist.id,
+        json.playlist.name,
+        json.playlist.tracks,
+        json.playlist.soundtrackPlaylistId ?? null,
+      )
       setDraftPlaylistId(null)
       setDraftName('')
       setDraftTracks([])
@@ -715,6 +763,7 @@ export function VysionMusicClient({
           setSavedPlaylistId(null)
           setSavedPlaylistTracks([])
           setSavedPlaylistName('')
+          setSavedSoundtrackPlaylistId(null)
         }
         void fetchSavedPlaylists()
       } catch {
@@ -738,7 +787,12 @@ export function VysionMusicClient({
         const res = await fetch(apiBase, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ op: 'playPlaylist', trackIds: ids, playlistName }),
+          body: JSON.stringify({
+            op: 'playPlaylist',
+            trackIds: ids,
+            playlistName,
+            soundtrackPlaylistId: savedSoundtrackPlaylistId,
+          }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
         if (!res.ok) {
@@ -755,7 +809,15 @@ export function VysionMusicClient({
         window.setTimeout(() => void loadSnapshot(), 800)
       }
     },
-    [apiBase, draftName, loadSnapshot, restoreSavedPlaylistView, savedPlaylistName, t],
+    [
+      apiBase,
+      draftName,
+      loadSnapshot,
+      restoreSavedPlaylistView,
+      savedPlaylistName,
+      savedSoundtrackPlaylistId,
+      t,
+    ],
   )
 
   const playSavedPlaylistFromRow = useCallback(

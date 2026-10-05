@@ -6889,6 +6889,7 @@
     "playlistEmptyDrop": "Drop tracks here",
     "playlistTracksLabel": "tracks",
     "playlistTablesMissing": "Playlists are not enabled in the database yet. Run supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql in the Supabase SQL Editor.",
+    "soundtrackSyncFailed": "Could not sync the playlist to Soundtrack. Check SOUNDTRACK_API_BASIC and manual playlist permissions.",
     "playlistLoadFailed": "Could not load playlists.",
     "playlistSaveFailed": "Could not save playlist.",
     "playlistDeleteFailed": "Could not delete playlist.",

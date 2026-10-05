@@ -6889,6 +6889,7 @@
     "playlistEmptyDrop": "Sleep hier nummers naartoe",
     "playlistTracksLabel": "nummers",
     "playlistTablesMissing": "Afspeellijsten zijn nog niet geactiveerd in de database. Voer in Supabase (SQL Editor) het bestand supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql uit.",
+    "soundtrackSyncFailed": "Kon de lijst niet synchroniseren met Soundtrack. Controleer SOUNDTRACK_API_BASIC en rechten op manual playlists.",
     "playlistLoadFailed": "Afspeellijsten laden mislukt.",
     "playlistSaveFailed": "Opslaan mislukt.",
     "playlistDeleteFailed": "Verwijderen mislukt.",

@@ -6952,6 +6952,7 @@
     "playlistEmptyDrop": "Titel hier ablegen",
     "playlistTracksLabel": "Titel",
     "playlistTablesMissing": "Wiedergabelisten sind in der Datenbank noch nicht aktiv. Führen Sie supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql im Supabase SQL Editor aus.",
+    "soundtrackSyncFailed": "Synchronisation mit Soundtrack fehlgeschlagen. Prüfen Sie SOUNDTRACK_API_BASIC und Berechtigungen für Manual Playlists.",
     "playlistLoadFailed": "Listen konnten nicht geladen werden.",
     "playlistSaveFailed": "Speichern fehlgeschlagen.",
     "playlistDeleteFailed": "Löschen fehlgeschlagen.",

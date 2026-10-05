@@ -6929,6 +6929,7 @@
     "playlistEmptyDrop": "Suelta temas aquí",
     "playlistTracksLabel": "temas",
     "playlistTablesMissing": "Las listas aún no están activadas en la base de datos. Ejecute supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql en el editor SQL de Supabase.",
+    "soundtrackSyncFailed": "No se pudo sincronizar la lista con Soundtrack. Compruebe SOUNDTRACK_API_BASIC y permisos de playlists manuales.",
     "playlistLoadFailed": "No se pudieron cargar las listas.",
     "playlistSaveFailed": "No se pudo guardar la lista.",
     "playlistDeleteFailed": "No se pudo eliminar la lista.",

@@ -6929,6 +6929,7 @@
     "playlistEmptyDrop": "将曲目拖放到此处",
     "playlistTracksLabel": "首",
     "playlistTablesMissing": "播放列表数据库尚未启用。请在 Supabase SQL Editor 中运行 supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql。",
+    "soundtrackSyncFailed": "无法将播放列表同步到 Soundtrack。请检查 SOUNDTRACK_API_BASIC 和 manual playlist 权限。",
     "playlistLoadFailed": "无法加载播放列表。",
     "playlistSaveFailed": "保存失败。",
     "playlistDeleteFailed": "删除失败。",
