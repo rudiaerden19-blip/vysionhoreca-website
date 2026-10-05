@@ -32,6 +32,7 @@ import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
 import { VysionMusicPlaylistsModal } from './VysionMusicPlaylistsModal'
+import { VysionMusicSpotifyImportModal } from './VysionMusicSpotifyImportModal'
 import type { VysionMusicPlaylistSummary } from '@/lib/vysion-music-playlists-server'
 import { readDragTrack, writeDragTrack } from '@/lib/vysion-music-drag-track'
 import styles from './vysion-music.module.css'
@@ -83,6 +84,22 @@ function mapPlaylistApiError(
   return json.error || t(fallbackKey)
 }
 
+function mapSpotifyImportError(
+  json: { error?: string; code?: string },
+  t: (key: string) => string,
+): string {
+  if (json.code === 'spotify_not_configured') {
+    return t('vysionMusic.spotifyNotConfigured')
+  }
+  if (json.code === 'invalid_spotify_url') {
+    return t('vysionMusic.spotifyInvalidUrl')
+  }
+  if (json.code === 'empty_playlist') {
+    return t('vysionMusic.spotifyEmptyPlaylist')
+  }
+  return json.error || t('vysionMusic.spotifyImportFailed')
+}
+
 function formatClock(now: Date, locale: string): { date: string; time: string } {
   const date = now.toLocaleDateString(locale, {
     weekday: 'short',
@@ -126,6 +143,15 @@ export function VysionMusicClient({
   const [savedPlaylists, setSavedPlaylists] = useState<VysionMusicPlaylistSummary[]>([])
   const [leftDropActive, setLeftDropActive] = useState(false)
   const [savingPlaylist, setSavingPlaylist] = useState(false)
+  const [spotifyOpen, setSpotifyOpen] = useState(false)
+  const [spotifyUrl, setSpotifyUrl] = useState('')
+  const [spotifyLoading, setSpotifyLoading] = useState(false)
+  const [spotifySummary, setSpotifySummary] = useState<{
+    total: number
+    matchedCount: number
+    playlistName: string
+  } | null>(null)
+  const [spotifyImportTracks, setSpotifyImportTracks] = useState<TrackRow[]>([])
 
   const apiBase = `/api/soundtrack/${encodeURIComponent(tenant)}`
   const playlistsApiBase = `${apiBase}/playlists`
@@ -401,6 +427,62 @@ export function VysionMusicClient({
     setDraftTracks([])
     scrollToPlaylistPanel()
   }, [scrollToPlaylistPanel])
+
+  const openSpotifyImport = useCallback(() => {
+    setSpotifySummary(null)
+    setSpotifyImportTracks([])
+    setSpotifyOpen(true)
+  }, [])
+
+  const runSpotifyImport = useCallback(async () => {
+    const url = spotifyUrl.trim()
+    if (!url) return
+    setSpotifyLoading(true)
+    setSpotifySummary(null)
+    setSpotifyImportTracks([])
+    try {
+      const res = await fetch(`${apiBase}/spotify-import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ url }),
+      })
+      const json = (await res.json()) as {
+        import?: {
+          playlistName: string
+          total: number
+          matchedCount: number
+          soundtrackTracks: TrackRow[]
+        }
+        error?: string
+        code?: string
+      }
+      if (!res.ok || !json.import) {
+        setError(mapSpotifyImportError(json, t))
+        return
+      }
+      setError(null)
+      setSpotifySummary({
+        playlistName: json.import.playlistName,
+        total: json.import.total,
+        matchedCount: json.import.matchedCount,
+      })
+      setSpotifyImportTracks(json.import.soundtrackTracks)
+    } catch {
+      setError(t('vysionMusic.errorNetwork'))
+    } finally {
+      setSpotifyLoading(false)
+    }
+  }, [apiBase, spotifyUrl, t])
+
+  const applySpotifyImportToList = useCallback(() => {
+    if (spotifyImportTracks.length === 0) return
+    setSpotifyOpen(false)
+    setLeftPanelMode('edit')
+    setDraftPlaylistId(null)
+    setDraftName(spotifySummary?.playlistName?.trim() || '')
+    setDraftTracks(spotifyImportTracks)
+    scrollToPlaylistPanel()
+  }, [scrollToPlaylistPanel, spotifyImportTracks, spotifySummary?.playlistName])
 
   const cancelPlaylistEdit = useCallback(() => {
     setLeftPanelMode('live')
@@ -813,7 +895,7 @@ export function VysionMusicClient({
               <button
                 type="button"
                 className={styles.glassActionBtn}
-                onClick={() => setError(t('vysionMusic.playlistSpotifySoon'))}
+                onClick={() => openSpotifyImport()}
               >
                 <span>{t('vysionMusic.actionSpotifyImport')}</span>
               </button>
@@ -1049,6 +1131,17 @@ export function VysionMusicClient({
         onClose={() => setPlaylistsOpen(false)}
         onSelect={(id) => void loadSavedPlaylistIntoPanel(id)}
         onDelete={(id) => void deleteSavedPlaylist(id)}
+      />
+
+      <VysionMusicSpotifyImportModal
+        open={spotifyOpen}
+        url={spotifyUrl}
+        loading={spotifyLoading}
+        summary={spotifySummary}
+        onUrlChange={setSpotifyUrl}
+        onClose={() => setSpotifyOpen(false)}
+        onImport={() => void runSpotifyImport()}
+        onApplyToList={() => applySpotifyImportToList()}
       />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
