@@ -72,6 +72,17 @@ function formatMs(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+function mapPlaylistApiError(
+  json: { error?: string; code?: string },
+  t: (key: string) => string,
+  fallbackKey: string,
+): string {
+  if (json.code === 'playlist_tables_missing') {
+    return t('vysionMusic.playlistTablesMissing')
+  }
+  return json.error || t(fallbackKey)
+}
+
 function formatClock(now: Date, locale: string): { date: string; time: string } {
   const date = now.toLocaleDateString(locale, {
     weekday: 'short',
@@ -408,9 +419,10 @@ export function VysionMusicClient({
       const json = (await res.json()) as {
         playlists?: VysionMusicPlaylistSummary[]
         error?: string
+        code?: string
       }
       if (!res.ok) {
-        setError(json.error || t('vysionMusic.playlistLoadFailed'))
+        setError(mapPlaylistApiError(json, t, 'vysionMusic.playlistLoadFailed'))
         setSavedPlaylists([])
         return
       }
@@ -444,9 +456,10 @@ export function VysionMusicClient({
             tracks: TrackRow[]
           }
           error?: string
+          code?: string
         }
         if (!res.ok || !json.playlist) {
-          setError(json.error || t('vysionMusic.playlistLoadFailed'))
+          setError(mapPlaylistApiError(json, t, 'vysionMusic.playlistLoadFailed'))
           return
         }
         setLeftPanelMode('saved')
@@ -491,9 +504,10 @@ export function VysionMusicClient({
       const json = (await res.json()) as {
         playlist?: { id: string; name: string; tracks: TrackRow[] }
         error?: string
+        code?: string
       }
       if (!res.ok || !json.playlist) {
-        setError(json.error || t('vysionMusic.playlistSaveFailed'))
+        setError(mapPlaylistApiError(json, t, 'vysionMusic.playlistSaveFailed'))
         return
       }
       setError(null)

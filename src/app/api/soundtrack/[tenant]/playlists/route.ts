@@ -22,7 +22,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: true, playlists })
   } catch (e) {
     if (e instanceof VysionMusicPlaylistError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
+      return NextResponse.json(
+        { error: e.message, code: e.code },
+        { status: e.status },
+      )
     }
     return NextResponse.json({ error: 'Failed to load playlists' }, { status: 500 })
   }
@@ -67,7 +70,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: true, playlist })
   } catch (e) {
     if (e instanceof VysionMusicPlaylistError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
+      return NextResponse.json(
+        { error: e.message, code: e.code },
+        { status: e.status },
+      )
     }
     return NextResponse.json({ error: 'Failed to save playlist' }, { status: 500 })
   }

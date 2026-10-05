@@ -6948,6 +6948,7 @@
     "playlistDropHint": "Glissez des titres depuis les résultats de recherche ici.",
     "playlistEmptyDrop": "Déposez des titres ici",
     "playlistTracksLabel": "titres",
+    "playlistTablesMissing": "Les listes ne sont pas encore activées en base. Exécutez supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql dans l’éditeur SQL Supabase.",
     "playlistLoadFailed": "Impossible de charger les listes.",
     "playlistSaveFailed": "Enregistrement impossible.",
     "playlistDeleteFailed": "Suppression impossible.",

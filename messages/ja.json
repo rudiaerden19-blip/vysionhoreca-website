@@ -6925,6 +6925,7 @@
     "playlistDropHint": "検索結果からここに曲をドラッグしてください。",
     "playlistEmptyDrop": "ここに曲をドロップ",
     "playlistTracksLabel": "曲",
+    "playlistTablesMissing": "プレイリスト用のデータベースがまだ有効化されていません。Supabase SQL Editor で supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql を実行してください。",
     "playlistLoadFailed": "プレイリストを読み込めませんでした。",
     "playlistSaveFailed": "保存に失敗しました。",
     "playlistDeleteFailed": "削除に失敗しました。",

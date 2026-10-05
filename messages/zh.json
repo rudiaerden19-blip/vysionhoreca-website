@@ -6925,6 +6925,7 @@
     "playlistDropHint": "将搜索结果中的曲目拖到此面板。",
     "playlistEmptyDrop": "将曲目拖放到此处",
     "playlistTracksLabel": "首",
+    "playlistTablesMissing": "播放列表数据库尚未启用。请在 Supabase SQL Editor 中运行 supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql。",
     "playlistLoadFailed": "无法加载播放列表。",
     "playlistSaveFailed": "保存失败。",
     "playlistDeleteFailed": "删除失败。",

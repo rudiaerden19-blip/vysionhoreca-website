@@ -28,7 +28,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: true, playlist })
   } catch (e) {
     if (e instanceof VysionMusicPlaylistError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
+      return NextResponse.json(
+        { error: e.message, code: e.code },
+        { status: e.status },
+      )
     }
     return NextResponse.json({ error: 'Failed to load playlist' }, { status: 500 })
   }
@@ -46,7 +49,10 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: true })
   } catch (e) {
     if (e instanceof VysionMusicPlaylistError) {
-      return NextResponse.json({ error: e.message }, { status: e.status })
+      return NextResponse.json(
+        { error: e.message, code: e.code },
+        { status: e.status },
+      )
     }
     return NextResponse.json({ error: 'Failed to delete playlist' }, { status: 500 })
   }

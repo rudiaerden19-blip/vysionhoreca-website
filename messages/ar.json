@@ -6925,6 +6925,7 @@
     "playlistDropHint": "اسحب المقاطع من نتائج البحث إلى هنا.",
     "playlistEmptyDrop": "أفلت المقاطع هنا",
     "playlistTracksLabel": "مقطع",
+    "playlistTablesMissing": "قوائم التشغيل غير مفعّلة في قاعدة البيانات بعد. نفّذ supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql في محرر SQL في Supabase.",
     "playlistLoadFailed": "تعذر تحميل القوائم.",
     "playlistSaveFailed": "تعذر الحفظ.",
     "playlistDeleteFailed": "تعذر الحذف.",

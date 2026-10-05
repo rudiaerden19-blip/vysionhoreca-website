@@ -6885,6 +6885,7 @@
     "playlistDropHint": "Drag tracks from search results into this panel.",
     "playlistEmptyDrop": "Drop tracks here",
     "playlistTracksLabel": "tracks",
+    "playlistTablesMissing": "Playlists are not enabled in the database yet. Run supabase/VYSION_MUSIC_PLAYLISTS_APPLY.sql in the Supabase SQL Editor.",
     "playlistLoadFailed": "Could not load playlists.",
     "playlistSaveFailed": "Could not save playlist.",
     "playlistDeleteFailed": "Could not delete playlist.",

@@ -24,12 +24,16 @@ export type VysionMusicPlaylistDetail = {
 
 export class VysionMusicPlaylistError extends Error {
   status: number
-  constructor(message: string, status = 400) {
+  code?: string
+  constructor(message: string, status = 400, code?: string) {
     super(message)
     this.name = 'VysionMusicPlaylistError'
     this.status = status
+    this.code = code
   }
 }
+
+export const VYSION_MUSIC_PLAYLIST_TABLES_MISSING_CODE = 'playlist_tables_missing'
 
 function requireDb() {
   const supabase = getServerSupabaseClient()
@@ -60,8 +64,9 @@ export async function listVysionMusicPlaylists(
   if (error) {
     if (isMissingTableError(error.message)) {
       throw new VysionMusicPlaylistError(
-        'Playlist tables not migrated (run supabase/migrations/20261006130000_vysion_music_playlists.sql)',
+        'Playlist tables not migrated',
         503,
+        VYSION_MUSIC_PLAYLIST_TABLES_MISSING_CODE,
       )
     }
     throw new VysionMusicPlaylistError(error.message, 500)
@@ -110,8 +115,9 @@ export async function getVysionMusicPlaylist(
   if (error) {
     if (isMissingTableError(error.message)) {
       throw new VysionMusicPlaylistError(
-        'Playlist tables not migrated (run supabase/migrations/20261006130000_vysion_music_playlists.sql)',
+        'Playlist tables not migrated',
         503,
+        VYSION_MUSIC_PLAYLIST_TABLES_MISSING_CODE,
       )
     }
     throw new VysionMusicPlaylistError(error.message, 500)
@@ -186,8 +192,9 @@ export async function saveVysionMusicPlaylist(
     if (insErr) {
       if (isMissingTableError(insErr.message)) {
         throw new VysionMusicPlaylistError(
-          'Playlist tables not migrated (run supabase/migrations/20261006130000_vysion_music_playlists.sql)',
+          'Playlist tables not migrated',
           503,
+          VYSION_MUSIC_PLAYLIST_TABLES_MISSING_CODE,
         )
       }
       throw new VysionMusicPlaylistError(insErr.message, 500)
