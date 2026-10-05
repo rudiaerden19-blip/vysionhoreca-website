@@ -5461,8 +5461,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => openKassaHelp()}
-            className={`${headerQuickLinkBtnClass} bg-red-600 text-white shadow-sm ring-1 ring-red-400/50 hover:bg-red-500 active:bg-red-700 ${
-              kassaHelpOpen ? 'ring-2 ring-white/60' : ''
+            className={`${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE} ${
+              kassaHelpOpen ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''
             }`}
             title={t('kassaApp.helpVideoButton')}
           >
