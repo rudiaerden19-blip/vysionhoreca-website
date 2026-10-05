@@ -88,6 +88,7 @@ import { cache, cacheKey } from '@/lib/cache'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
+import { KassaHelpVideoPanel } from '@/components/kassa/KassaHelpVideoPanel'
 import {
   kassaUiLayoutUsesPosLuxury,
 } from '@/lib/kassa-ui-layout'
@@ -1074,6 +1075,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }, [baseUrl, tenant, demoViewOnly, moduleFlagsLoading, effectiveAccess, effectiveLabelPrinting, effectiveJson])
 
+  const [kassaHelpOpen, setKassaHelpOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
   const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
@@ -5214,13 +5216,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   return (
     <div
-      className="relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]"
+      className={`relative flex min-h-0 overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
+        kassaHelpOpen ? 'flex-row' : 'flex-col'
+      }`}
       data-testid="kassa-app"
       data-kassa-vp={kassaChromeDensity}
     >
       {kassaLayout === 'luxe' ? (
         <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
       ) : null}
+      <div
+        className={`relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
+          kassaHelpOpen ? 'w-[60%] max-w-[60%] shrink-0' : 'w-full flex-1 min-w-0'
+        }`}
+      >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
@@ -5451,6 +5460,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               rowInactiveClassName={ui.langRowInactive}
             />
           ) : null}
+
+          <button
+            type="button"
+            onClick={() => setKassaHelpOpen(true)}
+            className={headerQuickLinkBtnClass}
+            title={t('kassaApp.helpVideoButton')}
+          >
+            <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.helpVideoButton')}</span>
+          </button>
 
           <button
             type="button"
@@ -7272,6 +7290,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
       </div>
+      </div>
+      {kassaHelpOpen ? (
+        <KassaHelpVideoPanel tenantSlug={tenant} onClose={() => setKassaHelpOpen(false)} />
+      ) : null}
     </div>
   )
 }
