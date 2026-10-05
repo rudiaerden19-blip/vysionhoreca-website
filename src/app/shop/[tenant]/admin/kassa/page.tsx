@@ -1152,8 +1152,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [numpadValue, setNumpadValue] = useState('')
   /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
-  /** Snelmenu-balk onderaan: aan tot de knop wordt getikt. Alle modes. */
-  const [kassaQuickMenuVisible, setKassaQuickMenuVisible] = useState(true)
+  /** Snelmenu-balk: standaard dicht; alleen open via knop «Snel menu» (niet na refresh). */
+  const [kassaQuickMenuVisible, setKassaQuickMenuVisible] = useState(false)
   const [showNameAccountModal, setShowNameAccountModal] = useState(false)
   useEffect(() => {
     if (cart.length > 0) setNumpadPanelVisible(false)

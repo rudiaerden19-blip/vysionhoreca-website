@@ -343,7 +343,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [importBusy, setImportBusy] = useState(false)
   const [importHighlight, setImportHighlight] = useState<'csv' |  'excel'| null>(null)
-  const [quickMenuOpen, setQuickMenuOpen] = useState(true)
+  const [quickMenuOpen, setQuickMenuOpen] = useState(false)
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   const [numpadValue, setNumpadValue] = useState('')
   const [addOkFlash, setAddOkFlash] = useState(false)
