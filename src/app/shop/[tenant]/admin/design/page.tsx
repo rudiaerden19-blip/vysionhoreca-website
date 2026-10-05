@@ -115,7 +115,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
         whileTap={{ scale: 0.95 }}
         onClick={handleSave}
         disabled={saving}
-        className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
+        className={`vysion-admin-save-fab fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
           saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
         }`}
       >

@@ -64,9 +64,17 @@ export function KassaHelpVideoProvider({
 
   useEffect(() => {
     const root = document.documentElement
-    if (session.open) root.setAttribute('data-kassa-help-open', '1')
-    else root.removeAttribute('data-kassa-help-open')
-    return () => root.removeAttribute('data-kassa-help-open')
+    if (session.open) {
+      root.setAttribute('data-kassa-help-open', '1')
+      root.style.setProperty('--vysion-admin-pane-width', '50vw')
+    } else {
+      root.removeAttribute('data-kassa-help-open')
+      root.style.removeProperty('--vysion-admin-pane-width')
+    }
+    return () => {
+      root.removeAttribute('data-kassa-help-open')
+      root.style.removeProperty('--vysion-admin-pane-width')
+    }
   }, [session.open])
 
   const openHelp = useCallback(() => {
@@ -117,9 +125,15 @@ export function KassaHelpVideoProvider({
     <KassaHelpVideoContext.Provider value={value}>
       {session.open ? (
         <div className="flex h-[100dvh] max-h-[100dvh] min-h-0 w-full flex-row overflow-hidden supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]">
-          <div className={KASSA_COLUMN_WHEN_HELP_OPEN_CLASS}>{children}</div>
+          <div
+            className={`${KASSA_COLUMN_WHEN_HELP_OPEN_CLASS} relative isolate max-w-[50vw] bg-gray-100`}
+            data-vysion-admin-pane
+          >
+            {children}
+          </div>
           <aside
-            className={`relative z-[30] flex min-h-0 flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl ${KASSA_HELP_PANEL_COLUMN_CLASS}`}
+            className={`relative z-[30] flex min-h-0 max-w-[50vw] flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl ${KASSA_HELP_PANEL_COLUMN_CLASS}`}
+            data-vysion-help-video-pane
           >
             <KassaHelpVideoPanel tenantSlug={tenantSlug} />
           </aside>

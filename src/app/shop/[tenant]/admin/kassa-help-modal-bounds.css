@@ -1,8 +1,14 @@
 /**
- * Help-video open = admin in linker helft. fixed inset-0-modals/portals zitten op body
- * maar moeten niet onder het help-paneel vallen (z-[30] sibling rechts).
+ * Help open: admin = linker helft (50vw), help = rechter helft.
+ * --vysion-admin-pane-width wordt gezet op <html> door KassaHelpVideoProvider.
  */
 html[data-kassa-help-open='1'] .fixed.inset-0 {
-  right: 50vw !important;
+  right: var(--vysion-admin-pane-width, 50vw) !important;
   left: 0 !important;
+}
+
+/* Zwevende Opslaan-knoppen (fixed rechtsonder viewport → nu rechtsonder admin-kolom) */
+html[data-kassa-help-open='1'] .vysion-admin-save-fab,
+html[data-kassa-help-open='1'] .fixed.bottom-6.right-6 {
+  right: calc(var(--vysion-admin-pane-width, 50vw) + 1.5rem) !important;
 }
