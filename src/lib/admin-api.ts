@@ -1601,7 +1601,7 @@ export async function registerCustomer(
   address: string,
   postal_code: string,
   city: string
-): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+): Promise<{ success: boolean; customer?: Customer; error?: string; sessionBound?: boolean }> {
   if (typeof window !== 'undefined') {
     const { registerShopCustomerViaApi } = await import('./shop-customer-client')
     return registerShopCustomerViaApi(tenantSlug, {
@@ -1656,7 +1656,7 @@ export async function loginCustomer(
   tenantSlug: string, 
   email: string, 
   password: string
-): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+): Promise<{ success: boolean; customer?: Customer; error?: string; sessionBound?: boolean }> {
   if (typeof window !== 'undefined') {
     const { loginShopCustomerViaApi } = await import('./shop-customer-client')
     return loginShopCustomerViaApi(tenantSlug, email, password)

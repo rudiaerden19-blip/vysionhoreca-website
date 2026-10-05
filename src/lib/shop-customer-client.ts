@@ -5,7 +5,7 @@ function customerApiBase(tenantSlug: string): string {
 }
 
 type ApiCustomerResponse =
-  | { ok: true; customer: Customer }
+  | { ok: true; customer: Customer; session_bound?: boolean }
   | { ok: false; error?: string }
 
 type ApiOrdersResponse = { ok: true; orders: Order[] } | { ok: false; error?: string }
@@ -21,7 +21,7 @@ export async function registerShopCustomerViaApi(
     postal_code: string
     city: string
   },
-): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+): Promise<{ success: boolean; customer?: Customer; error?: string; sessionBound?: boolean }> {
   try {
     const res = await fetch(`${customerApiBase(tenantSlug)}/register`, {
       method: 'POST',
@@ -31,10 +31,20 @@ export async function registerShopCustomerViaApi(
     })
     const data = (await res.json()) as ApiCustomerResponse
     if (data.ok && data.customer) {
-      return { success: true, customer: data.customer }
+      return {
+        success: true,
+        customer: data.customer,
+        sessionBound: data.session_bound === true,
+      }
     }
     if (!data.ok && data.error === 'email_in_use') {
       return { success: false, error: 'Email is al in gebruik' }
+    }
+    if (!data.ok && data.error === 'session_save_failed') {
+      return {
+        success: false,
+        error: 'Sessie kon niet worden opgeslagen. Probeer opnieuw in te loggen.',
+      }
     }
     return { success: false, error: 'Registratie mislukt' }
   } catch {
@@ -46,7 +56,7 @@ export async function loginShopCustomerViaApi(
   tenantSlug: string,
   email: string,
   password: string,
-): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+): Promise<{ success: boolean; customer?: Customer; error?: string; sessionBound?: boolean }> {
   try {
     const res = await fetch(`${customerApiBase(tenantSlug)}/login`, {
       method: 'POST',
@@ -56,7 +66,17 @@ export async function loginShopCustomerViaApi(
     })
     const data = (await res.json()) as ApiCustomerResponse
     if (data.ok && data.customer) {
-      return { success: true, customer: data.customer }
+      return {
+        success: true,
+        customer: data.customer,
+        sessionBound: data.session_bound === true,
+      }
+    }
+    if (!data.ok && data.error === 'session_save_failed') {
+      return {
+        success: false,
+        error: 'Sessie kon niet worden opgeslagen. Probeer opnieuw in te loggen.',
+      }
     }
     return { success: false, error: 'Onjuiste email of wachtwoord' }
   } catch {

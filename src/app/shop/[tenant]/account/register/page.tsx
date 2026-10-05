@@ -123,13 +123,15 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
     )
     
     if (result.success && result.customer?.id) {
-      const sessionSaved = await patchWebshopBrowserSession(params.tenant, {
-        shop_customer_id: result.customer.id,
-      })
-      if (!sessionSaved) {
-        setGeneralError(t('accountPage.sessionSaveFailed') || 'Account aangemaakt, maar sessie kon niet worden opgeslagen. Log in met je wachtwoord.')
-        setSubmitting(false)
-        return
+      if (!result.sessionBound) {
+        const sessionSaved = await patchWebshopBrowserSession(params.tenant, {
+          shop_customer_id: result.customer.id,
+        })
+        if (!sessionSaved) {
+          setGeneralError(t('accountPage.sessionSaveFailed'))
+          setSubmitting(false)
+          return
+        }
       }
       assignTenantHref(params.tenant, '/account')
     } else {

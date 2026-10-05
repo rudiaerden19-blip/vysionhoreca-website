@@ -45,13 +45,15 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
     const result = await loginCustomer(params.tenant, email, password)
     
     if (result.success && result.customer?.id) {
-      const sessionSaved = await patchWebshopBrowserSession(params.tenant, {
-        shop_customer_id: result.customer.id,
-      })
-      if (!sessionSaved) {
-        setError(t('accountPage.sessionSaveFailed') || 'Inloggen gelukt, maar sessie kon niet worden opgeslagen. Probeer opnieuw.')
-        setSubmitting(false)
-        return
+      if (!result.sessionBound) {
+        const sessionSaved = await patchWebshopBrowserSession(params.tenant, {
+          shop_customer_id: result.customer.id,
+        })
+        if (!sessionSaved) {
+          setError(t('accountPage.sessionSaveFailed'))
+          setSubmitting(false)
+          return
+        }
       }
       assignTenantHref(params.tenant, '/account')
     } else {

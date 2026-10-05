@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getShopCustomerByIdServer } from '@/lib/shop-customer-auth-server'
+import { tenantSlugsMatch } from '@/lib/tenant-slug-variants'
 import {
   readWebshopBrowserSessionToken,
   resolveWebshopTenantSlug,
@@ -140,11 +141,28 @@ export async function PATCH(request: NextRequest) {
     if (!UUID_RE.test(id)) {
       return NextResponse.json({ ok: false, error: 'invalid_customer' }, { status: 400 })
     }
+    let verifiedId: string | null = null
     const customer = await getShopCustomerByIdServer(supabase, tenantInput, id)
-    if (!customer?.id) {
+    if (customer?.id) {
+      verifiedId = customer.id
+    } else {
+      const { data: byId } = await supabase
+        .from('shop_customers')
+        .select('id, tenant_slug')
+        .eq('id', id)
+        .maybeSingle()
+      if (
+        byId?.id &&
+        typeof byId.tenant_slug === 'string' &&
+        tenantSlugsMatch(byId.tenant_slug, tenantInput)
+      ) {
+        verifiedId = String(byId.id)
+      }
+    }
+    if (!verifiedId) {
       return NextResponse.json({ ok: false, error: 'invalid_customer' }, { status: 400 })
     }
-    nextShopCustomerId = customer.id
+    nextShopCustomerId = verifiedId
   }
 
   const nextRow = {

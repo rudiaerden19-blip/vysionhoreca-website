@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { registerShopCustomerServer } from '@/lib/shop-customer-auth-server'
+import {
+  applyWebshopSessionCookieToResponse,
+  bindShopCustomerToBrowserSession,
+} from '@/lib/webshop-browser-session-server'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,5 +51,22 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: result.error }, { status })
   }
 
-  return NextResponse.json({ ok: true, customer: result.customer })
+  const customerId = result.customer.id
+  if (!customerId) {
+    return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
+  }
+
+  const bound = await bindShopCustomerToBrowserSession(
+    request,
+    supabase,
+    tenantSlug,
+    String(customerId),
+  )
+  if (!bound.ok) {
+    return NextResponse.json({ ok: false, error: 'session_save_failed' }, { status: 500 })
+  }
+
+  const res = NextResponse.json({ ok: true, customer: result.customer, session_bound: true })
+  applyWebshopSessionCookieToResponse(request, res, tenantSlug, bound.sessionToken)
+  return res
 }
