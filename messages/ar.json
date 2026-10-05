@@ -3686,7 +3686,8 @@
     "helpVideoHintRewards1": "المكافآت / نقاط الولاء في الإدارة (Pro).",
     "helpVideoHintRewards2": "أضف مكافآت قابلة للاستبدال بالنقاط.",
     "helpVideoHintReports1": "التقارير أو تقرير Z في الإدارة للإيرادات وطرق الدفع.",
-    "helpVideoHintReports2": "اطبع أو أرسل تقرير Z بعد الإغلاق."
+    "helpVideoHintReports2": "اطبع أو أرسل تقرير Z بعد الإغلاق.",
+    "helpVideoHintFollowVideo": "اتبع الخطوات في الفيديو. اضغط «الخطوة التالية» عند الانتهاء."
   },
   "kassaCustomerDisplay": {
     "missingToken": "جلسة غير صالحة. افتح شاشة العميل من نقطة البيع.",

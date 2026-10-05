@@ -3186,7 +3186,8 @@
     "helpVideoHintRewards1": "Belohnungen / Treuepunkte im Admin (Pro).",
     "helpVideoHintRewards2": "Belohnungen zum Einlösen mit Punkten. Punkte pro Euro einstellen.",
     "helpVideoHintReports1": "Berichte oder Z-Bericht im Admin für Umsatz und Zahlungsarten.",
-    "helpVideoHintReports2": "Z-Bericht nach Schließung drucken oder mailen. Analyse für Trends nutzen."
+    "helpVideoHintReports2": "Z-Bericht nach Schließung drucken oder mailen. Analyse für Trends nutzen.",
+    "helpVideoHintFollowVideo": "Folgen Sie den Schritten im Video. Tippen Sie auf «Nächster Schritt», wenn Sie fertig sind."
   },
   "kassaCustomerDisplay": {
     "missingToken": "Ungültige Sitzung. Öffnen Sie die Kundenanzeige von der Kasse aus.",

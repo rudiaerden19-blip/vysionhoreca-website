@@ -3686,7 +3686,8 @@
     "helpVideoHintRewards1": "Premi / punti fedeltà in admin (Pro).",
     "helpVideoHintRewards2": "Aggiungi premi riscattabili con punti.",
     "helpVideoHintReports1": "Report o report Z in admin per incassi e pagamenti.",
-    "helpVideoHintReports2": "Stampa o invia il report Z alla chiusura."
+    "helpVideoHintReports2": "Stampa o invia il report Z alla chiusura.",
+    "helpVideoHintFollowVideo": "Segui i passaggi nel video. Tocca «Passo successivo» quando hai finito."
   },
   "kassaCustomerDisplay": {
     "missingToken": "Sessione non valida. Apri lo schermo cliente dalla cassa.",

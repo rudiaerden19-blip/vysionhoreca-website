@@ -3686,7 +3686,8 @@
     "helpVideoHintRewards1": "Recompensas / fidelización en admin (Pro).",
     "helpVideoHintRewards2": "Añade recompensas canjeables con puntos.",
     "helpVideoHintReports1": "Informes o informe Z en admin para ingresos y pagos.",
-    "helpVideoHintReports2": "Imprime o envía el informe Z al cerrar."
+    "helpVideoHintReports2": "Imprime o envía el informe Z al cerrar.",
+    "helpVideoHintFollowVideo": "Sigue los pasos del vídeo. Pulsa «Siguiente paso» cuando hayas terminado."
   },
   "kassaCustomerDisplay": {
     "missingToken": "Sesión no válida. Abra la pantalla cliente desde la caja.",

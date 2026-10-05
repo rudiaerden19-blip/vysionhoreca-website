@@ -4036,6 +4036,7 @@
     "helpVideoBackToList": "Back to list",
     "helpVideoNoVideoYet": "Video coming soon. Follow the steps below in the admin panel.",
     "helpVideoStepLabel": "Step {current} of {total}",
+    "helpVideoHintFollowVideo": "Follow the steps in the video. Tap «Next step» when you are done.",
     "helpVideoTopicAddCategory": "Add category",
     "helpVideoTopicAddProduct": "Add product",
     "helpVideoTopicOptionsExtras": "Options & extras",

@@ -4036,6 +4036,7 @@
     "helpVideoBackToList": "Terug naar overzicht",
     "helpVideoNoVideoYet": "Video volgt binnenkort. Volg de stappen hieronder in het admin-panel.",
     "helpVideoStepLabel": "Stap {current} van {total}",
+    "helpVideoHintFollowVideo": "Volg de stappen in de video. Tik op «Volgende stap» als je klaar bent.",
     "helpVideoTopicAddCategory": "Categorie toevoegen",
     "helpVideoTopicAddProduct": "Product toevoegen",
     "helpVideoTopicOptionsExtras": "Opties & extras",

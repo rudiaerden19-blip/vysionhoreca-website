@@ -3686,7 +3686,8 @@
     "helpVideoHintRewards1": "管理后台奖励 / 积分（Pro）。",
     "helpVideoHintRewards2": "添加可用积分兑换的奖励。",
     "helpVideoHintReports1": "管理后台报表或 Z 报表查看营业额与支付方式。",
-    "helpVideoHintReports2": "打烊后打印或邮件发送 Z 报表。"
+    "helpVideoHintReports2": "打烊后打印或邮件发送 Z 报表。",
+    "helpVideoHintFollowVideo": "请按视频中的步骤操作。完成后点击「下一步」。"
   },
   "kassaCustomerDisplay": {
     "missingToken": "会话无效。请从收银台打开顾客显示屏。",

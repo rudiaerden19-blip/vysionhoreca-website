@@ -14,118 +14,74 @@ export type KassaHelpVideoTopic = {
   steps: KassaHelpVideoStep[]
 }
 
+const FOLLOW_VIDEO_HINT = 'kassaApp.helpVideoHintFollowVideo'
+
+function topicSteps(
+  folder: string,
+  count: number,
+  hintKeys: string[],
+): KassaHelpVideoStep[] {
+  return Array.from({ length: count }, (_, i) => ({
+    videoPath: `kassa-help/${folder}/${String(i + 1).padStart(2, '0')}.mp4`,
+    hintKey: hintKeys[i] ?? FOLLOW_VIDEO_HINT,
+  }))
+}
+
 export const KASSA_HELP_VIDEO_TOPICS: KassaHelpVideoTopic[] = [
   {
     id: 'add-category',
     titleKey: 'kassaApp.helpVideoTopicAddCategory',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintAddCategory1',
-        videoPath: 'kassa-help/add-category/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintAddCategory2',
-        videoPath: 'kassa-help/add-category/02.mp4',
-      },
-    ],
+    steps: topicSteps('add-category', 5, [
+      'kassaApp.helpVideoHintAddCategory1',
+      'kassaApp.helpVideoHintAddCategory2',
+    ]),
   },
   {
     id: 'add-product',
     titleKey: 'kassaApp.helpVideoTopicAddProduct',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintAddProduct1',
-        videoPath: 'kassa-help/add-product/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintAddProduct2',
-        videoPath: 'kassa-help/add-product/02.mp4',
-      },
-    ],
+    steps: topicSteps('add-product', 5, [
+      'kassaApp.helpVideoHintAddProduct1',
+      'kassaApp.helpVideoHintAddProduct2',
+    ]),
   },
   {
     id: 'options-extras',
     titleKey: 'kassaApp.helpVideoTopicOptionsExtras',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintOptionsExtras1',
-        videoPath: 'kassa-help/options-extras/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintOptionsExtras2',
-        videoPath: 'kassa-help/options-extras/02.mp4',
-      },
-    ],
+    steps: topicSteps('options-extras', 5, [
+      'kassaApp.helpVideoHintOptionsExtras1',
+      'kassaApp.helpVideoHintOptionsExtras2',
+    ]),
   },
   {
     id: 'pincode',
     titleKey: 'kassaApp.helpVideoTopicPincode',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintPincode1',
-        videoPath: 'kassa-help/pincode/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintPincode2',
-        videoPath: 'kassa-help/pincode/02.mp4',
-      },
-    ],
+    steps: topicSteps('pincode', 1, ['kassaApp.helpVideoHintPincode1']),
   },
   {
     id: 'inventory',
     titleKey: 'kassaApp.helpVideoTopicInventory',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintInventory1',
-        videoPath: 'kassa-help/inventory/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintInventory2',
-        videoPath: 'kassa-help/inventory/02.mp4',
-      },
-    ],
+    steps: topicSteps('inventory', 2, [
+      'kassaApp.helpVideoHintInventory1',
+      'kassaApp.helpVideoHintInventory2',
+    ]),
   },
   {
     id: 'online-toggle',
     titleKey: 'kassaApp.helpVideoTopicOnlineToggle',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintOnlineToggle1',
-        videoPath: 'kassa-help/online-toggle/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintOnlineToggle2',
-        videoPath: 'kassa-help/online-toggle/02.mp4',
-      },
-    ],
+    steps: topicSteps('online-toggle', 2, [
+      'kassaApp.helpVideoHintOnlineToggle1',
+      'kassaApp.helpVideoHintOnlineToggle2',
+    ]),
   },
   {
     id: 'rewards',
     titleKey: 'kassaApp.helpVideoTopicRewards',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintRewards1',
-        videoPath: 'kassa-help/rewards/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintRewards2',
-        videoPath: 'kassa-help/rewards/02.mp4',
-      },
-    ],
+    steps: topicSteps('rewards', 1, ['kassaApp.helpVideoHintRewards1']),
   },
   {
     id: 'reports',
     titleKey: 'kassaApp.helpVideoTopicReports',
-    steps: [
-      {
-        hintKey: 'kassaApp.helpVideoHintReports1',
-        videoPath: 'kassa-help/reports/01.mp4',
-      },
-      {
-        hintKey: 'kassaApp.helpVideoHintReports2',
-        videoPath: 'kassa-help/reports/02.mp4',
-      },
-    ],
+    steps: topicSteps('reports', 1, ['kassaApp.helpVideoHintReports1']),
   },
 ]
 
