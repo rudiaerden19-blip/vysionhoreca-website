@@ -166,22 +166,27 @@ function TopicPlayer({
     <div className="flex min-h-0 flex-1 flex-col">
       <p className="shrink-0 px-3 pt-1.5 text-xs text-white/60 sm:px-4">{stepLabel}</p>
 
-      <div className="relative mx-2 mt-1 flex min-h-0 flex-1 flex-col sm:mx-3">
+      <div className="flex min-h-0 flex-1 flex-col justify-center px-2 py-1 sm:px-3">
         {videoSrc && !videoFailed ? (
-          <video
-            ref={videoRef}
-            key={videoSrc}
-            className="min-h-0 w-full flex-1 rounded-xl bg-black object-contain"
-            src={videoSrc}
-            controls
-            autoPlay
-            playsInline
-            preload="auto"
-            onLoadedData={(e) => playHelpVideo(e.currentTarget)}
-            onError={onVideoError}
-          />
+          /* Volle paneelbreedte, hoogte 16:9 — geen leeg zwart flex-vak met mini-video */
+          <div className="relative w-full overflow-hidden rounded-xl bg-black shadow-lg">
+            <div className="relative w-full pt-[56.25%]">
+              <video
+                ref={videoRef}
+                key={videoSrc}
+                className="absolute inset-0 size-full object-contain"
+                src={videoSrc}
+                controls
+                autoPlay
+                playsInline
+                preload="auto"
+                onLoadedData={(e) => playHelpVideo(e.currentTarget)}
+                onError={onVideoError}
+              />
+            </div>
+          </div>
         ) : (
-          <div className="flex min-h-[12rem] flex-1 flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
+          <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
             <span>{t('kassaApp.helpVideoNoVideoYet')}</span>
           </div>
         )}
