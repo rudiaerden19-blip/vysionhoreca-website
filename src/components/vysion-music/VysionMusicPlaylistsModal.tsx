@@ -16,7 +16,7 @@ export function VysionMusicPlaylistsModal({
   loading: boolean
   playlists: VysionMusicPlaylistSummary[]
   onClose: () => void
-  onSelect: (playlistId: string) => void
+  onSelect: (playlistId: string, playlistName: string) => void
   onDelete: (playlistId: string) => void
 }) {
   const { t } = useLanguage()
@@ -59,7 +59,7 @@ export function VysionMusicPlaylistsModal({
                 <button
                   type="button"
                   className={styles.playlistModalSelect}
-                  onClick={() => onSelect(p.id)}
+                  onClick={() => onSelect(p.id, p.name)}
                 >
                   <span className={styles.playlistModalName}>{p.name}</span>
                   <span className={styles.playlistModalMeta}>

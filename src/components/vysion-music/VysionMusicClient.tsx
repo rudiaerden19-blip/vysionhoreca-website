@@ -138,6 +138,7 @@ export function VysionMusicClient({
   const [savedPlaylistName, setSavedPlaylistName] = useState('')
   const [savedPlaylistTracks, setSavedPlaylistTracks] = useState<TrackRow[]>([])
   const [savedPlaylistId, setSavedPlaylistId] = useState<string | null>(null)
+  const [savedPlaylistLoading, setSavedPlaylistLoading] = useState(false)
   const [playlistsOpen, setPlaylistsOpen] = useState(false)
   const [playlistsLoading, setPlaylistsLoading] = useState(false)
   const [savedPlaylists, setSavedPlaylists] = useState<VysionMusicPlaylistSummary[]>([])
@@ -523,9 +524,14 @@ export function VysionMusicClient({
   }, [fetchSavedPlaylists])
 
   const loadSavedPlaylistIntoPanel = useCallback(
-    async (playlistId: string) => {
+    async (playlistId: string, playlistNameHint?: string) => {
       setPlaylistsOpen(false)
       scrollToPlaylistPanel()
+      setSavedPlaylistLoading(true)
+      setLeftPanelMode('saved')
+      setSavedPlaylistId(playlistId)
+      setSavedPlaylistName(playlistNameHint?.trim() || '')
+      setSavedPlaylistTracks([])
       try {
         const res = await fetch(`${playlistsApiBase}/${encodeURIComponent(playlistId)}`, {
           headers: getAuthHeaders(),
@@ -542,14 +548,24 @@ export function VysionMusicClient({
         }
         if (!res.ok || !json.playlist) {
           setError(mapPlaylistApiError(json, t, 'vysionMusic.playlistLoadFailed'))
+          setLeftPanelMode('live')
+          setSavedPlaylistId(null)
+          setSavedPlaylistName('')
+          setPlaylistsOpen(true)
           return
         }
-        setLeftPanelMode('saved')
+        setError(null)
         setSavedPlaylistId(json.playlist.id)
         setSavedPlaylistName(json.playlist.name)
         setSavedPlaylistTracks(json.playlist.tracks)
       } catch {
         setError(t('vysionMusic.errorNetwork'))
+        setLeftPanelMode('live')
+        setSavedPlaylistId(null)
+        setSavedPlaylistName('')
+        setPlaylistsOpen(true)
+      } finally {
+        setSavedPlaylistLoading(false)
       }
     },
     [playlistsApiBase, scrollToPlaylistPanel, t],
@@ -663,7 +679,6 @@ export function VysionMusicClient({
         } else {
           setError(null)
           if (json.snapshot) setSnapshot(json.snapshot)
-          setLeftPanelMode('live')
         }
       } catch {
         setError(t('vysionMusic.errorNetwork'))
@@ -1021,7 +1036,16 @@ export function VysionMusicClient({
             {leftPanelMode === 'edit' && draftTracks.length === 0 ? (
               <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistEmptyDrop')}</p>
             ) : null}
-            {leftPanelRows.map((row, idx) => {
+            {leftPanelMode === 'saved' && savedPlaylistLoading ? (
+              <p className={styles.playlistEmptyDrop}>{t('vysionMusic.loading')}</p>
+            ) : null}
+            {leftPanelMode === 'saved' &&
+            !savedPlaylistLoading &&
+            savedPlaylistTracks.length === 0 ? (
+              <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistModalEmpty')}</p>
+            ) : null}
+            {!savedPlaylistLoading &&
+            leftPanelRows.map((row, idx) => {
               const active = nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
               return (
                 <div key={`${row.id}-${idx}`} className={styles.listRowWrap}>
@@ -1147,7 +1171,7 @@ export function VysionMusicClient({
         loading={playlistsLoading}
         playlists={savedPlaylists}
         onClose={() => setPlaylistsOpen(false)}
-        onSelect={(id) => void loadSavedPlaylistIntoPanel(id)}
+        onSelect={(id, name) => void loadSavedPlaylistIntoPanel(id, name)}
         onDelete={(id) => void deleteSavedPlaylist(id)}
       />
 

@@ -818,6 +818,18 @@ async function queueTracksOnSoundZone(
   )
 }
 
+async function playQueuedTracksOnSoundZone(zoneId: string, trackIds: string[]): Promise<void> {
+  const filtered = trackIds
+    .map((id) => id.trim())
+    .filter((id) => id && !id.startsWith('placeholder-'))
+  if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
+  await queueTracksOnSoundZone(zoneId, filtered, true)
+  await soundtrackGraphql(
+    `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+    { input: { soundZone: zoneId } },
+  )
+}
+
 export async function soundtrackControl(
   zoneId: string,
   op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack' | 'playPlaylist',
@@ -866,7 +878,12 @@ export async function soundtrackControl(
     }
     case 'playPlaylist': {
       const trackIds = opts?.trackIds ?? []
-      await playManualPlaylistOnSoundZone(zoneId, trackIds, opts?.playlistName ?? '')
+      try {
+        await playManualPlaylistOnSoundZone(zoneId, trackIds, opts?.playlistName ?? '')
+      } catch (manualErr) {
+        console.error('[soundtrack] playManualPlaylist failed, fallback to queue', manualErr)
+        await playQueuedTracksOnSoundZone(zoneId, trackIds)
+      }
       return
     }
     default:
