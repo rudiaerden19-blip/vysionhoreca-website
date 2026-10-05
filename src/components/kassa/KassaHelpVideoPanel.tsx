@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_HELP_VIDEO_TOPICS,
@@ -71,7 +71,7 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
       data-testid="kassa-help-panel"
       aria-label={t('kassaApp.helpVideoPanelTitle')}
     >
-      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-2.5 sm:px-4">
+      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-2 sm:px-4">
         <div className="min-w-0">
           <p className="truncate text-xs font-medium uppercase tracking-wide text-white/60">
             {t('kassaApp.helpVideoPanelTitle')}
@@ -121,6 +121,14 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
   )
 }
 
+function playHelpVideo(el: HTMLVideoElement | null) {
+  if (!el) return
+  el.currentTime = 0
+  void el.play().catch(() => {
+    /* sommige browsers blokkeren zonder recente tik — knop Volgende stap telt als gesture */
+  })
+}
+
 function TopicPlayer({
   topic,
   stepIndex,
@@ -142,38 +150,48 @@ function TopicPlayer({
   onNextStep: () => void
   onBackToList: () => void
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
   const step = topic.steps[stepIndex]
   const hint = step ? t(step.hintKey) : ''
   const stepLabel = t('kassaApp.helpVideoStepLabel')
     .replace('{current}', String(stepIndex + 1))
     .replace('{total}', String(topic.steps.length))
 
+  useEffect(() => {
+    if (!videoSrc || videoFailed) return
+    playHelpVideo(videoRef.current)
+  }, [videoSrc, videoFailed, stepIndex])
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <p className="shrink-0 px-3 pt-2 text-xs text-white/60 sm:px-4">
-        {stepLabel}
-      </p>
-      <div className="relative mx-3 mt-2 aspect-video shrink-0 overflow-hidden rounded-xl bg-black/40 sm:mx-4">
+      <p className="shrink-0 px-3 pt-1.5 text-xs text-white/60 sm:px-4">{stepLabel}</p>
+
+      <div className="relative mx-2 mt-1 flex min-h-0 flex-1 flex-col sm:mx-3">
         {videoSrc && !videoFailed ? (
           <video
+            ref={videoRef}
             key={videoSrc}
-            className="h-full w-full object-contain"
+            className="min-h-0 w-full flex-1 rounded-xl bg-black object-contain"
             src={videoSrc}
             controls
+            autoPlay
             playsInline
-            preload="metadata"
+            preload="auto"
+            onLoadedData={(e) => playHelpVideo(e.currentTarget)}
             onError={onVideoError}
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-sm text-white/70">
+          <div className="flex min-h-[12rem] flex-1 flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
             <span>{t('kassaApp.helpVideoNoVideoYet')}</span>
           </div>
         )}
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 text-sm leading-relaxed text-white/90 sm:px-4">
+
+      <div className="max-h-[4.5rem] shrink-0 overflow-y-auto px-3 py-2 text-xs leading-snug text-white/80 sm:px-4 sm:text-sm">
         {hint}
       </div>
-      <footer className="flex shrink-0 flex-col gap-2 border-t border-white/10 p-3 sm:flex-row sm:p-4">
+
+      <footer className="flex shrink-0 flex-col gap-2 border-t border-white/10 p-3 sm:flex-row sm:p-3">
         <button
           type="button"
           onClick={onBackToList}
