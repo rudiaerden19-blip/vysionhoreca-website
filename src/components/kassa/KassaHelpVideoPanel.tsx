@@ -8,26 +8,24 @@ import {
   kassaHelpVideoPublicUrl,
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
-import { KASSA_HELP_PANEL_COLUMN_CLASS } from '@/lib/kassa-help-panel-layout'
 import { kassaHelpVideoMaxCssSize } from '@/lib/kassa-help-video-display'
+import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 
 type Props = {
-  /** Gereserveerd voor tenant-specifieke video’s later */
   tenantSlug: string
-  onClose: () => void
 }
 
-export function KassaHelpVideoPanel({ onClose }: Props) {
+export function KassaHelpVideoPanel({ tenantSlug: _tenantSlug }: Props) {
   const { t } = useLanguage()
-  const [topicId, setTopicId] = useState<string | null>(null)
-  const [stepIndex, setStepIndex] = useState(0)
+  const {
+    topicId,
+    stepIndex,
+    closeHelp,
+    openTopic,
+    backToTopicList,
+    nextStep,
+  } = useKassaHelpVideoSession()
   const [videoFailed, setVideoFailed] = useState(false)
-
-  useEffect(() => {
-    setTopicId(null)
-    setStepIndex(0)
-    setVideoFailed(false)
-  }, [])
 
   const topic = topicId ? findKassaHelpTopic(topicId) : null
   const step = topic?.steps[stepIndex]
@@ -41,26 +39,24 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
     setVideoFailed(false)
   }, [videoSrc, stepIndex, topicId])
 
-  const openTopic = useCallback((id: string) => {
-    setTopicId(id)
-    setStepIndex(0)
-    setVideoFailed(false)
-  }, [])
+  const onOpenTopic = useCallback(
+    (id: string) => {
+      setVideoFailed(false)
+      openTopic(id)
+    },
+    [openTopic],
+  )
 
   const backToList = useCallback(() => {
-    setTopicId(null)
-    setStepIndex(0)
     setVideoFailed(false)
-  }, [])
+    backToTopicList()
+  }, [backToTopicList])
 
   const onNextStep = useCallback(() => {
     if (!topic) return
-    if (stepIndex < topic.steps.length - 1) {
-      setStepIndex((i) => i + 1)
-      return
-    }
-    backToList()
-  }, [topic, stepIndex, backToList])
+    setVideoFailed(false)
+    nextStep(topic.steps.length)
+  }, [topic, nextStep])
 
   const nextLabel =
     topic && stepIndex >= topic.steps.length - 1
@@ -68,8 +64,8 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
       : t('kassaApp.helpVideoNextStep')
 
   return (
-    <aside
-      className={`flex flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl ${KASSA_HELP_PANEL_COLUMN_CLASS}`}
+    <div
+      className="flex min-h-0 flex-1 flex-col"
       data-testid="kassa-help-panel"
       aria-label={t('kassaApp.helpVideoPanelTitle')}
     >
@@ -84,7 +80,7 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
         </div>
         <button
           type="button"
-          onClick={onClose}
+          onClick={closeHelp}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-lg font-bold hover:bg-white/20"
           aria-label={t('kassaApp.helpVideoClose')}
         >
@@ -98,7 +94,7 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
             <li key={item.id}>
               <button
                 type="button"
-                onClick={() => openTopic(item.id)}
+                onClick={() => onOpenTopic(item.id)}
                 className="mb-2 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-semibold hover:bg-white/10 sm:text-base"
               >
                 {t(item.titleKey)}
@@ -119,7 +115,7 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
           onBackToList={backToList}
         />
       )}
-    </aside>
+    </div>
   )
 }
 

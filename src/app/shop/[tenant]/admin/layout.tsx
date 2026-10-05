@@ -31,6 +31,10 @@ import {
 } from '@/lib/tenant-module-flags-context'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
+import {
+  KassaHelpVideoProvider,
+  useKassaHelpVideoSessionOptional,
+} from '@/components/kassa/KassaHelpVideoSession'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
 import {
@@ -67,12 +71,16 @@ const LOCK_PAGES = ['categorieen']
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   return (
     <TenantModuleFlagsProvider tenantSlug={params.tenant}>
-      <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
+      <KassaHelpVideoProvider tenantSlug={params.tenant}>
+        <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
+      </KassaHelpVideoProvider>
     </TenantModuleFlagsProvider>
   )
 }
 
 function AdminLayoutBody({ children, params }: AdminLayoutProps) {
+  const kassaHelpSession = useKassaHelpVideoSessionOptional()
+  const kassaHelpOpen = kassaHelpSession?.open === true
   const pathname = usePathname()
   const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
   const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
@@ -515,10 +523,19 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         isReservationsSoftwareTenant(moduleAccess, enabledModulesJson)
       }
     >
-      <div style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%'}} className="min-h-screen bg-gray-100">
+      <div
+        style={{ maxWidth: '100%', overflowX: 'hidden', width: '100%' }}
+        className={
+          kassaHelpOpen
+            ? 'flex h-full min-h-0 flex-col overflow-hidden bg-gray-100'
+            : 'min-h-screen bg-gray-100'
+        }
+      >
         {/* ── Zwarte topbalk (zelfde stijl als kassa). Z-index 100 — modals/dialoog: min. z-[130] zodat ze boven deze balk blijven (iPad). ── */}
         <div
-          className="fixed top-0 left-0 right-0 z-[100] grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 bg-black px-2 sm:px-3"
+          className={`z-[100] grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 bg-black px-2 sm:px-3 ${
+            kassaHelpOpen ? 'relative shrink-0' : 'fixed top-0 left-0 right-0'
+          }`}
           style={{ height: 56, gridTemplateColumns: 'auto 1fr auto' }}
         >
           <div className="flex min-w-0 items-center gap-2 justify-self-start">
@@ -595,7 +612,11 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       <main
         data-vysion-admin-scroll
         data-osk-scroll
-        className="fixed inset-x-0 bottom-0 top-14 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]"
+        className={
+          kassaHelpOpen
+            ? 'z-0 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]'
+            : 'fixed inset-x-0 bottom-0 top-14 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]'
+        }
       >
         <div
           className={`max-w-full p-4 md:p-6 ${

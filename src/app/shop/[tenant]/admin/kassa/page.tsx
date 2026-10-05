@@ -88,8 +88,7 @@ import { cache, cacheKey } from '@/lib/cache'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
-import { KassaHelpVideoPanel } from '@/components/kassa/KassaHelpVideoPanel'
-import { KASSA_COLUMN_WHEN_HELP_OPEN_CLASS } from '@/lib/kassa-help-panel-layout'
+import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 import {
   kassaUiLayoutUsesPosLuxury,
 } from '@/lib/kassa-ui-layout'
@@ -1076,7 +1075,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }, [baseUrl, tenant, demoViewOnly, moduleFlagsLoading, effectiveAccess, effectiveLabelPrinting, effectiveJson])
 
-  const [kassaHelpOpen, setKassaHelpOpen] = useState(false)
+  const { open: kassaHelpOpen, openHelp: openKassaHelp } = useKassaHelpVideoSession()
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
   const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
@@ -5217,8 +5216,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   return (
     <div
-      className={`relative flex min-h-0 overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
-        kassaHelpOpen ? 'flex-row' : 'flex-col'
+      className={`relative flex min-h-0 flex-col overflow-hidden ${
+        kassaHelpOpen
+          ? 'h-full max-h-full min-h-0'
+          : 'h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]'
       }`}
       data-testid="kassa-app"
       data-kassa-vp={kassaChromeDensity}
@@ -5226,11 +5227,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {kassaLayout === 'luxe' ? (
         <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
       ) : null}
-      <div
-        className={`relative flex min-h-0 flex-col h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
-          kassaHelpOpen ? KASSA_COLUMN_WHEN_HELP_OPEN_CLASS : 'w-full min-w-0 flex-1 overflow-hidden'
-        }`}
-      >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
@@ -5464,7 +5460,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           <button
             type="button"
-            onClick={() => setKassaHelpOpen(true)}
+            onClick={() => openKassaHelp()}
             className={`${headerQuickLinkBtnClass} bg-red-600 text-white shadow-sm ring-1 ring-red-400/50 hover:bg-red-500 active:bg-red-700 ${
               kassaHelpOpen ? 'ring-2 ring-white/60' : ''
             }`}
@@ -7293,10 +7289,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
       </div>
-      </div>
-      {kassaHelpOpen ? (
-        <KassaHelpVideoPanel tenantSlug={tenant} onClose={() => setKassaHelpOpen(false)} />
-      ) : null}
     </div>
   )
 }
