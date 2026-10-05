@@ -9,7 +9,6 @@ import {
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
-import { kassaHelpVideoContainSize } from '@/lib/kassa-help-video-fill-scale'
 
 type Props = {
   tenantSlug: string
@@ -149,44 +148,16 @@ function TopicPlayer({
   onBackToList: () => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const stageRef = useRef<HTMLDivElement>(null)
-  const [frameSize, setFrameSize] = useState<{ width: number; height: number } | null>(null)
   const step = topic.steps[stepIndex]
   const hint = step ? t(step.hintKey) : ''
   const stepLabel = t('kassaApp.helpVideoStepLabel')
     .replace('{current}', String(stepIndex + 1))
     .replace('{total}', String(topic.steps.length))
 
-  const recomputeFrameSize = useCallback(() => {
-    const stage = stageRef.current
-    const video = videoRef.current
-    if (!stage || !video?.videoWidth) return
-    setFrameSize(
-      kassaHelpVideoContainSize(
-        stage.clientWidth,
-        stage.clientHeight,
-        video.videoWidth,
-        video.videoHeight,
-      ),
-    )
-  }, [])
-
   useEffect(() => {
     if (!videoSrc || videoFailed) return
     playHelpVideo(videoRef.current)
   }, [videoSrc, videoFailed, stepIndex])
-
-  useEffect(() => {
-    setFrameSize(null)
-  }, [videoSrc, stepIndex])
-
-  useEffect(() => {
-    const stage = stageRef.current
-    if (!stage || !videoSrc || videoFailed) return
-    const ro = new ResizeObserver(() => recomputeFrameSize())
-    ro.observe(stage)
-    return () => ro.disconnect()
-  }, [videoSrc, videoFailed, recomputeFrameSize])
 
   const enterFullscreen = () => {
     const el = videoRef.current
@@ -212,35 +183,20 @@ function TopicPlayer({
         ) : null}
       </div>
 
-      <div
-        ref={stageRef}
-        className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#0b0f14] px-2 sm:px-3"
-      >
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-[#0b0f14]">
         {videoSrc && !videoFailed ? (
-          <div
-            className="max-h-full max-w-full overflow-hidden rounded-lg ring-1 ring-white/10 sm:rounded-xl"
-            style={
-              frameSize && frameSize.width > 0
-                ? { width: frameSize.width, height: frameSize.height }
-                : { width: '100%', aspectRatio: '16 / 9' }
-            }
-          >
-            <video
-              ref={videoRef}
-              key={videoSrc}
-              className="block h-full w-full"
-              src={videoSrc}
-              controls
-              autoPlay
-              playsInline
-              preload="auto"
-              onLoadedMetadata={(e) => {
-                playHelpVideo(e.currentTarget)
-                recomputeFrameSize()
-              }}
-              onError={onVideoError}
-            />
-          </div>
+          <video
+            ref={videoRef}
+            key={videoSrc}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            src={videoSrc}
+            controls
+            autoPlay
+            playsInline
+            preload="auto"
+            onLoadedMetadata={(e) => playHelpVideo(e.currentTarget)}
+            onError={onVideoError}
+          />
         ) : (
           <div className="flex h-full min-h-[8rem] flex-col items-center justify-center gap-2 rounded-xl bg-white/5 p-4 text-center text-sm text-white/70">
             <span>{t('kassaApp.helpVideoNoVideoYet')}</span>
