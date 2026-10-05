@@ -8,6 +8,8 @@ import {
   getAuthHeaders,
   redirectToShopOwnerLogin,
 } from '@/lib/auth-headers'
+import { useKassaHelpVideoSessionOptional } from '@/components/kassa/KassaHelpVideoSession'
+import { kassaHelpAdminModalOverlayClass } from '@/lib/kassa-help-admin-modal-overlay'
 
 const REASONS = [
   { key: 'volzet',   icon: '', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc'},
@@ -19,6 +21,7 @@ const REASONS = [
 
 export default function OnlineStatusPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const kassaHelpOpen = useKassaHelpVideoSessionOptional()?.open === true
   const [isOffline, setIsOffline] = useState(false)
   const [offlineReason, setOfflineReason] = useState<string | null>(null)
   const [offlineMessage, setOfflineMessage] = useState<string | null>(null)
@@ -249,7 +252,7 @@ ALTER TABLE shop_offline_status
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/60 p-4"
+            className={kassaHelpAdminModalOverlayClass(kassaHelpOpen)}
             onClick={() => setShowPopup(false)}
           >
             <motion.div

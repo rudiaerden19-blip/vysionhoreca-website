@@ -62,6 +62,13 @@ export function KassaHelpVideoProvider({
     saveKassaHelpVideoSession(tenantSlug, session)
   }, [tenantSlug, session])
 
+  useEffect(() => {
+    const root = document.documentElement
+    if (session.open) root.setAttribute('data-kassa-help-open', '1')
+    else root.removeAttribute('data-kassa-help-open')
+    return () => root.removeAttribute('data-kassa-help-open')
+  }, [session.open])
+
   const openHelp = useCallback(() => {
     setSession((s) => ({ ...s, open: true }))
   }, [])
@@ -112,7 +119,7 @@ export function KassaHelpVideoProvider({
         <div className="flex h-[100dvh] max-h-[100dvh] min-h-0 w-full flex-row overflow-hidden supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]">
           <div className={KASSA_COLUMN_WHEN_HELP_OPEN_CLASS}>{children}</div>
           <aside
-            className={`flex min-h-0 flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl ${KASSA_HELP_PANEL_COLUMN_CLASS}`}
+            className={`relative z-[30] flex min-h-0 flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl ${KASSA_HELP_PANEL_COLUMN_CLASS}`}
           >
             <KassaHelpVideoPanel tenantSlug={tenantSlug} />
           </aside>
