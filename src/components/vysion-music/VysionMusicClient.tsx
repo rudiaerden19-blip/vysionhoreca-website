@@ -167,7 +167,33 @@ export function VysionMusicClient({
   const searchQueryRef = useRef(searchQuery)
   const searchAbortRef = useRef<AbortController | null>(null)
   const searchDebounceRef = useRef<number | null>(null)
+  /** Blijft staan tijdens afspelen — voorkomt terugvallen naar live-geschiedenis in het paneel. */
+  const savedPlaylistViewRef = useRef<{
+    id: string
+    name: string
+    tracks: TrackRow[]
+  } | null>(null)
   searchQueryRef.current = searchQuery
+
+  const pinSavedPlaylistView = useCallback(
+    (id: string, name: string, tracks: TrackRow[]) => {
+      savedPlaylistViewRef.current = { id, name, tracks }
+      setSavedPlaylistId(id)
+      setSavedPlaylistName(name)
+      setSavedPlaylistTracks(tracks)
+      setLeftPanelMode('saved')
+    },
+    [],
+  )
+
+  const restoreSavedPlaylistView = useCallback(() => {
+    const pin = savedPlaylistViewRef.current
+    if (!pin) return
+    setLeftPanelMode('saved')
+    setSavedPlaylistId(pin.id)
+    setSavedPlaylistName(pin.name)
+    setSavedPlaylistTracks(pin.tracks)
+  }, [])
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
     setSnapshot((prev) => {
@@ -548,6 +574,7 @@ export function VysionMusicClient({
         }
         if (!res.ok || !json.playlist) {
           setError(mapPlaylistApiError(json, t, 'vysionMusic.playlistLoadFailed'))
+          savedPlaylistViewRef.current = null
           setLeftPanelMode('live')
           setSavedPlaylistId(null)
           setSavedPlaylistName('')
@@ -555,11 +582,10 @@ export function VysionMusicClient({
           return
         }
         setError(null)
-        setSavedPlaylistId(json.playlist.id)
-        setSavedPlaylistName(json.playlist.name)
-        setSavedPlaylistTracks(json.playlist.tracks)
+        pinSavedPlaylistView(json.playlist.id, json.playlist.name, json.playlist.tracks)
       } catch {
         setError(t('vysionMusic.errorNetwork'))
+        savedPlaylistViewRef.current = null
         setLeftPanelMode('live')
         setSavedPlaylistId(null)
         setSavedPlaylistName('')
@@ -568,7 +594,7 @@ export function VysionMusicClient({
         setSavedPlaylistLoading(false)
       }
     },
-    [playlistsApiBase, scrollToPlaylistPanel, t],
+    [pinSavedPlaylistView, playlistsApiBase, scrollToPlaylistPanel, t],
   )
 
   const editSavedPlaylist = useCallback(() => {
@@ -609,10 +635,7 @@ export function VysionMusicClient({
         return
       }
       setError(null)
-      setLeftPanelMode('saved')
-      setSavedPlaylistId(json.playlist.id)
-      setSavedPlaylistName(json.playlist.name)
-      setSavedPlaylistTracks(json.playlist.tracks)
+      pinSavedPlaylistView(json.playlist.id, json.playlist.name, json.playlist.tracks)
       setDraftPlaylistId(null)
       setDraftName('')
       setDraftTracks([])
@@ -627,6 +650,7 @@ export function VysionMusicClient({
     draftPlaylistId,
     draftTracks,
     fetchSavedPlaylists,
+    pinSavedPlaylistView,
     playlistsApiBase,
     t,
   ])
@@ -644,6 +668,7 @@ export function VysionMusicClient({
           return
         }
         if (savedPlaylistId === playlistId) {
+          savedPlaylistViewRef.current = null
           setLeftPanelMode('live')
           setSavedPlaylistId(null)
           setSavedPlaylistTracks([])
@@ -684,10 +709,11 @@ export function VysionMusicClient({
         setError(t('vysionMusic.errorNetwork'))
       } finally {
         setSwitchingTrack(false)
+        restoreSavedPlaylistView()
         window.setTimeout(() => void loadSnapshot(), 800)
       }
     },
-    [apiBase, draftName, loadSnapshot, savedPlaylistName, t],
+    [apiBase, draftName, loadSnapshot, restoreSavedPlaylistView, savedPlaylistName, t],
   )
 
   const playSavedPlaylistFromRow = useCallback(
@@ -761,17 +787,22 @@ export function VysionMusicClient({
     [snapshot?.playlist],
   )
 
+  const showingSavedPlaylist =
+    leftPanelMode !== 'edit' &&
+    savedPlaylistId != null &&
+    savedPlaylistTracks.length > 0
+
   const leftPanelTitle =
     leftPanelMode === 'edit'
       ? t('vysionMusic.playlistEditTitle')
-      : leftPanelMode === 'saved'
+      : showingSavedPlaylist
         ? savedPlaylistName || t('vysionMusic.playlistTitle')
         : t('vysionMusic.playlistTitle')
 
   const leftPanelRows =
     leftPanelMode === 'edit'
       ? draftTracks
-      : leftPanelMode === 'saved'
+      : showingSavedPlaylist
         ? savedPlaylistTracks
         : playlistRows
 
@@ -968,7 +999,7 @@ export function VysionMusicClient({
         <div className={styles.panel} ref={playlistPanelRef}>
           <div className={styles.panelTitleRow}>
             <div className={styles.panelTitle}>{leftPanelTitle}</div>
-            {leftPanelMode === 'saved' && savedPlaylistTracks.length > 0 ? (
+            {showingSavedPlaylist ? (
               <div className={styles.panelTitleActions}>
                 <button
                   type="button"
@@ -1036,10 +1067,10 @@ export function VysionMusicClient({
             {leftPanelMode === 'edit' && draftTracks.length === 0 ? (
               <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistEmptyDrop')}</p>
             ) : null}
-            {leftPanelMode === 'saved' && savedPlaylistLoading ? (
+            {(leftPanelMode === 'saved' || savedPlaylistId) && savedPlaylistLoading ? (
               <p className={styles.playlistEmptyDrop}>{t('vysionMusic.loading')}</p>
             ) : null}
-            {leftPanelMode === 'saved' &&
+            {savedPlaylistId &&
             !savedPlaylistLoading &&
             savedPlaylistTracks.length === 0 ? (
               <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistModalEmpty')}</p>
@@ -1054,7 +1085,7 @@ export function VysionMusicClient({
                     className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                     disabled={switchingTrack || !row.id || row.id.startsWith('placeholder')}
                     onClick={() =>
-                      leftPanelMode === 'saved'
+                      showingSavedPlaylist
                         ? playSavedPlaylistFromRow(row, savedPlaylistTracks)
                         : void playTrackRow(row)
                     }
