@@ -9,6 +9,7 @@ import { useLanguage, type Locale } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
+  getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   isReservationsSoftwareTenant,
   isShopAdminAnyPosPath,
@@ -342,12 +343,25 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     if (adminPath.includes('/admin/pincode')) return
 
     const adminRoot = `/shop/${params.tenant}/admin`
+    const isAdminHome =
+      adminPath === adminRoot || adminPath === `${adminRoot}/`
     if (
       isReservationsSoftwareTenant(moduleAccess, enabledModulesJson) &&
-      (adminPath === adminRoot || adminPath === `${adminRoot}/`)
+      isAdminHome
     ) {
       router.replace(getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson))
       return
+    }
+    if (isAdminHome) {
+      const posHref = getAdminKassaEntryHref(
+        params.tenant,
+        moduleAccess,
+        enabledModulesJson,
+      )
+      if (posHref) {
+        router.replace(posHref)
+        return
+      }
     }
 
     const gate = adminPathToModule(adminPath, params.tenant)

@@ -261,14 +261,18 @@ export default function LoginPage() {
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
       const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`
       const dest = safeNext || fallbackAfterLogin
+      const destPath = dest.split('?')[0] ?? ''
       const isKassaPosAfterLogin =
-        /\/admin\/(?:retail-kassa|kassa)(?:\/|$)/.test(dest.split('?')[0] ?? '')
+        /\/admin\/(?:retail-kassa|kassa)(?:\/|$)/.test(destPath)
+      const isAdminHomeAfterLogin =
+        destPath === `/shop/${tenant.tenant_slug}/admin` ||
+        destPath === `/shop/${tenant.tenant_slug}/admin/`
 
       const host =
         typeof window !== 'undefined'? window.location.hostname : ''
       const origin = typeof window !== 'undefined'? window.location.origin : ''
 
-      if (isKassaPosAfterLogin && origin) {
+      if ((isKassaPosAfterLogin || isAdminHomeAfterLogin) && origin) {
         /** Volledige load: één mount → één audioscherm (geen router.push-flits). */
         window.location.assign(`${origin}${dest.startsWith('/') ? dest : `/${dest}`}`)
         return

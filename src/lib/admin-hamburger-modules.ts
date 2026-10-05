@@ -599,6 +599,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       labelKey: rowLabelKey('rapporten'),
       items: [
         {
+          id: 'sm_rpt_overzicht',
+          icon: '',
+          label: 'Overzicht zaak',
+          labelKey: itemLabelKey('sm_rpt_overzicht'),
+          href: `${baseUrl}/rapporten/overzicht`,
+        },
+        {
           id: 'sm_rpt_rapporten',
           icon: '',
           label: 'Rapportages',
