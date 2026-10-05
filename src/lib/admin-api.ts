@@ -1602,6 +1602,19 @@ export async function registerCustomer(
   postal_code: string,
   city: string
 ): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+  if (typeof window !== 'undefined') {
+    const { registerShopCustomerViaApi } = await import('./shop-customer-client')
+    return registerShopCustomerViaApi(tenantSlug, {
+      email,
+      password,
+      name,
+      phone,
+      address,
+      postal_code,
+      city,
+    })
+  }
+
   // Check if email already exists
   const { data: existing } = await supabase
     .from('shop_customers')
@@ -1644,6 +1657,11 @@ export async function loginCustomer(
   email: string, 
   password: string
 ): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+  if (typeof window !== 'undefined') {
+    const { loginShopCustomerViaApi } = await import('./shop-customer-client')
+    return loginShopCustomerViaApi(tenantSlug, email, password)
+  }
+
   // First, find the customer by email
   const { data, error } = await supabase
     .from('shop_customers')
@@ -1681,7 +1699,12 @@ export async function loginCustomer(
   return { success: true, customer: data }
 }
 
-export async function getCustomer(customerId: string): Promise<Customer | null> {
+export async function getCustomer(customerId: string, tenantSlug?: string): Promise<Customer | null> {
+  if (typeof window !== 'undefined' && tenantSlug) {
+    const { fetchShopCustomerMe } = await import('./shop-customer-client')
+    return fetchShopCustomerMe(tenantSlug)
+  }
+
   const { data, error } = await supabase
     .from('shop_customers')
     .select('*')
@@ -1692,7 +1715,16 @@ export async function getCustomer(customerId: string): Promise<Customer | null> 
   return data
 }
 
-export async function updateCustomer(customerId: string, updates: Partial<Customer>): Promise<boolean> {
+export async function updateCustomer(
+  customerId: string,
+  updates: Partial<Customer>,
+  tenantSlug?: string,
+): Promise<boolean> {
+  if (typeof window !== 'undefined' && tenantSlug) {
+    const { patchShopCustomerMe } = await import('./shop-customer-client')
+    return patchShopCustomerMe(tenantSlug, updates)
+  }
+
   const { error } = await supabase
     .from('shop_customers')
     .update(updates)
@@ -1702,6 +1734,11 @@ export async function updateCustomer(customerId: string, updates: Partial<Custom
 }
 
 export async function getCustomerOrders(tenantSlug: string, customerEmail: string): Promise<Order[]> {
+  if (typeof window !== 'undefined') {
+    const { fetchShopCustomerOrders } = await import('./shop-customer-client')
+    return fetchShopCustomerOrders(tenantSlug)
+  }
+
   const { data, error } = await supabase
     .from('orders')
     .select('*')
@@ -1714,25 +1751,38 @@ export async function getCustomerOrders(tenantSlug: string, customerEmail: strin
   return data || []
 }
 
-export async function addLoyaltyPoints(customerId: string, points: number, orderTotal: number): Promise<boolean> {
-  const { data: customer } = await supabase
-    .from('shop_customers')
-    .select('loyalty_points, total_spent, total_orders')
-    .eq('id', customerId)
-    .single()
-  
-  if (!customer) return false
-  
-  const { error } = await supabase
-    .from('shop_customers')
-    .update({
+export async function addLoyaltyPoints(
+  tenantSlug: string,
+  customerId: string,
+  points: number,
+  orderTotal: number,
+): Promise<boolean> {
+  const lookup = await adminDb.select<{
+    loyalty_points: number
+    total_spent: number
+    total_orders: number
+  }>('shop_customers', {
+    tenantSlug,
+    select: 'loyalty_points,total_spent,total_orders',
+    match: { id: customerId },
+    single: 'maybe',
+  })
+
+  if (!lookup.ok || !lookup.data) return false
+  const customer = lookup.data
+
+  const updated = await adminDb.update(
+    'shop_customers',
+    {
       loyalty_points: customer.loyalty_points + points,
       total_spent: customer.total_spent + orderTotal,
       total_orders: customer.total_orders + 1,
-    })
-    .eq('id', customerId)
-  
-  return !error
+    },
+    { id: customerId, tenant_slug: tenantSlug },
+    { tenantSlug },
+  )
+
+  return updated.ok
 }
 
 // =====================================================
@@ -1787,6 +1837,11 @@ export async function deleteLoyaltyReward(rewardId: string): Promise<boolean> {
 
 // GDPR: Verwijder klant account en alle data
 export async function deleteCustomerAccount(customerId: string, tenantSlug: string): Promise<boolean> {
+  if (typeof window !== 'undefined') {
+    const { deleteShopCustomerViaApi } = await import('./shop-customer-client')
+    return deleteShopCustomerViaApi(tenantSlug)
+  }
+
   if (!supabase) return false
   
   // 1. Verwijder loyalty redemptions
@@ -1825,6 +1880,11 @@ export async function deleteCustomerAccount(customerId: string, tenantSlug: stri
 }
 
 export async function redeemReward(customerId: string, rewardId: string, pointsUsed: number, tenantSlug: string): Promise<boolean> {
+  if (typeof window !== 'undefined') {
+    const { redeemShopRewardViaApi } = await import('./shop-customer-client')
+    return redeemShopRewardViaApi(tenantSlug, rewardId, pointsUsed)
+  }
+
   // Deduct points from customer
   const { data: customer } = await supabase
     .from('shop_customers')

@@ -566,7 +566,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             : null
           if (customer) {
             const points = Math.floor(order.total)
-            await addLoyaltyPoints(customer.id, points, order.total)
+            await addLoyaltyPoints(params.tenant, customer.id, points, order.total)
             console.log(`Added ${points} loyalty points to customer ${customer.id}`)
           }
         } catch (e) {

@@ -9,7 +9,6 @@ import {
   getDeliverySettings,
   TenantSettings,
   DeliverySettings,
-  addLoyaltyPoints,
   getCustomer,
   getShopStatus,
   ShopStatus,
@@ -222,7 +221,7 @@ export default function CheckoutPageClient({
     const session = await fetchWebshopBrowserSession(params.tenant)
     const customerId = session.shop_customer_id
     if (customerId) {
-      const customer = await getCustomer(customerId)
+      const customer = await getCustomer(customerId, params.tenant)
       if (customer) {
         setLoggedInCustomerId(customerId)
         // Pre-fill customer info

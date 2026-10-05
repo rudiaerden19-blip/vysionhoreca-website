@@ -47,7 +47,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     }
 
     const [customerData, settings, rewardsData] = await Promise.all([
-      getCustomer(customerId),
+      getCustomer(customerId, params.tenant),
       getTenantSettings(params.tenant),
       getLoyaltyRewards(params.tenant),
     ])
@@ -102,7 +102,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     if (!customer) return
     setSaving(true)
     
-    const success = await updateCustomer(customer.id!, editForm)
+    const success = await updateCustomer(customer.id!, editForm, params.tenant)
     if (success) {
       setCustomer({ ...customer, ...editForm })
       setEditing(false)
