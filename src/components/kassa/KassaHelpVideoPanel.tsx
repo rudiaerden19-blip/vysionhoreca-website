@@ -10,8 +10,8 @@ import {
 } from '@/lib/kassa-help-video-catalog'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 
-/** Standaard iets ingezoomd — UI-tekst in schermopnames moet meeleesbaar zijn op tablet. */
-const HELP_VIDEO_DEFAULT_ZOOM = 1.45
+/** 100% = volledige opname (menu zichtbaar). Klant kan zelf + gebruiken voor tekst. */
+const HELP_VIDEO_DEFAULT_ZOOM = 1
 const HELP_VIDEO_ZOOM_MIN = 1
 const HELP_VIDEO_ZOOM_MAX = 2.5
 const HELP_VIDEO_ZOOM_STEP = 0.1
@@ -234,15 +234,16 @@ function TopicPlayer({
           <div className="absolute inset-0 overflow-auto rounded-lg bg-black shadow-lg sm:rounded-xl">
             <div
               className="flex min-h-full min-w-full items-center justify-center"
-              style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: 'center center',
-              }}
+              style={
+                zoom !== 1
+                  ? { transform: `scale(${zoom})`, transformOrigin: 'center center' }
+                  : undefined
+              }
             >
               <video
                 ref={videoRef}
                 key={videoSrc}
-                className="size-full object-cover object-center [transform:translateZ(0)]"
+                className="size-full object-contain object-center [transform:translateZ(0)]"
                 src={videoSrc}
                 controls
                 autoPlay
