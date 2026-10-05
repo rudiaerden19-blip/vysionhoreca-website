@@ -183,13 +183,13 @@ function TopicPlayer({
         ) : null}
       </div>
 
-      <div className="relative mx-0.5 min-h-0 flex-1 sm:mx-1">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-2 sm:px-3">
         {videoSrc && !videoFailed ? (
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg bg-black shadow-lg sm:rounded-xl">
+          <div className="w-full overflow-hidden rounded-lg ring-1 ring-white/10 sm:rounded-xl">
             <video
               ref={videoRef}
               key={videoSrc}
-              className="max-h-full max-w-full object-contain object-center"
+              className="block h-auto w-full max-w-full bg-black"
               src={videoSrc}
               controls
               autoPlay
@@ -200,7 +200,7 @@ function TopicPlayer({
             />
           </div>
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
+          <div className="flex min-h-[8rem] flex-col items-center justify-center gap-2 rounded-xl bg-white/5 p-4 text-center text-sm text-white/70">
             <span>{t('kassaApp.helpVideoNoVideoYet')}</span>
           </div>
         )}

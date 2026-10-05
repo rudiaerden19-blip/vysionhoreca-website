@@ -6,7 +6,9 @@
  * Optioneel: node scripts/upload-kassa-help-videos.mjs pincode   (alleen één topic-id)
  */
 import fs from 'fs'
+import os from 'os'
 import path from 'path'
+import { spawnSync } from 'child_process'
 import { createClient } from '@supabase/supabase-js'
 
 const DESKTOP = '/Users/rudiaerden/Desktop'
@@ -107,6 +109,71 @@ function loadEnv() {
 
 const HELP_VIDEO_BUCKET = 'kassa-help'
 
+/** Schermopnames hebben vaak zwarte balken in 1080p — cropdetect verwijdert die vóór upload. */
+function detectCropFilter(localPath) {
+  const r = spawnSync(
+    'ffmpeg',
+    [
+      '-hide_banner',
+      '-ss',
+      '2',
+      '-i',
+      localPath,
+      '-vf',
+      'cropdetect=24:16:0',
+      '-frames:v',
+      '45',
+      '-f',
+      'null',
+      '-',
+    ],
+    { encoding: 'utf8' },
+  )
+  const text = `${r.stderr || ''}${r.stdout || ''}`
+  const matches = [...text.matchAll(/crop=(\d+):(\d+):(\d+):(\d+)/g)]
+  const last = matches.at(-1)
+  if (!last) return 'crop=1920:720:0:180'
+  const [, w, h, x, y] = last
+  return `crop=${w}:${h}:${x}:${y}`
+}
+
+function transcodeHelpVideo(localPath) {
+  const crop = detectCropFilter(localPath)
+  const safeName = path.basename(localPath).replace(/\s+/g, '_')
+  const out = path.join(os.tmpdir(), `kassa-help-crop-${Date.now()}-${safeName}`)
+  console.log(`  letterbox crop: ${crop}`)
+  const r = spawnSync(
+    'ffmpeg',
+    [
+      '-hide_banner',
+      '-y',
+      '-i',
+      localPath,
+      '-vf',
+      `${crop},scale=1920:-2:flags=lanczos`,
+      '-c:v',
+      'libx264',
+      '-crf',
+      '20',
+      '-preset',
+      'medium',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '128k',
+      '-movflags',
+      '+faststart',
+      out,
+    ],
+    { stdio: 'inherit' },
+  )
+  if (r.status !== 0) {
+    console.warn('  transcode mislukt — origineel uploaden')
+    return { body: fs.readFileSync(localPath), temp: null }
+  }
+  return { body: fs.readFileSync(out), temp: out }
+}
+
 function storageObjectKey(storagePath) {
   return storagePath.replace(/^kassa-help\//, '')
 }
@@ -159,12 +226,20 @@ async function main() {
         fail++
         continue
       }
-      const body = fs.readFileSync(local)
+      console.log(`\n${storage}`)
+      const { body, temp } = transcodeHelpVideo(local)
+      if (temp) {
+        try {
+          fs.unlinkSync(temp)
+        } catch {
+          /* ignore */
+        }
+      }
       const objectKey = storageObjectKey(storage)
       const { error } = await supabase.storage.from(HELP_VIDEO_BUCKET).upload(objectKey, body, {
         contentType: 'video/mp4',
         upsert: true,
-        cacheControl: '3600',
+        cacheControl: '86400',
       })
       if (error) {
         console.error(`FAIL ${storage}:`, error.message)
