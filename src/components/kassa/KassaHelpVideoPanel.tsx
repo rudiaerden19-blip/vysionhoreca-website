@@ -9,7 +9,7 @@ import {
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
-import { kassaHelpVideoFillScale } from '@/lib/kassa-help-video-fill-scale'
+import { kassaHelpVideoContainSize } from '@/lib/kassa-help-video-fill-scale'
 
 type Props = {
   tenantSlug: string
@@ -150,19 +150,19 @@ function TopicPlayer({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const [fillScale, setFillScale] = useState(1)
+  const [frameSize, setFrameSize] = useState<{ width: number; height: number } | null>(null)
   const step = topic.steps[stepIndex]
   const hint = step ? t(step.hintKey) : ''
   const stepLabel = t('kassaApp.helpVideoStepLabel')
     .replace('{current}', String(stepIndex + 1))
     .replace('{total}', String(topic.steps.length))
 
-  const recomputeFillScale = useCallback(() => {
+  const recomputeFrameSize = useCallback(() => {
     const stage = stageRef.current
     const video = videoRef.current
     if (!stage || !video?.videoWidth) return
-    setFillScale(
-      kassaHelpVideoFillScale(
+    setFrameSize(
+      kassaHelpVideoContainSize(
         stage.clientWidth,
         stage.clientHeight,
         video.videoWidth,
@@ -177,12 +177,16 @@ function TopicPlayer({
   }, [videoSrc, videoFailed, stepIndex])
 
   useEffect(() => {
+    setFrameSize(null)
+  }, [videoSrc, stepIndex])
+
+  useEffect(() => {
     const stage = stageRef.current
     if (!stage || !videoSrc || videoFailed) return
-    const ro = new ResizeObserver(() => recomputeFillScale())
+    const ro = new ResizeObserver(() => recomputeFrameSize())
     ro.observe(stage)
     return () => ro.disconnect()
-  }, [videoSrc, videoFailed, recomputeFillScale])
+  }, [videoSrc, videoFailed, recomputeFrameSize])
 
   const enterFullscreen = () => {
     const el = videoRef.current
@@ -210,33 +214,32 @@ function TopicPlayer({
 
       <div
         ref={stageRef}
-        className="relative min-h-0 flex-1 overflow-hidden px-2 sm:px-3"
+        className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-[#0b0f14] px-2 sm:px-3"
       >
         {videoSrc && !videoFailed ? (
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-            <div
-              className="w-full max-w-full will-change-transform"
-              style={{
-                transform: `scale(${fillScale})`,
-                transformOrigin: 'center center',
+          <div
+            className="max-h-full max-w-full overflow-hidden rounded-lg ring-1 ring-white/10 sm:rounded-xl"
+            style={
+              frameSize && frameSize.width > 0
+                ? { width: frameSize.width, height: frameSize.height }
+                : { width: '100%', aspectRatio: '16 / 9' }
+            }
+          >
+            <video
+              ref={videoRef}
+              key={videoSrc}
+              className="block h-full w-full"
+              src={videoSrc}
+              controls
+              autoPlay
+              playsInline
+              preload="auto"
+              onLoadedMetadata={(e) => {
+                playHelpVideo(e.currentTarget)
+                recomputeFrameSize()
               }}
-            >
-              <video
-                ref={videoRef}
-                key={videoSrc}
-                className="block h-auto w-full bg-black"
-                src={videoSrc}
-                controls
-                autoPlay
-                playsInline
-                preload="auto"
-                onLoadedMetadata={(e) => {
-                  playHelpVideo(e.currentTarget)
-                  recomputeFillScale()
-                }}
-                onError={onVideoError}
-              />
-            </div>
+              onError={onVideoError}
+            />
           </div>
         ) : (
           <div className="flex h-full min-h-[8rem] flex-col items-center justify-center gap-2 rounded-xl bg-white/5 p-4 text-center text-sm text-white/70">
