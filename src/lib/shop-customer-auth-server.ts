@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { verifyPassword, needsHashUpgrade, type Customer } from '@/lib/admin-api'
-import { resolveWebshopTenantSlug, tenantSlugQueryVariants } from '@/lib/webshop-tenant-slug'
+import { resolveWebshopTenantSlug, webshopTenantSlugDbVariants } from '@/lib/webshop-tenant-slug'
 
 const PUBLIC_CUSTOMER_COLUMNS =
   'id,tenant_slug,email,name,phone,address,postal_code,city,loyalty_points,total_spent,total_orders,is_active,email_verified,created_at,updated_at,last_login,first_name,last_name'
@@ -36,7 +36,7 @@ export async function registerShopCustomerServer(
   }
 
   const canonicalSlug = await resolveWebshopTenantSlug(supabase, tenantSlug)
-  const slugVariants = [...new Set([canonicalSlug, ...tenantSlugQueryVariants(tenantSlug)])]
+  const slugVariants = [...new Set([canonicalSlug, ...webshopTenantSlugDbVariants(tenantSlug)])]
 
   const { data: existing } = await supabase
     .from('shop_customers')
@@ -87,7 +87,7 @@ export async function loginShopCustomerServer(
 ): Promise<{ ok: true; customer: PublicShopCustomer } | { ok: false; error: string }> {
   const email = emailRaw.trim().toLowerCase()
   const canonicalSlug = await resolveWebshopTenantSlug(supabase, tenantSlug)
-  const slugVariants = [...new Set([canonicalSlug, ...tenantSlugQueryVariants(tenantSlug)])]
+  const slugVariants = [...new Set([canonicalSlug, ...webshopTenantSlugDbVariants(tenantSlug)])]
 
   const { data, error } = await supabase
     .from('shop_customers')
@@ -124,7 +124,7 @@ export async function getShopCustomerByIdServer(
   customerId: string,
 ): Promise<PublicShopCustomer | null> {
   const canonicalSlug = await resolveWebshopTenantSlug(supabase, tenantSlug)
-  const slugVariants = [...new Set([canonicalSlug, ...tenantSlugQueryVariants(tenantSlug)])]
+  const slugVariants = [...new Set([canonicalSlug, ...webshopTenantSlugDbVariants(tenantSlug)])]
 
   const { data, error } = await supabase
     .from('shop_customers')
@@ -144,12 +144,16 @@ export async function deleteShopCustomerAccountServer(
   customerId: string,
 ): Promise<boolean> {
   const customer = await getShopCustomerByIdServer(supabase, tenantSlug, customerId)
-  const email = customer?.email?.trim().toLowerCase()
+  if (!customer?.id) return false
+
+  const dbTenant =
+    customer.tenant_slug || (await resolveWebshopTenantSlug(supabase, tenantSlug))
+  const email = customer.email?.trim().toLowerCase()
 
   await supabase
     .from('loyalty_redemptions')
     .delete()
-    .eq('tenant_slug', tenantSlug)
+    .eq('tenant_slug', dbTenant)
     .eq('customer_id', customerId)
 
   if (email) {
@@ -164,14 +168,14 @@ export async function deleteShopCustomerAccountServer(
         delivery_notes: null,
         customer_notes: null,
       })
-      .eq('tenant_slug', tenantSlug)
+      .eq('tenant_slug', dbTenant)
       .eq('customer_email', email)
   }
 
   const { error } = await supabase
     .from('shop_customers')
     .delete()
-    .eq('tenant_slug', tenantSlug)
+    .eq('tenant_slug', dbTenant)
     .eq('id', customerId)
 
   if (error) {

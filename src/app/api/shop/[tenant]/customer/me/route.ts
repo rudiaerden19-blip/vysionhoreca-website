@@ -5,6 +5,7 @@ import {
   getShopCustomerByIdServer,
 } from '@/lib/shop-customer-auth-server'
 import { resolveShopCustomerIdFromRequest } from '@/lib/shop-customer-session'
+import { resolveWebshopTenantSlug } from '@/lib/webshop-tenant-slug'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,10 +66,12 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   if (typeof body.city === 'string') updates.city = body.city.trim()
   updates.updated_at = new Date().toISOString()
 
+  const dbTenant = await resolveWebshopTenantSlug(supabase, tenantSlug)
+
   const { error } = await supabase
     .from('shop_customers')
     .update(updates)
-    .eq('tenant_slug', tenantSlug)
+    .eq('tenant_slug', dbTenant)
     .eq('id', customerId)
 
   if (error) {

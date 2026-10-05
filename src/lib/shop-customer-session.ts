@@ -3,7 +3,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import {
   readWebshopBrowserSessionToken,
   resolveWebshopTenantSlug,
-  tenantSlugQueryVariants,
+  webshopTenantSlugDbVariants,
 } from '@/lib/webshop-tenant-slug'
 
 /** Klant-id uit httpOnly webshop-sessie (zelfde cookie als /api/shop/browser-session). */
@@ -18,7 +18,7 @@ export async function resolveShopCustomerIdFromRequest(
   if (!token) return null
 
   const canonical = await resolveWebshopTenantSlug(supabase, tenantSlug)
-  const slugCandidates = [...new Set([canonical, ...tenantSlugQueryVariants(tenantSlug)])]
+  const slugCandidates = [...new Set([canonical, ...webshopTenantSlugDbVariants(tenantSlug)])]
 
   for (const slug of slugCandidates) {
     const { data, error } = await supabase

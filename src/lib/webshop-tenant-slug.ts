@@ -14,13 +14,37 @@ export function legacyWebshopBrowserSessionCookieName(tenantSlug: string): strin
   return `vysion_wbs_${tenantSlug.replace(/[^a-zA-Z0-9_-]/g, '_')}`
 }
 
+/**
+ * Alle slug-vormen om in DB te matchen (elke tenant: hyphen, case, subdomein).
+ * Geen hardcoded slug — alleen afgeleid van route/host-input.
+ */
+export function webshopTenantSlugDbVariants(slug: string): string[] {
+  const trimmed = slug.trim()
+  if (!trimmed) return []
+
+  const out = new Set<string>()
+  const seeds = [
+    trimmed,
+    trimmed.toLowerCase(),
+    trimmed.replace(/-/g, ''),
+    trimmed.toLowerCase().replace(/-/g, ''),
+  ]
+  for (const seed of seeds) {
+    if (!seed) continue
+    for (const v of tenantSlugQueryVariants(seed)) {
+      out.add(v)
+    }
+  }
+  return [...out]
+}
+
 /** Lees sessietoken — nieuwe + legacy cookienaam (alleen webshop-mand/klant). */
 export function readWebshopBrowserSessionToken(
   request: NextRequest,
   tenantSlug: string,
 ): string | null {
   const names = new Set<string>()
-  for (const slug of [tenantSlug, ...tenantSlugQueryVariants(tenantSlug)]) {
+  for (const slug of webshopTenantSlugDbVariants(tenantSlug)) {
     names.add(webshopBrowserSessionCookieName(slug))
     names.add(legacyWebshopBrowserSessionCookieName(slug))
   }
@@ -31,7 +55,7 @@ export function readWebshopBrowserSessionToken(
   return null
 }
 
-/** Canonieke `tenant_slug` uit DB (hyphen/case/subdomein). */
+/** Canonieke `tenant_slug` uit DB (tenant_settings of tenants.slug). */
 export async function resolveWebshopTenantSlug(
   supabase: SupabaseClient,
   slug: string,
@@ -39,17 +63,28 @@ export async function resolveWebshopTenantSlug(
   const trimmed = slug.trim()
   if (!trimmed) return trimmed
 
-  const variants = tenantSlugQueryVariants(trimmed)
-  const { data } = await supabase
+  const variants = webshopTenantSlugDbVariants(trimmed)
+
+  const { data: settingsRows, error: settingsErr } = await supabase
     .from('tenant_settings')
     .select('tenant_slug')
     .in('tenant_slug', variants)
     .limit(1)
-    .maybeSingle()
 
-  if (data?.tenant_slug && typeof data.tenant_slug === 'string') {
-    return data.tenant_slug
+  if (!settingsErr && settingsRows?.[0]?.tenant_slug) {
+    return String(settingsRows[0].tenant_slug)
   }
+
+  const { data: tenantRows, error: tenantsErr } = await supabase
+    .from('tenants')
+    .select('slug')
+    .in('slug', variants)
+    .limit(1)
+
+  if (!tenantsErr && tenantRows?.[0]?.slug) {
+    return String(tenantRows[0].slug)
+  }
+
   return trimmed
 }
 

@@ -3,8 +3,8 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import {
   readWebshopBrowserSessionToken,
   resolveWebshopTenantSlug,
-  tenantSlugQueryVariants,
   webshopBrowserSessionCookieName,
+  webshopTenantSlugDbVariants,
 } from '@/lib/webshop-tenant-slug'
 
 export const dynamic = 'force-dynamic'
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
   }
 
   let row: SessionRow | null = null
-  const slugCandidates = [...new Set([tenant_slug, ...tenantSlugQueryVariants(tenantInput)])]
+  const slugCandidates = [...new Set([tenant_slug, ...webshopTenantSlugDbVariants(tenantInput)])]
   for (const slug of slugCandidates) {
     const { data, error } = await supabase
       .from('webshop_browser_sessions')
@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   let existing: SessionRow | null = null
-  const slugCandidates = [...new Set([tenant_slug, ...tenantSlugQueryVariants(tenantInput)])]
+  const slugCandidates = [...new Set([tenant_slug, ...webshopTenantSlugDbVariants(tenantInput)])]
   for (const slug of slugCandidates) {
     const { data } = await supabase
       .from('webshop_browser_sessions')
