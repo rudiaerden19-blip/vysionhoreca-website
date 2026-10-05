@@ -435,7 +435,7 @@
   min-height: 2.7rem;
   padding: 0.5rem 0.4rem;
   border-radius: 999px;
-  color: var(--vm-accent);
+  color: #fff;
   font-size: clamp(0.62rem, 1.25vw, 0.76rem);
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -464,7 +464,7 @@
 
 .glassActionBtn:not(:disabled):active {
   transform: scale(0.96);
-  color: #5cb8ff;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .glassActionBtn:not(:disabled):active::before,
@@ -494,7 +494,7 @@
   width: clamp(1.45rem, 2.4vw, 1.75rem);
   height: clamp(1.45rem, 2.4vw, 1.75rem);
   flex-shrink: 0;
-  color: var(--vm-accent);
+  color: #fff;
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -504,7 +504,7 @@
   width: clamp(2rem, 3.2vw, 2.35rem);
   height: clamp(2rem, 3.2vw, 2.35rem);
   flex-shrink: 0;
-  color: var(--vm-accent);
+  color: #fff;
   transition: color 0.1s ease, transform 0.12s ease;
 }
 
@@ -519,7 +519,7 @@
 
 .transportBtn:not(:disabled):active .transportIcon {
   transform: scale(0.92);
-  color: #5cb8ff;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .transportPrimary {
@@ -529,7 +529,7 @@
   min-height: var(--vm-transport-primary);
   border-radius: 50%;
   padding: 0;
-  color: var(--vm-accent);
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -548,7 +548,7 @@
 
 .transportPrimary:not(:disabled):active .transportIconPrimary {
   transform: scale(0.9);
-  color: #5cb8ff;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .volumeColumn {
