@@ -3187,7 +3187,12 @@
     "helpVideoHintRewards2": "Ajoutez des récompenses échangeables contre des points.",
     "helpVideoHintReports1": "Rapports ou rapport Z dans l'admin pour le chiffre d'affaires.",
     "helpVideoHintReports2": "Imprimez ou envoyez le rapport Z après fermeture.",
-    "helpVideoHintFollowVideo": "Suivez les étapes de la vidéo. Appuyez sur « Étape suivante » quand vous avez terminé."
+    "helpVideoHintFollowVideo": "Suivez les étapes de la vidéo. Appuyez sur « Étape suivante » quand vous avez terminé.",
+    "helpVideoZoomIn": "Zoom avant",
+    "helpVideoZoomOut": "Zoom arrière",
+    "helpVideoZoomReset": "Zoom",
+    "helpVideoFullscreen": "Plein écran",
+    "helpVideoShowHint": "Afficher les instructions"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Session invalide. Ouvrez l’écran client depuis la caisse.",

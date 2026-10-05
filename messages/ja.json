@@ -3687,7 +3687,12 @@
     "helpVideoHintRewards2": "ポイント交換できる特典を追加。",
     "helpVideoHintReports1": "管理のレポートまたはZレポートで売上と支払い方法。",
     "helpVideoHintReports2": "閉店後にZレポートを印刷またはメール。",
-    "helpVideoHintFollowVideo": "動画の手順に従ってください。終わったら「次のステップ」をタップします。"
+    "helpVideoHintFollowVideo": "動画の手順に従ってください。終わったら「次のステップ」をタップします。",
+    "helpVideoZoomIn": "拡大",
+    "helpVideoZoomOut": "縮小",
+    "helpVideoZoomReset": "ズーム",
+    "helpVideoFullscreen": "全画面",
+    "helpVideoShowHint": "説明を表示"
   },
   "kassaCustomerDisplay": {
     "missingToken": "セッションが無効です。レジからお客様画面を開いてください。",

@@ -3687,7 +3687,12 @@
     "helpVideoHintRewards2": "أضف مكافآت قابلة للاستبدال بالنقاط.",
     "helpVideoHintReports1": "التقارير أو تقرير Z في الإدارة للإيرادات وطرق الدفع.",
     "helpVideoHintReports2": "اطبع أو أرسل تقرير Z بعد الإغلاق.",
-    "helpVideoHintFollowVideo": "اتبع الخطوات في الفيديو. اضغط «الخطوة التالية» عند الانتهاء."
+    "helpVideoHintFollowVideo": "اتبع الخطوات في الفيديو. اضغط «الخطوة التالية» عند الانتهاء.",
+    "helpVideoZoomIn": "تكبير",
+    "helpVideoZoomOut": "تصغير",
+    "helpVideoZoomReset": "تكبير",
+    "helpVideoFullscreen": "ملء الشاشة",
+    "helpVideoShowHint": "إظهار التعليمات"
   },
   "kassaCustomerDisplay": {
     "missingToken": "جلسة غير صالحة. افتح شاشة العميل من نقطة البيع.",

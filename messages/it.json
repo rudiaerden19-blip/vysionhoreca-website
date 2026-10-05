@@ -3687,7 +3687,12 @@
     "helpVideoHintRewards2": "Aggiungi premi riscattabili con punti.",
     "helpVideoHintReports1": "Report o report Z in admin per incassi e pagamenti.",
     "helpVideoHintReports2": "Stampa o invia il report Z alla chiusura.",
-    "helpVideoHintFollowVideo": "Segui i passaggi nel video. Tocca «Passo successivo» quando hai finito."
+    "helpVideoHintFollowVideo": "Segui i passaggi nel video. Tocca «Passo successivo» quando hai finito.",
+    "helpVideoZoomIn": "Ingrandisci",
+    "helpVideoZoomOut": "Riduci",
+    "helpVideoZoomReset": "Zoom",
+    "helpVideoFullscreen": "Schermo intero",
+    "helpVideoShowHint": "Mostra istruzioni"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Sessione non valida. Apri lo schermo cliente dalla cassa.",

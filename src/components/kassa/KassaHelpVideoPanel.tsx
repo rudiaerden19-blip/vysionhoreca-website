@@ -8,8 +8,13 @@ import {
   kassaHelpVideoPublicUrl,
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
-import { kassaHelpVideoMaxCssSize } from '@/lib/kassa-help-video-display'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
+
+/** Standaard iets ingezoomd — UI-tekst in schermopnames moet meeleesbaar zijn op tablet. */
+const HELP_VIDEO_DEFAULT_ZOOM = 1.45
+const HELP_VIDEO_ZOOM_MIN = 1
+const HELP_VIDEO_ZOOM_MAX = 2.5
+const HELP_VIDEO_ZOOM_STEP = 0.1
 
 type Props = {
   tenantSlug: string
@@ -149,7 +154,7 @@ function TopicPlayer({
   onBackToList: () => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [intrinsicSize, setIntrinsicSize] = useState<{ w: number; h: number } | null>(null)
+  const [zoom, setZoom] = useState(HELP_VIDEO_DEFAULT_ZOOM)
   const step = topic.steps[stepIndex]
   const hint = step ? t(step.hintKey) : ''
   const stepLabel = t('kassaApp.helpVideoStepLabel')
@@ -157,53 +162,96 @@ function TopicPlayer({
     .replace('{total}', String(topic.steps.length))
 
   useEffect(() => {
-    setIntrinsicSize(null)
+    setZoom(HELP_VIDEO_DEFAULT_ZOOM)
   }, [videoSrc])
 
   useEffect(() => {
     if (!videoSrc || videoFailed) return
     playHelpVideo(videoRef.current)
-  }, [videoSrc, videoFailed, stepIndex, intrinsicSize])
+  }, [videoSrc, videoFailed, stepIndex])
 
-  const sharpCap = intrinsicSize
-    ? kassaHelpVideoMaxCssSize(intrinsicSize.w, intrinsicSize.h)
-    : null
+  const nudgeZoom = (delta: number) => {
+    setZoom((z) => {
+      const next = Math.round((z + delta) * 10) / 10
+      return Math.min(HELP_VIDEO_ZOOM_MAX, Math.max(HELP_VIDEO_ZOOM_MIN, next))
+    })
+  }
+
+  const enterFullscreen = () => {
+    const el = videoRef.current
+    if (!el) return
+    const req =
+      el.requestFullscreen?.bind(el) ??
+      (el as HTMLVideoElement & { webkitEnterFullscreen?: () => void }).webkitEnterFullscreen?.bind(el)
+    req?.()
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <p className="shrink-0 px-2 pt-1 text-[11px] text-white/60 sm:px-3">{stepLabel}</p>
-
-      <div className="relative mx-1 min-h-0 flex-1 sm:mx-2">
+      <div className="flex shrink-0 items-center justify-between gap-2 px-2 pt-1 sm:px-3">
+        <p className="text-[11px] text-white/60">{stepLabel}</p>
         {videoSrc && !videoFailed ? (
-          <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-lg bg-black shadow-lg sm:rounded-xl">
-            <video
-              ref={videoRef}
-              key={videoSrc}
-              className="max-h-full max-w-full object-contain [transform:translateZ(0)]"
-              width={intrinsicSize?.w}
-              height={intrinsicSize?.h}
-              style={
-                sharpCap
-                  ? {
-                      maxWidth: `min(100%, ${sharpCap.maxWidthPx}px)`,
-                      maxHeight: `min(100%, ${sharpCap.maxHeightPx}px)`,
-                      width: 'auto',
-                      height: 'auto',
-                    }
-                  : { maxWidth: '100%', maxHeight: '100%' }
-              }
-              src={videoSrc}
-              controls
-              autoPlay
-              playsInline
-              preload="auto"
-              onLoadedMetadata={(e) => {
-                const v = e.currentTarget
-                setIntrinsicSize({ w: v.videoWidth, h: v.videoHeight })
-                playHelpVideo(v)
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => nudgeZoom(-HELP_VIDEO_ZOOM_STEP)}
+              className="rounded-md bg-white/10 px-2 py-0.5 text-sm font-bold text-white hover:bg-white/20"
+              aria-label={t('kassaApp.helpVideoZoomOut')}
+            >
+              −
+            </button>
+            <span className="min-w-[3rem] text-center text-[11px] tabular-nums text-white/80">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              type="button"
+              onClick={() => nudgeZoom(HELP_VIDEO_ZOOM_STEP)}
+              className="rounded-md bg-white/10 px-2 py-0.5 text-sm font-bold text-white hover:bg-white/20"
+              aria-label={t('kassaApp.helpVideoZoomIn')}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              onClick={() => setZoom(HELP_VIDEO_DEFAULT_ZOOM)}
+              className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-white/20"
+            >
+              {t('kassaApp.helpVideoZoomReset')}
+            </button>
+            <button
+              type="button"
+              onClick={enterFullscreen}
+              className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-white/20"
+            >
+              {t('kassaApp.helpVideoFullscreen')}
+            </button>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="relative mx-0.5 min-h-0 flex-1 sm:mx-1">
+        {videoSrc && !videoFailed ? (
+          <div className="absolute inset-0 overflow-auto rounded-lg bg-black shadow-lg sm:rounded-xl">
+            <div
+              className="flex min-h-full min-w-full items-center justify-center"
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: 'center center',
               }}
-              onError={onVideoError}
-            />
+            >
+              <video
+                ref={videoRef}
+                key={videoSrc}
+                className="size-full object-cover object-center [transform:translateZ(0)]"
+                src={videoSrc}
+                controls
+                autoPlay
+                playsInline
+                preload="auto"
+                onLoadedMetadata={(e) => playHelpVideo(e.currentTarget)}
+                onError={onVideoError}
+              />
+            </div>
           </div>
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-black/40 p-4 text-center text-sm text-white/70">
@@ -212,9 +260,10 @@ function TopicPlayer({
         )}
       </div>
 
-      <div className="line-clamp-2 shrink-0 px-2 py-1 text-[11px] leading-snug text-white/75 sm:px-3 sm:text-xs">
-        {hint}
-      </div>
+      <details className="shrink-0 px-2 py-0.5 text-[11px] text-white/75 sm:px-3 sm:text-xs">
+        <summary className="cursor-pointer select-none text-white/60">{t('kassaApp.helpVideoShowHint')}</summary>
+        <p className="pt-1 leading-snug">{hint}</p>
+      </details>
 
       <footer className="flex shrink-0 flex-col gap-2 border-t border-white/10 p-3 sm:flex-row sm:p-3">
         <button
