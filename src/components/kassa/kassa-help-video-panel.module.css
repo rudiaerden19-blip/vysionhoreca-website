@@ -1,0 +1,12 @@
+/* Geen zwevende PiP/fullscreen-knoppen van de browser bovenop de kassa. */
+.helpVideo {
+  pointer-events: auto;
+}
+
+.helpVideo::-webkit-media-controls-overlay-enclosure {
+  display: none !important;
+}
+
+.helpVideo::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+}

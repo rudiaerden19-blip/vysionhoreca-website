@@ -9,6 +9,7 @@ import {
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
+import styles from '@/components/kassa/kassa-help-video-panel.module.css'
 
 type Props = {
   tenantSlug: string
@@ -188,12 +189,16 @@ function TopicPlayer({
           <video
             ref={videoRef}
             key={videoSrc}
-            className="absolute inset-0 h-full w-full object-contain object-center"
+            className={`${styles.helpVideo} absolute inset-0 h-full w-full object-contain object-center`}
             src={videoSrc}
             controls
+            controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
+            disablePictureInPicture
+            disableRemotePlayback
             autoPlay
             playsInline
             preload="auto"
+            onContextMenu={(e) => e.preventDefault()}
             onLoadedMetadata={(e) => playHelpVideo(e.currentTarget)}
             onError={onVideoError}
           />
