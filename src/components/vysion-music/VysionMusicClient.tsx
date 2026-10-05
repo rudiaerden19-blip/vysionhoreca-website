@@ -103,6 +103,7 @@ export function VysionMusicClient({
   const searchRequestId = useRef(0)
   const searchQueryRef = useRef(searchQuery)
   const searchAbortRef = useRef<AbortController | null>(null)
+  const searchDebounceRef = useRef<number | null>(null)
   searchQueryRef.current = searchQuery
 
   const mergeSnapshot = useCallback((snap: Snapshot) => {
@@ -164,11 +165,7 @@ export function VysionMusicClient({
         }
         if (!stillCurrent()) return null
         if (!res.ok) return []
-        let tracks = json.search?.tracks ?? []
-        if (prefersArtistOnlySearchResults(trimmed)) {
-          tracks = filterTracksByArtistQuery(tracks, trimmed)
-        }
-        return tracks
+        return json.search?.tracks ?? []
       }
 
       try {
@@ -177,7 +174,10 @@ export function VysionMusicClient({
         setSearchResults(quickTracks)
         setSearchLoading(false)
 
-        if (prefersArtistOnlySearchResults(trimmed)) {
+        const wantsArtistCatalog =
+          prefersArtistOnlySearchResults(trimmed) &&
+          filterTracksByArtistQuery(quickTracks, trimmed).length > 0
+        if (wantsArtistCatalog) {
           setSearchLoadingMore(true)
           const fullTracks = await fetchScope('full')
           if (fullTracks == null) return
@@ -196,6 +196,16 @@ export function VysionMusicClient({
     },
     [apiBase],
   )
+
+  const submitSearchNow = useCallback(() => {
+    const trimmed = searchQueryRef.current.trim()
+    if (!trimmed) return
+    if (searchDebounceRef.current != null) {
+      window.clearTimeout(searchDebounceRef.current)
+      searchDebounceRef.current = null
+    }
+    void runSearch(trimmed)
+  }, [runSearch])
 
   useEffect(() => {
     void loadSnapshot()
@@ -225,9 +235,15 @@ export function VysionMusicClient({
       setSearchLoadingMore(false)
       return
     }
-    const id = window.setTimeout(() => void runSearch(trimmed), 100)
+    searchDebounceRef.current = window.setTimeout(() => {
+      searchDebounceRef.current = null
+      void runSearch(trimmed)
+    }, 280)
     return () => {
-      window.clearTimeout(id)
+      if (searchDebounceRef.current != null) {
+        window.clearTimeout(searchDebounceRef.current)
+        searchDebounceRef.current = null
+      }
       searchRequestId.current += 1
       searchAbortRef.current?.abort()
     }
@@ -592,17 +608,24 @@ export function VysionMusicClient({
                 className={styles.searchInput}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    submitSearchNow()
+                  }
+                }}
                 placeholder={t('vysionMusic.searchPlaceholder')}
                 aria-label={t('vysionMusic.searchPlaceholder')}
+                enterKeyHint="search"
               />
-              {searchQuery ? (
+              {searchQuery.trim() ? (
                 <button
                   type="button"
-                  className={styles.searchClear}
-                  aria-label={t('vysionMusic.searchClear')}
-                  onClick={() => setSearchQuery('')}
+                  className={styles.searchSubmit}
+                  aria-label={t('vysionMusic.searchSubmit')}
+                  onClick={() => submitSearchNow()}
                 >
-                  ×
+                  <span aria-hidden>›</span>
                 </button>
               ) : null}
             </div>

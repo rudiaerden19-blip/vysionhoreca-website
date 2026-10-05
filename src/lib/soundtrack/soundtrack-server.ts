@@ -647,7 +647,10 @@ async function collectArtistScopedTrackSearch(
   return collected.slice(0, maxResults)
 }
 
-/** Soundtrack search met paginatie; artiest-query → volledige gefilterde lijst. */
+/**
+ * Soundtrack `search(type: track)` — zelfde index als Soundtrack player (titels + artiesten).
+ * Diepe artiest-catalogus alleen bij `scope=full` én wanneer artiest-treffers bestaan.
+ */
 export async function soundtrackSearchTracks(
   query: string,
   opts?: {
@@ -658,23 +661,33 @@ export async function soundtrackSearchTracks(
 ): Promise<SoundtrackTrackRow[]> {
   const q = query.trim()
   if (!q) return []
-  const artistOnly = prefersArtistOnlySearchResults(q)
-  const defaultMax = artistOnly ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS : 80
-  const hardCap = artistOnly ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS : SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS
+  const expandArtistCatalog = prefersArtistOnlySearchResults(q)
+  const artistSearchMode = opts?.artistSearchMode ?? 'quick'
+  const catalogFull =
+    expandArtistCatalog && artistSearchMode === 'full'
+  const defaultMax = catalogFull ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS : 80
+  const hardCap = catalogFull
+    ? SOUNDTRACK_ARTIST_SEARCH_MAX_TRACKS
+    : SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS
   const maxResults = Math.min(Math.max(opts?.maxResults ?? defaultMax, 1), hardCap)
   const pageSize = Math.min(Math.max(opts?.pageSize ?? 50, 1), 50)
-  const artistSearchMode = opts?.artistSearchMode ?? 'quick'
 
-  if (artistOnly) {
-    return collectArtistScopedTrackSearch(q, maxResults, pageSize, artistSearchMode)
+  if (catalogFull) {
+    const artistTracks = await collectArtistScopedTrackSearch(
+      q,
+      maxResults,
+      pageSize,
+      'full',
+    )
+    if (artistTracks.length > 0) return artistTracks
   }
 
   let collected: SoundtrackTrackRow[] = []
-  let artistScoped: SoundtrackTrackRow[] | null = null
   let after: string | null = null
 
   const maxPages = artistSearchMode === 'quick' ? 1 : 24
-  const generalPageSize = artistSearchMode === 'quick' ? SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE : pageSize
+  const generalPageSize =
+    artistSearchMode === 'quick' ? SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE : pageSize
   for (let page = 0; page < maxPages; page++) {
     const data = await fetchSoundtrackTrackSearchPage(q, generalPageSize, after)
 
@@ -685,22 +698,13 @@ export async function soundtrackSearchTracks(
     }
 
     collected = dedupeSearchTrackRows(collected)
-
-    const scoped = collected.filter((r) => trackArtistMatchesQuery(r.artist, q))
-    if (scoped.length > 0) {
-      artistScoped = scoped
-      if (artistScoped.length >= maxResults) break
-    } else if (collected.length >= maxResults) {
-      break
-    }
+    if (collected.length >= maxResults) break
 
     const pi = data.search?.pageInfo
     if (!pi?.hasNextPage || !pi.endCursor) break
     after = pi.endCursor
   }
 
-  if (artistScoped) return artistScoped.slice(0, maxResults)
-  if (prefersArtistOnlySearchResults(q)) return []
   return collected.slice(0, maxResults)
 }
 

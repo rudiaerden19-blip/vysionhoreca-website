@@ -1,4 +1,4 @@
-/** Korte zoekterm → artiest verwacht (U2, Elvis, …), geen brede track-mix. */
+/** Korte zoekterm → optioneel diepe artiest-catalogus (U2, UB40, …), na quick track-search. */
 export function prefersArtistOnlySearchResults(query: string): boolean {
   const q = query.trim()
   if (q.length < 2 || q.length > 50) return false

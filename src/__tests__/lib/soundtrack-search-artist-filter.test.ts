@@ -33,7 +33,7 @@ describe('soundtrack search artist filter', () => {
     expect(pickArtistScopedSearchResults(rows, 'One')).toBeNull()
   })
 
-  it('treats short queries as artist-only search', () => {
+  it('treats short queries as artist catalog expansion candidates', () => {
     expect(prefersArtistOnlySearchResults('U2')).toBe(true)
     expect(prefersArtistOnlySearchResults('Elvis Presley')).toBe(true)
     expect(prefersArtistOnlySearchResults('a very long song title search phrase')).toBe(false)
