@@ -21,6 +21,20 @@ describe('webshop tenant slug (all tenants)', () => {
     expect(tenantSlugsMatch(variants[0], 'frituurrudi')).toBe(true)
   })
 
+  it('resolve falls back to route slug when ambiguous (no cross-tenant steal)', async () => {
+    const { resolveWebshopTenantSlug } = await import('@/lib/webshop-tenant-slug')
+    const supabase = {
+      from: () => ({
+        select: () => ({
+          eq: () => ({ maybeSingle: async () => ({ data: null }) }),
+          in: async () => ({ data: [{ tenant_slug: 'other-tenant' }, { tenant_slug: 'other2' }] }),
+        }),
+      }),
+    }
+    const resolved = await resolveWebshopTenantSlug(supabase as never, 'my-unique-shop')
+    expect(resolved).toBe('my-unique-shop')
+  })
+
   it('legacy cookie name differs from normalized but both are derivable', () => {
     const legacy = legacyWebshopBrowserSessionCookieName('frituur-rudi')
     const modern = webshopBrowserSessionCookieName('frituur-rudi')

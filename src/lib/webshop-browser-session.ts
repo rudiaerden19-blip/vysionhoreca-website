@@ -151,7 +151,6 @@ export async function migrateLegacyWebshopLocalStorage(tenantSlug: string): Prom
   if (typeof window === 'undefined') return
   let legacyCart: WebshopStoredCartItem[] | null = null
   let legacyWa: string | null = null
-  let legacyCustomer: string | null = null
   try {
     const rawCart = window.localStorage.getItem(legacyLocalCartKey(tenantSlug))
     if (rawCart) {
@@ -159,7 +158,6 @@ export async function migrateLegacyWebshopLocalStorage(tenantSlug: string): Prom
       if (Array.isArray(parsed)) legacyCart = parsed as WebshopStoredCartItem[]
     }
     legacyWa = window.localStorage.getItem(`whatsapp_phone_${tenantSlug}`)
-    legacyCustomer = window.localStorage.getItem(`customer_${tenantSlug}`)
   } catch {
     /* ignore */
   }
@@ -178,9 +176,7 @@ export async function migrateLegacyWebshopLocalStorage(tenantSlug: string): Prom
   if (!session.whatsapp_phone && legacyWa) {
     patch.whatsapp_phone = legacyWa
   }
-  if (!session.shop_customer_id && legacyCustomer) {
-    patch.shop_customer_id = legacyCustomer
-  }
+  // Geen legacy `customer_*` → shop_customer_id: kan zaak-/admin-id zijn geweest (geen webshop-klant).
 
   if (Object.keys(patch).length > 0) {
     await patchWebshopBrowserSession(tenantSlug, patch)

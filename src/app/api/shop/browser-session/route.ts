@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { getShopCustomerByIdServer } from '@/lib/shop-customer-auth-server'
 import {
   readWebshopBrowserSessionToken,
   resolveWebshopTenantSlug,
   webshopBrowserSessionCookieName,
   webshopTenantSlugDbVariants,
 } from '@/lib/webshop-tenant-slug'
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export const dynamic = 'force-dynamic'
 
@@ -128,14 +132,28 @@ export async function PATCH(request: NextRequest) {
     shop_customer_id: null,
   }
 
+  let nextShopCustomerId =
+    'shop_customer_id' in body ? body.shop_customer_id ?? null : prev.shop_customer_id
+
+  if (nextShopCustomerId != null && nextShopCustomerId !== prev.shop_customer_id) {
+    const id = String(nextShopCustomerId).trim()
+    if (!UUID_RE.test(id)) {
+      return NextResponse.json({ ok: false, error: 'invalid_customer' }, { status: 400 })
+    }
+    const customer = await getShopCustomerByIdServer(supabase, tenantInput, id)
+    if (!customer?.id) {
+      return NextResponse.json({ ok: false, error: 'invalid_customer' }, { status: 400 })
+    }
+    nextShopCustomerId = customer.id
+  }
+
   const nextRow = {
     tenant_slug,
     session_token: token,
     cart_items: 'cart' in body ? normalizeCart(body.cart) : normalizeCart(prev.cart_items),
     whatsapp_phone:
       'whatsapp_phone' in body ? body.whatsapp_phone?.trim() || null : prev.whatsapp_phone,
-    shop_customer_id:
-      'shop_customer_id' in body ? body.shop_customer_id ?? null : prev.shop_customer_id,
+    shop_customer_id: nextShopCustomerId,
     updated_at: new Date().toISOString(),
   }
 

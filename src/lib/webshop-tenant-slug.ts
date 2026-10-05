@@ -55,7 +55,7 @@ export function readWebshopBrowserSessionToken(
   return null
 }
 
-/** Canonieke `tenant_slug` uit DB (tenant_settings of tenants.slug). */
+/** Canonieke `tenant_slug` uit DB — nooit willekeurig andere tenant (limit(1) zonder exacte match). */
 export async function resolveWebshopTenantSlug(
   supabase: SupabaseClient,
   slug: string,
@@ -63,26 +63,44 @@ export async function resolveWebshopTenantSlug(
   const trimmed = slug.trim()
   if (!trimmed) return trimmed
 
-  const variants = webshopTenantSlugDbVariants(trimmed)
+  const { data: exactSettings } = await supabase
+    .from('tenant_settings')
+    .select('tenant_slug')
+    .eq('tenant_slug', trimmed)
+    .maybeSingle()
+  if (exactSettings?.tenant_slug) return String(exactSettings.tenant_slug)
 
-  const { data: settingsRows, error: settingsErr } = await supabase
+  const { data: exactTenant } = await supabase
+    .from('tenants')
+    .select('slug')
+    .eq('slug', trimmed)
+    .maybeSingle()
+  if (exactTenant?.slug) return String(exactTenant.slug)
+
+  const variants = webshopTenantSlugDbVariants(trimmed)
+  const matched = new Set<string>()
+
+  const { data: settingsRows } = await supabase
     .from('tenant_settings')
     .select('tenant_slug')
     .in('tenant_slug', variants)
-    .limit(1)
-
-  if (!settingsErr && settingsRows?.[0]?.tenant_slug) {
-    return String(settingsRows[0].tenant_slug)
+  for (const row of settingsRows ?? []) {
+    if (row?.tenant_slug) matched.add(String(row.tenant_slug))
   }
 
-  const { data: tenantRows, error: tenantsErr } = await supabase
+  const { data: tenantRows } = await supabase
     .from('tenants')
     .select('slug')
     .in('slug', variants)
-    .limit(1)
+  for (const row of tenantRows ?? []) {
+    if (row?.slug) matched.add(String(row.slug))
+  }
 
-  if (!tenantsErr && tenantRows?.[0]?.slug) {
-    return String(tenantRows[0].slug)
+  if (matched.size === 1) return [...matched][0]
+
+  const wantKey = normalizeTenantSlugKey(trimmed)
+  for (const m of matched) {
+    if (normalizeTenantSlugKey(m) === wantKey) return m
   }
 
   return trimmed

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { getTenantSettings, loginCustomer, TenantSettings } from '@/lib/admin-api'
 import { assignTenantHref } from '@/lib/tenant-url'
-import { clearTerminalLogout } from '@/lib/session-broadcast'
 import { fetchWebshopBrowserSession, patchWebshopBrowserSession, migrateLegacyWebshopLocalStorage } from '@/lib/webshop-browser-session'
 import { useLanguage } from '@/i18n'
 
@@ -46,7 +45,6 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
     const result = await loginCustomer(params.tenant, email, password)
     
     if (result.success && result.customer?.id) {
-      clearTerminalLogout()
       const sessionSaved = await patchWebshopBrowserSession(params.tenant, {
         shop_customer_id: result.customer.id,
       })
