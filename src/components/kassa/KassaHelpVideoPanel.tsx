@@ -8,6 +8,7 @@ import {
   kassaHelpVideoPublicUrl,
   type KassaHelpVideoTopic,
 } from '@/lib/kassa-help-video-catalog'
+import { KASSA_HELP_PANEL_COLUMN_CLASS } from '@/lib/kassa-help-panel-layout'
 
 type Props = {
   /** Gereserveerd voor tenant-specifieke video’s later */
@@ -67,7 +68,7 @@ export function KassaHelpVideoPanel({ onClose }: Props) {
 
   return (
     <aside
-      className="flex min-h-0 w-[50%] max-w-[50%] shrink-0 flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl"
+      className={`flex flex-col border-l border-white/10 bg-[#0b0f14] text-white shadow-2xl ${KASSA_HELP_PANEL_COLUMN_CLASS}`}
       data-testid="kassa-help-panel"
       aria-label={t('kassaApp.helpVideoPanelTitle')}
     >

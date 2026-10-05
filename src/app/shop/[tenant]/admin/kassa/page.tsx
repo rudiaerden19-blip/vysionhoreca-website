@@ -89,6 +89,7 @@ import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
 import { KassaHelpVideoPanel } from '@/components/kassa/KassaHelpVideoPanel'
+import { KASSA_COLUMN_WHEN_HELP_OPEN_CLASS } from '@/lib/kassa-help-panel-layout'
 import {
   kassaUiLayoutUsesPosLuxury,
 } from '@/lib/kassa-ui-layout'
@@ -5226,8 +5227,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
       ) : null}
       <div
-        className={`relative flex min-h-0 flex-col overflow-hidden h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
-          kassaHelpOpen ? 'w-[50%] max-w-[50%] shrink-0' : 'w-full flex-1 min-w-0'
+        className={`relative flex min-h-0 flex-col h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh] ${
+          kassaHelpOpen ? KASSA_COLUMN_WHEN_HELP_OPEN_CLASS : 'w-full min-w-0 flex-1 overflow-hidden'
         }`}
       >
       <LogoutSoftwareConfirmModal
