@@ -1,10 +1,5 @@
 import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
 import {
-  mapSoundtrackTrackRow,
-  SOUNDTRACK_TRACK_GRAPHQL_FIELDS,
-  type SoundtrackTrackGraphNode,
-} from '@/lib/soundtrack/soundtrack-track-map'
-import {
   SoundtrackApiError,
   soundtrackGraphql,
 } from '@/lib/soundtrack/soundtrack-server'
@@ -29,9 +24,14 @@ const ZONE_ACCOUNT_QUERY = `query($id: ID!) {
   }
 }`
 
-/** Soundtrack API: `Playlist` heeft géén `artwork` — alleen `Soundtrack`-stations wel. */
-const SOUNDTRACK_STATION_ARTWORK = `
-  artwork { url sizes { thumbnail teaser hero } }
+/** Zelfde hoes als Soundtrack desktop: `display.image`, niet track-artwork. */
+const LIBRARY_DISPLAY_IMAGE = `
+  display {
+    image {
+      sizes { thumbnail teaser hero }
+      size
+    }
+  }
 `
 
 const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
@@ -41,9 +41,9 @@ const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
       edges {
         node {
           __typename
-          ... on Playlist { id name }
-          ... on Soundtrack { id name ${SOUNDTRACK_STATION_ARTWORK} }
-          ... on Schedule { id name }
+          ... on Playlist { id name ${LIBRARY_DISPLAY_IMAGE} }
+          ... on Soundtrack { id name ${LIBRARY_DISPLAY_IMAGE} }
+          ... on Schedule { id name ${LIBRARY_DISPLAY_IMAGE} }
         }
       }
     }
@@ -54,10 +54,10 @@ const LIBRARY_SPLIT_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
     playlists(first: 200) {
-      edges { node { id name } }
+      edges { node { id name ${LIBRARY_DISPLAY_IMAGE} } }
     }
     soundtracks(first: 200) {
-      edges { node { id name ${SOUNDTRACK_STATION_ARTWORK} } }
+      edges { node { id name ${LIBRARY_DISPLAY_IMAGE} } }
     }
   }
 }`
@@ -66,7 +66,7 @@ const LIBRARY_PLAYLISTS_ONLY_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
     playlists(first: 200) {
-      edges { node { id name } }
+      edges { node { id name ${LIBRARY_DISPLAY_IMAGE} } }
     }
   }
 }`
@@ -88,23 +88,25 @@ type LibraryArtworkNode = {
   __typename?: string
   id?: string
   name?: string | null
-  artwork?: {
-    url?: string | null
-    sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
+  display?: {
+    image?: {
+      size?: string | null
+      sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
+    } | null
   } | null
 }
 
-function libraryItemImageUrl(node: LibraryArtworkNode): string | null {
-  const sizeSources = [node.artwork?.sizes]
-  for (const sizes of sizeSources) {
-    if (!sizes) continue
-    for (const key of ['teaser', 'hero', 'thumbnail'] as const) {
+/** Soundtrack bibliotheek-lijst: thumbnail uit `display.image` (desktop-player). */
+export function soundtrackLibraryListImageUrl(node: LibraryArtworkNode): string | null {
+  const sizes = node.display?.image?.sizes
+  if (sizes) {
+    for (const key of ['thumbnail', 'teaser', 'hero'] as const) {
       const raw = sizes[key]?.trim()
       if (raw) return soundtrackAlbumArtUrl(raw)
     }
   }
-  const direct = node.artwork?.url?.trim()
-  if (direct) return soundtrackAlbumArtUrl(direct)
+  const single = node.display?.image?.size?.trim()
+  if (single) return soundtrackAlbumArtUrl(single)
   return null
 }
 
@@ -117,7 +119,7 @@ function mapLibraryNodes(
     const id = edge.node?.id?.trim()
     const name = edge.node?.name?.trim()
     if (!id || !name) continue
-    const imageUrl = libraryItemImageUrl(edge.node)
+    const imageUrl = soundtrackLibraryListImageUrl(edge.node)
     rows.push({
       id,
       name,
@@ -154,26 +156,23 @@ function isUnknownFieldError(e: unknown): boolean {
   return /Cannot query field|Unknown field|Unknown type/i.test(msg)
 }
 
-async function playlistCoverFromFirstTrack(
-  playlistId: string,
+const LIBRARY_DISPLAY_BY_ID_QUERY = `query($id: ID!) {
+  node(id: $id) {
+    __typename
+    ... on Playlist { ${LIBRARY_DISPLAY_IMAGE} }
+    ... on Soundtrack { ${LIBRARY_DISPLAY_IMAGE} }
+    ... on Schedule { ${LIBRARY_DISPLAY_IMAGE} }
+  }
+}`
+
+async function fetchLibraryDisplayImageUrl(
+  sourceId: string,
   gql: SoundtrackGql,
 ): Promise<string | null> {
-  const data = await gql<{
-    playlist: {
-      tracks: { edges: { node: SoundtrackTrackGraphNode }[] }
-    } | null
-  }>(
-    `query($id: ID!) {
-      playlist(id: $id) {
-        tracks(first: 1) {
-          edges { node { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} } }
-        }
-      }
-    }`,
-    { id: playlistId },
-  )
-  const track = data.playlist?.tracks?.edges?.[0]?.node
-  return track ? mapSoundtrackTrackRow(track)?.imageUrl ?? null : null
+  const data = await gql<{ node: LibraryArtworkNode | null }>(LIBRARY_DISPLAY_BY_ID_QUERY, {
+    id: sourceId,
+  })
+  return data.node ? soundtrackLibraryListImageUrl(data.node) : null
 }
 
 async function enrichLibraryCovers(
@@ -187,19 +186,8 @@ async function enrichLibraryCovers(
   await Promise.all(
     missing.map(async (row) => {
       try {
-        if (row.sourceKind === 'soundtrack') {
-          const data = await gql<{
-            soundtrack: LibraryArtworkNode | null
-          }>(
-            `query($id: ID!) { soundtrack(id: $id) { ${SOUNDTRACK_STATION_ARTWORK} } }`,
-            { id: row.id },
-          )
-          const url = data.soundtrack ? libraryItemImageUrl(data.soundtrack) : null
-          if (url) coverById.set(row.id, url)
-          return
-        }
-        const fromTrack = await playlistCoverFromFirstTrack(row.id, gql)
-        if (fromTrack) coverById.set(row.id, fromTrack)
+        const url = await fetchLibraryDisplayImageUrl(row.id, gql)
+        if (url) coverById.set(row.id, url)
       } catch {
         /* skip */
       }
