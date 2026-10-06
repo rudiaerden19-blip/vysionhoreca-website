@@ -37,7 +37,6 @@ export function VysionMusicCatalogPanel({
   tenant,
   activeSourceId,
   nowTrackId,
-  onSelectPlaylist,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
   busy,
@@ -45,7 +44,6 @@ export function VysionMusicCatalogPanel({
   tenant: string
   activeSourceId: string | null
   nowTrackId: string | null
-  onSelectPlaylist: (sourceId: string) => boolean | Promise<boolean>
   onPlayPlaylistTrack: (sourceId: string, trackId: string) => void | Promise<void>
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
   busy: boolean
@@ -192,12 +190,7 @@ export function VysionMusicCatalogPanel({
   const selectedName = selectedItem?.name ?? t('vysionMusic.tracksTitle')
 
   const pickPlaylist = (id: string) => {
-    const prev = selectedId
     setSelectedId(id)
-    void (async () => {
-      const ok = await onSelectPlaylist(id)
-      if (!ok) setSelectedId(activeSourceId ?? prev)
-    })()
   }
 
   return (

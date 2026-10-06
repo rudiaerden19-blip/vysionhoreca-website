@@ -263,48 +263,21 @@ export function VysionMusicClient({
     window.setTimeout(() => void loadSnapshot(), 1500)
   }, [loadSnapshot])
 
-  const assignSourceAndPlay = useCallback(
-    async (assignInput: Record<string, unknown>): Promise<boolean> => {
-      const assignPayload = { immediate: true, ...assignInput }
-      const assigned = await postMutation('soundZoneAssignSource', assignPayload)
-      if (!assigned) return false
-      if (assignPayload.immediate === true) return true
-      return postMutation('play', {}, { silent: true })
-    },
-    [postMutation],
-  )
-
-  const selectLibrarySource = useCallback(
-    async (sourceId: string): Promise<boolean> => {
-      setPlaylistSelecting(true)
-      try {
-        const ok = await assignSourceAndPlay({
-          source: sourceId,
-          sourceTrackIndex: 0,
-        })
-        if (ok) refreshSnapshotAfterControl()
-        return ok
-      } finally {
-        setPlaylistSelecting(false)
-      }
-    },
-    [assignSourceAndPlay, refreshSnapshotAfterControl],
-  )
-
   const queueTrackNow = useCallback(
     async (trackId: string) => {
       setPlaylistSelecting(true)
       try {
-        await postMutation('soundZoneQueueTracks', {
+        const ok = await postMutation('soundZoneQueueTracks', {
           tracks: [trackId],
           immediate: true,
           clearQueuedTracks: true,
         })
+        if (ok) refreshSnapshotAfterControl()
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation],
+    [postMutation, refreshSnapshotAfterControl],
   )
 
   const playPlaylistTrack = useCallback(
@@ -484,7 +457,6 @@ export function VysionMusicClient({
         activeSourceId={playFromId}
         nowTrackId={nowTrack?.id ?? null}
         busy={catalogBusy}
-        onSelectPlaylist={selectLibrarySource}
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}
       />
