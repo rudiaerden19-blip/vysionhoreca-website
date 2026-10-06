@@ -13,21 +13,27 @@ function row(partial: Partial<SoundtrackTrackRow> & Pick<SoundtrackTrackRow, 'id
 }
 
 describe('dedupeSearchTrackRows', () => {
-  it('keeps first row per track id', () => {
-    const a = row({ id: 't1' })
-    const b = row({ id: 't1', name: 'Other title' })
-    expect(dedupeSearchTrackRows([a, b])).toEqual([a])
-  })
-
-  it('dedupes different ids with same title artist duration', () => {
+  it('dedupes same title+artist with different track ids', () => {
     const a = row({ id: 't1' })
     const b = row({ id: 't2' })
     expect(dedupeSearchTrackRows([a, b])).toEqual([a])
   })
 
-  it('keeps different duration as separate version', () => {
+  it('dedupes same title+artist with different duration', () => {
     const a = row({ id: 't1', durationMs: 184_000 })
-    const b = row({ id: 't2', durationMs: 200_000 })
+    const b = row({ id: 't2', durationMs: 183_000 })
+    expect(dedupeSearchTrackRows([a, b])).toEqual([a])
+  })
+
+  it('normalizes case and spacing', () => {
+    const a = row({ id: 't1', name: 'Red Red Wine', artist: 'UB40' })
+    const b = row({ id: 't2', name: '  red   red   wine  ', artist: ' ub40 ' })
+    expect(dedupeSearchTrackRows([a, b])).toEqual([a])
+  })
+
+  it('keeps different title or artist', () => {
+    const a = row({ id: 't1' })
+    const b = row({ id: 't2', name: 'Other Song' })
     expect(dedupeSearchTrackRows([a, b])).toHaveLength(2)
   })
 })

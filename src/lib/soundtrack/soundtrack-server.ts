@@ -748,22 +748,18 @@ export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
 function normalizeSearchTrackDedupeKey(row: SoundtrackTrackRow): string {
   const title = row.name.trim().toLowerCase().replace(/\s+/g, ' ')
   const artist = row.artist.trim().toLowerCase().replace(/\s+/g, ' ')
-  const dur = Math.max(0, Math.round(row.durationMs))
-  return `${title}\u0000${artist}\u0000${dur}`
+  return `${title}\u0000${artist}`
 }
 
-/** Zoekresultaten: unieke track-id, daarna zelfde opname (titel+artiest+duur). */
+/** Zoekresultaten: één rij per genormaliseerde titel + artiest (eerste behouden). */
 export function dedupeSearchTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
-  const seenIds = new Set<string>()
-  const seenRecording = new Set<string>()
+  const seen = new Set<string>()
   const out: SoundtrackTrackRow[] = []
   for (const row of rows) {
-    const id = row.id.trim()
-    if (!id || seenIds.has(id)) continue
-    const recordingKey = normalizeSearchTrackDedupeKey(row)
-    if (seenRecording.has(recordingKey)) continue
-    seenIds.add(id)
-    seenRecording.add(recordingKey)
+    const key = normalizeSearchTrackDedupeKey(row)
+    if (!key || key === '\u0000') continue
+    if (seen.has(key)) continue
+    seen.add(key)
     out.push(row)
   }
   return out
