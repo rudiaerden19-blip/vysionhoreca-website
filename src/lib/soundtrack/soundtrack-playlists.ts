@@ -299,6 +299,44 @@ async function resolveZoneAccountId(zoneId: string): Promise<string> {
   return accountId
 }
 
+const OWNER_LIBRARY_VERSION_QUERY = `query($owner: ID!) {
+  library(owner: $owner) { version }
+}`
+
+/**
+ * Soundtrack desktop player volgt `library` + `libraryUpdate` (owner), niet alleen `musicLibrary`.
+ * Na create: playlist staat in musicLibrary via `addToMusicLibrary`; `addToLibrary` pusht revision naar players.
+ */
+async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
+  const owner = ownerId.trim()
+  const id = playlistId.trim()
+  if (!owner || !id) return
+
+  let version: string | undefined
+  try {
+    const data = await soundtrackGraphql<{
+      library: { version: string | null } | null
+    }>(OWNER_LIBRARY_VERSION_QUERY, { owner })
+    const v = data.library?.version?.trim()
+    if (v) version = v
+  } catch {
+    /* version is optional on addToLibrary */
+  }
+
+  await soundtrackGraphql(
+    `mutation($owner: ID!, $input: AddToLibraryInput!) {
+      addToLibrary(owner: $owner, input: $input) { version }
+    }`,
+    {
+      owner,
+      input: {
+        ...(version ? { version } : {}),
+        items: [{ id, itemKind: 'PLAYLIST' }],
+      },
+    },
+  )
+}
+
 /** Soundtrack `createManualPlaylist` + `addToMusicLibrary` (zelfde account-bibliotheek als lijst-UI). */
 export async function createManualPlaylistInMusicLibrary(
   zoneId: string,
@@ -327,10 +365,14 @@ export async function createManualPlaylistInMusicLibrary(
 
   await soundtrackGraphql(
     `mutation($input: AddToMusicLibraryInput!) {
-      addToMusicLibrary(input: $input) { __typename }
+      addToMusicLibrary(input: $input) {
+        musicLibrary { revision ids }
+      }
     }`,
     { input: { parent: ownerId, source: id } },
   )
+
+  await addPlaylistToOwnerLibrary(ownerId, id)
 
   return {
     id,
