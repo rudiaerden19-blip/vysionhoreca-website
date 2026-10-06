@@ -236,12 +236,21 @@ export async function withSoundtrackAudioFade<T>(
   }
 }
 
-async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string> {
-  const needle = zoneName.trim()
-  if (!needle) throw new SoundtrackConfigError('Empty Soundtrack zone name')
-  const cacheKey = needle.toLowerCase()
-  const cached = zoneIdByNameCache.get(cacheKey)
-  if (cached) return cached
+type SoundZoneRef = { id: string; name: string }
+
+const ALL_SOUND_ZONES_TTL_MS = 120_000
+let allSoundZonesCache: { fetchedAt: number; zones: SoundZoneRef[] } | null = null
+
+function normalizeSoundZoneNameKey(name: string): string {
+  return name.trim().toLowerCase()
+}
+
+/** Alle zones onder het Vercel Soundtrack API-token (partner-account). */
+async function fetchAllSoundZonesFromApi(): Promise<SoundZoneRef[]> {
+  const now = Date.now()
+  if (allSoundZonesCache && now - allSoundZonesCache.fetchedAt < ALL_SOUND_ZONES_TTL_MS) {
+    return allSoundZonesCache.zones
+  }
 
   const data = await soundtrackGraphql<{
     me: {
@@ -281,19 +290,41 @@ async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string
     }
   }`)
 
-  const accounts = data.me?.accounts?.edges ?? []
-  for (const ae of accounts) {
+  const zones: SoundZoneRef[] = []
+  for (const ae of data.me?.accounts?.edges ?? []) {
     for (const le of ae.node.locations?.edges ?? []) {
       for (const se of le.node.soundZones?.edges ?? []) {
-        const z = se.node
-        if (z.name.trim() === needle) {
-          zoneIdByNameCache.set(cacheKey, z.id)
-          return z.id
-        }
+        const id = se.node.id?.trim()
+        const name = se.node.name?.trim()
+        if (id && name) zones.push({ id, name })
       }
     }
   }
-  throw new SoundtrackConfigError(`Soundtrack zone not found: ${needle}`)
+  allSoundZonesCache = { fetchedAt: now, zones }
+  return zones
+}
+
+function findSoundZoneIdByDisplayName(zones: SoundZoneRef[], zoneName: string): string | null {
+  const key = normalizeSoundZoneNameKey(zoneName)
+  if (!key) return null
+  for (const z of zones) {
+    if (normalizeSoundZoneNameKey(z.name) === key) return z.id
+  }
+  return null
+}
+
+async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string> {
+  const needle = zoneName.trim()
+  if (!needle) throw new SoundtrackConfigError('Empty Soundtrack zone name')
+  const cacheKey = normalizeSoundZoneNameKey(needle)
+  const cached = zoneIdByNameCache.get(cacheKey)
+  if (cached) return cached
+
+  const zones = await fetchAllSoundZonesFromApi()
+  const id = findSoundZoneIdByDisplayName(zones, needle)
+  if (!id) throw new SoundtrackConfigError(`Soundtrack zone not found: ${needle}`)
+  zoneIdByNameCache.set(cacheKey, id)
+  return id
 }
 
 export type SoundtrackZoneLinkSource =
@@ -332,14 +363,16 @@ export async function resolveSoundZoneForTenant(
   let resolved = ''
   let linkSource: SoundtrackZoneLinkSource = 'env_name'
 
+  let businessName = ''
   const supabase = getServerSupabaseClient()
   if (supabase) {
     const { data, error } = await supabase
       .from('tenant_settings')
-      .select('soundtrack_sound_zone_id, soundtrack_zone_name')
+      .select('soundtrack_sound_zone_id, soundtrack_zone_name, business_name')
       .eq('tenant_slug', slug)
       .maybeSingle()
     if (!error && data) {
+      businessName = (data.business_name as string | null | undefined)?.trim() || ''
       const fromTenantId = (data.soundtrack_sound_zone_id as string | null | undefined)?.trim()
       if (fromTenantId) {
         resolved = fromTenantId
@@ -350,6 +383,22 @@ export async function resolveSoundZoneForTenant(
           resolved = await resolveSoundZoneIdByDisplayName(fromTenantName)
           linkSource = 'tenant_name'
         }
+      }
+    }
+  }
+
+  /** Per tenant: zone in Soundtrack heet meestal zoals slug of zaaknaam (eigen player op PC). */
+  if (!resolved) {
+    const zones = await fetchAllSoundZonesFromApi()
+    const bySlug = findSoundZoneIdByDisplayName(zones, slug)
+    if (bySlug) {
+      resolved = bySlug
+      linkSource = 'tenant_name'
+    } else if (businessName) {
+      const byBusiness = findSoundZoneIdByDisplayName(zones, businessName)
+      if (byBusiness) {
+        resolved = byBusiness
+        linkSource = 'tenant_name'
       }
     }
   }
@@ -365,7 +414,7 @@ export async function resolveSoundZoneForTenant(
 
   if (!resolved) {
     throw new SoundtrackConfigError(
-      'No Soundtrack sound zone configured for this tenant (set tenant_settings or SOUNDTRACK_DEFAULT_SOUND_ZONE_ID / SOUNDTRACK_DEFAULT_ZONE_NAME on Vercel)',
+      `Geen Soundtrack-zone voor tenant «${slug}». Noem de zone in Soundtrack hetzelfde als de tenant-slug of zaaknaam, of zet soundtrack_sound_zone_id in tenant_settings.`,
     )
   }
 
