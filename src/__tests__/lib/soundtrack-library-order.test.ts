@@ -1,4 +1,7 @@
-import { dedupeLibraryRowsPreserveOrder } from '@/lib/soundtrack/soundtrack-playlists'
+import {
+  dedupeLibraryRowsPreserveOrder,
+  orderLibraryRowsByIds,
+} from '@/lib/soundtrack/soundtrack-playlists'
 
 describe('dedupeLibraryRowsPreserveOrder', () => {
   it('keeps Soundtrack desktop order (no alphabetical sort)', () => {
@@ -12,6 +15,16 @@ describe('dedupeLibraryRowsPreserveOrder', () => {
       'Modern Jazz',
       'Dream House',
     ])
+  })
+
+  it('orders rows by musicLibrary.ids from Soundtrack API', () => {
+    const byId = new Map(
+      [
+        { id: '1', name: 'B', sourceKind: 'playlist' as const, imageUrl: null },
+        { id: '2', name: 'A', sourceKind: 'playlist' as const, imageUrl: null },
+      ].map((r) => [r.id, r]),
+    )
+    expect(orderLibraryRowsByIds(['2', '1'], byId).map((r) => r.name)).toEqual(['A', 'B'])
   })
 
   it('drops duplicate ids keeping first occurrence', () => {

@@ -263,39 +263,59 @@ export function VysionMusicClient({
     window.setTimeout(() => void loadSnapshot(), 1500)
   }, [loadSnapshot])
 
+  const assignSourceAndPlay = useCallback(
+    async (assignInput: Record<string, unknown>): Promise<boolean> => {
+      const assigned = await postMutation('soundZoneAssignSource', {
+        immediate: true,
+        ...assignInput,
+      })
+      if (!assigned) return false
+      return postMutation('play', {}, { silent: true })
+    },
+    [postMutation],
+  )
+
   const selectLibrarySource = useCallback(
     async (sourceId: string): Promise<boolean> => {
       setPlaylistSelecting(true)
       try {
-        const ok = await postMutation('setPlayFrom', { source: sourceId })
+        const ok = await assignSourceAndPlay({
+          source: sourceId,
+          sourceTrackIndex: 0,
+        })
         if (ok) refreshSnapshotAfterControl()
         return ok
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation, refreshSnapshotAfterControl],
+    [assignSourceAndPlay, refreshSnapshotAfterControl],
   )
 
   const playPlaylistTrack = useCallback(
     async (sourceId: string, trackId: string): Promise<boolean> => {
       setPlaylistSelecting(true)
       try {
-        const ok = await postMutation('playPlaylistTrack', { source: sourceId, trackId })
+        const ok = await assignSourceAndPlay({ source: sourceId, track: trackId })
         if (ok) refreshSnapshotAfterControl()
         return ok
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation, refreshSnapshotAfterControl],
+    [assignSourceAndPlay, refreshSnapshotAfterControl],
   )
 
   const playSearchTrack = useCallback(
     async (trackId: string) => {
       setPlaylistSelecting(true)
       try {
-        await postMutation('playSearchTrack', { trackId })
+        const queued = await postMutation('soundZoneQueueTracks', {
+          tracks: [trackId],
+          immediate: true,
+          clearQueuedTracks: true,
+        })
+        if (queued) await postMutation('play', {}, { silent: true })
       } finally {
         setPlaylistSelecting(false)
       }

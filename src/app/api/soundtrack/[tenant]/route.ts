@@ -1,38 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
+  isSoundtrackPublicMutationName,
+  soundtrackExecutePublicMutation,
+} from '@/lib/soundtrack/soundtrack-public-mutations'
+import {
   SoundtrackApiError,
   SoundtrackConfigError,
   emptySoundtrackPlayerSnapshot,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneForTenant,
-  skipSoundZoneTracks,
-  soundtrackGraphql,
-  soundtrackPauseZone,
-  soundtrackApplyPlayFromSource,
-  soundtrackJumpToPlaylistTrack,
-  soundtrackPlayZone,
-  soundtrackQueueAndPlayTrack,
   soundtrackSearchTracks,
-  soundtrackSkipTrack,
   soundtrackUiPercentToApiVolume,
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
 
 type RouteContext = { params: { tenant: string } }
-
-const SOUNDTRACK_MUTATIONS = [
-  'play',
-  'pause',
-  'setPlayFrom',
-  'playPlaylistTrack',
-  'playSearchTrack',
-  'skipTrack',
-  'skipTracks',
-  'setVolume',
-] as const
-type SoundtrackMutationName = (typeof SOUNDTRACK_MUTATIONS)[number]
 
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
@@ -84,75 +68,36 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const mutation = body.mutation as SoundtrackMutationName | undefined
-  if (!mutation || !SOUNDTRACK_MUTATIONS.includes(mutation)) {
+  const mutation = body.mutation?.trim() ?? ''
+  if (!isSoundtrackPublicMutationName(mutation)) {
     return NextResponse.json(
-      { error: `mutation must be one of: ${SOUNDTRACK_MUTATIONS.join(', ')}` },
+      {
+        error: `mutation must be a Soundtrack Public API name: ${[
+          'play',
+          'pause',
+          'setPlayFrom',
+          'soundZoneAssignSource',
+          'soundZoneQueueTracks',
+          'skipTrack',
+          'skipTracks',
+          'setVolume',
+        ].join(', ')}`,
+      },
       { status: 400 },
     )
   }
 
-  const input = body.input ?? {}
+  const input = { ...(body.input ?? {}) }
 
   try {
     const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
 
-    switch (mutation) {
-      case 'play':
-        await soundtrackPlayZone(zoneId)
-        break
-      case 'pause':
-        await soundtrackPauseZone(zoneId)
-        break
-      case 'setPlayFrom': {
-        const source = String(input.source ?? '').trim()
-        if (!source) {
-          return NextResponse.json({ error: 'input.source required' }, { status: 400 })
-        }
-        await soundtrackApplyPlayFromSource(zoneId, source)
-        break
-      }
-      case 'playPlaylistTrack': {
-        const source = String(input.source ?? '').trim()
-        const trackId = String(input.trackId ?? '').trim()
-        if (!source || !trackId) {
-          return NextResponse.json({ error: 'input.source and trackId required' }, { status: 400 })
-        }
-        await soundtrackJumpToPlaylistTrack(zoneId, source, trackId)
-        break
-      }
-      case 'playSearchTrack': {
-        const trackId = String(input.trackId ?? '').trim()
-        if (!trackId) {
-          return NextResponse.json({ error: 'input.trackId required' }, { status: 400 })
-        }
-        await soundtrackQueueAndPlayTrack(zoneId, trackId)
-        break
-      }
-      case 'skipTrack':
-        await soundtrackSkipTrack(zoneId)
-        break
-      case 'skipTracks': {
-        const tracksToSkip =
-          typeof input.tracksToSkip === 'number' && Number.isFinite(input.tracksToSkip)
-            ? Math.max(0, Math.floor(input.tracksToSkip))
-            : 1
-        const crossfade = input.crossfade !== false
-        if (tracksToSkip > 0) await skipSoundZoneTracks(zoneId, tracksToSkip, crossfade)
-        break
-      }
-      case 'setVolume': {
-        const ui = typeof input.volume === 'number' ? input.volume : 0
-        const volume = soundtrackUiPercentToApiVolume(ui)
-        await soundtrackGraphql(
-          `mutation($input: SetVolumeInput!) { setVolume(input: $input) { status volume } }`,
-          { input: { soundZone: zoneId, volume } },
-        )
-        break
-      }
-      default:
-        break
+    if (mutation === 'setVolume') {
+      const ui = typeof input.volume === 'number' ? input.volume : 0
+      input.volume = soundtrackUiPercentToApiVolume(ui)
     }
+
+    await soundtrackExecutePublicMutation(zoneId, mutation, input)
 
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, mutation, snapshot })
