@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { quantizeVolumeUiPercent } from '@/lib/soundtrack/soundtrack-server'
@@ -16,7 +16,9 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
+import type { VysionMusicCatalogTrack } from './vysion-music-catalog-cache'
 import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
+import { perfLog, perfNow } from './vysion-music-perf'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -86,7 +88,9 @@ export function VysionMusicClient({
   const [tick, setTick] = useState(0)
   const [volumeUi, setVolumeUi] = useState(0)
   const [coverBroken, setCoverBroken] = useState(false)
+  const [visibleCoverSrc, setVisibleCoverSrc] = useState<string | null>(null)
   const [playlistSelecting, setPlaylistSelecting] = useState(false)
+  const [optimisticTrack, setOptimisticTrack] = useState<TrackRow | null>(null)
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -95,6 +99,9 @@ export function VysionMusicClient({
   const volumeDraggingRef = useRef(false)
   const nowLeftRef = useRef<HTMLDivElement>(null)
   const lastTrackKeyRef = useRef('')
+  const optimisticStartedAtRef = useRef<string | null>(null)
+  const confirmSessionRef = useRef(0)
+  const visibleCoverForTrackIdRef = useRef<string | null>(null)
 
   const applyServerVolume = useCallback((v: number) => {
     const q = quantizeVolumeUiPercent(v)
@@ -117,22 +124,27 @@ export function VysionMusicClient({
     [applyServerVolume],
   )
 
+  const fetchSnapshot = useCallback(async (): Promise<Snapshot | null> => {
+    const res = await fetch(apiBase, { headers: getAuthHeaders(), cache: 'no-store' })
+    const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
+    if (!res.ok) {
+      setError(json.error || t('vysionMusic.errorLoad'))
+      return null
+    }
+    return json.snapshot ?? null
+  }, [apiBase, t])
+
   const loadSnapshot = useCallback(async () => {
     try {
-      const res = await fetch(apiBase, { headers: getAuthHeaders(), cache: 'no-store' })
-      const json = (await res.json()) as { snapshot?: Snapshot; error?: string }
-      if (!res.ok) {
-        setError(json.error || t('vysionMusic.errorLoad'))
-        return
-      }
-      if (json.snapshot) {
-        mergeSnapshot(json.snapshot)
+      const snap = await fetchSnapshot()
+      if (snap) {
+        mergeSnapshot(snap)
         setError(null)
       }
     } catch {
       setError(t('vysionMusic.errorNetwork'))
     }
-  }, [apiBase, mergeSnapshot, t])
+  }, [fetchSnapshot, mergeSnapshot, t])
 
   const postMutation = useCallback(
     async (
@@ -185,12 +197,6 @@ export function VysionMusicClient({
     return () => window.clearInterval(id)
   }, [])
 
-  useEffect(() => {
-    if (snapshot?.playbackState !== 'playing') return
-    const id = window.setInterval(() => setTick((n) => n + 1), 1000)
-    return () => window.clearInterval(id)
-  }, [snapshot?.playbackState, snapshot?.nowPlaying.startedAt])
-
   const syncVolume = useCallback(
     (v: number, immediate?: boolean) => {
       if (immediate && lastVolumeSentRef.current === v) return
@@ -212,7 +218,28 @@ export function VysionMusicClient({
     }
   }, [])
 
-  const nowTrack = snapshot?.nowPlaying.track
+  useEffect(() => {
+    const serverId = snapshot?.nowPlaying.track?.id
+    if (optimisticTrack && serverId && serverId === optimisticTrack.id) {
+      setOptimisticTrack(null)
+      optimisticStartedAtRef.current = null
+    }
+  }, [snapshot?.nowPlaying.track?.id, optimisticTrack])
+
+  useEffect(() => {
+    const playing =
+      optimisticTrack != null || snapshot?.playbackState === 'playing'
+    if (!playing) return
+    const id = window.setInterval(() => setTick((n) => n + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [optimisticTrack, snapshot?.playbackState, snapshot?.nowPlaying.startedAt])
+
+  const nowTrack = optimisticTrack ?? snapshot?.nowPlaying.track ?? null
+  const playbackState =
+    optimisticTrack != null ? 'playing' : (snapshot?.playbackState ?? 'paused')
+  const nowTrackId = nowTrack?.id ?? null
+  const nowTrackImageUrl = nowTrack?.imageUrl ?? null
+
   useEffect(() => {
     const key = trackIdentity(nowTrack)
     if (!key) return
@@ -229,70 +256,141 @@ export function VysionMusicClient({
     lastTrackKeyRef.current = key
   }, [nowTrack?.id, nowTrack?.name, nowTrack?.artist, nowTrack])
 
-  const durationMs = nowTrack?.durationMs ?? 0
-  let progressMs = snapshot?.nowPlaying.progressMs ?? 0
-  if (snapshot?.playbackState === 'playing' && snapshot.nowPlaying.startedAt && durationMs) {
-    progressMs = Math.min(
-      durationMs,
-      Math.max(0, Date.now() - new Date(snapshot.nowPlaying.startedAt).getTime()),
-    )
-  }
-  void tick
-
-  const progressPct = durationMs > 0 ? (progressMs / durationMs) * 100 : 0
-  const isPlaying = snapshot?.playbackState === 'playing'
-  const playPausePending: TransportPending = isPlaying ? 'pause' : 'play'
-  const { date: clockDate, time: clockTime } = formatClock(clock, locale)
-
   useEffect(() => {
-    setCoverBroken(false)
-  }, [nowTrack?.imageUrl, nowTrack?.id])
+    const raw = nowTrackImageUrl?.trim()
+    if (!raw || !nowTrackId) return
+    if (visibleCoverForTrackIdRef.current === nowTrackId && visibleCoverSrc) return
 
-  const coverSrc = useMemo(() => {
-    const raw = nowTrack?.imageUrl?.trim()
-    if (!raw || coverBroken) return null
-    return `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
-  }, [nowTrack?.imageUrl, coverBroken, nowTrack?.id])
+    const proxied = `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
+    const img = new Image()
+    img.referrerPolicy = 'no-referrer'
+    img.onload = () => {
+      visibleCoverForTrackIdRef.current = nowTrackId
+      setVisibleCoverSrc(proxied)
+      setCoverBroken(false)
+    }
+    img.onerror = () => setCoverBroken(true)
+    img.src = proxied
+  }, [nowTrackId, nowTrackImageUrl, visibleCoverSrc])
 
-  const playFromId = snapshot?.playFromPlaylistId?.trim() || null
-
-  const catalogBusy = playlistSelecting || transportPending != null
-
-  const refreshSnapshotAfterControl = useCallback(() => {
-    void loadSnapshot()
-    window.setTimeout(() => void loadSnapshot(), 1500)
-  }, [loadSnapshot])
+  const pollUntilNowPlayingMatches = useCallback(
+    async (expectedTrackId: string, mutationStartedAt: number) => {
+      const session = ++confirmSessionRef.current
+      const waits = [0, 500, 1000, 2000]
+      let prev = 0
+      for (const target of waits) {
+        if (session !== confirmSessionRef.current) return
+        const delay = target - prev
+        prev = target
+        if (delay > 0) {
+          await new Promise<void>((resolve) => window.setTimeout(resolve, delay))
+        }
+        if (session !== confirmSessionRef.current) return
+        const snapT0 = perfNow()
+        try {
+          const snap = await fetchSnapshot()
+          if (session !== confirmSessionRef.current) return
+          if (snap) mergeSnapshot(snap)
+          const nowId = snap?.nowPlaying.track?.id ?? null
+          perfLog(`track-confirm-snapshot-${target}ms`, snapT0, {
+            expectedTrackId,
+            nowId,
+            match: nowId === expectedTrackId,
+          })
+          if (nowId === expectedTrackId) {
+            perfLog('track-soundtrack-confirmation-total', mutationStartedAt, {
+              expectedTrackId,
+              matchedAfterMs: target,
+            })
+            setOptimisticTrack(null)
+            optimisticStartedAtRef.current = null
+            return
+          }
+        } catch {
+          /* volgende poging */
+        }
+      }
+    },
+    [fetchSnapshot, mergeSnapshot],
+  )
 
   const queueTrackNow = useCallback(
-    async (trackId: string) => {
+    async (track: VysionMusicCatalogTrack) => {
+      const clickT0 = perfNow()
+      const row: TrackRow = {
+        id: track.id,
+        name: track.name,
+        artist: track.artist,
+        durationMs: track.durationMs,
+        imageUrl: track.imageUrl,
+      }
+      optimisticStartedAtRef.current = new Date().toISOString()
+      setOptimisticTrack(row)
+      perfLog('track-ui-update', clickT0, { trackId: track.id })
+
       setPlaylistSelecting(true)
+      const mutationT0 = perfNow()
       try {
         const ok = await postMutation('soundZoneQueueTracks', {
-          tracks: [trackId],
+          tracks: [track.id],
           immediate: true,
           clearQueuedTracks: true,
         })
-        if (ok) refreshSnapshotAfterControl()
+        perfLog('track-mutation-response', mutationT0, { ok, trackId: track.id })
+        if (ok) void pollUntilNowPlayingMatches(track.id, mutationT0)
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation, refreshSnapshotAfterControl],
+    [pollUntilNowPlayingMatches, postMutation],
   )
 
   const playPlaylistTrack = useCallback(
-    async (_sourceId: string, trackId: string) => {
-      await queueTrackNow(trackId)
+    async (_sourceId: string, track: VysionMusicCatalogTrack) => {
+      await queueTrackNow(track)
     },
     [queueTrackNow],
   )
 
   const playSearchTrack = useCallback(
-    async (trackId: string) => {
-      await queueTrackNow(trackId)
+    async (track: VysionMusicCatalogTrack) => {
+      await queueTrackNow(track)
     },
     [queueTrackNow],
   )
+
+  const durationMs = nowTrack?.durationMs ?? 0
+  const startedAt =
+    optimisticTrack != null
+      ? optimisticStartedAtRef.current ?? snapshot?.nowPlaying.startedAt
+      : snapshot?.nowPlaying.startedAt
+
+  let progressMs = snapshot?.nowPlaying.progressMs ?? 0
+  if (optimisticTrack && optimisticStartedAtRef.current && durationMs) {
+    progressMs = Math.min(
+      durationMs,
+      Math.max(0, Date.now() - new Date(optimisticStartedAtRef.current).getTime()),
+    )
+  } else if (optimisticTrack) progressMs = 0
+  else if (playbackState === 'playing' && startedAt && durationMs) {
+    progressMs = Math.min(
+      durationMs,
+      Math.max(0, Date.now() - new Date(startedAt).getTime()),
+    )
+  }
+  void tick
+
+  const progressPct = durationMs > 0 ? (progressMs / durationMs) * 100 : 0
+  const isPlaying = playbackState === 'playing'
+  const playPausePending: TransportPending = isPlaying ? 'pause' : 'play'
+  const { date: clockDate, time: clockTime } = formatClock(clock, locale)
+
+  const coverSrc =
+    coverBroken || !visibleCoverSrc ? null : visibleCoverSrc
+
+  const playFromId = snapshot?.playFromPlaylistId?.trim() || null
+
+  const catalogBusy = playlistSelecting || transportPending != null
 
   return (
     <div className={styles.root}>

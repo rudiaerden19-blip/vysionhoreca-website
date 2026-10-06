@@ -1,27 +1,23 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import type { SoundtrackLibrarySourceKind } from '@/lib/soundtrack/soundtrack-playlists'
+import {
+  getCachedPlaylistTracks,
+  getCachedPlaylists,
+  markTracksPrefetched,
+  setCachedPlaylistTracks,
+  setCachedPlaylists,
+  type VysionMusicCatalogTrack,
+  type VysionMusicLibraryItem,
+} from './vysion-music-catalog-cache'
+import { perfLog, perfNow } from './vysion-music-perf'
 import styles from './vysion-music.module.css'
 
-type LibraryItem = {
-  id: string
-  name: string
-  sourceTypename: string
-  snapshot: string | null
-  sourceKind: SoundtrackLibrarySourceKind
-  imageUrl: string | null
-}
-
-type TrackItem = {
-  id: string
-  name: string
-  artist: string
-  durationMs: number
-  imageUrl: string | null
-}
+type LibraryItem = VysionMusicLibraryItem
+type TrackItem = VysionMusicCatalogTrack
 
 type LibraryTab = 'lists' | 'schedules'
 
@@ -44,78 +40,150 @@ export function VysionMusicCatalogPanel({
   tenant: string
   activeSourceId: string | null
   nowTrackId: string | null
-  onPlayPlaylistTrack: (sourceId: string, trackId: string) => void | Promise<void>
-  onPlaySearchTrack: (trackId: string) => void | Promise<void>
+  onPlayPlaylistTrack: (
+    sourceId: string,
+    track: TrackItem,
+  ) => void | Promise<void>
+  onPlaySearchTrack: (track: TrackItem) => void | Promise<void>
   busy: boolean
 }) {
   const { t } = useLanguage()
   const [tab, setTab] = useState<LibraryTab>('lists')
-  const [items, setItems] = useState<LibraryItem[]>([])
-  const [listsLoading, setListsLoading] = useState(true)
+  const [items, setItems] = useState<LibraryItem[]>(() => getCachedPlaylists(tenant) ?? [])
+  const [listsLoading, setListsLoading] = useState(() => !getCachedPlaylists(tenant))
   const [listsError, setListsError] = useState<string | null>(null)
+  const listsLoadedOnceRef = useRef(Boolean(getCachedPlaylists(tenant)))
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [tracks, setTracks] = useState<TrackItem[]>([])
   const [tracksLoading, setTracksLoading] = useState(false)
   const [tracksError, setTracksError] = useState<string | null>(null)
+  const tracksFetchGenRef = useRef(0)
 
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
 
-  const loadLists = useCallback(async () => {
-    setListsLoading(true)
-    setListsError(null)
-    try {
-      const res = await fetch(
-        `/api/soundtrack/${encodeURIComponent(tenant)}/playlists`,
-        { headers: getAuthHeaders(), cache: 'no-store' },
-      )
-      const json = (await res.json()) as { playlists?: LibraryItem[]; error?: string }
-      if (!res.ok) {
-        setListsError(json.error || t('vysionMusic.libraryLoadError'))
-        setItems([])
-        return
+  const prefetchTracksForSource = useCallback(
+    async (sourceId: string) => {
+      if (!markTracksPrefetched(tenant, sourceId)) return
+      if (getCachedPlaylistTracks(tenant, sourceId)) return
+      try {
+        const res = await fetch(
+          `/api/soundtrack/${encodeURIComponent(tenant)}/playlist-tracks?source=${encodeURIComponent(sourceId)}`,
+          { headers: getAuthHeaders(), cache: 'no-store' },
+        )
+        const json = (await res.json()) as { tracks?: TrackItem[] }
+        if (res.ok && json.tracks) setCachedPlaylistTracks(tenant, sourceId, json.tracks)
+      } catch {
+        /* prefetch best-effort */
       }
-      setItems(json.playlists ?? [])
-    } catch {
-      setListsError(t('vysionMusic.errorNetwork'))
-      setItems([])
-    } finally {
-      setListsLoading(false)
-    }
-  }, [tenant, t])
+    },
+    [tenant],
+  )
+
+  const loadLists = useCallback(
+    async (opts?: { background?: boolean }) => {
+      if (!opts?.background && !listsLoadedOnceRef.current) {
+        setListsLoading(true)
+      }
+      setListsError(null)
+      const t0 = perfNow()
+      try {
+        const res = await fetch(
+          `/api/soundtrack/${encodeURIComponent(tenant)}/playlists`,
+          { headers: getAuthHeaders(), cache: 'no-store' },
+        )
+        const json = (await res.json()) as { playlists?: LibraryItem[]; error?: string }
+        if (!res.ok) {
+          setListsError(json.error || t('vysionMusic.libraryLoadError'))
+          if (!getCachedPlaylists(tenant)) setItems([])
+          return
+        }
+        const next = json.playlists ?? []
+        setItems(next)
+        setCachedPlaylists(tenant, next)
+        listsLoadedOnceRef.current = true
+        perfLog('playlist-list-fetch', t0, { count: next.length, background: !!opts?.background })
+      } catch {
+        setListsError(t('vysionMusic.errorNetwork'))
+        if (!getCachedPlaylists(tenant)) setItems([])
+      } finally {
+        setListsLoading(false)
+      }
+    },
+    [tenant, t],
+  )
 
   useEffect(() => {
-    void loadLists()
-  }, [loadLists])
+    const cached = getCachedPlaylists(tenant)
+    if (cached?.length) {
+      setItems(cached)
+      setListsLoading(false)
+      void loadLists({ background: true })
+    } else {
+      void loadLists()
+    }
+  }, [loadLists, tenant])
 
   useEffect(() => {
     if (activeSourceId) setSelectedId(activeSourceId)
   }, [activeSourceId])
 
   const loadTracks = useCallback(
-    async (sourceId: string) => {
-      setTracksLoading(true)
-      setTracksError(null)
+    async (sourceId: string, opts?: { background?: boolean }) => {
+      const gen = ++tracksFetchGenRef.current
+      const cached = getCachedPlaylistTracks(tenant, sourceId)
+      const clickT0 = perfNow()
+
+      if (cached?.length) {
+        setTracks(cached)
+        setTracksLoading(false)
+        setTracksError(null)
+        perfLog('playlist-tracks-cached-show', clickT0, {
+          sourceId,
+          count: cached.length,
+        })
+      } else if (!opts?.background) {
+        setTracksLoading(true)
+        setTracksError(null)
+      }
+
       try {
+        const reqT0 = perfNow()
         const res = await fetch(
           `/api/soundtrack/${encodeURIComponent(tenant)}/playlist-tracks?source=${encodeURIComponent(sourceId)}`,
           { headers: getAuthHeaders(), cache: 'no-store' },
         )
         const json = (await res.json()) as { tracks?: TrackItem[]; error?: string }
+        if (gen !== tracksFetchGenRef.current) return
         if (!res.ok) {
-          setTracksError(json.error || t('vysionMusic.tracksLoadError'))
-          setTracks([])
+          if (!cached?.length) {
+            setTracksError(json.error || t('vysionMusic.tracksLoadError'))
+            setTracks([])
+          }
           return
         }
-        setTracks(json.tracks ?? [])
+        const next = json.tracks ?? []
+        setCachedPlaylistTracks(tenant, sourceId, next)
+        setTracks(next)
+        setTracksError(null)
+        perfLog(cached?.length ? 'playlist-tracks-background-refresh' : 'playlist-tracks-first-load', reqT0, {
+          sourceId,
+          count: next.length,
+          playlistClickToRenderMs: cached?.length
+            ? Math.round(perfNow() - clickT0)
+            : undefined,
+        })
       } catch {
-        setTracksError(t('vysionMusic.errorNetwork'))
-        setTracks([])
+        if (gen !== tracksFetchGenRef.current) return
+        if (!cached?.length) {
+          setTracksError(t('vysionMusic.errorNetwork'))
+          setTracks([])
+        }
       } finally {
-        setTracksLoading(false)
+        if (gen === tracksFetchGenRef.current) setTracksLoading(false)
       }
     },
     [tenant, t],
@@ -128,6 +196,20 @@ export function VysionMusicCatalogPanel({
     }
     void loadTracks(selectedId)
   }, [selectedId, loadTracks])
+
+  const filteredLists = useMemo(() => {
+    if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
+    return items.filter((i) => i.sourceKind !== 'schedule')
+  }, [items, tab])
+
+  useEffect(() => {
+    if (!items.length) return
+    const toPrefetch = filteredLists.slice(0, 2)
+    const id = window.setTimeout(() => {
+      for (const pl of toPrefetch) void prefetchTracksForSource(pl.id)
+    }, 400)
+    return () => window.clearTimeout(id)
+  }, [items, filteredLists, prefetchTracksForSource])
 
   const runSearch = useCallback(async () => {
     const q = searchQuery.trim()
@@ -181,16 +263,18 @@ export function VysionMusicCatalogPanel({
     [t],
   )
 
-  const filteredLists = useMemo(() => {
-    if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
-    return items.filter((i) => i.sourceKind !== 'schedule')
-  }, [items, tab])
-
   const selectedItem = items.find((i) => i.id === selectedId)
   const selectedName = selectedItem?.name ?? t('vysionMusic.tracksTitle')
 
   const pickPlaylist = (id: string) => {
+    const t0 = perfNow()
     setSelectedId(id)
+    const cached = getCachedPlaylistTracks(tenant, id)
+    if (cached?.length) {
+      setTracks(cached)
+      setTracksLoading(false)
+      perfLog('playlist-click-cached-tracks-visible', t0, { sourceId: id, count: cached.length })
+    }
   }
 
   return (
@@ -272,7 +356,7 @@ export function VysionMusicCatalogPanel({
           <div className={styles.catalogColHead}>
             <h2 className={styles.catalogColTitle}>{selectedName}</h2>
           </div>
-          {tracksLoading ? (
+          {tracksLoading && tracks.length === 0 ? (
             <p className={styles.libraryMuted}>{t('vysionMusic.tracksLoading')}</p>
           ) : null}
           {tracksError ? (
@@ -288,14 +372,14 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.tracksEmpty')}</li>
             ) : null}
             {tracks.map((tr, idx) => {
-              const active = nowTrackId === tr.id && activeSourceId === selectedId
+              const active = nowTrackId === tr.id
               return (
                 <li key={`${tr.id}-${idx}`}>
                   <button
                     type="button"
                     className={active ? styles.trackRowActive : styles.trackRow}
                     disabled={busy || !selectedId}
-                    onClick={() => void onPlayPlaylistTrack(selectedId!, tr.id)}
+                    onClick={() => void onPlayPlaylistTrack(selectedId!, tr)}
                   >
                     <span className={styles.trackRowNum}>{idx + 1}</span>
                     <span className={styles.trackRowMain}>
@@ -338,7 +422,7 @@ export function VysionMusicCatalogPanel({
                     type="button"
                     className={active ? styles.trackRowActive : styles.trackRow}
                     disabled={busy}
-                    onClick={() => void onPlaySearchTrack(tr.id)}
+                    onClick={() => void onPlaySearchTrack(tr)}
                   >
                     <span className={styles.trackRowNum}>{idx + 1}</span>
                     <span className={styles.trackRowMain}>
