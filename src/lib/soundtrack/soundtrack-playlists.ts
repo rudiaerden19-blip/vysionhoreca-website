@@ -38,6 +38,12 @@ const ZONE_ACCOUNT_QUERY = `query($id: ID!) {
   }
 }`
 
+const SOUND_ZONE_PLAYER_WEB_URL_QUERY = `query($id: ID!) {
+  soundZone(id: $id) {
+    nowPlayingDisplayUrl
+  }
+}`
+
 const LIBRARY_DISPLAY_IMAGE = `
   display {
     image {
@@ -298,6 +304,15 @@ async function resolveZoneAccountId(zoneId: string): Promise<string> {
   return ctx.ownerId
 }
 
+/** Officiële Soundtrack-web URL voor deze zone (browser player / display). */
+export async function getSoundZoneNowPlayingDisplayUrl(zoneId: string): Promise<string | null> {
+  const data = await soundtrackGraphql<{
+    soundZone: { nowPlayingDisplayUrl: string | null } | null
+  }>(SOUND_ZONE_PLAYER_WEB_URL_QUERY, { id: zoneId.trim() })
+  const url = data.soundZone?.nowPlayingDisplayUrl?.trim()
+  return url || null
+}
+
 export async function resolveSoundtrackZoneLibraryContext(
   zoneId: string,
 ): Promise<{ ownerId: string; musicLibraryId: string }> {
@@ -350,10 +365,7 @@ const OWNER_LIBRARY_VERSION_QUERY = `query($owner: ID!) {
   library(owner: $owner) { version }
 }`
 
-/**
- * Soundtrack desktop player: `addToLibrary` triggert libraryUpdate op de player.
- * Alleen `addToMusicLibrary` is niet genoeg voor automatische zichtbaarheid in de speler.
- */
+/** `libraryUpdate` subscription (browser player) — na `addToMusicLibrary`. */
 async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
   const owner = ownerId.trim()
   const id = playlistId.trim()
@@ -436,15 +448,14 @@ async function assertPlaylistVisibleInSoundtrackLibraries(
       musicLibraryId: musicLibraryId.trim(),
     })
 
-    const inOwnerLibrary = soundtrackLibraryIdsInclude(data.library?.ids, pid)
     const inMusicLibrary = soundtrackLibraryIdsInclude(data.musicLibrary?.ids, pid)
-    if (inOwnerLibrary && inMusicLibrary) return
+    if (inMusicLibrary) return
 
     if (i < 9) await soundtrackSyncPause(150)
   }
 
   throw new SoundtrackApiError(
-    'Soundtrack playlist not visible in account library after create',
+    'Soundtrack playlist not visible in music library after create',
     502,
   )
 }
@@ -517,8 +528,8 @@ export async function createManualPlaylistInMusicLibrary(
     throw new SoundtrackApiError('Soundtrack created no playlist', 502)
   }
 
-  await addPlaylistToOwnerLibrary(ownerId, id)
   await addPlaylistToMusicLibrary(ownerId, id)
+  await addPlaylistToOwnerLibrary(ownerId, id)
   await assertPlaylistVisibleInSoundtrackLibraries(ownerId, musicLibraryId, id)
 
   const plData = await soundtrackGraphql<{

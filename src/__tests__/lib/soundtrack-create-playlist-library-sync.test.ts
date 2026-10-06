@@ -51,9 +51,11 @@ describe('createManualPlaylistInMusicLibrary', () => {
     expect(out).toEqual({ id: 'pl-test', name: 'TEST' })
 
     expect(graphql.mock.calls.some(([q]) => String(q).includes('createManualPlaylist'))).toBe(true)
-    expect(graphql.mock.calls.some(([q]) => String(q).includes('addToLibrary'))).toBe(true)
-    const addCall = graphql.mock.calls.find(([q]) => String(q).includes('addToMusicLibrary'))
-    expect(addCall?.[1]).toEqual({
+    const musicIdx = graphql.mock.calls.findIndex(([q]) => String(q).includes('addToMusicLibrary'))
+    const libraryIdx = graphql.mock.calls.findIndex(([q]) => String(q).includes('addToLibrary'))
+    expect(musicIdx).toBeGreaterThan(-1)
+    expect(libraryIdx).toBeGreaterThan(musicIdx)
+    expect(graphql.mock.calls[musicIdx]?.[1]).toEqual({
       input: { parent: 'acc-1', source: 'pl-test' },
     })
   })
