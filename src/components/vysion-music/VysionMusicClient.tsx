@@ -17,6 +17,7 @@ import {
   filterTracksByArtistQuery,
   prefersArtistOnlySearchResults,
 } from '@/lib/soundtrack/soundtrack-search-artist-filter'
+import { playSoundtrackPlaylistRow } from '@/lib/soundtrack/soundtrack-playlist-row-play'
 import { quantizeVolumeUiPercent } from '@/lib/soundtrack/soundtrack-server'
 import {
   VYSION_MUSIC_TRACK_FADE_MS,
@@ -315,35 +316,26 @@ export function VysionMusicClient({
     }
   }, [])
 
-  /** Zelfde keten als Soundtrack-speler: setPlayFrom → play → skipTracks(index). */
-  const playPlaylistAtIndex = useCallback(
-    async (source: string, trackIndex: number) => {
+  /** Afspeellijst (links): alleen Soundtrack setPlayFrom → play → skipTracks. */
+  const playPlaylistRow = useCallback(
+    async (trackIndex: number) => {
+      const source = snapshot?.playFromPlaylistId?.trim()
+      if (!source) {
+        setError(t('vysionMusic.errorControl'))
+        return
+      }
       setSwitchingTrack(true)
       setError(null)
-      const ok1 = await postMutation('setPlayFrom', { source }, { silent: true })
-      if (!ok1) {
-        setError(t('vysionMusic.errorControl'))
-        setSwitchingTrack(false)
-        return
-      }
-      const ok2 = await postMutation('play', {}, { silent: true })
-      if (!ok2) {
-        setError(t('vysionMusic.errorControl'))
-        setSwitchingTrack(false)
-        return
-      }
-      if (trackIndex > 0) {
-        const ok3 = await postMutation(
-          'skipTracks',
-          { tracksToSkip: trackIndex, crossfade: true },
-          { silent: true },
-        )
-        if (!ok3) setError(t('vysionMusic.errorControl'))
+      const result = await playSoundtrackPlaylistRow(apiBase, source, trackIndex)
+      if (!result.ok) {
+        setError(result.error || t('vysionMusic.errorControl'))
+      } else if (result.snapshot) {
+        mergeSnapshot(result.snapshot as Snapshot)
       }
       setSwitchingTrack(false)
       void loadSnapshot()
     },
-    [loadSnapshot, postMutation, t],
+    [apiBase, loadSnapshot, mergeSnapshot, snapshot?.playFromPlaylistId, t],
   )
 
   const playTrack = useCallback(
@@ -506,7 +498,7 @@ export function VysionMusicClient({
                   const idx = queueRows.findIndex(
                     (r) => r.id === nowTrack.id && r.name === nowTrack.name,
                   )
-                  if (idx > 0) void playPlaylistAtIndex(playFromId, idx - 1)
+                  if (idx > 0) void playPlaylistRow(idx - 1)
                 }}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -603,9 +595,8 @@ export function VysionMusicClient({
                       type="button"
                       className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                       disabled={switchingTrack || !playFromId}
-                      onClick={() => {
-                        if (playFromId) void playPlaylistAtIndex(playFromId, idx)
-                      }}
+                      aria-label={`${row.name} – ${t('vysionMusic.play')}`}
+                      onClick={() => void playPlaylistRow(idx)}
                     >
                       <span className={styles.rowNum}>{idx + 1}</span>
                       <span className={styles.rowPlay} aria-hidden>
