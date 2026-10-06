@@ -22,7 +22,10 @@ import {
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
-import { openSoundtrackCreate } from '@/lib/vysion-music/open-soundtrack-create'
+import {
+  defaultNewPlaylistName,
+  soundtrackCreateManualPlaylist,
+} from '@/lib/vysion-music/soundtrack-create-manual-playlist'
 import {
   vysionMusicLibraryCoverProxyUrl,
   vysionMusicLibraryFallbackCoverSrc,
@@ -99,6 +102,7 @@ export function VysionMusicCatalogPanel({
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
+  const [createBusy, setCreateBusy] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
@@ -169,12 +173,20 @@ export function VysionMusicCatalogPanel({
     [tenant, t],
   )
 
-  const runSoundtrackCreate = useCallback(() => {
+  const runSoundtrackCreate = useCallback(async () => {
+    setCreateBusy(true)
     setCreateError(null)
-    if (!openSoundtrackCreate()) {
+    try {
+      const created = await soundtrackCreateManualPlaylist(tenant, defaultNewPlaylistName())
+      setTab('lists')
+      setSelectedId(created.id)
+      await loadLists({ background: true })
+    } catch {
       setCreateError(t('vysionMusic.createPlaylistError'))
+    } finally {
+      setCreateBusy(false)
     }
-  }, [t])
+  }, [tenant, t, loadLists])
 
   useEffect(() => {
     const cached = getCachedPlaylists(tenant)
@@ -446,9 +458,10 @@ export function VysionMusicCatalogPanel({
               <button
                 type="button"
                 className={styles.libraryTab}
-                onClick={() => runSoundtrackCreate()}
+                disabled={createBusy}
+                onClick={() => void runSoundtrackCreate()}
               >
-                {t('vysionMusic.libraryCreatePlaylist')}
+                {createBusy ? t('vysionMusic.createPlaylistSaving') : t('vysionMusic.libraryCreatePlaylist')}
               </button>
             </div>
           </div>
