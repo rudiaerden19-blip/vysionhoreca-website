@@ -24,7 +24,7 @@ import styles from './vysion-music.module.css'
 type LibraryItem = VysionMusicLibraryItem
 type TrackItem = VysionMusicCatalogTrack
 
-type LibraryTab = 'lists' | 'schedules'
+type LibraryTab = 'lists' | 'stations' | 'schedules'
 
 function formatMs(ms: number): string {
   if (!ms || ms < 0) return '0:00'
@@ -217,7 +217,8 @@ export function VysionMusicCatalogPanel({
 
   const filteredLists = useMemo(() => {
     if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
-    return items.filter((i) => i.sourceKind !== 'schedule')
+    if (tab === 'stations') return items.filter((i) => i.sourceKind === 'soundtrack')
+    return items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown')
   }, [items, tab])
 
   useEffect(() => {
@@ -308,6 +309,13 @@ export function VysionMusicCatalogPanel({
                 onClick={() => setTab('lists')}
               >
                 {t('vysionMusic.libraryTabLists')}
+              </button>
+              <button
+                type="button"
+                className={tab === 'stations' ? styles.libraryTabActive : styles.libraryTab}
+                onClick={() => setTab('stations')}
+              >
+                {t('vysionMusic.libraryTabStations')}
               </button>
               <button
                 type="button"
