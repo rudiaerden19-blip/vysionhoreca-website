@@ -148,3 +148,51 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ success: true, linked: true })
 }
+
+export async function DELETE(request: NextRequest) {
+  const tenantSlug = new URL(request.url).searchParams.get('tenant')?.trim()
+  if (!tenantSlug) {
+    return NextResponse.json({ error: 'tenant vereist' }, { status: 400 })
+  }
+
+  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json(
+      { error: access.error || 'Forbidden' },
+      { status: access.error?.includes('ingelogd') ? 401 : 403 },
+    )
+  }
+
+  const supabase = getServerSupabaseClient()
+  if (!supabase) {
+    return NextResponse.json({ error: 'Server fout' }, { status: 500 })
+  }
+
+  const { error } = await supabase
+    .from('tenant_settings')
+    .update({
+      soundtrack_player_email: null,
+      soundtrack_player_password: null,
+    })
+    .eq('tenant_slug', tenantSlug)
+
+  if (error) {
+    const missingCol =
+      error.message.includes('soundtrack_player') ||
+      error.message.includes('schema cache') ||
+      error.code === 'PGRST204'
+    if (missingCol) {
+      return NextResponse.json(
+        {
+          error:
+            'Databasekolommen ontbreken. Voer migratie 20261006160000_tenant_soundtrack_player_credentials.sql uit in Supabase.',
+          code: 'migration',
+        },
+        { status: 503 },
+      )
+    }
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true, linked: false })
+}

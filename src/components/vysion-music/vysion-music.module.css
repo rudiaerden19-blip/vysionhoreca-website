@@ -1703,12 +1703,25 @@
 }
 
 .modalSecondary,
-.modalPrimary {
+.modalPrimary,
+.modalDanger {
   border-radius: 8px;
   padding: 0.5rem 0.85rem;
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
+}
+
+.modalDanger {
+  margin-right: auto;
+  border: 1px solid rgba(248, 113, 113, 0.55);
+  background: transparent;
+  color: #fca5a5;
+}
+
+.modalDanger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .modalSecondary {

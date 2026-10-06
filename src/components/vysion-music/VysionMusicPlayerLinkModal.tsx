@@ -24,8 +24,11 @@ export function VysionMusicPlayerLinkModal({
   const [linked, setLinked] = useState(false)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [unlinking, setUnlinking] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const [unlinked, setUnlinked] = useState(false)
+  const busy = saving || unlinking
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -66,6 +69,7 @@ export function VysionMusicPlayerLinkModal({
     if (open) {
       setPassword('')
       setSaved(false)
+      setUnlinked(false)
       void load()
     }
   }, [open, load])
@@ -94,6 +98,35 @@ export function VysionMusicPlayerLinkModal({
       setError(t('vysionMusic.errorNetwork'))
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleUnlink = async () => {
+    if (!window.confirm(t('vysionMusic.playerLinkUnlinkConfirm'))) return
+    setUnlinking(true)
+    setError(null)
+    setSaved(false)
+    setUnlinked(false)
+    try {
+      const res = await fetch(
+        `/api/tenant/soundtrack-player?tenant=${encodeURIComponent(tenant)}`,
+        { method: 'DELETE', headers: getAuthHeaders() },
+      )
+      const json = (await res.json()) as { success?: boolean; error?: string }
+      if (!res.ok || !json.success) {
+        setError(json.error || t('vysionMusic.playerLinkUnlinkError'))
+        return
+      }
+      setEmail('')
+      setPassword('')
+      setPasswordSet(false)
+      setLinked(false)
+      onLinkedChange?.(false)
+      setUnlinked(true)
+    } catch {
+      setError(t('vysionMusic.errorNetwork'))
+    } finally {
+      setUnlinking(false)
     }
   }
 
@@ -132,7 +165,7 @@ export function VysionMusicPlayerLinkModal({
             autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={saving}
+            disabled={busy}
           />
         </label>
 
@@ -144,18 +177,29 @@ export function VysionMusicPlayerLinkModal({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder={passwordSet ? t('vysionMusic.playerLinkPasswordKeep') : undefined}
-            disabled={saving}
+            disabled={busy}
           />
         </label>
 
         {error ? <p className={styles.modalError}>{error}</p> : null}
         {saved ? <p className={styles.modalSuccess}>{t('vysionMusic.playerLinkSaved')}</p> : null}
+        {unlinked ? <p className={styles.modalSuccess}>{t('vysionMusic.playerLinkUnlinked')}</p> : null}
 
         <div className={styles.modalActions}>
-          <button type="button" className={styles.modalSecondary} onClick={onClose} disabled={saving}>
+          {linked ? (
+            <button
+              type="button"
+              className={styles.modalDanger}
+              onClick={() => void handleUnlink()}
+              disabled={busy || loading}
+            >
+              {unlinking ? t('vysionMusic.playerLinkSaving') : t('vysionMusic.playerLinkDisconnect')}
+            </button>
+          ) : null}
+          <button type="button" className={styles.modalSecondary} onClick={onClose} disabled={busy}>
             {t('vysionMusic.playerLinkClose')}
           </button>
-          <button type="button" className={styles.modalPrimary} onClick={() => void handleSave()} disabled={saving || loading}>
+          <button type="button" className={styles.modalPrimary} onClick={() => void handleSave()} disabled={busy || loading}>
             {saving ? t('vysionMusic.playerLinkSaving') : t('vysionMusic.playerLinkConnect')}
           </button>
         </div>
