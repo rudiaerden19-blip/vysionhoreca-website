@@ -2,12 +2,18 @@ import {
   artistDiscoverySearchQueries,
   artistQuickDiscoverySearchQueries,
   prefersArtistOnlySearchResults,
-  trackArtistMatchesQuery,
   trackArtistNamesMatchQuery,
 } from '@/lib/soundtrack/soundtrack-search-artist-filter'
-import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
+import {
+  mapSoundtrackTrackRow,
+  SOUNDTRACK_TRACK_GRAPHQL_FIELDS,
+  type SoundtrackTrackGraphNode,
+  type SoundtrackTrackRow,
+} from '@/lib/soundtrack/soundtrack-track-map'
 
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+
+export type { SoundtrackTrackRow } from '@/lib/soundtrack/soundtrack-track-map'
 
 const API_URL = 'https://api.soundtrackyourbrand.com/v2'
 
@@ -59,8 +65,13 @@ export class SoundtrackApiError extends Error {
 }
 
 function soundtrackToken(): string {
-  const t = (process.env.SOUNDTRACK_API_BASIC || '').trim()
-  if (!t) throw new SoundtrackConfigError('Soundtrack API not configured')
+  let t = (process.env.SOUNDTRACK_API_BASIC || '').trim()
+  if (/^basic\s/i.test(t)) t = t.replace(/^basic\s+/i, '').trim()
+  if (!t || t === '[SENSITIVE]') {
+    throw new SoundtrackConfigError(
+      'Soundtrack niet geconfigureerd: zet SOUNDTRACK_API_BASIC in .env.local (uit Vercel).',
+    )
+  }
   return t
 }
 
@@ -349,16 +360,6 @@ export async function soundtrackGraphql<T = Record<string, unknown>>(
   return json.data
 }
 
-export type SoundtrackTrackRow = {
-  id: string
-  name: string
-  artist: string
-  durationMs: number
-  imageUrl: string | null
-  imageWidth: number | null
-  imageHeight: number | null
-}
-
 export type SoundtrackPlayerSnapshot = {
   zoneId: string
   zoneName: string
@@ -379,42 +380,22 @@ export type SoundtrackPlayerSnapshot = {
   playFromTypename: string | null
 }
 
-function mapTrack(
-  track:
-    | {
-        id?: string
-        name?: string
-        artists?: { name?: string }[]
-        duration?: number
-        album?: {
-          image?: { url?: string; width?: number; height?: number } | null
-        } | null
-      }
-    | null
-    | undefined,
-  artistQuery?: string,
-): SoundtrackTrackRow | null {
-  const id = track?.id?.trim()
-  if (!track?.name || !id) return null
-  const img = track.album?.image
-  const imageWidth = typeof img?.width === 'number' && img.width > 0 ? img.width : null
-  const imageHeight = typeof img?.height === 'number' && img.height > 0 ? img.height : null
-  const imageUrl = soundtrackAlbumArtUrl(img?.url ?? null)
-  const artistNames =
-    track.artists?.map((a) => a.name?.trim()).filter((n): n is string => Boolean(n)) ?? []
-  let artist = artistNames[0] || '—'
-  if (artistQuery) {
-    const matched = artistNames.find((n) => trackArtistMatchesQuery(n, artistQuery))
-    if (matched) artist = matched
-  }
+/** Lege zone — lokaal zonder Soundtrack-token (UI blijft bruikbaar). */
+export function emptySoundtrackPlayerSnapshot(
+  zoneName = '—',
+): SoundtrackPlayerSnapshot {
   return {
-    id,
-    name: track.name,
-    artist,
-    durationMs: typeof track.duration === 'number' ? track.duration : 0,
-    imageUrl,
-    imageWidth,
-    imageHeight,
+    zoneId: '',
+    zoneName,
+    online: false,
+    isPaired: false,
+    deviceName: null,
+    playbackState: 'paused',
+    volume: 0,
+    nowPlaying: { track: null, startedAt: null, progressMs: 0 },
+    playlist: [],
+    playFromPlaylistId: null,
+    playFromTypename: null,
   }
 }
 
@@ -433,13 +414,7 @@ export async function fetchSoundtrackPlayerSnapshot(
       playback: { state: string; volume: number }
       nowPlaying: {
         startedAt: string
-        track: {
-          id: string
-          name: string
-          duration: number
-          artists: { name: string }[]
-          album: { image: { url: string; width?: number; height?: number } | null } | null
-        } | null
+        track: SoundtrackTrackGraphNode | null
       } | null
       playFrom: {
         __typename: string
@@ -455,14 +430,14 @@ export async function fetchSoundtrackPlayerSnapshot(
         nowPlaying {
           startedAt
           track {
-            id name duration
-            artists { name }
-            album { image { url width height } }
+            ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS}
           }
         }
         playFrom {
           __typename
           ... on Playlist { id }
+          ... on Soundtrack { id }
+          ... on Schedule { id }
         }
       }
     }`,
@@ -470,7 +445,7 @@ export async function fetchSoundtrackPlayerSnapshot(
   )
 
   const sz = data.soundZone
-  const nowTrack = mapTrack(sz.nowPlaying?.track ?? null)
+  const nowTrack = mapSoundtrackTrackRow(sz.nowPlaying?.track ?? null)
   const startedAt = sz.nowPlaying?.startedAt ?? null
   let progressMs = 0
   if (startedAt && nowTrack?.durationMs) {
@@ -498,7 +473,7 @@ export async function fetchSoundtrackPlayerSnapshot(
     online: sz.online,
     isPaired: sz.isPaired,
     deviceName: sz.device?.name ?? null,
-    playbackState: sz.playback?.state ?? 'stopped',
+    playbackState: sz.playback?.state ?? 'paused',
     volume:
       typeof sz.playback?.volume === 'number'
         ? quantizeVolumeUiPercent(soundtrackApiVolumeToUiPercent(sz.playback.volume))
@@ -529,13 +504,8 @@ function dedupeSearchTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[]
   return out
 }
 
-type SoundtrackTrackSearchNode = {
+type SoundtrackTrackSearchNode = SoundtrackTrackGraphNode & {
   __typename: string
-  id?: string
-  name?: string
-  duration?: number
-  artists?: { name: string }[]
-  album?: { image: { url: string; width?: number; height?: number } | null } | null
 }
 
 type SoundtrackTrackSearchPage = {
@@ -558,9 +528,7 @@ async function fetchSoundtrackTrackSearchPage(
           node {
             __typename
             ... on Track {
-              id name duration
-              artists { name }
-              album { image { url width height } }
+              ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS}
             }
           }
         }
@@ -579,8 +547,10 @@ function ingestArtistScopedSearchPage(
   let out = collected
   for (const edge of data.search?.edges ?? []) {
     if (edge.node.__typename !== 'Track') continue
-    if (!trackArtistNamesMatchQuery(edge.node.artists?.map((a) => a.name), q)) continue
-    const row = mapTrack(edge.node, q)
+    const artistNames =
+      edge.node.artists?.map((a) => a.name?.trim()).filter((n): n is string => Boolean(n)) ?? []
+    if (!trackArtistNamesMatchQuery(artistNames, q)) continue
+    const row = mapSoundtrackTrackRow(edge.node, q)
     if (row) out.push(row)
   }
   return dedupeSearchTrackRows(out)
@@ -675,7 +645,7 @@ export async function soundtrackSearchTracks(
 
     for (const edge of data.search?.edges ?? []) {
       if (edge.node.__typename !== 'Track') continue
-      const row = mapTrack(edge.node)
+      const row = mapSoundtrackTrackRow(edge.node)
       if (row) collected.push(row)
     }
 
@@ -750,15 +720,7 @@ export async function fetchPlaylistTrackRows(playlistId: string): Promise<Soundt
   const data = await soundtrackGraphql<{
     playlist: {
       tracks: {
-        edges: {
-          node: {
-            id: string
-            name: string
-            duration: number
-            artists: { name: string }[]
-            album: { image: { url: string; width?: number; height?: number } | null } | null
-          }
-        }[]
+        edges: { node: SoundtrackTrackGraphNode }[]
       }
     } | null
   }>(
@@ -767,9 +729,7 @@ export async function fetchPlaylistTrackRows(playlistId: string): Promise<Soundt
         tracks(first: 500) {
           edges {
             node {
-              id name duration
-              artists { name }
-              album { image { url width height } }
+              ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS}
             }
           }
         }
@@ -779,7 +739,7 @@ export async function fetchPlaylistTrackRows(playlistId: string): Promise<Soundt
   )
   const rows: SoundtrackTrackRow[] = []
   for (const edge of data.playlist?.tracks?.edges ?? []) {
-    const row = mapTrack(edge.node)
+    const row = mapSoundtrackTrackRow(edge.node)
     if (row) rows.push(row)
   }
   return rows

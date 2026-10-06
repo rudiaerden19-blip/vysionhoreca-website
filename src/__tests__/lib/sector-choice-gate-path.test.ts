@@ -34,6 +34,7 @@ describe('shouldShowSectorChoiceGate', () => {
     expect(shouldShowSectorChoiceGate('/shop/demo', host)).toBe(false)
     expect(shouldShowSectorChoiceGate('/superadmin', host)).toBe(false)
     expect(shouldShowSectorChoiceGate('/dashboard', host)).toBe(false)
+    expect(shouldShowSectorChoiceGate('/dev/vysion-music', host)).toBe(false)
   })
 
   it('does not cover dedicated sector landings', () => {

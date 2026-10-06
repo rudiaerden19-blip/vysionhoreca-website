@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
   SoundtrackApiError,
   SoundtrackConfigError,
+  emptySoundtrackPlayerSnapshot,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneIdForTenant,
   skipSoundZoneTracks,
@@ -36,7 +37,7 @@ type SoundtrackMutationName = (typeof SOUNDTRACK_MUTATIONS)[number]
 
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
-  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+  const access = await authorizeSoundtrackTenantRequest(request, tenantSlug)
   if (!access.authorized) {
     return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
   }
@@ -44,10 +45,20 @@ export async function GET(request: NextRequest, context: RouteContext) {
   try {
     const q = request.nextUrl.searchParams.get('q')
     if (q != null && q !== '') {
-      const scope = request.nextUrl.searchParams.get('scope')
-      const artistSearchMode = scope === 'full' ? 'full' : 'quick'
-      const tracks = await soundtrackSearchTracks(q, { artistSearchMode })
-      return NextResponse.json({ ok: true, search: { query: q, tracks } })
+      try {
+        const scope = request.nextUrl.searchParams.get('scope')
+        const artistSearchMode = scope === 'full' ? 'full' : 'quick'
+        const tracks = await soundtrackSearchTracks(q, { artistSearchMode })
+        return NextResponse.json({ ok: true, search: { query: q, tracks } })
+      } catch (searchErr) {
+        if (
+          process.env.NODE_ENV === 'development' &&
+          searchErr instanceof SoundtrackConfigError
+        ) {
+          return NextResponse.json({ ok: true, search: { query: q, tracks: [] } })
+        }
+        throw searchErr
+      }
     }
 
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
@@ -55,6 +66,14 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
+      if (process.env.NODE_ENV === 'development') {
+        const name =
+          (process.env.SOUNDTRACK_DEFAULT_ZONE_NAME || '').trim() || tenantSlug
+        return NextResponse.json({
+          ok: true,
+          snapshot: emptySoundtrackPlayerSnapshot(name),
+        })
+      }
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
     }
     if (e instanceof SoundtrackApiError) {
@@ -66,7 +85,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
 export async function POST(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
-  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+  const access = await authorizeSoundtrackTenantRequest(request, tenantSlug)
   if (!access.authorized) {
     return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
   }

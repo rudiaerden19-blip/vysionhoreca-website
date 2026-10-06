@@ -34,6 +34,7 @@ export function shouldShowSectorChoiceGate(pathname: string | null, hostname: st
   if (pathname.startsWith('/display')) return false
   if (pathname.startsWith('/account')) return false
   if (pathname.startsWith('/sectoren')) return false
+  if (pathname.startsWith('/dev')) return false
 
   return true
 }
