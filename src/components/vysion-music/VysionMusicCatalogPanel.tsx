@@ -36,7 +36,7 @@ function formatMs(ms: number): string {
 
 export function VysionMusicCatalogPanel({
   tenant,
-  activeSourceId,
+  activeSourceId: _playFromSourceId,
   playingSourceId,
   nowPlayingTrack,
   nowPlaying,
@@ -58,6 +58,8 @@ export function VysionMusicCatalogPanel({
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
   busy: boolean
 }) {
+  void _playFromSourceId
+
   const { t } = useLanguage()
   const [tab, setTab] = useState<LibraryTab>('lists')
   const [items, setItems] = useState<LibraryItem[]>(() => getCachedPlaylists(tenant) ?? [])
@@ -137,10 +139,6 @@ export function VysionMusicCatalogPanel({
       void loadLists()
     }
   }, [loadLists, tenant])
-
-  useEffect(() => {
-    if (activeSourceId) setSelectedId(activeSourceId)
-  }, [activeSourceId])
 
   const loadTracks = useCallback(
     async (sourceId: string, opts?: { background?: boolean }) => {
@@ -324,8 +322,12 @@ export function VysionMusicCatalogPanel({
             ) : null}
             {filteredLists.map((pl) => {
               const isPlayingList = playingSourceId === pl.id && nowPlayingTrack != null
-              const active =
-                selectedId === pl.id || activeSourceId === pl.id || isPlayingList
+              const isBrowsing = selectedId === pl.id && !isPlayingList
+              const rowClass = isPlayingList
+                ? styles.libraryRowActive
+                : isBrowsing
+                  ? styles.libraryRowSelected
+                  : styles.libraryRow
               const thumbSrc =
                 pl.imageUrl && pl.imageUrl.startsWith('http')
                   ? `/api/soundtrack/cover?url=${encodeURIComponent(pl.imageUrl)}`
@@ -334,7 +336,7 @@ export function VysionMusicCatalogPanel({
                 <li key={pl.id}>
                   <button
                     type="button"
-                    className={active ? styles.libraryRowActive : styles.libraryRow}
+                    className={rowClass}
                     disabled={busy}
                     onClick={() => pickPlaylist(pl.id)}
                   >
