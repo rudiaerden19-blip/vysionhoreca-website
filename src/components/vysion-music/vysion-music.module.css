@@ -1162,3 +1162,61 @@
   }
 }
 
+/* Tijdelijk: playlist-click diagnose (geen cover-styles) */
+.playlistDebugPanel {
+  position: fixed;
+  right: 12px;
+  bottom: 48px;
+  z-index: 90;
+  width: min(420px, calc(100vw - 24px));
+  max-height: min(52vh, 520px);
+  overflow: auto;
+  padding: 10px 12px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 180, 80, 0.55);
+  background: rgba(12, 10, 8, 0.94);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  font-size: 11px;
+  line-height: 1.35;
+  color: #f5e6d0;
+}
+
+.playlistDebugHeader {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 6px;
+}
+
+.playlistDebugStatus {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffb84d;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 184, 77, 0.25);
+}
+
+.playlistDebugSection {
+  margin-bottom: 8px;
+}
+
+.playlistDebugSectionTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #c9b89a;
+}
+
+.playlistDebugPre {
+  margin: 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  color: #e8dcc8;
+}
+

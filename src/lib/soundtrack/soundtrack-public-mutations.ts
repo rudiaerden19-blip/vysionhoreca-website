@@ -100,13 +100,18 @@ export async function soundtrackExecutePublicMutation(
   await soundtrackGraphql(MUTATION_DOCUMENT[mutation], { input: payload })
 }
 
-/** Zelfde als execute, met volledige raw response voor Vercel-debug. */
+export type SoundtrackMutationLoggedResult = {
+  graphqlVariables: { input: Record<string, unknown> }
+  raw: Awaited<ReturnType<typeof soundtrackGraphqlRaw>>
+}
+
+/** Zelfde als execute, met volledige raw response (Vercel + UI debug panel). */
 export async function soundtrackExecutePublicMutationLogged(
   zoneId: string,
   mutation: SoundtrackPublicMutationName,
   input: Record<string, unknown> = {},
   logTag: string,
-): Promise<Awaited<ReturnType<typeof soundtrackGraphqlRaw>>> {
+): Promise<SoundtrackMutationLoggedResult> {
   const id = zoneId.trim()
   if (!id) throw new SoundtrackApiError('sound zone id required', 400)
   const payload = injectSoundZoneId(id, mutation, input)
@@ -125,7 +130,73 @@ export async function soundtrackExecutePublicMutationLogged(
     fullBody: raw.body,
   })
   throwIfGraphqlRawFailed(raw)
-  return raw
+  return { graphqlVariables: variables, raw }
+}
+
+/** Debug-panel: response altijd terug (ook bij GraphQL/HTTP fout). */
+export async function soundtrackExecutePublicMutationLoggedSoft(
+  zoneId: string,
+  mutation: SoundtrackPublicMutationName,
+  input: Record<string, unknown> = {},
+  logTag: string,
+): Promise<
+  SoundtrackMutationLoggedResult & {
+    ok: boolean
+    errorMessage: string | null
+  }
+> {
+  const id = zoneId.trim()
+  if (!id) {
+    return {
+      ok: false,
+      errorMessage: 'sound zone id required',
+      graphqlVariables: { input: {} },
+      raw: { httpStatus: 0, body: {} },
+    }
+  }
+  const payload = injectSoundZoneId(id, mutation, input)
+  const variables = { input: payload }
+  console.info(`${logTag} REQUEST`, { mutation, zoneId: id, graphqlVariables: variables })
+  const raw = await soundtrackGraphqlRaw(MUTATION_DOCUMENT[mutation], variables)
+  console.info(`${logTag} RESPONSE`, {
+    httpStatus: raw.httpStatus,
+    data: raw.body.data ?? null,
+    errors: raw.body.errors ?? null,
+    extensions: (raw.body as { extensions?: unknown }).extensions ?? null,
+    fullBody: raw.body,
+  })
+  try {
+    throwIfGraphqlRawFailed(raw)
+    return { ok: true, errorMessage: null, graphqlVariables: variables, raw }
+  } catch (e) {
+    const msg = e instanceof SoundtrackApiError ? e.message : 'Soundtrack mutation failed'
+    return { ok: false, errorMessage: msg, graphqlVariables: variables, raw }
+  }
+}
+
+export function graphqlResponseDebugPayload(
+  raw: Awaited<ReturnType<typeof soundtrackGraphqlRaw>>,
+): Record<string, unknown> {
+  return {
+    httpStatus: raw.httpStatus,
+    data: raw.body.data ?? null,
+    errors: raw.body.errors ?? null,
+  }
+}
+
+/** Alleen voor debug-panel (geen secrets). */
+export function playlistAssignRequestDebug(
+  zoneId: string,
+  graphqlVariables: { input: Record<string, unknown> },
+): Record<string, unknown> {
+  const input = graphqlVariables.input
+  return {
+    mutation: 'soundZoneAssignSource',
+    soundZoneId: zoneId,
+    source: input.source ?? null,
+    sourceTrackIndex: input.sourceTrackIndex ?? null,
+    immediate: input.immediate ?? null,
+  }
 }
 
 const QUEUE_DEBUG_TAG = '[soundtrack-debug soundZoneQueueTracks]'

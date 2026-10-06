@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
+  graphqlResponseDebugPayload,
   isSoundtrackPublicMutationName,
+  playlistAssignRequestDebug,
   soundtrackDebugSoundZoneQueueTracks,
   soundtrackExecutePublicMutation,
-  soundtrackExecutePublicMutationLogged,
+  soundtrackExecutePublicMutationLoggedSoft,
 } from '@/lib/soundtrack/soundtrack-public-mutations'
 import {
   SoundtrackApiError,
@@ -14,7 +16,33 @@ import {
   resolveSoundZoneForTenant,
   soundtrackSearchTracks,
   soundtrackUiPercentToApiVolume,
+  type SoundtrackPlayerSnapshot,
 } from '@/lib/soundtrack/soundtrack-server'
+
+function snapshotPlaylistDebug(s: SoundtrackPlayerSnapshot) {
+  return {
+    zoneId: s.zoneId,
+    online: s.online,
+    isPaired: s.isPaired,
+    playbackState: s.playbackState,
+    playFromTypename: s.playFromTypename ?? null,
+    playFromId: s.playFromPlaylistId ?? null,
+    nowPlayingTrackId: s.nowPlaying.track?.id ?? null,
+    nowPlayingTitle: s.nowPlaying.track?.name ?? null,
+  }
+}
+
+function playlistClickFromInput(input: Record<string, unknown>) {
+  return {
+    sourceId: String(input.source ?? '').trim(),
+    sourceName: String(input.debugSourceName ?? '').trim(),
+    clickedTrackId: String(input.debugTrackId ?? '').trim(),
+    clickedTrackTitle: String(input.debugTrackTitle ?? '').trim(),
+    uiPosition: typeof input.debugUiPosition === 'number' ? input.debugUiPosition : null,
+    sourceTrackIndex:
+      typeof input.sourceTrackIndex === 'number' ? input.sourceTrackIndex : null,
+  }
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -93,6 +121,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const isPlaylistTrackClick =
     mutation === 'soundZoneAssignSource' && typeof input.debugUiPosition === 'number'
 
+  let playlistTrackDebug: Record<string, unknown> | undefined
+
   try {
     const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
 
@@ -136,19 +166,43 @@ export async function POST(request: NextRequest, context: RouteContext) {
       })
       await soundtrackDebugSoundZoneQueueTracks(zoneId, input)
     } else if (isPlaylistTrackClick) {
-      await soundtrackExecutePublicMutationLogged(
+      const logged = await soundtrackExecutePublicMutationLoggedSoft(
         zoneId,
         'soundZoneAssignSource',
         input,
         '[soundtrack-debug soundZoneAssignSource]',
       )
+      playlistTrackDebug = {
+        click: playlistClickFromInput(input),
+        assign: {
+          request: playlistAssignRequestDebug(zoneId, logged.graphqlVariables),
+          response: graphqlResponseDebugPayload(logged.raw),
+          ok: logged.ok,
+          errorMessage: logged.errorMessage,
+        },
+      }
+      if (!logged.ok) {
+        throw new SoundtrackApiError(logged.errorMessage || 'soundZoneAssignSource failed')
+      }
     } else if (mutation === 'play' && input.debugPlaylistPlay === true) {
-      await soundtrackExecutePublicMutationLogged(
+      const logged = await soundtrackExecutePublicMutationLoggedSoft(
         zoneId,
         'play',
         input,
         '[soundtrack-debug playlist-play]',
       )
+      playlistTrackDebug = {
+        play: {
+          executed: true,
+          request: { mutation: 'play', soundZoneId: zoneId },
+          response: graphqlResponseDebugPayload(logged.raw),
+          ok: logged.ok,
+          errorMessage: logged.errorMessage,
+        },
+      }
+      if (!logged.ok) {
+        throw new SoundtrackApiError(logged.errorMessage || 'play failed')
+      }
     } else {
       await soundtrackExecutePublicMutation(zoneId, mutation, input)
     }
@@ -188,13 +242,29 @@ export async function POST(request: NextRequest, context: RouteContext) {
           : null,
       })
     }
-    return NextResponse.json({ ok: true, mutation, snapshot })
+    if (playlistTrackDebug) {
+      playlistTrackDebug.snapshotAfter = snapshotPlaylistDebug(snapshot)
+    }
+    return NextResponse.json({
+      ok: true,
+      mutation,
+      snapshot,
+      ...(playlistTrackDebug ? { debug: { playlistTrack: playlistTrackDebug } } : {}),
+    })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
     }
     if (e instanceof SoundtrackApiError) {
-      return NextResponse.json({ error: e.message, code: 'soundtrack' }, { status: e.status })
+      return NextResponse.json(
+        {
+          ok: false,
+          error: e.message,
+          code: 'soundtrack',
+          ...(playlistTrackDebug ? { debug: { playlistTrack: playlistTrackDebug } } : {}),
+        },
+        { status: e.status },
+      )
     }
     return NextResponse.json({ error: 'Soundtrack mutation failed' }, { status: 500 })
   }

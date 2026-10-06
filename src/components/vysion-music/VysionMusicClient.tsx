@@ -17,6 +17,11 @@ import {
   VmStop,
 } from './VysionMusicIcons'
 import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
+import {
+  mergePlaylistTrackDebugState,
+  VysionMusicPlaylistDebugPanel,
+  type PlaylistTrackDebugState,
+} from './VysionMusicPlaylistDebugPanel'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -134,6 +139,12 @@ export function VysionMusicClient({
     }
   }, [apiBase, mergeSnapshot, t])
 
+  const [playlistDebug, setPlaylistDebug] = useState<PlaylistTrackDebugState | null>(null)
+  const mergePlaylistDebugRef = useRef<(partial: Record<string, unknown>) => void>(() => {})
+  mergePlaylistDebugRef.current = (partial) => {
+    setPlaylistDebug((prev) => mergePlaylistTrackDebugState(prev, partial))
+  }
+
   const postMutation = useCallback(
     async (
       mutation: string,
@@ -148,7 +159,15 @@ export function VysionMusicClient({
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify({ mutation, input }),
         })
-        const json = (await res.json()) as { snapshot?: Snapshot; error?: string; ok?: boolean }
+        const json = (await res.json()) as {
+          snapshot?: Snapshot
+          error?: string
+          ok?: boolean
+          debug?: { playlistTrack?: Record<string, unknown> }
+        }
+        if (json.debug?.playlistTrack) {
+          mergePlaylistDebugRef.current(json.debug.playlistTrack)
+        }
         if (!res.ok || json.ok === false) {
           if (!opts?.silent) setError(json.error || t('vysionMusic.errorControl'))
           return false
@@ -318,6 +337,17 @@ export function VysionMusicClient({
       },
     ): Promise<boolean> => {
       setPlaylistSelecting(true)
+      setPlaylistDebug({
+        click: {
+          sourceId,
+          sourceName: meta.sourceName,
+          clickedTrackId: trackId,
+          clickedTrackTitle: meta.trackTitle,
+          uiPosition: meta.uiPosition,
+          sourceTrackIndex: meta.sourceTrackIndex,
+        },
+        play: { executed: false },
+      })
       try {
         const ok = await assignSourceAndPlay(
           {
@@ -522,6 +552,8 @@ export function VysionMusicClient({
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}
       />
+
+      <VysionMusicPlaylistDebugPanel state={playlistDebug} />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
     </div>
