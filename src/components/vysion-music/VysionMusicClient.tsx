@@ -19,6 +19,10 @@ import {
 import type { VysionMusicCatalogTrack } from './vysion-music-catalog-cache'
 import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
 import { perfLog, perfNow } from './vysion-music-perf'
+import {
+  lookupVysionMusicCoverArt,
+  rememberVysionMusicCoverArt,
+} from './vysion-music-cover-cache'
 import { vysionMusicTrackRowIsNowPlaying } from './vysion-music-track-match'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
@@ -70,7 +74,9 @@ function formatMs(ms: number): string {
 
 function proxiedCoverUrl(raw: string | null | undefined): string | null {
   const trimmed = raw?.trim()
-  if (!trimmed || !trimmed.startsWith('http')) return null
+  if (!trimmed) return null
+  if (trimmed.startsWith('/api/soundtrack/cover')) return trimmed
+  if (!trimmed.startsWith('http')) return null
   return `/api/soundtrack/cover?url=${encodeURIComponent(trimmed)}`
 }
 
@@ -119,6 +125,7 @@ export function VysionMusicClient({
   const confirmSessionRef = useRef(0)
   const snapshotRef = useRef<Snapshot | null>(null)
   const optimisticTrackRef = useRef<TrackRow | null>(null)
+  const coverArtCacheRef = useRef(new Map<string, string>())
 
   const applyServerVolume = useCallback((v: number) => {
     const q = quantizeVolumeUiPercent(v)
@@ -325,7 +332,9 @@ export function VysionMusicClient({
   const playbackState =
     optimisticTrack != null ? 'playing' : (snapshot?.playbackState ?? 'paused')
   const nowTrackId = nowTrack?.id ?? null
-  const nowTrackImageUrl = nowTrack?.imageUrl ?? null
+
+  rememberVysionMusicCoverArt(coverArtCacheRef.current, nowTrack)
+  const nowTrackImageUrl = lookupVysionMusicCoverArt(coverArtCacheRef.current, nowTrack)
 
   useEffect(() => {
     const key = trackIdentity(nowTrack)
@@ -405,6 +414,7 @@ export function VysionMusicClient({
     }
     optimisticStartedAtRef.current = new Date().toISOString()
     setOptimisticTrack(row)
+    rememberVysionMusicCoverArt(coverArtCacheRef.current, row)
     perfLog('track-ui-update', clickT0, { trackId: track.id })
     const coverUrl = proxiedCoverUrl(track.imageUrl)
     if (coverUrl) {
