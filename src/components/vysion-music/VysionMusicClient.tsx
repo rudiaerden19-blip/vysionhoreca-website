@@ -24,6 +24,7 @@ import {
   filterTracksByArtistQuery,
   prefersArtistOnlySearchResults,
 } from '@/lib/soundtrack/soundtrack-search-artist-filter'
+import { quantizeVolumeUiPercent } from '@/lib/soundtrack/soundtrack-server'
 import {
   VYSION_MUSIC_TRACK_FADE_MS,
   trackIdentity,
@@ -160,6 +161,8 @@ export function VysionMusicClient({
     playlistName: string
   } | null>(null)
   const [spotifyImportTracks, setSpotifyImportTracks] = useState<TrackRow[]>([])
+  /** Slider/VU — niet laten overschrijven door trage Soundtrack-polls tijdens slepen. */
+  const [volumeUi, setVolumeUi] = useState(0)
 
   const apiBase = `/api/soundtrack/${encodeURIComponent(tenant)}`
   const playlistsApiBase = `${apiBase}/playlists`
@@ -167,6 +170,7 @@ export function VysionMusicClient({
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
   const lastVolumeSentRef = useRef<number | null>(null)
+  const volumeUiPendingRef = useRef<number | null>(null)
   const volumeDraggingRef = useRef(false)
   const playlistPanelRef = useRef<HTMLDivElement>(null)
   const nowLeftRef = useRef<HTMLDivElement>(null)
@@ -212,14 +216,36 @@ export function VysionMusicClient({
     setSavedSoundtrackPlaylistId(pin.soundtrackPlaylistId)
   }, [])
 
-  const mergeSnapshot = useCallback((snap: Snapshot, opts?: { ignoreVolume?: boolean }) => {
-    setSnapshot((prev) => {
-      let volume = snap.volume
-      if (opts?.ignoreVolume && prev) volume = prev.volume
-      if (volumeDraggingRef.current && prev) volume = prev.volume
-      return volume === snap.volume ? snap : { ...snap, volume }
+  const applyServerVolume = useCallback((serverVolume: number) => {
+    if (volumeDraggingRef.current) return
+    const qServer = quantizeVolumeUiPercent(serverVolume)
+    setVolumeUi((ui) => {
+      const pending = volumeUiPendingRef.current
+      if (pending != null) {
+        if (qServer === quantizeVolumeUiPercent(pending)) {
+          volumeUiPendingRef.current = null
+          return qServer
+        }
+        return ui
+      }
+      return qServer
     })
   }, [])
+
+  const mergeSnapshot = useCallback(
+    (snap: Snapshot, opts?: { ignoreVolume?: boolean }) => {
+      setSnapshot((prev) => {
+        let volume = snap.volume
+        const pending = volumeUiPendingRef.current
+        if (pending != null) volume = pending
+        else if (opts?.ignoreVolume && prev) volume = prev.volume
+        else if (volumeDraggingRef.current && prev) volume = prev.volume
+        return volume === snap.volume ? snap : { ...snap, volume }
+      })
+      applyServerVolume(snap.volume)
+    },
+    [applyServerVolume],
+  )
 
   const loadSnapshot = useCallback(async () => {
     try {
@@ -392,11 +418,11 @@ export function VysionMusicClient({
         } else {
           if (!(opts?.silent && op === 'setVolume')) setError(null)
           if (json.snapshot) {
-            const staleVolume =
-              op === 'setVolume' &&
-              volumeGeneration != null &&
-              volumeGeneration !== volumeSyncGeneration.current
-            mergeSnapshot(json.snapshot, { ignoreVolume: staleVolume })
+            const ignoreVolume =
+              op === 'setVolume' ||
+              (volumeGeneration != null &&
+                volumeGeneration !== volumeSyncGeneration.current)
+            mergeSnapshot(json.snapshot, { ignoreVolume })
           }
         }
       } catch {
@@ -878,7 +904,7 @@ export function VysionMusicClient({
   )
 
   const nowTrack = snapshot?.nowPlaying.track
-  volumeUiRef.current = snapshot?.volume ?? 0
+  volumeUiRef.current = volumeUi
 
   const nowTrackId = nowTrack?.id
   const nowTrackName = nowTrack?.name
@@ -1099,7 +1125,7 @@ export function VysionMusicClient({
             <div className={styles.volumeControlsRow}>
               <VuMeterStereo
                 playing={isPlaying}
-                volumePercent={snapshot?.volume ?? 0}
+                volumePercent={volumeUi}
                 trackKey={trackIdentity(nowTrack)}
               />
               <div className={styles.volumeSliderStack}>
@@ -1108,13 +1134,15 @@ export function VysionMusicClient({
                 </span>
                 <div className={styles.volumeSliderWrap}>
                   <VolumeSliderVertical
-                    value={snapshot?.volume ?? 0}
+                    value={volumeUi}
                     disabled={busy}
                     ariaLabel={t('vysionMusic.volume')}
                     onDragChange={(dragging) => {
                       volumeDraggingRef.current = dragging
                     }}
                     onChange={(v) => {
+                      volumeUiPendingRef.current = v
+                      setVolumeUi(v)
                       setSnapshot((s) => (s ? { ...s, volume: v } : s))
                     }}
                     onCommit={(v) => syncVolume(v, true)}

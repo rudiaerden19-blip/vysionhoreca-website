@@ -33,12 +33,15 @@ export function VolumeSliderVertical({
   const shown = dragValue ?? quantizeVolumeUiPercent(value)
 
   useEffect(() => {
-    if (!draggingRef.current) {
+    if (draggingRef.current) return
+    if (dragValue != null && quantizeVolumeUiPercent(value) === dragValue) {
       setDragValue(null)
       lastDragShownRef.current = null
+    }
+    if (dragValue == null) {
       lastCommittedStepRef.current = quantizeVolumeUiPercent(value)
     }
-  }, [value])
+  }, [value, dragValue])
 
   const rawFromClientY = useCallback((clientY: number): number => {
     const inner = innerRef.current
@@ -70,13 +73,13 @@ export function VolumeSliderVertical({
       if (!draggingRef.current) return
       draggingRef.current = false
       activePointerRef.current = null
-      onDragChange?.(false)
 
       const raw =
         clientY != null ? rawFromClientY(clientY) : dragValue ?? clampUiPercent(value)
       const committed = quantizeVolumeUiPercent(raw)
-      setDragValue(null)
       onChange(committed)
+      onDragChange?.(false)
+      setDragValue(committed)
       if (committed !== lastCommittedStepRef.current) {
         lastCommittedStepRef.current = committed
         onCommit?.(committed)
