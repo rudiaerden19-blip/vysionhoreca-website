@@ -6871,7 +6871,7 @@
     "libraryTitle": "Soundtrack library",
     "libraryTabLists": "Playlists",
     "libraryTabSchedules": "Schedules",
-    "libraryCreatePlaylist": "+ Playlist",
+    "libraryCreatePlaylist": "Create",
     "createPlaylistTitle": "New playlist",
     "createPlaylistNameLabel": "Playlist name",
     "createPlaylistCancel": "Cancel",
