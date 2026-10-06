@@ -5,15 +5,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { quantizeVolumeUiPercent } from '@/lib/soundtrack/soundtrack-server'
-import { sourceTrackIndexInCatalog } from '@/lib/vysion-music-playfrom-continuity'
 import {
   VYSION_MUSIC_TRACK_FADE_MS,
   trackIdentity,
 } from '@/lib/vysion-music-track-fade'
-import {
-  getCachedPlaylistTracks,
-  setCachedPlaylistTracks,
-} from './vysion-music-catalog-cache'
 import {
   VmPause,
   VmPlay,
@@ -124,8 +119,6 @@ export function VysionMusicClient({
   const snapshotRef = useRef<Snapshot | null>(null)
   const optimisticTrackRef = useRef<TrackRow | null>(null)
   const coverArtCacheRef = useRef(new Map<string, string>())
-  const playFromContinuitySyncKeyRef = useRef<string | null>(null)
-  const playFromContinuityInFlightRef = useRef(false)
 
   const applyServerVolume = useCallback((v: number) => {
     const q = quantizeVolumeUiPercent(v)
@@ -400,59 +393,20 @@ export function VysionMusicClient({
     [queueTrackNow],
   )
 
-  useEffect(() => {
-    playFromContinuitySyncKeyRef.current = null
-  }, [playbackSourceId])
-
-  /** Playlist doorloop na track-einde: playFrom/assign los van bevroren track-klik. */
-  useEffect(() => {
-    const sourceId = playbackSourceId?.trim()
-    const trackId = snapshot?.nowPlaying.track?.id?.trim()
-    if (!sourceId || !trackId) return
-
-    const syncKey = `${sourceId}:${trackId}`
-    if (playFromContinuitySyncKeyRef.current === syncKey) return
-    if (playFromContinuityInFlightRef.current) return
-
-    let cancelled = false
-    playFromContinuityInFlightRef.current = true
-
-    void (async () => {
+  const applySoundtrackPlayFrom = useCallback(
+    async (sourceId: string) => {
+      const id = sourceId.trim()
+      if (!id) return
+      setPlaylistSelecting(true)
       try {
-        let tracks = getCachedPlaylistTracks(tenant, sourceId)
-        if (!tracks?.length) {
-          const res = await fetch(
-            `/api/soundtrack/${encodeURIComponent(tenant)}/playlist-tracks?source=${encodeURIComponent(sourceId)}`,
-            { headers: getAuthHeaders(), cache: 'no-store' },
-          )
-          const json = (await res.json()) as { tracks?: TrackRow[] }
-          if (cancelled) return
-          if (res.ok && json.tracks?.length) {
-            tracks = json.tracks
-            setCachedPlaylistTracks(tenant, sourceId, json.tracks)
-          }
-        }
-
-        const sourceTrackIndex = tracks
-          ? sourceTrackIndexInCatalog(tracks, trackId)
-          : undefined
-        const input: Record<string, unknown> = {
-          source: sourceId,
-          immediate: false,
-        }
-        if (sourceTrackIndex !== undefined) input.sourceTrackIndex = sourceTrackIndex
-
-        const ok = await postMutation('soundZoneAssignSource', input, { silent: true })
-        if (!cancelled && ok) playFromContinuitySyncKeyRef.current = syncKey
+        const ok = await postMutation('setPlayFrom', { source: id })
+        if (ok) refreshSnapshotAfterControl()
       } finally {
-        if (!cancelled) playFromContinuityInFlightRef.current = false
+        setPlaylistSelecting(false)
       }
-    })()
-
-    return () => {
-      cancelled = true
-    }
-  }, [playbackSourceId, snapshot?.nowPlaying.track?.id, tenant, postMutation])
+    },
+    [postMutation, refreshSnapshotAfterControl],
+  )
 
   const durationMs = nowTrack?.durationMs ?? 0
   const startedAt =
@@ -658,6 +612,7 @@ export function VysionMusicClient({
         busy={catalogBusy}
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}
+        onPlaylistSelected={applySoundtrackPlayFrom}
       />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>

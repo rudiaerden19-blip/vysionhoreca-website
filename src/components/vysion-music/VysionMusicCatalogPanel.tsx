@@ -36,12 +36,13 @@ function formatMs(ms: number): string {
 
 export function VysionMusicCatalogPanel({
   tenant,
-  activeSourceId: _playFromSourceId,
+  activeSourceId: playFromSourceId,
   playingSourceId,
   nowPlayingTrack,
   nowPlaying,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
+  onPlaylistSelected,
   busy,
 }: {
   tenant: string
@@ -56,9 +57,10 @@ export function VysionMusicCatalogPanel({
     playlistTracks: TrackItem[],
   ) => void | Promise<void>
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
+  onPlaylistSelected: (sourceId: string) => void | Promise<void>
   busy: boolean
 }) {
-  void _playFromSourceId
+  void playingSourceId
 
   const { t } = useLanguage()
   const [tab, setTab] = useState<LibraryTab>('lists')
@@ -206,6 +208,13 @@ export function VysionMusicCatalogPanel({
     void loadTracks(selectedId)
   }, [selectedId, loadTracks])
 
+  useEffect(() => {
+    const id = playFromSourceId?.trim()
+    if (!id || !items.length) return
+    if (!items.some((i) => i.id === id)) return
+    setSelectedId((prev) => (prev === id ? prev : id))
+  }, [playFromSourceId, items])
+
   const filteredLists = useMemo(() => {
     if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
     return items.filter((i) => i.sourceKind !== 'schedule')
@@ -284,6 +293,7 @@ export function VysionMusicCatalogPanel({
       setTracksLoading(false)
       perfLog('playlist-click-cached-tracks-visible', t0, { sourceId: id, count: cached.length })
     }
+    void onPlaylistSelected(id)
   }
 
   return (
@@ -321,11 +331,11 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const isPlayingList = playingSourceId === pl.id && nowPlayingTrack != null
-              const isBrowsing = selectedId === pl.id && !isPlayingList
+              const isActivePlayFrom = playFromSourceId === pl.id
+              const isBrowsing = selectedId === pl.id && !isActivePlayFrom
               const rowClass = [
                 styles.libraryRow,
-                isPlayingList
+                isActivePlayFrom
                   ? styles.libraryRowActive
                   : isBrowsing
                     ? styles.libraryRowSelected
@@ -365,7 +375,7 @@ export function VysionMusicCatalogPanel({
                       <span className={styles.libraryRowName}>{pl.name}</span>
                       <span className={styles.libraryRowMeta}>{sourceLabel(pl.sourceKind)}</span>
                     </span>
-                    {isPlayingList ? (
+                    {isActivePlayFrom && nowPlayingTrack != null ? (
                       <span className={styles.libraryRowEq}>
                         <TrackNowPlayingBars playing={nowPlaying} />
                       </span>
