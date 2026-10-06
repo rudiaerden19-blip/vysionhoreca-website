@@ -112,7 +112,6 @@ export function VysionMusicCatalogPanel({
   const [listsLoading, setListsLoading] = useState(() => !getCachedPlaylists(tenant))
   const [listsError, setListsError] = useState<string | null>(null)
   const listsLoadedOnceRef = useRef(Boolean(getCachedPlaylists(tenant)))
-  const libraryPanelRef = useRef<HTMLElement>(null)
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [tracks, setTracks] = useState<TrackItem[]>([])
@@ -454,11 +453,7 @@ export function VysionMusicCatalogPanel({
   }
 
   return (
-    <section
-      ref={libraryPanelRef}
-      className={styles.libraryPanel}
-      aria-label={t('vysionMusic.libraryTitle')}
-    >
+    <section className={styles.libraryPanel} aria-label={t('vysionMusic.libraryTitle')}>
       <div className={styles.catalogGrid}>
         <div className={styles.catalogCol}>
           <div className={styles.catalogColHead}>
