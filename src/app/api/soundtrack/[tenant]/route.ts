@@ -10,12 +10,12 @@ import {
   skipSoundZoneTracks,
   soundtrackGraphql,
   soundtrackPauseZone,
+  soundtrackApplySourceOnZone,
   soundtrackJumpToPlaylistTrack,
   soundtrackPlayFromTrackIndex,
   soundtrackPlayZone,
   soundtrackQueueTracksOnZone,
   soundtrackSearchTracks,
-  soundtrackSetPlayFrom,
   soundtrackSkipTrack,
   soundtrackUiPercentToApiVolume,
 } from '@/lib/soundtrack/soundtrack-server'
@@ -65,16 +65,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
       }
     }
 
-    const resolution = await resolveSoundZoneForTenant(tenantSlug)
-    const snapshot = await fetchSoundtrackPlayerSnapshot(resolution.zoneId)
-    return NextResponse.json({
-      ok: true,
-      snapshot: {
-        ...snapshot,
-        zoneLinkSource: resolution.linkSource,
-        tenantZoneConfigured: resolution.tenantConfigured,
-      },
-    })
+    const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
+    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       if (process.env.NODE_ENV === 'development') {
@@ -137,7 +130,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
         if (!source) {
           return NextResponse.json({ error: 'input.source required' }, { status: 400 })
         }
-        await soundtrackSetPlayFrom(zoneId, source)
+        await soundtrackApplySourceOnZone(zoneId, source, 0)
         break
       }
       case 'skipTrack':

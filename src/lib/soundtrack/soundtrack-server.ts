@@ -753,6 +753,59 @@ export async function soundtrackPauseZone(zoneId: string): Promise<void> {
   )
 }
 
+function isSoundtrackSchemaFieldError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e)
+  return /Cannot query field|Unknown type|Unknown field|Unknown argument/i.test(msg)
+}
+
+/**
+ * Zelfde mutatie als Soundtrack-speler: bron + track-index op de fysieke zone.
+ * Faalt stilletjes als het schema deze mutatie niet heeft → fallback setPlayFrom.
+ */
+async function trySoundZoneAssignSource(
+  zoneId: string,
+  sourceId: string,
+  sourceTrackIndex: number,
+): Promise<boolean> {
+  const source = sourceId.trim()
+  const index = Math.max(0, Math.floor(sourceTrackIndex))
+  const attempts: Record<string, unknown>[] = [
+    { soundZones: [zoneId], source, sourceTrackIndex: index, immediate: true },
+    { soundZone: zoneId, source, sourceTrackIndex: index, immediate: true },
+  ]
+  for (const input of attempts) {
+    try {
+      await soundtrackGraphql(
+        `mutation($input: SoundZoneAssignSourceInput!) {
+          soundZoneAssignSource(input: $input) { __typename }
+        }`,
+        { input },
+      )
+      return true
+    } catch (e) {
+      if (isSoundtrackSchemaFieldError(e)) continue
+      throw e
+    }
+  }
+  return false
+}
+
+/** Bron op zone zetten en afspelen — één pad voor library + rij-klik. */
+export async function soundtrackApplySourceOnZone(
+  zoneId: string,
+  sourceId: string,
+  sourceTrackIndex = 0,
+): Promise<void> {
+  const source = sourceId.trim()
+  if (!source) throw new SoundtrackApiError('source id required')
+  const index = Math.max(0, Math.floor(sourceTrackIndex))
+  if (await trySoundZoneAssignSource(zoneId, source, index)) {
+    await soundtrackPlayZone(zoneId)
+    return
+  }
+  await soundtrackRestartPlayFromAtIndex(zoneId, source, index)
+}
+
 /** Soundtrack `setPlayFrom` — alleen `SetPlayFromInput` (soundZone + source). */
 export async function soundtrackSetPlayFrom(zoneId: string, sourceId: string): Promise<void> {
   const source = sourceId.trim()
@@ -879,23 +932,18 @@ export async function soundtrackJumpToPlaylistTrack(
       return
     }
     if (targetIndex > currentIndex) {
+      if (await trySoundZoneAssignSource(zoneId, source, targetIndex)) {
+        await soundtrackPlayZone(zoneId)
+        await waitForNowPlayingTrackId(zoneId, wantId, 10000)
+        return
+      }
       await skipSoundZoneTracks(zoneId, targetIndex - currentIndex, true)
       return
     }
   }
 
-  await soundtrackPauseZone(zoneId)
-  await soundtrackSetPlayFrom(zoneId, source)
-  await soundtrackSetPlaybackOrderLinear(zoneId)
-  await soundtrackPlayZone(zoneId)
-
-  const firstId = ids[0]
-  if (firstId) await waitForNowPlayingTrackId(zoneId, firstId)
-
-  if (targetIndex > 0) {
-    await skipSoundZoneTracks(zoneId, targetIndex, true)
-    await waitForNowPlayingTrackId(zoneId, wantId, 10000)
-  }
+  await soundtrackApplySourceOnZone(zoneId, source, targetIndex)
+  await waitForNowPlayingTrackId(zoneId, wantId, 10000)
 }
 
 /** Soundtrack `skipTrack` (één track vooruit). */
