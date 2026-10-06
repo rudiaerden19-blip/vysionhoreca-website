@@ -373,9 +373,13 @@ export function VysionMusicCatalogPanel({
               ]
                 .filter(Boolean)
                 .join(' ')
+              const cachedTrackArt =
+                getCachedPlaylistTracks(tenant, pl.id)?.find((t) => t.imageUrl?.trim())?.imageUrl ??
+                null
+              const listArtUrl = pl.imageUrl?.trim() || cachedTrackArt?.trim() || null
               const thumbSrc =
-                pl.imageUrl && pl.imageUrl.startsWith('http')
-                  ? `/api/soundtrack/cover?url=${encodeURIComponent(pl.imageUrl)}`
+                listArtUrl && listArtUrl.startsWith('http')
+                  ? `/api/soundtrack/cover?url=${encodeURIComponent(listArtUrl)}`
                   : null
               return (
                 <li key={pl.id}>
@@ -586,6 +590,7 @@ export function VysionMusicCatalogPanel({
             setTracks(refreshedTracks)
             setTracksError(null)
           }
+          await loadLists({ background: true })
         }}
       />
     </section>

@@ -1,5 +1,9 @@
 import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
 import {
+  soundtrackTrackArtUrlFromAlbum,
+  type SoundtrackTrackGraphNode,
+} from '@/lib/soundtrack/soundtrack-track-map'
+import {
   SoundtrackApiError,
   soundtrackGraphql,
 } from '@/lib/soundtrack/soundtrack-server'
@@ -211,13 +215,77 @@ async function fetchAccountLibrary(
   return { playlists }
 }
 
+const PLAYLIST_LIST_THUMB_QUERY = `query($id: ID!) {
+  playlist(id: $id) {
+    display {
+      image { sizes { thumbnail teaser hero } }
+    }
+    tracks(first: 1) {
+      edges {
+        node {
+          album {
+            display {
+              image { sizes { thumbnail teaser hero } }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
+
+async function resolvePlaylistListImageUrl(playlistId: string): Promise<string | null> {
+  const data = await soundtrackGraphql<{
+    playlist: (LibraryArtworkNode & {
+      tracks?: { edges: { node: { album?: SoundtrackTrackGraphNode['album'] } }[] }
+    }) | null
+  }>(PLAYLIST_LIST_THUMB_QUERY, { id: playlistId.trim() })
+
+  const pl = data.playlist
+  if (!pl) return null
+
+  const fromDisplay = soundtrackLibraryListImageUrl(pl)
+  if (fromDisplay) return fromDisplay
+
+  for (const edge of pl.tracks?.edges ?? []) {
+    const fromTrack = soundtrackTrackArtUrlFromAlbum(edge.node?.album)
+    if (fromTrack) return fromTrack
+  }
+  return null
+}
+
+async function enrichMissingPlaylistImages(
+  playlists: SoundtrackLibraryPlaylist[],
+): Promise<SoundtrackLibraryPlaylist[]> {
+  const missing = playlists.filter((p) => !p.imageUrl && p.sourceKind !== 'schedule')
+  if (!missing.length) return playlists
+
+  const imageById = new Map<string, string>()
+  await Promise.all(
+    missing.map(async (p) => {
+      try {
+        const url = await resolvePlaylistListImageUrl(p.id)
+        if (url) imageById.set(p.id, url)
+      } catch {
+        /* best-effort thumbnail */
+      }
+    }),
+  )
+
+  if (!imageById.size) return playlists
+  return playlists.map((p) => {
+    const url = imageById.get(p.id)
+    return url ? { ...p, imageUrl: url } : p
+  })
+}
+
 export async function listSoundtrackLibraryPlaylists(
   zoneId: string,
 ): Promise<SoundtrackLibraryPlaylist[]> {
   const id = zoneId.trim()
   if (!id) throw new SoundtrackApiError('sound zone id required', 400)
   const library = await fetchAccountLibrary(id, soundtrackGraphql)
-  return library.playlists
+  return enrichMissingPlaylistImages(library.playlists)
 }
 
 async function resolveZoneAccountId(zoneId: string): Promise<string> {
