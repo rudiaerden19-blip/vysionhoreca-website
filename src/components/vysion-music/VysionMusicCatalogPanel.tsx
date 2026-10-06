@@ -296,7 +296,8 @@ export function VysionMusicCatalogPanel({
 
   const filteredLists = useMemo(() => {
     if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
-    return items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown')
+    // Zelfde set als Soundtrack «Playlists & Stations»: manual + Soundtrack-curated (niet schedules).
+    return items.filter((i) => i.sourceKind !== 'schedule')
   }, [items, tab])
 
   const addablePlaylists = useMemo(
