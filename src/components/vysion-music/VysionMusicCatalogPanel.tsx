@@ -92,8 +92,8 @@ export function VysionMusicCatalogPanel({
   }, [loadLists])
 
   useEffect(() => {
-    if (activeSourceId && !selectedId) setSelectedId(activeSourceId)
-  }, [activeSourceId, selectedId])
+    if (activeSourceId) setSelectedId(activeSourceId)
+  }, [activeSourceId])
 
   const loadTracks = useCallback(
     async (sourceId: string) => {

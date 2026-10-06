@@ -262,24 +262,26 @@ export function VysionMusicClient({
     async (sourceId: string) => {
       setPlaylistSelecting(true)
       try {
-        await postMutation('setPlayFrom', { source: sourceId })
+        const ok = await postMutation('setPlayFrom', { source: sourceId })
+        if (ok) void loadSnapshot()
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation],
+    [postMutation, loadSnapshot],
   )
 
   const playPlaylistTrack = useCallback(
     async (sourceId: string, trackId: string) => {
       setPlaylistSelecting(true)
       try {
-        await postMutation('playPlaylistTrack', { source: sourceId, trackId })
+        const ok = await postMutation('playPlaylistTrack', { source: sourceId, trackId })
+        if (ok) void loadSnapshot()
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation],
+    [postMutation, loadSnapshot],
   )
 
   const playSearchTrack = useCallback(

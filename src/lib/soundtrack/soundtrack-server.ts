@@ -557,7 +557,11 @@ export async function fetchSoundtrackPlayerSnapshot(
   let playFromPlaylistId: string | null = null
   let playlist: SoundtrackTrackRow[] = []
 
-  if (playFrom?.__typename === 'Playlist' || playFrom?.__typename === 'Soundtrack') {
+  if (
+    playFrom?.__typename === 'Playlist' ||
+    playFrom?.__typename === 'Soundtrack' ||
+    playFrom?.__typename === 'Schedule'
+  ) {
     playFromPlaylistId = playFrom.id?.trim() || null
   }
 

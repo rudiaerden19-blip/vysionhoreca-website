@@ -29,9 +29,9 @@ const ZONE_ACCOUNT_QUERY = `query($id: ID!) {
   }
 }`
 
-const LIBRARY_ARTWORK_FIELDS = `
+/** Soundtrack API: `Playlist` heeft géén `artwork` — alleen `Soundtrack`-stations wel. */
+const SOUNDTRACK_STATION_ARTWORK = `
   artwork { url sizes { thumbnail teaser hero } }
-  display { image { sizes { thumbnail teaser hero } } }
 `
 
 const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
@@ -41,24 +41,8 @@ const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
       edges {
         node {
           __typename
-          ... on Playlist { id name ${LIBRARY_ARTWORK_FIELDS} }
-          ... on Soundtrack { id name ${LIBRARY_ARTWORK_FIELDS} }
-          ... on Schedule { id name ${LIBRARY_ARTWORK_FIELDS} }
-        }
-      }
-    }
-  }
-}`
-
-const LIBRARY_CHILDREN_MINIMAL_QUERY = `query($id: ID!) {
-  musicLibrary(id: $id) {
-    id
-    children(first: 200) {
-      edges {
-        node {
-          __typename
-          ... on Playlist { id name artwork { url } }
-          ... on Soundtrack { id name artwork { url } }
+          ... on Playlist { id name }
+          ... on Soundtrack { id name ${SOUNDTRACK_STATION_ARTWORK} }
           ... on Schedule { id name }
         }
       }
@@ -70,10 +54,10 @@ const LIBRARY_SPLIT_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
     playlists(first: 200) {
-      edges { node { id name ${LIBRARY_ARTWORK_FIELDS} } }
+      edges { node { id name } }
     }
     soundtracks(first: 200) {
-      edges { node { id name ${LIBRARY_ARTWORK_FIELDS} } }
+      edges { node { id name ${SOUNDTRACK_STATION_ARTWORK} } }
     }
   }
 }`
@@ -82,7 +66,7 @@ const LIBRARY_PLAYLISTS_ONLY_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
     playlists(first: 200) {
-      edges { node { id name ${LIBRARY_ARTWORK_FIELDS} } }
+      edges { node { id name } }
     }
   }
 }`
@@ -108,15 +92,10 @@ type LibraryArtworkNode = {
     url?: string | null
     sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
   } | null
-  display?: {
-    image?: {
-      sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
-    } | null
-  } | null
 }
 
 function libraryItemImageUrl(node: LibraryArtworkNode): string | null {
-  const sizeSources = [node.artwork?.sizes, node.display?.image?.sizes]
+  const sizeSources = [node.artwork?.sizes]
   for (const sizes of sizeSources) {
     if (!sizes) continue
     for (const key of ['teaser', 'hero', 'thumbnail'] as const) {
@@ -206,7 +185,7 @@ async function enrichLibraryCovers(
           const data = await gql<{
             soundtrack: LibraryArtworkNode | null
           }>(
-            `query($id: ID!) { soundtrack(id: $id) { ${LIBRARY_ARTWORK_FIELDS} } }`,
+            `query($id: ID!) { soundtrack(id: $id) { ${SOUNDTRACK_STATION_ARTWORK} } }`,
             { id: row.id },
           )
           const url = data.soundtrack ? libraryItemImageUrl(data.soundtrack) : null
@@ -243,12 +222,6 @@ async function fetchMusicLibraryRows(
     if (rows.length > 0) return enrichLibraryCovers(dedupeLibraryRows(rows), gql)
   } catch (e) {
     if (!isUnknownFieldError(e)) throw e
-    try {
-      const rows = await runChildren(LIBRARY_CHILDREN_MINIMAL_QUERY)
-      if (rows.length > 0) return enrichLibraryCovers(dedupeLibraryRows(rows), gql)
-    } catch (e2) {
-      if (!isUnknownFieldError(e2)) throw e2
-    }
   }
 
   try {
