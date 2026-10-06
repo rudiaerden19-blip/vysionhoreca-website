@@ -8,7 +8,7 @@ import {
   resolveSoundZoneIdForTenant,
   skipSoundZoneTracks,
   soundtrackControl,
-  soundtrackPlayPlaylistAtTrackIndex,
+  soundtrackJumpToPlaylistTrack,
   soundtrackSearchTracks,
   soundtrackSetPlayFrom,
   soundtrackPlayZone,
@@ -101,12 +101,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
       if (!source) {
         return NextResponse.json({ error: 'source or playlistId required' }, { status: 400 })
       }
-      const trackIndex =
-        typeof body.trackIndex === 'number' && Number.isFinite(body.trackIndex)
-          ? Math.max(0, Math.floor(body.trackIndex))
-          : 0
-      if (trackIndex > 0) {
-        await soundtrackPlayPlaylistAtTrackIndex(zoneId, source, trackIndex)
+      const jumpTrackId = body.trackId?.trim()
+      if (jumpTrackId) {
+        await soundtrackJumpToPlaylistTrack(zoneId, source, jumpTrackId)
       } else {
         await soundtrackSetPlayFrom(zoneId, source)
         await soundtrackPlayZone(zoneId)

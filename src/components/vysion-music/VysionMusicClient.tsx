@@ -314,10 +314,10 @@ export function VysionMusicClient({
     }
   }, [])
 
-  const setPlayFromTrack = useCallback(
-    async (source: string, trackIndex: number) => {
+  const playPlaylistTrack = useCallback(
+    async (source: string, trackId: string) => {
       setSwitchingTrack(true)
-      await postOp({ op: 'setPlayFrom', source, trackIndex })
+      await postOp({ op: 'setPlayFrom', source, trackId })
       setSwitchingTrack(false)
       window.setTimeout(() => void loadSnapshot(), 800)
     },
@@ -479,7 +479,8 @@ export function VysionMusicClient({
                   const idx = queueRows.findIndex(
                     (r) => r.id === nowTrack.id && r.name === nowTrack.name,
                   )
-                  if (idx > 0) void setPlayFromTrack(playFromId, idx - 1)
+                  const prev = idx > 0 ? queueRows[idx - 1] : null
+                  if (prev?.id) void playPlaylistTrack(playFromId, prev.id)
                 }}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -578,7 +579,7 @@ export function VysionMusicClient({
                       className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                       disabled={switchingTrack || !playFromId}
                       onClick={() => {
-                        if (playFromId) void setPlayFromTrack(playFromId, idx)
+                        if (playFromId) void playPlaylistTrack(playFromId, row.id)
                       }}
                     >
                       <span className={styles.rowNum}>{idx + 1}</span>

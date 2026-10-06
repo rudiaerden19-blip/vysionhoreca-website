@@ -752,18 +752,66 @@ export async function soundtrackSetPlayFrom(zoneId: string, sourceId: string): P
   }
 }
 
+async function waitForNowPlayingTrackId(
+  zoneId: string,
+  trackId: string,
+  maxMs = 6000,
+): Promise<void> {
+  const want = trackId.trim()
+  if (!want) return
+  const deadline = Date.now() + maxMs
+  while (Date.now() < deadline) {
+    const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+    if (snap.nowPlaying.track?.id === want) return
+    await new Promise((r) => setTimeout(r, 300))
+  }
+}
+
 /**
- * Playlist op index: `setPlayFrom` → `play` → `skipTracks(n)` — alleen Soundtrack GraphQL.
+ * Spring naar een track in de actieve playlist — volgorde altijd uit Soundtrack `playlist.tracks`.
+ * Zelfde playFrom + vooruit: alleen `skipTracks`. Terug / andere bron: `pause` → `setPlayFrom` → `play` → wacht op track 1 → `skipTracks`.
  */
-export async function soundtrackPlayPlaylistAtTrackIndex(
+export async function soundtrackJumpToPlaylistTrack(
   zoneId: string,
   playlistId: string,
-  trackIndex: number,
+  trackId: string,
 ): Promise<void> {
-  await soundtrackSetPlayFrom(zoneId, playlistId)
+  const source = playlistId.trim()
+  const wantId = trackId.trim()
+  if (!source || !wantId) throw new SoundtrackApiError('playlistId and trackId required')
+
+  const rows = await fetchPlaylistTrackRows(source)
+  const ids = rows.map((r) => r.id)
+  const targetIndex = ids.indexOf(wantId)
+  if (targetIndex < 0) throw new SoundtrackApiError('Track not in this playlist')
+
+  const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+  const samePlayFrom = snap.playFromPlaylistId === source
+  const nowId = snap.nowPlaying.track?.id ?? null
+  const currentIndex = nowId ? ids.indexOf(nowId) : -1
+
+  if (samePlayFrom && currentIndex >= 0) {
+    if (targetIndex === currentIndex) {
+      await soundtrackPauseZone(zoneId)
+      await soundtrackPlayZone(zoneId)
+      return
+    }
+    if (targetIndex > currentIndex) {
+      await skipSoundZoneTracks(zoneId, targetIndex - currentIndex, true)
+      return
+    }
+  }
+
+  await soundtrackPauseZone(zoneId)
+  await soundtrackSetPlayFrom(zoneId, source)
   await soundtrackPlayZone(zoneId)
-  const n = Math.max(0, Math.floor(trackIndex))
-  if (n > 0) await skipSoundZoneTracks(zoneId, n, true)
+
+  const firstId = ids[0]
+  if (firstId) await waitForNowPlayingTrackId(zoneId, firstId)
+
+  if (targetIndex > 0) {
+    await skipSoundZoneTracks(zoneId, targetIndex, true)
+  }
 }
 
 export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
