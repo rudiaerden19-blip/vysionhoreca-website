@@ -51,17 +51,18 @@ export function VysionMusicCreatePlaylistModal({
     setSaving(true)
     setError(null)
     try {
-      const res = await fetch(
-        `/api/soundtrack/${encodeURIComponent(tenant)}/playlists`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify({ name: trimmed }),
-        },
-      )
+      const res = await fetch(`/api/soundtrack/${encodeURIComponent(tenant)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({
+          mutation: 'createManualPlaylist',
+          input: { name: trimmed },
+        }),
+      })
       const json = (await res.json()) as {
         error?: string
         ok?: boolean
+        mutation?: string
         playlist?: { id?: string; name?: string }
         playlists?: { id: string; name: string }[]
       }

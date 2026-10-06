@@ -13,6 +13,8 @@ export const SOUNDTRACK_PUBLIC_MUTATION_NAMES = [
   'skipTrack',
   'skipTracks',
   'setVolume',
+  /** Soundtrack Create → Create a playlist (GraphQL v2). */
+  'createManualPlaylist',
 ] as const
 
 export type SoundtrackPublicMutationName = (typeof SOUNDTRACK_PUBLIC_MUTATION_NAMES)[number]
@@ -30,6 +32,9 @@ const MUTATION_DOCUMENT: Record<SoundtrackPublicMutationName, string> = {
   skipTrack: `mutation($input: SkipTrackInput!) { skipTrack(input: $input) { __typename } }`,
   skipTracks: `mutation($input: SkipTracksInput!) { skipTracks(input: $input) { __typename } }`,
   setVolume: `mutation($input: SetVolumeInput!) { setVolume(input: $input) { status volume } }`,
+  createManualPlaylist: `mutation($input: CreateManualPlaylistInput!) {
+    createManualPlaylist(input: $input) { id name }
+  }`,
 }
 
 export function sanitizeSoundtrackMutationInput(

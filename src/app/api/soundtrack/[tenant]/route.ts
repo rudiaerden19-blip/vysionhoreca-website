@@ -5,6 +5,10 @@ import {
   soundtrackExecutePublicMutation,
 } from '@/lib/soundtrack/soundtrack-public-mutations'
 import {
+  createManualPlaylistInMusicLibrary,
+  listSoundtrackLibraryPlaylists,
+} from '@/lib/soundtrack/soundtrack-playlists'
+import {
   SoundtrackApiError,
   SoundtrackConfigError,
   emptySoundtrackPlayerSnapshot,
@@ -83,6 +87,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
           'skipTrack',
           'skipTracks',
           'setVolume',
+          'createManualPlaylist',
         ].join(', ')}`,
       },
       { status: 400 },
@@ -93,6 +98,16 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
+
+    if (mutation === 'createManualPlaylist') {
+      const name = String(input.name ?? '').trim()
+      if (!name) {
+        return NextResponse.json({ error: 'input.name vereist' }, { status: 400 })
+      }
+      const playlist = await createManualPlaylistInMusicLibrary(zoneId, name)
+      const playlists = await listSoundtrackLibraryPlaylists(zoneId)
+      return NextResponse.json({ ok: true, mutation, playlist, playlists })
+    }
 
     if (mutation === 'setVolume') {
       const ui = typeof input.volume === 'number' ? input.volume : 0

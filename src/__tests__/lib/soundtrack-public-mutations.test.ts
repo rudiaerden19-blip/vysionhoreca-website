@@ -15,12 +15,14 @@ describe('Soundtrack Public API mutation names', () => {
       'skipTrack',
       'skipTracks',
       'setVolume',
+      'createManualPlaylist',
     ])
   })
 
   it('rejects custom BFF mutation aliases', () => {
     expect(isSoundtrackPublicMutationName('playPlaylistTrack')).toBe(false)
     expect(isSoundtrackPublicMutationName('soundZoneAssignSource')).toBe(true)
+    expect(isSoundtrackPublicMutationName('createManualPlaylist')).toBe(true)
   })
 
   it('soundZoneAssignSource: sourceTrackIndex zero-based, strips conflicting track id', () => {
