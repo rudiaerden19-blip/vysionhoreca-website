@@ -28,7 +28,6 @@ const LIBRARY_DISPLAY_IMAGE = `
   display {
     image {
       sizes { thumbnail teaser hero }
-      size
     }
   }
 `
@@ -66,7 +65,6 @@ type LibraryArtworkNode = {
   composerType?: string | null
   display?: {
     image?: {
-      size?: string | null
       sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
     } | null
   } | null
@@ -81,8 +79,6 @@ export function soundtrackLibraryListImageUrl(node: LibraryArtworkNode): string 
       if (raw) return soundtrackAlbumArtUrl(raw)
     }
   }
-  const single = node.display?.image?.size?.trim()
-  if (single) return soundtrackAlbumArtUrl(single)
   return null
 }
 

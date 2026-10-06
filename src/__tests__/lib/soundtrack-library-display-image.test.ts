@@ -16,14 +16,7 @@ describe('soundtrackLibraryListImageUrl', () => {
     expect(url).toMatch(/100.*100|thumbnail/)
   })
 
-  it('falls back to display.image.size', () => {
-    const url = soundtrackLibraryListImageUrl({
-      display: {
-        image: {
-          size: 'https://i.soundcdn.com/k/100/100/soundtrack:artwork:xyz/size.jpg',
-        },
-      },
-    })
-    expect(url).toContain('soundtrack:artwork:xyz')
+  it('returns null when sizes are missing', () => {
+    expect(soundtrackLibraryListImageUrl({ display: { image: {} } })).toBeNull()
   })
 })
