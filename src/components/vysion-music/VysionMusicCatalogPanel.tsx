@@ -14,6 +14,7 @@ import {
   type VysionMusicLibraryItem,
 } from './vysion-music-catalog-cache'
 import { perfLog, perfNow } from './vysion-music-perf'
+import { TrackNowPlayingBars } from './TrackNowPlayingBars'
 import styles from './vysion-music.module.css'
 
 type LibraryItem = VysionMusicLibraryItem
@@ -33,6 +34,7 @@ export function VysionMusicCatalogPanel({
   tenant,
   activeSourceId,
   nowTrackId,
+  nowPlaying,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
   busy,
@@ -40,6 +42,7 @@ export function VysionMusicCatalogPanel({
   tenant: string
   activeSourceId: string | null
   nowTrackId: string | null
+  nowPlaying: boolean
   onPlayPlaylistTrack: (
     sourceId: string,
     track: TrackItem,
@@ -381,7 +384,11 @@ export function VysionMusicCatalogPanel({
                     disabled={busy || !selectedId}
                     onClick={() => void onPlayPlaylistTrack(selectedId!, tr)}
                   >
-                    <span className={styles.trackRowNum}>{idx + 1}</span>
+                    {active ? (
+                      <TrackNowPlayingBars playing={nowPlaying} />
+                    ) : (
+                      <span className={styles.trackRowNum}>{idx + 1}</span>
+                    )}
                     <span className={styles.trackRowMain}>
                       <span className={styles.trackRowTitle}>{tr.name}</span>
                       <span className={styles.trackRowArtist}>{tr.artist}</span>
@@ -424,7 +431,11 @@ export function VysionMusicCatalogPanel({
                     disabled={busy}
                     onClick={() => void onPlaySearchTrack(tr)}
                   >
-                    <span className={styles.trackRowNum}>{idx + 1}</span>
+                    {active ? (
+                      <TrackNowPlayingBars playing={nowPlaying} />
+                    ) : (
+                      <span className={styles.trackRowNum}>{idx + 1}</span>
+                    )}
                     <span className={styles.trackRowMain}>
                       <span className={styles.trackRowTitle}>{tr.name}</span>
                       <span className={styles.trackRowArtist}>{tr.artist}</span>

@@ -550,6 +550,7 @@ export function VysionMusicClient({
         tenant={tenant}
         activeSourceId={playFromId}
         nowTrackId={nowTrack?.id ?? null}
+        nowPlaying={isPlaying}
         busy={catalogBusy}
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}
