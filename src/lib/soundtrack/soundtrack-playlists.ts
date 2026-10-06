@@ -31,8 +31,16 @@ const LIBRARY_QUERY = `query($id: ID!) {
       id
       musicLibrary {
         id
-        playlists(first: 100, orderBy: { direction: ASC }) {
-          edges { node { id name tracks { total } } }
+        playlists(first: 100) {
+          edges {
+            node {
+              id
+              name
+              tracks(first: 1) {
+                totalCount
+              }
+            }
+          }
         }
       }
     }
@@ -140,14 +148,23 @@ async function resolveSoundZoneIdByDisplayName(name: string): Promise<string> {
 }
 
 function mapPlaylists(
-  edges: { node: { id?: string; name?: string; tracks?: { total?: number } | null } }[] | null | undefined,
+  edges:
+    | {
+        node: {
+          id?: string
+          name?: string
+          tracks?: { totalCount?: number } | null
+        }
+      }[]
+    | null
+    | undefined,
 ): SoundtrackLibraryPlaylist[] {
   const rows: SoundtrackLibraryPlaylist[] = []
   for (const edge of edges ?? []) {
     const id = edge.node?.id?.trim()
     const name = edge.node?.name?.trim()
     if (!id || !name) continue
-    const total = edge.node.tracks?.total
+    const total = edge.node.tracks?.totalCount
     rows.push({
       id,
       name,
@@ -166,7 +183,13 @@ async function fetchAccountLibrary(zoneId: string, gql: SoundtrackGql): Promise<
         musicLibrary: {
           id: string
           playlists: {
-            edges: { node: { id?: string; name?: string; tracks?: { total?: number } | null } }[]
+            edges: {
+              node: {
+                id?: string
+                name?: string
+                tracks?: { totalCount?: number } | null
+              }
+            }[]
           }
         } | null
       } | null

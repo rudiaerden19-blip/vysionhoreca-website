@@ -17,7 +17,7 @@ function libraryPayload(playlists: { id: string; name: string; total: number }[]
           id: LIBRARY,
           playlists: {
             edges: playlists.map((p) => ({
-              node: { id: p.id, name: p.name, tracks: { total: p.total } },
+              node: { id: p.id, name: p.name, tracks: { totalCount: p.total } },
             })),
           },
         },
@@ -41,8 +41,9 @@ describe('soundtrack library playlists', () => {
 
     expect(calls).toHaveLength(1)
     expect(calls[0].query).toContain('soundZone(id: $id)')
-    expect(calls[0].query).toContain('playlists(first: 100, orderBy: { direction: ASC })')
-    expect(calls[0].query).toContain('tracks { total }')
+    expect(calls[0].query).toContain('playlists(first: 100)')
+    expect(calls[0].query).toContain('tracks(first: 1)')
+    expect(calls[0].query).toContain('totalCount')
     expect(calls[0].query).not.toContain('album')
     expect(calls[0].variables).toEqual({ id: ZONE })
     expect(rows.map((r) => r.name)).toEqual(['Avond', 'Zomer'])
