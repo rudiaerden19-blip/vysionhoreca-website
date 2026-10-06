@@ -33,6 +33,7 @@ function formatMs(ms: number): string {
 export function VysionMusicCatalogPanel({
   tenant,
   activeSourceId,
+  playingSourceId,
   nowTrackId,
   nowPlaying,
   onPlayPlaylistTrack,
@@ -41,6 +42,7 @@ export function VysionMusicCatalogPanel({
 }: {
   tenant: string
   activeSourceId: string | null
+  playingSourceId: string | null
   nowTrackId: string | null
   nowPlaying: boolean
   onPlayPlaylistTrack: (
@@ -315,7 +317,10 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const active = activeSourceId === pl.id
+              const isPlayingList =
+                playingSourceId === pl.id && nowTrackId != null && nowTrackId.length > 0
+              const active =
+                selectedId === pl.id || activeSourceId === pl.id || isPlayingList
               const thumbSrc =
                 pl.imageUrl && pl.imageUrl.startsWith('http')
                   ? `/api/soundtrack/cover?url=${encodeURIComponent(pl.imageUrl)}`
@@ -348,6 +353,11 @@ export function VysionMusicCatalogPanel({
                       <span className={styles.libraryRowName}>{pl.name}</span>
                       <span className={styles.libraryRowMeta}>{sourceLabel(pl.sourceKind)}</span>
                     </span>
+                    {isPlayingList ? (
+                      <span className={styles.libraryRowEq}>
+                        <TrackNowPlayingBars playing={nowPlaying} />
+                      </span>
+                    ) : null}
                   </button>
                 </li>
               )

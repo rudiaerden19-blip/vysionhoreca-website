@@ -330,10 +330,17 @@
 }
 
 .libraryRowText {
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.12rem;
+}
+
+.libraryRowEq {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 0.35rem;
 }
 
 .libraryRowName {

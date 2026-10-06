@@ -102,6 +102,7 @@ export function VysionMusicClient({
   const [coverBroken, setCoverBroken] = useState(false)
   const [playlistSelecting, setPlaylistSelecting] = useState(false)
   const [optimisticTrack, setOptimisticTrack] = useState<TrackRow | null>(null)
+  const [playbackSourceId, setPlaybackSourceId] = useState<string | null>(null)
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -287,6 +288,11 @@ export function VysionMusicClient({
   }, [snapshot?.nowPlaying.track?.id, optimisticTrack])
 
   useEffect(() => {
+    const from = snapshot?.playFromPlaylistId?.trim()
+    if (from) setPlaybackSourceId(from)
+  }, [snapshot?.playFromPlaylistId])
+
+  useEffect(() => {
     const playing =
       optimisticTrack != null || snapshot?.playbackState === 'playing'
     if (!playing) return
@@ -416,7 +422,8 @@ export function VysionMusicClient({
   )
 
   const playPlaylistTrack = useCallback(
-    async (_sourceId: string, track: VysionMusicCatalogTrack) => {
+    async (sourceId: string, track: VysionMusicCatalogTrack) => {
+      setPlaybackSourceId(sourceId)
       await queueTrackNow(track)
     },
     [queueTrackNow],
@@ -424,6 +431,7 @@ export function VysionMusicClient({
 
   const playSearchTrack = useCallback(
     async (track: VysionMusicCatalogTrack) => {
+      setPlaybackSourceId(null)
       await queueTrackNow(track)
     },
     [queueTrackNow],
@@ -623,6 +631,7 @@ export function VysionMusicClient({
       <VysionMusicCatalogPanel
         tenant={tenant}
         activeSourceId={playFromId}
+        playingSourceId={playbackSourceId ?? playFromId}
         nowTrackId={nowTrack?.id ?? null}
         nowPlaying={isPlaying}
         busy={catalogBusy}
