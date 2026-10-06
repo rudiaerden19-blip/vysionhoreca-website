@@ -323,11 +323,16 @@ export function VysionMusicCatalogPanel({
             {filteredLists.map((pl) => {
               const isPlayingList = playingSourceId === pl.id && nowPlayingTrack != null
               const isBrowsing = selectedId === pl.id && !isPlayingList
-              const rowClass = isPlayingList
-                ? styles.libraryRowActive
-                : isBrowsing
-                  ? styles.libraryRowSelected
-                  : styles.libraryRow
+              const rowClass = [
+                styles.libraryRow,
+                isPlayingList
+                  ? styles.libraryRowActive
+                  : isBrowsing
+                    ? styles.libraryRowSelected
+                    : '',
+              ]
+                .filter(Boolean)
+                .join(' ')
               const thumbSrc =
                 pl.imageUrl && pl.imageUrl.startsWith('http')
                   ? `/api/soundtrack/cover?url=${encodeURIComponent(pl.imageUrl)}`
