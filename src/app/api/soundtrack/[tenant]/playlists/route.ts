@@ -3,7 +3,6 @@ import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-de
 import {
   createManualPlaylistInMusicLibrary,
   findSoundtrackMusicLibraryPlaylistByName,
-  getSoundZoneNowPlayingDisplayUrl,
   listSoundtrackLibraryPlaylists,
   removePlaylistFromMusicLibrary,
   renameManualPlaylist,
@@ -81,13 +80,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
         502,
       )
     }
-    let playerWebUrl: string | null = null
-    try {
-      playerWebUrl = await getSoundZoneNowPlayingDisplayUrl(zoneId)
-    } catch {
-      /* refresh trigger best-effort */
-    }
-    return NextResponse.json({ ok: true, playlist: created, playlists, playerWebUrl })
+    return NextResponse.json({ ok: true, playlist: created, playlists })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })

@@ -3,7 +3,6 @@
 import { useEffect, useId, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
-import { refreshSoundtrackWebPlayer } from '@/lib/vysion-music/soundtrack-web-player-refresh'
 import type {
   VysionMusicCatalogTrack,
   VysionMusicLibraryItem,
@@ -69,13 +68,11 @@ export function VysionMusicAddTrackToPlaylistModal({
         error?: string
         ok?: boolean
         tracks?: VysionMusicCatalogTrack[]
-        playerWebUrl?: string | null
       }
       if (!res.ok || json.ok === false) {
         setError(json.error || t('vysionMusic.addToPlaylistError'))
         return
       }
-      refreshSoundtrackWebPlayer(json.playerWebUrl)
       await onAdded(source, json.tracks ?? [])
       onClose()
     } catch {

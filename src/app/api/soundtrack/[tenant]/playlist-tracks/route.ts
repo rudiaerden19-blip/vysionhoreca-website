@@ -2,14 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
   addTrackToManualPlaylist,
-  getSoundZoneNowPlayingDisplayUrl,
   removeTrackFromManualPlaylist,
 } from '@/lib/soundtrack/soundtrack-playlists'
 import {
   SoundtrackApiError,
   SoundtrackConfigError,
   fetchPlaySourceTrackRows,
-  resolveSoundZoneIdForTenant,
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
@@ -65,14 +63,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   try {
     await addTrackToManualPlaylist(source, trackId)
     const tracks = await fetchPlaySourceTrackRows(source)
-    let playerWebUrl: string | null = null
-    try {
-      const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-      playerWebUrl = await getSoundZoneNowPlayingDisplayUrl(zoneId)
-    } catch {
-      /* refresh trigger best-effort */
-    }
-    return NextResponse.json({ ok: true, tracks, playerWebUrl })
+    return NextResponse.json({ ok: true, tracks })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
