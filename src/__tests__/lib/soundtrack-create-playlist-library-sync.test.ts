@@ -29,11 +29,16 @@ describe('createManualPlaylistInMusicLibrary', () => {
       if (query.includes('addToMusicLibrary')) {
         return { addToMusicLibrary: { musicLibrary: { revision: '3', ids: ['pl-test'] } } }
       }
-      if (query.includes('playlist(id') && query.includes('name')) {
+      if (query.includes('playlist(id') && query.includes('name') && !query.includes('playlists')) {
         return { playlist: { id: 'pl-test', name: 'TEST' } }
       }
-      if (query.includes('musicLibrary(id') && query.includes('ids')) {
-        return { musicLibrary: { ids: ['pl-test'], revision: '3' } }
+      if (query.includes('musicLibrary(id') && query.includes('playlists')) {
+        return {
+          musicLibrary: {
+            ids: ['pl-test'],
+            playlists: { edges: [{ node: { id: 'pl-test', name: 'TEST' } }] },
+          },
+        }
       }
       throw new Error(`unexpected graphql: ${query.slice(0, 120)}`)
     })

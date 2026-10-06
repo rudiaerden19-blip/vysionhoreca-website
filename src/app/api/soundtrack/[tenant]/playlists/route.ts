@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
   createManualPlaylistInMusicLibrary,
+  findSoundtrackMusicLibraryPlaylistByName,
   listSoundtrackLibraryPlaylists,
   removePlaylistFromMusicLibrary,
   renameManualPlaylist,
+  resolveSoundtrackZoneLibraryContext,
 } from '@/lib/soundtrack/soundtrack-playlists'
 import {
   SoundtrackApiError,
@@ -60,8 +62,19 @@ export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     const created = await createManualPlaylistInMusicLibrary(zoneId, name)
+    const { musicLibraryId } = await resolveSoundtrackZoneLibraryContext(zoneId)
+    const inSoundtrackLibrary = await findSoundtrackMusicLibraryPlaylistByName(
+      musicLibraryId,
+      name,
+    )
+    if (!inSoundtrackLibrary || inSoundtrackLibrary.id !== created.id) {
+      throw new SoundtrackApiError(
+        'Soundtrack music library does not contain created playlist',
+        502,
+      )
+    }
     const playlists = await listSoundtrackLibraryPlaylists(zoneId)
-    if (!playlists.some((p) => p.id === created.id)) {
+    if (!playlists.some((p) => p.id === created.id && p.name.trim() === name)) {
       throw new SoundtrackApiError(
         'Playlist not in Soundtrack music library list after create',
         502,

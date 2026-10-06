@@ -289,11 +289,11 @@ export async function listSoundtrackLibraryPlaylists(
 }
 
 async function resolveZoneAccountId(zoneId: string): Promise<string> {
-  const ctx = await resolveZoneLibraryContext(zoneId)
+  const ctx = await resolveSoundtrackZoneLibraryContext(zoneId)
   return ctx.ownerId
 }
 
-async function resolveZoneLibraryContext(
+export async function resolveSoundtrackZoneLibraryContext(
   zoneId: string,
 ): Promise<{ ownerId: string; musicLibraryId: string }> {
   const data = await soundtrackGraphql<{
@@ -326,11 +326,44 @@ function soundtrackSyncPause(ms: number): Promise<void> {
   })
 }
 
-const MUSIC_LIBRARY_IDS_QUERY = `query($id: ID!) {
-  musicLibrary(id: $id) { ids revision }
+const MUSIC_LIBRARY_PLAYLIST_BY_NAME_QUERY = `query($id: ID!) {
+  musicLibrary(id: $id) {
+    ids
+    playlists(first: 500) {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
 }`
 
-/** Bevestig dat Soundtrack de playlist-node én musicLibrary-lidmaatschap heeft. */
+/** Acceptatietest / POST: playlist in Soundtrack musicLibrary op naam (officiële API-read). */
+export async function findSoundtrackMusicLibraryPlaylistByName(
+  musicLibraryId: string,
+  name: string,
+): Promise<{ id: string; name: string } | null> {
+  const libId = musicLibraryId.trim()
+  const want = name.trim()
+  if (!libId || !want) return null
+
+  const data = await soundtrackGraphql<{
+    musicLibrary: {
+      playlists?: { edges: { node: { id: string; name: string | null } }[] } | null
+    } | null
+  }>(MUSIC_LIBRARY_PLAYLIST_BY_NAME_QUERY, { id: libId })
+
+  for (const edge of data.musicLibrary?.playlists?.edges ?? []) {
+    const id = edge.node.id?.trim()
+    const nodeName = (edge.node.name ?? '').trim()
+    if (id && nodeName === want) return { id, name: nodeName }
+  }
+  return null
+}
+
+/** Bevestig Soundtrack playlist-node + musicLibrary.playlists (id + naam). */
 async function assertPlaylistInSoundtrackMusicLibrary(
   musicLibraryId: string,
   playlistId: string,
@@ -355,13 +388,10 @@ async function assertPlaylistInSoundtrackMusicLibrary(
     throw new SoundtrackApiError('Soundtrack playlist name mismatch after create', 502)
   }
 
-  for (let i = 0; i < 8; i++) {
-    const lib = await soundtrackGraphql<{
-      musicLibrary: { ids?: string[] | null } | null
-    }>(MUSIC_LIBRARY_IDS_QUERY, { id: musicLibraryId.trim() })
-
-    if (soundtrackLibraryIdsInclude(lib.musicLibrary?.ids, pid)) return
-    if (i < 7) await soundtrackSyncPause(150)
+  for (let i = 0; i < 10; i++) {
+    const inLibrary = await findSoundtrackMusicLibraryPlaylistByName(musicLibraryId, expectedName)
+    if (inLibrary?.id === pid) return
+    if (i < 9) await soundtrackSyncPause(200)
   }
 
   throw new SoundtrackApiError('Playlist not in Soundtrack music library after create', 502)
@@ -377,7 +407,7 @@ export async function createManualPlaylistInMusicLibrary(
   if (!zid) throw new SoundtrackApiError('sound zone id required', 400)
   if (!name) throw new SoundtrackApiError('playlist name required', 400)
 
-  const { ownerId, musicLibraryId } = await resolveZoneLibraryContext(zid)
+  const { ownerId, musicLibraryId } = await resolveSoundtrackZoneLibraryContext(zid)
 
   const created = await soundtrackGraphql<{
     createManualPlaylist: { id: string; name: string } | null
@@ -393,7 +423,7 @@ export async function createManualPlaylistInMusicLibrary(
     throw new SoundtrackApiError('Soundtrack created no playlist', 502)
   }
 
-  await soundtrackGraphql<{
+  const added = await soundtrackGraphql<{
     addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
   }>(
     `mutation($input: AddToMusicLibraryInput!) {
@@ -403,6 +433,13 @@ export async function createManualPlaylistInMusicLibrary(
     }`,
     { input: { parent: ownerId, source: id } },
   )
+
+  if (!soundtrackLibraryIdsInclude(added.addToMusicLibrary?.musicLibrary?.ids, id)) {
+    throw new SoundtrackApiError(
+      'addToMusicLibrary did not register playlist in Soundtrack music library',
+      502,
+    )
+  }
 
   await assertPlaylistInSoundtrackMusicLibrary(musicLibraryId, id, name)
 

@@ -59,9 +59,26 @@ export function VysionMusicCreatePlaylistModal({
           body: JSON.stringify({ name: trimmed }),
         },
       )
-      const json = (await res.json()) as { error?: string; ok?: boolean }
+      const json = (await res.json()) as {
+        error?: string
+        ok?: boolean
+        playlist?: { id?: string; name?: string }
+        playlists?: { id: string; name: string }[]
+      }
       if (!res.ok || json.ok === false) {
         setError(json.error || t('vysionMusic.createPlaylistError'))
+        return
+      }
+      const createdId = json.playlist?.id?.trim()
+      if (!createdId) {
+        setError(t('vysionMusic.createPlaylistError'))
+        return
+      }
+      const inSoundtrackList = (json.playlists ?? []).some(
+        (p) => p.id.trim() === createdId && p.name.trim() === trimmed,
+      )
+      if (!inSoundtrackList) {
+        setError(t('vysionMusic.createPlaylistError'))
         return
       }
       await onCreated()
