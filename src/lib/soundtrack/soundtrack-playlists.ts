@@ -420,14 +420,19 @@ async function ownerLibraryContainsPlaylist(ownerId: string, playlistId: string)
   return soundtrackLibraryIdsInclude(data.library?.ids, playlistId)
 }
 
-async function musicLibraryContainsPlaylist(musicLibraryId: string, playlistId: string): Promise<boolean> {
+async function accountMusicLibraryContainsPlaylist(
+  accountId: string,
+  playlistId: string,
+): Promise<boolean> {
   const data = await soundtrackGraphql<{
-    musicLibrary: { ids?: string[] | null } | null
+    account: { musicLibrary: { ids?: string[] | null } | null } | null
   }>(
-    `query($id: ID!) { musicLibrary(id: $id) { ids } }`,
-    { id: musicLibraryId.trim() },
+    `query($id: ID!) {
+      account(id: $id) { musicLibrary { ids } }
+    }`,
+    { id: accountId.trim() },
   )
-  return soundtrackLibraryIdsInclude(data.musicLibrary?.ids, playlistId)
+  return soundtrackLibraryIdsInclude(data.account?.musicLibrary?.ids, playlistId)
 }
 
 export type SoundtrackPlaylistCreateSyncMeta = {
@@ -463,8 +468,8 @@ export async function readSoundtrackPlaylistCreateSyncMeta(
 }
 
 /**
- * Saved `Library` (libraryUpdate subscription) — na MusicLibrary-sync voor desktop push.
- * MusicLibrary/Lijsten: `addToMusicLibrary` met parent = musicLibrary.id.
+ * Account saved `Library` (user favorites) — niet hetzelfde als MusicLibrary/Lijsten.
+ * Speler-Lijsten volgen `addToMusicLibrary` + subscription `libraryUpdate(owner: Account)`.
  */
 async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
   const owner = ownerId.trim()
@@ -571,52 +576,29 @@ async function removePlaylistFromOwnerLibrary(ownerId: string, playlistId: strin
   }
 }
 
-async function addPlaylistToMusicLibrary(
-  musicLibraryId: string,
-  accountId: string,
-  playlistId: string,
-): Promise<void> {
+/** Soundtrack schema: parent = Account id (niet musicLibrary.id). */
+async function addPlaylistToMusicLibrary(accountId: string, playlistId: string): Promise<void> {
+  const parent = accountId.trim()
   const source = playlistId.trim()
-  const libParent = musicLibraryId.trim()
-  const accParent = accountId.trim()
-  if (!source || !libParent) return
-
-  const run = async (parent: string) => {
-    await soundtrackGraphql<{
-      addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
-    }>(
-      `mutation($input: AddToMusicLibraryInput!) {
-        addToMusicLibrary(input: $input) {
-          musicLibrary { revision ids }
-        }
-      }`,
-      { input: { parent: parent.trim(), source } },
-    )
-  }
+  if (!parent || !source) return
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      await run(libParent)
+      await soundtrackGraphql<{
+        addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
+      }>(
+        `mutation($input: AddToMusicLibraryInput!) {
+          addToMusicLibrary(input: $input) {
+            musicLibrary { revision ids }
+          }
+        }`,
+        { input: { parent, source } },
+      )
       return
     } catch (e) {
       const benign =
         e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)
-      if (benign && (await musicLibraryContainsPlaylist(libParent, source))) return
-
-      const parentError =
-        e instanceof SoundtrackApiError &&
-        /parent|owner|invalid id|not found/i.test(e.message) &&
-        accParent &&
-        accParent !== libParent
-
-      if (parentError && attempt === 0) {
-        try {
-          await run(accParent)
-          return
-        } catch (fallbackErr) {
-          e = fallbackErr
-        }
-      }
+      if (benign && (await accountMusicLibraryContainsPlaylist(parent, source))) return
 
       const versionConflict =
         e instanceof SoundtrackApiError &&
@@ -642,14 +624,13 @@ async function assertPlaylistVisibleInSoundtrackLibraries(
     }
 
     const inMusicLibrary = soundtrackLibraryIdsInclude(membership.musicLibraryIds, pid)
-    const inSavedLibrary = soundtrackLibraryIdsInclude(membership.savedLibraryIds, pid)
-    if (inMusicLibrary && inSavedLibrary) return
+    if (inMusicLibrary) return
 
     if (i < 9) await soundtrackSyncPause(150)
   }
 
   throw new SoundtrackApiError(
-    'Soundtrack playlist not visible in account library after create',
+    'Soundtrack playlist not visible in music library after create',
     502,
   )
 }
@@ -696,7 +677,7 @@ export async function findSoundtrackMusicLibraryPlaylistByName(
   return null
 }
 
-/** Officieel v2: create + owner library (player) + musicLibrary (Vysion-lijst). */
+/** Officieel v2: createManualPlaylist + addToMusicLibrary (Account parent) → speler Lijsten. */
 export async function createManualPlaylistInMusicLibrary(
   zoneId: string,
   playlistName: string,
@@ -706,7 +687,7 @@ export async function createManualPlaylistInMusicLibrary(
   if (!zid) throw new SoundtrackApiError('sound zone id required', 400)
   if (!name) throw new SoundtrackApiError('playlist name required', 400)
 
-  const { ownerId, musicLibraryId } = await resolveSoundtrackZoneLibraryContext(zid)
+  const { ownerId } = await resolveSoundtrackZoneLibraryContext(zid)
 
   const created = await soundtrackGraphql<{
     createManualPlaylist: { id: string; name: string } | null
@@ -722,8 +703,7 @@ export async function createManualPlaylistInMusicLibrary(
     throw new SoundtrackApiError('Soundtrack created no playlist', 502)
   }
 
-  await addPlaylistToMusicLibrary(musicLibraryId, ownerId, id)
-  await addPlaylistToOwnerLibrary(ownerId, id)
+  await addPlaylistToMusicLibrary(ownerId, id)
   await assertPlaylistVisibleInSoundtrackLibraries(zid, id)
 
   const plData = await soundtrackGraphql<{
@@ -778,15 +758,19 @@ export async function removePlaylistFromMusicLibrary(
 ): Promise<void> {
   const pid = playlistId.trim()
   if (!pid) throw new SoundtrackApiError('playlist id required', 400)
-  const { ownerId, musicLibraryId } = await resolveSoundtrackZoneLibraryContext(zoneId.trim())
+  const { ownerId } = await resolveSoundtrackZoneLibraryContext(zoneId.trim())
 
   await soundtrackGraphql(
     `mutation($input: RemoveFromMusicLibraryInput!) {
       removeFromMusicLibrary(input: $input) { __typename }
     }`,
-    { input: { parent: musicLibraryId, source: pid } },
+    { input: { parent: ownerId, source: pid } },
   )
-  await removePlaylistFromOwnerLibrary(ownerId, pid)
+  try {
+    await removePlaylistFromOwnerLibrary(ownerId, pid)
+  } catch {
+    /* saved Library is optional; Lijsten = MusicLibrary */
+  }
 }
 
 async function spliceManualPlaylist(input: {

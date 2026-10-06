@@ -19,7 +19,7 @@ describe('createManualPlaylistInMusicLibrary', () => {
     graphql.mockReset()
   })
 
-  it('uses createManualPlaylist, addToLibrary (player) and addToMusicLibrary', async () => {
+  it('uses createManualPlaylist and addToMusicLibrary with Account parent', async () => {
     graphql.mockImplementation(async (query: string) => {
       if (query.includes('soundZone')) {
         return {
@@ -30,7 +30,7 @@ describe('createManualPlaylistInMusicLibrary', () => {
             online: true,
             account: {
               id: 'acc-1',
-              library: { ids: ['pl-test'], version: 'v2' },
+              library: { ids: [], version: 'v2' },
               musicLibrary: { id: 'ml-1', ids: ['pl-test'], revision: '3' },
             },
           },
@@ -39,17 +39,11 @@ describe('createManualPlaylistInMusicLibrary', () => {
       if (query.includes('createManualPlaylist')) {
         return { createManualPlaylist: { id: 'pl-test', name: 'TEST' } }
       }
-      if (query.includes('library(owner') && query.includes('version') && !query.includes('musicLibrary')) {
-        return { library: { version: 'v1' } }
-      }
-      if (query.includes('addToLibrary')) {
-        return { addToLibrary: { version: 'v2' } }
-      }
       if (query.includes('addToMusicLibrary')) {
         return { addToMusicLibrary: { musicLibrary: { revision: '3', ids: ['pl-test'] } } }
       }
-      if (query.includes('musicLibrary(id') && query.includes('ids') && !query.includes('playlists')) {
-        return { musicLibrary: { ids: ['pl-test'] } }
+      if (query.includes('account(id') && query.includes('musicLibrary')) {
+        return { account: { musicLibrary: { ids: ['pl-test'] } } }
       }
       if (query.includes('playlist(id') && query.includes('name') && !query.includes('playlists')) {
         return { playlist: { id: 'pl-test', name: 'TEST' } }
@@ -61,13 +55,10 @@ describe('createManualPlaylistInMusicLibrary', () => {
     expect(out).toEqual({ id: 'pl-test', name: 'TEST' })
 
     expect(graphql.mock.calls.some(([q]) => String(q).includes('createManualPlaylist'))).toBe(true)
-    const addToLibraryCalls = graphql.mock.calls.filter(([q]) =>
-      String(q).includes('addToLibrary'),
-    )
-    expect(addToLibraryCalls.length).toBe(1)
+    expect(graphql.mock.calls.some(([q]) => String(q).includes('addToLibrary'))).toBe(false)
     const addCall = graphql.mock.calls.find(([q]) => String(q).includes('addToMusicLibrary'))
     expect(addCall?.[1]).toEqual({
-      input: { parent: 'ml-1', source: 'pl-test' },
+      input: { parent: 'acc-1', source: 'pl-test' },
     })
   })
 
@@ -123,7 +114,7 @@ describe('removePlaylistFromMusicLibrary', () => {
       String(q).includes('removeFromMusicLibrary'),
     )
     expect(removeMusicCall?.[1]).toEqual({
-      input: { parent: 'ml-1', source: 'pl-80s' },
+      input: { parent: 'acc-1', source: 'pl-80s' },
     })
 
     const removeOwnerCall = graphql.mock.calls.find(([q]) => String(q).includes('removeFromLibrary'))
