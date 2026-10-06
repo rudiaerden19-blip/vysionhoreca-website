@@ -1,13 +1,11 @@
-import { dedupeSearchTrackRows, type SoundtrackTrackRow } from '@/lib/soundtrack/soundtrack-server'
+import { dedupeSearchTrackRows, type SoundtrackSearchDedupeRow } from '@/lib/soundtrack/soundtrack-search-dedupe'
 
-function row(partial: Partial<SoundtrackTrackRow> & Pick<SoundtrackTrackRow, 'id'>): SoundtrackTrackRow {
+function row(
+  partial: Partial<SoundtrackSearchDedupeRow> & Pick<SoundtrackSearchDedupeRow, 'id'>,
+): SoundtrackSearchDedupeRow {
   return {
     name: 'Red Red Wine',
     artist: 'UB40',
-    durationMs: 184_000,
-    imageUrl: null,
-    imageWidth: null,
-    imageHeight: null,
     ...partial,
   }
 }
@@ -19,9 +17,9 @@ describe('dedupeSearchTrackRows', () => {
     expect(dedupeSearchTrackRows([a, b])).toEqual([a])
   })
 
-  it('dedupes same title+artist with different duration', () => {
-    const a = row({ id: 't1', durationMs: 184_000 })
-    const b = row({ id: 't2', durationMs: 183_000 })
+  it('dedupes same title+artist regardless of differing extra fields', () => {
+    const a = row({ id: 't1' })
+    const b = row({ id: 't2' })
     expect(dedupeSearchTrackRows([a, b])).toEqual([a])
   })
 

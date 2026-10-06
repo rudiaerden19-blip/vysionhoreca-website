@@ -4,6 +4,9 @@ import {
   type SoundtrackTrackGraphNode,
   type SoundtrackTrackRow,
 } from '@/lib/soundtrack/soundtrack-track-map'
+import { dedupeSearchTrackRows } from '@/lib/soundtrack/soundtrack-search-dedupe'
+
+export { dedupeSearchTrackRows } from '@/lib/soundtrack/soundtrack-search-dedupe'
 
 import {
   soundtrackApiBasicAuthorizationHeader,
@@ -743,26 +746,6 @@ export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
     `mutation($input: SkipTrackInput!) { skipTrack(input: $input) { __typename } }`,
     { input: { soundZone: zoneId } },
   )
-}
-
-function normalizeSearchTrackDedupeKey(row: SoundtrackTrackRow): string {
-  const title = row.name.trim().toLowerCase().replace(/\s+/g, ' ')
-  const artist = row.artist.trim().toLowerCase().replace(/\s+/g, ' ')
-  return `${title}\u0000${artist}`
-}
-
-/** Zoekresultaten: één rij per genormaliseerde titel + artiest (eerste behouden). */
-export function dedupeSearchTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
-  const seen = new Set<string>()
-  const out: SoundtrackTrackRow[] = []
-  for (const row of rows) {
-    const key = normalizeSearchTrackDedupeKey(row)
-    if (!key || key === '\u0000') continue
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(row)
-  }
-  return out
 }
 
 export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {

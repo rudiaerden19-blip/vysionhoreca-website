@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { dedupeSearchTrackRows } from '@/lib/soundtrack/soundtrack-search-dedupe'
 import type { SoundtrackLibrarySourceKind } from '@/lib/soundtrack/soundtrack-playlists'
 import {
   getCachedPlaylistTracks,
@@ -271,7 +272,7 @@ export function VysionMusicCatalogPanel({
         setSearchResults([])
         return
       }
-      setSearchResults(json.search?.tracks ?? [])
+      setSearchResults(dedupeSearchTrackRows(json.search?.tracks ?? []))
     } catch {
       setSearchResults([])
     } finally {
