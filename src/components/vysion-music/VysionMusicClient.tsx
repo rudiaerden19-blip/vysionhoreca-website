@@ -354,6 +354,7 @@ export function VysionMusicClient({
         const ok = await assignSourceAndPlay(
           {
             source: sourceId,
+            track: trackId,
             sourceTrackIndex: meta.sourceTrackIndex,
             debugTrackId: trackId,
             debugTrackTitle: meta.trackTitle,

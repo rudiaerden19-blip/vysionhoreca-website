@@ -23,14 +23,27 @@ describe('Soundtrack Public API mutation names', () => {
     expect(isSoundtrackPublicMutationName('soundZoneAssignSource')).toBe(true)
   })
 
-  it('playlist track: sourceTrackIndex zero-based, strip track id + debug fields', () => {
+  it('playlist track: prefers official track id over sourceTrackIndex', () => {
     const out = sanitizeSoundtrackMutationInput('soundZoneAssignSource', {
       source: 'pl-1',
       sourceTrackIndex: 4,
-      track: 'track-wrong',
+      track: 'soundtrack:track:abc',
       immediate: true,
       debugUiPosition: 5,
       debugTrackId: 'track-a',
+    })
+    expect(out).toEqual({
+      source: 'pl-1',
+      track: 'soundtrack:track:abc',
+      immediate: true,
+    })
+  })
+
+  it('playlist track: sourceTrackIndex zero-based when no track id', () => {
+    const out = sanitizeSoundtrackMutationInput('soundZoneAssignSource', {
+      source: 'pl-1',
+      sourceTrackIndex: 4,
+      immediate: true,
     })
     expect(out).toEqual({
       source: 'pl-1',

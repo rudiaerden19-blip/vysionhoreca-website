@@ -681,6 +681,12 @@ export async function resolveSoundtrackRuntimeAssignSourceId(
     throw new SoundtrackApiError('source and sound zone id required', 400)
   }
 
+  const snapBefore = await fetchSoundtrackPlayerSnapshot(zid)
+  const currentPlayFrom = snapBefore.playFromPlaylistId?.trim()
+  if (currentPlayFrom && currentPlayFrom === libraryId) {
+    return { runtimeSourceId: currentPlayFrom, playFromTypename: snapBefore.playFromTypename }
+  }
+
   await soundtrackGraphql(
     `mutation($input: SetPlayFromInput!) {
       setPlayFrom(input: $input) {

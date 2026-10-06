@@ -48,10 +48,16 @@ export function sanitizeSoundtrackMutationInput(
 ): Record<string, unknown> {
   const out = { ...input }
   for (const key of ASSIGN_DEBUG_KEYS) delete out[key]
-  if (mutation === 'soundZoneAssignSource' && typeof out.sourceTrackIndex === 'number') {
-    // Binnen bron: index in source-volgorde (Soundtrack API), niet los track-id veld.
-    delete out.track
-    out.sourceTrackIndex = Math.max(0, Math.floor(out.sourceTrackIndex))
+  if (mutation === 'soundZoneAssignSource') {
+    const trackId = typeof out.track === 'string' ? out.track.trim() : ''
+    if (trackId) {
+      // Officieel: `track` = specifieke track in de bron (nauwkeuriger dan index).
+      out.track = trackId
+      delete out.sourceTrackIndex
+    } else if (typeof out.sourceTrackIndex === 'number') {
+      delete out.track
+      out.sourceTrackIndex = Math.max(0, Math.floor(out.sourceTrackIndex))
+    }
   }
   return out
 }
@@ -195,6 +201,7 @@ export function playlistAssignRequestDebug(
     soundZoneId: zoneId,
     source: input.source ?? null,
     sourceSnapshot: input.sourceSnapshot ?? null,
+    track: input.track ?? null,
     sourceTrackIndex: input.sourceTrackIndex ?? null,
     immediate: input.immediate ?? null,
   }
