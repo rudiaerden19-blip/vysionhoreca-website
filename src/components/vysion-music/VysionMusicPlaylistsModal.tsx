@@ -10,6 +10,7 @@ export function VysionMusicPlaylistsModal({
   playlists,
   onClose,
   onSelect,
+  onEdit,
   onDelete,
 }: {
   open: boolean
@@ -17,6 +18,7 @@ export function VysionMusicPlaylistsModal({
   playlists: VysionMusicPlaylistSummary[]
   onClose: () => void
   onSelect: (playlistId: string, playlistName: string) => void
+  onEdit: (playlistId: string) => void
   onDelete: (playlistId: string) => void
 }) {
   const { t } = useLanguage()
@@ -65,6 +67,14 @@ export function VysionMusicPlaylistsModal({
                   <span className={styles.playlistModalMeta}>
                     {p.trackCount} {t('vysionMusic.playlistTracksLabel')}
                   </span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.playlistModalDelete}
+                  aria-label={t('vysionMusic.playlistEdit')}
+                  onClick={() => onEdit(p.id)}
+                >
+                  ✎
                 </button>
                 <button
                   type="button"

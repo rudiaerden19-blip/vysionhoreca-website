@@ -183,34 +183,40 @@ export async function syncManualPlaylistToSoundtrackLibrary(input: {
  * Soundtrack-speler: sync playlist → setPlayFrom → play.
  * Start op gekozen track: skipTracks(index) (geen playlist herschikken in Soundtrack).
  */
+/** setPlayFrom → play → optioneel skipTracks(index) — zoals Soundtrack-speler. */
+export async function playSoundtrackPlaylistAtIndex(
+  zoneId: string,
+  soundtrackPlaylistId: string,
+  trackIndex: number,
+): Promise<void> {
+  const playlistId = soundtrackPlaylistId.trim()
+  if (!playlistId) throw new SoundtrackApiError('soundtrackPlaylistId required')
+  await playSoundtrackPlaylistOnZone(zoneId, playlistId)
+  const idx = Math.max(0, Math.floor(trackIndex))
+  if (idx > 0) {
+    await new Promise((r) => setTimeout(r, 500))
+    await skipSoundZoneTracks(zoneId, idx, true)
+  }
+}
+
+/** Vysion-opgeslagen lijst: sync naar Soundtrack library, daarna playFrom op index. */
 export async function playManualPlaylistOnSoundZone(input: {
   zoneId: string
   name: string
   trackIds: string[]
   soundtrackPlaylistId?: string | null
   startTrackId?: string | null
-  /** Alleen bij «Afspelen» / opslaan — niet bij elke rij-klik (Soundtrack sync is zwaar). */
-  syncToSoundtrack?: boolean
 }): Promise<string> {
   const ids = filterTrackIds(input.trackIds)
-  let playlistId = input.soundtrackPlaylistId?.trim() || ''
-  if (input.syncToSoundtrack || !playlistId) {
-    playlistId = await syncManualPlaylistToSoundtrackLibrary({
-      zoneId: input.zoneId,
-      name: input.name,
-      trackIds: ids,
-      soundtrackPlaylistId: playlistId || null,
-    })
-  }
-  await playSoundtrackPlaylistOnZone(input.zoneId, playlistId)
+  const playlistId = await syncManualPlaylistToSoundtrackLibrary({
+    zoneId: input.zoneId,
+    name: input.name,
+    trackIds: ids,
+    soundtrackPlaylistId: input.soundtrackPlaylistId ?? null,
+  })
   const start = input.startTrackId?.trim()
-  if (start) {
-    const idx = ids.indexOf(start)
-    if (idx > 0) {
-      await new Promise((r) => setTimeout(r, 500))
-      await skipSoundZoneTracks(input.zoneId, idx, true)
-    }
-  }
+  const idx = start ? Math.max(0, ids.indexOf(start)) : 0
+  await playSoundtrackPlaylistAtIndex(input.zoneId, playlistId, idx)
   return playlistId
 }
 

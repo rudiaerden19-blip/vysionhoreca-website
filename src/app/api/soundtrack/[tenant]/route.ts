@@ -70,8 +70,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
     trackId?: string
     trackIds?: string[]
     startTrackId?: string
-    syncToSoundtrack?: boolean
     playlistName?: string
+    playlistId?: string
+    trackIndex?: number
     soundtrackPlaylistId?: string | null
     vysionPlaylistId?: string | null
   }
@@ -82,8 +83,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
       trackId?: string
       trackIds?: string[]
       startTrackId?: string
-      syncToSoundtrack?: boolean
       playlistName?: string
+      playlistId?: string
+      trackIndex?: number
       soundtrackPlaylistId?: string | null
       vysionPlaylistId?: string | null
     }
@@ -100,6 +102,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     'setVolume',
     'playTrack',
     'playPlaylist',
+    'playFromIndex',
   ] as const
   if (!op || !allowed.includes(op as (typeof allowed)[number])) {
     return NextResponse.json({ error: 'Invalid op' }, { status: 400 })
@@ -111,7 +114,21 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     let soundtrackPlaylistId: string | undefined
 
-    if (op === 'playPlaylist') {
+    if (op === 'playFromIndex') {
+      const playlistId =
+        body.playlistId?.trim() || body.soundtrackPlaylistId?.trim() || ''
+      if (!playlistId) {
+        return NextResponse.json({ error: 'playlistId required' }, { status: 400 })
+      }
+      const trackIndex =
+        typeof body.trackIndex === 'number' && Number.isFinite(body.trackIndex)
+          ? Math.max(0, Math.floor(body.trackIndex))
+          : 0
+      const { playSoundtrackPlaylistAtIndex } =
+        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
+      await playSoundtrackPlaylistAtIndex(zoneId, playlistId, trackIndex)
+      await new Promise((r) => setTimeout(r, 800))
+    } else if (op === 'playPlaylist') {
       const trackIds = body.trackIds ?? []
       if (trackIds.length === 0) {
         return NextResponse.json({ error: 'trackIds required' }, { status: 400 })
@@ -124,7 +141,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
         trackIds,
         soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
         startTrackId: body.startTrackId ?? null,
-        syncToSoundtrack: body.syncToSoundtrack === true,
       })
       const vysionPlaylistId = body.vysionPlaylistId?.trim()
       if (vysionPlaylistId && soundtrackPlaylistId) {
@@ -138,7 +154,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
       }
       await new Promise((r) => setTimeout(r, 1200))
     } else {
-      await soundtrackControl(zoneId, op as (typeof allowed)[number], {
+      await soundtrackControl(
+        zoneId,
+        op as 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack',
+        {
         volume: op === 'setVolume' ? body.volume : undefined,
         trackId: body.trackId,
         trackIds: body.trackIds,
