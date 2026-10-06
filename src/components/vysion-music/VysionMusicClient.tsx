@@ -16,14 +16,11 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
-import type { VysionMusicCatalogTrack } from './vysion-music-catalog-cache'
 import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
-import { perfLog, perfNow } from './vysion-music-perf'
 import {
   lookupVysionMusicCoverArt,
   rememberVysionMusicCoverArt,
 } from './vysion-music-cover-cache'
-import { vysionMusicTrackRowIsNowPlaying } from './vysion-music-track-match'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -36,9 +33,6 @@ const SNAPSHOT_POLL_IDLE_MS = 6000
 const SNAPSHOT_POLL_PLAYING_MS = 1500
 const SNAPSHOT_POLL_NEAR_END_MS = 500
 const SNAPSHOT_NEAR_END_WINDOW_MS = 8000
-
-/** Max tracks in één queue-mutatie (van geklikte song t/m einde playlist). */
-const PLAYLIST_QUEUE_MAX_TRACKS = 80
 
 type TrackRow = {
   id: string
@@ -122,7 +116,6 @@ export function VysionMusicClient({
   const nowLeftRef = useRef<HTMLDivElement>(null)
   const lastTrackKeyRef = useRef('')
   const optimisticStartedAtRef = useRef<string | null>(null)
-  const confirmSessionRef = useRef(0)
   const snapshotRef = useRef<Snapshot | null>(null)
   const optimisticTrackRef = useRef<TrackRow | null>(null)
   const coverArtCacheRef = useRef(new Map<string, string>())
@@ -356,137 +349,41 @@ export function VysionMusicClient({
     setCoverBroken(false)
   }, [nowTrackId, nowTrackImageUrl])
 
-  const pollUntilNowPlayingMatches = useCallback(
-    async (expected: VysionMusicCatalogTrack, mutationStartedAt: number) => {
-      const session = ++confirmSessionRef.current
-      const waits = [0, 500, 1000, 2000]
-      let prev = 0
-      for (const target of waits) {
-        if (session !== confirmSessionRef.current) return
-        const delay = target - prev
-        prev = target
-        if (delay > 0) {
-          await new Promise<void>((resolve) => window.setTimeout(resolve, delay))
-        }
-        if (session !== confirmSessionRef.current) return
-        const snapT0 = perfNow()
-        try {
-          const snap = await fetchSnapshot()
-          if (session !== confirmSessionRef.current) return
-          if (snap) mergeSnapshot(snap)
-          const nowRow = snap?.nowPlaying.track ?? null
-          const match = vysionMusicTrackRowIsNowPlaying(
-            expected,
-            nowRow
-              ? { id: nowRow.id, name: nowRow.name, artist: nowRow.artist }
-              : null,
-          )
-          perfLog(`track-confirm-snapshot-${target}ms`, snapT0, {
-            expectedTrackId: expected.id,
-            nowId: nowRow?.id ?? null,
-            match,
-          })
-          if (match) {
-            perfLog('track-soundtrack-confirmation-total', mutationStartedAt, {
-              expectedTrackId: expected.id,
-              matchedAfterMs: target,
-            })
-            setOptimisticTrack(null)
-            optimisticStartedAtRef.current = null
-            return
-          }
-        } catch {
-          /* volgende poging */
-        }
-      }
-    },
-    [fetchSnapshot, mergeSnapshot],
-  )
-
-  const applyOptimisticNowPlaying = useCallback((track: VysionMusicCatalogTrack) => {
-    const clickT0 = perfNow()
-    const row: TrackRow = {
-      id: track.id,
-      name: track.name,
-      artist: track.artist,
-      durationMs: track.durationMs,
-      imageUrl: track.imageUrl,
-    }
-    optimisticStartedAtRef.current = new Date().toISOString()
-    setOptimisticTrack(row)
-    rememberVysionMusicCoverArt(coverArtCacheRef.current, row)
-    perfLog('track-ui-update', clickT0, { trackId: track.id })
-    const coverUrl = proxiedCoverUrl(track.imageUrl)
-    if (coverUrl) {
-      const img = new Image()
-      img.referrerPolicy = 'no-referrer'
-      img.src = coverUrl
-    }
-    return clickT0
-  }, [])
+  /** BEvroren playback-pad (e7a1da0d): één track, soundZoneQueueTracks. */
+  const refreshSnapshotAfterControl = useCallback(() => {
+    void loadSnapshot()
+    window.setTimeout(() => void loadSnapshot(), 1500)
+  }, [loadSnapshot])
 
   const queueTrackNow = useCallback(
-    async (track: VysionMusicCatalogTrack) => {
-      applyOptimisticNowPlaying(track)
+    async (trackId: string) => {
       setPlaylistSelecting(true)
-      const mutationT0 = perfNow()
       try {
         const ok = await postMutation('soundZoneQueueTracks', {
-          tracks: [track.id],
+          tracks: [trackId],
           immediate: true,
           clearQueuedTracks: true,
         })
-        perfLog('track-mutation-response', mutationT0, { ok, trackId: track.id })
-        if (ok) void pollUntilNowPlayingMatches(track, mutationT0)
+        if (ok) refreshSnapshotAfterControl()
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [applyOptimisticNowPlaying, pollUntilNowPlayingMatches, postMutation],
+    [postMutation, refreshSnapshotAfterControl],
   )
 
-  /**
-   * Playlist: queueTracks (wisselt meteen van song) + rest van lijst in queue voor auto-volgende.
-   * assignSource alleen wisselde vaak niet van audio — queue wel.
-   */
   const playPlaylistTrack = useCallback(
-    async (
-      sourceId: string,
-      track: VysionMusicCatalogTrack,
-      trackIndex: number,
-      playlistTracks: VysionMusicCatalogTrack[],
-    ) => {
+    async (sourceId: string, trackId: string) => {
       setPlaybackSourceId(sourceId)
-      applyOptimisticNowPlaying(track)
-      setPlaylistSelecting(true)
-      const mutationT0 = perfNow()
-      const fromHere = playlistTracks.slice(Math.max(0, trackIndex)).map((t) => t.id)
-      const tracksToQueue =
-        fromHere.length > 0 ? fromHere.slice(0, PLAYLIST_QUEUE_MAX_TRACKS) : [track.id]
-      try {
-        const ok = await postMutation('soundZoneQueueTracks', {
-          tracks: tracksToQueue,
-          immediate: true,
-          clearQueuedTracks: true,
-        })
-        perfLog('playlist-track-queue-response', mutationT0, {
-          ok,
-          trackId: track.id,
-          trackIndex,
-          queuedCount: tracksToQueue.length,
-        })
-        if (ok) void pollUntilNowPlayingMatches(track, mutationT0)
-      } finally {
-        setPlaylistSelecting(false)
-      }
+      await queueTrackNow(trackId)
     },
-    [applyOptimisticNowPlaying, pollUntilNowPlayingMatches, postMutation],
+    [queueTrackNow],
   )
 
   const playSearchTrack = useCallback(
-    async (track: VysionMusicCatalogTrack) => {
+    async (trackId: string) => {
       setPlaybackSourceId(null)
-      await queueTrackNow(track)
+      await queueTrackNow(trackId)
     },
     [queueTrackNow],
   )
