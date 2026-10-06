@@ -548,6 +548,7 @@ export function VysionMusicCatalogPanel({
                             disabled={busy}
                             onClick={() => {
                               setSearchMenuTrackId(null)
+                              void loadLists({ background: true })
                               setAddToPlaylistTrackId(tr.id)
                             }}
                           >

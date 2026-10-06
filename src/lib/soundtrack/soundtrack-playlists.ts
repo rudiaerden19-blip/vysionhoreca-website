@@ -273,7 +273,7 @@ export async function createManualPlaylistInMusicLibrary(
 const PLAYLIST_SPLICE_META_QUERY = `query($id: ID!) {
   playlist(id: $id) {
     snapshot
-    tracks { total }
+    tracks(first: 1) { total }
   }
 }`
 
