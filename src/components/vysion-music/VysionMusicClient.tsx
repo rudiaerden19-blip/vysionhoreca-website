@@ -431,6 +431,11 @@ export function VysionMusicClient({
 
   const progressPct = durationMs > 0 ? (progressMs / durationMs) * 100 : 0
   const isPlaying = playbackState === 'playing'
+  /** Catalogus: zelfde nowPlaying + voortgang als NU SPEELT (incl. optimistic tijdens snapshot-gap). */
+  const catalogNowTrack = nowTrack
+  const catalogDurationMs = durationMs
+  const catalogProgressMs = progressMs
+  const catalogIsPlaying = isPlaying && catalogNowTrack != null
   const playPausePending: TransportPending = isPlaying ? 'pause' : 'play'
   const { date: clockDate, time: clockTime } = formatClock(clock, locale)
 
@@ -604,11 +609,17 @@ export function VysionMusicClient({
         activeSourceId={playFromId}
         playingSourceId={playbackSourceId}
         nowPlayingTrack={
-          nowTrack
-            ? { id: nowTrack.id, name: nowTrack.name, artist: nowTrack.artist }
+          catalogNowTrack
+            ? {
+                id: catalogNowTrack.id,
+                name: catalogNowTrack.name,
+                artist: catalogNowTrack.artist,
+              }
             : null
         }
-        nowPlaying={isPlaying}
+        nowPlaying={catalogIsPlaying}
+        nowPlayingProgressMs={catalogNowTrack ? catalogProgressMs : 0}
+        nowPlayingDurationMs={catalogNowTrack ? catalogDurationMs : 0}
         busy={catalogBusy}
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}
