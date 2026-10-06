@@ -181,7 +181,8 @@
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: var(--vm-accent);
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.55);
   transition: width 0.4s linear;
 }
 
