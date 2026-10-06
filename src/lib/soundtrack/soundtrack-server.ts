@@ -473,7 +473,7 @@ export async function fetchSoundtrackPlayerSnapshot(
         }
         playFrom {
           __typename
-          ... on ManualPlaylist {
+          ... on Playlist {
             id
             tracks(first: 500) {
               edges {
@@ -507,7 +507,7 @@ export async function fetchSoundtrackPlayerSnapshot(
   let playFromPlaylistId: string | null = null
   const playlist: SoundtrackTrackRow[] = []
 
-  if (playFrom?.__typename === 'ManualPlaylist' && playFrom.tracks?.edges?.length) {
+  if (playFrom?.__typename === 'Playlist' && playFrom.tracks?.edges?.length) {
     playFromPlaylistId = playFrom.id?.trim() || null
     for (const edge of playFrom.tracks.edges) {
       const row = mapTrack(edge.node)
