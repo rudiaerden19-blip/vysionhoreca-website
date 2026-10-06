@@ -149,25 +149,7 @@
 }
 
 .trackRowActive {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--vm-accent-rgb), 0.28) 0%,
-    rgba(var(--vm-accent-rgb), 0.12) 55%,
-    var(--vm-row-active) 100%
-  );
-  box-shadow: inset 3px 0 0 var(--vm-accent);
-}
-
-.trackRowActive .trackRowTitle {
-  color: #fff;
-}
-
-.trackRowActive .trackRowArtist {
-  color: rgba(255, 255, 255, 0.78);
-}
-
-.trackRowActive .trackRowDur {
-  color: rgba(255, 255, 255, 0.65);
+  background: var(--vm-row-active);
 }
 
 .trackRow:disabled,
@@ -295,18 +277,11 @@
 }
 
 .libraryRowActive {
-  background: linear-gradient(
-    90deg,
-    rgba(var(--vm-accent-rgb), 0.28) 0%,
-    rgba(var(--vm-accent-rgb), 0.12) 55%,
-    var(--vm-row-active) 100%
-  );
-  box-shadow: inset 3px 0 0 var(--vm-accent);
+  background: var(--vm-row-active);
 }
 
 .libraryRowSelected {
-  background: rgba(var(--vm-accent-rgb), 0.1);
-  box-shadow: inset 2px 0 0 rgba(var(--vm-accent-rgb), 0.35);
+  background: rgba(var(--vm-accent-rgb), 0.12);
 }
 
 .libraryRow:disabled,
