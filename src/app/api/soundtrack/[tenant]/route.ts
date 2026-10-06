@@ -11,11 +11,11 @@ import {
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
-/** Artiest-zoek kan veel Soundtrack-pagina’s ophalen (U2, …). */
 export const maxDuration = 60
 
 type RouteContext = { params: { tenant: string } }
 
+/** Dunne BFF: alleen Soundtrack GraphQL (snapshot, zoeken, zone-control). */
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
@@ -24,24 +24,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
-    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-    await ensureSoundZoneCrossfadeSettings(zoneId)
-
-    if (request.nextUrl.searchParams.get('libraryPlaylists') === '1') {
-      const { fetchMusicLibraryPlaylistsForZone } =
-        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
-      const playlists = await fetchMusicLibraryPlaylistsForZone(zoneId)
-      return NextResponse.json({ ok: true, libraryPlaylists: playlists })
-    }
-
-    const soundtrackPlaylistId = request.nextUrl.searchParams.get('playlistId')?.trim()
-    if (soundtrackPlaylistId) {
-      const { fetchSoundtrackPlaylistDetail } =
-        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
-      const playlist = await fetchSoundtrackPlaylistDetail(soundtrackPlaylistId)
-      return NextResponse.json({ ok: true, playlist })
-    }
-
     const q = request.nextUrl.searchParams.get('q')
     if (q != null && q !== '') {
       const scope = request.nextUrl.searchParams.get('scope')
@@ -50,17 +32,9 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ ok: true, search: { query: q, tracks } })
     }
 
-    let snapshot
-    try {
-      snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
-    } catch (snapErr) {
-      console.warn('[soundtrack] GET snapshot failed', snapErr)
-      return NextResponse.json({
-        ok: false,
-        error: snapErr instanceof Error ? snapErr.message : 'Snapshot failed',
-        code: 'soundtrack',
-      })
-    }
+    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    await ensureSoundZoneCrossfadeSettings(zoneId)
+    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
@@ -84,26 +58,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
     op?: string
     volume?: number
     trackId?: string
-    trackIds?: string[]
-    startTrackId?: string
-    playlistName?: string
     playlistId?: string
     trackIndex?: number
-    soundtrackPlaylistId?: string | null
   }
   try {
-    body = (await request.json()) as {
-      op?: string
-      volume?: number
-      trackId?: string
-      trackIds?: string[]
-      startTrackId?: string
-      playlistName?: string
-      playlistId?: string
-      trackIndex?: number
-      soundtrackPlaylistId?: string | null
-      vysionPlaylistId?: string | null
-    }
+    body = (await request.json()) as typeof body
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
@@ -116,7 +75,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     'stop',
     'setVolume',
     'playTrack',
-    'playPlaylist',
     'playFromIndex',
   ] as const
   if (!op || !allowed.includes(op as (typeof allowed)[number])) {
@@ -127,11 +85,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     await ensureSoundZoneCrossfadeSettings(zoneId)
 
-    let soundtrackPlaylistId: string | undefined
-
     if (op === 'playFromIndex') {
-      const playlistId =
-        body.playlistId?.trim() || body.soundtrackPlaylistId?.trim() || ''
+      const playlistId = body.playlistId?.trim() || ''
       if (!playlistId) {
         return NextResponse.json({ error: 'playlistId required' }, { status: 400 })
       }
@@ -143,49 +98,22 @@ export async function POST(request: NextRequest, context: RouteContext) {
         await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
       await playSoundtrackPlaylistAtIndex(zoneId, playlistId, trackIndex)
       await new Promise((r) => setTimeout(r, 800))
-    } else if (op === 'playPlaylist') {
-      const trackIds = body.trackIds ?? []
-      if (trackIds.length === 0) {
-        return NextResponse.json({ error: 'trackIds required' }, { status: 400 })
-      }
-      const { playManualPlaylistOnSoundZone } =
-        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
-      soundtrackPlaylistId = await playManualPlaylistOnSoundZone({
-        zoneId,
-        name: body.playlistName ?? '',
-        trackIds,
-        soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
-        startTrackId: body.startTrackId ?? null,
-      })
-      await new Promise((r) => setTimeout(r, 1200))
     } else {
       await soundtrackControl(
         zoneId,
         op as 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack',
         {
-        volume: op === 'setVolume' ? body.volume : undefined,
-        trackId: body.trackId,
-        trackIds: body.trackIds,
-        playlistName: body.playlistName,
-        soundtrackPlaylistId: body.soundtrackPlaylistId,
-      })
+          volume: op === 'setVolume' ? body.volume : undefined,
+          trackId: body.trackId,
+        },
+      )
       if (op === 'playTrack') {
         await new Promise((r) => setTimeout(r, 500))
       }
     }
 
-    let snapshot
-    try {
-      snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
-    } catch (snapErr) {
-      console.warn('[soundtrack] snapshot after control failed', snapErr)
-    }
-
-    return NextResponse.json({
-      ok: true,
-      ...(snapshot ? { snapshot } : {}),
-      ...(soundtrackPlaylistId ? { soundtrackPlaylistId } : {}),
-    })
+    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
