@@ -785,7 +785,8 @@ export async function fetchPlaylistTrackRows(playlistId: string): Promise<Soundt
   return rows
 }
 
-async function queueTracksOnSoundZone(
+/** Soundtrack `soundZoneQueueTracks`. */
+export async function soundtrackQueueTracksOnZone(
   zoneId: string,
   trackIds: string[],
   clearQueuedTracks: boolean,
@@ -843,7 +844,7 @@ export async function soundtrackControl(
       }
       // Nooit skipTracks hier: skip gaat naar volgende station-/playlist-track, niet naar
       // de zojuist gequeue'de zoekresultaat-track.
-      await queueTracksOnSoundZone(zoneId, [trackId], true)
+      await soundtrackQueueTracksOnZone(zoneId, [trackId], true)
       await soundtrackPlayZone(zoneId)
       return
     }

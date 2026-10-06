@@ -6,12 +6,14 @@ import {
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneIdForTenant,
   skipSoundZoneTracks,
-  soundtrackControl,
+  soundtrackGraphql,
+  soundtrackPauseZone,
+  soundtrackPlayZone,
+  soundtrackQueueTracksOnZone,
   soundtrackSearchTracks,
   soundtrackSetPlayFrom,
-  soundtrackPlayZone,
-  soundtrackPauseZone,
   soundtrackSkipTrack,
+  soundtrackUiPercentToApiVolume,
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
@@ -19,7 +21,19 @@ export const maxDuration = 60
 
 type RouteContext = { params: { tenant: string } }
 
-/** Elke POST `op` = precies één Soundtrack GraphQL-mutatie (behalve auth + zone-id). */
+/** Whitelist = exacte Soundtrack GraphQL mutation-namen. Geen eigen `op`-laag. */
+const SOUNDTRACK_MUTATIONS = [
+  'play',
+  'pause',
+  'setPlayFrom',
+  'skipTrack',
+  'skipTracks',
+  'setVolume',
+  'soundZoneQueueTracks',
+] as const
+
+type SoundtrackMutationName = (typeof SOUNDTRACK_MUTATIONS)[number]
+
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
@@ -58,79 +72,81 @@ export async function POST(request: NextRequest, context: RouteContext) {
   }
 
   let body: {
-    op?: string
-    volume?: number
-    trackId?: string
-    source?: string
-    playlistId?: string
-    tracksToSkip?: number
-    crossfade?: boolean
+    mutation?: string
+    input?: Record<string, unknown>
   }
   try {
-    body = (await request.json()) as typeof body
+    body = (await request.json()) as { mutation?: string; input?: Record<string, unknown> }
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const op = body.op
-  const allowed = [
-    'play',
-    'pause',
-    'stop',
-    'setVolume',
-    'playTrack',
-    'skipTrack',
-    'skipTracks',
-    'setPlayFrom',
-  ] as const
-  if (!op || !allowed.includes(op as (typeof allowed)[number])) {
-    return NextResponse.json({ error: 'Invalid op' }, { status: 400 })
+  const mutation = body.mutation as SoundtrackMutationName | undefined
+  if (!mutation || !SOUNDTRACK_MUTATIONS.includes(mutation)) {
+    return NextResponse.json(
+      { error: `mutation must be one of: ${SOUNDTRACK_MUTATIONS.join(', ')}` },
+      { status: 400 },
+    )
   }
+
+  const input = body.input ?? {}
 
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
 
-    switch (op) {
-      case 'setPlayFrom': {
-        const source = (body.source ?? body.playlistId)?.trim() || ''
-        if (!source) {
-          return NextResponse.json({ error: 'source or playlistId required' }, { status: 400 })
-        }
-        await soundtrackSetPlayFrom(zoneId, source)
-        break
-      }
+    switch (mutation) {
       case 'play':
         await soundtrackPlayZone(zoneId)
         break
       case 'pause':
-      case 'stop':
         await soundtrackPauseZone(zoneId)
         break
+      case 'setPlayFrom': {
+        const source = String(input.source ?? '').trim()
+        if (!source) {
+          return NextResponse.json({ error: 'input.source required' }, { status: 400 })
+        }
+        await soundtrackSetPlayFrom(zoneId, source)
+        break
+      }
       case 'skipTrack':
         await soundtrackSkipTrack(zoneId)
         break
       case 'skipTracks': {
-        const n =
-          typeof body.tracksToSkip === 'number' && Number.isFinite(body.tracksToSkip)
-            ? Math.max(0, Math.floor(body.tracksToSkip))
+        const tracksToSkip =
+          typeof input.tracksToSkip === 'number' && Number.isFinite(input.tracksToSkip)
+            ? Math.max(0, Math.floor(input.tracksToSkip))
             : 1
-        const crossfade = body.crossfade !== false
-        if (n > 0) await skipSoundZoneTracks(zoneId, n, crossfade)
+        const crossfade = input.crossfade !== false
+        if (tracksToSkip > 0) await skipSoundZoneTracks(zoneId, tracksToSkip, crossfade)
         break
       }
-      case 'setVolume':
-      case 'playTrack':
-        await soundtrackControl(zoneId, op, {
-          volume: body.volume,
-          trackId: body.trackId,
-        })
+      case 'setVolume': {
+        const ui = typeof input.volume === 'number' ? input.volume : 0
+        const volume = soundtrackUiPercentToApiVolume(ui)
+        await soundtrackGraphql(
+          `mutation($input: SetVolumeInput!) { setVolume(input: $input) { status volume } }`,
+          { input: { soundZone: zoneId, volume } },
+        )
         break
+      }
+      case 'soundZoneQueueTracks': {
+        const tracks = Array.isArray(input.tracks)
+          ? input.tracks.map((t) => String(t).trim()).filter(Boolean)
+          : []
+        if (tracks.length === 0) {
+          return NextResponse.json({ error: 'input.tracks required' }, { status: 400 })
+        }
+        const clearQueuedTracks = input.clearQueuedTracks !== false
+        await soundtrackQueueTracksOnZone(zoneId, tracks, clearQueuedTracks)
+        break
+      }
       default:
         break
     }
 
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
-    return NextResponse.json({ ok: true, snapshot })
+    return NextResponse.json({ ok: true, mutation, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
@@ -138,6 +154,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     if (e instanceof SoundtrackApiError) {
       return NextResponse.json({ error: e.message, code: 'soundtrack' }, { status: e.status })
     }
-    return NextResponse.json({ error: 'Soundtrack control failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Soundtrack mutation failed' }, { status: 500 })
   }
 }

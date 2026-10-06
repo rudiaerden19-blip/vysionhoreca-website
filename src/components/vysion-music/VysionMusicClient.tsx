@@ -146,9 +146,10 @@ export function VysionMusicClient({
     }
   }, [apiBase, mergeSnapshot, t])
 
-  const postOp = useCallback(
+  const postMutation = useCallback(
     async (
-      body: Record<string, unknown>,
+      mutation: string,
+      input: Record<string, unknown> = {},
       opts?: { silent?: boolean; transportPending?: TransportPending; volumeGeneration?: number },
     ) => {
       const transportKey = opts?.transportPending
@@ -157,7 +158,7 @@ export function VysionMusicClient({
         const res = await fetch(apiBase, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ mutation, input }),
         })
         const json = (await res.json()) as { snapshot?: Snapshot; error?: string; ok?: boolean }
         if (!res.ok || json.ok === false) {
@@ -167,7 +168,7 @@ export function VysionMusicClient({
         if (!opts?.silent) setError(null)
         if (json.snapshot) {
           const ignoreVolume =
-            body.op === 'setVolume' ||
+            mutation === 'setVolume' ||
             (opts?.volumeGeneration != null &&
               opts.volumeGeneration !== volumeSyncGeneration.current)
           mergeSnapshot(json.snapshot, { ignoreVolume: !!ignoreVolume })
@@ -300,12 +301,12 @@ export function VysionMusicClient({
       const send = () => {
         lastVolumeSentRef.current = v
         const gen = ++volumeSyncGeneration.current
-        void postOp({ op: 'setVolume', volume: v }, { silent: true, volumeGeneration: gen })
+        void postMutation('setVolume', { volume: v }, { silent: true, volumeGeneration: gen })
       }
       if (immediate) send()
       else volumeSyncTimer.current = setTimeout(send, 320)
     },
-    [postOp],
+    [postMutation],
   )
 
   useEffect(() => {
@@ -319,21 +320,22 @@ export function VysionMusicClient({
     async (source: string, trackIndex: number) => {
       setSwitchingTrack(true)
       setError(null)
-      const ok1 = await postOp({ op: 'setPlayFrom', source }, { silent: true })
+      const ok1 = await postMutation('setPlayFrom', { source }, { silent: true })
       if (!ok1) {
         setError(t('vysionMusic.errorControl'))
         setSwitchingTrack(false)
         return
       }
-      const ok2 = await postOp({ op: 'play' }, { silent: true })
+      const ok2 = await postMutation('play', {}, { silent: true })
       if (!ok2) {
         setError(t('vysionMusic.errorControl'))
         setSwitchingTrack(false)
         return
       }
       if (trackIndex > 0) {
-        const ok3 = await postOp(
-          { op: 'skipTracks', tracksToSkip: trackIndex, crossfade: true },
+        const ok3 = await postMutation(
+          'skipTracks',
+          { tracksToSkip: trackIndex, crossfade: true },
           { silent: true },
         )
         if (!ok3) setError(t('vysionMusic.errorControl'))
@@ -341,18 +343,23 @@ export function VysionMusicClient({
       setSwitchingTrack(false)
       void loadSnapshot()
     },
-    [loadSnapshot, postOp],
+    [loadSnapshot, postMutation, t],
   )
 
   const playTrack = useCallback(
     async (trackId: string) => {
       if (!trackId || trackId.startsWith('placeholder')) return
       setSwitchingTrack(true)
-      await postOp({ op: 'playTrack', trackId })
+      await postMutation(
+        'soundZoneQueueTracks',
+        { tracks: [trackId], immediate: true, clearQueuedTracks: true },
+        { silent: true },
+      )
+      await postMutation('play', {})
       setSwitchingTrack(false)
-      window.setTimeout(() => void loadSnapshot(), 800)
+      void loadSnapshot()
     },
-    [loadSnapshot, postOp],
+    [loadSnapshot, postMutation],
   )
 
   const nowTrack = snapshot?.nowPlaying.track
@@ -510,10 +517,9 @@ export function VysionMusicClient({
                 disabled={transportPending === playPausePending}
                 aria-label={isPlaying ? t('vysionMusic.pause') : t('vysionMusic.play')}
                 onClick={() =>
-                  void postOp(
-                    { op: isPlaying ? 'pause' : 'play' },
-                    { transportPending: playPausePending },
-                  )
+                  void postMutation(isPlaying ? 'pause' : 'play', {}, {
+                    transportPending: playPausePending,
+                  })
                 }
               >
                 {isPlaying ? (
@@ -527,7 +533,7 @@ export function VysionMusicClient({
                 className={styles.transportBtn}
                 disabled={transportPending === 'stop'}
                 aria-label={t('vysionMusic.stop')}
-                onClick={() => void postOp({ op: 'stop' }, { transportPending: 'stop' })}
+                onClick={() => void postMutation('pause', {}, { transportPending: 'stop' })}
               >
                 <VmStop className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
@@ -537,7 +543,7 @@ export function VysionMusicClient({
                 disabled={transportPending === 'skipNext'}
                 aria-label={t('vysionMusic.next')}
                 onClick={() =>
-                  void postOp({ op: 'skipTrack' }, { transportPending: 'skipNext' })
+                  void postMutation('skipTrack', {}, { transportPending: 'skipNext' })
                 }
               >
                 <VmSkipForward className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
