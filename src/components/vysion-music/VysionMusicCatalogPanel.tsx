@@ -49,7 +49,12 @@ export function VysionMusicCatalogPanel({
   playingSourceId: string | null
   nowPlayingTrack: VysionMusicNowPlayingMatch | null
   nowPlaying: boolean
-  onPlayPlaylistTrack: (sourceId: string, trackId: string) => void | Promise<void>
+  onPlayPlaylistTrack: (
+    sourceId: string,
+    trackId: string,
+    trackIndex: number,
+    playlistTracks: TrackItem[],
+  ) => void | Promise<void>
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
   busy: boolean
 }) {
@@ -392,7 +397,7 @@ export function VysionMusicCatalogPanel({
                     type="button"
                     className={active ? styles.trackRowActive : styles.trackRow}
                     disabled={busy || !selectedId}
-                    onClick={() => void onPlayPlaylistTrack(selectedId!, tr.id)}
+                    onClick={() => void onPlayPlaylistTrack(selectedId!, tr.id, idx, tracks)}
                   >
                     {active ? (
                       <TrackNowPlayingBars playing={nowPlaying} />

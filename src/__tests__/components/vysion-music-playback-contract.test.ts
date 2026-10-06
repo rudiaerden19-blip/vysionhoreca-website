@@ -12,7 +12,7 @@ export const VYSION_MUSIC_FROZEN_QUEUE_TRACKS_INPUT = {
 }
 
 describe('Vysion Music playback contract (frozen)', () => {
-  it('search and playlist use single-track soundZoneQueueTracks', () => {
+  it('search uses single-track soundZoneQueueTracks', () => {
     expect(VYSION_MUSIC_FROZEN_QUEUE_TRACKS_INPUT.mutation).toBe('soundZoneQueueTracks')
     expect(VYSION_MUSIC_FROZEN_QUEUE_TRACKS_INPUT.shape.immediate).toBe(true)
     expect(VYSION_MUSIC_FROZEN_QUEUE_TRACKS_INPUT.shape.clearQueuedTracks).toBe(true)

@@ -21,6 +21,7 @@ import {
   lookupVysionMusicCoverArt,
   rememberVysionMusicCoverArt,
 } from './vysion-music-cover-cache'
+import { buildPlaylistQueueTrackIds } from './vysion-music-playlist-queue'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -373,11 +374,27 @@ export function VysionMusicClient({
   )
 
   const playPlaylistTrack = useCallback(
-    async (sourceId: string, trackId: string) => {
+    async (
+      sourceId: string,
+      trackId: string,
+      trackIndex: number,
+      playlistTracks: { id: string }[],
+    ) => {
       setPlaybackSourceId(sourceId)
-      await queueTrackNow(trackId)
+      const tracksToQueue = buildPlaylistQueueTrackIds(playlistTracks, trackIndex, trackId)
+      setPlaylistSelecting(true)
+      try {
+        const ok = await postMutation('soundZoneQueueTracks', {
+          tracks: tracksToQueue,
+          immediate: true,
+          clearQueuedTracks: true,
+        })
+        if (ok) refreshSnapshotAfterControl()
+      } finally {
+        setPlaylistSelecting(false)
+      }
     },
-    [queueTrackNow],
+    [postMutation, refreshSnapshotAfterControl],
   )
 
   const playSearchTrack = useCallback(
