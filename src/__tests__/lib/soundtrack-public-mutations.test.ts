@@ -1,5 +1,6 @@
 import {
   isSoundtrackPublicMutationName,
+  sanitizeSoundtrackMutationInput,
   SOUNDTRACK_PUBLIC_MUTATION_NAMES,
 } from '@/lib/soundtrack/soundtrack-public-mutations'
 
@@ -20,5 +21,21 @@ describe('Soundtrack Public API mutation names', () => {
   it('rejects custom BFF mutation aliases', () => {
     expect(isSoundtrackPublicMutationName('playPlaylistTrack')).toBe(false)
     expect(isSoundtrackPublicMutationName('soundZoneAssignSource')).toBe(true)
+  })
+
+  it('playlist track: sourceTrackIndex zero-based, strip track id + debug fields', () => {
+    const out = sanitizeSoundtrackMutationInput('soundZoneAssignSource', {
+      source: 'pl-1',
+      sourceTrackIndex: 4,
+      track: 'track-wrong',
+      immediate: true,
+      debugUiPosition: 5,
+      debugTrackId: 'track-a',
+    })
+    expect(out).toEqual({
+      source: 'pl-1',
+      sourceTrackIndex: 4,
+      immediate: true,
+    })
   })
 })

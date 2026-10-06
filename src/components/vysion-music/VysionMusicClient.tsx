@@ -293,10 +293,20 @@ export function VysionMusicClient({
   )
 
   const playPlaylistTrack = useCallback(
-    async (sourceId: string, trackId: string): Promise<boolean> => {
+    async (
+      sourceId: string,
+      trackId: string,
+      meta: { sourceTrackIndex: number; trackTitle: string; uiPosition: number },
+    ): Promise<boolean> => {
       setPlaylistSelecting(true)
       try {
-        const ok = await assignSourceAndPlay({ source: sourceId, track: trackId })
+        const ok = await assignSourceAndPlay({
+          source: sourceId,
+          sourceTrackIndex: meta.sourceTrackIndex,
+          debugTrackId: trackId,
+          debugTrackTitle: meta.trackTitle,
+          debugUiPosition: meta.uiPosition,
+        })
         if (ok) refreshSnapshotAfterControl()
         return ok
       } finally {
