@@ -6919,6 +6919,10 @@
   },
   "vysionMusic": {
     "backToKassa": "Kasse",
+    "blankSlateTitle": "Soundtrack-Anbindung — leere Seite",
+    "blankSlateHint": "Alles ist weg. Keine Soundtrack-Anbindung, keine API, keine Zonen-Logik — leere Seite.",
+    "soundtrackLiveReadonly": "LIVE VON SOUNDTRACK (nur lesen)",
+    "nothingPlaying": "Kein Titel in der Zone.",
     "nowPlaying": "spielt gerade ab",
     "switchingTrack": "WECHSELN…",
     "playlistTitle": "WIEDERGABELISTE",

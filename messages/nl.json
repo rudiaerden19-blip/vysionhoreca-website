@@ -6855,6 +6855,10 @@
   },
   "vysionMusic": {
     "backToKassa": "Kassa",
+    "blankSlateTitle": "Schone lei",
+    "blankSlateHint": "Alles is weg. Geen Soundtrack-koppeling, geen API, geen zone-logica — lege lei.",
+    "soundtrackLiveReadonly": "LIVE VAN SOUNDTRACK (alleen lezen)",
+    "nothingPlaying": "Geen track op de zone.",
     "nowPlaying": "SPEELT NU AF",
     "switchingTrack": "BEZIG MET WISSELEN…",
     "playlistTitle": "AFSPEELLIJST",

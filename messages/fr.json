@@ -6919,6 +6919,10 @@
   },
   "vysionMusic": {
     "backToKassa": "Caisse",
+    "blankSlateTitle": "Liaison Soundtrack — page blanche",
+    "blankSlateHint": "Tout est supprimé. Pas de liaison Soundtrack, pas d’API, pas de logique de zone — page blanche.",
+    "soundtrackLiveReadonly": "EN DIRECT SOUNDTRACK (lecture seule)",
+    "nothingPlaying": "Aucun morceau sur la zone.",
     "nowPlaying": "en cours de lecture",
     "switchingTrack": "CHANGEMENT…",
     "playlistTitle": "LISTE DE LECTURE",

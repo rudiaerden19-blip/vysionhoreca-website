@@ -6896,6 +6896,10 @@
   },
   "vysionMusic": {
     "backToKassa": "الكassa",
+    "blankSlateTitle": "ربط Soundtrack — صفحة فارغة",
+    "blankSlateHint": "تم حذف كل شيء. لا ربط Soundtrack، لا API، لا منطق مناطق — صفحة فارغة.",
+    "soundtrackLiveReadonly": "مباشر من SOUNDTRACK (قراءة فقط)",
+    "nothingPlaying": "لا يوجد مقطع في المنطقة.",
     "nowPlaying": "يُشغَّل الآن",
     "switchingTrack": "جارٍ التبديل…",
     "playlistTitle": "قائمة التشغيل",

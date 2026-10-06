@@ -6855,6 +6855,10 @@
   },
   "vysionMusic": {
     "backToKassa": "POS",
+    "blankSlateTitle": "Clean slate",
+    "blankSlateHint": "Everything is gone. No Soundtrack link, no API, no zone logic — blank slate.",
+    "soundtrackLiveReadonly": "LIVE FROM SOUNDTRACK (read-only)",
+    "nothingPlaying": "No track on the zone.",
     "nowPlaying": "now playing",
     "switchingTrack": "SWITCHING…",
     "playlistTitle": "PLAYLIST",

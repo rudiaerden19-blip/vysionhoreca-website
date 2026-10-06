@@ -6896,6 +6896,10 @@
   },
   "vysionMusic": {
     "backToKassa": "Cassa",
+    "blankSlateTitle": "Collegamento Soundtrack — foglio pulito",
+    "blankSlateHint": "Tutto rimosso. Nessun collegamento Soundtrack, nessuna API, nessuna logica zone — foglio pulito.",
+    "soundtrackLiveReadonly": "LIVE DA SOUNDTRACK (sola lettura)",
+    "nothingPlaying": "Nessun brano nella zona.",
     "nowPlaying": "in riproduzione",
     "switchingTrack": "CAMBIO…",
     "playlistTitle": "PLAYLIST",

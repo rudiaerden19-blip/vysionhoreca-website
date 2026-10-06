@@ -6896,6 +6896,10 @@
   },
   "vysionMusic": {
     "backToKassa": "レジ",
+    "blankSlateTitle": "Soundtrack連携 — 白紙から",
+    "blankSlateHint": "すべて削除しました。Soundtrack連携なし、APIなし、ゾーンロジックなし — 白紙から。",
+    "soundtrackLiveReadonly": "SOUNDTRACK ライブ（読み取り専用）",
+    "nothingPlaying": "ゾーンに曲がありません。",
     "nowPlaying": "再生中",
     "switchingTrack": "切り替え中…",
     "playlistTitle": "プレイリスト",

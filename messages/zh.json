@@ -6896,6 +6896,10 @@
   },
   "vysionMusic": {
     "backToKassa": "收银",
+    "blankSlateTitle": "Soundtrack 连接 — 空白起点",
+    "blankSlateHint": "已全部移除。无 Soundtrack 连接、无 API、无区域逻辑 — 空白起点。",
+    "soundtrackLiveReadonly": "SOUNDTRACK 实时（只读）",
+    "nothingPlaying": "区域上没有曲目。",
     "nowPlaying": "正在播放",
     "switchingTrack": "切换中…",
     "playlistTitle": "播放列表",
