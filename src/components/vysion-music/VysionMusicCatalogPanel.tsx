@@ -42,7 +42,6 @@ export function VysionMusicCatalogPanel({
   nowPlaying,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
-  onPlaylistSelected,
   busy,
 }: {
   tenant: string
@@ -57,8 +56,6 @@ export function VysionMusicCatalogPanel({
     playlistTracks: TrackItem[],
   ) => void | Promise<void>
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
-  /** Test: setPlayFrom voor gekozen playlist (geen UI). */
-  onPlaylistSelected?: (sourceId: string) => void | Promise<void>
   busy: boolean
 }) {
   void _playFromSourceId
@@ -281,7 +278,6 @@ export function VysionMusicCatalogPanel({
   const pickPlaylist = (id: string) => {
     const t0 = perfNow()
     setSelectedId(id)
-    void onPlaylistSelected?.(id)
     const cached = getCachedPlaylistTracks(tenant, id)
     if (cached?.length) {
       setTracks(cached)
