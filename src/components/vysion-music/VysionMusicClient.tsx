@@ -310,12 +310,11 @@ export function VysionMusicClient({
     async (trackId: string) => {
       setPlaylistSelecting(true)
       try {
-        const queued = await postMutation('soundZoneQueueTracks', {
+        await postMutation('soundZoneQueueTracks', {
           tracks: [trackId],
           immediate: true,
           clearQueuedTracks: true,
         })
-        if (queued) await postMutation('play', {}, { silent: true })
       } finally {
         setPlaylistSelecting(false)
       }

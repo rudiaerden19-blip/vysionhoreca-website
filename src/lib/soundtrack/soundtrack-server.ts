@@ -471,10 +471,16 @@ export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<s
   return (await resolveSoundZoneForTenant(tenantSlug)).zoneId
 }
 
-export async function soundtrackGraphql<T = Record<string, unknown>>(
+export type SoundtrackGraphqlRawResult = {
+  httpStatus: number
+  body: { data?: unknown; errors?: { message?: string }[] }
+}
+
+/** Tijdelijk debug: volledige HTTP + GraphQL body (geen Authorization loggen). */
+export async function soundtrackGraphqlRaw(
   query: string,
   variables?: Record<string, unknown>,
-): Promise<T> {
+): Promise<SoundtrackGraphqlRawResult> {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -485,12 +491,17 @@ export async function soundtrackGraphql<T = Record<string, unknown>>(
     body: JSON.stringify({ query, variables }),
     cache: 'no-store',
   })
-  const json = (await res.json()) as {
-    data?: T
-    errors?: { message?: string }[]
-  }
-  if (!res.ok) {
-    throw new SoundtrackApiError(json.errors?.[0]?.message || `HTTP ${res.status}`, res.status)
+  const body = (await res.json()) as SoundtrackGraphqlRawResult['body']
+  return { httpStatus: res.status, body }
+}
+
+export async function soundtrackGraphql<T = Record<string, unknown>>(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<T> {
+  const { httpStatus, body: json } = await soundtrackGraphqlRaw(query, variables)
+  if (httpStatus !== 200) {
+    throw new SoundtrackApiError(json.errors?.[0]?.message || `HTTP ${httpStatus}`, httpStatus)
   }
   if (json.errors?.length) {
     throw new SoundtrackApiError(json.errors.map((e) => e.message).join('; ') || 'GraphQL error')
@@ -498,7 +509,7 @@ export async function soundtrackGraphql<T = Record<string, unknown>>(
   if (json.data == null) {
     throw new SoundtrackApiError('Empty GraphQL response')
   }
-  return json.data
+  return json.data as T
 }
 
 export type SoundtrackPlayerSnapshot = {

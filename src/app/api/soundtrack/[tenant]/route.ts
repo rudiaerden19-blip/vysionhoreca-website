@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
   isSoundtrackPublicMutationName,
+  soundtrackDebugSoundZoneQueueTracks,
   soundtrackExecutePublicMutation,
 } from '@/lib/soundtrack/soundtrack-public-mutations'
 import {
@@ -97,9 +98,32 @@ export async function POST(request: NextRequest, context: RouteContext) {
       input.volume = soundtrackUiPercentToApiVolume(ui)
     }
 
-    await soundtrackExecutePublicMutation(zoneId, mutation, input)
+    if (mutation === 'soundZoneQueueTracks') {
+      const trackId = Array.isArray(input.tracks) ? String(input.tracks[0] ?? '') : ''
+      console.info('[soundtrack-debug soundZoneQueueTracks]', {
+        tenantSlug,
+        zoneIdBeforeMutation: zoneId,
+        trackIdFromClient: trackId,
+        mutationName: mutation,
+      })
+      await soundtrackDebugSoundZoneQueueTracks(zoneId, input)
+    } else {
+      await soundtrackExecutePublicMutation(zoneId, mutation, input)
+    }
 
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    if (mutation === 'soundZoneQueueTracks') {
+      console.info('[soundtrack-debug soundZoneQueueTracks]', {
+        snapshotAfterMutation: {
+          zoneId: snapshot.zoneId,
+          online: snapshot.online,
+          isPaired: snapshot.isPaired,
+          playbackState: snapshot.playbackState,
+          nowPlayingTrackId: snapshot.nowPlaying.track?.id ?? null,
+          nowPlayingTitle: snapshot.nowPlaying.track?.name ?? null,
+        },
+      })
+    }
     return NextResponse.json({ ok: true, mutation, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {

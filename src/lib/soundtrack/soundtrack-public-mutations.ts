@@ -1,4 +1,8 @@
-import { SoundtrackApiError, soundtrackGraphql } from '@/lib/soundtrack/soundtrack-server'
+import {
+  SoundtrackApiError,
+  soundtrackGraphql,
+  soundtrackGraphqlRaw,
+} from '@/lib/soundtrack/soundtrack-server'
 
 /** Alleen mutaties uit het Soundtrack Public API v2 schema (1:1 GraphQL). */
 export const SOUNDTRACK_PUBLIC_MUTATION_NAMES = [
@@ -60,4 +64,38 @@ export async function soundtrackExecutePublicMutation(
   if (!id) throw new SoundtrackApiError('sound zone id required', 400)
   const payload = injectSoundZoneId(id, mutation, input)
   await soundtrackGraphql(MUTATION_DOCUMENT[mutation], { input: payload })
+}
+
+const QUEUE_DEBUG_TAG = '[soundtrack-debug soundZoneQueueTracks]'
+
+/** Tijdelijk: log request/response voor queue-debug (geen token). */
+export async function soundtrackDebugSoundZoneQueueTracks(
+  zoneId: string,
+  input: Record<string, unknown>,
+): Promise<{ variables: { input: Record<string, unknown> }; raw: Awaited<ReturnType<typeof soundtrackGraphqlRaw>> }> {
+  const id = zoneId.trim()
+  const payload = injectSoundZoneId(id, 'soundZoneQueueTracks', input)
+  const variables = { input: payload }
+  const mutationDoc = MUTATION_DOCUMENT.soundZoneQueueTracks
+  console.info(QUEUE_DEBUG_TAG, {
+    mutation: 'soundZoneQueueTracks',
+    soundZoneId: id,
+    trackIds: payload.tracks,
+    graphqlVariables: variables,
+  })
+  const raw = await soundtrackGraphqlRaw(mutationDoc, variables)
+  console.info(QUEUE_DEBUG_TAG, {
+    httpStatus: raw.httpStatus,
+    graphqlResponse: raw.body,
+    graphqlErrors: raw.body.errors ?? null,
+  })
+  if (raw.httpStatus !== 200) {
+    throw new SoundtrackApiError(raw.body.errors?.[0]?.message || `HTTP ${raw.httpStatus}`, raw.httpStatus)
+  }
+  if (raw.body.errors?.length) {
+    throw new SoundtrackApiError(
+      raw.body.errors.map((e) => e.message).join('; ') || 'GraphQL error',
+    )
+  }
+  return { variables, raw }
 }
