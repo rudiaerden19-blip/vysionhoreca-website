@@ -22,7 +22,7 @@ import {
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
-import { soundtrackCreateManualPlaylist } from '@/lib/vysion-music/soundtrack-create-manual-playlist'
+import { openSoundtrackWebUrl } from '@/lib/vysion-music/open-soundtrack-create'
 import {
   vysionMusicLibraryCoverProxyUrl,
   vysionMusicLibraryFallbackCoverSrc,
@@ -170,24 +170,33 @@ export function VysionMusicCatalogPanel({
     [tenant, t],
   )
 
-  const runSoundtrackCreatePlaylist = useCallback(async () => {
-    const raw = window.prompt(t('vysionMusic.createPlaylistNameLabel'))
-    if (raw === null) return
-    const name = raw.trim()
-    if (!name) return
-
+  const runSoundtrackCreate = useCallback(async () => {
     setCreateBusy(true)
     setCreateError(null)
     try {
-      await soundtrackCreateManualPlaylist(tenant, name)
-      setTab('lists')
-      await loadLists({ background: true })
+      const res = await fetch(
+        `/api/soundtrack/${encodeURIComponent(tenant)}/soundtrack-web-url`,
+        { headers: getAuthHeaders(), cache: 'no-store' },
+      )
+      const json = (await res.json()) as {
+        playerWebUrl?: string | null
+        createWebUrl?: string | null
+        error?: string
+      }
+      if (!res.ok) {
+        setCreateError(json.error || t('vysionMusic.createPlaylistError'))
+        return
+      }
+      const target = json.createWebUrl?.trim() || json.playerWebUrl?.trim()
+      if (!target || !openSoundtrackWebUrl(target)) {
+        setCreateError(t('vysionMusic.createPlaylistError'))
+      }
     } catch {
-      setCreateError(t('vysionMusic.createPlaylistError'))
+      setCreateError(t('vysionMusic.errorNetwork'))
     } finally {
       setCreateBusy(false)
     }
-  }, [tenant, t, loadLists])
+  }, [tenant, t])
 
   useEffect(() => {
     const cached = getCachedPlaylists(tenant)
@@ -460,7 +469,7 @@ export function VysionMusicCatalogPanel({
                 type="button"
                 className={styles.libraryTab}
                 disabled={createBusy}
-                onClick={() => void runSoundtrackCreatePlaylist()}
+                onClick={() => void runSoundtrackCreate()}
               >
                 {createBusy ? t('vysionMusic.createPlaylistSaving') : t('vysionMusic.libraryCreatePlaylist')}
               </button>
