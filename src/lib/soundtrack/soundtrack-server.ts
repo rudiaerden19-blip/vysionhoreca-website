@@ -4,9 +4,6 @@ import {
   type SoundtrackTrackGraphNode,
   type SoundtrackTrackRow,
 } from '@/lib/soundtrack/soundtrack-track-map'
-import { dedupeSearchTrackRows } from '@/lib/soundtrack/soundtrack-search-dedupe'
-
-export { dedupeSearchTrackRows } from '@/lib/soundtrack/soundtrack-search-dedupe'
 
 import {
   soundtrackApiBasicAuthorizationHeader,
@@ -748,6 +745,17 @@ export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
   )
 }
 
+function dedupeTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
+  const seen = new Set<string>()
+  const out: SoundtrackTrackRow[] = []
+  for (const row of rows) {
+    if (seen.has(row.id)) continue
+    seen.add(row.id)
+    out.push(row)
+  }
+  return out
+}
+
 export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
   const id = playlistId.trim()
   const data = await soundtrackGraphql<{
@@ -772,44 +780,11 @@ export async function fetchPlaylistTrackRows(playlistId: string): Promise<Soundt
   return rows
 }
 
-/** Null = geen Playlist-node (probeer Soundtrack-station). Lege array = wel playlist, 0 tracks. */
-export async function fetchPlaylistTrackRowsIfPlaylist(
-  sourceId: string,
-): Promise<SoundtrackTrackRow[] | null> {
-  const id = sourceId.trim()
-  if (!id) return null
-  try {
-    const data = await soundtrackGraphql<{
-      playlist: {
-        tracks: { edges: { node: SoundtrackTrackGraphNode }[] }
-      } | null
-    }>(
-      `query($id: ID!) {
-        playlist(id: $id) {
-          tracks(first: 500) {
-            edges { node { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} } }
-          }
-        }
-      }`,
-      { id },
-    )
-    if (!data.playlist) return null
-    const rows: SoundtrackTrackRow[] = []
-    for (const edge of data.playlist.tracks?.edges ?? []) {
-      const row = mapSoundtrackTrackRow(edge.node)
-      if (row) rows.push(row)
-    }
-    return rows
-  } catch {
-    return null
-  }
-}
-
 /** Tracks voor manual playlist of Soundtrack-station in de bibliotheek. */
 export async function fetchPlaySourceTrackRows(sourceId: string): Promise<SoundtrackTrackRow[]> {
   const id = sourceId.trim()
-  const fromPlaylist = await fetchPlaylistTrackRowsIfPlaylist(id)
-  if (fromPlaylist !== null) return fromPlaylist
+  const fromPlaylist = await fetchPlaylistTrackRows(id).catch(() => [] as SoundtrackTrackRow[])
+  if (fromPlaylist.length > 0) return fromPlaylist
 
   const data = await soundtrackGraphql<{
     soundtrack: {
@@ -840,6 +815,7 @@ export async function soundtrackSearchTracks(
   const q = query.trim()
   if (!q) return []
   const maxResults = Math.min(Math.max(opts?.maxResults ?? 80, 1), SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS)
+  const pageSize = SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE
   const data = await soundtrackGraphql<{
     search: {
       edges: { node: SoundtrackTrackGraphNode & { __typename?: string } }[]
@@ -855,7 +831,7 @@ export async function soundtrackSearchTracks(
         }
       }
     }`,
-    { q, first: maxResults },
+    { q, first: pageSize },
   )
   const rows: SoundtrackTrackRow[] = []
   for (const edge of data.search?.edges ?? []) {
@@ -863,6 +839,6 @@ export async function soundtrackSearchTracks(
     const row = mapSoundtrackTrackRow(edge.node)
     if (row) rows.push(row)
   }
-  return dedupeSearchTrackRows(rows).slice(0, maxResults)
+  return dedupeTrackRows(rows).slice(0, maxResults)
 }
 

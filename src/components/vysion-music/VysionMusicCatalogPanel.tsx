@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
-import { dedupeSearchTrackRows } from '@/lib/soundtrack/soundtrack-search-dedupe'
 import type { SoundtrackLibrarySourceKind } from '@/lib/soundtrack/soundtrack-playlists'
 import {
   getCachedPlaylistTracks,
@@ -14,27 +13,13 @@ import {
   type VysionMusicCatalogTrack,
   type VysionMusicLibraryItem,
 } from './vysion-music-catalog-cache'
-import { VysionMusicAddTrackToPlaylistModal } from './VysionMusicAddTrackToPlaylistModal'
 import { perfLog, perfNow } from './vysion-music-perf'
 import { TrackNowPlayingBars } from './TrackNowPlayingBars'
 import {
-  vysionMusicPlaylistRowIsActivePlayFrom,
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
-import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
-import {
-  vysionMusicLibraryCoverProxyUrl,
-  vysionMusicLibraryListArtUrl,
-  vysionMusicLibraryPlaceholderLetter,
-} from './vysion-music-library-thumb'
-import { VysionMusicDeletePlaylistModal } from './VysionMusicDeletePlaylistModal'
-import { VysionMusicRenamePlaylistModal } from './VysionMusicRenamePlaylistModal'
 import styles from './vysion-music.module.css'
-
-function isManualLibraryPlaylist(kind: SoundtrackLibrarySourceKind): boolean {
-  return kind === 'playlist' || kind === 'unknown'
-}
 
 type LibraryItem = VysionMusicLibraryItem
 type TrackItem = VysionMusicCatalogTrack
@@ -55,8 +40,6 @@ export function VysionMusicCatalogPanel({
   playingSourceId,
   nowPlayingTrack,
   nowPlaying,
-  nowPlayingProgressMs,
-  nowPlayingDurationMs,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
   onPlaylistSelected,
@@ -67,8 +50,6 @@ export function VysionMusicCatalogPanel({
   playingSourceId: string | null
   nowPlayingTrack: VysionMusicNowPlayingMatch | null
   nowPlaying: boolean
-  nowPlayingProgressMs: number
-  nowPlayingDurationMs: number
   onPlayPlaylistTrack: (
     sourceId: string,
     trackId: string,
@@ -98,12 +79,6 @@ export function VysionMusicCatalogPanel({
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
-  const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
-  const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
-  const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
-  const [libraryMenuPlaylistId, setLibraryMenuPlaylistId] = useState<string | null>(null)
-  const [renamePlaylist, setRenamePlaylist] = useState<{ id: string; name: string } | null>(null)
-  const [deletePlaylist, setDeletePlaylist] = useState<{ id: string; name: string } | null>(null)
 
   const prefetchTracksForSource = useCallback(
     async (sourceId: string) => {
@@ -242,37 +217,8 @@ export function VysionMusicCatalogPanel({
 
   const filteredLists = useMemo(() => {
     if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
-    return items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown')
+    return items.filter((i) => i.sourceKind !== 'schedule')
   }, [items, tab])
-
-  const addablePlaylists = useMemo(
-    () => items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown'),
-    [items],
-  )
-
-  useEffect(() => {
-    if (!searchMenuTrackId) return
-    const close = () => setSearchMenuTrackId(null)
-    const id = window.setTimeout(() => {
-      document.addEventListener('click', close)
-    }, 0)
-    return () => {
-      window.clearTimeout(id)
-      document.removeEventListener('click', close)
-    }
-  }, [searchMenuTrackId])
-
-  useEffect(() => {
-    if (!libraryMenuPlaylistId) return
-    const close = () => setLibraryMenuPlaylistId(null)
-    const id = window.setTimeout(() => {
-      document.addEventListener('click', close)
-    }, 0)
-    return () => {
-      window.clearTimeout(id)
-      document.removeEventListener('click', close)
-    }
-  }, [libraryMenuPlaylistId])
 
   useEffect(() => {
     if (!items.length) return
@@ -303,7 +249,7 @@ export function VysionMusicCatalogPanel({
         setSearchResults([])
         return
       }
-      setSearchResults(dedupeSearchTrackRows(json.search?.tracks ?? []))
+      setSearchResults(json.search?.tracks ?? [])
     } catch {
       setSearchResults([])
     } finally {
@@ -370,13 +316,6 @@ export function VysionMusicCatalogPanel({
               >
                 {t('vysionMusic.libraryTabSchedules')}
               </button>
-              <button
-                type="button"
-                className={styles.libraryTab}
-                onClick={() => setCreatePlaylistOpen(true)}
-              >
-                {t('vysionMusic.libraryCreatePlaylist')}
-              </button>
             </div>
           </div>
           {listsLoading ? (
@@ -392,15 +331,7 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const cachedPlaylistTracks = getCachedPlaylistTracks(tenant, pl.id)
-              const playlistTrackIds = cachedPlaylistTracks?.map((t) => t.id) ?? null
-              const isActivePlayFrom = vysionMusicPlaylistRowIsActivePlayFrom(
-                pl.id,
-                playFromSourceId,
-                nowPlayingTrack,
-                playlistTrackIds,
-                cachedPlaylistTracks,
-              )
+              const isActivePlayFrom = playFromSourceId === pl.id
               const isBrowsing = selectedId === pl.id && !isActivePlayFrom
               const rowClass = [
                 styles.libraryRow,
@@ -412,104 +343,44 @@ export function VysionMusicCatalogPanel({
               ]
                 .filter(Boolean)
                 .join(' ')
-              const cachedTrackArt =
-                getCachedPlaylistTracks(tenant, pl.id)?.find((t) => t.imageUrl?.trim())?.imageUrl ??
-                null
-              const listArtUrl = vysionMusicLibraryListArtUrl(
-                pl.sourceKind,
-                pl.imageUrl,
-                cachedTrackArt,
-              )
-              const thumbSrc = vysionMusicLibraryCoverProxyUrl(listArtUrl)
-              const libraryMenuOpen = libraryMenuPlaylistId === pl.id
-              const showPlaylistMenu = isManualLibraryPlaylist(pl.sourceKind)
+              const thumbSrc =
+                pl.imageUrl && pl.imageUrl.startsWith('http')
+                  ? `/api/soundtrack/cover?url=${encodeURIComponent(pl.imageUrl)}`
+                  : null
               return (
                 <li key={pl.id}>
-                  <div className={styles.libraryRowWrap}>
-                    <button
-                      type="button"
-                      className={`${rowClass} ${styles.libraryRowMainBtn}`}
-                      disabled={busy}
-                      onClick={() => pickPlaylist(pl.id)}
-                    >
-                      <span className={styles.libraryThumb} aria-hidden>
-                        {thumbSrc && !brokenThumbIds.has(pl.id) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={thumbSrc}
-                            alt=""
-                            className={styles.libraryThumbImg}
-                            referrerPolicy="no-referrer"
-                            onError={() =>
-                              setBrokenThumbIds((prev) => new Set(prev).add(pl.id))
-                            }
-                          />
-                        ) : (
-                          <span className={styles.libraryThumbFallback}>
-                            {vysionMusicLibraryPlaceholderLetter(pl.name)}
-                          </span>
-                        )}
+                  <button
+                    type="button"
+                    className={rowClass}
+                    disabled={busy}
+                    onClick={() => pickPlaylist(pl.id)}
+                  >
+                    <span className={styles.libraryThumb} aria-hidden>
+                      {thumbSrc && !brokenThumbIds.has(pl.id) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={thumbSrc}
+                          alt=""
+                          className={styles.libraryThumbImg}
+                          referrerPolicy="no-referrer"
+                          onError={() =>
+                            setBrokenThumbIds((prev) => new Set(prev).add(pl.id))
+                          }
+                        />
+                      ) : (
+                        <span className={styles.libraryThumbFallback}>{pl.name.charAt(0)}</span>
+                      )}
+                    </span>
+                    <span className={styles.libraryRowText}>
+                      <span className={styles.libraryRowName}>{pl.name}</span>
+                      <span className={styles.libraryRowMeta}>{sourceLabel(pl.sourceKind)}</span>
+                    </span>
+                    {isActivePlayFrom && nowPlayingTrack != null ? (
+                      <span className={styles.libraryRowEq}>
+                        <TrackNowPlayingBars playing={nowPlaying} />
                       </span>
-                      <span className={styles.libraryRowText}>
-                        <span className={styles.libraryRowName}>{pl.name}</span>
-                        <span className={styles.libraryRowMeta}>{sourceLabel(pl.sourceKind)}</span>
-                      </span>
-                      {isActivePlayFrom && nowPlayingTrack != null ? (
-                        <span className={styles.libraryRowEq}>
-                          <TrackNowPlayingBars playing={nowPlaying} />
-                        </span>
-                      ) : null}
-                    </button>
-                    {showPlaylistMenu ? (
-                      <div className={styles.searchTrackMenuWrap}>
-                        <button
-                          type="button"
-                          className={styles.searchTrackMenuBtn}
-                          disabled={busy}
-                          aria-label={t('vysionMusic.playlistMenuAria')}
-                          aria-expanded={libraryMenuOpen}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setLibraryMenuPlaylistId((prev) => (prev === pl.id ? null : pl.id))
-                          }}
-                        >
-                          ⋮
-                        </button>
-                        {libraryMenuOpen ? (
-                          <div
-                            className={styles.searchTrackMenu}
-                            role="menu"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={styles.searchTrackMenuItem}
-                              disabled={busy}
-                              onClick={() => {
-                                setLibraryMenuPlaylistId(null)
-                                setRenamePlaylist({ id: pl.id, name: pl.name })
-                              }}
-                            >
-                              {t('vysionMusic.playlistRename')}
-                            </button>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={styles.searchTrackMenuItem}
-                              disabled={busy}
-                              onClick={() => {
-                                setLibraryMenuPlaylistId(null)
-                                setDeletePlaylist({ id: pl.id, name: pl.name })
-                              }}
-                            >
-                              {t('vysionMusic.playlistDelete')}
-                            </button>
-                          </div>
-                        ) : null}
-                      </div>
                     ) : null}
-                  </div>
+                  </button>
                 </li>
               )
             })}
@@ -536,45 +407,25 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.tracksEmpty')}</li>
             ) : null}
             {tracks.map((tr, idx) => {
-              const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack, {
-                allowTitleArtistFallback: true,
-              })
-              const rowProgressPct =
-                active && nowPlayingDurationMs > 0
-                  ? Math.min(100, (nowPlayingProgressMs / nowPlayingDurationMs) * 100)
-                  : 0
+              const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
               return (
                 <li key={`${tr.id}-${idx}`}>
                   <button
                     type="button"
-                    className={
-                      active
-                        ? `${styles.trackRowActive} ${styles.trackRowNowPlaying}`
-                        : styles.trackRow
-                    }
+                    className={active ? styles.trackRowActive : styles.trackRow}
                     disabled={busy || !selectedId}
                     onClick={() => void onPlayPlaylistTrack(selectedId!, tr.id, idx, tracks)}
                   >
-                    <span className={styles.trackRowHeader}>
-                      {active ? (
-                        <TrackNowPlayingBars playing={nowPlaying} />
-                      ) : (
-                        <span className={styles.trackRowNum}>{idx + 1}</span>
-                      )}
-                      <span className={styles.trackRowMain}>
-                        <span className={styles.trackRowTitle}>{tr.name}</span>
-                        <span className={styles.trackRowArtist}>{tr.artist}</span>
-                      </span>
-                      <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
-                    </span>
                     {active ? (
-                      <span className={styles.trackRowProgressTrack} aria-hidden>
-                        <span
-                          className={styles.trackRowProgressFill}
-                          style={{ width: `${rowProgressPct}%` }}
-                        />
-                      </span>
-                    ) : null}
+                      <TrackNowPlayingBars playing={nowPlaying} />
+                    ) : (
+                      <span className={styles.trackRowNum}>{idx + 1}</span>
+                    )}
+                    <span className={styles.trackRowMain}>
+                      <span className={styles.trackRowTitle}>{tr.name}</span>
+                      <span className={styles.trackRowArtist}>{tr.artist}</span>
+                    </span>
+                    <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
                   </button>
                 </li>
               )
@@ -604,146 +455,31 @@ export function VysionMusicCatalogPanel({
             ) : null}
             {searchResults.map((tr, idx) => {
               const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
-              const rowProgressPct =
-                active && nowPlayingDurationMs > 0
-                  ? Math.min(100, (nowPlayingProgressMs / nowPlayingDurationMs) * 100)
-                  : 0
-              const menuOpen = searchMenuTrackId === tr.id
               return (
-                <li key={`${tr.id}-s-${idx}`} className={styles.searchTrackItem}>
-                  <div className={styles.searchTrackRow}>
-                    <button
-                      type="button"
-                      className={
-                        active
-                          ? `${styles.trackRowActive} ${styles.trackRowNowPlaying} ${styles.searchTrackPlay}`
-                          : `${styles.trackRow} ${styles.searchTrackPlay}`
-                      }
-                      disabled={busy}
-                      onClick={() => void onPlaySearchTrack(tr.id)}
-                    >
-                      <span className={styles.trackRowHeader}>
-                        {active ? (
-                          <TrackNowPlayingBars playing={nowPlaying} />
-                        ) : (
-                          <span className={styles.trackRowNum}>{idx + 1}</span>
-                        )}
-                        <span className={styles.trackRowMain}>
-                          <span className={styles.trackRowTitle}>{tr.name}</span>
-                          <span className={styles.trackRowArtist}>{tr.artist}</span>
-                        </span>
-                      </span>
-                      {active ? (
-                        <span className={styles.trackRowProgressTrack} aria-hidden>
-                          <span
-                            className={styles.trackRowProgressFill}
-                            style={{ width: `${rowProgressPct}%` }}
-                          />
-                        </span>
-                      ) : null}
-                    </button>
-                    <span className={styles.searchTrackDur}>{formatMs(tr.durationMs)}</span>
-                    <div className={styles.searchTrackMenuWrap}>
-                      <button
-                        type="button"
-                        className={styles.searchTrackMenuBtn}
-                        disabled={busy}
-                        aria-label={t('vysionMusic.searchTrackMenuAria')}
-                        aria-expanded={menuOpen}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSearchMenuTrackId((prev) => (prev === tr.id ? null : tr.id))
-                        }}
-                      >
-                        ⋮
-                      </button>
-                      {menuOpen ? (
-                        <div
-                          className={styles.searchTrackMenu}
-                          role="menu"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            type="button"
-                            role="menuitem"
-                            className={styles.searchTrackMenuItem}
-                            disabled={busy}
-                            onClick={() => {
-                              setSearchMenuTrackId(null)
-                              void onPlaySearchTrack(tr.id)
-                            }}
-                          >
-                            {t('vysionMusic.searchPlayNow')}
-                          </button>
-                          <button
-                            type="button"
-                            role="menuitem"
-                            className={styles.searchTrackMenuItem}
-                            disabled={busy}
-                            onClick={() => {
-                              setSearchMenuTrackId(null)
-                              void loadLists({ background: true })
-                              setAddToPlaylistTrackId(tr.id)
-                            }}
-                          >
-                            {t('vysionMusic.searchAddToPlaylist')}
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
+                <li key={`${tr.id}-s-${idx}`}>
+                  <button
+                    type="button"
+                    className={active ? styles.trackRowActive : styles.trackRow}
+                    disabled={busy}
+                    onClick={() => void onPlaySearchTrack(tr.id)}
+                  >
+                    {active ? (
+                      <TrackNowPlayingBars playing={nowPlaying} />
+                    ) : (
+                      <span className={styles.trackRowNum}>{idx + 1}</span>
+                    )}
+                    <span className={styles.trackRowMain}>
+                      <span className={styles.trackRowTitle}>{tr.name}</span>
+                      <span className={styles.trackRowArtist}>{tr.artist}</span>
+                    </span>
+                    <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
+                  </button>
                 </li>
               )
             })}
           </ul>
         </div>
       </div>
-      <VysionMusicCreatePlaylistModal
-        tenant={tenant}
-        open={createPlaylistOpen}
-        onClose={() => setCreatePlaylistOpen(false)}
-        onCreated={() => {
-          setTab('lists')
-          return loadLists()
-        }}
-      />
-      <VysionMusicRenamePlaylistModal
-        tenant={tenant}
-        open={renamePlaylist != null}
-        playlistId={renamePlaylist?.id ?? ''}
-        initialName={renamePlaylist?.name ?? ''}
-        onClose={() => setRenamePlaylist(null)}
-        onRenamed={() => loadLists({ background: true })}
-      />
-      <VysionMusicDeletePlaylistModal
-        tenant={tenant}
-        open={deletePlaylist != null}
-        playlistId={deletePlaylist?.id ?? ''}
-        playlistName={deletePlaylist?.name ?? ''}
-        onClose={() => setDeletePlaylist(null)}
-        onDeleted={async (removedId) => {
-          if (selectedId === removedId) {
-            setSelectedId(null)
-            setTracks([])
-          }
-          await loadLists({ background: true })
-        }}
-      />
-      <VysionMusicAddTrackToPlaylistModal
-        tenant={tenant}
-        open={addToPlaylistTrackId != null}
-        trackId={addToPlaylistTrackId ?? ''}
-        playlists={addablePlaylists}
-        onClose={() => setAddToPlaylistTrackId(null)}
-        onAdded={async (playlistId, refreshedTracks) => {
-          setCachedPlaylistTracks(tenant, playlistId, refreshedTracks)
-          if (selectedId === playlistId) {
-            setTracks(refreshedTracks)
-            setTracksError(null)
-          }
-          await loadLists({ background: true })
-        }}
-      />
     </section>
   )
 }
