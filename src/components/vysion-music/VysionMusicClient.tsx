@@ -19,6 +19,7 @@ import {
 import type { VysionMusicCatalogTrack } from './vysion-music-catalog-cache'
 import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
 import { perfLog, perfNow } from './vysion-music-perf'
+import { vysionMusicTrackRowIsNowPlaying } from './vysion-music-track-match'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -280,17 +281,17 @@ export function VysionMusicClient({
   }, [])
 
   useEffect(() => {
-    const serverId = snapshot?.nowPlaying.track?.id
-    if (optimisticTrack && serverId && serverId === optimisticTrack.id) {
+    const server = snapshot?.nowPlaying.track
+    if (!optimisticTrack || !server?.id) return
+    const sameId = server.id === optimisticTrack.id
+    const sameMeta =
+      server.name.trim().toLowerCase() === optimisticTrack.name.trim().toLowerCase() &&
+      server.artist.trim().toLowerCase() === optimisticTrack.artist.trim().toLowerCase()
+    if (sameId || sameMeta) {
       setOptimisticTrack(null)
       optimisticStartedAtRef.current = null
     }
-  }, [snapshot?.nowPlaying.track?.id, optimisticTrack])
-
-  useEffect(() => {
-    const from = snapshot?.playFromPlaylistId?.trim()
-    if (from) setPlaybackSourceId(from)
-  }, [snapshot?.playFromPlaylistId])
+  }, [snapshot?.nowPlaying.track, optimisticTrack])
 
   useEffect(() => {
     const playing =
@@ -344,7 +345,7 @@ export function VysionMusicClient({
   }, [nowTrackId, nowTrackImageUrl])
 
   const pollUntilNowPlayingMatches = useCallback(
-    async (expectedTrackId: string, mutationStartedAt: number) => {
+    async (expected: VysionMusicCatalogTrack, mutationStartedAt: number) => {
       const session = ++confirmSessionRef.current
       const waits = [0, 500, 1000, 2000]
       let prev = 0
@@ -361,15 +362,21 @@ export function VysionMusicClient({
           const snap = await fetchSnapshot()
           if (session !== confirmSessionRef.current) return
           if (snap) mergeSnapshot(snap)
-          const nowId = snap?.nowPlaying.track?.id ?? null
+          const nowRow = snap?.nowPlaying.track ?? null
+          const match = vysionMusicTrackRowIsNowPlaying(
+            expected,
+            nowRow
+              ? { id: nowRow.id, name: nowRow.name, artist: nowRow.artist }
+              : null,
+          )
           perfLog(`track-confirm-snapshot-${target}ms`, snapT0, {
-            expectedTrackId,
-            nowId,
-            match: nowId === expectedTrackId,
+            expectedTrackId: expected.id,
+            nowId: nowRow?.id ?? null,
+            match,
           })
-          if (nowId === expectedTrackId) {
+          if (match) {
             perfLog('track-soundtrack-confirmation-total', mutationStartedAt, {
-              expectedTrackId,
+              expectedTrackId: expected.id,
               matchedAfterMs: target,
             })
             setOptimisticTrack(null)
@@ -417,7 +424,7 @@ export function VysionMusicClient({
           clearQueuedTracks: true,
         })
         perfLog('track-mutation-response', mutationT0, { ok, trackId: track.id })
-        if (ok) void pollUntilNowPlayingMatches(track.id, mutationT0)
+        if (ok) void pollUntilNowPlayingMatches(track, mutationT0)
       } finally {
         setPlaylistSelecting(false)
       }
@@ -435,15 +442,16 @@ export function VysionMusicClient({
       try {
         const ok = await postMutation('soundZoneAssignSource', {
           source: sourceId,
-          sourceTrackIndex: trackIndex,
+          track: track.id,
           immediate: true,
         })
         perfLog('playlist-track-assign-response', mutationT0, {
           ok,
           trackId: track.id,
           trackIndex,
+          mode: 'track-id',
         })
-        if (ok) void pollUntilNowPlayingMatches(track.id, mutationT0)
+        if (ok) void pollUntilNowPlayingMatches(track, mutationT0)
       } finally {
         setPlaylistSelecting(false)
       }
@@ -653,8 +661,12 @@ export function VysionMusicClient({
       <VysionMusicCatalogPanel
         tenant={tenant}
         activeSourceId={playFromId}
-        playingSourceId={playbackSourceId ?? playFromId}
-        nowTrackId={nowTrack?.id ?? null}
+        playingSourceId={playbackSourceId}
+        nowPlayingTrack={
+          nowTrack
+            ? { id: nowTrack.id, name: nowTrack.name, artist: nowTrack.artist }
+            : null
+        }
         nowPlaying={isPlaying}
         busy={catalogBusy}
         onPlayPlaylistTrack={playPlaylistTrack}

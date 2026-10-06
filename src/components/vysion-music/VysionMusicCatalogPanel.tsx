@@ -15,6 +15,10 @@ import {
 } from './vysion-music-catalog-cache'
 import { perfLog, perfNow } from './vysion-music-perf'
 import { TrackNowPlayingBars } from './TrackNowPlayingBars'
+import {
+  vysionMusicTrackRowIsNowPlaying,
+  type VysionMusicNowPlayingMatch,
+} from './vysion-music-track-match'
 import styles from './vysion-music.module.css'
 
 type LibraryItem = VysionMusicLibraryItem
@@ -34,7 +38,7 @@ export function VysionMusicCatalogPanel({
   tenant,
   activeSourceId,
   playingSourceId,
-  nowTrackId,
+  nowPlayingTrack,
   nowPlaying,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
@@ -43,7 +47,7 @@ export function VysionMusicCatalogPanel({
   tenant: string
   activeSourceId: string | null
   playingSourceId: string | null
-  nowTrackId: string | null
+  nowPlayingTrack: VysionMusicNowPlayingMatch | null
   nowPlaying: boolean
   onPlayPlaylistTrack: (
     sourceId: string,
@@ -318,8 +322,7 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const isPlayingList =
-                playingSourceId === pl.id && nowTrackId != null && nowTrackId.length > 0
+              const isPlayingList = playingSourceId === pl.id && nowPlayingTrack != null
               const active =
                 selectedId === pl.id || activeSourceId === pl.id || isPlayingList
               const thumbSrc =
@@ -386,7 +389,7 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.tracksEmpty')}</li>
             ) : null}
             {tracks.map((tr, idx) => {
-              const active = nowTrackId === tr.id
+              const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
               return (
                 <li key={`${tr.id}-${idx}`}>
                   <button
@@ -433,7 +436,7 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.searchEmpty')}</li>
             ) : null}
             {searchResults.map((tr, idx) => {
-              const active = nowTrackId === tr.id
+              const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
               return (
                 <li key={`${tr.id}-s-${idx}`}>
                   <button
