@@ -189,20 +189,25 @@ export async function playManualPlaylistOnSoundZone(input: {
   trackIds: string[]
   soundtrackPlaylistId?: string | null
   startTrackId?: string | null
+  /** Alleen bij «Afspelen» / opslaan — niet bij elke rij-klik (Soundtrack sync is zwaar). */
+  syncToSoundtrack?: boolean
 }): Promise<string> {
   const ids = filterTrackIds(input.trackIds)
-  const playlistId = await syncManualPlaylistToSoundtrackLibrary({
-    zoneId: input.zoneId,
-    name: input.name,
-    trackIds: ids,
-    soundtrackPlaylistId: input.soundtrackPlaylistId ?? null,
-  })
+  let playlistId = input.soundtrackPlaylistId?.trim() || ''
+  if (input.syncToSoundtrack || !playlistId) {
+    playlistId = await syncManualPlaylistToSoundtrackLibrary({
+      zoneId: input.zoneId,
+      name: input.name,
+      trackIds: ids,
+      soundtrackPlaylistId: playlistId || null,
+    })
+  }
   await playSoundtrackPlaylistOnZone(input.zoneId, playlistId)
   const start = input.startTrackId?.trim()
   if (start) {
     const idx = ids.indexOf(start)
     if (idx > 0) {
-      await new Promise((r) => setTimeout(r, 400))
+      await new Promise((r) => setTimeout(r, 500))
       await skipSoundZoneTracks(input.zoneId, idx, true)
     }
   }

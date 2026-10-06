@@ -34,7 +34,17 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     await ensureSoundZoneCrossfadeSettings(zoneId)
-    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    let snapshot
+    try {
+      snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    } catch (snapErr) {
+      console.warn('[soundtrack] GET snapshot failed', snapErr)
+      return NextResponse.json({
+        ok: false,
+        error: snapErr instanceof Error ? snapErr.message : 'Snapshot failed',
+        code: 'soundtrack',
+      })
+    }
     return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
@@ -60,6 +70,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     trackId?: string
     trackIds?: string[]
     startTrackId?: string
+    syncToSoundtrack?: boolean
     playlistName?: string
     soundtrackPlaylistId?: string | null
     vysionPlaylistId?: string | null
@@ -71,6 +82,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       trackId?: string
       trackIds?: string[]
       startTrackId?: string
+      syncToSoundtrack?: boolean
       playlistName?: string
       soundtrackPlaylistId?: string | null
       vysionPlaylistId?: string | null
@@ -112,6 +124,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
         trackIds,
         soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
         startTrackId: body.startTrackId ?? null,
+        syncToSoundtrack: body.syncToSoundtrack === true,
       })
       const vysionPlaylistId = body.vysionPlaylistId?.trim()
       if (vysionPlaylistId && soundtrackPlaylistId) {
