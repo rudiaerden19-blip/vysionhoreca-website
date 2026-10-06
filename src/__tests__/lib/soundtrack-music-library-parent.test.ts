@@ -40,6 +40,12 @@ describe('Soundtrack addToMusicLibrary parent contract', () => {
       if (query.includes('createManualPlaylist')) {
         return { createManualPlaylist: { id: 'pl-x', name: 'X' } }
       }
+      if (query.includes('library(owner') && !query.includes('account')) {
+        return { library: { version: '1' } }
+      }
+      if (query.includes('addToLibrary')) {
+        return { addToLibrary: { version: '2' } }
+      }
       if (query.includes('addToMusicLibrary')) {
         return { addToMusicLibrary: { musicLibrary: { ids: ['pl-x'], revision: '2' } } }
       }

@@ -704,6 +704,12 @@ export async function createManualPlaylistInMusicLibrary(
   }
 
   await addPlaylistToMusicLibrary(ownerId, id)
+  /**
+   * Server-side staat de lijst in musicLibrary (zichtbaar na handmatige refresh in de speler).
+   * `addToLibrary` triggert libraryUpdate richting gekoppelde desktop player — geen aparte
+   * Public-API-mutatie voor “force refresh Lijsten”.
+   */
+  await addPlaylistToOwnerLibrary(ownerId, id)
   await assertPlaylistVisibleInSoundtrackLibraries(zid, id)
 
   const plData = await soundtrackGraphql<{
