@@ -24,7 +24,7 @@ import styles from './vysion-music.module.css'
 type LibraryItem = VysionMusicLibraryItem
 type TrackItem = VysionMusicCatalogTrack
 
-type LibraryTab = 'lists' | 'stations' | 'schedules'
+type LibraryTab = 'lists' | 'schedules'
 
 function formatMs(ms: number): string {
   if (!ms || ms < 0) return '0:00'
@@ -217,7 +217,6 @@ export function VysionMusicCatalogPanel({
 
   const filteredLists = useMemo(() => {
     if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
-    if (tab === 'stations') return items.filter((i) => i.sourceKind === 'soundtrack')
     return items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown')
   }, [items, tab])
 
@@ -312,17 +311,19 @@ export function VysionMusicCatalogPanel({
               </button>
               <button
                 type="button"
-                className={tab === 'stations' ? styles.libraryTabActive : styles.libraryTab}
-                onClick={() => setTab('stations')}
-              >
-                {t('vysionMusic.libraryTabStations')}
-              </button>
-              <button
-                type="button"
                 className={tab === 'schedules' ? styles.libraryTabActive : styles.libraryTab}
                 onClick={() => setTab('schedules')}
               >
                 {t('vysionMusic.libraryTabSchedules')}
+              </button>
+              <button
+                type="button"
+                className={styles.libraryTab}
+                onClick={() =>
+                  window.open('https://business.soundtrackyourbrand.com/', '_blank', 'noopener,noreferrer')
+                }
+              >
+                {t('vysionMusic.libraryCreatePlaylist')}
               </button>
             </div>
           </div>
