@@ -673,10 +673,14 @@ export async function soundtrackApplyPlayFromSource(
 ): Promise<void> {
   const source = sourceId.trim()
   if (!source) throw new SoundtrackApiError('source id required', 400)
-  await soundtrackGraphql(
-    `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
-    { input: { soundZone: zoneId, source } },
-  )
+  const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+  if (snap.playFromPlaylistId !== source) {
+    await soundtrackPauseZone(zoneId)
+    await soundtrackGraphql(
+      `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
+      { input: { soundZone: zoneId, source } },
+    )
+  }
   await soundtrackPlayZone(zoneId)
 }
 

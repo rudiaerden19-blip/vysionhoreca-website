@@ -43,8 +43,8 @@ export function VysionMusicCatalogPanel({
   tenant: string
   activeSourceId: string | null
   nowTrackId: string | null
-  onSelectPlaylist: (sourceId: string) => void | Promise<void>
-  onPlayPlaylistTrack: (sourceId: string, trackId: string) => void | Promise<void>
+  onSelectPlaylist: (sourceId: string) => boolean | Promise<boolean>
+  onPlayPlaylistTrack: (sourceId: string, trackId: string) => boolean | Promise<boolean>
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
   busy: boolean
 }) {
@@ -190,8 +190,12 @@ export function VysionMusicCatalogPanel({
     items.find((i) => i.id === selectedId)?.name ?? t('vysionMusic.tracksTitle')
 
   const pickPlaylist = (id: string) => {
+    const prev = selectedId
     setSelectedId(id)
-    void onSelectPlaylist(id)
+    void (async () => {
+      const ok = await onSelectPlaylist(id)
+      if (!ok) setSelectedId(activeSourceId ?? prev)
+    })()
   }
 
   return (
@@ -229,7 +233,6 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const picked = selectedId === pl.id
               const active = activeSourceId === pl.id
               const thumbSrc =
                 pl.imageUrl && pl.imageUrl.startsWith('http')
@@ -239,9 +242,7 @@ export function VysionMusicCatalogPanel({
                 <li key={pl.id}>
                   <button
                     type="button"
-                    className={
-                      picked || active ? styles.libraryRowActive : styles.libraryRow
-                    }
+                    className={active ? styles.libraryRowActive : styles.libraryRow}
                     disabled={busy}
                     onClick={() => pickPlaylist(pl.id)}
                   >

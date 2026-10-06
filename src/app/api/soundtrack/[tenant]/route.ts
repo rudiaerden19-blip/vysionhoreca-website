@@ -5,6 +5,7 @@ import {
   SoundtrackConfigError,
   emptySoundtrackPlayerSnapshot,
   fetchSoundtrackPlayerSnapshot,
+  invalidateSoundtrackZoneCacheForTenant,
   resolveSoundZoneForTenant,
   skipSoundZoneTracks,
   soundtrackGraphql,
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const input = body.input ?? {}
 
   try {
+    invalidateSoundtrackZoneCacheForTenant(tenantSlug)
     const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
 
     switch (mutation) {

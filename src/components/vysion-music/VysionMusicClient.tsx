@@ -258,30 +258,37 @@ export function VysionMusicClient({
 
   const catalogBusy = playlistSelecting || transportPending != null
 
+  const refreshSnapshotAfterControl = useCallback(() => {
+    void loadSnapshot()
+    window.setTimeout(() => void loadSnapshot(), 1500)
+  }, [loadSnapshot])
+
   const selectLibrarySource = useCallback(
-    async (sourceId: string) => {
+    async (sourceId: string): Promise<boolean> => {
       setPlaylistSelecting(true)
       try {
         const ok = await postMutation('setPlayFrom', { source: sourceId })
-        if (ok) void loadSnapshot()
+        if (ok) refreshSnapshotAfterControl()
+        return ok
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation, loadSnapshot],
+    [postMutation, refreshSnapshotAfterControl],
   )
 
   const playPlaylistTrack = useCallback(
-    async (sourceId: string, trackId: string) => {
+    async (sourceId: string, trackId: string): Promise<boolean> => {
       setPlaylistSelecting(true)
       try {
         const ok = await postMutation('playPlaylistTrack', { source: sourceId, trackId })
-        if (ok) void loadSnapshot()
+        if (ok) refreshSnapshotAfterControl()
+        return ok
       } finally {
         setPlaylistSelecting(false)
       }
     },
-    [postMutation, loadSnapshot],
+    [postMutation, refreshSnapshotAfterControl],
   )
 
   const playSearchTrack = useCallback(
