@@ -22,7 +22,7 @@ import {
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
-import { openSoundtrackWebUrl } from '@/lib/vysion-music/open-soundtrack-create'
+import { openSoundtrackCreate } from '@/lib/vysion-music/open-soundtrack-create'
 import {
   vysionMusicLibraryCoverProxyUrl,
   vysionMusicLibraryFallbackCoverSrc,
@@ -99,7 +99,6 @@ export function VysionMusicCatalogPanel({
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
-  const [createBusy, setCreateBusy] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
@@ -170,33 +169,12 @@ export function VysionMusicCatalogPanel({
     [tenant, t],
   )
 
-  const runSoundtrackCreate = useCallback(async () => {
-    setCreateBusy(true)
+  const runSoundtrackCreate = useCallback(() => {
     setCreateError(null)
-    try {
-      const res = await fetch(
-        `/api/soundtrack/${encodeURIComponent(tenant)}/soundtrack-web-url`,
-        { headers: getAuthHeaders(), cache: 'no-store' },
-      )
-      const json = (await res.json()) as {
-        playerWebUrl?: string | null
-        createWebUrl?: string | null
-        error?: string
-      }
-      if (!res.ok) {
-        setCreateError(json.error || t('vysionMusic.createPlaylistError'))
-        return
-      }
-      const target = json.createWebUrl?.trim() || json.playerWebUrl?.trim()
-      if (!target || !openSoundtrackWebUrl(target)) {
-        setCreateError(t('vysionMusic.createPlaylistError'))
-      }
-    } catch {
-      setCreateError(t('vysionMusic.errorNetwork'))
-    } finally {
-      setCreateBusy(false)
+    if (!openSoundtrackCreate()) {
+      setCreateError(t('vysionMusic.createPlaylistError'))
     }
-  }, [tenant, t])
+  }, [t])
 
   useEffect(() => {
     const cached = getCachedPlaylists(tenant)
@@ -468,10 +446,9 @@ export function VysionMusicCatalogPanel({
               <button
                 type="button"
                 className={styles.libraryTab}
-                disabled={createBusy}
-                onClick={() => void runSoundtrackCreate()}
+                onClick={() => runSoundtrackCreate()}
               >
-                {createBusy ? t('vysionMusic.createPlaylistSaving') : t('vysionMusic.libraryCreatePlaylist')}
+                {t('vysionMusic.libraryCreatePlaylist')}
               </button>
             </div>
           </div>
