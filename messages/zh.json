@@ -6917,6 +6917,15 @@
     "librarySourceSchedule": "日程",
     "libraryEmpty": "此标签下暂无列表。",
     "libraryLoading": "正在加载列表…",
-    "libraryLoadError": "无法加载 Soundtrack 列表。"
+    "libraryLoadError": "无法加载 Soundtrack 列表。",
+    "searchTitle": "搜索音乐",
+    "searchPlaceholder": "歌曲或艺人…",
+    "searchLoading": "搜索中…",
+    "searchEmpty": "无结果。",
+    "tracksTitle": "曲目",
+    "tracksLoading": "加载中…",
+    "tracksEmpty": "此列表无曲目。",
+    "tracksPickList": "请在左侧选择播放列表。",
+    "tracksLoadError": "无法加载曲目。"
   }
 }

@@ -6917,6 +6917,15 @@
     "librarySourceSchedule": "جدول",
     "libraryEmpty": "لا توجد قوائم في هذا التبويب.",
     "libraryLoading": "جارٍ تحميل القوائم…",
-    "libraryLoadError": "تعذّر تحميل قوائم Soundtrack."
+    "libraryLoadError": "تعذّر تحميل قوائم Soundtrack.",
+    "searchTitle": "بحث موسيقى",
+    "searchPlaceholder": "عنوان أو فنان…",
+    "searchLoading": "جارٍ البحث…",
+    "searchEmpty": "لا نتائج.",
+    "tracksTitle": "المقطعات",
+    "tracksLoading": "جارٍ التحميل…",
+    "tracksEmpty": "لا مقاطع.",
+    "tracksPickList": "اختر قائمة على اليسار.",
+    "tracksLoadError": "تعذّر تحميل المقطعات."
   }
 }

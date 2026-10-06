@@ -6876,6 +6876,15 @@
     "librarySourceSchedule": "Schema",
     "libraryEmpty": "Geen lijsten in deze tab.",
     "libraryLoading": "Lijsten laden…",
-    "libraryLoadError": "Kon Soundtrack-lijsten niet laden."
+    "libraryLoadError": "Kon Soundtrack-lijsten niet laden.",
+    "searchTitle": "Zoek muziek",
+    "searchPlaceholder": "Zoek titel of artiest…",
+    "searchLoading": "Zoeken…",
+    "searchEmpty": "Geen resultaten.",
+    "tracksTitle": "Nummers",
+    "tracksLoading": "Nummers laden…",
+    "tracksEmpty": "Geen nummers in deze lijst.",
+    "tracksPickList": "Kies links een afspeellijst.",
+    "tracksLoadError": "Kon nummers niet laden."
   }
 }

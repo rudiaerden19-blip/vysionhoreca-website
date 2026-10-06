@@ -10,7 +10,10 @@ import {
   soundtrackGraphql,
   soundtrackPauseZone,
   soundtrackApplyPlayFromSource,
+  soundtrackJumpToPlaylistTrack,
   soundtrackPlayZone,
+  soundtrackQueueAndPlayTrack,
+  soundtrackSearchTracks,
   soundtrackSkipTrack,
   soundtrackUiPercentToApiVolume,
 } from '@/lib/soundtrack/soundtrack-server'
@@ -23,6 +26,8 @@ const SOUNDTRACK_MUTATIONS = [
   'play',
   'pause',
   'setPlayFrom',
+  'playPlaylistTrack',
+  'playSearchTrack',
   'skipTrack',
   'skipTracks',
   'setVolume',
@@ -37,6 +42,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
+    const q = request.nextUrl.searchParams.get('q')?.trim()
+    if (q) {
+      const tracks = await soundtrackSearchTracks(q)
+      return NextResponse.json({ ok: true, search: { query: q, tracks } })
+    }
+
     const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, snapshot })
@@ -99,6 +110,23 @@ export async function POST(request: NextRequest, context: RouteContext) {
           return NextResponse.json({ error: 'input.source required' }, { status: 400 })
         }
         await soundtrackApplyPlayFromSource(zoneId, source)
+        break
+      }
+      case 'playPlaylistTrack': {
+        const source = String(input.source ?? '').trim()
+        const trackId = String(input.trackId ?? '').trim()
+        if (!source || !trackId) {
+          return NextResponse.json({ error: 'input.source and trackId required' }, { status: 400 })
+        }
+        await soundtrackJumpToPlaylistTrack(zoneId, source, trackId)
+        break
+      }
+      case 'playSearchTrack': {
+        const trackId = String(input.trackId ?? '').trim()
+        if (!trackId) {
+          return NextResponse.json({ error: 'input.trackId required' }, { status: 400 })
+        }
+        await soundtrackQueueAndPlayTrack(zoneId, trackId)
         break
       }
       case 'skipTrack':

@@ -6940,6 +6940,15 @@
     "librarySourceSchedule": "Planning",
     "libraryEmpty": "Aucune liste dans cet onglet.",
     "libraryLoading": "Chargement des listes…",
-    "libraryLoadError": "Impossible de charger les listes Soundtrack."
+    "libraryLoadError": "Impossible de charger les listes Soundtrack.",
+    "searchTitle": "Rechercher",
+    "searchPlaceholder": "Titre ou artiste…",
+    "searchLoading": "Recherche…",
+    "searchEmpty": "Aucun résultat.",
+    "tracksTitle": "Morceaux",
+    "tracksLoading": "Chargement…",
+    "tracksEmpty": "Aucun morceau.",
+    "tracksPickList": "Choisissez une playlist à gauche.",
+    "tracksLoadError": "Impossible de charger les morceaux."
   }
 }

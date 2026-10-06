@@ -16,7 +16,7 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
-import { VysionMusicLibraryPanel } from './VysionMusicLibraryPanel'
+import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -256,11 +256,37 @@ export function VysionMusicClient({
 
   const playFromId = snapshot?.playFromPlaylistId?.trim() || null
 
+  const catalogBusy = playlistSelecting || transportPending != null
+
   const selectLibrarySource = useCallback(
     async (sourceId: string) => {
       setPlaylistSelecting(true)
       try {
         await postMutation('setPlayFrom', { source: sourceId })
+      } finally {
+        setPlaylistSelecting(false)
+      }
+    },
+    [postMutation],
+  )
+
+  const playPlaylistTrack = useCallback(
+    async (sourceId: string, trackId: string) => {
+      setPlaylistSelecting(true)
+      try {
+        await postMutation('playPlaylistTrack', { source: sourceId, trackId })
+      } finally {
+        setPlaylistSelecting(false)
+      }
+    },
+    [postMutation],
+  )
+
+  const playSearchTrack = useCallback(
+    async (trackId: string) => {
+      setPlaylistSelecting(true)
+      try {
+        await postMutation('playSearchTrack', { trackId })
       } finally {
         setPlaylistSelecting(false)
       }
@@ -426,11 +452,14 @@ export function VysionMusicClient({
         </div>
       </section>
 
-      <VysionMusicLibraryPanel
+      <VysionMusicCatalogPanel
         tenant={tenant}
         activeSourceId={playFromId}
-        selecting={playlistSelecting || transportPending != null}
-        onSelect={(id) => void selectLibrarySource(id)}
+        nowTrackId={nowTrack?.id ?? null}
+        busy={catalogBusy}
+        onSelectPlaylist={selectLibrarySource}
+        onPlayPlaylistTrack={playPlaylistTrack}
+        onPlaySearchTrack={playSearchTrack}
       />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>

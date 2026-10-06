@@ -1,0 +1,37 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
+import {
+  SoundtrackApiError,
+  SoundtrackConfigError,
+  fetchPlaySourceTrackRows,
+} from '@/lib/soundtrack/soundtrack-server'
+
+export const dynamic = 'force-dynamic'
+
+type RouteContext = { params: { tenant: string } }
+
+export async function GET(request: NextRequest, context: RouteContext) {
+  const tenantSlug = context.params.tenant
+  const access = await authorizeSoundtrackTenantRequest(request, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+  }
+
+  const source = new URL(request.url).searchParams.get('source')?.trim()
+  if (!source) {
+    return NextResponse.json({ error: 'source vereist' }, { status: 400 })
+  }
+
+  try {
+    const tracks = await fetchPlaySourceTrackRows(source)
+    return NextResponse.json({ ok: true, tracks })
+  } catch (e) {
+    if (e instanceof SoundtrackConfigError) {
+      return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
+    }
+    if (e instanceof SoundtrackApiError) {
+      return NextResponse.json({ error: e.message, code: 'soundtrack' }, { status: e.status })
+    }
+    return NextResponse.json({ error: 'Soundtrack request failed' }, { status: 500 })
+  }
+}

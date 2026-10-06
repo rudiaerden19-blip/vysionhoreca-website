@@ -6876,6 +6876,15 @@
     "librarySourceSchedule": "Schedule",
     "libraryEmpty": "No lists in this tab.",
     "libraryLoading": "Loading lists…",
-    "libraryLoadError": "Could not load Soundtrack lists."
+    "libraryLoadError": "Could not load Soundtrack lists.",
+    "searchTitle": "Search music",
+    "searchPlaceholder": "Search title or artist…",
+    "searchLoading": "Searching…",
+    "searchEmpty": "No results.",
+    "tracksTitle": "Tracks",
+    "tracksLoading": "Loading tracks…",
+    "tracksEmpty": "No tracks in this list.",
+    "tracksPickList": "Pick a playlist on the left.",
+    "tracksLoadError": "Could not load tracks."
   }
 }

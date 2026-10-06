@@ -642,3 +642,197 @@ export async function soundtrackApplyPlayFromSource(
   )
   await soundtrackPlayZone(zoneId)
 }
+
+function dedupeTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
+  const seen = new Set<string>()
+  const out: SoundtrackTrackRow[] = []
+  for (const row of rows) {
+    if (seen.has(row.id)) continue
+    seen.add(row.id)
+    out.push(row)
+  }
+  return out
+}
+
+export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
+  const id = playlistId.trim()
+  const data = await soundtrackGraphql<{
+    playlist: {
+      tracks: { edges: { node: SoundtrackTrackGraphNode }[] }
+    } | null
+  }>(
+    `query($id: ID!) {
+      playlist(id: $id) {
+        tracks(first: 500) {
+          edges { node { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} } }
+        }
+      }
+    }`,
+    { id },
+  )
+  const rows: SoundtrackTrackRow[] = []
+  for (const edge of data.playlist?.tracks?.edges ?? []) {
+    const row = mapSoundtrackTrackRow(edge.node)
+    if (row) rows.push(row)
+  }
+  return rows
+}
+
+/** Tracks voor manual playlist of Soundtrack-station in de bibliotheek. */
+export async function fetchPlaySourceTrackRows(sourceId: string): Promise<SoundtrackTrackRow[]> {
+  const id = sourceId.trim()
+  const fromPlaylist = await fetchPlaylistTrackRows(id).catch(() => [] as SoundtrackTrackRow[])
+  if (fromPlaylist.length > 0) return fromPlaylist
+
+  const data = await soundtrackGraphql<{
+    soundtrack: {
+      tracks: { edges: { node: SoundtrackTrackGraphNode }[] }
+    } | null
+  }>(
+    `query($id: ID!) {
+      soundtrack(id: $id) {
+        tracks(first: 500) {
+          edges { node { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} } }
+        }
+      }
+    }`,
+    { id },
+  )
+  const rows: SoundtrackTrackRow[] = []
+  for (const edge of data.soundtrack?.tracks?.edges ?? []) {
+    const row = mapSoundtrackTrackRow(edge.node)
+    if (row) rows.push(row)
+  }
+  return rows
+}
+
+export async function soundtrackSearchTracks(
+  query: string,
+  opts?: { maxResults?: number },
+): Promise<SoundtrackTrackRow[]> {
+  const q = query.trim()
+  if (!q) return []
+  const maxResults = Math.min(Math.max(opts?.maxResults ?? 80, 1), SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS)
+  const pageSize = SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE
+  const data = await soundtrackGraphql<{
+    search: {
+      edges: { node: SoundtrackTrackGraphNode & { __typename?: string } }[]
+    }
+  }>(
+    `query($q: String!, $first: Int!) {
+      search(query: $q, type: track, first: $first) {
+        edges {
+          node {
+            __typename
+            ... on Track { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} }
+          }
+        }
+      }
+    }`,
+    { q, first: pageSize },
+  )
+  const rows: SoundtrackTrackRow[] = []
+  for (const edge of data.search?.edges ?? []) {
+    if (edge.node.__typename !== 'Track') continue
+    const row = mapSoundtrackTrackRow(edge.node)
+    if (row) rows.push(row)
+  }
+  return dedupeTrackRows(rows).slice(0, maxResults)
+}
+
+async function soundtrackSetPlaybackOrderLinear(zoneId: string): Promise<void> {
+  try {
+    await soundtrackGraphql(
+      `mutation($input: SoundZoneSetPlaybackOrderInput!) {
+        soundZoneSetPlaybackOrder(input: $input) { __typename }
+      }`,
+      { input: { soundZone: zoneId, playbackOrder: 'LINEAR' } },
+    )
+  } catch {
+    /* optioneel */
+  }
+}
+
+async function waitForNowPlayingTrackId(
+  zoneId: string,
+  trackId: string,
+  maxMs = 8000,
+): Promise<void> {
+  const want = trackId.trim()
+  if (!want) return
+  const deadline = Date.now() + maxMs
+  while (Date.now() < deadline) {
+    const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+    if (snap.nowPlaying.track?.id === want) return
+    await sleep(350)
+  }
+}
+
+export async function soundtrackJumpToPlaylistTrack(
+  zoneId: string,
+  playlistId: string,
+  trackId: string,
+): Promise<void> {
+  const source = playlistId.trim()
+  const wantId = trackId.trim()
+  if (!source || !wantId) throw new SoundtrackApiError('source and trackId required')
+
+  const rows = await fetchPlaySourceTrackRows(source)
+  const ids = rows.map((r) => r.id)
+  const targetIndex = ids.indexOf(wantId)
+  if (targetIndex < 0) throw new SoundtrackApiError('Track not in this list')
+
+  const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+  const samePlayFrom = snap.playFromPlaylistId === source
+  const nowId = snap.nowPlaying.track?.id ?? null
+  const currentIndex = nowId ? ids.indexOf(nowId) : -1
+
+  if (samePlayFrom && currentIndex >= 0) {
+    if (targetIndex === currentIndex) {
+      await soundtrackPlayZone(zoneId)
+      return
+    }
+    if (targetIndex > currentIndex) {
+      await skipSoundZoneTracks(zoneId, targetIndex - currentIndex, true)
+      return
+    }
+  }
+
+  await soundtrackPauseZone(zoneId)
+  await soundtrackGraphql(
+    `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
+    { input: { soundZone: zoneId, source } },
+  )
+  await soundtrackSetPlaybackOrderLinear(zoneId)
+  await soundtrackPlayZone(zoneId)
+
+  const firstId = ids[0]
+  if (firstId) await waitForNowPlayingTrackId(zoneId, firstId)
+
+  if (targetIndex > 0) {
+    await skipSoundZoneTracks(zoneId, targetIndex, true)
+    await waitForNowPlayingTrackId(zoneId, wantId, 10000)
+  }
+}
+
+export async function soundtrackQueueAndPlayTrack(
+  zoneId: string,
+  trackId: string,
+): Promise<void> {
+  const id = trackId.trim()
+  if (!id) throw new SoundtrackApiError('trackId required')
+  await soundtrackGraphql(
+    `mutation($input: SoundZoneQueueTracksInput!) {
+      soundZoneQueueTracks(input: $input) { __typename }
+    }`,
+    {
+      input: {
+        soundZone: zoneId,
+        tracks: [id],
+        immediate: true,
+        clearQueuedTracks: true,
+      },
+    },
+  )
+  await soundtrackPlayZone(zoneId)
+}

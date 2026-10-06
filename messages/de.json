@@ -6940,6 +6940,15 @@
     "librarySourceSchedule": "Zeitplan",
     "libraryEmpty": "Keine Listen in diesem Tab.",
     "libraryLoading": "Listen werden geladen…",
-    "libraryLoadError": "Soundtrack-Listen konnten nicht geladen werden."
+    "libraryLoadError": "Soundtrack-Listen konnten nicht geladen werden.",
+    "searchTitle": "Musik suchen",
+    "searchPlaceholder": "Titel oder Künstler…",
+    "searchLoading": "Suche…",
+    "searchEmpty": "Keine Ergebnisse.",
+    "tracksTitle": "Titel",
+    "tracksLoading": "Titel werden geladen…",
+    "tracksEmpty": "Keine Titel in dieser Liste.",
+    "tracksPickList": "Links eine Playlist wählen.",
+    "tracksLoadError": "Titel konnten nicht geladen werden."
   }
 }

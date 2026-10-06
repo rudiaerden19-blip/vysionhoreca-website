@@ -6917,6 +6917,15 @@
     "librarySourceSchedule": "Programmazione",
     "libraryEmpty": "Nessuna lista in questa scheda.",
     "libraryLoading": "Caricamento liste…",
-    "libraryLoadError": "Impossibile caricare le liste Soundtrack."
+    "libraryLoadError": "Impossibile caricare le liste Soundtrack.",
+    "searchTitle": "Cerca musica",
+    "searchPlaceholder": "Titolo o artista…",
+    "searchLoading": "Ricerca…",
+    "searchEmpty": "Nessun risultato.",
+    "tracksTitle": "Brani",
+    "tracksLoading": "Caricamento…",
+    "tracksEmpty": "Nessun brano.",
+    "tracksPickList": "Scegli una playlist a sinistra.",
+    "tracksLoadError": "Impossibile caricare i brani."
   }
 }
