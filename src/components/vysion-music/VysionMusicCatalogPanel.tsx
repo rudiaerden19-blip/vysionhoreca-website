@@ -102,6 +102,8 @@ export function VysionMusicCatalogPanel({
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
   const [libraryMenuPlaylistId, setLibraryMenuPlaylistId] = useState<string | null>(null)
+  const [playlistTrackMenuIndex, setPlaylistTrackMenuIndex] = useState<number | null>(null)
+  const [playlistTrackActionBusy, setPlaylistTrackActionBusy] = useState(false)
   const [renamePlaylist, setRenamePlaylist] = useState<{ id: string; name: string } | null>(null)
   const [deletePlaylist, setDeletePlaylist] = useState<{ id: string; name: string } | null>(null)
 
@@ -260,6 +262,46 @@ export function VysionMusicCatalogPanel({
     [items],
   )
 
+  const selectedList = useMemo(
+    () => items.find((i) => i.id === selectedId) ?? null,
+    [items, selectedId],
+  )
+
+  const showPlaylistTrackMenu =
+    selectedList != null && isManualLibraryPlaylist(selectedList.sourceKind)
+
+  const removePlaylistTrack = useCallback(
+    async (trackIndex: number) => {
+      if (!selectedId) return
+      setPlaylistTrackMenuIndex(null)
+      setPlaylistTrackActionBusy(true)
+      try {
+        const res = await fetch(
+          `/api/soundtrack/${encodeURIComponent(tenant)}/playlist-tracks`,
+          {
+            method: 'DELETE',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: selectedId, trackIndex }),
+          },
+        )
+        const json = (await res.json()) as { tracks?: TrackItem[]; error?: string }
+        if (!res.ok) {
+          setTracksError(json.error || t('vysionMusic.playlistTrackRemoveError'))
+          return
+        }
+        const next = json.tracks ?? []
+        setTracks(next)
+        setCachedPlaylistTracks(tenant, selectedId, next)
+        setTracksError(null)
+      } catch {
+        setTracksError(t('vysionMusic.errorNetwork'))
+      } finally {
+        setPlaylistTrackActionBusy(false)
+      }
+    },
+    [selectedId, tenant, t],
+  )
+
   useEffect(() => {
     if (!searchMenuTrackId) return
     const close = () => setSearchMenuTrackId(null)
@@ -271,6 +313,18 @@ export function VysionMusicCatalogPanel({
       document.removeEventListener('click', close)
     }
   }, [searchMenuTrackId])
+
+  useEffect(() => {
+    if (playlistTrackMenuIndex == null) return
+    const close = () => setPlaylistTrackMenuIndex(null)
+    const id = window.setTimeout(() => {
+      document.addEventListener('click', close)
+    }, 0)
+    return () => {
+      window.clearTimeout(id)
+      document.removeEventListener('click', close)
+    }
+  }, [playlistTrackMenuIndex])
 
   useEffect(() => {
     if (!libraryMenuPlaylistId) return
@@ -552,39 +606,88 @@ export function VysionMusicCatalogPanel({
                 active && nowPlayingDurationMs > 0
                   ? Math.min(100, (nowPlayingProgressMs / nowPlayingDurationMs) * 100)
                   : 0
-              return (
-                <li key={`${tr.id}-${idx}`}>
-                  <button
-                    type="button"
-                    className={
-                      active
-                        ? `${styles.trackRowActive} ${styles.trackRowNowPlaying}`
-                        : styles.trackRow
-                    }
-                    disabled={busy || !selectedId}
-                    onClick={() => void onPlayPlaylistTrack(selectedId!, tr.id, idx, tracks)}
-                  >
-                    <span className={styles.trackRowHeader}>
-                      {active ? (
-                        <TrackNowPlayingBars playing={nowPlaying} />
-                      ) : (
-                        <span className={styles.trackRowNum}>{idx + 1}</span>
-                      )}
-                      <span className={styles.trackRowMain}>
-                        <span className={styles.trackRowTitle}>{tr.name}</span>
-                        <span className={styles.trackRowArtist}>{tr.artist}</span>
-                      </span>
-                      <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
-                    </span>
+              const trackMenuOpen = playlistTrackMenuIndex === idx
+              const rowDisabled = busy || playlistTrackActionBusy || !selectedId
+              const playBtn = (
+                <button
+                  type="button"
+                  className={
+                    active
+                      ? `${styles.trackRowActive} ${styles.trackRowNowPlaying}${showPlaylistTrackMenu ? ` ${styles.searchTrackPlay}` : ''}`
+                      : `${styles.trackRow}${showPlaylistTrackMenu ? ` ${styles.searchTrackPlay}` : ''}`
+                  }
+                  disabled={rowDisabled}
+                  onClick={() => void onPlayPlaylistTrack(selectedId!, tr.id, idx, tracks)}
+                >
+                  <span className={styles.trackRowHeader}>
                     {active ? (
-                      <span className={styles.trackRowProgressTrack} aria-hidden>
-                        <span
-                          className={styles.trackRowProgressFill}
-                          style={{ width: `${rowProgressPct}%` }}
-                        />
-                      </span>
+                      <TrackNowPlayingBars playing={nowPlaying} />
+                    ) : (
+                      <span className={styles.trackRowNum}>{idx + 1}</span>
+                    )}
+                    <span className={styles.trackRowMain}>
+                      <span className={styles.trackRowTitle}>{tr.name}</span>
+                      <span className={styles.trackRowArtist}>{tr.artist}</span>
+                    </span>
+                    {!showPlaylistTrackMenu ? (
+                      <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
                     ) : null}
-                  </button>
+                  </span>
+                  {active ? (
+                    <span className={styles.trackRowProgressTrack} aria-hidden>
+                      <span
+                        className={styles.trackRowProgressFill}
+                        style={{ width: `${rowProgressPct}%` }}
+                      />
+                    </span>
+                  ) : null}
+                </button>
+              )
+              return (
+                <li
+                  key={`${tr.id}-${idx}`}
+                  className={showPlaylistTrackMenu ? styles.searchTrackItem : undefined}
+                >
+                  {showPlaylistTrackMenu ? (
+                    <div className={styles.searchTrackRow}>
+                      {playBtn}
+                      <span className={styles.searchTrackDur}>{formatMs(tr.durationMs)}</span>
+                      <div className={styles.searchTrackMenuWrap}>
+                        <button
+                          type="button"
+                          className={styles.searchTrackMenuBtn}
+                          disabled={rowDisabled}
+                          aria-label={t('vysionMusic.playlistTrackMenuAria')}
+                          aria-expanded={trackMenuOpen}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setPlaylistTrackMenuIndex((prev) => (prev === idx ? null : idx))
+                          }}
+                        >
+                          ⋮
+                        </button>
+                        {trackMenuOpen ? (
+                          <div
+                            className={styles.searchTrackMenu}
+                            role="menu"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className={styles.searchTrackMenuItem}
+                              disabled={rowDisabled}
+                              onClick={() => void removePlaylistTrack(idx)}
+                            >
+                              {t('vysionMusic.playlistDelete')}
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : (
+                    playBtn
+                  )}
                 </li>
               )
             })}

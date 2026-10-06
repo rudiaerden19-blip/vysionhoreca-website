@@ -6957,6 +6957,8 @@
     "tracksLoading": "Cargando…",
     "tracksEmpty": "Sin canciones.",
     "tracksPickList": "Elige una lista a la izquierda.",
-    "tracksLoadError": "No se pudieron cargar las canciones."
+    "tracksLoadError": "No se pudieron cargar las canciones.",
+    "playlistTrackMenuAria": "Acciones para esta canción en la playlist",
+    "playlistTrackRemoveError": "No se pudo quitar la canción de la playlist."
   }
 }

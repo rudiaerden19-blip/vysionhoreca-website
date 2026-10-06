@@ -6980,6 +6980,8 @@
     "tracksLoading": "Chargement…",
     "tracksEmpty": "Aucun morceau.",
     "tracksPickList": "Choisissez une playlist à gauche.",
-    "tracksLoadError": "Impossible de charger les morceaux."
+    "tracksLoadError": "Impossible de charger les morceaux.",
+    "playlistTrackMenuAria": "Actions pour ce titre dans la playlist",
+    "playlistTrackRemoveError": "Impossible de retirer le titre de la playlist."
   }
 }

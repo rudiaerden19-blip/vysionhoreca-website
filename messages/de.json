@@ -6980,6 +6980,8 @@
     "tracksLoading": "Titel werden geladen…",
     "tracksEmpty": "Keine Titel in dieser Liste.",
     "tracksPickList": "Links eine Playlist wählen.",
-    "tracksLoadError": "Titel konnten nicht geladen werden."
+    "tracksLoadError": "Titel konnten nicht geladen werden.",
+    "playlistTrackMenuAria": "Aktionen für diesen Titel in der Playlist",
+    "playlistTrackRemoveError": "Titel konnte nicht aus der Playlist entfernt werden."
   }
 }

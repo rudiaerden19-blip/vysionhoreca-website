@@ -494,6 +494,47 @@ export async function removePlaylistFromMusicLibrary(
   )
 }
 
+export async function removeTrackFromManualPlaylist(
+  playlistId: string,
+  trackIndex: number,
+): Promise<void> {
+  const pid = playlistId.trim()
+  if (!pid) throw new SoundtrackApiError('playlist id required', 400)
+  if (!Number.isInteger(trackIndex) || trackIndex < 0) {
+    throw new SoundtrackApiError('track index required', 400)
+  }
+
+  const meta = await soundtrackGraphql<{
+    playlist: { snapshot: string | null; tracks: { total: number } } | null
+  }>(PLAYLIST_SPLICE_META_QUERY, { id: pid })
+
+  if (!meta.playlist) {
+    throw new SoundtrackApiError('Playlist not found', 404)
+  }
+
+  const total = meta.playlist.tracks?.total ?? 0
+  if (trackIndex >= total) {
+    throw new SoundtrackApiError('Track not found in playlist', 404)
+  }
+
+  const snapshot = meta.playlist.snapshot?.trim()
+
+  await soundtrackGraphql(
+    `mutation($input: SplicePlaylistInput!) {
+      spliceManualPlaylist(input: $input) { id }
+    }`,
+    {
+      input: {
+        id: pid,
+        start: trackIndex,
+        length: 1,
+        trackIds: [],
+        ...(snapshot ? { snapshot } : {}),
+      },
+    },
+  )
+}
+
 export async function addTrackToManualPlaylist(
   playlistId: string,
   trackId: string,

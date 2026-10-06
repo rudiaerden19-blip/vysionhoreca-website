@@ -6957,6 +6957,8 @@
     "tracksLoading": "Caricamento…",
     "tracksEmpty": "Nessun brano.",
     "tracksPickList": "Scegli una playlist a sinistra.",
-    "tracksLoadError": "Impossibile caricare i brani."
+    "tracksLoadError": "Impossibile caricare i brani.",
+    "playlistTrackMenuAria": "Azioni per questo brano nella playlist",
+    "playlistTrackRemoveError": "Impossibile rimuovere il brano dalla playlist."
   }
 }

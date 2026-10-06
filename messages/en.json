@@ -6916,6 +6916,8 @@
     "tracksLoading": "Loading tracks…",
     "tracksEmpty": "No tracks in this list.",
     "tracksPickList": "Pick a playlist on the left.",
-    "tracksLoadError": "Could not load tracks."
+    "tracksLoadError": "Could not load tracks.",
+    "playlistTrackMenuAria": "Actions for this track in the playlist",
+    "playlistTrackRemoveError": "Could not remove track from playlist."
   }
 }

@@ -6916,6 +6916,8 @@
     "tracksLoading": "Nummers laden…",
     "tracksEmpty": "Geen nummers in deze lijst.",
     "tracksPickList": "Kies links een afspeellijst.",
-    "tracksLoadError": "Kon nummers niet laden."
+    "tracksLoadError": "Kon nummers niet laden.",
+    "playlistTrackMenuAria": "Acties voor dit nummer in de afspeellijst",
+    "playlistTrackRemoveError": "Kon nummer niet uit afspeellijst verwijderen."
   }
 }

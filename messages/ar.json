@@ -6957,6 +6957,8 @@
     "tracksLoading": "جارٍ التحميل…",
     "tracksEmpty": "لا مقاطع.",
     "tracksPickList": "اختر قائمة على اليسار.",
-    "tracksLoadError": "تعذّر تحميل المقطعات."
+    "tracksLoadError": "تعذّر تحميل المقطعات.",
+    "playlistTrackMenuAria": "إجراءات هذا المقطع في قائمة التشغيل",
+    "playlistTrackRemoveError": "تعذّر إزالة المقطع من قائمة التشغيل."
   }
 }

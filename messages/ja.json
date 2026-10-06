@@ -6957,6 +6957,8 @@
     "tracksLoading": "読み込み中…",
     "tracksEmpty": "曲がありません。",
     "tracksPickList": "左でプレイリストを選んでください。",
-    "tracksLoadError": "曲を読み込めませんでした。"
+    "tracksLoadError": "曲を読み込めませんでした。",
+    "playlistTrackMenuAria": "プレイリスト内のこの曲の操作",
+    "playlistTrackRemoveError": "プレイリストから曲を削除できませんでした。"
   }
 }
