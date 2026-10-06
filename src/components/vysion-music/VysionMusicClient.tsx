@@ -899,13 +899,6 @@ export function VysionMusicClient({
     ],
   )
 
-  const playSavedPlaylistFromRow = useCallback(
-    (row: TrackRow, rows: TrackRow[]) => {
-      void playPlaylistTracks(rows, undefined, row.id)
-    },
-    [playPlaylistTracks],
-  )
-
   const handleLeftPanelDrop = useCallback(
     (e: DragEvent) => {
       e.preventDefault()
@@ -974,13 +967,6 @@ export function VysionMusicClient({
     savedPlaylistId != null &&
     savedPlaylistTracks.length > 0
 
-  const savedPlaylistMatchesSoundtrackQueue = Boolean(
-    showingSavedPlaylist &&
-      savedSoundtrackPlaylistId &&
-      snapshot?.playFromPlaylistId === savedSoundtrackPlaylistId &&
-      soundtrackQueueRows.length > 0,
-  )
-
   const leftPanelTitle =
     leftPanelMode === 'edit'
       ? t('vysionMusic.playlistEditTitle')
@@ -988,33 +974,43 @@ export function VysionMusicClient({
         ? savedPlaylistName || t('vysionMusic.playlistTitle')
         : t('vysionMusic.playlistTitle')
 
+  /** Lijst in paneel = Soundtrack `playFrom` playlist als die er is, anders opgeslagen draft. */
   const leftPanelRows =
     leftPanelMode === 'edit'
       ? draftTracks
       : showingSavedPlaylist
-        ? savedPlaylistMatchesSoundtrackQueue
+        ? soundtrackQueueRows.length > 0
           ? soundtrackQueueRows
           : savedPlaylistTracks
         : soundtrackQueueRows
 
-  const transportPlaylistRows =
-    soundtrackQueueRows.length > 0 ? soundtrackQueueRows : leftPanelRows
+  const transportPlaylistRows = soundtrackQueueRows.length > 0 ? soundtrackQueueRows : leftPanelRows
 
-  const playLiveQueueRow = useCallback(
+  const playQueueRow = useCallback(
     (row: TrackRow) => {
-      const playFromId = snapshot?.playFromPlaylistId
-      if (playFromId && soundtrackQueueRows.length > 0) {
+      if (showingSavedPlaylist && savedPlaylistTracks.length > 0) {
+        void playPlaylistTracks(savedPlaylistTracks, undefined, row.id)
+        return
+      }
+      if (snapshot?.playFromPlaylistId && soundtrackQueueRows.length > 0) {
         void playPlaylistTracks(
           soundtrackQueueRows,
           undefined,
           row.id,
-          playFromId,
+          snapshot.playFromPlaylistId,
         )
         return
       }
       void playTrackRow(row)
     },
-    [playPlaylistTracks, playTrackRow, snapshot?.playFromPlaylistId, soundtrackQueueRows],
+    [
+      playPlaylistTracks,
+      playTrackRow,
+      savedPlaylistTracks,
+      showingSavedPlaylist,
+      snapshot?.playFromPlaylistId,
+      soundtrackQueueRows,
+    ],
   )
 
   const resultsTitle = searchQuery.trim()
@@ -1315,7 +1311,7 @@ export function VysionMusicClient({
                 switchingTrack={switchingTrack}
                 nowTrackId={nowTrack?.id}
                 nowTrackName={nowTrack?.name}
-                onPlayRow={(row) => playSavedPlaylistFromRow(row, savedPlaylistTracks)}
+                onPlayRow={(row) => playQueueRow(row)}
               />
             ) : null}
             {!savedPlaylistLoading && leftPanelMode !== 'edit' && !showingSavedPlaylist
@@ -1330,7 +1326,7 @@ export function VysionMusicClient({
                         disabled={
                           switchingTrack || !row.id || row.id.startsWith('placeholder')
                         }
-                        onClick={() => void playLiveQueueRow(row)}
+                        onClick={() => void playQueueRow(row)}
                       >
                         <span className={styles.rowNum}>{idx + 1}</span>
                         <span className={styles.rowPlay} aria-hidden>

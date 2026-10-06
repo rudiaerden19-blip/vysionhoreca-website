@@ -1,4 +1,8 @@
-import { SoundtrackApiError, soundtrackGraphql } from '@/lib/soundtrack/soundtrack-server'
+import {
+  SoundtrackApiError,
+  skipSoundZoneTracks,
+  soundtrackGraphql,
+} from '@/lib/soundtrack/soundtrack-server'
 
 export type SoundtrackAccountContext = {
   accountId: string
@@ -175,16 +179,10 @@ export async function syncManualPlaylistToSoundtrackLibrary(input: {
   }
 }
 
-export function orderTrackIdsFromStart(trackIds: string[], startTrackId?: string | null): string[] {
-  const ids = filterTrackIds(trackIds)
-  const start = startTrackId?.trim()
-  if (!start) return ids
-  const idx = ids.indexOf(start)
-  if (idx <= 0) return ids
-  return [...ids.slice(idx), ...ids.slice(0, idx)]
-}
-
-/** Sync manual playlist + setPlayFrom + play (zelfde pad als Soundtrack-speler). */
+/**
+ * Soundtrack-speler: sync playlist → setPlayFrom → play.
+ * Start op gekozen track: skipTracks(index) (geen playlist herschikken in Soundtrack).
+ */
 export async function playManualPlaylistOnSoundZone(input: {
   zoneId: string
   name: string
@@ -192,14 +190,22 @@ export async function playManualPlaylistOnSoundZone(input: {
   soundtrackPlaylistId?: string | null
   startTrackId?: string | null
 }): Promise<string> {
-  const ordered = orderTrackIdsFromStart(input.trackIds, input.startTrackId)
+  const ids = filterTrackIds(input.trackIds)
   const playlistId = await syncManualPlaylistToSoundtrackLibrary({
     zoneId: input.zoneId,
     name: input.name,
-    trackIds: ordered,
+    trackIds: ids,
     soundtrackPlaylistId: input.soundtrackPlaylistId ?? null,
   })
   await playSoundtrackPlaylistOnZone(input.zoneId, playlistId)
+  const start = input.startTrackId?.trim()
+  if (start) {
+    const idx = ids.indexOf(start)
+    if (idx > 0) {
+      await new Promise((r) => setTimeout(r, 400))
+      await skipSoundZoneTracks(input.zoneId, idx, true)
+    }
+  }
   return playlistId
 }
 

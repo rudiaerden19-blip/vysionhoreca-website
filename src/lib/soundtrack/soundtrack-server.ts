@@ -444,17 +444,6 @@ export async function fetchSoundtrackPlayerSnapshot(
       playFrom: {
         __typename: string
         id?: string
-        tracks?: {
-          edges: {
-            node: {
-              id: string
-              name: string
-              duration: number
-              artists: { name: string }[]
-              album: { image: { url: string; width?: number; height?: number } | null } | null
-            }
-          }[]
-        }
       } | null
     }
   }>(
@@ -473,18 +462,7 @@ export async function fetchSoundtrackPlayerSnapshot(
         }
         playFrom {
           __typename
-          ... on Playlist {
-            id
-            tracks(first: 500) {
-              edges {
-                node {
-                  id name duration
-                  artists { name }
-                  album { image { url width height } }
-                }
-              }
-            }
-          }
+          ... on Playlist { id }
         }
       }
     }`,
@@ -505,13 +483,12 @@ export async function fetchSoundtrackPlayerSnapshot(
   const playFrom = sz.playFrom
   const playFromTypename = playFrom?.__typename ?? null
   let playFromPlaylistId: string | null = null
-  const playlist: SoundtrackTrackRow[] = []
+  let playlist: SoundtrackTrackRow[] = []
 
-  if (playFrom?.__typename === 'Playlist' && playFrom.tracks?.edges?.length) {
+  if (playFrom?.__typename === 'Playlist') {
     playFromPlaylistId = playFrom.id?.trim() || null
-    for (const edge of playFrom.tracks.edges) {
-      const row = mapTrack(edge.node)
-      if (row) playlist.push(row)
+    if (playFromPlaylistId) {
+      playlist = await fetchPlaylistTrackRows(playFromPlaylistId)
     }
   }
 
@@ -717,7 +694,14 @@ export async function soundtrackSearchTracks(
   return collected.slice(0, maxResults)
 }
 
-async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
+/** Soundtrack `skipTracks` — volgende track(s) in huidige playFrom/queue. */
+export async function skipSoundZoneTracks(
+  zoneId: string,
+  tracksToSkip: number,
+  crossfade = true,
+): Promise<void> {
+  const n = Math.max(0, Math.floor(tracksToSkip))
+  if (n === 0) return
   await soundtrackGraphql(
     `mutation($input: SkipTracksInput!) {
       skipTracks(input: $input) { __typename }
@@ -725,11 +709,54 @@ async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
     {
       input: {
         soundZone: zoneId,
-        tracksToSkip: 1,
-        crossfade: true,
+        tracksToSkip: n,
+        crossfade,
       },
     },
   )
+}
+
+async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
+  await skipSoundZoneTracks(zoneId, 1, true)
+}
+
+async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
+  const data = await soundtrackGraphql<{
+    playlist: {
+      tracks: {
+        edges: {
+          node: {
+            id: string
+            name: string
+            duration: number
+            artists: { name: string }[]
+            album: { image: { url: string; width?: number; height?: number } | null } | null
+          }
+        }[]
+      }
+    } | null
+  }>(
+    `query($id: ID!) {
+      playlist(id: $id) {
+        tracks(first: 500) {
+          edges {
+            node {
+              id name duration
+              artists { name }
+              album { image { url width height } }
+            }
+          }
+        }
+      }
+    }`,
+    { id: playlistId },
+  )
+  const rows: SoundtrackTrackRow[] = []
+  for (const edge of data.playlist?.tracks?.edges ?? []) {
+    const row = mapTrack(edge.node)
+    if (row) rows.push(row)
+  }
+  return rows
 }
 
 async function queueTracksOnSoundZone(

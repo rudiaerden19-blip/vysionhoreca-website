@@ -137,11 +137,16 @@ export async function POST(request: NextRequest, context: RouteContext) {
       }
     }
 
-    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    let snapshot
+    try {
+      snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
+    } catch (snapErr) {
+      console.warn('[soundtrack] snapshot after control failed', snapErr)
+    }
 
     return NextResponse.json({
       ok: true,
-      snapshot,
+      ...(snapshot ? { snapshot } : {}),
       ...(soundtrackPlaylistId ? { soundtrackPlaylistId } : {}),
     })
   } catch (e) {
