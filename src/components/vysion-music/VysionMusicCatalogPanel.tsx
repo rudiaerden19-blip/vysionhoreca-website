@@ -490,7 +490,11 @@ export function VysionMusicCatalogPanel({
                   <div className={styles.searchTrackRow}>
                     <button
                       type="button"
-                      className={active ? styles.trackRowActive : styles.trackRow}
+                      className={
+                        active
+                          ? `${styles.trackRowActive} ${styles.searchTrackPlay}`
+                          : `${styles.trackRow} ${styles.searchTrackPlay}`
+                      }
                       disabled={busy}
                       onClick={() => void onPlaySearchTrack(tr.id)}
                     >
@@ -503,8 +507,8 @@ export function VysionMusicCatalogPanel({
                         <span className={styles.trackRowTitle}>{tr.name}</span>
                         <span className={styles.trackRowArtist}>{tr.artist}</span>
                       </span>
-                      <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
                     </button>
+                    <span className={styles.searchTrackDur}>{formatMs(tr.durationMs)}</span>
                     <div className={styles.searchTrackMenuWrap}>
                       <button
                         type="button"

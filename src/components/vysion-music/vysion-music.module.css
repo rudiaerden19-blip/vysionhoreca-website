@@ -249,30 +249,46 @@
 
 .searchTrackRow {
   display: flex;
-  align-items: stretch;
-  gap: 0.15rem;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 0;
 }
 
-.searchTrackRow .trackRow,
-.searchTrackRow .trackRowActive {
+.searchTrackRow .trackRow.searchTrackPlay,
+.searchTrackRow .trackRowActive.searchTrackPlay {
   flex: 1 1 0;
   min-width: 0;
+  width: auto;
+  max-width: none;
+}
+
+.searchTrackDur {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  color: var(--vm-muted);
+  font-variant-numeric: tabular-nums;
+  padding-right: 0.1rem;
 }
 
 .searchTrackMenuWrap {
   position: relative;
-  flex: 0 0 auto;
+  flex: 0 0 2rem;
   display: flex;
   align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
 .searchTrackMenuBtn {
   border: none;
   background: transparent;
-  color: var(--vm-muted);
-  font-size: 1.15rem;
+  color: var(--vm-glass-emblem-active);
+  font-size: 1.25rem;
+  font-weight: 700;
   line-height: 1;
-  padding: 0.35rem 0.4rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.25rem;
   border-radius: 8px;
   cursor: pointer;
 }
