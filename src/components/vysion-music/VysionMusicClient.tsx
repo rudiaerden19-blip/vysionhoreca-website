@@ -264,13 +264,27 @@ export function VysionMusicClient({
   }, [loadSnapshot])
 
   const assignSourceAndPlay = useCallback(
-    async (assignInput: Record<string, unknown>): Promise<boolean> => {
-      const assigned = await postMutation('soundZoneAssignSource', {
-        immediate: true,
-        ...assignInput,
-      })
+    async (
+      assignInput: Record<string, unknown>,
+      opts?: { logPlaylistTrack?: boolean },
+    ): Promise<boolean> => {
+      const assignPayload = { immediate: true, ...assignInput }
+      if (opts?.logPlaylistTrack) {
+        console.info('[soundtrack-debug playlist-post]', {
+          mutation: 'soundZoneAssignSource',
+          input: assignPayload,
+        })
+      }
+      const assigned = await postMutation('soundZoneAssignSource', assignPayload)
       if (!assigned) return false
-      return postMutation('play', {}, { silent: true })
+      if (opts?.logPlaylistTrack) {
+        console.info('[soundtrack-debug playlist-post]', { mutation: 'play', input: {} })
+      }
+      return postMutation(
+        'play',
+        opts?.logPlaylistTrack ? { debugPlaylistPlay: true } : {},
+        { silent: !opts?.logPlaylistTrack },
+      )
     },
     [postMutation],
   )
@@ -296,17 +310,26 @@ export function VysionMusicClient({
     async (
       sourceId: string,
       trackId: string,
-      meta: { sourceTrackIndex: number; trackTitle: string; uiPosition: number },
+      meta: {
+        sourceTrackIndex: number
+        trackTitle: string
+        uiPosition: number
+        sourceName: string
+      },
     ): Promise<boolean> => {
       setPlaylistSelecting(true)
       try {
-        const ok = await assignSourceAndPlay({
-          source: sourceId,
-          sourceTrackIndex: meta.sourceTrackIndex,
-          debugTrackId: trackId,
-          debugTrackTitle: meta.trackTitle,
-          debugUiPosition: meta.uiPosition,
-        })
+        const ok = await assignSourceAndPlay(
+          {
+            source: sourceId,
+            sourceTrackIndex: meta.sourceTrackIndex,
+            debugTrackId: trackId,
+            debugTrackTitle: meta.trackTitle,
+            debugUiPosition: meta.uiPosition,
+            debugSourceName: meta.sourceName,
+          },
+          { logPlaylistTrack: true },
+        )
         if (ok) refreshSnapshotAfterControl()
         return ok
       } finally {

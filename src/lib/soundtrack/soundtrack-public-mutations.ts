@@ -33,7 +33,13 @@ const MUTATION_DOCUMENT: Record<SoundtrackPublicMutationName, string> = {
   setVolume: `mutation($input: SetVolumeInput!) { setVolume(input: $input) { status volume } }`,
 }
 
-const ASSIGN_DEBUG_KEYS = ['debugTrackId', 'debugTrackTitle', 'debugUiPosition'] as const
+const ASSIGN_DEBUG_KEYS = [
+  'debugTrackId',
+  'debugTrackTitle',
+  'debugUiPosition',
+  'debugSourceName',
+  'debugPlaylistPlay',
+] as const
 
 /** Debug-velden uit UI — niet naar Soundtrack GraphQL sturen. */
 export function sanitizeSoundtrackMutationInput(
@@ -71,6 +77,17 @@ export function isSoundtrackPublicMutationName(
   return (SOUNDTRACK_PUBLIC_MUTATION_NAMES as readonly string[]).includes(name)
 }
 
+function throwIfGraphqlRawFailed(raw: Awaited<ReturnType<typeof soundtrackGraphqlRaw>>): void {
+  if (raw.httpStatus !== 200) {
+    throw new SoundtrackApiError(raw.body.errors?.[0]?.message || `HTTP ${raw.httpStatus}`, raw.httpStatus)
+  }
+  if (raw.body.errors?.length) {
+    throw new SoundtrackApiError(
+      raw.body.errors.map((e) => e.message).join('; ') || 'GraphQL error',
+    )
+  }
+}
+
 /** Eén Soundtrack-mutatie; zone-id komt van tenant-resolutie, rest uit client-input. */
 export async function soundtrackExecutePublicMutation(
   zoneId: string,
@@ -81,6 +98,34 @@ export async function soundtrackExecutePublicMutation(
   if (!id) throw new SoundtrackApiError('sound zone id required', 400)
   const payload = injectSoundZoneId(id, mutation, input)
   await soundtrackGraphql(MUTATION_DOCUMENT[mutation], { input: payload })
+}
+
+/** Zelfde als execute, met volledige raw response voor Vercel-debug. */
+export async function soundtrackExecutePublicMutationLogged(
+  zoneId: string,
+  mutation: SoundtrackPublicMutationName,
+  input: Record<string, unknown> = {},
+  logTag: string,
+): Promise<Awaited<ReturnType<typeof soundtrackGraphqlRaw>>> {
+  const id = zoneId.trim()
+  if (!id) throw new SoundtrackApiError('sound zone id required', 400)
+  const payload = injectSoundZoneId(id, mutation, input)
+  const variables = { input: payload }
+  console.info(`${logTag} REQUEST`, {
+    mutation,
+    zoneId: id,
+    graphqlVariables: variables,
+  })
+  const raw = await soundtrackGraphqlRaw(MUTATION_DOCUMENT[mutation], variables)
+  console.info(`${logTag} RESPONSE`, {
+    httpStatus: raw.httpStatus,
+    data: raw.body.data ?? null,
+    errors: raw.body.errors ?? null,
+    extensions: (raw.body as { extensions?: unknown }).extensions ?? null,
+    fullBody: raw.body,
+  })
+  throwIfGraphqlRawFailed(raw)
+  return raw
 }
 
 const QUEUE_DEBUG_TAG = '[soundtrack-debug soundZoneQueueTracks]'
@@ -106,57 +151,6 @@ export async function soundtrackDebugSoundZoneQueueTracks(
     graphqlResponse: raw.body,
     graphqlErrors: raw.body.errors ?? null,
   })
-  if (raw.httpStatus !== 200) {
-    throw new SoundtrackApiError(raw.body.errors?.[0]?.message || `HTTP ${raw.httpStatus}`, raw.httpStatus)
-  }
-  if (raw.body.errors?.length) {
-    throw new SoundtrackApiError(
-      raw.body.errors.map((e) => e.message).join('; ') || 'GraphQL error',
-    )
-  }
-  return { variables, raw }
-}
-
-const ASSIGN_DEBUG_TAG = '[soundtrack-debug soundZoneAssignSource]'
-
-/** Tijdelijk: playlist-trackklik — request/response + match clicked vs nowPlaying. */
-export async function soundtrackDebugSoundZoneAssignSource(
-  zoneId: string,
-  input: Record<string, unknown>,
-  debug: {
-    sourceId: string
-    clickedTrackId: string
-    clickedTrackTitle: string
-    uiPosition: number
-    sourceTrackIndex: number
-  },
-): Promise<{ variables: { input: Record<string, unknown> }; raw: Awaited<ReturnType<typeof soundtrackGraphqlRaw>> }> {
-  const id = zoneId.trim()
-  const payload = injectSoundZoneId(id, 'soundZoneAssignSource', input)
-  const variables = { input: payload }
-  console.info(ASSIGN_DEBUG_TAG, {
-    mutation: 'soundZoneAssignSource',
-    soundZoneId: id,
-    sourceId: debug.sourceId,
-    clickedTrackId: debug.clickedTrackId,
-    clickedTrackTitle: debug.clickedTrackTitle,
-    uiPosition: debug.uiPosition,
-    sourceTrackIndex: debug.sourceTrackIndex,
-    graphqlVariables: variables,
-  })
-  const raw = await soundtrackGraphqlRaw(MUTATION_DOCUMENT.soundZoneAssignSource, variables)
-  console.info(ASSIGN_DEBUG_TAG, {
-    httpStatus: raw.httpStatus,
-    graphqlResponse: raw.body,
-    graphqlErrors: raw.body.errors ?? null,
-  })
-  if (raw.httpStatus !== 200) {
-    throw new SoundtrackApiError(raw.body.errors?.[0]?.message || `HTTP ${raw.httpStatus}`, raw.httpStatus)
-  }
-  if (raw.body.errors?.length) {
-    throw new SoundtrackApiError(
-      raw.body.errors.map((e) => e.message).join('; ') || 'GraphQL error',
-    )
-  }
+  throwIfGraphqlRawFailed(raw)
   return { variables, raw }
 }

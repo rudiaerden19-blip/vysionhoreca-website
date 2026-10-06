@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
 import {
   isSoundtrackPublicMutationName,
-  soundtrackDebugSoundZoneAssignSource,
   soundtrackDebugSoundZoneQueueTracks,
   soundtrackExecutePublicMutation,
+  soundtrackExecutePublicMutationLogged,
 } from '@/lib/soundtrack/soundtrack-public-mutations'
 import {
   SoundtrackApiError,
@@ -90,13 +90,40 @@ export async function POST(request: NextRequest, context: RouteContext) {
   }
 
   const input = { ...(body.input ?? {}) }
+  const isPlaylistTrackClick =
+    mutation === 'soundZoneAssignSource' && typeof input.debugUiPosition === 'number'
 
   try {
     const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
 
+    if (isPlaylistTrackClick || input.debugPlaylistPlay === true) {
+      console.info('[soundtrack-debug playlist-post]', {
+        tenantSlug,
+        mutation,
+        input,
+        source: input.source ?? null,
+        sourceTrackIndex: input.sourceTrackIndex ?? null,
+      })
+    }
+
     if (mutation === 'setVolume') {
       const ui = typeof input.volume === 'number' ? input.volume : 0
       input.volume = soundtrackUiPercentToApiVolume(ui)
+    }
+
+    let snapshotBefore: Awaited<ReturnType<typeof fetchSoundtrackPlayerSnapshot>> | null = null
+    if (isPlaylistTrackClick) {
+      snapshotBefore = await fetchSoundtrackPlayerSnapshot(zoneId)
+      console.info('[soundtrack-debug playlist-click snapshot-before]', {
+        zoneId: snapshotBefore.zoneId,
+        online: snapshotBefore.online,
+        isPaired: snapshotBefore.isPaired,
+        playbackState: snapshotBefore.playbackState,
+        playFromTypename: snapshotBefore.playFromTypename,
+        playFromId: snapshotBefore.playFromPlaylistId,
+        nowPlayingTrackId: snapshotBefore.nowPlaying.track?.id ?? null,
+        nowPlayingTitle: snapshotBefore.nowPlaying.track?.name ?? null,
+      })
     }
 
     if (mutation === 'soundZoneQueueTracks') {
@@ -108,19 +135,20 @@ export async function POST(request: NextRequest, context: RouteContext) {
         mutationName: mutation,
       })
       await soundtrackDebugSoundZoneQueueTracks(zoneId, input)
-    } else if (
-      mutation === 'soundZoneAssignSource' &&
-      typeof input.debugUiPosition === 'number' &&
-      typeof input.sourceTrackIndex === 'number'
-    ) {
-      const sourceId = String(input.source ?? '').trim()
-      await soundtrackDebugSoundZoneAssignSource(zoneId, input, {
-        sourceId,
-        clickedTrackId: String(input.debugTrackId ?? '').trim(),
-        clickedTrackTitle: String(input.debugTrackTitle ?? '').trim(),
-        uiPosition: Math.floor(input.debugUiPosition),
-        sourceTrackIndex: Math.floor(input.sourceTrackIndex),
-      })
+    } else if (isPlaylistTrackClick) {
+      await soundtrackExecutePublicMutationLogged(
+        zoneId,
+        'soundZoneAssignSource',
+        input,
+        '[soundtrack-debug soundZoneAssignSource]',
+      )
+    } else if (mutation === 'play' && input.debugPlaylistPlay === true) {
+      await soundtrackExecutePublicMutationLogged(
+        zoneId,
+        'play',
+        input,
+        '[soundtrack-debug playlist-play]',
+      )
     } else {
       await soundtrackExecutePublicMutation(zoneId, mutation, input)
     }
@@ -138,25 +166,26 @@ export async function POST(request: NextRequest, context: RouteContext) {
         },
       })
     }
-    if (
-      mutation === 'soundZoneAssignSource' &&
-      typeof input.debugUiPosition === 'number'
-    ) {
+    if (isPlaylistTrackClick) {
       const clickedId = String(input.debugTrackId ?? '').trim()
       const nowId = snapshot.nowPlaying.track?.id ?? ''
-      console.info('[soundtrack-debug soundZoneAssignSource]', {
-        snapshotAfterMutation: {
-          zoneId: snapshot.zoneId,
-          online: snapshot.online,
-          isPaired: snapshot.isPaired,
-          playbackState: snapshot.playbackState,
-          nowPlayingTrackId: nowId || null,
-          nowPlayingTitle: snapshot.nowPlaying.track?.name ?? null,
-          playFromTypename: snapshot.playFromTypename,
-          playFromId: snapshot.playFromPlaylistId,
-        },
+      console.info('[soundtrack-debug playlist-click snapshot-after]', {
+        zoneId: snapshot.zoneId,
+        online: snapshot.online,
+        isPaired: snapshot.isPaired,
+        playbackState: snapshot.playbackState,
+        playFromTypename: snapshot.playFromTypename,
+        playFromId: snapshot.playFromPlaylistId,
+        nowPlayingTrackId: nowId || null,
+        nowPlayingTitle: snapshot.nowPlaying.track?.name ?? null,
         clickedTrackId: clickedId,
         trackIdMatch: Boolean(clickedId && nowId && clickedId === nowId),
+        snapshotBefore: snapshotBefore
+          ? {
+              nowPlayingTrackId: snapshotBefore.nowPlaying.track?.id ?? null,
+              playbackState: snapshotBefore.playbackState,
+            }
+          : null,
       })
     }
     return NextResponse.json({ ok: true, mutation, snapshot })
