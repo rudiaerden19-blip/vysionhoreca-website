@@ -6867,6 +6867,15 @@
     "errorControl": "Bediening mislukt.",
     "errorNetwork": "Netwerkfout.",
     "errorDismiss": "Melding sluiten",
-    "statusFooter": "Afstandsbediening voor Soundtrack · player op de PC laten draaien · Vysion Music @ 2026"
+    "statusFooter": "Afstandsbediening voor Soundtrack · player op de PC laten draaien · Vysion Music @ 2026",
+    "libraryTitle": "Soundtrack-bibliotheek",
+    "libraryTabLists": "Afspeellijsten & stations",
+    "libraryTabSchedules": "Schema's",
+    "librarySourcePlaylist": "Playlist",
+    "librarySourceSoundtrack": "Soundtrack playlist",
+    "librarySourceSchedule": "Schema",
+    "libraryEmpty": "Geen lijsten in deze tab.",
+    "libraryLoading": "Lijsten laden…",
+    "libraryLoadError": "Kon Soundtrack-lijsten niet laden."
   }
 }

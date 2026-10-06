@@ -6908,6 +6908,15 @@
     "errorControl": "操作に失敗しました。",
     "errorNetwork": "ネットワークエラー。",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Soundtrackリモート · PCプレイヤーを起動したまま · Vysion Music @ 2026"
+    "statusFooter": "Soundtrackリモート · PCプレイヤーを起動したまま · Vysion Music @ 2026",
+    "libraryTitle": "Soundtrackライブラリ",
+    "libraryTabLists": "プレイリストとステーション",
+    "libraryTabSchedules": "スケジュール",
+    "librarySourcePlaylist": "プレイリスト",
+    "librarySourceSoundtrack": "Soundtrackプレイリスト",
+    "librarySourceSchedule": "スケジュール",
+    "libraryEmpty": "このタブにリストがありません。",
+    "libraryLoading": "リストを読み込み中…",
+    "libraryLoadError": "Soundtrackリストを読み込めませんでした。"
   }
 }

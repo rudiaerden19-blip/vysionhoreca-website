@@ -9,6 +9,7 @@ import {
   skipSoundZoneTracks,
   soundtrackGraphql,
   soundtrackPauseZone,
+  soundtrackApplyPlayFromSource,
   soundtrackPlayZone,
   soundtrackSkipTrack,
   soundtrackUiPercentToApiVolume,
@@ -18,7 +19,14 @@ export const dynamic = 'force-dynamic'
 
 type RouteContext = { params: { tenant: string } }
 
-const SOUNDTRACK_MUTATIONS = ['play', 'pause', 'skipTrack', 'skipTracks', 'setVolume'] as const
+const SOUNDTRACK_MUTATIONS = [
+  'play',
+  'pause',
+  'setPlayFrom',
+  'skipTrack',
+  'skipTracks',
+  'setVolume',
+] as const
 type SoundtrackMutationName = (typeof SOUNDTRACK_MUTATIONS)[number]
 
 export async function GET(request: NextRequest, context: RouteContext) {
@@ -85,6 +93,14 @@ export async function POST(request: NextRequest, context: RouteContext) {
       case 'pause':
         await soundtrackPauseZone(zoneId)
         break
+      case 'setPlayFrom': {
+        const source = String(input.source ?? '').trim()
+        if (!source) {
+          return NextResponse.json({ error: 'input.source required' }, { status: 400 })
+        }
+        await soundtrackApplyPlayFromSource(zoneId, source)
+        break
+      }
       case 'skipTrack':
         await soundtrackSkipTrack(zoneId)
         break

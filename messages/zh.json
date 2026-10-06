@@ -6908,6 +6908,15 @@
     "errorControl": "控制失败。",
     "errorNetwork": "网络错误。",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Soundtrack 遥控 · 请保持 PC 播放器运行 · Vysion Music @ 2026"
+    "statusFooter": "Soundtrack 遥控 · 请保持 PC 播放器运行 · Vysion Music @ 2026",
+    "libraryTitle": "Soundtrack 库",
+    "libraryTabLists": "播放列表与电台",
+    "libraryTabSchedules": "日程",
+    "librarySourcePlaylist": "播放列表",
+    "librarySourceSoundtrack": "Soundtrack 播放列表",
+    "librarySourceSchedule": "日程",
+    "libraryEmpty": "此标签下暂无列表。",
+    "libraryLoading": "正在加载列表…",
+    "libraryLoadError": "无法加载 Soundtrack 列表。"
   }
 }

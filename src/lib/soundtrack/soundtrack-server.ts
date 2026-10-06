@@ -628,3 +628,17 @@ export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
     { input: { soundZone: zoneId } },
   )
 }
+
+/** Zone laten spelen vanaf playlist/station/schedule (Soundtrack `setPlayFrom`). */
+export async function soundtrackApplyPlayFromSource(
+  zoneId: string,
+  sourceId: string,
+): Promise<void> {
+  const source = sourceId.trim()
+  if (!source) throw new SoundtrackApiError('source id required', 400)
+  await soundtrackGraphql(
+    `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
+    { input: { soundZone: zoneId, source } },
+  )
+  await soundtrackPlayZone(zoneId)
+}

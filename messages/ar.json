@@ -6908,6 +6908,15 @@
     "errorControl": "فشل التحكم.",
     "errorNetwork": "خطأ في الشبكة.",
     "errorDismiss": "Dismiss",
-    "statusFooter": "جهاز تحكم Soundtrack · أبقِ المشغّل على الكمبيوتر يعمل · Vysion Music @ 2026"
+    "statusFooter": "جهاز تحكم Soundtrack · أبقِ المشغّل على الكمبيوتر يعمل · Vysion Music @ 2026",
+    "libraryTitle": "مكتبة Soundtrack",
+    "libraryTabLists": "قوائم التشغيل والمحطات",
+    "libraryTabSchedules": "الجداول",
+    "librarySourcePlaylist": "قائمة تشغيل",
+    "librarySourceSoundtrack": "قائمة Soundtrack",
+    "librarySourceSchedule": "جدول",
+    "libraryEmpty": "لا توجد قوائم في هذا التبويب.",
+    "libraryLoading": "جارٍ تحميل القوائم…",
+    "libraryLoadError": "تعذّر تحميل قوائم Soundtrack."
   }
 }

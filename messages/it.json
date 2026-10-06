@@ -6908,6 +6908,15 @@
     "errorControl": "Comando non riuscito.",
     "errorNetwork": "Errore di rete.",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Telecomando Soundtrack · lascia attivo il player sul PC · Vysion Music @ 2026"
+    "statusFooter": "Telecomando Soundtrack · lascia attivo il player sul PC · Vysion Music @ 2026",
+    "libraryTitle": "Libreria Soundtrack",
+    "libraryTabLists": "Playlist e stazioni",
+    "libraryTabSchedules": "Programmazioni",
+    "librarySourcePlaylist": "Playlist",
+    "librarySourceSoundtrack": "Playlist Soundtrack",
+    "librarySourceSchedule": "Programmazione",
+    "libraryEmpty": "Nessuna lista in questa scheda.",
+    "libraryLoading": "Caricamento liste…",
+    "libraryLoadError": "Impossibile caricare le liste Soundtrack."
   }
 }

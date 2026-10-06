@@ -6867,6 +6867,15 @@
     "errorControl": "Control failed.",
     "errorNetwork": "Network error.",
     "errorDismiss": "Dismiss message",
-    "statusFooter": "Remote for Soundtrack · keep the PC player running · Vysion Music @ 2026"
+    "statusFooter": "Remote for Soundtrack · keep the PC player running · Vysion Music @ 2026",
+    "libraryTitle": "Soundtrack library",
+    "libraryTabLists": "Playlists & stations",
+    "libraryTabSchedules": "Schedules",
+    "librarySourcePlaylist": "Playlist",
+    "librarySourceSoundtrack": "Soundtrack playlist",
+    "librarySourceSchedule": "Schedule",
+    "libraryEmpty": "No lists in this tab.",
+    "libraryLoading": "Loading lists…",
+    "libraryLoadError": "Could not load Soundtrack lists."
   }
 }

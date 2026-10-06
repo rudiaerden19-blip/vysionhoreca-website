@@ -16,6 +16,7 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
+import { VysionMusicLibrarySidebar } from './VysionMusicLibrarySidebar'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -42,6 +43,7 @@ type Snapshot = {
     startedAt: string | null
     progressMs: number
   }
+  playFromPlaylistId?: string | null
 }
 
 type TransportPending = 'prev' | 'play' | 'pause' | 'stop' | 'skipNext'
@@ -84,6 +86,7 @@ export function VysionMusicClient({
   const [tick, setTick] = useState(0)
   const [volumeUi, setVolumeUi] = useState(0)
   const [coverBroken, setCoverBroken] = useState(false)
+  const [playlistSelecting, setPlaylistSelecting] = useState(false)
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -251,8 +254,30 @@ export function VysionMusicClient({
     return `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
   }, [nowTrack?.imageUrl, coverBroken, nowTrack?.id])
 
+  const playFromId = snapshot?.playFromPlaylistId?.trim() || null
+
+  const selectLibrarySource = useCallback(
+    async (sourceId: string) => {
+      setPlaylistSelecting(true)
+      try {
+        await postMutation('setPlayFrom', { source: sourceId })
+      } finally {
+        setPlaylistSelecting(false)
+      }
+    },
+    [postMutation],
+  )
+
   return (
     <div className={styles.root}>
+      <div className={styles.shell}>
+        <VysionMusicLibrarySidebar
+          tenant={tenant}
+          activeSourceId={playFromId}
+          selecting={playlistSelecting || transportPending != null}
+          onSelect={(id) => void selectLibrarySource(id)}
+        />
+        <div className={styles.mainColumn}>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <Link href={kassaHref} className={styles.menuBtn} prefetch={false}>
@@ -410,6 +435,8 @@ export function VysionMusicClient({
       </section>
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
+        </div>
+      </div>
     </div>
   )
 }

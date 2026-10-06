@@ -6931,6 +6931,15 @@
     "errorControl": "Steuerung fehlgeschlagen.",
     "errorNetwork": "Netzwerkfehler.",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Fernbedienung für Soundtrack · Player am PC laufen lassen · Vysion Music @ 2026"
+    "statusFooter": "Fernbedienung für Soundtrack · Player am PC laufen lassen · Vysion Music @ 2026",
+    "libraryTitle": "Soundtrack-Bibliothek",
+    "libraryTabLists": "Playlists & Stationen",
+    "libraryTabSchedules": "Zeitpläne",
+    "librarySourcePlaylist": "Playlist",
+    "librarySourceSoundtrack": "Soundtrack-Playlist",
+    "librarySourceSchedule": "Zeitplan",
+    "libraryEmpty": "Keine Listen in diesem Tab.",
+    "libraryLoading": "Listen werden geladen…",
+    "libraryLoadError": "Soundtrack-Listen konnten nicht geladen werden."
   }
 }
