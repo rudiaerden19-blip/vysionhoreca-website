@@ -175,6 +175,34 @@ export async function syncManualPlaylistToSoundtrackLibrary(input: {
   }
 }
 
+export function orderTrackIdsFromStart(trackIds: string[], startTrackId?: string | null): string[] {
+  const ids = filterTrackIds(trackIds)
+  const start = startTrackId?.trim()
+  if (!start) return ids
+  const idx = ids.indexOf(start)
+  if (idx <= 0) return ids
+  return [...ids.slice(idx), ...ids.slice(0, idx)]
+}
+
+/** Sync manual playlist + setPlayFrom + play (zelfde pad als Soundtrack-speler). */
+export async function playManualPlaylistOnSoundZone(input: {
+  zoneId: string
+  name: string
+  trackIds: string[]
+  soundtrackPlaylistId?: string | null
+  startTrackId?: string | null
+}): Promise<string> {
+  const ordered = orderTrackIdsFromStart(input.trackIds, input.startTrackId)
+  const playlistId = await syncManualPlaylistToSoundtrackLibrary({
+    zoneId: input.zoneId,
+    name: input.name,
+    trackIds: ordered,
+    soundtrackPlaylistId: input.soundtrackPlaylistId ?? null,
+  })
+  await playSoundtrackPlaylistOnZone(input.zoneId, playlistId)
+  return playlistId
+}
+
 export async function playSoundtrackPlaylistOnZone(
   zoneId: string,
   soundtrackPlaylistId: string,

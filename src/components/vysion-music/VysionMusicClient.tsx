@@ -65,6 +65,8 @@ type Snapshot = {
     progressMs: number
   }
   playlist: TrackRow[]
+  playFromPlaylistId?: string | null
+  playFromTypename?: string | null
 }
 
 function formatMs(ms: number): string {
@@ -486,18 +488,19 @@ export function VysionMusicClient({
           setError(json.error || t('vysionMusic.errorControl'))
         } else {
           setError(null)
-          if (json.snapshot) setSnapshot(json.snapshot)
+          if (json.snapshot) mergeSnapshot(json.snapshot)
         }
       } catch {
         setError(t('vysionMusic.errorNetwork'))
       } finally {
         setSwitchingTrack(false)
+        restoreSavedPlaylistView()
         window.setTimeout(() => void loadSnapshot(), 800)
         window.setTimeout(() => void loadSnapshot(), 3200)
         window.setTimeout(() => void loadSnapshot(), 6500)
       }
     },
-    [apiBase, loadSnapshot, t],
+    [apiBase, loadSnapshot, mergeSnapshot, restoreSavedPlaylistView, t],
   )
 
   const scrollToPlaylistPanel = useCallback(() => {
@@ -577,11 +580,12 @@ export function VysionMusicClient({
   }, [scrollToPlaylistPanel, spotifyImportTracks, spotifySummary?.playlistName])
 
   const cancelPlaylistEdit = useCallback(() => {
-    setLeftPanelMode('live')
     setDraftPlaylistId(null)
     setDraftName('')
     setDraftTracks([])
-  }, [])
+    restoreSavedPlaylistView()
+    if (!savedPlaylistViewRef.current) setLeftPanelMode('live')
+  }, [restoreSavedPlaylistView])
 
   const fetchSavedPlaylists = useCallback(async () => {
     setPlaylistsLoading(true)
@@ -824,7 +828,12 @@ export function VysionMusicClient({
   )
 
   const playPlaylistTracks = useCallback(
-    async (tracks: TrackRow[], nameOverride?: string) => {
+    async (
+      tracks: TrackRow[],
+      nameOverride?: string,
+      startTrackId?: string,
+      soundtrackPlaylistIdOverride?: string | null,
+    ) => {
       const ids = tracks.map((r) => r.id).filter((id) => id && !id.startsWith('placeholder'))
       if (ids.length === 0) return
       const playlistName =
@@ -840,8 +849,10 @@ export function VysionMusicClient({
           body: JSON.stringify({
             op: 'playPlaylist',
             trackIds: ids,
+            startTrackId: startTrackId?.trim() || undefined,
             playlistName,
-            soundtrackPlaylistId: savedSoundtrackPlaylistId,
+            soundtrackPlaylistId:
+              soundtrackPlaylistIdOverride ?? savedSoundtrackPlaylistId,
             vysionPlaylistId: savedPlaylistId,
           }),
         })
@@ -855,12 +866,12 @@ export function VysionMusicClient({
           setError(json.error || t('vysionMusic.errorControl'))
         } else {
           setError(null)
-          if (json.snapshot) setSnapshot(json.snapshot)
+          if (json.snapshot) mergeSnapshot(json.snapshot)
           if (json.soundtrackPlaylistId && savedPlaylistId) {
             pinSavedPlaylistView(
               savedPlaylistId,
               savedPlaylistName,
-              tracks,
+              savedPlaylistTracks.length > 0 ? savedPlaylistTracks : tracks,
               json.soundtrackPlaylistId,
             )
           }
@@ -879,8 +890,10 @@ export function VysionMusicClient({
       loadSnapshot,
       pinSavedPlaylistView,
       restoreSavedPlaylistView,
+      mergeSnapshot,
       savedPlaylistId,
       savedPlaylistName,
+      savedPlaylistTracks,
       savedSoundtrackPlaylistId,
       t,
     ],
@@ -888,9 +901,7 @@ export function VysionMusicClient({
 
   const playSavedPlaylistFromRow = useCallback(
     (row: TrackRow, rows: TrackRow[]) => {
-      const start = rows.findIndex((r) => r.id === row.id && r.name === row.name)
-      const slice = start >= 0 ? rows.slice(start) : [row]
-      void playPlaylistTracks(slice)
+      void playPlaylistTracks(rows, undefined, row.id)
     },
     [playPlaylistTracks],
   )
@@ -953,8 +964,8 @@ export function VysionMusicClient({
     return `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
   }, [nowTrack?.imageUrl, coverBroken, nowTrack?.id])
 
-  const playlistRows = useMemo(
-    () => (snapshot?.playlist ?? []).filter((r) => r.name !== '—'),
+  const soundtrackQueueRows = useMemo(
+    () => (snapshot?.playlist ?? []).filter((r) => r.name !== '—' && !r.id.startsWith('placeholder')),
     [snapshot?.playlist],
   )
 
@@ -962,6 +973,13 @@ export function VysionMusicClient({
     leftPanelMode !== 'edit' &&
     savedPlaylistId != null &&
     savedPlaylistTracks.length > 0
+
+  const savedPlaylistMatchesSoundtrackQueue = Boolean(
+    showingSavedPlaylist &&
+      savedSoundtrackPlaylistId &&
+      snapshot?.playFromPlaylistId === savedSoundtrackPlaylistId &&
+      soundtrackQueueRows.length > 0,
+  )
 
   const leftPanelTitle =
     leftPanelMode === 'edit'
@@ -974,8 +992,30 @@ export function VysionMusicClient({
     leftPanelMode === 'edit'
       ? draftTracks
       : showingSavedPlaylist
-        ? savedPlaylistTracks
-        : playlistRows
+        ? savedPlaylistMatchesSoundtrackQueue
+          ? soundtrackQueueRows
+          : savedPlaylistTracks
+        : soundtrackQueueRows
+
+  const transportPlaylistRows =
+    soundtrackQueueRows.length > 0 ? soundtrackQueueRows : leftPanelRows
+
+  const playLiveQueueRow = useCallback(
+    (row: TrackRow) => {
+      const playFromId = snapshot?.playFromPlaylistId
+      if (playFromId && soundtrackQueueRows.length > 0) {
+        void playPlaylistTracks(
+          soundtrackQueueRows,
+          undefined,
+          row.id,
+          playFromId,
+        )
+        return
+      }
+      void playTrackRow(row)
+    },
+    [playPlaylistTracks, playTrackRow, snapshot?.playFromPlaylistId, soundtrackQueueRows],
+  )
 
   const resultsTitle = searchQuery.trim()
     ? `${t('vysionMusic.resultsPrefix')} – ${searchQuery.trim().toUpperCase()}`
@@ -1067,11 +1107,13 @@ export function VysionMusicClient({
                 disabled={transportPending === 'prev'}
                 aria-label={t('vysionMusic.prev')}
                 onClick={() => {
-                  const rows = playlistRows
+                  const rows = transportPlaylistRows
                   if (!nowTrack || rows.length < 2) return
                   const idx = rows.findIndex((r) => r.id === nowTrack.id && r.name === nowTrack.name)
-                  const prev = idx > 0 ? rows[idx - 1] : rows[0]
-                  if (prev?.id) {
+                  const prev = idx > 0 ? rows[idx - 1] : null
+                  if (prev?.id && savedPlaylistId && savedPlaylistTracks.length > 0) {
+                    void playPlaylistTracks(savedPlaylistTracks, undefined, prev.id)
+                  } else if (prev?.id) {
                     void control('playTrack', { trackId: prev.id }, { transportPending: 'prev' })
                   }
                 }}
@@ -1277,7 +1319,7 @@ export function VysionMusicClient({
               />
             ) : null}
             {!savedPlaylistLoading && leftPanelMode !== 'edit' && !showingSavedPlaylist
-              ? leftPanelRows.map((row, idx) => {
+              ? soundtrackQueueRows.map((row, idx) => {
                   const active =
                     nowTrack && row.id === nowTrack.id && row.name === nowTrack.name
                   return (
@@ -1288,7 +1330,7 @@ export function VysionMusicClient({
                         disabled={
                           switchingTrack || !row.id || row.id.startsWith('placeholder')
                         }
-                        onClick={() => void playTrackRow(row)}
+                        onClick={() => void playLiveQueueRow(row)}
                       >
                         <span className={styles.rowNum}>{idx + 1}</span>
                         <span className={styles.rowPlay} aria-hidden>

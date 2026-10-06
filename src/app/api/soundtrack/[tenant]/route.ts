@@ -59,6 +59,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     volume?: number
     trackId?: string
     trackIds?: string[]
+    startTrackId?: string
     playlistName?: string
     soundtrackPlaylistId?: string | null
     vysionPlaylistId?: string | null
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       volume?: number
       trackId?: string
       trackIds?: string[]
+      startTrackId?: string
       playlistName?: string
       soundtrackPlaylistId?: string | null
       vysionPlaylistId?: string | null
@@ -94,46 +96,48 @@ export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     await ensureSoundZoneCrossfadeSettings(zoneId)
-    await soundtrackControl(zoneId, op as (typeof allowed)[number], {
-      volume: op === 'setVolume' ? body.volume : undefined,
-      trackId: body.trackId,
-      trackIds: body.trackIds,
-      playlistName: body.playlistName,
-      soundtrackPlaylistId: body.soundtrackPlaylistId,
-    })
-    if (op === 'playTrack' || op === 'playPlaylist') {
-      await new Promise((r) => setTimeout(r, op === 'playPlaylist' ? 1200 : 500))
-    }
-    const snapshot =
-      op === 'playTrack' || op === 'playPlaylist'
-        ? await fetchSoundtrackPlayerSnapshot(zoneId, { historyFirst: 0, padPlaylist: false })
-        : await fetchSoundtrackPlayerSnapshot(zoneId)
 
     let soundtrackPlaylistId: string | undefined
-    if (op === 'playPlaylist' && body.trackIds?.length) {
-      try {
-        const { syncManualPlaylistToSoundtrackLibrary } =
-          await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
-        soundtrackPlaylistId = await syncManualPlaylistToSoundtrackLibrary({
-          zoneId,
-          name: body.playlistName ?? '',
-          trackIds: body.trackIds,
-          soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
-        })
-        const vysionPlaylistId = body.vysionPlaylistId?.trim()
-        if (vysionPlaylistId && soundtrackPlaylistId) {
-          const { persistVysionPlaylistSoundtrackId } =
-            await import('@/lib/vysion-music-playlists-server')
-          await persistVysionPlaylistSoundtrackId(
-            tenantSlug,
-            vysionPlaylistId,
-            soundtrackPlaylistId,
-          )
-        }
-      } catch (syncErr) {
-        console.warn('[soundtrack] playPlaylist library sync failed', syncErr)
+
+    if (op === 'playPlaylist') {
+      const trackIds = body.trackIds ?? []
+      if (trackIds.length === 0) {
+        return NextResponse.json({ error: 'trackIds required' }, { status: 400 })
+      }
+      const { playManualPlaylistOnSoundZone } =
+        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
+      soundtrackPlaylistId = await playManualPlaylistOnSoundZone({
+        zoneId,
+        name: body.playlistName ?? '',
+        trackIds,
+        soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
+        startTrackId: body.startTrackId ?? null,
+      })
+      const vysionPlaylistId = body.vysionPlaylistId?.trim()
+      if (vysionPlaylistId && soundtrackPlaylistId) {
+        const { persistVysionPlaylistSoundtrackId } =
+          await import('@/lib/vysion-music-playlists-server')
+        await persistVysionPlaylistSoundtrackId(
+          tenantSlug,
+          vysionPlaylistId,
+          soundtrackPlaylistId,
+        )
+      }
+      await new Promise((r) => setTimeout(r, 1200))
+    } else {
+      await soundtrackControl(zoneId, op as (typeof allowed)[number], {
+        volume: op === 'setVolume' ? body.volume : undefined,
+        trackId: body.trackId,
+        trackIds: body.trackIds,
+        playlistName: body.playlistName,
+        soundtrackPlaylistId: body.soundtrackPlaylistId,
+      })
+      if (op === 'playTrack') {
+        await new Promise((r) => setTimeout(r, 500))
       }
     }
+
+    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
 
     return NextResponse.json({
       ok: true,

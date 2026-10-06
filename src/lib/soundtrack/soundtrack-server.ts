@@ -373,7 +373,10 @@ export type SoundtrackPlayerSnapshot = {
     startedAt: string | null
     progressMs: number
   }
+  /** Tracks uit Soundtrack `playFrom` (manual playlist), niet playback history. */
   playlist: SoundtrackTrackRow[]
+  playFromPlaylistId: string | null
+  playFromTypename: string | null
 }
 
 function mapTrack(
@@ -417,16 +420,9 @@ function mapTrack(
 
 export async function fetchSoundtrackPlayerSnapshot(
   zoneId: string,
-  opts?: { historyFirst?: number; padPlaylist?: boolean },
+  _opts?: { historyFirst?: number; padPlaylist?: boolean },
 ): Promise<SoundtrackPlayerSnapshot> {
-  const historyFirst = opts?.historyFirst ?? 10
-  const padPlaylist = opts?.padPlaylist ?? true
-  const historyBlock =
-    historyFirst > 0
-      ? `playbackHistory(first: ${historyFirst}) {
-          edges { node { track { id name duration artists { name } album { image { url width height } } } } }
-        }`
-      : ''
+  void _opts
   const data = await soundtrackGraphql<{
     soundZone: {
       id: string
@@ -442,12 +438,24 @@ export async function fetchSoundtrackPlayerSnapshot(
           name: string
           duration: number
           artists: { name: string }[]
-          album: { image: { url: string } | null } | null
+          album: { image: { url: string; width?: number; height?: number } | null } | null
         } | null
       } | null
-      playbackHistory: {
-        edges: { node: { track: { id: string; name: string; duration: number; artists: { name: string }[] } } }[]
-      }
+      playFrom: {
+        __typename: string
+        id?: string
+        tracks?: {
+          edges: {
+            node: {
+              id: string
+              name: string
+              duration: number
+              artists: { name: string }[]
+              album: { image: { url: string; width?: number; height?: number } | null } | null
+            }
+          }[]
+        }
+      } | null
     }
   }>(
     `query($id: ID!) {
@@ -463,7 +471,21 @@ export async function fetchSoundtrackPlayerSnapshot(
             album { image { url width height } }
           }
         }
-        ${historyBlock}
+        playFrom {
+          __typename
+          ... on ManualPlaylist {
+            id
+            tracks(first: 500) {
+              edges {
+                node {
+                  id name duration
+                  artists { name }
+                  album { image { url width height } }
+                }
+              }
+            }
+          }
+        }
       }
     }`,
     { id: zoneId },
@@ -480,36 +502,21 @@ export async function fetchSoundtrackPlayerSnapshot(
     )
   }
 
-  const historyRows: SoundtrackTrackRow[] = []
-  const seen = new Set<string>()
-  for (const edge of sz.playbackHistory?.edges ?? []) {
-    const row = mapTrack(edge.node.track)
-    if (!row) continue
-    const key = `${row.name}|${row.artist}`
-    if (seen.has(key)) continue
-    seen.add(key)
-    historyRows.push(row)
+  const playFrom = sz.playFrom
+  const playFromTypename = playFrom?.__typename ?? null
+  let playFromPlaylistId: string | null = null
+  const playlist: SoundtrackTrackRow[] = []
+
+  if (playFrom?.__typename === 'ManualPlaylist' && playFrom.tracks?.edges?.length) {
+    playFromPlaylistId = playFrom.id?.trim() || null
+    for (const edge of playFrom.tracks.edges) {
+      const row = mapTrack(edge.node)
+      if (row) playlist.push(row)
+    }
   }
 
-  const playlist: SoundtrackTrackRow[] = []
-  if (nowTrack) playlist.push(nowTrack)
-  for (const row of historyRows) {
-    if (nowTrack && row.id === nowTrack.id && row.name === nowTrack.name) continue
-    playlist.push(row)
-    if (playlist.length >= 10) break
-  }
-  if (padPlaylist) {
-    while (playlist.length < 10) {
-      playlist.push({
-        id: `placeholder-${playlist.length}`,
-        name: '—',
-        artist: '—',
-        durationMs: 0,
-        imageUrl: null,
-        imageWidth: null,
-        imageHeight: null,
-      })
-    }
+  if (playlist.length === 0 && nowTrack) {
+    playlist.push(nowTrack)
   }
 
   return {
@@ -529,6 +536,8 @@ export async function fetchSoundtrackPlayerSnapshot(
       progressMs,
     },
     playlist,
+    playFromPlaylistId,
+    playFromTypename,
   }
 }
 
@@ -797,21 +806,10 @@ export async function soundtrackControl(
       )
       return
     }
-    case 'playPlaylist': {
-      const trackIds = opts?.trackIds ?? []
-      const filtered = trackIds
-        .map((id) => id.trim())
-        .filter((id) => id && !id.startsWith('placeholder-'))
-      if (filtered.length === 0) throw new SoundtrackApiError('trackIds required')
-
-      // Direct afspelen: queue + play (zelfde bewezen pad als playTrack).
-      await queueTracksOnSoundZone(zoneId, filtered, true)
-      await soundtrackGraphql(
-        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
-        { input: { soundZone: zoneId } },
+    case 'playPlaylist':
+      throw new SoundtrackApiError(
+        'playPlaylist must use playManualPlaylistOnSoundZone (setPlayFrom) via API route',
       )
-      return
-    }
     default:
       throw new SoundtrackApiError('Unknown control op')
   }
