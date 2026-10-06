@@ -783,6 +783,70 @@ export async function soundtrackPlayFromTrackIndex(
   }
 }
 
+async function waitForNowPlayingTrackId(
+  zoneId: string,
+  trackId: string,
+  maxMs = 8000,
+): Promise<void> {
+  const want = trackId.trim()
+  if (!want) return
+  const deadline = Date.now() + maxMs
+  while (Date.now() < deadline) {
+    const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+    if (snap.nowPlaying.track?.id === want) return
+    await sleep(350)
+  }
+}
+
+/**
+ * Spring naar track in playlist — volgorde uit Soundtrack `playlist.tracks`.
+ * Pauze + wacht op track 1 vóór skip (zone mag anders door eigen queue lopen).
+ */
+export async function soundtrackJumpToPlaylistTrack(
+  zoneId: string,
+  playlistId: string,
+  trackId: string,
+): Promise<void> {
+  const source = playlistId.trim()
+  const wantId = trackId.trim()
+  if (!source || !wantId) throw new SoundtrackApiError('playlistId and trackId required')
+
+  const rows = await fetchPlaylistTrackRows(source)
+  const ids = rows.map((r) => r.id)
+  const targetIndex = ids.indexOf(wantId)
+  if (targetIndex < 0) throw new SoundtrackApiError('Track not in this playlist')
+
+  const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
+  const samePlayFrom = snap.playFromPlaylistId === source
+  const nowId = snap.nowPlaying.track?.id ?? null
+  const currentIndex = nowId ? ids.indexOf(nowId) : -1
+
+  if (samePlayFrom && currentIndex >= 0) {
+    if (targetIndex === currentIndex) {
+      await soundtrackPauseZone(zoneId)
+      await soundtrackPlayZone(zoneId)
+      return
+    }
+    if (targetIndex > currentIndex) {
+      await skipSoundZoneTracks(zoneId, targetIndex - currentIndex, true)
+      return
+    }
+  }
+
+  await soundtrackPauseZone(zoneId)
+  await soundtrackSetPlayFrom(zoneId, source)
+  await soundtrackSetPlaybackOrderLinear(zoneId)
+  await soundtrackPlayZone(zoneId)
+
+  const firstId = ids[0]
+  if (firstId) await waitForNowPlayingTrackId(zoneId, firstId)
+
+  if (targetIndex > 0) {
+    await skipSoundZoneTracks(zoneId, targetIndex, true)
+    await waitForNowPlayingTrackId(zoneId, wantId, 10000)
+  }
+}
+
 /** Soundtrack `skipTrack` (één track vooruit). */
 export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
   await soundtrackGraphql(

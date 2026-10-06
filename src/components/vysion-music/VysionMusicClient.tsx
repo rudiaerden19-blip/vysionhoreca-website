@@ -421,15 +421,18 @@ export function VysionMusicClient({
 
   /** Afspeellijst (links): één BFF-call playFromTrackIndex. */
   const playPlaylistRow = useCallback(
-    async (trackIndex: number) => {
+    async (trackIndex: number, trackId: string) => {
       const source = snapshot?.playFromPlaylistId?.trim()
       if (!source) {
         setError(t('vysionMusic.errorNoPlayFrom'))
         return
       }
+      const id = trackId.trim()
+      if (!id) return
       setSwitchingTrack(true)
       setError(null)
       const result = await playSoundtrackPlaylistRow(apiBase, source, trackIndex, {
+        trackId: id,
         activeSourceId: source,
         currentTrackId: snapshot?.nowPlaying.track?.id ?? null,
         playlistTrackIds: (snapshot?.playlist ?? []).map((r) => r.id),
@@ -613,7 +616,10 @@ export function VysionMusicClient({
                   const idx = queueRows.findIndex(
                     (r) => r.id === nowTrack.id && r.name === nowTrack.name,
                   )
-                  if (idx > 0) void playPlaylistRow(idx - 1)
+                  if (idx > 0) {
+                    const prev = queueRows[idx - 1]
+                    if (prev?.id) void playPlaylistRow(idx - 1, prev.id)
+                  }
                 }}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -731,7 +737,7 @@ export function VysionMusicClient({
                       className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                       disabled={switchingTrack || !playFromId}
                       aria-label={`${row.name} – ${t('vysionMusic.play')}`}
-                      onClick={() => void playPlaylistRow(idx)}
+                      onClick={() => void playPlaylistRow(idx, row.id)}
                     >
                       <span className={styles.rowNum}>{idx + 1}</span>
                       <span className={styles.rowPlay} aria-hidden>

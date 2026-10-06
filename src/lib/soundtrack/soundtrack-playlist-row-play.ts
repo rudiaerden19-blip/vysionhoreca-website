@@ -25,6 +25,7 @@ export async function playSoundtrackPlaylistRow(
   playlistSourceId: string,
   trackIndex: number,
   opts?: {
+    trackId?: string | null
     activeSourceId?: string | null
     currentTrackId?: string | null
     playlistTrackIds?: string[] | null
@@ -33,10 +34,11 @@ export async function playSoundtrackPlaylistRow(
   const source = playlistSourceId.trim()
   if (!source) return { ok: false, error: 'playlist source id required' }
 
+  const trackId = opts?.trackId?.trim() || ''
   const index = Math.max(0, Math.floor(trackIndex))
   return postSoundtrackMutation(apiBase, 'playFromTrackIndex', {
     source,
-    trackIndex: index,
+    ...(trackId ? { trackId } : { trackIndex: index }),
     activeSourceId: opts?.activeSourceId ?? null,
     currentTrackId: opts?.currentTrackId ?? null,
     playlistTrackIds: opts?.playlistTrackIds ?? null,

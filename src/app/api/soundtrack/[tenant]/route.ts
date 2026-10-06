@@ -4,11 +4,13 @@ import {
   SoundtrackApiError,
   SoundtrackConfigError,
   emptySoundtrackPlayerSnapshot,
+  ensureSoundZoneCrossfadeSettings,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneIdForTenant,
   skipSoundZoneTracks,
   soundtrackGraphql,
   soundtrackPauseZone,
+  soundtrackJumpToPlaylistTrack,
   soundtrackPlayFromTrackIndex,
   soundtrackPlayZone,
   soundtrackQueueTracksOnZone,
@@ -114,6 +116,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    await ensureSoundZoneCrossfadeSettings(zoneId)
 
     switch (mutation) {
       case 'play':
@@ -167,22 +170,27 @@ export async function POST(request: NextRequest, context: RouteContext) {
         if (!source) {
           return NextResponse.json({ error: 'input.source required' }, { status: 400 })
         }
-        const trackIndex =
-          typeof input.trackIndex === 'number' && Number.isFinite(input.trackIndex)
-            ? Math.max(0, Math.floor(input.trackIndex))
-            : 0
-        const activeSourceId =
-          typeof input.activeSourceId === 'string' ? input.activeSourceId : null
-        const currentTrackId =
-          typeof input.currentTrackId === 'string' ? input.currentTrackId : null
-        const playlistTrackIds = Array.isArray(input.playlistTrackIds)
-          ? input.playlistTrackIds.map((t) => String(t).trim()).filter(Boolean)
-          : null
-        await soundtrackPlayFromTrackIndex(zoneId, source, trackIndex, {
-          activeSourceId,
-          currentTrackId,
-          playlistTrackIds,
-        })
+        const trackId = String(input.trackId ?? '').trim()
+        if (trackId) {
+          await soundtrackJumpToPlaylistTrack(zoneId, source, trackId)
+        } else {
+          const trackIndex =
+            typeof input.trackIndex === 'number' && Number.isFinite(input.trackIndex)
+              ? Math.max(0, Math.floor(input.trackIndex))
+              : 0
+          const activeSourceId =
+            typeof input.activeSourceId === 'string' ? input.activeSourceId : null
+          const currentTrackId =
+            typeof input.currentTrackId === 'string' ? input.currentTrackId : null
+          const playlistTrackIds = Array.isArray(input.playlistTrackIds)
+            ? input.playlistTrackIds.map((t) => String(t).trim()).filter(Boolean)
+            : null
+          await soundtrackPlayFromTrackIndex(zoneId, source, trackIndex, {
+            activeSourceId,
+            currentTrackId,
+            playlistTrackIds,
+          })
+        }
         break
       }
       default:
