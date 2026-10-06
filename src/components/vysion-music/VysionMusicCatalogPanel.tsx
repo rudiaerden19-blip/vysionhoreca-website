@@ -391,13 +391,14 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const playlistTrackIds =
-                getCachedPlaylistTracks(tenant, pl.id)?.map((t) => t.id) ?? null
+              const cachedPlaylistTracks = getCachedPlaylistTracks(tenant, pl.id)
+              const playlistTrackIds = cachedPlaylistTracks?.map((t) => t.id) ?? null
               const isActivePlayFrom = vysionMusicPlaylistRowIsActivePlayFrom(
                 pl.id,
                 playFromSourceId,
-                nowPlayingTrack?.id ?? null,
+                nowPlayingTrack,
                 playlistTrackIds,
+                cachedPlaylistTracks,
               )
               const isBrowsing = selectedId === pl.id && !isActivePlayFrom
               const rowClass = [
@@ -530,7 +531,9 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.tracksEmpty')}</li>
             ) : null}
             {tracks.map((tr, idx) => {
-              const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
+              const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack, {
+                allowTitleArtistFallback: true,
+              })
               const rowProgressPct =
                 active && nowPlayingDurationMs > 0
                   ? Math.min(100, (nowPlayingProgressMs / nowPlayingDurationMs) * 100)
@@ -559,7 +562,7 @@ export function VysionMusicCatalogPanel({
                       </span>
                       <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
                     </span>
-                    {active && nowPlayingDurationMs > 0 ? (
+                    {active ? (
                       <span className={styles.trackRowProgressTrack} aria-hidden>
                         <span
                           className={styles.trackRowProgressFill}
@@ -596,6 +599,10 @@ export function VysionMusicCatalogPanel({
             ) : null}
             {searchResults.map((tr, idx) => {
               const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
+              const rowProgressPct =
+                active && nowPlayingDurationMs > 0
+                  ? Math.min(100, (nowPlayingProgressMs / nowPlayingDurationMs) * 100)
+                  : 0
               const menuOpen = searchMenuTrackId === tr.id
               return (
                 <li key={`${tr.id}-s-${idx}`} className={styles.searchTrackItem}>
@@ -604,21 +611,31 @@ export function VysionMusicCatalogPanel({
                       type="button"
                       className={
                         active
-                          ? `${styles.trackRowActive} ${styles.searchTrackPlay}`
+                          ? `${styles.trackRowActive} ${styles.trackRowNowPlaying} ${styles.searchTrackPlay}`
                           : `${styles.trackRow} ${styles.searchTrackPlay}`
                       }
                       disabled={busy}
                       onClick={() => void onPlaySearchTrack(tr.id)}
                     >
-                      {active ? (
-                        <TrackNowPlayingBars playing={nowPlaying} />
-                      ) : (
-                        <span className={styles.trackRowNum}>{idx + 1}</span>
-                      )}
-                      <span className={styles.trackRowMain}>
-                        <span className={styles.trackRowTitle}>{tr.name}</span>
-                        <span className={styles.trackRowArtist}>{tr.artist}</span>
+                      <span className={styles.trackRowHeader}>
+                        {active ? (
+                          <TrackNowPlayingBars playing={nowPlaying} />
+                        ) : (
+                          <span className={styles.trackRowNum}>{idx + 1}</span>
+                        )}
+                        <span className={styles.trackRowMain}>
+                          <span className={styles.trackRowTitle}>{tr.name}</span>
+                          <span className={styles.trackRowArtist}>{tr.artist}</span>
+                        </span>
                       </span>
+                      {active ? (
+                        <span className={styles.trackRowProgressTrack} aria-hidden>
+                          <span
+                            className={styles.trackRowProgressFill}
+                            style={{ width: `${rowProgressPct}%` }}
+                          />
+                        </span>
+                      ) : null}
                     </button>
                     <span className={styles.searchTrackDur}>{formatMs(tr.durationMs)}</span>
                     <div className={styles.searchTrackMenuWrap}>
