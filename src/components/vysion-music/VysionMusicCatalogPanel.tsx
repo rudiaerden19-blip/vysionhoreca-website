@@ -9,6 +9,8 @@ import styles from './vysion-music.module.css'
 type LibraryItem = {
   id: string
   name: string
+  sourceTypename: string
+  snapshot: string | null
   sourceKind: SoundtrackLibrarySourceKind
   imageUrl: string | null
 }
@@ -52,6 +54,7 @@ export function VysionMusicCatalogPanel({
       trackTitle: string
       uiPosition: number
       sourceName: string
+      sourceTypename?: string
     },
   ) => boolean | Promise<boolean>
   onPlaySearchTrack: (trackId: string) => void | Promise<void>
@@ -195,8 +198,8 @@ export function VysionMusicCatalogPanel({
     return items.filter((i) => i.sourceKind !== 'schedule')
   }, [items, tab])
 
-  const selectedName =
-    items.find((i) => i.id === selectedId)?.name ?? t('vysionMusic.tracksTitle')
+  const selectedItem = items.find((i) => i.id === selectedId)
+  const selectedName = selectedItem?.name ?? t('vysionMusic.tracksTitle')
 
   const pickPlaylist = (id: string) => {
     const prev = selectedId
@@ -323,6 +326,7 @@ export function VysionMusicCatalogPanel({
                         trackTitle: tr.name,
                         uiPosition: idx + 1,
                         sourceName: selectedName,
+                        sourceTypename: selectedItem?.sourceTypename,
                       })
                     }}
                   >

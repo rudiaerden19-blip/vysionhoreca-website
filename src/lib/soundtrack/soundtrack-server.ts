@@ -666,6 +666,55 @@ export async function skipSoundZoneTracks(
   )
 }
 
+/**
+ * Bibliotheek-catalogus id (o.a. System-scoped Playlist in musicLibrary) → runtime id
+ * zoals `soundZone.playFrom` (Composer/Playlist/Soundtrack/Schedule) voor assign.
+ * Officieel: `setPlayFrom` wijzigt de playback source en resolved het canonical playFrom-id.
+ */
+export async function resolveSoundtrackRuntimeAssignSourceId(
+  zoneId: string,
+  librarySourceId: string,
+): Promise<{ runtimeSourceId: string; playFromTypename: string | null }> {
+  const libraryId = librarySourceId.trim()
+  const zid = zoneId.trim()
+  if (!libraryId || !zid) {
+    throw new SoundtrackApiError('source and sound zone id required', 400)
+  }
+
+  await soundtrackGraphql(
+    `mutation($input: SetPlayFromInput!) {
+      setPlayFrom(input: $input) {
+        playFrom {
+          __typename
+          ... on Playlist { id }
+          ... on Soundtrack { id }
+          ... on Schedule { id }
+        }
+      }
+    }`,
+    { input: { soundZone: zid, source: libraryId } },
+  )
+
+  const snap = await fetchSoundtrackPlayerSnapshot(zid)
+  const runtimeSourceId = snap.playFromPlaylistId?.trim()
+  if (!runtimeSourceId) {
+    throw new SoundtrackApiError(
+      'Soundtrack resolved no playback source after setPlayFrom',
+      502,
+    )
+  }
+  return { runtimeSourceId, playFromTypename: snap.playFromTypename }
+}
+
+/** `Playlist.snapshot` voor SoundZoneAssignSourceInput.sourceSnapshot (optioneel). */
+export async function fetchPlaylistSourceSnapshot(sourceId: string): Promise<string | null> {
+  const data = await soundtrackGraphql<{
+    playlist: { snapshot: string } | null
+  }>(`query($id: ID!) { playlist(id: $id) { snapshot } }`, { id: sourceId.trim() })
+  const snap = data.playlist?.snapshot?.trim()
+  return snap || null
+}
+
 /** Soundtrack `play` mutation. */
 export async function soundtrackPlayZone(zoneId: string): Promise<void> {
   await soundtrackGraphql(

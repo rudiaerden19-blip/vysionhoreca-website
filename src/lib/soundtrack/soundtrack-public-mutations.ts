@@ -194,6 +194,7 @@ export function playlistAssignRequestDebug(
     mutation: 'soundZoneAssignSource',
     soundZoneId: zoneId,
     source: input.source ?? null,
+    sourceSnapshot: input.sourceSnapshot ?? null,
     sourceTrackIndex: input.sourceTrackIndex ?? null,
     immediate: input.immediate ?? null,
   }

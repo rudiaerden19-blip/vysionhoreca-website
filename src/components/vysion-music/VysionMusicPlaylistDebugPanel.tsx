@@ -4,6 +4,7 @@ import styles from './vysion-music.module.css'
 
 export type PlaylistTrackDebugState = {
   click?: Record<string, unknown>
+  sourceResolution?: Record<string, unknown>
   assign?: {
     request?: Record<string, unknown>
     response?: Record<string, unknown>
@@ -35,6 +36,8 @@ export function mergePlaylistTrackDebugState(
   const base = prev ?? {}
   return {
     click: section(base.click, partial.click) ?? base.click,
+    sourceResolution:
+      (partial.sourceResolution as Record<string, unknown> | undefined) ?? base.sourceResolution,
     assign: section(base.assign, partial.assign) as PlaylistTrackDebugState['assign'],
     play: section(base.play, partial.play) as PlaylistTrackDebugState['play'],
     snapshotAfter:
@@ -99,6 +102,7 @@ export function VysionMusicPlaylistDebugPanel({ state }: { state: PlaylistTrackD
       <div className={styles.playlistDebugHeader}>Playlist debug (tijdelijk)</div>
       <div className={styles.playlistDebugStatus}>{playlistTrackDebugStatus(state)}</div>
       <DebugBlock title="1. CLICK" data={state.click} />
+      <DebugBlock title="1b. SOURCE RESOLUTION" data={state.sourceResolution} />
       <DebugBlock title="2. ASSIGN REQUEST" data={state.assign?.request} />
       <DebugBlock title="3. ASSIGN RESPONSE" data={state.assign?.response} />
       <DebugBlock title="4. PLAY REQUEST" data={playRequest} />

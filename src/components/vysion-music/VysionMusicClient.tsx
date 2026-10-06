@@ -334,12 +334,14 @@ export function VysionMusicClient({
         trackTitle: string
         uiPosition: number
         sourceName: string
+        sourceTypename?: string
       },
     ): Promise<boolean> => {
       setPlaylistSelecting(true)
       setPlaylistDebug({
         click: {
           sourceId,
+          sourceTypename: meta.sourceTypename ?? null,
           sourceName: meta.sourceName,
           clickedTrackId: trackId,
           clickedTrackTitle: meta.trackTitle,

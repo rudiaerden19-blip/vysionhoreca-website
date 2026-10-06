@@ -12,8 +12,10 @@ import {
   SoundtrackApiError,
   SoundtrackConfigError,
   emptySoundtrackPlayerSnapshot,
+  fetchPlaylistSourceSnapshot,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneForTenant,
+  resolveSoundtrackRuntimeAssignSourceId,
   soundtrackSearchTracks,
   soundtrackUiPercentToApiVolume,
   type SoundtrackPlayerSnapshot,
@@ -165,24 +167,56 @@ export async function POST(request: NextRequest, context: RouteContext) {
         mutationName: mutation,
       })
       await soundtrackDebugSoundZoneQueueTracks(zoneId, input)
-    } else if (isPlaylistTrackClick) {
-      const logged = await soundtrackExecutePublicMutationLoggedSoft(
-        zoneId,
-        'soundZoneAssignSource',
-        input,
-        '[soundtrack-debug soundZoneAssignSource]',
-      )
-      playlistTrackDebug = {
-        click: playlistClickFromInput(input),
-        assign: {
-          request: playlistAssignRequestDebug(zoneId, logged.graphqlVariables),
-          response: graphqlResponseDebugPayload(logged.raw),
-          ok: logged.ok,
-          errorMessage: logged.errorMessage,
-        },
+    } else if (mutation === 'soundZoneAssignSource') {
+      const librarySourceId = String(input.source ?? '').trim()
+      const { runtimeSourceId, playFromTypename } =
+        await resolveSoundtrackRuntimeAssignSourceId(zoneId, librarySourceId)
+
+      const assignInput: Record<string, unknown> = {
+        ...input,
+        source: runtimeSourceId,
       }
-      if (!logged.ok) {
-        throw new SoundtrackApiError(logged.errorMessage || 'soundZoneAssignSource failed')
+      let runtimeSnapshot: string | null = null
+      try {
+        runtimeSnapshot = await fetchPlaylistSourceSnapshot(runtimeSourceId)
+      } catch {
+        runtimeSnapshot = null
+      }
+      if (runtimeSnapshot) assignInput.sourceSnapshot = runtimeSnapshot
+
+      const sourceResolution = {
+        displayedSource: {
+          id: librarySourceId,
+          assignSourceId: runtimeSourceId,
+          playFromTypenameAfterSetPlayFrom: playFromTypename,
+        },
+        librarySourceId,
+        runtimeSourceId,
+        sourceSnapshotIncluded: Boolean(runtimeSnapshot),
+      }
+
+      if (isPlaylistTrackClick) {
+        const logged = await soundtrackExecutePublicMutationLoggedSoft(
+          zoneId,
+          'soundZoneAssignSource',
+          assignInput,
+          '[soundtrack-debug soundZoneAssignSource]',
+        )
+        playlistTrackDebug = {
+          click: playlistClickFromInput(input),
+          sourceResolution,
+          assign: {
+            request: playlistAssignRequestDebug(zoneId, logged.graphqlVariables),
+            response: graphqlResponseDebugPayload(logged.raw),
+            ok: logged.ok,
+            errorMessage: logged.errorMessage,
+          },
+        }
+        if (!logged.ok) {
+          throw new SoundtrackApiError(logged.errorMessage || 'soundZoneAssignSource failed')
+        }
+      } else {
+        await soundtrackExecutePublicMutation(zoneId, 'soundZoneAssignSource', assignInput)
       }
     } else if (mutation === 'play' && input.debugPlaylistPlay === true) {
       const logged = await soundtrackExecutePublicMutationLoggedSoft(

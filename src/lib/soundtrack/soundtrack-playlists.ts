@@ -9,6 +9,10 @@ export type SoundtrackLibrarySourceKind = 'playlist' | 'soundtrack' | 'schedule'
 export type SoundtrackLibraryPlaylist = {
   id: string
   name: string
+  /** GraphQL __typename uit musicLibrary-lijst (Playlist | Schedule). */
+  sourceTypename: string
+  /** Soundtrack `Playlist.snapshot` — voor assign sourceSnapshot indien van toepassing. */
+  snapshot: string | null
   sourceKind: SoundtrackLibrarySourceKind
   imageUrl: string | null
 }
@@ -40,8 +44,10 @@ const MUSIC_LIBRARY_QUERY = `query($id: ID!) {
     playlists(first: 200) {
       edges {
         node {
+          __typename
           id
           name
+          snapshot
           composerType
           ${LIBRARY_DISPLAY_IMAGE}
         }
@@ -50,8 +56,10 @@ const MUSIC_LIBRARY_QUERY = `query($id: ID!) {
     schedules(first: 200) {
       edges {
         node {
+          __typename
           id
           name
+          snapshot
           ${LIBRARY_DISPLAY_IMAGE}
         }
       }
@@ -60,8 +68,10 @@ const MUSIC_LIBRARY_QUERY = `query($id: ID!) {
 }`
 
 type LibraryArtworkNode = {
+  __typename?: string
   id?: string
   name?: string | null
+  snapshot?: string | null
   composerType?: string | null
   display?: {
     image?: {
@@ -95,6 +105,8 @@ function mapPlaylistNode(node: LibraryArtworkNode): SoundtrackLibraryPlaylist | 
   return {
     id,
     name,
+    sourceTypename: node.__typename?.trim() || 'Playlist',
+    snapshot: node.snapshot?.trim() || null,
     imageUrl: soundtrackLibraryListImageUrl(node),
     sourceKind: playlistSourceKind(node),
   }
@@ -107,6 +119,8 @@ function mapScheduleNode(node: LibraryArtworkNode): SoundtrackLibraryPlaylist | 
   return {
     id,
     name,
+    sourceTypename: node.__typename?.trim() || 'Schedule',
+    snapshot: node.snapshot?.trim() || null,
     imageUrl: soundtrackLibraryListImageUrl(node),
     sourceKind: 'schedule',
   }
