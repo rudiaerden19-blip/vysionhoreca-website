@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { quantizeVolumeUiPercent } from '@/lib/soundtrack/soundtrack-server'
@@ -17,6 +17,12 @@ import {
   VmStop,
 } from './VysionMusicIcons'
 import { VysionMusicCatalogPanel } from './VysionMusicCatalogPanel'
+import {
+  getCachedPlaylistTracks,
+  setCachedPlaylistTracks,
+  type VysionMusicCatalogTrack,
+} from './vysion-music-catalog-cache'
+import { vysionMusicTrackRowIsNowPlaying } from './vysion-music-track-match'
 import {
   lookupVysionMusicCoverArt,
   rememberVysionMusicCoverArt,
@@ -107,6 +113,9 @@ export function VysionMusicClient({
   const [playlistSelecting, setPlaylistSelecting] = useState(false)
   const [optimisticTrack, setOptimisticTrack] = useState<TrackRow | null>(null)
   const [playbackSourceId, setPlaybackSourceId] = useState<string | null>(null)
+  const [transportPlaylistTracks, setTransportPlaylistTracks] = useState<VysionMusicCatalogTrack[]>(
+    [],
+  )
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -356,14 +365,18 @@ export function VysionMusicClient({
   }, [loadSnapshot])
 
   const queueTrackNow = useCallback(
-    async (trackId: string) => {
+    async (trackId: string, opts?: { transportPending?: TransportPending }) => {
       setPlaylistSelecting(true)
       try {
-        const ok = await postMutation('soundZoneQueueTracks', {
-          tracks: [trackId],
-          immediate: true,
-          clearQueuedTracks: true,
-        })
+        const ok = await postMutation(
+          'soundZoneQueueTracks',
+          {
+            tracks: [trackId],
+            immediate: true,
+            clearQueuedTracks: true,
+          },
+          { transportPending: opts?.transportPending },
+        )
         if (ok) refreshSnapshotAfterControl()
       } finally {
         setPlaylistSelecting(false)
@@ -371,6 +384,90 @@ export function VysionMusicClient({
     },
     [postMutation, refreshSnapshotAfterControl],
   )
+
+  const loadTransportPlaylistTracks = useCallback(
+    async (sourceId: string): Promise<VysionMusicCatalogTrack[]> => {
+      const id = sourceId.trim()
+      if (!id) return []
+      const cached = getCachedPlaylistTracks(tenant, id)
+      if (cached?.length) {
+        setTransportPlaylistTracks(cached)
+        return cached
+      }
+      try {
+        const res = await fetch(
+          `/api/soundtrack/${encodeURIComponent(tenant)}/playlist-tracks?source=${encodeURIComponent(id)}`,
+          { headers: getAuthHeaders(), cache: 'no-store' },
+        )
+        const json = (await res.json()) as { tracks?: VysionMusicCatalogTrack[] }
+        if (!res.ok || !json.tracks) return []
+        setCachedPlaylistTracks(tenant, id, json.tracks)
+        setTransportPlaylistTracks(json.tracks)
+        return json.tracks
+      } catch {
+        return []
+      }
+    },
+    [tenant],
+  )
+
+  const playFromSourceId = useMemo(
+    () => (snapshot?.playFromPlaylistId ?? playbackSourceId)?.trim() || null,
+    [snapshot?.playFromPlaylistId, playbackSourceId],
+  )
+
+  useEffect(() => {
+    if (!playFromSourceId) {
+      setTransportPlaylistTracks([])
+      return
+    }
+    const cached = getCachedPlaylistTracks(tenant, playFromSourceId)
+    if (cached?.length) {
+      setTransportPlaylistTracks(cached)
+      return
+    }
+    void loadTransportPlaylistTracks(playFromSourceId)
+  }, [playFromSourceId, tenant, loadTransportPlaylistTracks])
+
+  const nowPlayingIndexInPlayFrom = useMemo(() => {
+    if (!nowTrack || !transportPlaylistTracks.length) return -1
+    const nowMatch = {
+      id: nowTrack.id,
+      name: nowTrack.name,
+      artist: nowTrack.artist,
+    }
+    return transportPlaylistTracks.findIndex((row) =>
+      vysionMusicTrackRowIsNowPlaying(row, nowMatch, { allowTitleArtistFallback: true }),
+    )
+  }, [nowTrack, transportPlaylistTracks])
+
+  const canGoPrevious = nowPlayingIndexInPlayFrom > 0
+
+  const playPreviousTrack = useCallback(async () => {
+    const sourceId = playFromSourceId
+    if (!sourceId || !nowTrack) return
+    let rows = transportPlaylistTracks
+    if (!rows.length) rows = await loadTransportPlaylistTracks(sourceId)
+    const nowMatch = {
+      id: nowTrack.id,
+      name: nowTrack.name,
+      artist: nowTrack.artist,
+    }
+    let idx = rows.findIndex((row) =>
+      vysionMusicTrackRowIsNowPlaying(row, nowMatch, { allowTitleArtistFallback: true }),
+    )
+    if (idx <= 0) return
+    const prev = rows[idx - 1]
+    if (!prev?.id) return
+    setPlaybackSourceId(sourceId)
+    await queueTrackNow(prev.id, { transportPending: 'prev' })
+  }, [
+    loadTransportPlaylistTracks,
+    nowTrack,
+    playFromSourceId,
+    queueTrackNow,
+    transportPlaylistTracks,
+  ])
 
   const playPlaylistTrack = useCallback(
     async (
@@ -524,9 +621,12 @@ export function VysionMusicClient({
               <button
                 type="button"
                 className={styles.transportBtn}
-                disabled
+                disabled={
+                  !canGoPrevious || transportPending === 'prev' || playlistSelecting
+                }
                 aria-label={t('vysionMusic.prev')}
-                title={t('vysionMusic.prevUnavailable')}
+                title={canGoPrevious ? t('vysionMusic.prev') : t('vysionMusic.prevUnavailable')}
+                onClick={() => void playPreviousTrack()}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
