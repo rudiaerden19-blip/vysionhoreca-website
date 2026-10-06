@@ -58,6 +58,12 @@ function formatMs(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+function proxiedCoverUrl(raw: string | null | undefined): string | null {
+  const trimmed = raw?.trim()
+  if (!trimmed || !trimmed.startsWith('http')) return null
+  return `/api/soundtrack/cover?url=${encodeURIComponent(trimmed)}`
+}
+
 function formatClock(now: Date, locale: string): { date: string; time: string } {
   const date = now.toLocaleDateString(locale, {
     weekday: 'short',
@@ -88,7 +94,6 @@ export function VysionMusicClient({
   const [tick, setTick] = useState(0)
   const [volumeUi, setVolumeUi] = useState(0)
   const [coverBroken, setCoverBroken] = useState(false)
-  const [visibleCoverSrc, setVisibleCoverSrc] = useState<string | null>(null)
   const [playlistSelecting, setPlaylistSelecting] = useState(false)
   const [optimisticTrack, setOptimisticTrack] = useState<TrackRow | null>(null)
 
@@ -101,8 +106,6 @@ export function VysionMusicClient({
   const lastTrackKeyRef = useRef('')
   const optimisticStartedAtRef = useRef<string | null>(null)
   const confirmSessionRef = useRef(0)
-  const visibleCoverForTrackIdRef = useRef<string | null>(null)
-
   const applyServerVolume = useCallback((v: number) => {
     const q = quantizeVolumeUiPercent(v)
     if (volumeDraggingRef.current || volumeUiPendingRef.current != null) return
@@ -257,21 +260,8 @@ export function VysionMusicClient({
   }, [nowTrack?.id, nowTrack?.name, nowTrack?.artist, nowTrack])
 
   useEffect(() => {
-    const raw = nowTrackImageUrl?.trim()
-    if (!raw || !nowTrackId) return
-    if (visibleCoverForTrackIdRef.current === nowTrackId && visibleCoverSrc) return
-
-    const proxied = `/api/soundtrack/cover?url=${encodeURIComponent(raw)}`
-    const img = new Image()
-    img.referrerPolicy = 'no-referrer'
-    img.onload = () => {
-      visibleCoverForTrackIdRef.current = nowTrackId
-      setVisibleCoverSrc(proxied)
-      setCoverBroken(false)
-    }
-    img.onerror = () => setCoverBroken(true)
-    img.src = proxied
-  }, [nowTrackId, nowTrackImageUrl, visibleCoverSrc])
+    setCoverBroken(false)
+  }, [nowTrackId, nowTrackImageUrl])
 
   const pollUntilNowPlayingMatches = useCallback(
     async (expectedTrackId: string, mutationStartedAt: number) => {
@@ -327,6 +317,12 @@ export function VysionMusicClient({
       optimisticStartedAtRef.current = new Date().toISOString()
       setOptimisticTrack(row)
       perfLog('track-ui-update', clickT0, { trackId: track.id })
+      const coverUrl = proxiedCoverUrl(track.imageUrl)
+      if (coverUrl) {
+        const img = new Image()
+        img.referrerPolicy = 'no-referrer'
+        img.src = coverUrl
+      }
 
       setPlaylistSelecting(true)
       const mutationT0 = perfNow()
@@ -385,8 +381,7 @@ export function VysionMusicClient({
   const playPausePending: TransportPending = isPlaying ? 'pause' : 'play'
   const { date: clockDate, time: clockTime } = formatClock(clock, locale)
 
-  const coverSrc =
-    coverBroken || !visibleCoverSrc ? null : visibleCoverSrc
+  const coverSrc = coverBroken ? null : proxiedCoverUrl(nowTrackImageUrl)
 
   const playFromId = snapshot?.playFromPlaylistId?.trim() || null
 
@@ -441,6 +436,7 @@ export function VysionMusicClient({
             {coverSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
+                key={nowTrackId ?? 'cover'}
                 src={coverSrc}
                 alt=""
                 className={styles.cover}
