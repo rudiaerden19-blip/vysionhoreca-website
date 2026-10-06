@@ -255,11 +255,9 @@ export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal
       const fullData = data as TenantSettings & {
         stripe_secret_key?: string
         stripe_webhook_secret?: string
-        soundtrack_player_password?: string
       }
       delete fullData.stripe_secret_key
       delete fullData.stripe_webhook_secret
-      delete fullData.soundtrack_player_password
       return fullData as TenantSettings
     }
     return data

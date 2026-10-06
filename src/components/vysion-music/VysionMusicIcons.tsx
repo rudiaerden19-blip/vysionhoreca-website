@@ -13,15 +13,6 @@ const defaults = {
   strokeLinejoin: 'round' as const,
 }
 
-export function VmSettings({ strokeWidth = 2.35, className, ...rest }: VmIconProps) {
-  return (
-    <svg {...defaults} strokeWidth={strokeWidth} className={className} {...rest}>
-      <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}
-
 export function VmSkipBack({ strokeWidth = 2.35, className, ...rest }: VmIconProps) {
   return (
     <svg {...defaults} strokeWidth={strokeWidth} className={className} {...rest}>
@@ -68,35 +59,6 @@ export function VmStop({ strokeWidth = 2.35, className, ...rest }: VmIconProps) 
   return (
     <svg {...defaults} strokeWidth={strokeWidth} className={className} {...rest}>
       <rect x="6" y="6" width="12" height="12" rx="1" />
-    </svg>
-  )
-}
-
-export function VmVolume2({ strokeWidth = 2.35, className, ...rest }: VmIconProps) {
-  return (
-    <svg {...defaults} strokeWidth={strokeWidth} className={className} {...rest}>
-      <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
-      <path d="M16 9a5 5 0 0 1 0 6" />
-      <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
-    </svg>
-  )
-}
-
-export function VmVolume1({ strokeWidth = 2.35, className, ...rest }: VmIconProps) {
-  return (
-    <svg {...defaults} strokeWidth={strokeWidth} className={className} {...rest}>
-      <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
-      <path d="M16 9a5 5 0 0 1 0 6" />
-    </svg>
-  )
-}
-
-export function VmEllipsisVertical({ strokeWidth = 2.35, className, ...rest }: VmIconProps) {
-  return (
-    <svg {...defaults} strokeWidth={strokeWidth} className={className} {...rest}>
-      <circle cx="12" cy="5" r="1" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
-      <circle cx="12" cy="19" r="1" fill="currentColor" stroke="none" />
     </svg>
   )
 }
