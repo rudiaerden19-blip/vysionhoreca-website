@@ -331,6 +331,129 @@ function soundtrackSyncPause(ms: number): Promise<void> {
   })
 }
 
+export function isBenignSoundtrackLibraryDuplicateError(message: string): boolean {
+  const m = message.toLowerCase()
+  return (
+    m.includes('already') ||
+    m.includes('duplicate') ||
+    m.includes('exists') ||
+    m.includes('present')
+  )
+}
+
+const LIBRARY_MEMBERSHIP_QUERY = `query($owner: ID!, $musicLibraryId: ID!) {
+  library(owner: $owner) { ids version }
+  musicLibrary(id: $musicLibraryId) { ids revision }
+}`
+
+const OWNER_LIBRARY_VERSION_QUERY = `query($owner: ID!) {
+  library(owner: $owner) { version }
+}`
+
+/**
+ * Soundtrack desktop player: `addToLibrary` triggert libraryUpdate op de player.
+ * Alleen `addToMusicLibrary` is niet genoeg voor automatische zichtbaarheid in de speler.
+ */
+async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
+  const owner = ownerId.trim()
+  const id = playlistId.trim()
+  if (!owner || !id) return
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let version: string | undefined
+    try {
+      const data = await soundtrackGraphql<{
+        library: { version: string | null } | null
+      }>(OWNER_LIBRARY_VERSION_QUERY, { owner })
+      const v = data.library?.version?.trim()
+      if (v) version = v
+    } catch {
+      /* version is optional on addToLibrary */
+    }
+
+    try {
+      await soundtrackGraphql(
+        `mutation($owner: ID!, $input: AddToLibraryInput!) {
+          addToLibrary(owner: $owner, input: $input) { version }
+        }`,
+        {
+          owner,
+          input: {
+            ...(version ? { version } : {}),
+            items: [{ id, itemKind: 'PLAYLIST' }],
+          },
+        },
+      )
+      return
+    } catch (e) {
+      if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
+        return
+      }
+      const versionConflict =
+        e instanceof SoundtrackApiError &&
+        /version|conflict|stale|overwrite/i.test(e.message)
+      if (versionConflict && attempt < 2) {
+        await soundtrackSyncPause(120)
+        continue
+      }
+      throw e
+    }
+  }
+}
+
+async function addPlaylistToMusicLibrary(ownerId: string, playlistId: string): Promise<void> {
+  try {
+    await soundtrackGraphql<{
+      addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
+    }>(
+      `mutation($input: AddToMusicLibraryInput!) {
+        addToMusicLibrary(input: $input) {
+          musicLibrary { revision ids }
+        }
+      }`,
+      { input: { parent: ownerId.trim(), source: playlistId.trim() } },
+    )
+  } catch (e) {
+    if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
+      return
+    }
+    throw e
+  }
+}
+
+async function assertPlaylistVisibleInSoundtrackLibraries(
+  ownerId: string,
+  musicLibraryId: string,
+  playlistId: string,
+): Promise<void> {
+  const pid = playlistId.trim()
+  for (let i = 0; i < 10; i++) {
+    const data = await soundtrackGraphql<{
+      library: { ids?: string[] | null } | null
+      musicLibrary: { ids?: string[] | null } | null
+    }>(LIBRARY_MEMBERSHIP_QUERY, {
+      owner: ownerId.trim(),
+      musicLibraryId: musicLibraryId.trim(),
+    })
+
+    const inOwnerLibrary = soundtrackLibraryIdsInclude(data.library?.ids, pid)
+    const inMusicLibrary = soundtrackLibraryIdsInclude(data.musicLibrary?.ids, pid)
+    if (inOwnerLibrary && inMusicLibrary) return
+
+    if (i < 9) await soundtrackSyncPause(150)
+  }
+
+  throw new SoundtrackApiError(
+    'Soundtrack playlist not visible in account library after create',
+    502,
+  )
+}
+
+function isSoundtrackPlaylistSnapshotConflictError(e: unknown): boolean {
+  if (!(e instanceof SoundtrackApiError)) return false
+  return /snapshot|version|conflict|stale|overwrite/i.test(e.message)
+}
+
 const MUSIC_LIBRARY_PLAYLIST_BY_NAME_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     ids
@@ -368,41 +491,7 @@ export async function findSoundtrackMusicLibraryPlaylistByName(
   return null
 }
 
-/** Bevestig Soundtrack playlist-node + musicLibrary.playlists (id + naam). */
-async function assertPlaylistInSoundtrackMusicLibrary(
-  musicLibraryId: string,
-  playlistId: string,
-  playlistName: string,
-): Promise<void> {
-  const pid = playlistId.trim()
-  const expectedName = playlistName.trim()
-
-  const plData = await soundtrackGraphql<{
-    playlist: { id: string; name: string | null } | null
-  }>(
-    `query($id: ID!) {
-      playlist(id: $id) { id name }
-    }`,
-    { id: pid },
-  )
-  const node = plData.playlist
-  if (!node?.id?.trim()) {
-    throw new SoundtrackApiError('Soundtrack playlist not found after create', 502)
-  }
-  if ((node.name ?? '').trim() !== expectedName) {
-    throw new SoundtrackApiError('Soundtrack playlist name mismatch after create', 502)
-  }
-
-  for (let i = 0; i < 10; i++) {
-    const inLibrary = await findSoundtrackMusicLibraryPlaylistByName(musicLibraryId, expectedName)
-    if (inLibrary?.id === pid) return
-    if (i < 9) await soundtrackSyncPause(200)
-  }
-
-  throw new SoundtrackApiError('Playlist not in Soundtrack music library after create', 502)
-}
-
-/** Officieel v2: `createManualPlaylist` + `addToMusicLibrary` (Account parent). */
+/** Officieel v2: create + owner library (player) + musicLibrary (Vysion-lijst). */
 export async function createManualPlaylistInMusicLibrary(
   zoneId: string,
   playlistName: string,
@@ -428,25 +517,25 @@ export async function createManualPlaylistInMusicLibrary(
     throw new SoundtrackApiError('Soundtrack created no playlist', 502)
   }
 
-  const added = await soundtrackGraphql<{
-    addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
+  await addPlaylistToOwnerLibrary(ownerId, id)
+  await addPlaylistToMusicLibrary(ownerId, id)
+  await assertPlaylistVisibleInSoundtrackLibraries(ownerId, musicLibraryId, id)
+
+  const plData = await soundtrackGraphql<{
+    playlist: { id: string; name: string | null } | null
   }>(
-    `mutation($input: AddToMusicLibraryInput!) {
-      addToMusicLibrary(input: $input) {
-        musicLibrary { revision ids }
-      }
+    `query($id: ID!) {
+      playlist(id: $id) { id name }
     }`,
-    { input: { parent: ownerId, source: id } },
+    { id },
   )
-
-  if (!soundtrackLibraryIdsInclude(added.addToMusicLibrary?.musicLibrary?.ids, id)) {
-    throw new SoundtrackApiError(
-      'addToMusicLibrary did not register playlist in Soundtrack music library',
-      502,
-    )
+  const node = plData.playlist
+  if (!node?.id?.trim()) {
+    throw new SoundtrackApiError('Soundtrack playlist not found after create', 502)
   }
-
-  await assertPlaylistInSoundtrackMusicLibrary(musicLibraryId, id, name)
+  if ((node.name ?? '').trim() !== name) {
+    throw new SoundtrackApiError('Soundtrack playlist name mismatch after create', 502)
+  }
 
   return {
     id,
@@ -494,6 +583,52 @@ export async function removePlaylistFromMusicLibrary(
   )
 }
 
+async function spliceManualPlaylist(input: {
+  id: string
+  start: number
+  length: number
+  trackIds: string[]
+}): Promise<void> {
+  const pid = input.id.trim()
+  if (!pid) throw new SoundtrackApiError('playlist id required', 400)
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const meta = await soundtrackGraphql<{
+      playlist: { snapshot: string | null; tracks: { total: number } } | null
+    }>(PLAYLIST_SPLICE_META_QUERY, { id: pid })
+
+    if (!meta.playlist) {
+      throw new SoundtrackApiError('Playlist not found', 404)
+    }
+
+    const snapshot = meta.playlist.snapshot?.trim()
+
+    try {
+      await soundtrackGraphql(
+        `mutation($input: SplicePlaylistInput!) {
+          spliceManualPlaylist(input: $input) { id }
+        }`,
+        {
+          input: {
+            id: pid,
+            start: input.start,
+            length: input.length,
+            trackIds: input.trackIds,
+            ...(snapshot ? { snapshot } : {}),
+          },
+        },
+      )
+      return
+    } catch (e) {
+      if (isSoundtrackPlaylistSnapshotConflictError(e) && attempt < 2) {
+        await soundtrackSyncPause(120)
+        continue
+      }
+      throw e
+    }
+  }
+}
+
 export async function removeTrackFromManualPlaylist(
   playlistId: string,
   trackIndex: number,
@@ -517,22 +652,12 @@ export async function removeTrackFromManualPlaylist(
     throw new SoundtrackApiError('Track not found in playlist', 404)
   }
 
-  const snapshot = meta.playlist.snapshot?.trim()
-
-  await soundtrackGraphql(
-    `mutation($input: SplicePlaylistInput!) {
-      spliceManualPlaylist(input: $input) { id }
-    }`,
-    {
-      input: {
-        id: pid,
-        start: trackIndex,
-        length: 1,
-        trackIds: [],
-        ...(snapshot ? { snapshot } : {}),
-      },
-    },
-  )
+  await spliceManualPlaylist({
+    id: pid,
+    start: trackIndex,
+    length: 1,
+    trackIds: [],
+  })
 }
 
 export async function addTrackToManualPlaylist(
@@ -553,20 +678,11 @@ export async function addTrackToManualPlaylist(
   }
 
   const start = Math.max(0, meta.playlist.tracks?.total ?? 0)
-  const snapshot = meta.playlist.snapshot?.trim()
 
-  await soundtrackGraphql(
-    `mutation($input: SplicePlaylistInput!) {
-      spliceManualPlaylist(input: $input) { id }
-    }`,
-    {
-      input: {
-        id: pid,
-        start,
-        length: 0,
-        trackIds: [tid],
-        ...(snapshot ? { snapshot } : {}),
-      },
-    },
-  )
+  await spliceManualPlaylist({
+    id: pid,
+    start,
+    length: 0,
+    trackIds: [tid],
+  })
 }

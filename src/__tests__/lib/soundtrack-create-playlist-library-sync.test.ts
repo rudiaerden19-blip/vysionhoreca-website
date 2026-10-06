@@ -16,7 +16,7 @@ describe('createManualPlaylistInMusicLibrary', () => {
     graphql.mockReset()
   })
 
-  it('uses createManualPlaylist then addToMusicLibrary and verifies musicLibrary membership', async () => {
+  it('uses createManualPlaylist, addToLibrary (player) and addToMusicLibrary', async () => {
     graphql.mockImplementation(async (query: string) => {
       if (query.includes('soundZone')) {
         return {
@@ -26,19 +26,23 @@ describe('createManualPlaylistInMusicLibrary', () => {
       if (query.includes('createManualPlaylist')) {
         return { createManualPlaylist: { id: 'pl-test', name: 'TEST' } }
       }
+      if (query.includes('library(owner') && query.includes('version') && !query.includes('musicLibrary')) {
+        return { library: { version: 'v1' } }
+      }
+      if (query.includes('addToLibrary')) {
+        return { addToLibrary: { version: 'v2' } }
+      }
       if (query.includes('addToMusicLibrary')) {
         return { addToMusicLibrary: { musicLibrary: { revision: '3', ids: ['pl-test'] } } }
       }
+      if (query.includes('library(owner') && query.includes('musicLibrary(id')) {
+        return {
+          library: { ids: ['pl-test'], version: 'v2' },
+          musicLibrary: { ids: ['pl-test'], revision: '3' },
+        }
+      }
       if (query.includes('playlist(id') && query.includes('name') && !query.includes('playlists')) {
         return { playlist: { id: 'pl-test', name: 'TEST' } }
-      }
-      if (query.includes('musicLibrary(id') && query.includes('playlists')) {
-        return {
-          musicLibrary: {
-            ids: ['pl-test'],
-            playlists: { edges: [{ node: { id: 'pl-test', name: 'TEST' } }] },
-          },
-        }
       }
       throw new Error(`unexpected graphql: ${query.slice(0, 120)}`)
     })
@@ -47,6 +51,7 @@ describe('createManualPlaylistInMusicLibrary', () => {
     expect(out).toEqual({ id: 'pl-test', name: 'TEST' })
 
     expect(graphql.mock.calls.some(([q]) => String(q).includes('createManualPlaylist'))).toBe(true)
+    expect(graphql.mock.calls.some(([q]) => String(q).includes('addToLibrary'))).toBe(true)
     const addCall = graphql.mock.calls.find(([q]) => String(q).includes('addToMusicLibrary'))
     expect(addCall?.[1]).toEqual({
       input: { parent: 'acc-1', source: 'pl-test' },
