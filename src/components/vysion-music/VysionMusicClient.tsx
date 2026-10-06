@@ -26,6 +26,12 @@ import styles from './vysion-music.module.css'
 
 const VM_ICON_STROKE = 2.35
 
+/** Snapshot polling — sneller tijdens play + burst vlak voor einde track (auto-volgende). */
+const SNAPSHOT_POLL_IDLE_MS = 6000
+const SNAPSHOT_POLL_PLAYING_MS = 1500
+const SNAPSHOT_POLL_NEAR_END_MS = 500
+const SNAPSHOT_NEAR_END_WINDOW_MS = 8000
+
 type TrackRow = {
   id: string
   name: string
@@ -106,6 +112,9 @@ export function VysionMusicClient({
   const lastTrackKeyRef = useRef('')
   const optimisticStartedAtRef = useRef<string | null>(null)
   const confirmSessionRef = useRef(0)
+  const snapshotRef = useRef<Snapshot | null>(null)
+  const optimisticTrackRef = useRef<TrackRow | null>(null)
+
   const applyServerVolume = useCallback((v: number) => {
     const q = quantizeVolumeUiPercent(v)
     if (volumeDraggingRef.current || volumeUiPendingRef.current != null) return
@@ -190,9 +199,57 @@ export function VysionMusicClient({
   )
 
   useEffect(() => {
-    void loadSnapshot()
-    const id = window.setInterval(() => void loadSnapshot(), 6000)
-    return () => window.clearInterval(id)
+    snapshotRef.current = snapshot
+  }, [snapshot])
+
+  useEffect(() => {
+    optimisticTrackRef.current = optimisticTrack
+  }, [optimisticTrack])
+
+  useEffect(() => {
+    let cancelled = false
+    let timer: number | undefined
+
+    const pollDelayMs = (): number => {
+      const snap = snapshotRef.current
+      const optimistic = optimisticTrackRef.current
+      const playing = optimistic != null || snap?.playbackState === 'playing'
+      if (!playing) return SNAPSHOT_POLL_IDLE_MS
+
+      const track = optimistic ?? snap?.nowPlaying.track ?? null
+      const durationMs = track?.durationMs ?? 0
+      if (!durationMs) return SNAPSHOT_POLL_PLAYING_MS
+
+      const startedAt =
+        optimistic != null
+          ? optimisticStartedAtRef.current ?? snap?.nowPlaying.startedAt
+          : snap?.nowPlaying.startedAt
+
+      let progressMs = snap?.nowPlaying.progressMs ?? 0
+      if (startedAt) {
+        progressMs = Math.min(
+          durationMs,
+          Math.max(0, Date.now() - new Date(startedAt).getTime()),
+        )
+      }
+
+      const remaining = durationMs - progressMs
+      if (remaining <= SNAPSHOT_NEAR_END_WINDOW_MS) return SNAPSHOT_POLL_NEAR_END_MS
+      return SNAPSHOT_POLL_PLAYING_MS
+    }
+
+    const run = async () => {
+      if (cancelled) return
+      await loadSnapshot()
+      if (cancelled) return
+      timer = window.setTimeout(() => void run(), pollDelayMs())
+    }
+
+    void run()
+    return () => {
+      cancelled = true
+      if (timer != null) window.clearTimeout(timer)
+    }
   }, [loadSnapshot])
 
   useEffect(() => {
@@ -233,9 +290,26 @@ export function VysionMusicClient({
     const playing =
       optimisticTrack != null || snapshot?.playbackState === 'playing'
     if (!playing) return
-    const id = window.setInterval(() => setTick((n) => n + 1), 1000)
+    const id = window.setInterval(() => {
+      setTick((n) => n + 1)
+      const snap = snapshotRef.current
+      const optimistic = optimisticTrackRef.current
+      const track = optimistic ?? snap?.nowPlaying.track ?? null
+      const durationMs = track?.durationMs ?? 0
+      if (!durationMs || !snap) return
+      const startedAt =
+        optimistic != null
+          ? optimisticStartedAtRef.current ?? snap.nowPlaying.startedAt
+          : snap.nowPlaying.startedAt
+      if (!startedAt) return
+      const progressMs = Math.min(
+        durationMs,
+        Math.max(0, Date.now() - new Date(startedAt).getTime()),
+      )
+      if (durationMs - progressMs <= 1500) void loadSnapshot()
+    }, 1000)
     return () => window.clearInterval(id)
-  }, [optimisticTrack, snapshot?.playbackState, snapshot?.nowPlaying.startedAt])
+  }, [optimisticTrack, loadSnapshot, snapshot?.playbackState, snapshot?.nowPlaying.startedAt])
 
   const nowTrack = optimisticTrack ?? snapshot?.nowPlaying.track ?? null
   const playbackState =
