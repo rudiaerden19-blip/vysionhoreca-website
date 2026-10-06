@@ -269,3 +269,47 @@ export async function createManualPlaylistInMusicLibrary(
     name: created.createManualPlaylist?.name?.trim() || name,
   }
 }
+
+const PLAYLIST_SPLICE_META_QUERY = `query($id: ID!) {
+  playlist(id: $id) {
+    snapshot
+    tracks { total }
+  }
+}`
+
+/** Voeg één track toe aan een manual Soundtrack-playlist (`spliceManualPlaylist`). */
+export async function addTrackToManualPlaylist(
+  playlistId: string,
+  trackId: string,
+): Promise<void> {
+  const pid = playlistId.trim()
+  const tid = trackId.trim()
+  if (!pid) throw new SoundtrackApiError('playlist id required', 400)
+  if (!tid) throw new SoundtrackApiError('track id required', 400)
+
+  const meta = await soundtrackGraphql<{
+    playlist: { snapshot: string | null; tracks: { total: number } } | null
+  }>(PLAYLIST_SPLICE_META_QUERY, { id: pid })
+
+  if (!meta.playlist) {
+    throw new SoundtrackApiError('Playlist not found', 404)
+  }
+
+  const start = Math.max(0, meta.playlist.tracks?.total ?? 0)
+  const snapshot = meta.playlist.snapshot?.trim()
+
+  await soundtrackGraphql(
+    `mutation($input: SplicePlaylistInput!) {
+      spliceManualPlaylist(input: $input) { id }
+    }`,
+    {
+      input: {
+        id: pid,
+        start,
+        length: 0,
+        trackIds: [tid],
+        ...(snapshot ? { snapshot } : {}),
+      },
+    },
+  )
+}

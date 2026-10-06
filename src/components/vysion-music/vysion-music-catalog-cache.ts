@@ -45,6 +45,12 @@ export function setCachedPlaylistTracks(
   tracksByKey.set(tracksCacheKey(tenant, sourceId), tracks)
 }
 
+export function clearCachedPlaylistTracks(tenant: string, sourceId: string): void {
+  const key = tracksCacheKey(tenant, sourceId)
+  tracksByKey.delete(key)
+  prefetchedTrackSources.delete(key)
+}
+
 const prefetchedTrackSources = new Set<string>()
 
 export function markTracksPrefetched(tenant: string, sourceId: string): boolean {

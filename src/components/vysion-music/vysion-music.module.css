@@ -243,6 +243,136 @@
   font-variant-numeric: tabular-nums;
 }
 
+.searchTrackItem {
+  list-style: none;
+}
+
+.searchTrackRow {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+}
+
+.searchTrackRow .trackRow,
+.searchTrackRow .trackRowActive {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.searchTrackMenuWrap {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.searchTrackMenuBtn {
+  border: none;
+  background: transparent;
+  color: var(--vm-muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 0.35rem 0.4rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.searchTrackMenuBtn:hover:not(:disabled) {
+  color: var(--vm-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.searchTrackMenuBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.searchTrackMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  min-width: 11.5rem;
+  margin-top: 0.15rem;
+  padding: 0.35rem 0;
+  border: 1px solid var(--vm-panel-border);
+  border-radius: 10px;
+  background: var(--vm-panel);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.searchTrackMenuItem {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.86rem;
+  color: var(--vm-text);
+  cursor: pointer;
+}
+
+.searchTrackMenuItem:hover:not(:disabled) {
+  background: var(--vm-row-active);
+}
+
+.searchTrackMenuItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addToPlaylistDialog {
+  width: min(100%, 24rem);
+  max-height: min(70vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid var(--vm-panel-border);
+  border-radius: 12px;
+  background: var(--vm-panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.addToPlaylistList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 14rem;
+}
+
+.addToPlaylistRow,
+.addToPlaylistRowActive {
+  display: block;
+  width: 100%;
+  border: none;
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--vm-text);
+  background: transparent;
+}
+
+.addToPlaylistRow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.addToPlaylistRowActive {
+  background: var(--vm-row-active);
+  font-weight: 600;
+}
+
+.addToPlaylistRow:disabled,
+.addToPlaylistRowActive:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .searchBox {
   margin-top: 0.15rem;
 }

@@ -13,6 +13,7 @@ import {
   type VysionMusicCatalogTrack,
   type VysionMusicLibraryItem,
 } from './vysion-music-catalog-cache'
+import { VysionMusicAddTrackToPlaylistModal } from './VysionMusicAddTrackToPlaylistModal'
 import { perfLog, perfNow } from './vysion-music-perf'
 import { TrackNowPlayingBars } from './TrackNowPlayingBars'
 import {
@@ -81,6 +82,8 @@ export function VysionMusicCatalogPanel({
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
   const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
+  const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
+  const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
 
   const prefetchTracksForSource = useCallback(
     async (sourceId: string) => {
@@ -221,6 +224,23 @@ export function VysionMusicCatalogPanel({
     if (tab === 'schedules') return items.filter((i) => i.sourceKind === 'schedule')
     return items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown')
   }, [items, tab])
+
+  const addablePlaylists = useMemo(
+    () => items.filter((i) => i.sourceKind === 'playlist' || i.sourceKind === 'unknown'),
+    [items],
+  )
+
+  useEffect(() => {
+    if (!searchMenuTrackId) return
+    const close = () => setSearchMenuTrackId(null)
+    const id = window.setTimeout(() => {
+      document.addEventListener('click', close)
+    }, 0)
+    return () => {
+      window.clearTimeout(id)
+      document.removeEventListener('click', close)
+    }
+  }, [searchMenuTrackId])
 
   useEffect(() => {
     if (!items.length) return
@@ -464,25 +484,75 @@ export function VysionMusicCatalogPanel({
             ) : null}
             {searchResults.map((tr, idx) => {
               const active = vysionMusicTrackRowIsNowPlaying(tr, nowPlayingTrack)
+              const menuOpen = searchMenuTrackId === tr.id
               return (
-                <li key={`${tr.id}-s-${idx}`}>
-                  <button
-                    type="button"
-                    className={active ? styles.trackRowActive : styles.trackRow}
-                    disabled={busy}
-                    onClick={() => void onPlaySearchTrack(tr.id)}
-                  >
-                    {active ? (
-                      <TrackNowPlayingBars playing={nowPlaying} />
-                    ) : (
-                      <span className={styles.trackRowNum}>{idx + 1}</span>
-                    )}
-                    <span className={styles.trackRowMain}>
-                      <span className={styles.trackRowTitle}>{tr.name}</span>
-                      <span className={styles.trackRowArtist}>{tr.artist}</span>
-                    </span>
-                    <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
-                  </button>
+                <li key={`${tr.id}-s-${idx}`} className={styles.searchTrackItem}>
+                  <div className={styles.searchTrackRow}>
+                    <button
+                      type="button"
+                      className={active ? styles.trackRowActive : styles.trackRow}
+                      disabled={busy}
+                      onClick={() => void onPlaySearchTrack(tr.id)}
+                    >
+                      {active ? (
+                        <TrackNowPlayingBars playing={nowPlaying} />
+                      ) : (
+                        <span className={styles.trackRowNum}>{idx + 1}</span>
+                      )}
+                      <span className={styles.trackRowMain}>
+                        <span className={styles.trackRowTitle}>{tr.name}</span>
+                        <span className={styles.trackRowArtist}>{tr.artist}</span>
+                      </span>
+                      <span className={styles.trackRowDur}>{formatMs(tr.durationMs)}</span>
+                    </button>
+                    <div className={styles.searchTrackMenuWrap}>
+                      <button
+                        type="button"
+                        className={styles.searchTrackMenuBtn}
+                        disabled={busy}
+                        aria-label={t('vysionMusic.searchTrackMenuAria')}
+                        aria-expanded={menuOpen}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSearchMenuTrackId((prev) => (prev === tr.id ? null : tr.id))
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {menuOpen ? (
+                        <div
+                          className={styles.searchTrackMenu}
+                          role="menu"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            role="menuitem"
+                            className={styles.searchTrackMenuItem}
+                            disabled={busy}
+                            onClick={() => {
+                              setSearchMenuTrackId(null)
+                              void onPlaySearchTrack(tr.id)
+                            }}
+                          >
+                            {t('vysionMusic.searchPlayNow')}
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            className={styles.searchTrackMenuItem}
+                            disabled={busy}
+                            onClick={() => {
+                              setSearchMenuTrackId(null)
+                              setAddToPlaylistTrackId(tr.id)
+                            }}
+                          >
+                            {t('vysionMusic.searchAddToPlaylist')}
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
                 </li>
               )
             })}
@@ -496,6 +566,20 @@ export function VysionMusicCatalogPanel({
         onCreated={() => {
           setTab('lists')
           return loadLists({ background: true })
+        }}
+      />
+      <VysionMusicAddTrackToPlaylistModal
+        tenant={tenant}
+        open={addToPlaylistTrackId != null}
+        trackId={addToPlaylistTrackId ?? ''}
+        playlists={addablePlaylists}
+        onClose={() => setAddToPlaylistTrackId(null)}
+        onAdded={async (playlistId, refreshedTracks) => {
+          setCachedPlaylistTracks(tenant, playlistId, refreshedTracks)
+          if (selectedId === playlistId) {
+            setTracks(refreshedTracks)
+            setTracksError(null)
+          }
         }}
       />
     </section>

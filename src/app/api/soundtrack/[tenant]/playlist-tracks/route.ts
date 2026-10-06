@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authorizeSoundtrackTenantRequest } from '@/lib/soundtrack/soundtrack-dev-auth'
+import { addTrackToManualPlaylist } from '@/lib/soundtrack/soundtrack-playlists'
 import {
   SoundtrackApiError,
   SoundtrackConfigError,
@@ -23,6 +24,41 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
+    const tracks = await fetchPlaySourceTrackRows(source)
+    return NextResponse.json({ ok: true, tracks })
+  } catch (e) {
+    if (e instanceof SoundtrackConfigError) {
+      return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
+    }
+    if (e instanceof SoundtrackApiError) {
+      return NextResponse.json({ error: e.message, code: 'soundtrack' }, { status: e.status })
+    }
+    return NextResponse.json({ error: 'Soundtrack request failed' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest, context: RouteContext) {
+  const tenantSlug = context.params.tenant
+  const access = await authorizeSoundtrackTenantRequest(request, tenantSlug)
+  if (!access.authorized) {
+    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+  }
+
+  let body: { source?: string; trackId?: string }
+  try {
+    body = (await request.json()) as { source?: string; trackId?: string }
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const source = body.source?.trim() ?? ''
+  const trackId = body.trackId?.trim() ?? ''
+  if (!source || !trackId) {
+    return NextResponse.json({ error: 'source en trackId vereist' }, { status: 400 })
+  }
+
+  try {
+    await addTrackToManualPlaylist(source, trackId)
     const tracks = await fetchPlaySourceTrackRows(source)
     return NextResponse.json({ ok: true, tracks })
   } catch (e) {
