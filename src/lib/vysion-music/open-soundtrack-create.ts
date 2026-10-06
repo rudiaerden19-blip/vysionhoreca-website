@@ -1,5 +1,5 @@
-/** Officieel Soundtrack Create-scherm (Create your own sound). */
-export const SOUNDTRACK_CREATE_WEB_URL = 'https://app.soundtrack.io/create'
+/** Officieel aanmaken-scherm (taal = account/browser; lang=nl is best-effort). */
+export const SOUNDTRACK_CREATE_WEB_URL = 'https://app.soundtrack.io/create?lang=nl'
 
 export const VYSION_SOUNDTRACK_PLAYER_WINDOW = 'vysion-soundtrack-web-player'
 
