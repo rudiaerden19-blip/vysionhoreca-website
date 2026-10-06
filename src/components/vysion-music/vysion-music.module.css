@@ -154,6 +154,37 @@
   background: var(--vm-row-active);
 }
 
+.trackRowNowPlaying {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
+}
+
+.trackRowHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.trackRowProgressTrack {
+  display: block;
+  width: 100%;
+  height: 0.22rem;
+  border-radius: 999px;
+  background: var(--vm-accent-track-off);
+  overflow: hidden;
+}
+
+.trackRowProgressFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--vm-accent);
+  transition: width 0.4s linear;
+}
+
 .trackRow:disabled,
 .trackRowActive:disabled {
   opacity: 0.55;

@@ -609,6 +609,8 @@ export function VysionMusicClient({
             : null
         }
         nowPlaying={isPlaying}
+        nowPlayingProgressMs={nowTrack ? progressMs : 0}
+        nowPlayingDurationMs={nowTrack ? durationMs : 0}
         busy={catalogBusy}
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}

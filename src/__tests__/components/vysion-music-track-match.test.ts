@@ -38,4 +38,32 @@ describe('vysionMusicTrackRowIsNowPlaying', () => {
       }),
     ).toBe(false)
   })
+
+  it('matches remastered list title to plain now playing title', () => {
+    expect(
+      vysionMusicTrackRowIsNowPlaying(
+        {
+          ...row,
+          id: 'pl-1',
+          name: 'Easy Lover (Remastered)',
+          artist: 'Philip Bailey',
+        },
+        { id: 'zone-9', name: 'Easy Lover', artist: 'Philip Bailey' },
+      ),
+    ).toBe(true)
+  })
+
+  it('matches when snapshot artist is primary name only', () => {
+    expect(
+      vysionMusicTrackRowIsNowPlaying(
+        {
+          ...row,
+          id: 'pl-2',
+          name: 'Alive And Kicking',
+          artist: 'Simple Minds',
+        },
+        { id: 'zone-2', name: 'Alive and Kicking', artist: 'Simple Minds, Jim Kerr' },
+      ),
+    ).toBe(true)
+  })
 })
