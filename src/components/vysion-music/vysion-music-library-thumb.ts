@@ -1,3 +1,4 @@
+import { vysionMusicLibraryFallbackCoverPath } from '@/lib/vysion-music/vysion-music-library-fallback-cover'
 import { pickSoundtrackLibraryListArtUrl } from '@/lib/soundtrack/soundtrack-library-list-art'
 
 /** Zelfde fallback-letter als lege playlists in de bibliotheeklijst (geen leeg thumb-vak). */
@@ -11,6 +12,11 @@ export function vysionMusicLibraryCoverProxyUrl(imageUrl: string | null | undefi
   const url = imageUrl?.trim()
   if (!url || !url.startsWith('http')) return null
   return `/api/soundtrack/cover?url=${encodeURIComponent(url)}`
+}
+
+/** Lokale gegenereerde cover wanneer Soundtrack geen lijst-art stuurt. */
+export function vysionMusicLibraryFallbackCoverSrc(playlistName: string): string {
+  return vysionMusicLibraryFallbackCoverPath(playlistName)
 }
 
 export type VysionMusicLibraryListArtSourceKind =

@@ -4,6 +4,8 @@ import {
   nullSharedSoundtrackPlaceholderListArt,
 } from '@/lib/soundtrack/soundtrack-library-list-art'
 import {
+  mapSoundtrackTrackRow,
+  SOUNDTRACK_TRACK_GRAPHQL_FIELDS,
   soundtrackTrackArtUrlFromAlbum,
   type SoundtrackTrackGraphNode,
 } from '@/lib/soundtrack/soundtrack-track-map'
@@ -227,15 +229,9 @@ const PLAYLIST_LIST_THUMB_QUERY = `query($id: ID!) {
     display {
       image { sizes { thumbnail teaser hero } }
     }
-    tracks(first: 1) {
+    tracks(first: 12) {
       edges {
-        node {
-          album {
-            display {
-              image { sizes { thumbnail teaser hero } }
-            }
-          }
-        }
+        node { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} }
       }
     }
   }
@@ -252,7 +248,8 @@ async function resolvePlaylistListImageUrl(playlistId: string): Promise<string |
   if (!pl) return null
 
   for (const edge of pl.tracks?.edges ?? []) {
-    const fromTrack = soundtrackTrackArtUrlFromAlbum(edge.node?.album)
+    const row = mapSoundtrackTrackRow(edge.node)
+    const fromTrack = row?.imageUrl ?? soundtrackTrackArtUrlFromAlbum(edge.node?.album)
     if (fromTrack && !isSoundtrackGenericLibraryArtUrl(fromTrack)) return fromTrack
   }
   return soundtrackLibraryListImageUrl(pl)

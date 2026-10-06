@@ -25,8 +25,8 @@ import {
 import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
 import {
   vysionMusicLibraryCoverProxyUrl,
+  vysionMusicLibraryFallbackCoverSrc,
   vysionMusicLibraryListArtUrl,
-  vysionMusicLibraryPlaceholderLetter,
 } from './vysion-music-library-thumb'
 import { VysionMusicDeletePlaylistModal } from './VysionMusicDeletePlaylistModal'
 import { VysionMusicRenamePlaylistModal } from './VysionMusicRenamePlaylistModal'
@@ -115,7 +115,17 @@ export function VysionMusicCatalogPanel({
           { headers: getAuthHeaders(), cache: 'no-store' },
         )
         const json = (await res.json()) as { tracks?: TrackItem[] }
-        if (res.ok && json.tracks) setCachedPlaylistTracks(tenant, sourceId, json.tracks)
+        if (res.ok && json.tracks) {
+          setCachedPlaylistTracks(tenant, sourceId, json.tracks)
+          const art = json.tracks.find((t) => t.imageUrl?.trim())?.imageUrl ?? null
+          if (art) {
+            setItems((prev) =>
+              prev.map((pl) =>
+                pl.id === sourceId && !pl.imageUrl?.trim() ? { ...pl, imageUrl: art } : pl,
+              ),
+            )
+          }
+        }
       } catch {
         /* prefetch best-effort */
       }
@@ -276,7 +286,7 @@ export function VysionMusicCatalogPanel({
 
   useEffect(() => {
     if (!items.length) return
-    const toPrefetch = filteredLists.slice(0, 2)
+    const toPrefetch = filteredLists.filter((pl) => !pl.imageUrl?.trim())
     const id = window.setTimeout(() => {
       for (const pl of toPrefetch) void prefetchTracksForSource(pl.id)
     }, 400)
@@ -421,6 +431,7 @@ export function VysionMusicCatalogPanel({
                 cachedTrackArt,
               )
               const thumbSrc = vysionMusicLibraryCoverProxyUrl(listArtUrl)
+              const fallbackCoverSrc = vysionMusicLibraryFallbackCoverSrc(pl.name)
               const libraryMenuOpen = libraryMenuPlaylistId === pl.id
               const showPlaylistMenu = isManualLibraryPlaylist(pl.sourceKind)
               return (
@@ -433,22 +444,20 @@ export function VysionMusicCatalogPanel({
                       onClick={() => pickPlaylist(pl.id)}
                     >
                       <span className={styles.libraryThumb} aria-hidden>
-                        {thumbSrc && !brokenThumbIds.has(pl.id) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={thumbSrc}
-                            alt=""
-                            className={styles.libraryThumbImg}
-                            referrerPolicy="no-referrer"
-                            onError={() =>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={
+                            thumbSrc && !brokenThumbIds.has(pl.id) ? thumbSrc : fallbackCoverSrc
+                          }
+                          alt=""
+                          className={styles.libraryThumbImg}
+                          referrerPolicy="no-referrer"
+                          onError={() => {
+                            if (thumbSrc && !brokenThumbIds.has(pl.id)) {
                               setBrokenThumbIds((prev) => new Set(prev).add(pl.id))
                             }
-                          />
-                        ) : (
-                          <span className={styles.libraryThumbFallback}>
-                            {vysionMusicLibraryPlaceholderLetter(pl.name)}
-                          </span>
-                        )}
+                          }}
+                        />
                       </span>
                       <span className={styles.libraryRowText}>
                         <span className={styles.libraryRowName}>{pl.name}</span>
