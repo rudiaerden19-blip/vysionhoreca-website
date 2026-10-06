@@ -296,33 +296,72 @@ async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string
   throw new SoundtrackConfigError(`Soundtrack zone not found: ${needle}`)
 }
 
-export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<string> {
-  const cached = zoneIdByTenantCache.get(tenantSlug)
+export type SoundtrackZoneLinkSource =
+  | 'tenant_id'
+  | 'tenant_name'
+  | 'env_id'
+  | 'env_name'
+
+export type SoundtrackZoneResolution = {
+  zoneId: string
+  linkSource: SoundtrackZoneLinkSource
+  /** True wanneer tenant_settings een zone heeft (niet alleen Vercel-default). */
+  tenantConfigured: boolean
+}
+
+const zoneResolutionCache = new Map<string, SoundtrackZoneResolution>()
+
+export function invalidateSoundtrackZoneCacheForTenant(tenantSlug: string): void {
+  const slug = tenantSlug.trim()
+  zoneIdByTenantCache.delete(slug)
+  zoneResolutionCache.delete(slug)
+}
+
+export async function resolveSoundZoneForTenant(
+  tenantSlug: string,
+): Promise<SoundtrackZoneResolution> {
+  const slug = tenantSlug.trim()
+  if (!slug) throw new SoundtrackConfigError('tenant slug required')
+
+  const cached = zoneResolutionCache.get(slug)
   if (cached) return cached
 
   const fromEnvId = (process.env.SOUNDTRACK_DEFAULT_SOUND_ZONE_ID || '').trim()
   const fromEnvName = (process.env.SOUNDTRACK_DEFAULT_ZONE_NAME || '').trim()
 
   let resolved = ''
+  let linkSource: SoundtrackZoneLinkSource = 'env_name'
+
   const supabase = getServerSupabaseClient()
   if (supabase) {
     const { data, error } = await supabase
       .from('tenant_settings')
       .select('soundtrack_sound_zone_id, soundtrack_zone_name')
-      .eq('tenant_slug', tenantSlug)
+      .eq('tenant_slug', slug)
       .maybeSingle()
     if (!error && data) {
       const fromTenantId = (data.soundtrack_sound_zone_id as string | null | undefined)?.trim()
-      if (fromTenantId) resolved = fromTenantId
-      else {
+      if (fromTenantId) {
+        resolved = fromTenantId
+        linkSource = 'tenant_id'
+      } else {
         const fromTenantName = (data.soundtrack_zone_name as string | null | undefined)?.trim()
-        if (fromTenantName) resolved = await resolveSoundZoneIdByDisplayName(fromTenantName)
+        if (fromTenantName) {
+          resolved = await resolveSoundZoneIdByDisplayName(fromTenantName)
+          linkSource = 'tenant_name'
+        }
       }
     }
   }
 
-  if (!resolved && fromEnvId) resolved = fromEnvId
-  if (!resolved && fromEnvName) resolved = await resolveSoundZoneIdByDisplayName(fromEnvName)
+  if (!resolved && fromEnvId) {
+    resolved = fromEnvId
+    linkSource = 'env_id'
+  }
+  if (!resolved && fromEnvName) {
+    resolved = await resolveSoundZoneIdByDisplayName(fromEnvName)
+    linkSource = 'env_name'
+  }
 
   if (!resolved) {
     throw new SoundtrackConfigError(
@@ -330,8 +369,18 @@ export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<s
     )
   }
 
-  zoneIdByTenantCache.set(tenantSlug, resolved)
-  return resolved
+  const out: SoundtrackZoneResolution = {
+    zoneId: resolved,
+    linkSource,
+    tenantConfigured: linkSource === 'tenant_id' || linkSource === 'tenant_name',
+  }
+  zoneIdByTenantCache.set(slug, resolved)
+  zoneResolutionCache.set(slug, out)
+  return out
+}
+
+export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<string> {
+  return (await resolveSoundZoneForTenant(tenantSlug)).zoneId
 }
 
 export async function soundtrackGraphql<T = Record<string, unknown>>(
@@ -382,6 +431,8 @@ export type SoundtrackPlayerSnapshot = {
   playlist: SoundtrackTrackRow[]
   playFromPlaylistId: string | null
   playFromTypename: string | null
+  zoneLinkSource?: SoundtrackZoneLinkSource
+  tenantZoneConfigured?: boolean
 }
 
 /** Lege zone — lokaal zonder Soundtrack-token (UI blijft bruikbaar). */
@@ -464,7 +515,7 @@ export async function fetchSoundtrackPlayerSnapshot(
   let playFromPlaylistId: string | null = null
   let playlist: SoundtrackTrackRow[] = []
 
-  if (playFrom?.__typename === 'Playlist') {
+  if (playFrom?.__typename === 'Playlist' || playFrom?.__typename === 'Soundtrack') {
     playFromPlaylistId = playFrom.id?.trim() || null
     if (playFromPlaylistId) {
       playlist = await fetchPlaylistTrackRows(playFromPlaylistId)

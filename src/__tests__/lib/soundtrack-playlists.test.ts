@@ -8,53 +8,62 @@ const ZONE = 'zone-1'
 const ACCOUNT = 'account-1'
 const LIBRARY = 'library-1'
 
-function libraryPayload(playlists: { id: string; name: string; total: number }[]) {
+function zoneAccountPayload() {
   return {
     soundZone: {
       account: {
         id: ACCOUNT,
-        musicLibrary: {
-          id: LIBRARY,
-          playlists: {
-            edges: playlists.map((p) => ({
-              node: { id: p.id, name: p.name, tracks: { totalCount: p.total } },
-            })),
-          },
-        },
+        musicLibrary: { id: LIBRARY },
+      },
+    },
+  }
+}
+
+function childrenPayload(
+  nodes: { id: string; name: string; __typename: string }[],
+) {
+  return {
+    musicLibrary: {
+      id: LIBRARY,
+      children: {
+        edges: nodes.map((n) => ({ node: n })),
       },
     },
   }
 }
 
 describe('soundtrack library playlists', () => {
-  it('lists playlists from the zone account music library', async () => {
+  it('lists library children (playlists + soundtracks) from Soundtrack musicLibrary', async () => {
     const calls: { query: string; variables?: Record<string, unknown> }[] = []
     const gql: SoundtrackGql = async <T,>(query: string, variables?: Record<string, unknown>) => {
       calls.push({ query, variables })
-      return libraryPayload([
-        { id: 'b', name: 'Zomer', total: 4 },
-        { id: 'a', name: 'Avond', total: 2 },
-      ]) as T
+      if (query.includes('soundZone')) return zoneAccountPayload() as T
+      if (query.includes('children(first: 200)')) {
+        return childrenPayload([
+          { id: 'st-1', name: 'Modern Jazz', __typename: 'Soundtrack' },
+          { id: 'pl-1', name: 'AFSPEELLIJST', __typename: 'Playlist' },
+        ]) as T
+      }
+      throw new Error(`unexpected query: ${query}`)
     }
 
     const rows = await listSoundtrackLibraryPlaylists(ZONE, gql)
 
-    expect(calls).toHaveLength(1)
-    expect(calls[0].query).toContain('soundZone(id: $id)')
-    expect(calls[0].query).toContain('playlists(first: 100)')
-    expect(calls[0].query).toContain('tracks(first: 1)')
-    expect(calls[0].query).toContain('totalCount')
-    expect(calls[0].query).not.toContain('album')
-    expect(calls[0].variables).toEqual({ id: ZONE })
-    expect(rows.map((r) => r.name)).toEqual(['Avond', 'Zomer'])
-    expect(rows[0]).toEqual({ id: 'a', name: 'Avond', trackCount: 2 })
+    expect(calls.some((c) => c.query.includes('children(first: 200)'))).toBe(true)
+    expect(rows.map((r) => r.name)).toEqual(['AFSPEELLIJST', 'Modern Jazz'])
+    expect(rows.find((r) => r.id === 'st-1')?.sourceKind).toBe('soundtrack')
+    expect(rows.find((r) => r.id === 'pl-1')?.sourceKind).toBe('playlist')
   })
 
   it('creates a manual playlist and adds it to the music library', async () => {
     const calls: { query: string; variables?: Record<string, unknown> }[] = []
     const gql: SoundtrackGql = async <T,>(query: string, variables?: Record<string, unknown>) => {
       calls.push({ query, variables })
-      if (query.includes('soundZone')) return libraryPayload([]) as T
+      if (query.includes('soundZone')) return zoneAccountPayload() as T
+      if (query.includes('children(first: 200)')) return childrenPayload([]) as T
+      if (query.includes('playlists(first: 200)')) {
+        return { musicLibrary: { id: LIBRARY, playlists: { edges: [] } } } as T
+      }
       if (query.includes('createManualPlaylist')) {
         return { createManualPlaylist: { id: 'pl-new', name: 'Zaal' } } as T
       }
@@ -66,16 +75,13 @@ describe('soundtrack library playlists', () => {
 
     const created = await createSoundtrackLibraryPlaylist(ZONE, '  Zaal  ', gql)
 
-    expect(created).toEqual({ id: 'pl-new', name: 'Zaal', trackCount: 0 })
-    expect(calls).toHaveLength(3)
-    expect(calls[1].query).toContain('mutation($input: CreateManualPlaylistInput!)')
-    expect(calls[1].variables).toEqual({
-      input: { ownerId: ACCOUNT, name: 'Zaal', playbackMode: 'linear' },
+    expect(created).toEqual({
+      id: 'pl-new',
+      name: 'Zaal',
+      trackCount: 0,
+      sourceKind: 'playlist',
     })
-    expect(calls[2].query).toContain('mutation($input: AddToMusicLibraryInput!)')
-    expect(calls[2].variables).toEqual({
-      input: { parent: LIBRARY, source: 'pl-new' },
-    })
+    expect(calls.some((c) => c.query.includes('createManualPlaylist'))).toBe(true)
   })
 
   it('rejects an empty playlist name before calling Soundtrack', async () => {

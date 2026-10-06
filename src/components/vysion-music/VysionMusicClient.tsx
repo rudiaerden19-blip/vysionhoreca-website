@@ -51,6 +51,9 @@ type Snapshot = {
   }
   playlist: TrackRow[]
   playFromPlaylistId?: string | null
+  zoneLinkSource?: string
+  tenantZoneConfigured?: boolean
+  isPaired?: boolean
 }
 
 type TransportPending = 'prev' | 'play' | 'pause' | 'stop' | 'skipNext'
@@ -59,6 +62,16 @@ type LibraryPlaylist = {
   id: string
   name: string
   trackCount: number
+  sourceKind?: string
+}
+
+type ZoneListItem = {
+  id: string
+  name: string
+  locationName: string
+  online: boolean
+  isPaired: boolean
+  deviceName: string | null
 }
 
 function formatMs(ms: number): string {
@@ -111,6 +124,11 @@ export function VysionMusicClient({
   const [creatingList, setCreatingList] = useState(false)
   const [newListName, setNewListName] = useState('')
   const [librarySaving, setLibrarySaving] = useState(false)
+  const [zoneOpen, setZoneOpen] = useState(false)
+  const [zoneLoading, setZoneLoading] = useState(false)
+  const [zoneSaving, setZoneSaving] = useState(false)
+  const [zoneError, setZoneError] = useState<string | null>(null)
+  const [zoneOptions, setZoneOptions] = useState<ZoneListItem[]>([])
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -365,31 +383,88 @@ export function VysionMusicClient({
     async (playlistId: string) => {
       const source = playlistId.trim()
       if (!source) return
+      if (snapshot && !snapshot.online) {
+        setError(t('vysionMusic.errorZoneOffline'))
+        return
+      }
       setLibraryOpen(false)
       setSwitchingTrack(true)
       setError(null)
-      const result = await playSoundtrackPlaylistRow(apiBase, source, 0, {
-        activeSourceId: snapshot?.playFromPlaylistId ?? null,
-        currentTrackId: snapshot?.nowPlaying.track?.id ?? null,
-        playlistTrackIds: (snapshot?.playlist ?? []).map((r) => r.id),
-      })
-      if (!result.ok) {
-        setError(result.error || t('vysionMusic.errorControl'))
-      } else if (result.snapshot) {
-        mergeSnapshot(result.snapshot as Snapshot)
+      const okSet = await postMutation('setPlayFrom', { source }, { silent: true })
+      const okPlay = okSet ? await postMutation('play', {}, { silent: true }) : false
+      if (!okPlay) {
+        setError(t('vysionMusic.errorControl'))
       }
       setSwitchingTrack(false)
       void loadSnapshot()
     },
-    [
-      apiBase,
-      loadSnapshot,
-      mergeSnapshot,
-      snapshot?.nowPlaying.track?.id,
-      snapshot?.playFromPlaylistId,
-      snapshot?.playlist,
-      t,
-    ],
+    [loadSnapshot, postMutation, snapshot, t],
+  )
+
+  const loadZoneOptions = useCallback(async () => {
+    setZoneLoading(true)
+    setZoneError(null)
+    try {
+      const res = await fetch(`${apiBase}/zone`, { headers: getAuthHeaders(), cache: 'no-store' })
+      const json = (await res.json()) as {
+        ok?: boolean
+        zones?: ZoneListItem[]
+        error?: string
+      }
+      if (!res.ok || json.ok === false) {
+        setZoneError(json.error || t('vysionMusic.errorLoad'))
+        setZoneOptions([])
+        return
+      }
+      setZoneOptions(json.zones ?? [])
+    } catch {
+      setZoneError(t('vysionMusic.errorNetwork'))
+      setZoneOptions([])
+    } finally {
+      setZoneLoading(false)
+    }
+  }, [apiBase, t])
+
+  const linkSoundtrackZone = useCallback(
+    async (zoneId: string, zoneName: string) => {
+      setZoneSaving(true)
+      setZoneError(null)
+      try {
+        const res = await fetch(`${apiBase}/zone`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+          body: JSON.stringify({ zoneId, zoneName }),
+        })
+        const json = (await res.json()) as { ok?: boolean; error?: string }
+        if (!res.ok || json.ok === false) {
+          setZoneError(json.error || t('vysionMusic.errorControl'))
+          return
+        }
+        setZoneOpen(false)
+        void loadSnapshot()
+      } catch {
+        setZoneError(t('vysionMusic.errorNetwork'))
+      } finally {
+        setZoneSaving(false)
+      }
+    },
+    [apiBase, loadSnapshot, t],
+  )
+
+  const librarySourceLabel = useCallback(
+    (kind?: string) => {
+      switch (kind) {
+        case 'soundtrack':
+          return t('vysionMusic.librarySourceSoundtrack')
+        case 'schedule':
+          return t('vysionMusic.librarySourceSchedule')
+        case 'playlist':
+          return t('vysionMusic.librarySourcePlaylist')
+        default:
+          return t('vysionMusic.librarySourcePlaylist')
+      }
+    },
+    [t],
   )
 
   const saveNewLibraryPlaylist = useCallback(async () => {
@@ -552,9 +627,17 @@ export function VysionMusicClient({
             <div className={styles.clockDate}>{clockDate}</div>
             <div className={styles.clockTime}>{clockTime}</div>
           </div>
-          <span className={styles.settingsBtn} aria-hidden>
+          <button
+            type="button"
+            className={styles.settingsBtn}
+            aria-label={t('vysionMusic.zoneLinkTitle')}
+            onClick={() => {
+              setZoneOpen(true)
+              void loadZoneOptions()
+            }}
+          >
             <VmSettings strokeWidth={VM_ICON_STROKE} />
-          </span>
+          </button>
         </div>
       </header>
 
@@ -911,7 +994,7 @@ export function VysionMusicClient({
                           {active ? ' ✓' : ''}
                         </span>
                         <span className={styles.playlistModalMeta}>
-                          {pl.trackCount} {t('vysionMusic.playlistTracksLabel')}
+                          {librarySourceLabel(pl.sourceKind)}
                         </span>
                       </button>
                     </li>
@@ -923,7 +1006,92 @@ export function VysionMusicClient({
         </div>
       ) : null}
 
-      <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
+      {zoneOpen ? (
+        <div
+          className={styles.playlistModalBackdrop}
+          role="presentation"
+          onClick={() => setZoneOpen(false)}
+        >
+          <div
+            className={styles.playlistModal}
+            role="dialog"
+            aria-labelledby="vm-zone-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.playlistModalHeader}>
+              <h2 id="vm-zone-title" className={styles.playlistModalTitle}>
+                {t('vysionMusic.zoneLinkTitle')}
+              </h2>
+              <button
+                type="button"
+                className={styles.playlistModalClose}
+                onClick={() => setZoneOpen(false)}
+              >
+                {t('vysionMusic.playlistModalClose')}
+              </button>
+            </div>
+            <p className={styles.playlistModalHint}>{t('vysionMusic.zoneLinkHint')}</p>
+            {snapshot ? (
+              <p className={styles.playlistModalHint}>
+                {snapshot.zoneName}
+                {snapshot.deviceName ? ` · ${snapshot.deviceName}` : ''}
+                {' · '}
+                {snapshot.online ? t('vysionMusic.online') : t('vysionMusic.offline')}
+                {!snapshot.tenantZoneConfigured ? ` · ${t('vysionMusic.zoneLinkFallback')}` : ''}
+              </p>
+            ) : null}
+            {zoneError ? (
+              <p className={styles.playlistModalHint} role="alert">
+                {zoneError}
+              </p>
+            ) : null}
+            {zoneLoading ? (
+              <p className={styles.playlistModalHint}>{t('vysionMusic.loading')}</p>
+            ) : null}
+            <ul className={styles.playlistModalList}>
+              {zoneOptions.map((z) => {
+                const active = snapshot?.zoneName === z.name
+                return (
+                  <li key={z.id} className={styles.playlistModalItem}>
+                    <button
+                      type="button"
+                      className={styles.playlistModalSelect}
+                      disabled={zoneSaving}
+                      onClick={() => void linkSoundtrackZone(z.id, z.name)}
+                    >
+                      <span className={styles.playlistModalName}>
+                        {z.name}
+                        {active ? ' ✓' : ''}
+                      </span>
+                      <span className={styles.playlistModalMeta}>
+                        {z.locationName}
+                        {z.deviceName ? ` · ${z.deviceName}` : ''}
+                        {' · '}
+                        {z.online ? t('vysionMusic.online') : t('vysionMusic.offline')}
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        </div>
+      ) : null}
+
+      <div className={styles.statusBar}>
+        {snapshot ? (
+          <span>
+            {snapshot.zoneName}
+            {snapshot.deviceName ? ` · ${snapshot.deviceName}` : ''}
+            {' · '}
+            {snapshot.online ? t('vysionMusic.online') : t('vysionMusic.offline')}
+            {!snapshot.tenantZoneConfigured ? ` · ${t('vysionMusic.zoneLinkFallback')}` : ''}
+          </span>
+        ) : (
+          <span>{t('vysionMusic.loading')}</span>
+        )}
+        <span>{t('vysionMusic.statusFooter')}</span>
+      </div>
     </div>
   )
 }

@@ -6,7 +6,7 @@ import {
   emptySoundtrackPlayerSnapshot,
   ensureSoundZoneCrossfadeSettings,
   fetchSoundtrackPlayerSnapshot,
-  resolveSoundZoneIdForTenant,
+  resolveSoundZoneForTenant,
   skipSoundZoneTracks,
   soundtrackGraphql,
   soundtrackPauseZone,
@@ -65,9 +65,16 @@ export async function GET(request: NextRequest, context: RouteContext) {
       }
     }
 
-    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-    const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
-    return NextResponse.json({ ok: true, snapshot })
+    const resolution = await resolveSoundZoneForTenant(tenantSlug)
+    const snapshot = await fetchSoundtrackPlayerSnapshot(resolution.zoneId)
+    return NextResponse.json({
+      ok: true,
+      snapshot: {
+        ...snapshot,
+        zoneLinkSource: resolution.linkSource,
+        tenantZoneConfigured: resolution.tenantConfigured,
+      },
+    })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       if (process.env.NODE_ENV === 'development') {
@@ -115,7 +122,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const input = body.input ?? {}
 
   try {
-    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    const zoneId = (await resolveSoundZoneForTenant(tenantSlug)).zoneId
     await ensureSoundZoneCrossfadeSettings(zoneId)
 
     switch (mutation) {

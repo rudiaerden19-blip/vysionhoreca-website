@@ -1,14 +1,18 @@
-import { getServerSupabaseClient } from '@/lib/supabase-server'
 import {
   SoundtrackApiError,
-  SoundtrackConfigError,
+  resolveSoundZoneIdForTenant,
   soundtrackGraphql,
 } from '@/lib/soundtrack/soundtrack-server'
+
+export { resolveSoundZoneIdForTenant } from '@/lib/soundtrack/soundtrack-server'
+
+export type SoundtrackLibrarySourceKind = 'playlist' | 'soundtrack' | 'schedule' | 'unknown'
 
 export type SoundtrackLibraryPlaylist = {
   id: string
   name: string
   trackCount: number
+  sourceKind: SoundtrackLibrarySourceKind
 }
 
 export type SoundtrackGql = <T = Record<string, unknown>>(
@@ -16,163 +20,166 @@ export type SoundtrackGql = <T = Record<string, unknown>>(
   variables?: Record<string, unknown>,
 ) => Promise<T>
 
-const zoneIdByTenantCache = new Map<string, string>()
-const zoneIdByNameCache = new Map<string, string>()
-
 type AccountLibrary = {
   accountId: string
   libraryId: string
   playlists: SoundtrackLibraryPlaylist[]
 }
 
-const LIBRARY_QUERY = `query($id: ID!) {
+const ZONE_ACCOUNT_QUERY = `query($id: ID!) {
   soundZone(id: $id) {
     account {
       id
-      musicLibrary {
-        id
-        playlists(first: 100) {
-          edges {
-            node {
-              id
-              name
-              tracks(first: 1) {
-                totalCount
-              }
-            }
-          }
+      musicLibrary { id }
+    }
+  }
+}`
+
+/** Zelfde lijst als Soundtrack-app «Playlists & Stations» — union `children`. */
+const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
+  musicLibrary(id: $id) {
+    id
+    children(first: 200) {
+      edges {
+        node {
+          __typename
+          ... on Playlist { id name }
+          ... on Soundtrack { id name }
+          ... on Schedule { id name }
         }
       }
     }
   }
 }`
 
-/**
- * Zone van deze tenant: tenant_settings, anders de omgevings-default.
- * Eén Soundtrack-account kan meerdere zones hebben; de lijst hangt aan het account van déze zone.
- */
-export async function resolveSoundZoneIdForTenant(tenantSlug: string): Promise<string> {
-  const slug = tenantSlug.trim()
-  if (!slug) throw new SoundtrackConfigError('tenant slug required')
-  const cached = zoneIdByTenantCache.get(slug)
-  if (cached) return cached
-
-  const fromEnvId = (process.env.SOUNDTRACK_DEFAULT_SOUND_ZONE_ID || '').trim()
-  const fromEnvName = (process.env.SOUNDTRACK_DEFAULT_ZONE_NAME || '').trim()
-
-  let resolved = ''
-  const supabase = getServerSupabaseClient()
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('tenant_settings')
-      .select('soundtrack_sound_zone_id, soundtrack_zone_name')
-      .eq('tenant_slug', slug)
-      .maybeSingle()
-    if (!error && data) {
-      const fromTenantId = (data.soundtrack_sound_zone_id as string | null | undefined)?.trim()
-      if (fromTenantId) resolved = fromTenantId
-      else {
-        const fromTenantName = (data.soundtrack_zone_name as string | null | undefined)?.trim()
-        if (fromTenantName) resolved = await resolveSoundZoneIdByDisplayName(fromTenantName)
-      }
+/** Fallback: manual playlists + Soundtrack-curated stations. */
+const LIBRARY_SPLIT_QUERY = `query($id: ID!) {
+  musicLibrary(id: $id) {
+    id
+    playlists(first: 200) {
+      edges { node { id name } }
+    }
+    soundtracks(first: 200) {
+      edges { node { id name } }
     }
   }
+}`
 
-  if (!resolved && fromEnvId) resolved = fromEnvId
-  if (!resolved && fromEnvName) resolved = await resolveSoundZoneIdByDisplayName(fromEnvName)
-  if (!resolved) {
-    throw new SoundtrackConfigError(
-      'No Soundtrack sound zone configured for this tenant',
-    )
+const LIBRARY_PLAYLISTS_ONLY_QUERY = `query($id: ID!) {
+  musicLibrary(id: $id) {
+    id
+    playlists(first: 200) {
+      edges { node { id name } }
+    }
   }
+}`
 
-  zoneIdByTenantCache.set(slug, resolved)
-  return resolved
+function kindFromTypename(typename: string | undefined): SoundtrackLibrarySourceKind {
+  switch (typename) {
+    case 'Playlist':
+      return 'playlist'
+    case 'Soundtrack':
+      return 'soundtrack'
+    case 'Schedule':
+      return 'schedule'
+    default:
+      return 'unknown'
+  }
 }
 
-async function resolveSoundZoneIdByDisplayName(name: string): Promise<string> {
-  const needle = name.trim()
-  const cacheKey = needle.toLowerCase()
-  const cached = zoneIdByNameCache.get(cacheKey)
-  if (cached) return cached
-
-  const data = await soundtrackGraphql<{
-    me: {
-      accounts: {
-        edges: {
-          node: {
-            locations: {
-              edges: {
-                node: {
-                  soundZones: { edges: { node: { id: string; name: string } }[] }
-                }
-              }[]
-            }
-          }
-        }[]
-      }
-    }
-  }>(`query {
-    me {
-      ... on PublicAPIClient {
-        accounts(first: 25) {
-          edges {
-            node {
-              locations(first: 50) {
-                edges {
-                  node {
-                    soundZones(first: 50) {
-                      edges { node { id name } }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }`)
-
-  for (const account of data.me?.accounts?.edges ?? []) {
-    for (const location of account.node.locations?.edges ?? []) {
-      for (const zone of location.node.soundZones?.edges ?? []) {
-        if (zone.node.name.trim() === needle) {
-          zoneIdByNameCache.set(cacheKey, zone.node.id)
-          return zone.node.id
-        }
-      }
-    }
-  }
-  throw new SoundtrackConfigError(`Soundtrack zone not found: ${needle}`)
-}
-
-function mapPlaylists(
+function mapLibraryNodes(
   edges:
     | {
         node: {
+          __typename?: string
           id?: string
-          name?: string
-          tracks?: { totalCount?: number } | null
+          name?: string | null
         }
       }[]
     | null
     | undefined,
+  defaultKind: SoundtrackLibrarySourceKind = 'unknown',
 ): SoundtrackLibraryPlaylist[] {
   const rows: SoundtrackLibraryPlaylist[] = []
   for (const edge of edges ?? []) {
     const id = edge.node?.id?.trim()
     const name = edge.node?.name?.trim()
     if (!id || !name) continue
-    const total = edge.node.tracks?.totalCount
     rows.push({
       id,
       name,
-      trackCount: typeof total === 'number' && total > 0 ? Math.floor(total) : 0,
+      trackCount: 0,
+      sourceKind:
+        defaultKind === 'unknown'
+          ? kindFromTypename(edge.node?.__typename)
+          : defaultKind,
     })
   }
-  rows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
   return rows
+}
+
+function dedupeLibraryRows(rows: SoundtrackLibraryPlaylist[]): SoundtrackLibraryPlaylist[] {
+  const seen = new Set<string>()
+  const out: SoundtrackLibraryPlaylist[] = []
+  for (const row of rows) {
+    if (seen.has(row.id)) continue
+    seen.add(row.id)
+    out.push(row)
+  }
+  out.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+  return out
+}
+
+function isUnknownFieldError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e)
+  return /Cannot query field|Unknown field|Unknown type/i.test(msg)
+}
+
+async function fetchMusicLibraryRows(
+  libraryId: string,
+  gql: SoundtrackGql,
+): Promise<SoundtrackLibraryPlaylist[]> {
+  const id = libraryId.trim()
+
+  try {
+    const data = await gql<{
+      musicLibrary: {
+        children: {
+          edges: {
+            node: { __typename?: string; id?: string; name?: string | null }
+          }[]
+        }
+      } | null
+    }>(LIBRARY_CHILDREN_QUERY, { id })
+    const rows = mapLibraryNodes(data.musicLibrary?.children?.edges)
+    if (rows.length > 0) return dedupeLibraryRows(rows)
+  } catch (e) {
+    if (!isUnknownFieldError(e)) throw e
+  }
+
+  try {
+    const data = await gql<{
+      musicLibrary: {
+        playlists: { edges: { node: { id?: string; name?: string | null } }[] }
+        soundtracks: { edges: { node: { id?: string; name?: string | null } }[] }
+      } | null
+    }>(LIBRARY_SPLIT_QUERY, { id })
+    const lib = data.musicLibrary
+    const rows = [
+      ...mapLibraryNodes(lib?.playlists?.edges, 'playlist'),
+      ...mapLibraryNodes(lib?.soundtracks?.edges, 'soundtrack'),
+    ]
+    if (rows.length > 0) return dedupeLibraryRows(rows)
+  } catch (e) {
+    if (!isUnknownFieldError(e)) throw e
+  }
+
+  const data = await gql<{
+    musicLibrary: {
+      playlists: { edges: { node: { id?: string; name?: string | null } }[] }
+    } | null
+  }>(LIBRARY_PLAYLISTS_ONLY_QUERY, { id })
+  return dedupeLibraryRows(mapLibraryNodes(data.musicLibrary?.playlists?.edges, 'playlist'))
 }
 
 async function fetchAccountLibrary(zoneId: string, gql: SoundtrackGql): Promise<AccountLibrary> {
@@ -180,31 +187,22 @@ async function fetchAccountLibrary(zoneId: string, gql: SoundtrackGql): Promise<
     soundZone: {
       account: {
         id: string
-        musicLibrary: {
-          id: string
-          playlists: {
-            edges: {
-              node: {
-                id?: string
-                name?: string
-                tracks?: { totalCount?: number } | null
-              }
-            }[]
-          }
-        } | null
+        musicLibrary: { id: string } | null
       } | null
     } | null
-  }>(LIBRARY_QUERY, { id: zoneId })
+  }>(ZONE_ACCOUNT_QUERY, { id: zoneId })
 
   const account = data.soundZone?.account
   const library = account?.musicLibrary
   if (!account?.id || !library?.id) {
     throw new SoundtrackApiError('Soundtrack zone has no music library')
   }
+
+  const playlists = await fetchMusicLibraryRows(library.id, gql)
   return {
     accountId: account.id,
     libraryId: library.id,
-    playlists: mapPlaylists(library.playlists?.edges),
+    playlists,
   }
 }
 
@@ -257,5 +255,6 @@ export async function createSoundtrackLibraryPlaylist(
     id: playlistId,
     name: playlist?.name?.trim() || title,
     trackCount: 0,
+    sourceKind: 'playlist',
   }
 }
