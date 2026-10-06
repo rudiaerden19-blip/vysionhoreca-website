@@ -15,7 +15,7 @@ type LibraryItem = {
 
 type LibraryTab = 'lists' | 'schedules'
 
-export function VysionMusicLibrarySidebar({
+export function VysionMusicLibraryPanel({
   tenant,
   activeSourceId,
   onSelect,
@@ -82,7 +82,7 @@ export function VysionMusicLibrarySidebar({
   }, [items, tab])
 
   return (
-    <aside className={styles.librarySidebar} aria-label={t('vysionMusic.libraryTitle')}>
+    <section className={styles.libraryPanel} aria-label={t('vysionMusic.libraryTitle')}>
       <div className={styles.libraryTabs}>
         <button
           type="button"
@@ -144,6 +144,6 @@ export function VysionMusicLibrarySidebar({
           )
         })}
       </ul>
-    </aside>
+    </section>
   )
 }

@@ -52,47 +52,30 @@
   touch-action: manipulation;
 }
 
-.shell {
+.libraryPanel {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
-  flex-direction: row;
-  overflow: hidden;
-}
-
-.mainColumn {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-.librarySidebar {
-  flex: 0 0 min(22rem, 36vw);
-  max-width: 22rem;
-  background: #eceff3;
-  color: #111827;
-  border-right: 1px solid #d1d5db;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
+  background: var(--vm-bg);
+  border-top: 1px solid var(--vm-panel-border);
+  padding: 0 0.35rem;
 }
 
 .libraryTabs {
   display: flex;
   gap: 0.45rem;
-  padding: 0.85rem 0.85rem 0.55rem;
+  padding: 0.65rem 0.85rem 0.45rem;
   flex-shrink: 0;
 }
 
 .libraryTab,
 .libraryTabActive {
   border-radius: 999px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #334155;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.55);
+  color: #93c5fd;
   font-size: 0.78rem;
   font-weight: 600;
   padding: 0.35rem 0.65rem;
@@ -100,10 +83,9 @@
 }
 
 .libraryTabActive {
-  border-color: #94a3b8;
-  background: #fff;
-  color: #0f172a;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.35);
+  color: #eff6ff;
 }
 
 .libraryList {
@@ -131,7 +113,7 @@
 }
 
 .libraryRowActive {
-  background: rgba(15, 23, 42, 0.08);
+  background: var(--vm-row-active);
 }
 
 .libraryRow:disabled,
@@ -146,7 +128,7 @@
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
-  background: #cbd5e1;
+  background: var(--vm-accent-panel);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -161,7 +143,7 @@
 .libraryThumbFallback {
   font-weight: 700;
   font-size: 1rem;
-  color: #475569;
+  color: var(--vm-text-accent);
 }
 
 .libraryRowText {
@@ -182,21 +164,21 @@
 
 .libraryRowMeta {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--vm-muted);
 }
 
 .libraryMuted {
   margin: 0;
   padding: 0 0.85rem 0.5rem;
   font-size: 0.82rem;
-  color: #64748b;
+  color: var(--vm-muted);
 }
 
 .libraryError {
   margin: 0;
   padding: 0 0.85rem 0.5rem;
   font-size: 0.82rem;
-  color: #b91c1c;
+  color: #fecaca;
 }
 
 .header {
@@ -1021,16 +1003,6 @@
 }
 
 @media (max-width: 900px) {
-  .shell {
-    flex-direction: column;
-  }
-  .librarySidebar {
-    flex: 0 0 auto;
-    max-width: none;
-    max-height: 38vh;
-    border-right: none;
-    border-bottom: 1px solid #d1d5db;
-  }
   .nowPlaying {
     grid-template-columns: 1fr;
     text-align: center;

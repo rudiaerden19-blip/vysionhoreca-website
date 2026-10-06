@@ -16,7 +16,7 @@ import {
   VmSkipForward,
   VmStop,
 } from './VysionMusicIcons'
-import { VysionMusicLibrarySidebar } from './VysionMusicLibrarySidebar'
+import { VysionMusicLibraryPanel } from './VysionMusicLibraryPanel'
 import { VolumeSliderVertical } from './VolumeSliderVertical'
 import { VolumeSpeakerArt } from './VolumeSpeakerArt'
 import { VuMeterStereo } from './VuMeterStereo'
@@ -270,14 +270,6 @@ export function VysionMusicClient({
 
   return (
     <div className={styles.root}>
-      <div className={styles.shell}>
-        <VysionMusicLibrarySidebar
-          tenant={tenant}
-          activeSourceId={playFromId}
-          selecting={playlistSelecting || transportPending != null}
-          onSelect={(id) => void selectLibrarySource(id)}
-        />
-        <div className={styles.mainColumn}>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <Link href={kassaHref} className={styles.menuBtn} prefetch={false}>
@@ -434,9 +426,14 @@ export function VysionMusicClient({
         </div>
       </section>
 
+      <VysionMusicLibraryPanel
+        tenant={tenant}
+        activeSourceId={playFromId}
+        selecting={playlistSelecting || transportPending != null}
+        onSelect={(id) => void selectLibrarySource(id)}
+      />
+
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
-        </div>
-      </div>
     </div>
   )
 }
