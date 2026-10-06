@@ -132,7 +132,8 @@ export function VysionMusicClient({
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchLoadingMore, setSearchLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  type TransportPending = 'prev' | 'play' | 'pause' | 'stop' | 'skipNext'
+  const [transportPending, setTransportPending] = useState<TransportPending | null>(null)
   const [switchingTrack, setSwitchingTrack] = useState(false)
   const [clock, setClock] = useState(() => new Date())
   const [tick, setTick] = useState(0)
@@ -395,9 +396,16 @@ export function VysionMusicClient({
     async (
       op: string,
       extra?: { volume?: number; trackId?: string; trackIds?: string[] },
-      opts?: { silent?: boolean; volumeGeneration?: number },
+      opts?: {
+        silent?: boolean
+        volumeGeneration?: number
+        transportPending?: TransportPending
+      },
     ) => {
-      if (!opts?.silent) setBusy(true)
+      const transportKey = opts?.transportPending
+      if (!opts?.silent) {
+        if (transportKey) setTransportPending(transportKey)
+      }
       const volumeGeneration = opts?.volumeGeneration
       try {
         const res = await fetch(apiBase, {
@@ -430,7 +438,9 @@ export function VysionMusicClient({
           setError(t('vysionMusic.errorNetwork'))
         }
       } finally {
-        if (!opts?.silent) setBusy(false)
+        if (!opts?.silent && transportKey) {
+          setTransportPending((p) => (p === transportKey ? null : p))
+        }
       }
     },
     [apiBase, mergeSnapshot, t],
@@ -930,6 +940,7 @@ export function VysionMusicClient({
 
   const progressPct = durationMs > 0 ? (progressMs / durationMs) * 100 : 0
   const isPlaying = snapshot?.playbackState === 'playing'
+  const playPausePending: TransportPending = isPlaying ? 'pause' : 'play'
   const { date: clockDate, time: clockTime } = formatClock(clock, locale)
   const [coverBroken, setCoverBroken] = useState(false)
   useEffect(() => {
@@ -1053,14 +1064,16 @@ export function VysionMusicClient({
               <button
                 type="button"
                 className={styles.transportBtn}
-                disabled={busy}
+                disabled={transportPending === 'prev'}
                 aria-label={t('vysionMusic.prev')}
                 onClick={() => {
                   const rows = playlistRows
                   if (!nowTrack || rows.length < 2) return
                   const idx = rows.findIndex((r) => r.id === nowTrack.id && r.name === nowTrack.name)
                   const prev = idx > 0 ? rows[idx - 1] : rows[0]
-                  if (prev?.id) void control('playTrack', { trackId: prev.id })
+                  if (prev?.id) {
+                    void control('playTrack', { trackId: prev.id }, { transportPending: 'prev' })
+                  }
                 }}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -1068,9 +1081,13 @@ export function VysionMusicClient({
               <button
                 type="button"
                 className={styles.transportPrimary}
-                disabled={busy}
+                disabled={transportPending === playPausePending}
                 aria-label={isPlaying ? t('vysionMusic.pause') : t('vysionMusic.play')}
-                onClick={() => void control(isPlaying ? 'pause' : 'play')}
+                onClick={() =>
+                  void control(isPlaying ? 'pause' : 'play', undefined, {
+                    transportPending: playPausePending,
+                  })
+                }
               >
                 {isPlaying ? (
                   <VmPause className={styles.transportIconPrimary} strokeWidth={VM_ICON_STROKE} />
@@ -1081,18 +1098,20 @@ export function VysionMusicClient({
               <button
                 type="button"
                 className={styles.transportBtn}
-                disabled={busy}
+                disabled={transportPending === 'stop'}
                 aria-label={t('vysionMusic.stop')}
-                onClick={() => void control('stop')}
+                onClick={() => void control('stop', undefined, { transportPending: 'stop' })}
               >
                 <VmStop className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
               <button
                 type="button"
                 className={styles.transportBtn}
-                disabled={busy}
+                disabled={transportPending === 'skipNext'}
                 aria-label={t('vysionMusic.next')}
-                onClick={() => void control('skipNext')}
+                onClick={() =>
+                  void control('skipNext', undefined, { transportPending: 'skipNext' })
+                }
               >
                 <VmSkipForward className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
               </button>
@@ -1135,7 +1154,6 @@ export function VysionMusicClient({
                 <div className={styles.volumeSliderWrap}>
                   <VolumeSliderVertical
                     value={volumeUi}
-                    disabled={busy}
                     ariaLabel={t('vysionMusic.volume')}
                     onDragChange={(dragging) => {
                       volumeDraggingRef.current = dragging
@@ -1166,7 +1184,7 @@ export function VysionMusicClient({
                 <button
                   type="button"
                   className={styles.panelMiniBtn}
-                  disabled={busy || switchingTrack}
+                  disabled={switchingTrack}
                   onClick={() => void playPlaylistTracks(savedPlaylistTracks)}
                 >
                   {t('vysionMusic.playlistPlay')}
