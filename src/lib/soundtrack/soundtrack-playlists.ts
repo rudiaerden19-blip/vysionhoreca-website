@@ -444,7 +444,7 @@ async function removePlaylistFromOwnerLibrary(ownerId: string, playlistId: strin
           owner,
           input: {
             ...(version ? { version } : {}),
-            items: [{ id, itemKind: 'PLAYLIST' }],
+            itemIds: [id],
           },
         },
       )
