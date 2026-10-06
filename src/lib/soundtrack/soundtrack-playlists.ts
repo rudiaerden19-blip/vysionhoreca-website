@@ -341,135 +341,18 @@ export function isBenignSoundtrackLibraryDuplicateError(message: string): boolea
   )
 }
 
-/** Zelfde pad als Soundtrack Account: saved Library vs MusicLibrary (Lijsten in speler). */
-const ZONE_LIBRARY_MEMBERSHIP_QUERY = `query($zoneId: ID!) {
-  soundZone(id: $zoneId) {
-    id
-    name
-    isPaired
-    online
-    account {
-      id
-      library { ids version }
-      musicLibrary { id ids revision }
-    }
-  }
+const LIBRARY_MEMBERSHIP_QUERY = `query($owner: ID!, $musicLibraryId: ID!) {
+  library(owner: $owner) { ids version }
+  musicLibrary(id: $musicLibraryId) { ids revision }
 }`
 
 const OWNER_LIBRARY_VERSION_QUERY = `query($owner: ID!) {
   library(owner: $owner) { version }
 }`
 
-const OWNER_LIBRARY_IDS_QUERY = `query($owner: ID!) {
-  library(owner: $owner) { ids version }
-}`
-
-type ZoneLibraryMembership = {
-  zoneId: string
-  zoneName: string
-  isPaired: boolean
-  online: boolean
-  accountId: string
-  musicLibraryId: string
-  savedLibraryIds: string[] | null | undefined
-  musicLibraryIds: string[] | null | undefined
-  savedLibraryVersion: string | null
-  musicLibraryRevision: string | null
-}
-
-async function fetchZoneLibraryMembership(zoneId: string): Promise<ZoneLibraryMembership | null> {
-  const data = await soundtrackGraphql<{
-    soundZone: {
-      id: string
-      name: string
-      isPaired: boolean
-      online: boolean
-      account: {
-        id: string
-        library: { ids?: string[] | null; version?: string | null } | null
-        musicLibrary: { id: string; ids?: string[] | null; revision?: string | null } | null
-      } | null
-    } | null
-  }>(ZONE_LIBRARY_MEMBERSHIP_QUERY, { zoneId: zoneId.trim() })
-
-  const zone = data.soundZone
-  const account = zone?.account
-  if (!zone?.id || !account?.id || !account.musicLibrary?.id) return null
-
-  const accountId = account.id.trim()
-  const musicLibraryId = account.musicLibrary.id.trim()
-
-  return {
-    zoneId: zone.id.trim(),
-    zoneName: (zone.name ?? '').trim(),
-    isPaired: !!zone.isPaired,
-    online: !!zone.online,
-    accountId,
-    musicLibraryId,
-    savedLibraryIds: account.library?.ids,
-    musicLibraryIds: account.musicLibrary?.ids,
-    savedLibraryVersion: account.library?.version?.trim() || null,
-    musicLibraryRevision: account.musicLibrary?.revision?.trim() || null,
-  }
-}
-
-async function ownerLibraryContainsPlaylist(ownerId: string, playlistId: string): Promise<boolean> {
-  const data = await soundtrackGraphql<{
-    library: { ids?: string[] | null } | null
-  }>(OWNER_LIBRARY_IDS_QUERY, { owner: ownerId.trim() })
-  return soundtrackLibraryIdsInclude(data.library?.ids, playlistId)
-}
-
-async function accountMusicLibraryContainsPlaylist(
-  accountId: string,
-  playlistId: string,
-): Promise<boolean> {
-  const data = await soundtrackGraphql<{
-    account: { musicLibrary: { ids?: string[] | null } | null } | null
-  }>(
-    `query($id: ID!) {
-      account(id: $id) { musicLibrary { ids } }
-    }`,
-    { id: accountId.trim() },
-  )
-  return soundtrackLibraryIdsInclude(data.account?.musicLibrary?.ids, playlistId)
-}
-
-export type SoundtrackPlaylistCreateSyncMeta = {
-  zoneId: string
-  zoneName: string
-  isPaired: boolean
-  online: boolean
-  accountId: string
-  musicLibraryId: string
-  inMusicLibrary: boolean
-  inSavedLibrary: boolean
-  musicLibraryRevision: string | null
-}
-
-export async function readSoundtrackPlaylistCreateSyncMeta(
-  zoneId: string,
-  playlistId: string,
-): Promise<SoundtrackPlaylistCreateSyncMeta | null> {
-  const membership = await fetchZoneLibraryMembership(zoneId)
-  if (!membership) return null
-  const pid = playlistId.trim()
-  return {
-    zoneId: membership.zoneId,
-    zoneName: membership.zoneName,
-    isPaired: membership.isPaired,
-    online: membership.online,
-    accountId: membership.accountId,
-    musicLibraryId: membership.musicLibraryId,
-    inMusicLibrary: soundtrackLibraryIdsInclude(membership.musicLibraryIds, pid),
-    inSavedLibrary: soundtrackLibraryIdsInclude(membership.savedLibraryIds, pid),
-    musicLibraryRevision: membership.musicLibraryRevision,
-  }
-}
-
 /**
- * Account saved `Library` (user favorites) — niet hetzelfde als MusicLibrary/Lijsten.
- * Speler-Lijsten volgen `addToMusicLibrary` + subscription `libraryUpdate(owner: Account)`.
+ * Soundtrack desktop player: `addToLibrary` triggert libraryUpdate op de player.
+ * Alleen `addToMusicLibrary` is niet genoeg voor automatische zichtbaarheid in de speler.
  */
 async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
   const owner = ownerId.trim()
@@ -504,12 +387,7 @@ async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): P
       return
     } catch (e) {
       if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
-        if (await ownerLibraryContainsPlaylist(owner, id)) return
-        if (attempt < 2) {
-          await soundtrackSyncPause(120)
-          continue
-        }
-        throw e
+        return
       }
       const versionConflict =
         e instanceof SoundtrackApiError &&
@@ -523,114 +401,50 @@ async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): P
   }
 }
 
-/** Player libraryUpdate na verwijderen uit musicLibrary. */
-async function removePlaylistFromOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
-  const owner = ownerId.trim()
-  const id = playlistId.trim()
-  if (!owner || !id) return
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    let version: string | undefined
-    try {
-      const data = await soundtrackGraphql<{
-        library: { version: string | null } | null
-      }>(OWNER_LIBRARY_VERSION_QUERY, { owner })
-      const v = data.library?.version?.trim()
-      if (v) version = v
-    } catch {
-      /* version optional */
-    }
-
-    try {
-      await soundtrackGraphql(
-        `mutation($owner: ID!, $input: RemoveFromLibraryInput!) {
-          removeFromLibrary(owner: $owner, input: $input) { version }
-        }`,
-        {
-          owner,
-          input: {
-            ...(version ? { version } : {}),
-            itemIds: [id],
-          },
-        },
-      )
-      return
-    } catch (e) {
-      if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
-        if (!(await ownerLibraryContainsPlaylist(owner, id))) return
-        if (attempt < 2) {
-          await soundtrackSyncPause(120)
-          continue
+async function addPlaylistToMusicLibrary(ownerId: string, playlistId: string): Promise<void> {
+  try {
+    await soundtrackGraphql<{
+      addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
+    }>(
+      `mutation($input: AddToMusicLibraryInput!) {
+        addToMusicLibrary(input: $input) {
+          musicLibrary { revision ids }
         }
-        throw e
-      }
-      const versionConflict =
-        e instanceof SoundtrackApiError &&
-        /version|conflict|stale|overwrite/i.test(e.message)
-      if (versionConflict && attempt < 2) {
-        await soundtrackSyncPause(120)
-        continue
-      }
-      throw e
-    }
-  }
-}
-
-/** Soundtrack schema: parent = Account id (niet musicLibrary.id). */
-async function addPlaylistToMusicLibrary(accountId: string, playlistId: string): Promise<void> {
-  const parent = accountId.trim()
-  const source = playlistId.trim()
-  if (!parent || !source) return
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      await soundtrackGraphql<{
-        addToMusicLibrary: { musicLibrary: { ids?: string[] | null } | null } | null
-      }>(
-        `mutation($input: AddToMusicLibraryInput!) {
-          addToMusicLibrary(input: $input) {
-            musicLibrary { revision ids }
-          }
-        }`,
-        { input: { parent, source } },
-      )
+      }`,
+      { input: { parent: ownerId.trim(), source: playlistId.trim() } },
+    )
+  } catch (e) {
+    if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
       return
-    } catch (e) {
-      const benign =
-        e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)
-      if (benign && (await accountMusicLibraryContainsPlaylist(parent, source))) return
-
-      const versionConflict =
-        e instanceof SoundtrackApiError &&
-        /version|conflict|stale|overwrite|revision/i.test(e.message)
-      if (versionConflict && attempt < 2) {
-        await soundtrackSyncPause(120)
-        continue
-      }
-      throw e
     }
+    throw e
   }
 }
 
 async function assertPlaylistVisibleInSoundtrackLibraries(
-  zoneId: string,
+  ownerId: string,
+  musicLibraryId: string,
   playlistId: string,
 ): Promise<void> {
   const pid = playlistId.trim()
   for (let i = 0; i < 10; i++) {
-    const membership = await fetchZoneLibraryMembership(zoneId)
-    if (!membership) {
-      throw new SoundtrackApiError('Soundtrack zone library context missing after create', 502)
-    }
+    const data = await soundtrackGraphql<{
+      library: { ids?: string[] | null } | null
+      musicLibrary: { ids?: string[] | null } | null
+    }>(LIBRARY_MEMBERSHIP_QUERY, {
+      owner: ownerId.trim(),
+      musicLibraryId: musicLibraryId.trim(),
+    })
 
-    const inMusicLibrary = soundtrackLibraryIdsInclude(membership.musicLibraryIds, pid)
-    if (inMusicLibrary) return
+    const inOwnerLibrary = soundtrackLibraryIdsInclude(data.library?.ids, pid)
+    const inMusicLibrary = soundtrackLibraryIdsInclude(data.musicLibrary?.ids, pid)
+    if (inOwnerLibrary && inMusicLibrary) return
 
     if (i < 9) await soundtrackSyncPause(150)
   }
 
   throw new SoundtrackApiError(
-    'Soundtrack playlist not visible in music library after create',
+    'Soundtrack playlist not visible in account library after create',
     502,
   )
 }
@@ -677,7 +491,7 @@ export async function findSoundtrackMusicLibraryPlaylistByName(
   return null
 }
 
-/** Officieel v2: createManualPlaylist + addToMusicLibrary (Account parent) → speler Lijsten. */
+/** Officieel v2: create + owner library (player) + musicLibrary (Vysion-lijst). */
 export async function createManualPlaylistInMusicLibrary(
   zoneId: string,
   playlistName: string,
@@ -687,7 +501,7 @@ export async function createManualPlaylistInMusicLibrary(
   if (!zid) throw new SoundtrackApiError('sound zone id required', 400)
   if (!name) throw new SoundtrackApiError('playlist name required', 400)
 
-  const { ownerId } = await resolveSoundtrackZoneLibraryContext(zid)
+  const { ownerId, musicLibraryId } = await resolveSoundtrackZoneLibraryContext(zid)
 
   const created = await soundtrackGraphql<{
     createManualPlaylist: { id: string; name: string } | null
@@ -703,14 +517,9 @@ export async function createManualPlaylistInMusicLibrary(
     throw new SoundtrackApiError('Soundtrack created no playlist', 502)
   }
 
-  await addPlaylistToMusicLibrary(ownerId, id)
-  /**
-   * Server-side staat de lijst in musicLibrary (zichtbaar na handmatige refresh in de speler).
-   * `addToLibrary` triggert libraryUpdate richting gekoppelde desktop player — geen aparte
-   * Public-API-mutatie voor “force refresh Lijsten”.
-   */
   await addPlaylistToOwnerLibrary(ownerId, id)
-  await assertPlaylistVisibleInSoundtrackLibraries(zid, id)
+  await addPlaylistToMusicLibrary(ownerId, id)
+  await assertPlaylistVisibleInSoundtrackLibraries(ownerId, musicLibraryId, id)
 
   const plData = await soundtrackGraphql<{
     playlist: { id: string; name: string | null } | null
@@ -764,7 +573,7 @@ export async function removePlaylistFromMusicLibrary(
 ): Promise<void> {
   const pid = playlistId.trim()
   if (!pid) throw new SoundtrackApiError('playlist id required', 400)
-  const { ownerId } = await resolveSoundtrackZoneLibraryContext(zoneId.trim())
+  const ownerId = await resolveZoneAccountId(zoneId.trim())
 
   await soundtrackGraphql(
     `mutation($input: RemoveFromMusicLibraryInput!) {
@@ -772,11 +581,6 @@ export async function removePlaylistFromMusicLibrary(
     }`,
     { input: { parent: ownerId, source: pid } },
   )
-  try {
-    await removePlaylistFromOwnerLibrary(ownerId, pid)
-  } catch {
-    /* saved Library is optional; Lijsten = MusicLibrary */
-  }
 }
 
 async function spliceManualPlaylist(input: {

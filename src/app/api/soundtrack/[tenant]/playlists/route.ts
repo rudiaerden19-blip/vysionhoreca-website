@@ -4,7 +4,6 @@ import {
   createManualPlaylistInMusicLibrary,
   findSoundtrackMusicLibraryPlaylistByName,
   listSoundtrackLibraryPlaylists,
-  readSoundtrackPlaylistCreateSyncMeta,
   removePlaylistFromMusicLibrary,
   renameManualPlaylist,
   resolveSoundtrackZoneLibraryContext,
@@ -81,8 +80,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
         502,
       )
     }
-    const sync = await readSoundtrackPlaylistCreateSyncMeta(zoneId, created.id)
-    return NextResponse.json({ ok: true, playlist: created, playlists, sync })
+    return NextResponse.json({ ok: true, playlist: created, playlists })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {
       return NextResponse.json({ error: e.message, code: 'config' }, { status: 503 })
