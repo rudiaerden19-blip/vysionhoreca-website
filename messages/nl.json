@@ -6859,7 +6859,7 @@
     "blankSlateHint": "Stap 1: koppel je Soundtrack-speler via het tandwiel (zelfde e-mail en wachtwoord als de player op je PC).",
     "settingsOpen": "Instellingen",
     "playerLinkTitle": "Speler koppelen",
-    "playerLinkHint": "Log in met het Soundtrack-account van de player in je zaak. We testen de login bij Soundtrack voordat we opslaan.",
+    "playerLinkHint": "Zelfde e-mail en wachtwoord als de Soundtrack-player in je zaak. We slaan dit per zaak op; bediening loopt via Soundtrack op de server (Vercel-key).",
     "playerLinkEmail": "E-mail Soundtrack",
     "playerLinkPassword": "Wachtwoord",
     "playerLinkPasswordKeep": "Laat leeg om het opgeslagen wachtwoord te behouden",

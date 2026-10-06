@@ -6938,7 +6938,7 @@
     "prevUnavailable": "Vorheriger Titel: nur in der Soundtrack-Player-App",
     "settingsOpen": "Einstellungen",
     "playerLinkTitle": "Player koppeln",
-    "playerLinkHint": "Gleiche E-Mail und Passwort wie der Soundtrack-Player vor Ort. Login wird bei Soundtrack geprüft.",
+    "playerLinkHint": "Gleiche E-Mail/Passwort wie der Soundtrack-Player vor Ort. Pro Betrieb gespeichert; Steuerung über Server-Key (Vercel).",
     "playerLinkEmail": "Soundtrack-E-Mail",
     "playerLinkPassword": "Passwort",
     "playerLinkPasswordKeep": "Leer lassen, um gespeichertes Passwort zu behalten",

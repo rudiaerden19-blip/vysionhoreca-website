@@ -6915,7 +6915,7 @@
     "prevUnavailable": "前の曲：Soundtrackプレイヤーアプリのみ",
     "settingsOpen": "設定",
     "playerLinkTitle": "プレイヤーをリンク",
-    "playerLinkHint": "店内のSoundtrackプレイヤーと同じメールとパスワード。保存前にSoundtrackでログインを確認します。",
+    "playerLinkHint": "店内プレイヤーと同じメール/パスワード。テナントごとに保存；操作はサーバー鍵（Vercel）経由。",
     "playerLinkEmail": "Soundtrackメール",
     "playerLinkPassword": "パスワード",
     "playerLinkPasswordKeep": "空のままにすると保存済みパスワードを維持",

@@ -6915,7 +6915,7 @@
     "prevUnavailable": "Pista anterior: solo en la app Soundtrack",
     "settingsOpen": "Ajustes",
     "playerLinkTitle": "Vincular reproductor",
-    "playerLinkHint": "Mismo correo y contraseña que el reproductor Soundtrack en el local. Verificamos con Soundtrack antes de guardar.",
+    "playerLinkHint": "Mismo correo/contraseña que el reproductor Soundtrack. Guardado por local; control vía clave del servidor (Vercel).",
     "playerLinkEmail": "Correo Soundtrack",
     "playerLinkPassword": "Contraseña",
     "playerLinkPasswordKeep": "Dejar vacío para mantener la contraseña guardada",

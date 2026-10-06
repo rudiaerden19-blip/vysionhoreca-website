@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { soundtrackLoginUser } from '@/lib/soundtrack/soundtrack-login-user'
+import {
+  isSoundtrackApiBasicConfigured,
+  pingSoundtrackPublicApi,
+} from '@/lib/soundtrack/soundtrack-api-basic'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
@@ -36,11 +39,16 @@ export async function GET(request: NextRequest) {
 
   const email = (data?.soundtrack_player_email as string | null | undefined)?.trim() || ''
   const passwordSet = !!(data?.soundtrack_player_password as string | null | undefined)?.trim()
+  const platformConfigured = isSoundtrackApiBasicConfigured()
+  const platformPing = platformConfigured ? await pingSoundtrackPublicApi() : { ok: false as const }
 
   return NextResponse.json({
     email,
     password_set: passwordSet,
     linked: Boolean(email && passwordSet),
+    platform_soundtrack_configured: platformConfigured && platformPing.ok,
+    platform_soundtrack_error:
+      platformConfigured && !platformPing.ok ? platformPing.error : null,
   })
 }
 
@@ -75,6 +83,19 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  const platformPing = await pingSoundtrackPublicApi()
+  if (!platformPing.ok) {
+    return NextResponse.json(
+      {
+        error:
+          platformPing.error ||
+          'Soundtrack op de server is niet bereikbaar. Zet SOUNDTRACK_API_BASIC in Vercel → Production (zelfde key als voor de player).',
+        code: 'soundtrack_config',
+      },
+      { status: 503 },
+    )
+  }
+
   const supabase = getServerSupabaseClient()
   if (!supabase) {
     return NextResponse.json({ error: 'Server fout' }, { status: 500 })
@@ -92,21 +113,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Wachtwoord vereist' }, { status: 400 })
   }
 
-  try {
-    await soundtrackLoginUser(email, passwordToUse)
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Soundtrack login mislukt'
-    return NextResponse.json({ error: message, code: 'soundtrack_login' }, { status: 400 })
-  }
-
   const row: Record<string, unknown> = {
     tenant_slug: tenantSlug,
     soundtrack_player_email: email,
-  }
-  if (password.trim()) {
-    row.soundtrack_player_password = password
-  } else if (storedPassword) {
-    row.soundtrack_player_password = storedPassword
+    soundtrack_player_password: password.trim() || storedPassword,
   }
 
   const { error, data } = await supabase

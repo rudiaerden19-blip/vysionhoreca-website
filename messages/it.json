@@ -6915,7 +6915,7 @@
     "prevUnavailable": "Brano precedente: solo dall’app Soundtrack",
     "settingsOpen": "Impostazioni",
     "playerLinkTitle": "Collega player",
-    "playerLinkHint": "Stessa e-mail e password del player Soundtrack in locale. Verifichiamo con Soundtrack prima di salvare.",
+    "playerLinkHint": "Stessa e-mail/password del player Soundtrack in locale. Salvato per locale; controllo via chiave server (Vercel).",
     "playerLinkEmail": "E-mail Soundtrack",
     "playerLinkPassword": "Password",
     "playerLinkPasswordKeep": "Lascia vuoto per mantenere la password salvata",

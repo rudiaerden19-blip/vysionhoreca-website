@@ -6859,7 +6859,7 @@
     "blankSlateHint": "Link your Soundtrack player via the gear icon (same email and password as the PC player).",
     "settingsOpen": "Settings",
     "playerLinkTitle": "Link player",
-    "playerLinkHint": "Sign in with the Soundtrack account used by the player in your venue. We verify with Soundtrack before saving.",
+    "playerLinkHint": "Same email and password as the Soundtrack player in your venue. Stored per tenant; control uses the server Soundtrack key (Vercel).",
     "playerLinkEmail": "Soundtrack email",
     "playerLinkPassword": "Password",
     "playerLinkPasswordKeep": "Leave empty to keep the saved password",

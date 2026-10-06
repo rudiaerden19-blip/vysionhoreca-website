@@ -6915,7 +6915,7 @@
     "prevUnavailable": "上一首：请使用 Soundtrack 播放器应用",
     "settingsOpen": "设置",
     "playerLinkTitle": "链接播放器",
-    "playerLinkHint": "与店内 Soundtrack 播放器相同的邮箱和密码。保存前会向 Soundtrack 验证登录。",
+    "playerLinkHint": "与店内 Soundtrack 播放器相同的邮箱/密码。按租户保存；通过服务器密钥（Vercel）控制。",
     "playerLinkEmail": "Soundtrack 邮箱",
     "playerLinkPassword": "密码",
     "playerLinkPasswordKeep": "留空以保留已保存的密码",

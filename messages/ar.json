@@ -6915,7 +6915,7 @@
     "prevUnavailable": "المقطع السابق: عبر تطبيق Soundtrack فقط",
     "settingsOpen": "الإعدادات",
     "playerLinkTitle": "ربط المشغّل",
-    "playerLinkHint": "نفس البريد وكلمة المرور لمشغّل Soundtrack في المحل. نتحقق من Soundtrack قبل الحفظ.",
+    "playerLinkHint": "نفس البريد/كلمة المرور لمشغّل Soundtrack في المحل. يُحفظ لكل مستأجر؛ التحكم عبر مفتاح الخادم (Vercel).",
     "playerLinkEmail": "بريد Soundtrack",
     "playerLinkPassword": "كلمة المرور",
     "playerLinkPasswordKeep": "اتركه فارغًا للاحتفاظ بكلمة المرور المحفوظة",

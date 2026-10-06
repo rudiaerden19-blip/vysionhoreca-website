@@ -6938,7 +6938,7 @@
     "prevUnavailable": "Morceau précédent : via l’app Soundtrack uniquement",
     "settingsOpen": "Paramètres",
     "playerLinkTitle": "Lier le lecteur",
-    "playerLinkHint": "Même e-mail et mot de passe que le lecteur Soundtrack sur place. Vérification auprès de Soundtrack avant enregistrement.",
+    "playerLinkHint": "Même e-mail/mot de passe que le lecteur Soundtrack sur place. Enregistré par établissement ; commande via la clé serveur (Vercel).",
     "playerLinkEmail": "E-mail Soundtrack",
     "playerLinkPassword": "Mot de passe",
     "playerLinkPasswordKeep": "Laisser vide pour conserver le mot de passe enregistré",

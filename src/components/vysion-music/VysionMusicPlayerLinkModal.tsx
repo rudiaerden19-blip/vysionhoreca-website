@@ -40,10 +40,15 @@ export function VysionMusicPlayerLinkModal({
         password_set?: boolean
         linked?: boolean
         error?: string
+        platform_soundtrack_configured?: boolean
+        platform_soundtrack_error?: string | null
       }
       if (!res.ok) {
         setError(json.error || t('vysionMusic.playerLinkLoadError'))
         return
+      }
+      if (json.platform_soundtrack_configured === false && json.platform_soundtrack_error) {
+        setError(json.platform_soundtrack_error)
       }
       setEmail(json.email || '')
       setPasswordSet(!!json.password_set)
