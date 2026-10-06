@@ -1,5 +1,9 @@
 import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
 import {
+  isSoundtrackGenericLibraryArtUrl,
+  nullSharedSoundtrackPlaceholderListArt,
+} from '@/lib/soundtrack/soundtrack-library-list-art'
+import {
   soundtrackTrackArtUrlFromAlbum,
   type SoundtrackTrackGraphNode,
 } from '@/lib/soundtrack/soundtrack-track-map'
@@ -90,7 +94,9 @@ export function soundtrackLibraryListImageUrl(node: LibraryArtworkNode): string 
   if (sizes) {
     for (const key of ['thumbnail', 'teaser', 'hero'] as const) {
       const raw = sizes[key]?.trim()
-      if (raw) return soundtrackAlbumArtUrl(raw)
+      if (!raw) continue
+      const url = soundtrackAlbumArtUrl(raw)
+      if (url && !isSoundtrackGenericLibraryArtUrl(url)) return url
     }
   }
   return null
@@ -190,7 +196,8 @@ async function fetchMusicLibraryRows(
     if (row) byId.set(row.id, row)
   }
 
-  return dedupeLibraryRowsPreserveOrder(orderLibraryRowsByIds(lib.ids, byId))
+  const ordered = dedupeLibraryRowsPreserveOrder(orderLibraryRowsByIds(lib.ids, byId))
+  return nullSharedSoundtrackPlaceholderListArt(ordered)
 }
 
 async function fetchAccountLibrary(
@@ -244,20 +251,21 @@ async function resolvePlaylistListImageUrl(playlistId: string): Promise<string |
   const pl = data.playlist
   if (!pl) return null
 
-  const fromDisplay = soundtrackLibraryListImageUrl(pl)
-  if (fromDisplay) return fromDisplay
-
   for (const edge of pl.tracks?.edges ?? []) {
     const fromTrack = soundtrackTrackArtUrlFromAlbum(edge.node?.album)
-    if (fromTrack) return fromTrack
+    if (fromTrack && !isSoundtrackGenericLibraryArtUrl(fromTrack)) return fromTrack
   }
-  return null
+  return soundtrackLibraryListImageUrl(pl)
 }
 
 async function enrichMissingPlaylistImages(
   playlists: SoundtrackLibraryPlaylist[],
 ): Promise<SoundtrackLibraryPlaylist[]> {
-  const missing = playlists.filter((p) => !p.imageUrl && p.sourceKind !== 'schedule')
+  const missing = playlists.filter(
+    (p) =>
+      p.sourceKind !== 'schedule' &&
+      (!p.imageUrl || isSoundtrackGenericLibraryArtUrl(p.imageUrl)),
+  )
   if (!missing.length) return playlists
 
   const imageById = new Map<string, string>()

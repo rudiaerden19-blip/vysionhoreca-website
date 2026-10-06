@@ -15,26 +15,34 @@ describe('vysionMusicLibraryPlaceholderLetter', () => {
 })
 
 describe('vysionMusicLibraryListArtUrl', () => {
-  it('manual playlist: ignore Soundtrack display placeholder, use track art only', () => {
+  it('ignores generic display, uses track art', () => {
     expect(
       vysionMusicLibraryListArtUrl(
-        'playlist',
-        'https://i.soundcdn.com/default-playlist.png',
-        null,
-      ),
-    ).toBeNull()
-    expect(
-      vysionMusicLibraryListArtUrl(
-        'playlist',
+        'soundtrack',
         'https://i.soundcdn.com/default-playlist.png',
         'https://i.soundcdn.com/k/1/1/soundtrack:artwork:x/t.jpg',
       ),
     ).toContain('soundtrack:artwork')
   })
 
-  it('soundtrack station keeps display image', () => {
+  it('keeps real station display image', () => {
     const url = 'https://i.soundcdn.com/k/1/1/soundtrack:artwork:station/t.jpg'
     expect(vysionMusicLibraryListArtUrl('soundtrack', url, null)).toBe(url)
+  })
+
+  it('manual playlist uses server-enriched cover when not generic', () => {
+    const url = 'https://i.soundcdn.com/k/1/1/soundtrack:artwork:fromFirstTrack/t.jpg'
+    expect(vysionMusicLibraryListArtUrl('playlist', url, null)).toBe(url)
+  })
+
+  it('manual playlist ignores generic display without cache', () => {
+    expect(
+      vysionMusicLibraryListArtUrl(
+        'playlist',
+        'https://cdn.example/default-playlist.png',
+        null,
+      ),
+    ).toBeNull()
   })
 })
 

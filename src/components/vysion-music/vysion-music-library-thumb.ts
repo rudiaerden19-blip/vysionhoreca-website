@@ -1,3 +1,5 @@
+import { pickSoundtrackLibraryListArtUrl } from '@/lib/soundtrack/soundtrack-library-list-art'
+
 /** Zelfde fallback-letter als lege playlists in de bibliotheeklijst (geen leeg thumb-vak). */
 export function vysionMusicLibraryPlaceholderLetter(name: string): string {
   const ch = name.trim().charAt(0)
@@ -18,20 +20,19 @@ export type VysionMusicLibraryListArtSourceKind =
   | 'unknown'
 
 /**
- * Manual playlists: geen Soundtrack default-icoon uit display.image — letter-placeholder
- * tot er echte track-art is. Stations/schedules: display.image blijft leidend.
+ * Track-art eerst; anders echte display.image (na server-enrich).
+ * Manual playlists: nooit generiek Soundtrack-noten-icoon — letter tot echte art.
  */
 export function vysionMusicLibraryListArtUrl(
   sourceKind: VysionMusicLibraryListArtSourceKind,
   displayImageUrl: string | null | undefined,
   cachedTrackArtUrl: string | null | undefined,
 ): string | null {
-  const track = cachedTrackArtUrl?.trim()
-  const display = displayImageUrl?.trim()
   const manual = sourceKind === 'playlist' || sourceKind === 'unknown'
   if (manual) {
-    return track && track.startsWith('http') ? track : null
+    const fromCache = pickSoundtrackLibraryListArtUrl(null, cachedTrackArtUrl)
+    if (fromCache) return fromCache
+    return pickSoundtrackLibraryListArtUrl(displayImageUrl, null)
   }
-  if (display?.startsWith('http')) return display
-  return track && track.startsWith('http') ? track : null
+  return pickSoundtrackLibraryListArtUrl(displayImageUrl, cachedTrackArtUrl)
 }
