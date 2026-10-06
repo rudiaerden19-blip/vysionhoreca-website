@@ -356,6 +356,17 @@ export function VysionMusicClient({
     window.setTimeout(() => void loadSnapshot(), 1500)
   }, [loadSnapshot])
 
+  /** Test: gekozen bibliotheek-playlist → Soundtrack playFrom (setPlayFrom). */
+  const bindSoundtrackPlayFrom = useCallback(
+    async (sourceId: string) => {
+      const id = sourceId.trim()
+      if (!id) return
+      await postMutation('setPlayFrom', { source: id }, { silent: true })
+      refreshSnapshotAfterControl()
+    },
+    [postMutation, refreshSnapshotAfterControl],
+  )
+
   const queueTrackNow = useCallback(
     async (trackId: string) => {
       setPlaylistSelecting(true)
@@ -384,6 +395,7 @@ export function VysionMusicClient({
       const tracksToQueue = buildPlaylistQueueTrackIds(playlistTracks, trackIndex, trackId)
       setPlaylistSelecting(true)
       try {
+        await bindSoundtrackPlayFrom(sourceId)
         const ok = await postMutation('soundZoneQueueTracks', {
           tracks: tracksToQueue,
           immediate: true,
@@ -394,7 +406,7 @@ export function VysionMusicClient({
         setPlaylistSelecting(false)
       }
     },
-    [postMutation, refreshSnapshotAfterControl],
+    [bindSoundtrackPlayFrom, postMutation, refreshSnapshotAfterControl],
   )
 
   const playSearchTrack = useCallback(
@@ -609,6 +621,7 @@ export function VysionMusicClient({
         busy={catalogBusy}
         onPlayPlaylistTrack={playPlaylistTrack}
         onPlaySearchTrack={playSearchTrack}
+        onPlaylistSelected={bindSoundtrackPlayFrom}
       />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
