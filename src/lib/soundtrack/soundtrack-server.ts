@@ -720,7 +720,7 @@ async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
   await skipSoundZoneTracks(zoneId, 1, true)
 }
 
-async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
+export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
   const data = await soundtrackGraphql<{
     playlist: {
       tracks: {

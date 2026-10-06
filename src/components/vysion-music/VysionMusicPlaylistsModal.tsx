@@ -1,8 +1,12 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
-import type { VysionMusicPlaylistSummary } from '@/lib/vysion-music-playlists-server'
 import styles from './vysion-music.module.css'
+
+export type SoundtrackLibraryPlaylistRow = {
+  id: string
+  name: string
+}
 
 export function VysionMusicPlaylistsModal({
   open,
@@ -11,15 +15,13 @@ export function VysionMusicPlaylistsModal({
   onClose,
   onSelect,
   onEdit,
-  onDelete,
 }: {
   open: boolean
   loading: boolean
-  playlists: VysionMusicPlaylistSummary[]
+  playlists: SoundtrackLibraryPlaylistRow[]
   onClose: () => void
   onSelect: (playlistId: string, playlistName: string) => void
   onEdit: (playlistId: string) => void
-  onDelete: (playlistId: string) => void
 }) {
   const { t } = useLanguage()
   if (!open) return null
@@ -64,9 +66,6 @@ export function VysionMusicPlaylistsModal({
                   onClick={() => onSelect(p.id, p.name)}
                 >
                   <span className={styles.playlistModalName}>{p.name}</span>
-                  <span className={styles.playlistModalMeta}>
-                    {p.trackCount} {t('vysionMusic.playlistTracksLabel')}
-                  </span>
                 </button>
                 <button
                   type="button"
@@ -75,14 +74,6 @@ export function VysionMusicPlaylistsModal({
                   onClick={() => onEdit(p.id)}
                 >
                   ✎
-                </button>
-                <button
-                  type="button"
-                  className={styles.playlistModalDelete}
-                  aria-label={t('vysionMusic.playlistDelete')}
-                  onClick={() => onDelete(p.id)}
-                >
-                  ×
                 </button>
               </li>
             ))}

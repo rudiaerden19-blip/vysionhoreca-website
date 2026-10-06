@@ -1,7 +1,9 @@
 import {
   SoundtrackApiError,
+  fetchPlaylistTrackRows,
   skipSoundZoneTracks,
   soundtrackGraphql,
+  type SoundtrackTrackRow,
 } from '@/lib/soundtrack/soundtrack-server'
 
 export type SoundtrackAccountContext = {
@@ -247,4 +249,59 @@ export async function playSoundtrackPlaylistOnZone(
     `mutation($input: PlayInput!) { play(input: $input) { status } }`,
     { input: { soundZone: zoneId } },
   )
+}
+
+export type SoundtrackLibraryPlaylistSummary = {
+  id: string
+  name: string
+}
+
+/** Playlists in de Soundtrack music library van deze zone (geen Supabase). */
+export async function fetchMusicLibraryPlaylistsForZone(
+  zoneId: string,
+): Promise<SoundtrackLibraryPlaylistSummary[]> {
+  const ctx = await resolveSoundtrackAccountContextForZone(zoneId)
+  const data = await soundtrackGraphql<{
+    musicLibrary: {
+      playlists: { edges: { node: { id: string; name: string | null } }[] }
+    } | null
+  }>(
+    `query($id: ID!) {
+      musicLibrary(id: $id) {
+        playlists(first: 200) {
+          edges {
+            node { id name }
+          }
+        }
+      }
+    }`,
+    { id: ctx.musicLibraryId },
+  )
+  const out: SoundtrackLibraryPlaylistSummary[] = []
+  for (const edge of data.musicLibrary?.playlists?.edges ?? []) {
+    const id = edge.node?.id?.trim()
+    if (!id) continue
+    out.push({ id, name: edge.node.name?.trim() || 'Playlist' })
+  }
+  return out
+}
+
+export async function fetchSoundtrackPlaylistDetail(playlistId: string): Promise<{
+  id: string
+  name: string
+  tracks: SoundtrackTrackRow[]
+}> {
+  const id = playlistId.trim()
+  const data = await soundtrackGraphql<{ playlist: { id: string; name: string | null } | null }>(
+    `query($id: ID!) { playlist(id: $id) { id name } }`,
+    { id },
+  )
+  const pl = data.playlist
+  if (!pl?.id) throw new SoundtrackApiError('Soundtrack playlist not found')
+  const tracks = await fetchPlaylistTrackRows(pl.id)
+  return {
+    id: pl.id,
+    name: pl.name?.trim() || 'Playlist',
+    tracks,
+  }
 }

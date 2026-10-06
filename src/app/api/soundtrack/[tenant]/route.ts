@@ -24,6 +24,24 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 
   try {
+    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
+    await ensureSoundZoneCrossfadeSettings(zoneId)
+
+    if (request.nextUrl.searchParams.get('libraryPlaylists') === '1') {
+      const { fetchMusicLibraryPlaylistsForZone } =
+        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
+      const playlists = await fetchMusicLibraryPlaylistsForZone(zoneId)
+      return NextResponse.json({ ok: true, libraryPlaylists: playlists })
+    }
+
+    const soundtrackPlaylistId = request.nextUrl.searchParams.get('playlistId')?.trim()
+    if (soundtrackPlaylistId) {
+      const { fetchSoundtrackPlaylistDetail } =
+        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
+      const playlist = await fetchSoundtrackPlaylistDetail(soundtrackPlaylistId)
+      return NextResponse.json({ ok: true, playlist })
+    }
+
     const q = request.nextUrl.searchParams.get('q')
     if (q != null && q !== '') {
       const scope = request.nextUrl.searchParams.get('scope')
@@ -32,8 +50,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ ok: true, search: { query: q, tracks } })
     }
 
-    const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-    await ensureSoundZoneCrossfadeSettings(zoneId)
     let snapshot
     try {
       snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
@@ -74,7 +90,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     playlistId?: string
     trackIndex?: number
     soundtrackPlaylistId?: string | null
-    vysionPlaylistId?: string | null
   }
   try {
     body = (await request.json()) as {
@@ -142,16 +157,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
         soundtrackPlaylistId: body.soundtrackPlaylistId ?? null,
         startTrackId: body.startTrackId ?? null,
       })
-      const vysionPlaylistId = body.vysionPlaylistId?.trim()
-      if (vysionPlaylistId && soundtrackPlaylistId) {
-        const { persistVysionPlaylistSoundtrackId } =
-          await import('@/lib/vysion-music-playlists-server')
-        await persistVysionPlaylistSoundtrackId(
-          tenantSlug,
-          vysionPlaylistId,
-          soundtrackPlaylistId,
-        )
-      }
       await new Promise((r) => setTimeout(r, 1200))
     } else {
       await soundtrackControl(
