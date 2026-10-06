@@ -6,8 +6,12 @@ import {
   ensureSoundZoneCrossfadeSettings,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneIdForTenant,
+  skipSoundZoneTracks,
   soundtrackControl,
+  soundtrackPlayPlaylistAtTrackIndex,
   soundtrackSearchTracks,
+  soundtrackSetPlayFrom,
+  soundtrackPlayZone,
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +19,11 @@ export const maxDuration = 60
 
 type RouteContext = { params: { tenant: string } }
 
-/** Dunne BFF: alleen Soundtrack GraphQL (snapshot, zoeken, zone-control). */
+/**
+ * BFF → Soundtrack GraphQL (1:1):
+ * GET  snapshot: soundZone + playFrom playlist tracks | search(type: track)
+ * POST play | pause | stop | setVolume | playTrack (queue+play) | skipTracks | setPlayFrom (+ play [+ skipTracks])
+ */
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
@@ -58,8 +66,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
     op?: string
     volume?: number
     trackId?: string
+    source?: string
     playlistId?: string
     trackIndex?: number
+    tracksToSkip?: number
   }
   try {
     body = (await request.json()) as typeof body
@@ -71,11 +81,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const allowed = [
     'play',
     'pause',
-    'skipNext',
     'stop',
     'setVolume',
     'playTrack',
-    'playFromIndex',
+    'skipTracks',
+    'skipNext',
+    'setPlayFrom',
   ] as const
   if (!op || !allowed.includes(op as (typeof allowed)[number])) {
     return NextResponse.json({ error: 'Invalid op' }, { status: 400 })
@@ -85,19 +96,27 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     await ensureSoundZoneCrossfadeSettings(zoneId)
 
-    if (op === 'playFromIndex') {
-      const playlistId = body.playlistId?.trim() || ''
-      if (!playlistId) {
-        return NextResponse.json({ error: 'playlistId required' }, { status: 400 })
+    if (op === 'setPlayFrom') {
+      const source = (body.source ?? body.playlistId)?.trim() || ''
+      if (!source) {
+        return NextResponse.json({ error: 'source or playlistId required' }, { status: 400 })
       }
       const trackIndex =
         typeof body.trackIndex === 'number' && Number.isFinite(body.trackIndex)
           ? Math.max(0, Math.floor(body.trackIndex))
           : 0
-      const { playSoundtrackPlaylistAtIndex } =
-        await import('@/lib/soundtrack/soundtrack-manual-playlist-sync')
-      await playSoundtrackPlaylistAtIndex(zoneId, playlistId, trackIndex)
-      await new Promise((r) => setTimeout(r, 800))
+      if (trackIndex > 0) {
+        await soundtrackPlayPlaylistAtTrackIndex(zoneId, source, trackIndex)
+      } else {
+        await soundtrackSetPlayFrom(zoneId, source)
+        await soundtrackPlayZone(zoneId)
+      }
+    } else if (op === 'skipTracks') {
+      const n =
+        typeof body.tracksToSkip === 'number' && Number.isFinite(body.tracksToSkip)
+          ? Math.max(1, Math.floor(body.tracksToSkip))
+          : 1
+      await skipSoundZoneTracks(zoneId, n, true)
     } else {
       await soundtrackControl(
         zoneId,
@@ -107,9 +126,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
           trackId: body.trackId,
         },
       )
-      if (op === 'playTrack') {
-        await new Promise((r) => setTimeout(r, 500))
-      }
     }
 
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)

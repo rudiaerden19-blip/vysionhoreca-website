@@ -492,10 +492,6 @@ export async function fetchSoundtrackPlayerSnapshot(
     }
   }
 
-  if (playlist.length === 0 && nowTrack) {
-    playlist.push(nowTrack)
-  }
-
   return {
     zoneId: sz.id,
     zoneName: sz.name,
@@ -720,6 +716,56 @@ async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
   await skipSoundZoneTracks(zoneId, 1, true)
 }
 
+/** Soundtrack `play` mutation. */
+export async function soundtrackPlayZone(zoneId: string): Promise<void> {
+  await soundtrackGraphql(
+    `mutation($input: PlayInput!) { play(input: $input) { status } }`,
+    { input: { soundZone: zoneId } },
+  )
+}
+
+/** Soundtrack `pause` mutation (stop = pause). */
+export async function soundtrackPauseZone(zoneId: string): Promise<void> {
+  await soundtrackGraphql(
+    `mutation($input: PauseInput!) { pause(input: $input) { status } }`,
+    { input: { soundZone: zoneId } },
+  )
+}
+
+/** Soundtrack `setPlayFrom` (+ optioneel `soundZoneSetPlaybackOrder`). */
+export async function soundtrackSetPlayFrom(zoneId: string, sourceId: string): Promise<void> {
+  const source = sourceId.trim()
+  if (!source) throw new SoundtrackApiError('source playlist id required')
+  await soundtrackGraphql(
+    `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
+    { input: { soundZone: zoneId, source } },
+  )
+  try {
+    await soundtrackGraphql(
+      `mutation($input: SoundZoneSetPlaybackOrderInput!) {
+        soundZoneSetPlaybackOrder(input: $input) { __typename }
+      }`,
+      { input: { soundZone: zoneId, playbackOrder: 'LINEAR' } },
+    )
+  } catch {
+    /* playbackOrder niet overal verplicht */
+  }
+}
+
+/**
+ * Playlist op index: `setPlayFrom` → `play` → `skipTracks(n)` — alleen Soundtrack GraphQL.
+ */
+export async function soundtrackPlayPlaylistAtTrackIndex(
+  zoneId: string,
+  playlistId: string,
+  trackIndex: number,
+): Promise<void> {
+  await soundtrackSetPlayFrom(zoneId, playlistId)
+  await soundtrackPlayZone(zoneId)
+  const n = Math.max(0, Math.floor(trackIndex))
+  if (n > 0) await skipSoundZoneTracks(zoneId, n, true)
+}
+
 export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
   const data = await soundtrackGraphql<{
     playlist: {
@@ -783,28 +829,19 @@ async function queueTracksOnSoundZone(
 
 export async function soundtrackControl(
   zoneId: string,
-  op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack' | 'playPlaylist',
+  op: 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack',
   opts?: {
     volume?: number
     trackId?: string
-    trackIds?: string[]
-    playlistName?: string
-    soundtrackPlaylistId?: string | null
   },
 ): Promise<void> {
   switch (op) {
     case 'play':
-      await soundtrackGraphql(
-        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
-        { input: { soundZone: zoneId } },
-      )
+      await soundtrackPlayZone(zoneId)
       return
     case 'pause':
     case 'stop':
-      await soundtrackGraphql(
-        `mutation($input: PauseInput!) { pause(input: $input) { status } }`,
-        { input: { soundZone: zoneId } },
-      )
+      await soundtrackPauseZone(zoneId)
       return
     case 'skipNext':
       await skipSoundZoneTracksWithCrossfade(zoneId)
@@ -827,16 +864,9 @@ export async function soundtrackControl(
       // Nooit skipTracks hier: skip gaat naar volgende station-/playlist-track, niet naar
       // de zojuist gequeue'de zoekresultaat-track.
       await queueTracksOnSoundZone(zoneId, [trackId], true)
-      await soundtrackGraphql(
-        `mutation($input: PlayInput!) { play(input: $input) { status } }`,
-        { input: { soundZone: zoneId } },
-      )
+      await soundtrackPlayZone(zoneId)
       return
     }
-    case 'playPlaylist':
-      throw new SoundtrackApiError(
-        'playPlaylist must use playManualPlaylistOnSoundZone (setPlayFrom) via API route',
-      )
     default:
       throw new SoundtrackApiError('Unknown control op')
   }

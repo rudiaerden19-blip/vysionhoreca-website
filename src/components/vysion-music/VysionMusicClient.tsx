@@ -314,10 +314,10 @@ export function VysionMusicClient({
     }
   }, [])
 
-  const playFromIndex = useCallback(
-    async (playlistId: string, trackIndex: number) => {
+  const setPlayFromTrack = useCallback(
+    async (source: string, trackIndex: number) => {
       setSwitchingTrack(true)
-      await postOp({ op: 'playFromIndex', playlistId, trackIndex })
+      await postOp({ op: 'setPlayFrom', source, trackIndex })
       setSwitchingTrack(false)
       window.setTimeout(() => void loadSnapshot(), 800)
     },
@@ -479,7 +479,7 @@ export function VysionMusicClient({
                   const idx = queueRows.findIndex(
                     (r) => r.id === nowTrack.id && r.name === nowTrack.name,
                   )
-                  if (idx > 0) void playFromIndex(playFromId, idx - 1)
+                  if (idx > 0) void setPlayFromTrack(playFromId, idx - 1)
                 }}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -517,7 +517,7 @@ export function VysionMusicClient({
                 disabled={transportPending === 'skipNext'}
                 aria-label={t('vysionMusic.next')}
                 onClick={() =>
-                  void postOp({ op: 'skipNext' }, { transportPending: 'skipNext' })
+                  void postOp({ op: 'skipTracks', tracksToSkip: 1 }, { transportPending: 'skipNext' })
                 }
               >
                 <VmSkipForward className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -578,7 +578,7 @@ export function VysionMusicClient({
                       className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                       disabled={switchingTrack || !playFromId}
                       onClick={() => {
-                        if (playFromId) void playFromIndex(playFromId, idx)
+                        if (playFromId) void setPlayFromTrack(playFromId, idx)
                       }}
                     >
                       <span className={styles.rowNum}>{idx + 1}</span>
