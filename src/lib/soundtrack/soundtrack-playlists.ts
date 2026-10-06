@@ -346,6 +346,38 @@ const PLAYLIST_SPLICE_META_QUERY = `query($id: ID!) {
 }`
 
 /** Voeg één track toe aan een manual Soundtrack-playlist (`spliceManualPlaylist`). */
+/** Hernoem manual playlist (`updateManualPlaylist`). */
+export async function renameManualPlaylist(playlistId: string, name: string): Promise<void> {
+  const id = playlistId.trim()
+  const nextName = name.trim()
+  if (!id) throw new SoundtrackApiError('playlist id required', 400)
+  if (!nextName) throw new SoundtrackApiError('playlist name required', 400)
+
+  await soundtrackGraphql(
+    `mutation($input: UpdateManualPlaylistInfoInput!) {
+      updateManualPlaylist(input: $input) { id name }
+    }`,
+    { input: { id, name: nextName } },
+  )
+}
+
+/** Verwijder playlist uit account-bibliotheek (`removeFromMusicLibrary`). */
+export async function removePlaylistFromMusicLibrary(
+  zoneId: string,
+  playlistId: string,
+): Promise<void> {
+  const pid = playlistId.trim()
+  if (!pid) throw new SoundtrackApiError('playlist id required', 400)
+  const ownerId = await resolveZoneAccountId(zoneId.trim())
+
+  await soundtrackGraphql(
+    `mutation($input: RemoveFromMusicLibraryInput!) {
+      removeFromMusicLibrary(input: $input) { __typename }
+    }`,
+    { input: { parent: ownerId, source: pid } },
+  )
+}
+
 export async function addTrackToManualPlaylist(
   playlistId: string,
   trackId: string,

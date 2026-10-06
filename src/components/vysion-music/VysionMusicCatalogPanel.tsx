@@ -22,7 +22,13 @@ import {
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
 import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
+import { VysionMusicDeletePlaylistModal } from './VysionMusicDeletePlaylistModal'
+import { VysionMusicRenamePlaylistModal } from './VysionMusicRenamePlaylistModal'
 import styles from './vysion-music.module.css'
+
+function isManualLibraryPlaylist(kind: SoundtrackLibrarySourceKind): boolean {
+  return kind === 'playlist' || kind === 'unknown'
+}
 
 type LibraryItem = VysionMusicLibraryItem
 type TrackItem = VysionMusicCatalogTrack
@@ -89,6 +95,9 @@ export function VysionMusicCatalogPanel({
   const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
+  const [libraryMenuPlaylistId, setLibraryMenuPlaylistId] = useState<string | null>(null)
+  const [renamePlaylist, setRenamePlaylist] = useState<{ id: string; name: string } | null>(null)
+  const [deletePlaylist, setDeletePlaylist] = useState<{ id: string; name: string } | null>(null)
 
   const prefetchTracksForSource = useCallback(
     async (sourceId: string) => {
@@ -248,6 +257,18 @@ export function VysionMusicCatalogPanel({
   }, [searchMenuTrackId])
 
   useEffect(() => {
+    if (!libraryMenuPlaylistId) return
+    const close = () => setLibraryMenuPlaylistId(null)
+    const id = window.setTimeout(() => {
+      document.addEventListener('click', close)
+    }, 0)
+    return () => {
+      window.clearTimeout(id)
+      document.removeEventListener('click', close)
+    }
+  }, [libraryMenuPlaylistId])
+
+  useEffect(() => {
     if (!items.length) return
     const toPrefetch = filteredLists.slice(0, 2)
     const id = window.setTimeout(() => {
@@ -385,40 +406,93 @@ export function VysionMusicCatalogPanel({
                 listArtUrl && listArtUrl.startsWith('http')
                   ? `/api/soundtrack/cover?url=${encodeURIComponent(listArtUrl)}`
                   : null
+              const libraryMenuOpen = libraryMenuPlaylistId === pl.id
+              const showPlaylistMenu = isManualLibraryPlaylist(pl.sourceKind)
               return (
                 <li key={pl.id}>
-                  <button
-                    type="button"
-                    className={rowClass}
-                    disabled={busy}
-                    onClick={() => pickPlaylist(pl.id)}
-                  >
-                    <span className={styles.libraryThumb} aria-hidden>
-                      {thumbSrc && !brokenThumbIds.has(pl.id) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={thumbSrc}
-                          alt=""
-                          className={styles.libraryThumbImg}
-                          referrerPolicy="no-referrer"
-                          onError={() =>
-                            setBrokenThumbIds((prev) => new Set(prev).add(pl.id))
-                          }
-                        />
-                      ) : (
-                        <span className={styles.libraryThumbFallback}>{pl.name.charAt(0)}</span>
-                      )}
-                    </span>
-                    <span className={styles.libraryRowText}>
-                      <span className={styles.libraryRowName}>{pl.name}</span>
-                      <span className={styles.libraryRowMeta}>{sourceLabel(pl.sourceKind)}</span>
-                    </span>
-                    {isActivePlayFrom && nowPlayingTrack != null ? (
-                      <span className={styles.libraryRowEq}>
-                        <TrackNowPlayingBars playing={nowPlaying} />
+                  <div className={styles.libraryRowWrap}>
+                    <button
+                      type="button"
+                      className={`${rowClass} ${styles.libraryRowMainBtn}`}
+                      disabled={busy}
+                      onClick={() => pickPlaylist(pl.id)}
+                    >
+                      <span className={styles.libraryThumb} aria-hidden>
+                        {thumbSrc && !brokenThumbIds.has(pl.id) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={thumbSrc}
+                            alt=""
+                            className={styles.libraryThumbImg}
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setBrokenThumbIds((prev) => new Set(prev).add(pl.id))
+                            }
+                          />
+                        ) : (
+                          <span className={styles.libraryThumbFallback}>{pl.name.charAt(0)}</span>
+                        )}
                       </span>
+                      <span className={styles.libraryRowText}>
+                        <span className={styles.libraryRowName}>{pl.name}</span>
+                        <span className={styles.libraryRowMeta}>{sourceLabel(pl.sourceKind)}</span>
+                      </span>
+                      {isActivePlayFrom && nowPlayingTrack != null ? (
+                        <span className={styles.libraryRowEq}>
+                          <TrackNowPlayingBars playing={nowPlaying} />
+                        </span>
+                      ) : null}
+                    </button>
+                    {showPlaylistMenu ? (
+                      <div className={styles.searchTrackMenuWrap}>
+                        <button
+                          type="button"
+                          className={styles.searchTrackMenuBtn}
+                          disabled={busy}
+                          aria-label={t('vysionMusic.playlistMenuAria')}
+                          aria-expanded={libraryMenuOpen}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setLibraryMenuPlaylistId((prev) => (prev === pl.id ? null : pl.id))
+                          }}
+                        >
+                          ⋮
+                        </button>
+                        {libraryMenuOpen ? (
+                          <div
+                            className={styles.searchTrackMenu}
+                            role="menu"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className={styles.searchTrackMenuItem}
+                              disabled={busy}
+                              onClick={() => {
+                                setLibraryMenuPlaylistId(null)
+                                setRenamePlaylist({ id: pl.id, name: pl.name })
+                              }}
+                            >
+                              {t('vysionMusic.playlistRename')}
+                            </button>
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className={styles.searchTrackMenuItem}
+                              disabled={busy}
+                              onClick={() => {
+                                setLibraryMenuPlaylistId(null)
+                                setDeletePlaylist({ id: pl.id, name: pl.name })
+                              }}
+                            >
+                              {t('vysionMusic.playlistDelete')}
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
                     ) : null}
-                  </button>
+                  </div>
                 </li>
               )
             })}
@@ -598,6 +672,28 @@ export function VysionMusicCatalogPanel({
         onCreated={() => {
           setTab('lists')
           return loadLists({ background: true })
+        }}
+      />
+      <VysionMusicRenamePlaylistModal
+        tenant={tenant}
+        open={renamePlaylist != null}
+        playlistId={renamePlaylist?.id ?? ''}
+        initialName={renamePlaylist?.name ?? ''}
+        onClose={() => setRenamePlaylist(null)}
+        onRenamed={() => loadLists({ background: true })}
+      />
+      <VysionMusicDeletePlaylistModal
+        tenant={tenant}
+        open={deletePlaylist != null}
+        playlistId={deletePlaylist?.id ?? ''}
+        playlistName={deletePlaylist?.name ?? ''}
+        onClose={() => setDeletePlaylist(null)}
+        onDeleted={async (removedId) => {
+          if (selectedId === removedId) {
+            setSelectedId(null)
+            setTracks([])
+          }
+          await loadLists({ background: true })
         }}
       />
       <VysionMusicAddTrackToPlaylistModal
