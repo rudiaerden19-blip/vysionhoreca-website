@@ -229,7 +229,14 @@ export async function withSoundtrackAudioFade<T>(
   }
 }
 
-type SoundZoneRef = { id: string; name: string }
+export type SoundZonePickCandidate = {
+  id: string
+  name: string
+  online?: boolean
+  isPaired?: boolean
+}
+
+type SoundZoneRef = SoundZonePickCandidate
 
 const ALL_SOUND_ZONES_TTL_MS = 120_000
 let allSoundZonesCache: { fetchedAt: number; zones: SoundZoneRef[] } | null = null
@@ -271,7 +278,7 @@ async function fetchAllSoundZonesFromApi(): Promise<SoundZoneRef[]> {
                 edges {
                   node {
                     soundZones(first: 50) {
-                      edges { node { id name } }
+                      edges { node { id name online isPaired } }
                     }
                   }
                 }
@@ -297,13 +304,29 @@ async function fetchAllSoundZonesFromApi(): Promise<SoundZoneRef[]> {
   return zones
 }
 
-function findSoundZoneIdByDisplayName(zones: SoundZoneRef[], zoneName: string): string | null {
+/** Bij dubbele zonenaam: gekoppelde online player boven offline/duplicate zones. */
+export function pickSoundZoneIdByDisplayName(
+  zones: SoundZonePickCandidate[],
+  zoneName: string,
+): string | null {
   const key = normalizeSoundZoneNameKey(zoneName)
   if (!key) return null
+  const matches: SoundZonePickCandidate[] = []
   for (const z of zones) {
-    if (normalizeSoundZoneNameKey(z.name) === key) return z.id
+    if (normalizeSoundZoneNameKey(z.name) === key) matches.push(z)
   }
-  return null
+  if (matches.length === 0) return null
+  if (matches.length === 1) return matches[0]!.id
+
+  if (!matches.some((z) => z.isPaired)) return matches[0]!.id
+
+  const score = (z: SoundZonePickCandidate) => (z.isPaired ? 4 : 0) + (z.online ? 2 : 0)
+  matches.sort((a, b) => score(b) - score(a))
+  return matches[0]!.id
+}
+
+function findSoundZoneIdByDisplayName(zones: SoundZoneRef[], zoneName: string): string | null {
+  return pickSoundZoneIdByDisplayName(zones, zoneName)
 }
 
 async function resolveSoundZoneIdByDisplayName(zoneName: string): Promise<string> {
@@ -409,6 +432,16 @@ export async function resolveSoundZoneForTenant(
     throw new SoundtrackConfigError(
       `Geen Soundtrack-zone voor tenant «${slug}». Noem de zone in Soundtrack hetzelfde als de tenant-slug of zaaknaam, of zet soundtrack_sound_zone_id in tenant_settings.`,
     )
+  }
+
+  const zones = await fetchAllSoundZonesFromApi()
+  const active = zones.find((z) => z.id === resolved)
+  if (active && !(active.online && active.isPaired)) {
+    const better = pickSoundZoneIdByDisplayName(zones, active.name)
+    if (better && better !== resolved) {
+      resolved = better
+      if (linkSource === 'env_id') linkSource = 'tenant_name'
+    }
   }
 
   const out: SoundtrackZoneResolution = {

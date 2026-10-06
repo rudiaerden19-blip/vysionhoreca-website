@@ -131,7 +131,10 @@ function mapLibraryNodes(
   return rows
 }
 
-function dedupeLibraryRows(rows: SoundtrackLibraryPlaylist[]): SoundtrackLibraryPlaylist[] {
+/** Soundtrack desktop-volgorde behouden (geen alfabetische sort). */
+export function dedupeLibraryRowsPreserveOrder(
+  rows: SoundtrackLibraryPlaylist[],
+): SoundtrackLibraryPlaylist[] {
   const seen = new Set<string>()
   const out: SoundtrackLibraryPlaylist[] = []
   for (const row of rows) {
@@ -139,8 +142,11 @@ function dedupeLibraryRows(rows: SoundtrackLibraryPlaylist[]): SoundtrackLibrary
     seen.add(row.id)
     out.push(row)
   }
-  out.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
   return out
+}
+
+function dedupeLibraryRows(rows: SoundtrackLibraryPlaylist[]): SoundtrackLibraryPlaylist[] {
+  return dedupeLibraryRowsPreserveOrder(rows)
 }
 
 function isUnknownFieldError(e: unknown): boolean {
