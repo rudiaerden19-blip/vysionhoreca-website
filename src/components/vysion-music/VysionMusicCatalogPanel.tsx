@@ -22,10 +22,7 @@ import {
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
-import {
-  defaultNewPlaylistName,
-  soundtrackCreateManualPlaylist,
-} from '@/lib/vysion-music/soundtrack-create-manual-playlist'
+import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
 import {
   vysionMusicLibraryCoverProxyUrl,
   vysionMusicLibraryFallbackCoverSrc,
@@ -102,8 +99,7 @@ export function VysionMusicCatalogPanel({
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
-  const [createBusy, setCreateBusy] = useState(false)
-  const [createError, setCreateError] = useState<string | null>(null)
+  const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
   const [libraryMenuPlaylistId, setLibraryMenuPlaylistId] = useState<string | null>(null)
@@ -172,21 +168,6 @@ export function VysionMusicCatalogPanel({
     },
     [tenant, t],
   )
-
-  const runSoundtrackCreate = useCallback(async () => {
-    setCreateBusy(true)
-    setCreateError(null)
-    try {
-      const created = await soundtrackCreateManualPlaylist(tenant, defaultNewPlaylistName())
-      setTab('lists')
-      setSelectedId(created.id)
-      await loadLists({ background: true })
-    } catch {
-      setCreateError(t('vysionMusic.createPlaylistError'))
-    } finally {
-      setCreateBusy(false)
-    }
-  }, [tenant, t, loadLists])
 
   useEffect(() => {
     const cached = getCachedPlaylists(tenant)
@@ -458,18 +439,12 @@ export function VysionMusicCatalogPanel({
               <button
                 type="button"
                 className={styles.libraryTab}
-                disabled={createBusy}
-                onClick={() => void runSoundtrackCreate()}
+                onClick={() => setCreatePlaylistOpen(true)}
               >
-                {createBusy ? t('vysionMusic.createPlaylistSaving') : t('vysionMusic.libraryCreatePlaylist')}
+                {t('vysionMusic.libraryCreatePlaylist')}
               </button>
             </div>
           </div>
-          {createError ? (
-            <p className={styles.libraryError} role="alert">
-              {createError}
-            </p>
-          ) : null}
           {listsLoading ? (
             <p className={styles.libraryMuted}>{t('vysionMusic.libraryLoading')}</p>
           ) : null}
@@ -837,6 +812,15 @@ export function VysionMusicCatalogPanel({
           </ul>
         </div>
       </div>
+      <VysionMusicCreatePlaylistModal
+        tenant={tenant}
+        open={createPlaylistOpen}
+        onClose={() => setCreatePlaylistOpen(false)}
+        onCreated={() => {
+          setTab('lists')
+          return loadLists()
+        }}
+      />
       <VysionMusicRenamePlaylistModal
         tenant={tenant}
         open={renamePlaylist != null}

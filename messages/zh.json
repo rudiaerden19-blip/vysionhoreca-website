@@ -6912,7 +6912,7 @@
     "libraryTitle": "音乐库",
     "libraryTabLists": "播放列表",
     "libraryTabSchedules": "日程",
-    "libraryCreatePlaylist": "Create",
+    "libraryCreatePlaylist": "+ 播放列表",
     "createPlaylistTitle": "新建播放列表",
     "createPlaylistNameLabel": "播放列表名称",
     "createPlaylistCancel": "取消",

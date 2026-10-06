@@ -6871,7 +6871,7 @@
     "libraryTitle": "Library",
     "libraryTabLists": "Playlists",
     "libraryTabSchedules": "Schedules",
-    "libraryCreatePlaylist": "Create",
+    "libraryCreatePlaylist": "+ Playlist",
     "createPlaylistTitle": "New playlist",
     "createPlaylistNameLabel": "Playlist name",
     "createPlaylistCancel": "Cancel",
