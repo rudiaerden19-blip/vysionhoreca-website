@@ -9,6 +9,7 @@ import {
   skipSoundZoneTracks,
   soundtrackGraphql,
   soundtrackPauseZone,
+  soundtrackPlayFromTrackIndex,
   soundtrackPlayZone,
   soundtrackQueueTracksOnZone,
   soundtrackSearchTracks,
@@ -31,6 +32,7 @@ const SOUNDTRACK_MUTATIONS = [
   'skipTracks',
   'setVolume',
   'soundZoneQueueTracks',
+  'playFromTrackIndex',
 ] as const
 
 type SoundtrackMutationName = (typeof SOUNDTRACK_MUTATIONS)[number]
@@ -158,6 +160,29 @@ export async function POST(request: NextRequest, context: RouteContext) {
         }
         const clearQueuedTracks = input.clearQueuedTracks !== false
         await soundtrackQueueTracksOnZone(zoneId, tracks, clearQueuedTracks)
+        break
+      }
+      case 'playFromTrackIndex': {
+        const source = String(input.source ?? '').trim()
+        if (!source) {
+          return NextResponse.json({ error: 'input.source required' }, { status: 400 })
+        }
+        const trackIndex =
+          typeof input.trackIndex === 'number' && Number.isFinite(input.trackIndex)
+            ? Math.max(0, Math.floor(input.trackIndex))
+            : 0
+        const activeSourceId =
+          typeof input.activeSourceId === 'string' ? input.activeSourceId : null
+        const currentTrackId =
+          typeof input.currentTrackId === 'string' ? input.currentTrackId : null
+        const playlistTrackIds = Array.isArray(input.playlistTrackIds)
+          ? input.playlistTrackIds.map((t) => String(t).trim()).filter(Boolean)
+          : null
+        await soundtrackPlayFromTrackIndex(zoneId, source, trackIndex, {
+          activeSourceId,
+          currentTrackId,
+          playlistTrackIds,
+        })
         break
       }
       default:

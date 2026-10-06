@@ -18,38 +18,27 @@ async function postSoundtrackMutation(
 
 /**
  * Track kiezen in de huidige Soundtrack-afspeellijst (linkerpaneel).
- * Alleen Soundtrack: setPlayFrom → play → skipTracks(trackIndex).
- * `trackIndex` = 0-based positie in snapshot.playlist (rij 1 → 0).
+ * Eén POST: `playFromTrackIndex` (setPlayFrom + play + skip, of skip vooruit).
  */
 export async function playSoundtrackPlaylistRow(
   apiBase: string,
   playlistSourceId: string,
   trackIndex: number,
+  opts?: {
+    activeSourceId?: string | null
+    currentTrackId?: string | null
+    playlistTrackIds?: string[] | null
+  },
 ): Promise<{ ok: boolean; error?: string; snapshot?: unknown }> {
   const source = playlistSourceId.trim()
   if (!source) return { ok: false, error: 'playlist source id required' }
 
   const index = Math.max(0, Math.floor(trackIndex))
-  let lastSnapshot: unknown
-
-  const steps: Array<() => Promise<{ ok: boolean; error?: string; snapshot?: unknown }>> = [
-    () => postSoundtrackMutation(apiBase, 'setPlayFrom', { source }),
-    () => postSoundtrackMutation(apiBase, 'play', {}),
-  ]
-  if (index > 0) {
-    steps.push(() =>
-      postSoundtrackMutation(apiBase, 'skipTracks', {
-        tracksToSkip: index,
-        crossfade: true,
-      }),
-    )
-  }
-
-  for (const step of steps) {
-    const result = await step()
-    if (!result.ok) return { ok: false, error: result.error }
-    if (result.snapshot != null) lastSnapshot = result.snapshot
-  }
-
-  return { ok: true, snapshot: lastSnapshot }
+  return postSoundtrackMutation(apiBase, 'playFromTrackIndex', {
+    source,
+    trackIndex: index,
+    activeSourceId: opts?.activeSourceId ?? null,
+    currentTrackId: opts?.currentTrackId ?? null,
+    playlistTrackIds: opts?.playlistTrackIds ?? null,
+  })
 }

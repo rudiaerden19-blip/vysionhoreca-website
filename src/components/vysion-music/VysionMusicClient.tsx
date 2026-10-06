@@ -55,6 +55,12 @@ type Snapshot = {
 
 type TransportPending = 'prev' | 'play' | 'pause' | 'stop' | 'skipNext'
 
+type LibraryPlaylist = {
+  id: string
+  name: string
+  trackCount: number
+}
+
 function formatMs(ms: number): string {
   if (!ms || ms < 0) return '0:00'
   const totalSec = Math.floor(ms / 1000)
@@ -98,6 +104,13 @@ export function VysionMusicClient({
   const [tick, setTick] = useState(0)
   const [volumeUi, setVolumeUi] = useState(0)
   const [coverBroken, setCoverBroken] = useState(false)
+  const [libraryOpen, setLibraryOpen] = useState(false)
+  const [libraryPlaylists, setLibraryPlaylists] = useState<LibraryPlaylist[]>([])
+  const [libraryLoading, setLibraryLoading] = useState(false)
+  const [libraryError, setLibraryError] = useState<string | null>(null)
+  const [creatingList, setCreatingList] = useState(false)
+  const [newListName, setNewListName] = useState('')
+  const [librarySaving, setLibrarySaving] = useState(false)
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -316,17 +329,50 @@ export function VysionMusicClient({
     }
   }, [])
 
-  /** Afspeellijst (links): alleen Soundtrack setPlayFrom → play → skipTracks. */
-  const playPlaylistRow = useCallback(
-    async (trackIndex: number) => {
-      const source = snapshot?.playFromPlaylistId?.trim()
-      if (!source) {
-        setError(t('vysionMusic.errorControl'))
+  const loadLibraryPlaylists = useCallback(async () => {
+    setLibraryLoading(true)
+    setLibraryError(null)
+    try {
+      const res = await fetch(`${apiBase}/playlists`, {
+        headers: getAuthHeaders(),
+        cache: 'no-store',
+      })
+      const json = (await res.json()) as {
+        ok?: boolean
+        playlists?: LibraryPlaylist[]
+        error?: string
+      }
+      if (!res.ok || json.ok === false) {
+        setLibraryError(json.error || t('vysionMusic.playlistLoadFailed'))
+        setLibraryPlaylists([])
         return
       }
+      setLibraryPlaylists(json.playlists ?? [])
+    } catch {
+      setLibraryError(t('vysionMusic.errorNetwork'))
+      setLibraryPlaylists([])
+    } finally {
+      setLibraryLoading(false)
+    }
+  }, [apiBase, t])
+
+  const openLibrary = useCallback(() => {
+    setLibraryOpen(true)
+    void loadLibraryPlaylists()
+  }, [loadLibraryPlaylists])
+
+  const playLibraryPlaylist = useCallback(
+    async (playlistId: string) => {
+      const source = playlistId.trim()
+      if (!source) return
+      setLibraryOpen(false)
       setSwitchingTrack(true)
       setError(null)
-      const result = await playSoundtrackPlaylistRow(apiBase, source, trackIndex)
+      const result = await playSoundtrackPlaylistRow(apiBase, source, 0, {
+        activeSourceId: snapshot?.playFromPlaylistId ?? null,
+        currentTrackId: snapshot?.nowPlaying.track?.id ?? null,
+        playlistTrackIds: (snapshot?.playlist ?? []).map((r) => r.id),
+      })
       if (!result.ok) {
         setError(result.error || t('vysionMusic.errorControl'))
       } else if (result.snapshot) {
@@ -335,7 +381,76 @@ export function VysionMusicClient({
       setSwitchingTrack(false)
       void loadSnapshot()
     },
-    [apiBase, loadSnapshot, mergeSnapshot, snapshot?.playFromPlaylistId, t],
+    [
+      apiBase,
+      loadSnapshot,
+      mergeSnapshot,
+      snapshot?.nowPlaying.track?.id,
+      snapshot?.playFromPlaylistId,
+      snapshot?.playlist,
+      t,
+    ],
+  )
+
+  const saveNewLibraryPlaylist = useCallback(async () => {
+    const name = newListName.trim()
+    if (!name) return
+    setLibrarySaving(true)
+    setLibraryError(null)
+    try {
+      const res = await fetch(`${apiBase}/playlists`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ name }),
+      })
+      const json = (await res.json()) as { ok?: boolean; playlist?: LibraryPlaylist; error?: string }
+      if (!res.ok || json.ok === false) {
+        setLibraryError(json.error || t('vysionMusic.playlistSaveFailed'))
+        return
+      }
+      setNewListName('')
+      setCreatingList(false)
+      await loadLibraryPlaylists()
+      if (json.playlist?.id) void playLibraryPlaylist(json.playlist.id)
+    } catch {
+      setLibraryError(t('vysionMusic.errorNetwork'))
+    } finally {
+      setLibrarySaving(false)
+    }
+  }, [apiBase, loadLibraryPlaylists, newListName, playLibraryPlaylist, t])
+
+  /** Afspeellijst (links): één BFF-call playFromTrackIndex. */
+  const playPlaylistRow = useCallback(
+    async (trackIndex: number) => {
+      const source = snapshot?.playFromPlaylistId?.trim()
+      if (!source) {
+        setError(t('vysionMusic.errorNoPlayFrom'))
+        return
+      }
+      setSwitchingTrack(true)
+      setError(null)
+      const result = await playSoundtrackPlaylistRow(apiBase, source, trackIndex, {
+        activeSourceId: source,
+        currentTrackId: snapshot?.nowPlaying.track?.id ?? null,
+        playlistTrackIds: (snapshot?.playlist ?? []).map((r) => r.id),
+      })
+      if (!result.ok) {
+        setError(result.error || t('vysionMusic.errorControl'))
+      } else if (result.snapshot) {
+        mergeSnapshot(result.snapshot as Snapshot)
+      }
+      setSwitchingTrack(false)
+      void loadSnapshot()
+    },
+    [
+      apiBase,
+      loadSnapshot,
+      mergeSnapshot,
+      snapshot?.nowPlaying.track?.id,
+      snapshot?.playFromPlaylistId,
+      snapshot?.playlist,
+      t,
+    ],
   )
 
   const playTrack = useCallback(
@@ -581,10 +696,30 @@ export function VysionMusicClient({
         <div className={styles.panel}>
           <div className={styles.panelTitleRow}>
             <div className={styles.panelTitle}>{t('vysionMusic.playlistTitle')}</div>
+            <div className={styles.panelTitleActions}>
+              <button
+                type="button"
+                className={styles.panelMiniBtn}
+                onClick={() => openLibrary()}
+              >
+                {t('vysionMusic.actionPlaylist')}
+              </button>
+              <button
+                type="button"
+                className={styles.panelMiniBtnPrimary}
+                onClick={() => {
+                  setCreatingList(true)
+                  setLibraryOpen(true)
+                  void loadLibraryPlaylists()
+                }}
+              >
+                {t('vysionMusic.actionNewList')}
+              </button>
+            </div>
           </div>
           <div className={styles.list}>
             {queueRows.length === 0 ? (
-              <p className={styles.playlistEmptyDrop}>{t('vysionMusic.playlistModalEmpty')}</p>
+              <p className={styles.playlistEmptyDrop}>{t('vysionMusic.queueEmpty')}</p>
             ) : (
               queueRows.map((row, idx) => {
                 const active =
@@ -679,6 +814,108 @@ export function VysionMusicClient({
           ) : null}
         </div>
       </div>
+
+      {libraryOpen ? (
+        <div
+          className={styles.playlistModalBackdrop}
+          role="presentation"
+          onClick={() => {
+            setLibraryOpen(false)
+            setCreatingList(false)
+          }}
+        >
+          <div
+            className={styles.playlistModal}
+            role="dialog"
+            aria-labelledby="vm-library-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.playlistModalHeader}>
+              <h2 id="vm-library-title" className={styles.playlistModalTitle}>
+                {t('vysionMusic.playlistModalTitle')}
+              </h2>
+              <button
+                type="button"
+                className={styles.playlistModalClose}
+                onClick={() => {
+                  setLibraryOpen(false)
+                  setCreatingList(false)
+                }}
+              >
+                {t('vysionMusic.playlistModalClose')}
+              </button>
+            </div>
+            <p className={styles.playlistModalHint}>{t('vysionMusic.playlistModalHint')}</p>
+            {creatingList ? (
+              <div className={styles.playlistEditBar}>
+                <input
+                  className={styles.playlistNameInput}
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                  placeholder={t('vysionMusic.playlistNamePlaceholder')}
+                  aria-label={t('vysionMusic.playlistNamePlaceholder')}
+                />
+                <div className={styles.playlistEditActions}>
+                  <button
+                    type="button"
+                    className={styles.panelMiniBtnPrimary}
+                    disabled={librarySaving || !newListName.trim()}
+                    onClick={() => void saveNewLibraryPlaylist()}
+                  >
+                    {t('vysionMusic.playlistSave')}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.panelMiniBtn}
+                    disabled={librarySaving}
+                    onClick={() => {
+                      setCreatingList(false)
+                      setNewListName('')
+                    }}
+                  >
+                    {t('vysionMusic.playlistCancel')}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            {libraryError ? (
+              <p className={styles.playlistModalHint} role="alert">
+                {libraryError}
+              </p>
+            ) : null}
+            {libraryLoading ? (
+              <p className={styles.playlistModalHint}>{t('vysionMusic.loading')}</p>
+            ) : null}
+            <ul className={styles.playlistModalList}>
+              {!libraryLoading && libraryPlaylists.length === 0 ? (
+                <li className={styles.playlistModalHint}>{t('vysionMusic.playlistModalEmpty')}</li>
+              ) : (
+                libraryPlaylists.map((pl) => {
+                  const active = playFromId === pl.id
+                  return (
+                    <li key={pl.id} className={styles.playlistModalItem}>
+                      <button
+                        type="button"
+                        className={styles.playlistModalSelect}
+                        disabled={switchingTrack}
+                        onClick={() => void playLibraryPlaylist(pl.id)}
+                      >
+                        <span className={styles.playlistModalName}>
+                          {pl.name}
+                          {active ? ' ✓' : ''}
+                        </span>
+                        <span className={styles.playlistModalMeta}>
+                          {pl.trackCount} {t('vysionMusic.playlistTracksLabel')}
+                        </span>
+                      </button>
+                    </li>
+                  )
+                })
+              )}
+            </ul>
+          </div>
+        </div>
+      ) : null}
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
     </div>

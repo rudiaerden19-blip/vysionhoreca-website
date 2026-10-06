@@ -5,6 +5,10 @@ import {
   trackArtistNamesMatchQuery,
 } from '@/lib/soundtrack/soundtrack-search-artist-filter'
 import {
+  planPlaylistTrackPlay,
+  SOUNDTRACK_PLAY_FROM_SETTLE_MS,
+} from '@/lib/soundtrack/soundtrack-play-from-track-index'
+import {
   mapSoundtrackTrackRow,
   SOUNDTRACK_TRACK_GRAPHQL_FIELDS,
   type SoundtrackTrackGraphNode,
@@ -706,6 +710,77 @@ export async function soundtrackSetPlayFrom(zoneId: string, sourceId: string): P
     `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
     { input: { soundZone: zoneId, source } },
   )
+}
+
+async function soundtrackSetPlaybackOrderLinear(zoneId: string): Promise<void> {
+  try {
+    await soundtrackGraphql(
+      `mutation($input: SoundZoneSetPlaybackOrderInput!) {
+        soundZoneSetPlaybackOrder(input: $input) { __typename }
+      }`,
+      { input: { soundZone: zoneId, playbackOrder: 'LINEAR' } },
+    )
+  } catch {
+    /* optioneel op sommige accounts */
+  }
+}
+
+async function soundtrackRestartPlayFromAtIndex(
+  zoneId: string,
+  sourceId: string,
+  trackIndex: number,
+): Promise<void> {
+  await soundtrackSetPlayFrom(zoneId, sourceId)
+  await soundtrackSetPlaybackOrderLinear(zoneId)
+  await soundtrackPlayZone(zoneId)
+  const skip = Math.max(0, Math.floor(trackIndex))
+  if (skip > 0) {
+    await new Promise((r) => setTimeout(r, SOUNDTRACK_PLAY_FROM_SETTLE_MS))
+    await skipSoundZoneTracks(zoneId, skip, true)
+  }
+}
+
+/**
+ * Track op index in een Soundtrack-playlist (playFrom) — één server-roundtrip.
+ * Vermijdt setPlayFrom+skip race en skipt vooruit als dezelfde lijst al speelt.
+ */
+export async function soundtrackPlayFromTrackIndex(
+  zoneId: string,
+  sourceId: string,
+  trackIndex: number,
+  opts?: {
+    activeSourceId?: string | null
+    currentTrackId?: string | null
+    playlistTrackIds?: string[] | null
+  },
+): Promise<void> {
+  const source = sourceId.trim()
+  if (!source) throw new SoundtrackApiError('source playlist id required')
+  const target = Math.max(0, Math.floor(trackIndex))
+
+  const active = opts?.activeSourceId?.trim() || ''
+  const sameSource = Boolean(active && active === source)
+  const currentId = opts?.currentTrackId?.trim() || ''
+  let currentIndex: number | null = null
+  if (sameSource && currentId && Array.isArray(opts?.playlistTrackIds)) {
+    const idx = opts.playlistTrackIds.findIndex((id) => id.trim() === currentId)
+    if (idx >= 0) currentIndex = idx
+  }
+
+  const plan = planPlaylistTrackPlay(sameSource, currentIndex, target)
+  switch (plan.kind) {
+    case 'resume':
+      await soundtrackPlayZone(zoneId)
+      return
+    case 'skip_forward':
+      await skipSoundZoneTracks(zoneId, plan.tracksToSkip, true)
+      return
+    case 'restart_at':
+      await soundtrackRestartPlayFromAtIndex(zoneId, source, plan.trackIndex)
+      return
+    default:
+      return
+  }
 }
 
 /** Soundtrack `skipTrack` (één track vooruit). */
