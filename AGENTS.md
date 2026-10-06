@@ -19,6 +19,7 @@ De **horeca-kassa** (`src/app/shop/[tenant]/admin/kassa/`) **nooit aanraken**
  `npm test -- --testPathPatterns=kassa-table-park-flow` en `npm test -- --testPathPatterns=controlled-number-input`.
 - Vóór wijzigingen aan **op rekening v2** (zie `.cursor/rules/kassa-name-account-v2-sacred.mdc`):
  `npm test -- --testPathPatterns=kassa-name-account` en `npm test -- --testPathPatterns=kassa-name-tabs-cache` en `npm test -- --testPathPatterns=kassa-name-account-modal-ui`.
+- **Vysion Music playback/flow niet aanraken** (zie `.cursor/rules/vysion-music-playback-sacred.mdc`) — alleen Soundtrack-lijsten/sync/API zonder `VysionMusicClient` transport.
 
 ### Env / secrets (belangrijk, niet vanzelfsprekend)
 - De app **start prima zonder** `.env.local`; ontbrekende Supabase/Stripe/Zoho/Redis-config leidt

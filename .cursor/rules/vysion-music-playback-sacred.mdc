@@ -1,0 +1,41 @@
+---
+description: HEILIG — Vysion Music playback/flow; niet wijzigen zonder expliciete opdracht
+alwaysApply: true
+---
+
+# Vysion Music — playback & flow (HEILIG)
+
+**Eigenaar:** werkende afstandsbediening (play, pause, vorige/volgende, playlist selectie, zoeken → afspelen, volume, snapshot/voortgang). **Geen agent wijzigt dit** tenzij de gebruiker in **dezelfde opdracht** expliciet schrijft dat **playback / de flow / afspelen / transport** **mag** worden aangepast.
+
+Referentie-gedrag: commit **`8629f5ff`** + contract in `src/__tests__/components/vysion-music-playback-contract.test.ts` (single-track **`soundZoneQueueTracks`**, `immediate: true`, `clearQueuedTracks: true`).
+
+## Verboden paden (geen writes)
+
+- `src/components/vysion-music/VysionMusicClient.tsx` — transport, snapshot polling, `queueTrackNow`, `applySoundtrackPlayFrom`, optimistic track, voortgang, volume-sync
+- `src/components/vysion-music/vysion-music-playlist-queue.ts`
+- `src/lib/soundtrack/soundtrack-public-mutations.ts`
+- `src/app/api/soundtrack/[tenant]/route.ts` — GET snapshot / POST playback-mutaties
+- `src/__tests__/components/vysion-music-playback-contract.test.ts`
+
+## Verboden in andere Vysion Music-bestanden (zonder playback-opdracht)
+
+- **`VysionMusicCatalogPanel.tsx`:** geen wijzigingen aan play/pause callbacks, `onPlaySearchTrack`, playlist-selectie die **`setPlayFrom`** / **`soundZoneQueueTracks`** aanroept, of “nu speelt”-highlight-logica voor transport
+- **`vysion-music-track-match.ts`:** niet wijzigen als het **now playing / actieve rij** voor playback raakt
+
+## Wel toegestaan (Soundtrack sync, geen playback)
+
+- `src/lib/soundtrack/soundtrack-playlists.ts` — create/rename/delete lijst, tracks in manual playlist
+- `src/app/api/soundtrack/[tenant]/playlists/route.ts`
+- `src/app/api/soundtrack/[tenant]/playlist-tracks/route.ts`
+- Playlist-modals, covers (behalve albumcover-regel), zoek-UI **zonder** play-handler te wijzigen
+
+## Verplicht vóór commit als playback wél expliciet vrijgegeven is
+
+```bash
+npm test -- --testPathPatterns=vysion-music-playback-contract
+npx tsc --noEmit
+```
+
+## Git staging
+
+- Bij taken over **Lijsten / Soundtrack sync / covers / i18n:** `git diff` op verboden playback-paden hierboven moet **leeg** zijn.
