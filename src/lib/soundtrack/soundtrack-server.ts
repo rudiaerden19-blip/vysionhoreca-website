@@ -745,12 +745,25 @@ export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
   )
 }
 
-function dedupeTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
-  const seen = new Set<string>()
+function normalizeSearchTrackDedupeKey(row: SoundtrackTrackRow): string {
+  const title = row.name.trim().toLowerCase().replace(/\s+/g, ' ')
+  const artist = row.artist.trim().toLowerCase().replace(/\s+/g, ' ')
+  const dur = Math.max(0, Math.round(row.durationMs))
+  return `${title}\u0000${artist}\u0000${dur}`
+}
+
+/** Zoekresultaten: unieke track-id, daarna zelfde opname (titel+artiest+duur). */
+export function dedupeSearchTrackRows(rows: SoundtrackTrackRow[]): SoundtrackTrackRow[] {
+  const seenIds = new Set<string>()
+  const seenRecording = new Set<string>()
   const out: SoundtrackTrackRow[] = []
   for (const row of rows) {
-    if (seen.has(row.id)) continue
-    seen.add(row.id)
+    const id = row.id.trim()
+    if (!id || seenIds.has(id)) continue
+    const recordingKey = normalizeSearchTrackDedupeKey(row)
+    if (seenRecording.has(recordingKey)) continue
+    seenIds.add(id)
+    seenRecording.add(recordingKey)
     out.push(row)
   }
   return out
@@ -815,7 +828,6 @@ export async function soundtrackSearchTracks(
   const q = query.trim()
   if (!q) return []
   const maxResults = Math.min(Math.max(opts?.maxResults ?? 80, 1), SOUNDTRACK_GENERAL_SEARCH_MAX_TRACKS)
-  const pageSize = SOUNDTRACK_QUICK_SEARCH_PAGE_SIZE
   const data = await soundtrackGraphql<{
     search: {
       edges: { node: SoundtrackTrackGraphNode & { __typename?: string } }[]
@@ -831,7 +843,7 @@ export async function soundtrackSearchTracks(
         }
       }
     }`,
-    { q, first: pageSize },
+    { q, first: maxResults },
   )
   const rows: SoundtrackTrackRow[] = []
   for (const edge of data.search?.edges ?? []) {
@@ -839,6 +851,6 @@ export async function soundtrackSearchTracks(
     const row = mapSoundtrackTrackRow(edge.node)
     if (row) rows.push(row)
   }
-  return dedupeTrackRows(rows).slice(0, maxResults)
+  return dedupeSearchTrackRows(rows).slice(0, maxResults)
 }
 
