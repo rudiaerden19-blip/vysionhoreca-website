@@ -350,6 +350,17 @@ const OWNER_LIBRARY_VERSION_QUERY = `query($owner: ID!) {
   library(owner: $owner) { version }
 }`
 
+const OWNER_LIBRARY_IDS_QUERY = `query($owner: ID!) {
+  library(owner: $owner) { ids version }
+}`
+
+async function ownerLibraryContainsPlaylist(ownerId: string, playlistId: string): Promise<boolean> {
+  const data = await soundtrackGraphql<{
+    library: { ids?: string[] | null } | null
+  }>(OWNER_LIBRARY_IDS_QUERY, { owner: ownerId.trim() })
+  return soundtrackLibraryIdsInclude(data.library?.ids, playlistId)
+}
+
 /**
  * Soundtrack desktop player: `addToLibrary` triggert libraryUpdate op de player.
  * Alleen `addToMusicLibrary` is niet genoeg voor automatische zichtbaarheid in de speler.
@@ -387,7 +398,65 @@ async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): P
       return
     } catch (e) {
       if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
-        return
+        if (await ownerLibraryContainsPlaylist(owner, id)) return
+        if (attempt < 2) {
+          await soundtrackSyncPause(120)
+          continue
+        }
+        throw e
+      }
+      const versionConflict =
+        e instanceof SoundtrackApiError &&
+        /version|conflict|stale|overwrite/i.test(e.message)
+      if (versionConflict && attempt < 2) {
+        await soundtrackSyncPause(120)
+        continue
+      }
+      throw e
+    }
+  }
+}
+
+/** Player libraryUpdate na verwijderen uit musicLibrary. */
+async function removePlaylistFromOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
+  const owner = ownerId.trim()
+  const id = playlistId.trim()
+  if (!owner || !id) return
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let version: string | undefined
+    try {
+      const data = await soundtrackGraphql<{
+        library: { version: string | null } | null
+      }>(OWNER_LIBRARY_VERSION_QUERY, { owner })
+      const v = data.library?.version?.trim()
+      if (v) version = v
+    } catch {
+      /* version optional */
+    }
+
+    try {
+      await soundtrackGraphql(
+        `mutation($owner: ID!, $input: RemoveFromLibraryInput!) {
+          removeFromLibrary(owner: $owner, input: $input) { version }
+        }`,
+        {
+          owner,
+          input: {
+            ...(version ? { version } : {}),
+            items: [{ id, itemKind: 'PLAYLIST' }],
+          },
+        },
+      )
+      return
+    } catch (e) {
+      if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
+        if (!(await ownerLibraryContainsPlaylist(owner, id))) return
+        if (attempt < 2) {
+          await soundtrackSyncPause(120)
+          continue
+        }
+        throw e
       }
       const versionConflict =
         e instanceof SoundtrackApiError &&
@@ -519,6 +588,8 @@ export async function createManualPlaylistInMusicLibrary(
 
   await addPlaylistToOwnerLibrary(ownerId, id)
   await addPlaylistToMusicLibrary(ownerId, id)
+  /** Na musicLibrary-sync opnieuw addToLibrary — desktop player krijgt dan libraryUpdate. */
+  await addPlaylistToOwnerLibrary(ownerId, id)
   await assertPlaylistVisibleInSoundtrackLibraries(ownerId, musicLibraryId, id)
 
   const plData = await soundtrackGraphql<{
@@ -581,6 +652,7 @@ export async function removePlaylistFromMusicLibrary(
     }`,
     { input: { parent: ownerId, source: pid } },
   )
+  await removePlaylistFromOwnerLibrary(ownerId, pid)
 }
 
 async function spliceManualPlaylist(input: {
