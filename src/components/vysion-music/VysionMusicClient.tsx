@@ -33,6 +33,9 @@ const SNAPSHOT_POLL_PLAYING_MS = 1500
 const SNAPSHOT_POLL_NEAR_END_MS = 500
 const SNAPSHOT_NEAR_END_WINDOW_MS = 8000
 
+/** Max tracks in één queue-mutatie (van geklikte song t/m einde playlist). */
+const PLAYLIST_QUEUE_MAX_TRACKS = 80
+
 type TrackRow = {
   id: string
   name: string
@@ -432,24 +435,35 @@ export function VysionMusicClient({
     [applyOptimisticNowPlaying, pollUntilNowPlayingMatches, postMutation],
   )
 
-  /** Assign binnen playlist — Soundtrack gaat daarna automatisch naar volgende track in lijst. */
+  /**
+   * Playlist: queueTracks (wisselt meteen van song) + rest van lijst in queue voor auto-volgende.
+   * assignSource alleen wisselde vaak niet van audio — queue wel.
+   */
   const playPlaylistTrack = useCallback(
-    async (sourceId: string, track: VysionMusicCatalogTrack, trackIndex: number) => {
+    async (
+      sourceId: string,
+      track: VysionMusicCatalogTrack,
+      trackIndex: number,
+      playlistTracks: VysionMusicCatalogTrack[],
+    ) => {
       setPlaybackSourceId(sourceId)
       applyOptimisticNowPlaying(track)
       setPlaylistSelecting(true)
       const mutationT0 = perfNow()
+      const fromHere = playlistTracks.slice(Math.max(0, trackIndex)).map((t) => t.id)
+      const tracksToQueue =
+        fromHere.length > 0 ? fromHere.slice(0, PLAYLIST_QUEUE_MAX_TRACKS) : [track.id]
       try {
-        const ok = await postMutation('soundZoneAssignSource', {
-          source: sourceId,
-          track: track.id,
+        const ok = await postMutation('soundZoneQueueTracks', {
+          tracks: tracksToQueue,
           immediate: true,
+          clearQueuedTracks: true,
         })
-        perfLog('playlist-track-assign-response', mutationT0, {
+        perfLog('playlist-track-queue-response', mutationT0, {
           ok,
           trackId: track.id,
           trackIndex,
-          mode: 'track-id',
+          queuedCount: tracksToQueue.length,
         })
         if (ok) void pollUntilNowPlayingMatches(track, mutationT0)
       } finally {
