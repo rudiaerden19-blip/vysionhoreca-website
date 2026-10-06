@@ -30,7 +30,6 @@ import {
 } from './vysion-music-library-thumb'
 import { VysionMusicDeletePlaylistModal } from './VysionMusicDeletePlaylistModal'
 import { VysionMusicRenamePlaylistModal } from './VysionMusicRenamePlaylistModal'
-import { reloadSoundtrackPlayerWindow } from '@/lib/vysion-music/soundtrack-player-window'
 import styles from './vysion-music.module.css'
 
 function isManualLibraryPlaylist(kind: SoundtrackLibrarySourceKind): boolean {
@@ -84,33 +83,6 @@ export function VysionMusicCatalogPanel({
 
   const { t } = useLanguage()
 
-  const refreshSoundtrackPlayer = useCallback(async () => {
-    setSoundtrackReloadBusy(true)
-    setSoundtrackReloadError(null)
-    try {
-      const res = await fetch(
-        `/api/soundtrack/${encodeURIComponent(tenant)}/player-display-url`,
-        { headers: getAuthHeaders(), cache: 'no-store' },
-      )
-      const json = (await res.json()) as { playerWebUrl?: string | null; error?: string }
-      if (!res.ok) {
-        setSoundtrackReloadError(json.error || t('vysionMusic.libraryRefreshSoundtrackError'))
-        return
-      }
-      if (!json.playerWebUrl?.trim()) {
-        setSoundtrackReloadError(t('vysionMusic.libraryRefreshSoundtrackError'))
-        return
-      }
-      const result = reloadSoundtrackPlayerWindow(json.playerWebUrl)
-      if (result === 'failed') {
-        setSoundtrackReloadError(t('vysionMusic.libraryRefreshSoundtrackError'))
-      }
-    } catch {
-      setSoundtrackReloadError(t('vysionMusic.errorNetwork'))
-    } finally {
-      setSoundtrackReloadBusy(false)
-    }
-  }, [tenant, t])
   const [tab, setTab] = useState<LibraryTab>('lists')
   const [items, setItems] = useState<LibraryItem[]>(() => getCachedPlaylists(tenant) ?? [])
   const [listsLoading, setListsLoading] = useState(() => !getCachedPlaylists(tenant))
@@ -128,19 +100,6 @@ export function VysionMusicCatalogPanel({
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
   const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
-  const [soundtrackReloadBusy, setSoundtrackReloadBusy] = useState(false)
-  const [soundtrackReloadError, setSoundtrackReloadError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'F5') return
-      e.preventDefault()
-      if (soundtrackReloadBusy) return
-      void refreshSoundtrackPlayer()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [refreshSoundtrackPlayer, soundtrackReloadBusy])
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
   const [libraryMenuPlaylistId, setLibraryMenuPlaylistId] = useState<string | null>(null)
@@ -484,22 +443,8 @@ export function VysionMusicCatalogPanel({
               >
                 {t('vysionMusic.libraryCreatePlaylist')}
               </button>
-              <button
-                type="button"
-                className={styles.libraryTab}
-                disabled={soundtrackReloadBusy}
-                aria-label={t('vysionMusic.libraryRefreshSoundtrack')}
-                onClick={() => void refreshSoundtrackPlayer()}
-              >
-                {t('vysionMusic.libraryRefreshSoundtrack')}
-              </button>
             </div>
           </div>
-          {soundtrackReloadError ? (
-            <p className={styles.libraryError} role="alert">
-              {soundtrackReloadError}
-            </p>
-          ) : null}
           {listsLoading ? (
             <p className={styles.libraryMuted}>{t('vysionMusic.libraryLoading')}</p>
           ) : null}

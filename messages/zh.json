@@ -6913,8 +6913,6 @@
     "libraryTabLists": "播放列表",
     "libraryTabSchedules": "日程",
     "libraryCreatePlaylist": "+ 播放列表",
-    "libraryRefreshSoundtrack": "F5",
-    "libraryRefreshSoundtrackError": "F5 失败",
     "createPlaylistTitle": "新建播放列表",
     "createPlaylistNameLabel": "播放列表名称",
     "createPlaylistCancel": "取消",

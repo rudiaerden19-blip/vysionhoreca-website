@@ -1,0 +1,40 @@
+---
+description: Vysion Music / Soundtrack — stabiele flow DO NOT TOUCH (create, sync, playback)
+alwaysApply: true
+---
+
+# Vysion Music / Soundtrack — STABIEL, DO NOT TOUCH
+
+**Status (eigenaar):** playlist create, playlist → Soundtrack, live sync, playback, play/pause/skip/volume/queue/now playing, Windows Soundtrack player — **werken**. Windows-sync issue was geen codeprobleem (herstart). Deze flow is **beschermd**.
+
+Zie ook: `vysion-music-playback-sacred.mdc`, `vysion-music-album-cover-sacred.mdc`.
+
+## Zonder expliciete opdracht — NOOIT wijzigen
+
+- Soundtrack auth, API-config, GraphQL transport (HTTP BFF)
+- Playlist create/sync: `createManualPlaylist`, `addToMusicLibrary`, `addToLibrary`, library/musicLibrary sync
+- Sound zone / device koppeling
+- **Playback:** play, pause, stop, skip, next/previous, volume, queue, now playing, track/playlist starten, `soundZoneAssignSource`, `playbackUpdate`, `nowPlayingUpdate`, Windows player communicatie
+- Bestaande Soundtrack API-routes herschrijven; mutations vervangen; werkende functies refactoren/renamen/opschonen
+- State, fetch-flow, caching wijzigen; auto-refresh, polling, timers; WebSockets toevoegen of wijzigen; dependencies vervangen; werkende code verwijderen
+
+## Hoofdregel
+
+Nieuwe features (UI, foto’s, sortering, drag & drop, filters, Spotify, schema’s, …) **rond** de flow bouwen — **niet** door de stabiele Soundtrack/playback-laag te herschrijven.
+
+## Als wijziging aan beschermde code “nodig” lijkt
+
+**STOP.** Niet uitvoeren. Eerst rapporteren:
+
+1. Welk beschermd bestand/functie geraakt zou worden
+2. Waarom jij dat nodig acht
+3. Welk risico voor bestaande functionaliteit
+4. Of het zonder die wijziging kan
+
+Wacht op expliciete goedkeuring. Alleen wijzigen als de eigenaar letterlijk schrijft: **«JE MAG DE BESTAANDE SOUNDTRACK FLOW WIJZIGEN.»**
+
+## Indicatieve paden (niet limitatief)
+
+`src/lib/soundtrack/**`, `src/app/api/soundtrack/**`, `src/components/vysion-music/**` (transport/playback/create/sync), `soundtrack-public-mutations.ts`, playback contract tests.
+
+UI-only taken: diff mag **geen** create/sync/playback/auth/transport raken tenzij expliciet vrijgegeven.

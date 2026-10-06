@@ -38,12 +38,6 @@ const ZONE_ACCOUNT_QUERY = `query($id: ID!) {
   }
 }`
 
-const SOUND_ZONE_PLAYER_WEB_URL_QUERY = `query($id: ID!) {
-  soundZone(id: $id) {
-    nowPlayingDisplayUrl
-  }
-}`
-
 const LIBRARY_DISPLAY_IMAGE = `
   display {
     image {
@@ -302,15 +296,6 @@ export async function listSoundtrackLibraryPlaylists(
 async function resolveZoneAccountId(zoneId: string): Promise<string> {
   const ctx = await resolveSoundtrackZoneLibraryContext(zoneId)
   return ctx.ownerId
-}
-
-/** Zone display-URL (Soundtrack browser player); read-only. */
-export async function getSoundZoneNowPlayingDisplayUrl(zoneId: string): Promise<string | null> {
-  const data = await soundtrackGraphql<{
-    soundZone: { nowPlayingDisplayUrl: string | null } | null
-  }>(SOUND_ZONE_PLAYER_WEB_URL_QUERY, { id: zoneId.trim() })
-  const url = data.soundZone?.nowPlayingDisplayUrl?.trim()
-  return url || null
 }
 
 export async function resolveSoundtrackZoneLibraryContext(

@@ -6913,8 +6913,6 @@
     "libraryTabLists": "プレイリスト",
     "libraryTabSchedules": "スケジュール",
     "libraryCreatePlaylist": "+ プレイリスト",
-    "libraryRefreshSoundtrack": "F5",
-    "libraryRefreshSoundtrackError": "F5失敗",
     "createPlaylistTitle": "新しいプレイリスト",
     "createPlaylistNameLabel": "プレイリスト名",
     "createPlaylistCancel": "キャンセル",

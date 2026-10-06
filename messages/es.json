@@ -6913,8 +6913,6 @@
     "libraryTabLists": "Listas",
     "libraryTabSchedules": "Programaciones",
     "libraryCreatePlaylist": "+ Lista",
-    "libraryRefreshSoundtrack": "F5",
-    "libraryRefreshSoundtrackError": "F5 falló",
     "createPlaylistTitle": "Nueva lista de reproducción",
     "createPlaylistNameLabel": "Nombre de la lista",
     "createPlaylistCancel": "Cancelar",

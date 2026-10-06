@@ -6872,8 +6872,6 @@
     "libraryTabLists": "Afspeellijsten",
     "libraryTabSchedules": "Schema's",
     "libraryCreatePlaylist": "+ Afspeellijst",
-    "libraryRefreshSoundtrack": "F5",
-    "libraryRefreshSoundtrackError": "F5 mislukt",
     "createPlaylistTitle": "Nieuwe afspeellijst",
     "createPlaylistNameLabel": "Naam afspeellijst",
     "createPlaylistCancel": "Annuleren",
