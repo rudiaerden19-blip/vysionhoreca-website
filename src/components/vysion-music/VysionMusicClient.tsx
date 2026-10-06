@@ -296,14 +296,9 @@ export function VysionMusicClient({
       }
       const assigned = await postMutation('soundZoneAssignSource', assignPayload)
       if (!assigned) return false
-      if (opts?.logPlaylistTrack) {
-        console.info('[soundtrack-debug playlist-post]', { mutation: 'play', input: {} })
-      }
-      return postMutation(
-        'play',
-        opts?.logPlaylistTrack ? { debugPlaylistPlay: true } : {},
-        { silent: !opts?.logPlaylistTrack },
-      )
+      // immediate:true op assign — geen aparte play (schema: start via assign, play heeft geen track)
+      if (assignPayload.immediate === true) return true
+      return postMutation('play', {}, { silent: !opts?.logPlaylistTrack })
     },
     [postMutation],
   )

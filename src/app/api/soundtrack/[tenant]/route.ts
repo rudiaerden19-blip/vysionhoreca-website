@@ -13,10 +13,13 @@ import {
   SoundtrackConfigError,
   emptySoundtrackPlayerSnapshot,
   fetchPlaylistSourceSnapshot,
+  fetchPlaylistTrackListDebugContext,
   fetchSoundtrackPlayerSnapshot,
+  fetchSoundZonePlaybackDebugContext,
   resolveSoundZoneForTenant,
   resolveSoundtrackRuntimeAssignSourceId,
   soundtrackSearchTracks,
+  soundtrackSetZonePlaybackOrder,
   soundtrackUiPercentToApiVolume,
   type SoundtrackPlayerSnapshot,
 } from '@/lib/soundtrack/soundtrack-server'
@@ -184,6 +187,59 @@ export async function POST(request: NextRequest, context: RouteContext) {
       }
       if (runtimeSnapshot) assignInput.sourceSnapshot = runtimeSnapshot
 
+      let playbackDebug: Record<string, unknown> | undefined
+      let trackListProbe: Record<string, unknown> | undefined
+
+      if (isPlaylistTrackClick) {
+        const playbackCtx = await fetchSoundZonePlaybackDebugContext(zoneId)
+        let setLinear = false
+        if (
+          playbackCtx.playbackMode &&
+          playbackCtx.playbackMode !== 'LINEAR' &&
+          playbackCtx.availablePlaybackOrders.includes('LINEAR')
+        ) {
+          await soundtrackSetZonePlaybackOrder(zoneId, 'LINEAR')
+          setLinear = true
+        }
+        playbackDebug = { ...playbackCtx, setLinearBeforeAssign: setLinear }
+
+        const playlistCtx = await fetchPlaylistTrackListDebugContext(runtimeSourceId)
+        const clickedId = String(input.debugTrackId ?? '').trim()
+        const uiPos = typeof input.debugUiPosition === 'number' ? input.debugUiPosition : null
+        const idxFromList = playlistCtx.tracks.findIndex((t) => t.id === clickedId)
+        const idxZero =
+          typeof input.sourceTrackIndex === 'number' ? Math.floor(input.sourceTrackIndex) : null
+        const atUiIndex =
+          uiPos != null && uiPos >= 1 ? playlistCtx.tracks[uiPos - 1] : undefined
+        const atSourceTrackIndex = idxZero != null ? playlistCtx.tracks[idxZero] : undefined
+        trackListProbe = {
+          playlist: {
+            __typename: playlistCtx.__typename,
+            id: playlistCtx.playlistId,
+            snapshot: playlistCtx.snapshot,
+            composerType: playlistCtx.composerType,
+            presetPlaybackMode: playlistCtx.presetPlaybackMode,
+            trackTotal: playlistCtx.trackTotal,
+          },
+          assignSourceSnapshot: runtimeSnapshot,
+          snapshotMatchesPlaylistQuery:
+            Boolean(runtimeSnapshot && playlistCtx.snapshot) &&
+            runtimeSnapshot === playlistCtx.snapshot,
+          clickedTrackId: clickedId,
+          clickedTrackIndexInPlaylistTracks: idxFromList >= 0 ? idxFromList : null,
+          trackAtUiPosition: atUiIndex
+            ? { index: atUiIndex.index, id: atUiIndex.id, title: atUiIndex.title }
+            : null,
+          trackAtSourceTrackIndex: atSourceTrackIndex
+            ? {
+                index: atSourceTrackIndex.index,
+                id: atSourceTrackIndex.id,
+                title: atSourceTrackIndex.title,
+              }
+            : null,
+        }
+      }
+
       const sourceResolution = {
         displayedSource: {
           id: librarySourceId,
@@ -193,6 +249,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
         librarySourceId,
         runtimeSourceId,
         sourceSnapshotIncluded: Boolean(runtimeSnapshot),
+        ...(playbackDebug ? { playbackBeforeAssign: playbackDebug } : {}),
+        ...(trackListProbe ? { trackListProbe } : {}),
       }
 
       if (isPlaylistTrackClick) {

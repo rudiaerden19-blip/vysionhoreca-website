@@ -94,6 +94,10 @@ export function VysionMusicPlaylistDebugPanel({ state }: { state: PlaylistTrackD
 
   const playRequest = {
     uitgevoerd: state.play?.executed ? 'JA' : 'NEE',
+    opmerking:
+      state.play?.executed === false && state.assign?.request
+        ? 'Geen aparte play-mutatie: assign had immediate:true'
+        : undefined,
     ...(state.play?.request ? { request: state.play.request } : {}),
   }
 
