@@ -97,6 +97,10 @@ export function VysionMusicCatalogPanel({
         setSoundtrackReloadError(json.error || t('vysionMusic.libraryRefreshSoundtrackError'))
         return
       }
+      if (!json.playerWebUrl?.trim()) {
+        setSoundtrackReloadError(t('vysionMusic.libraryRefreshSoundtrackError'))
+        return
+      }
       const result = reloadSoundtrackPlayerWindow(json.playerWebUrl)
       if (result === 'failed') {
         setSoundtrackReloadError(t('vysionMusic.libraryRefreshSoundtrackError'))
