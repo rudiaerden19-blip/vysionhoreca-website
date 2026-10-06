@@ -1,3 +1,9 @@
+import { soundtrackAlbumArtUrl } from '@/lib/soundtrack/soundtrack-album-art'
+import {
+  mapSoundtrackTrackRow,
+  SOUNDTRACK_TRACK_GRAPHQL_FIELDS,
+  type SoundtrackTrackGraphNode,
+} from '@/lib/soundtrack/soundtrack-track-map'
 import {
   SoundtrackApiError,
   soundtrackGraphql,
@@ -23,6 +29,11 @@ const ZONE_ACCOUNT_QUERY = `query($id: ID!) {
   }
 }`
 
+const LIBRARY_ARTWORK_FIELDS = `
+  artwork { url sizes { thumbnail teaser hero } }
+  display { image { sizes { thumbnail teaser hero } } }
+`
+
 const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
@@ -30,7 +41,23 @@ const LIBRARY_CHILDREN_QUERY = `query($id: ID!) {
       edges {
         node {
           __typename
-          ... on Playlist { id name }
+          ... on Playlist { id name ${LIBRARY_ARTWORK_FIELDS} }
+          ... on Soundtrack { id name ${LIBRARY_ARTWORK_FIELDS} }
+          ... on Schedule { id name ${LIBRARY_ARTWORK_FIELDS} }
+        }
+      }
+    }
+  }
+}`
+
+const LIBRARY_CHILDREN_MINIMAL_QUERY = `query($id: ID!) {
+  musicLibrary(id: $id) {
+    id
+    children(first: 200) {
+      edges {
+        node {
+          __typename
+          ... on Playlist { id name artwork { url } }
           ... on Soundtrack { id name artwork { url } }
           ... on Schedule { id name }
         }
@@ -43,10 +70,10 @@ const LIBRARY_SPLIT_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
     playlists(first: 200) {
-      edges { node { id name } }
+      edges { node { id name ${LIBRARY_ARTWORK_FIELDS} } }
     }
     soundtracks(first: 200) {
-      edges { node { id name artwork { url } } }
+      edges { node { id name ${LIBRARY_ARTWORK_FIELDS} } }
     }
   }
 }`
@@ -55,7 +82,7 @@ const LIBRARY_PLAYLISTS_ONLY_QUERY = `query($id: ID!) {
   musicLibrary(id: $id) {
     id
     playlists(first: 200) {
-      edges { node { id name } }
+      edges { node { id name ${LIBRARY_ARTWORK_FIELDS} } }
     }
   }
 }`
@@ -73,18 +100,37 @@ function kindFromTypename(typename: string | undefined): SoundtrackLibrarySource
   }
 }
 
+type LibraryArtworkNode = {
+  __typename?: string
+  id?: string
+  name?: string | null
+  artwork?: {
+    url?: string | null
+    sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
+  } | null
+  display?: {
+    image?: {
+      sizes?: { thumbnail?: string | null; teaser?: string | null; hero?: string | null } | null
+    } | null
+  } | null
+}
+
+function libraryItemImageUrl(node: LibraryArtworkNode): string | null {
+  const sizeSources = [node.artwork?.sizes, node.display?.image?.sizes]
+  for (const sizes of sizeSources) {
+    if (!sizes) continue
+    for (const key of ['teaser', 'hero', 'thumbnail'] as const) {
+      const raw = sizes[key]?.trim()
+      if (raw) return soundtrackAlbumArtUrl(raw)
+    }
+  }
+  const direct = node.artwork?.url?.trim()
+  if (direct) return soundtrackAlbumArtUrl(direct)
+  return null
+}
+
 function mapLibraryNodes(
-  edges:
-    | {
-        node: {
-          __typename?: string
-          id?: string
-          name?: string | null
-          artwork?: { url?: string | null } | null
-        }
-      }[]
-    | null
-    | undefined,
+  edges: { node: LibraryArtworkNode }[] | null | undefined,
   defaultKind: SoundtrackLibrarySourceKind = 'unknown',
 ): SoundtrackLibraryPlaylist[] {
   const rows: SoundtrackLibraryPlaylist[] = []
@@ -92,7 +138,7 @@ function mapLibraryNodes(
     const id = edge.node?.id?.trim()
     const name = edge.node?.name?.trim()
     if (!id || !name) continue
-    const imageUrl = edge.node?.artwork?.url?.trim() || null
+    const imageUrl = libraryItemImageUrl(edge.node)
     rows.push({
       id,
       name,
@@ -123,42 +169,93 @@ function isUnknownFieldError(e: unknown): boolean {
   return /Cannot query field|Unknown field|Unknown type/i.test(msg)
 }
 
+async function playlistCoverFromFirstTrack(
+  playlistId: string,
+  gql: SoundtrackGql,
+): Promise<string | null> {
+  const data = await gql<{
+    playlist: {
+      tracks: { edges: { node: SoundtrackTrackGraphNode }[] }
+    } | null
+  }>(
+    `query($id: ID!) {
+      playlist(id: $id) {
+        tracks(first: 1) {
+          edges { node { ${SOUNDTRACK_TRACK_GRAPHQL_FIELDS} } }
+        }
+      }
+    }`,
+    { id: playlistId },
+  )
+  const track = data.playlist?.tracks?.edges?.[0]?.node
+  return track ? mapSoundtrackTrackRow(track)?.imageUrl ?? null : null
+}
+
+async function enrichLibraryCovers(
+  rows: SoundtrackLibraryPlaylist[],
+  gql: SoundtrackGql,
+): Promise<SoundtrackLibraryPlaylist[]> {
+  const missing = rows.filter((r) => !r.imageUrl)
+  if (missing.length === 0) return rows
+
+  const coverById = new Map<string, string>()
+  await Promise.all(
+    missing.map(async (row) => {
+      try {
+        if (row.sourceKind === 'soundtrack') {
+          const data = await gql<{
+            soundtrack: LibraryArtworkNode | null
+          }>(
+            `query($id: ID!) { soundtrack(id: $id) { ${LIBRARY_ARTWORK_FIELDS} } }`,
+            { id: row.id },
+          )
+          const url = data.soundtrack ? libraryItemImageUrl(data.soundtrack) : null
+          if (url) coverById.set(row.id, url)
+          return
+        }
+        const fromTrack = await playlistCoverFromFirstTrack(row.id, gql)
+        if (fromTrack) coverById.set(row.id, fromTrack)
+      } catch {
+        /* skip */
+      }
+    }),
+  )
+
+  if (coverById.size === 0) return rows
+  return rows.map((r) => (coverById.has(r.id) ? { ...r, imageUrl: coverById.get(r.id)! } : r))
+}
+
 async function fetchMusicLibraryRows(
   libraryId: string,
   gql: SoundtrackGql,
 ): Promise<SoundtrackLibraryPlaylist[]> {
   const id = libraryId.trim()
 
-  try {
+  const runChildren = async (query: string) => {
     const data = await gql<{
-      musicLibrary: {
-        children: {
-          edges: {
-            node: {
-              __typename?: string
-              id?: string
-              name?: string | null
-              artwork?: { url?: string | null } | null
-            }
-          }[]
-        }
-      } | null
-    }>(LIBRARY_CHILDREN_QUERY, { id })
-    const rows = mapLibraryNodes(data.musicLibrary?.children?.edges)
-    if (rows.length > 0) return dedupeLibraryRows(rows)
+      musicLibrary: { children: { edges: { node: LibraryArtworkNode }[] } } | null
+    }>(query, { id })
+    return mapLibraryNodes(data.musicLibrary?.children?.edges)
+  }
+
+  try {
+    const rows = await runChildren(LIBRARY_CHILDREN_QUERY)
+    if (rows.length > 0) return enrichLibraryCovers(dedupeLibraryRows(rows), gql)
   } catch (e) {
     if (!isUnknownFieldError(e)) throw e
+    try {
+      const rows = await runChildren(LIBRARY_CHILDREN_MINIMAL_QUERY)
+      if (rows.length > 0) return enrichLibraryCovers(dedupeLibraryRows(rows), gql)
+    } catch (e2) {
+      if (!isUnknownFieldError(e2)) throw e2
+    }
   }
 
   try {
     const data = await gql<{
       musicLibrary: {
-        playlists: { edges: { node: { id?: string; name?: string | null } }[] }
-        soundtracks: {
-          edges: {
-            node: { id?: string; name?: string | null; artwork?: { url?: string | null } | null }
-          }[]
-        }
+        playlists: { edges: { node: LibraryArtworkNode }[] }
+        soundtracks: { edges: { node: LibraryArtworkNode }[] }
       } | null
     }>(LIBRARY_SPLIT_QUERY, { id })
     const lib = data.musicLibrary
@@ -166,17 +263,18 @@ async function fetchMusicLibraryRows(
       ...mapLibraryNodes(lib?.playlists?.edges, 'playlist'),
       ...mapLibraryNodes(lib?.soundtracks?.edges, 'soundtrack'),
     ]
-    if (rows.length > 0) return dedupeLibraryRows(rows)
+    if (rows.length > 0) return enrichLibraryCovers(dedupeLibraryRows(rows), gql)
   } catch (e) {
     if (!isUnknownFieldError(e)) throw e
   }
 
   const data = await gql<{
-    musicLibrary: {
-      playlists: { edges: { node: { id?: string; name?: string | null } }[] }
-    } | null
+    musicLibrary: { playlists: { edges: { node: LibraryArtworkNode }[] } } | null
   }>(LIBRARY_PLAYLISTS_ONLY_QUERY, { id })
-  return dedupeLibraryRows(mapLibraryNodes(data.musicLibrary?.playlists?.edges, 'playlist'))
+  return enrichLibraryCovers(
+    dedupeLibraryRows(mapLibraryNodes(data.musicLibrary?.playlists?.edges, 'playlist')),
+    gql,
+  )
 }
 
 async function fetchAccountLibrary(

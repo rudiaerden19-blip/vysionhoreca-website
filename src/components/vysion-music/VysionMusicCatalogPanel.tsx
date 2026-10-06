@@ -62,6 +62,7 @@ export function VysionMusicCatalogPanel({
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
+  const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
 
   const loadLists = useCallback(async () => {
     setListsLoading(true)
@@ -245,9 +246,17 @@ export function VysionMusicCatalogPanel({
                     onClick={() => pickPlaylist(pl.id)}
                   >
                     <span className={styles.libraryThumb} aria-hidden>
-                      {thumbSrc ? (
+                      {thumbSrc && !brokenThumbIds.has(pl.id) ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={thumbSrc} alt="" className={styles.libraryThumbImg} />
+                        <img
+                          src={thumbSrc}
+                          alt=""
+                          className={styles.libraryThumbImg}
+                          referrerPolicy="no-referrer"
+                          onError={() =>
+                            setBrokenThumbIds((prev) => new Set(prev).add(pl.id))
+                          }
+                        />
                       ) : (
                         <span className={styles.libraryThumbFallback}>{pl.name.charAt(0)}</span>
                       )}
