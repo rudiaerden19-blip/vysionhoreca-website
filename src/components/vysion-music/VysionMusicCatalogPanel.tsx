@@ -18,6 +18,7 @@ import { VysionMusicAddTrackToPlaylistModal } from './VysionMusicAddTrackToPlayl
 import { perfLog, perfNow } from './vysion-music-perf'
 import { TrackNowPlayingBars } from './TrackNowPlayingBars'
 import {
+  vysionMusicPlaylistRowIsActivePlayFrom,
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
@@ -386,7 +387,14 @@ export function VysionMusicCatalogPanel({
               <li className={styles.libraryMuted}>{t('vysionMusic.libraryEmpty')}</li>
             ) : null}
             {filteredLists.map((pl) => {
-              const isActivePlayFrom = playFromSourceId === pl.id
+              const playlistTrackIds =
+                getCachedPlaylistTracks(tenant, pl.id)?.map((t) => t.id) ?? null
+              const isActivePlayFrom = vysionMusicPlaylistRowIsActivePlayFrom(
+                pl.id,
+                playFromSourceId,
+                nowPlayingTrack?.id ?? null,
+                playlistTrackIds,
+              )
               const isBrowsing = selectedId === pl.id && !isActivePlayFrom
               const rowClass = [
                 styles.libraryRow,

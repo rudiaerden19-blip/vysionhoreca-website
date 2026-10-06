@@ -1,4 +1,33 @@
-import { vysionMusicTrackRowIsNowPlaying } from '@/components/vysion-music/vysion-music-track-match'
+import {
+  vysionMusicPlaylistRowIsActivePlayFrom,
+  vysionMusicTrackRowIsNowPlaying,
+} from '@/components/vysion-music/vysion-music-track-match'
+
+describe('vysionMusicPlaylistRowIsActivePlayFrom', () => {
+  it('active when playFrom matches and nowPlaying track is in playlist', () => {
+    expect(
+      vysionMusicPlaylistRowIsActivePlayFrom('pl-disco', 'pl-disco', 'track-a', [
+        'track-a',
+        'track-b',
+      ]),
+    ).toBe(true)
+  })
+
+  it('not active when playFrom matches but nowPlaying is queued search track', () => {
+    expect(
+      vysionMusicPlaylistRowIsActivePlayFrom('pl-disco', 'pl-disco', 'track-rak', [
+        'track-a',
+        'track-b',
+      ]),
+    ).toBe(false)
+  })
+
+  it('falls back to playFrom when playlist tracks not cached yet', () => {
+    expect(
+      vysionMusicPlaylistRowIsActivePlayFrom('pl-disco', 'pl-disco', 'track-a', null),
+    ).toBe(true)
+  })
+})
 
 describe('vysionMusicTrackRowIsNowPlaying', () => {
   const row = {
