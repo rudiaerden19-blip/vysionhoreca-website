@@ -332,6 +332,62 @@ export function VysionMusicCatalogPanel({
   const selectedItem = items.find((i) => i.id === selectedId)
   const selectedName = selectedItem?.name ?? t('vysionMusic.tracksTitle')
 
+  const playlistManageMenu = useCallback(
+    (pl: { id: string; name: string }) => {
+      const menuOpen = libraryMenuPlaylistId === pl.id
+      return (
+        <div className={styles.searchTrackMenuWrap}>
+          <button
+            type="button"
+            className={styles.searchTrackMenuBtn}
+            disabled={busy}
+            aria-label={t('vysionMusic.playlistMenuAria')}
+            aria-expanded={menuOpen}
+            onClick={(e) => {
+              e.stopPropagation()
+              setLibraryMenuPlaylistId((prev) => (prev === pl.id ? null : pl.id))
+            }}
+          >
+            ⋮
+          </button>
+          {menuOpen ? (
+            <div
+              className={styles.searchTrackMenu}
+              role="menu"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.searchTrackMenuItem}
+                disabled={busy}
+                onClick={() => {
+                  setLibraryMenuPlaylistId(null)
+                  setRenamePlaylist({ id: pl.id, name: pl.name })
+                }}
+              >
+                {t('vysionMusic.playlistRename')}
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.searchTrackMenuItem}
+                disabled={busy}
+                onClick={() => {
+                  setLibraryMenuPlaylistId(null)
+                  setDeletePlaylist({ id: pl.id, name: pl.name })
+                }}
+              >
+                {t('vysionMusic.playlistDelete')}
+              </button>
+            </div>
+          ) : null}
+        </div>
+      )
+    },
+    [busy, libraryMenuPlaylistId, t],
+  )
+
   const pickPlaylist = (id: string) => {
     const t0 = perfNow()
     setSelectedId(id)
@@ -406,7 +462,6 @@ export function VysionMusicCatalogPanel({
                 listArtUrl && listArtUrl.startsWith('http')
                   ? `/api/soundtrack/cover?url=${encodeURIComponent(listArtUrl)}`
                   : null
-              const libraryMenuOpen = libraryMenuPlaylistId === pl.id
               const showPlaylistMenu = isManualLibraryPlaylist(pl.sourceKind)
               return (
                 <li key={pl.id}>
@@ -443,55 +498,7 @@ export function VysionMusicCatalogPanel({
                         </span>
                       ) : null}
                     </button>
-                    {showPlaylistMenu ? (
-                      <div className={styles.searchTrackMenuWrap}>
-                        <button
-                          type="button"
-                          className={styles.searchTrackMenuBtn}
-                          disabled={busy}
-                          aria-label={t('vysionMusic.playlistMenuAria')}
-                          aria-expanded={libraryMenuOpen}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setLibraryMenuPlaylistId((prev) => (prev === pl.id ? null : pl.id))
-                          }}
-                        >
-                          ⋮
-                        </button>
-                        {libraryMenuOpen ? (
-                          <div
-                            className={styles.searchTrackMenu}
-                            role="menu"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={styles.searchTrackMenuItem}
-                              disabled={busy}
-                              onClick={() => {
-                                setLibraryMenuPlaylistId(null)
-                                setRenamePlaylist({ id: pl.id, name: pl.name })
-                              }}
-                            >
-                              {t('vysionMusic.playlistRename')}
-                            </button>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={styles.searchTrackMenuItem}
-                              disabled={busy}
-                              onClick={() => {
-                                setLibraryMenuPlaylistId(null)
-                                setDeletePlaylist({ id: pl.id, name: pl.name })
-                              }}
-                            >
-                              {t('vysionMusic.playlistDelete')}
-                            </button>
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
+                    {showPlaylistMenu ? playlistManageMenu(pl) : null}
                   </div>
                 </li>
               )
@@ -501,7 +508,12 @@ export function VysionMusicCatalogPanel({
 
         <div className={styles.catalogCol}>
           <div className={styles.catalogColHead}>
-            <h2 className={styles.catalogColTitle}>{selectedName}</h2>
+            <div className={styles.catalogColHeadRow}>
+              <h2 className={styles.catalogColTitle}>{selectedName}</h2>
+              {selectedItem && isManualLibraryPlaylist(selectedItem.sourceKind)
+                ? playlistManageMenu(selectedItem)
+                : null}
+            </div>
           </div>
           {tracksLoading && tracks.length === 0 ? (
             <p className={styles.libraryMuted}>{t('vysionMusic.tracksLoading')}</p>
