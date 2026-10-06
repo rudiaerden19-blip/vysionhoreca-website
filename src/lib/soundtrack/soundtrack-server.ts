@@ -5,6 +5,10 @@ import {
   type SoundtrackTrackRow,
 } from '@/lib/soundtrack/soundtrack-track-map'
 
+import {
+  soundtrackApiBasicAuthorizationHeader,
+  soundtrackApiBasicToken,
+} from '@/lib/soundtrack/soundtrack-api-basic'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export type { SoundtrackTrackRow } from '@/lib/soundtrack/soundtrack-track-map'
@@ -59,14 +63,13 @@ export class SoundtrackApiError extends Error {
 }
 
 function soundtrackToken(): string {
-  let t = (process.env.SOUNDTRACK_API_BASIC || '').trim()
-  if (/^basic\s/i.test(t)) t = t.replace(/^basic\s+/i, '').trim()
-  if (!t || t === '[SENSITIVE]') {
+  try {
+    return soundtrackApiBasicToken()
+  } catch (e) {
     throw new SoundtrackConfigError(
-      'Soundtrack niet geconfigureerd: zet SOUNDTRACK_API_BASIC in .env.local (uit Vercel).',
+      e instanceof Error ? e.message : 'Soundtrack niet geconfigureerd (SOUNDTRACK_API_BASIC).',
     )
   }
-  return t
 }
 
 const zoneIdByNameCache = new Map<string, string>()
