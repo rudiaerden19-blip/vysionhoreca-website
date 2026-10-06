@@ -289,65 +289,171 @@ export async function listSoundtrackLibraryPlaylists(
 }
 
 async function resolveZoneAccountId(zoneId: string): Promise<string> {
-  const data = await soundtrackGraphql<{
-    soundZone: { account: { id: string } | null } | null
-  }>(ZONE_ACCOUNT_QUERY, { id: zoneId.trim() })
-  const accountId = data.soundZone?.account?.id?.trim()
-  if (!accountId) {
-    throw new SoundtrackApiError('Soundtrack zone has no account', 502)
-  }
-  return accountId
+  const ctx = await resolveZoneLibraryContext(zoneId)
+  return ctx.ownerId
 }
+
+async function resolveZoneLibraryContext(
+  zoneId: string,
+): Promise<{ ownerId: string; musicLibraryId: string }> {
+  const data = await soundtrackGraphql<{
+    soundZone: {
+      account: {
+        id: string
+        musicLibrary: { id: string } | null
+      } | null
+    } | null
+  }>(ZONE_ACCOUNT_QUERY, { id: zoneId.trim() })
+
+  const account = data.soundZone?.account
+  const ownerId = account?.id?.trim()
+  const musicLibraryId = account?.musicLibrary?.id?.trim()
+  if (!ownerId || !musicLibraryId) {
+    throw new SoundtrackApiError('Soundtrack zone has no music library', 502)
+  }
+  return { ownerId, musicLibraryId }
+}
+
+function soundtrackLibraryIdsInclude(ids: string[] | null | undefined, playlistId: string): boolean {
+  const pid = playlistId.trim()
+  if (!pid) return false
+  return (ids ?? []).some((raw) => raw?.trim() === pid)
+}
+
+export function isBenignSoundtrackLibraryDuplicateError(message: string): boolean {
+  const m = message.toLowerCase()
+  return (
+    m.includes('already') ||
+    m.includes('duplicate') ||
+    m.includes('exists') ||
+    m.includes('present')
+  )
+}
+
+function soundtrackSyncPause(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+const LIBRARY_MEMBERSHIP_QUERY = `query($owner: ID!, $musicLibraryId: ID!) {
+  library(owner: $owner) { ids version }
+  musicLibrary(id: $musicLibraryId) { ids revision }
+}`
 
 const OWNER_LIBRARY_VERSION_QUERY = `query($owner: ID!) {
   library(owner: $owner) { version }
 }`
 
 /**
- * Soundtrack desktop player volgt `library` + `libraryUpdate` (owner), niet alleen `musicLibrary`.
- * Na create: playlist staat in musicLibrary via `addToMusicLibrary`; `addToLibrary` pusht revision naar players.
+ * Soundtrack Player: `libraryUpdate` (owner) — `addToLibrary` moet vóór `addToMusicLibrary` zodat
+ * de player niet alleen via stille musicLibrary-sync de playlist ziet zonder push-event.
  */
 async function addPlaylistToOwnerLibrary(ownerId: string, playlistId: string): Promise<void> {
   const owner = ownerId.trim()
   const id = playlistId.trim()
   if (!owner || !id) return
 
-  let version: string | undefined
+  const maxAttempts = 3
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    let version: string | undefined
+    try {
+      const data = await soundtrackGraphql<{
+        library: { version: string | null } | null
+      }>(OWNER_LIBRARY_VERSION_QUERY, { owner })
+      const v = data.library?.version?.trim()
+      if (v) version = v
+    } catch {
+      /* version is optional on addToLibrary */
+    }
+
+    try {
+      await soundtrackGraphql(
+        `mutation($owner: ID!, $input: AddToLibraryInput!) {
+          addToLibrary(owner: $owner, input: $input) { version }
+        }`,
+        {
+          owner,
+          input: {
+            ...(version ? { version } : {}),
+            items: [{ id, itemKind: 'PLAYLIST' }],
+          },
+        },
+      )
+      return
+    } catch (e) {
+      if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
+        return
+      }
+      const versionConflict =
+        e instanceof SoundtrackApiError &&
+        /version|conflict|stale|overwrite/i.test(e.message)
+      if (versionConflict && attempt < maxAttempts - 1) {
+        await soundtrackSyncPause(120)
+        continue
+      }
+      throw e
+    }
+  }
+}
+
+async function addPlaylistToMusicLibrary(ownerId: string, playlistId: string): Promise<void> {
   try {
+    await soundtrackGraphql(
+      `mutation($input: AddToMusicLibraryInput!) {
+        addToMusicLibrary(input: $input) {
+          musicLibrary { revision ids }
+        }
+      }`,
+      { input: { parent: ownerId.trim(), source: playlistId.trim() } },
+    )
+  } catch (e) {
+    if (e instanceof SoundtrackApiError && isBenignSoundtrackLibraryDuplicateError(e.message)) {
+      return
+    }
+    throw e
+  }
+}
+
+async function assertPlaylistVisibleInSoundtrackLibraries(
+  ownerId: string,
+  musicLibraryId: string,
+  playlistId: string,
+): Promise<void> {
+  const pid = playlistId.trim()
+  for (let i = 0; i < 10; i++) {
     const data = await soundtrackGraphql<{
-      library: { version: string | null } | null
-    }>(OWNER_LIBRARY_VERSION_QUERY, { owner })
-    const v = data.library?.version?.trim()
-    if (v) version = v
-  } catch {
-    /* version is optional on addToLibrary */
+      library: { ids?: string[] | null } | null
+      musicLibrary: { ids?: string[] | null } | null
+    }>(LIBRARY_MEMBERSHIP_QUERY, {
+      owner: ownerId.trim(),
+      musicLibraryId: musicLibraryId.trim(),
+    })
+
+    const inOwnerLibrary = soundtrackLibraryIdsInclude(data.library?.ids, pid)
+    const inMusicLibrary = soundtrackLibraryIdsInclude(data.musicLibrary?.ids, pid)
+    if (inOwnerLibrary && inMusicLibrary) return
+
+    if (i < 9) await soundtrackSyncPause(150)
   }
 
-  await soundtrackGraphql(
-    `mutation($owner: ID!, $input: AddToLibraryInput!) {
-      addToLibrary(owner: $owner, input: $input) { version }
-    }`,
-    {
-      owner,
-      input: {
-        ...(version ? { version } : {}),
-        items: [{ id, itemKind: 'PLAYLIST' }],
-      },
-    },
+  throw new SoundtrackApiError(
+    'Soundtrack playlist not visible in account library after create',
+    502,
   )
 }
 
-/** Soundtrack `createManualPlaylist` + `addToMusicLibrary` (zelfde account-bibliotheek als lijst-UI). */
+/** Soundtrack `createManualPlaylist` + account library sync (Player + Vysion musicLibrary). */
 export async function createManualPlaylistInMusicLibrary(
   zoneId: string,
   playlistName: string,
-): Promise<{ id: string; name: string }> {
+): Promise<{ id: string; name: string; imageUrl: string | null }> {
   const zid = zoneId.trim()
   const name = playlistName.trim()
   if (!zid) throw new SoundtrackApiError('sound zone id required', 400)
   if (!name) throw new SoundtrackApiError('playlist name required', 400)
 
-  const ownerId = await resolveZoneAccountId(zid)
+  const { ownerId, musicLibraryId } = await resolveZoneLibraryContext(zid)
 
   const created = await soundtrackGraphql<{
     createManualPlaylist: { id: string; name: string } | null
@@ -363,20 +469,22 @@ export async function createManualPlaylistInMusicLibrary(
     throw new SoundtrackApiError('Soundtrack created no playlist', 502)
   }
 
-  await soundtrackGraphql(
-    `mutation($input: AddToMusicLibraryInput!) {
-      addToMusicLibrary(input: $input) {
-        musicLibrary { revision ids }
-      }
-    }`,
-    { input: { parent: ownerId, source: id } },
-  )
-
   await addPlaylistToOwnerLibrary(ownerId, id)
+  await addPlaylistToMusicLibrary(ownerId, id)
+  await assertPlaylistVisibleInSoundtrackLibraries(ownerId, musicLibraryId, id)
+
+  const displayName = created.createManualPlaylist?.name?.trim() || name
+  let imageUrl: string | null = null
+  try {
+    imageUrl = await resolvePlaylistListImageUrl(id)
+  } catch {
+    imageUrl = null
+  }
 
   return {
     id,
-    name: created.createManualPlaylist?.name?.trim() || name,
+    name: displayName,
+    imageUrl,
   }
 }
 

@@ -23,6 +23,10 @@ import {
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
 import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
+import {
+  vysionMusicLibraryCoverProxyUrl,
+  vysionMusicLibraryPlaceholderLetter,
+} from './vysion-music-library-thumb'
 import { VysionMusicDeletePlaylistModal } from './VysionMusicDeletePlaylistModal'
 import { VysionMusicRenamePlaylistModal } from './VysionMusicRenamePlaylistModal'
 import styles from './vysion-music.module.css'
@@ -410,10 +414,7 @@ export function VysionMusicCatalogPanel({
                 getCachedPlaylistTracks(tenant, pl.id)?.find((t) => t.imageUrl?.trim())?.imageUrl ??
                 null
               const listArtUrl = pl.imageUrl?.trim() || cachedTrackArt?.trim() || null
-              const thumbSrc =
-                listArtUrl && listArtUrl.startsWith('http')
-                  ? `/api/soundtrack/cover?url=${encodeURIComponent(listArtUrl)}`
-                  : null
+              const thumbSrc = vysionMusicLibraryCoverProxyUrl(listArtUrl)
               const libraryMenuOpen = libraryMenuPlaylistId === pl.id
               const showPlaylistMenu = isManualLibraryPlaylist(pl.sourceKind)
               return (
@@ -438,7 +439,9 @@ export function VysionMusicCatalogPanel({
                             }
                           />
                         ) : (
-                          <span className={styles.libraryThumbFallback}>{pl.name.charAt(0)}</span>
+                          <span className={styles.libraryThumbFallback}>
+                            {vysionMusicLibraryPlaceholderLetter(pl.name)}
+                          </span>
                         )}
                       </span>
                       <span className={styles.libraryRowText}>
@@ -677,8 +680,13 @@ export function VysionMusicCatalogPanel({
         tenant={tenant}
         open={createPlaylistOpen}
         onClose={() => setCreatePlaylistOpen(false)}
-        onCreated={() => {
+        onCreated={(playlists) => {
           setTab('lists')
+          if (playlists?.length) {
+            setItems(playlists)
+            setCachedPlaylists(tenant, playlists)
+            listsLoadedOnceRef.current = true
+          }
           return loadLists({ background: true })
         }}
       />
