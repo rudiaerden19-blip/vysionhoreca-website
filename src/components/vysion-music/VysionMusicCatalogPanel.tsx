@@ -680,14 +680,9 @@ export function VysionMusicCatalogPanel({
         tenant={tenant}
         open={createPlaylistOpen}
         onClose={() => setCreatePlaylistOpen(false)}
-        onCreated={(playlists) => {
+        onCreated={() => {
           setTab('lists')
-          if (playlists?.length) {
-            setItems(playlists)
-            setCachedPlaylists(tenant, playlists)
-            listsLoadedOnceRef.current = true
-          }
-          return loadLists({ background: true })
+          return loadLists()
         }}
       />
       <VysionMusicRenamePlaylistModal

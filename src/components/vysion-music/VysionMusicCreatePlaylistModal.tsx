@@ -3,7 +3,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
-import type { VysionMusicLibraryItem } from './vysion-music-catalog-cache'
 import styles from './vysion-music.module.css'
 
 export function VysionMusicCreatePlaylistModal({
@@ -15,7 +14,7 @@ export function VysionMusicCreatePlaylistModal({
   tenant: string
   open: boolean
   onClose: () => void
-  onCreated: (playlists?: VysionMusicLibraryItem[]) => void | Promise<void>
+  onCreated: () => void | Promise<void>
 }) {
   const { t } = useLanguage()
   const titleId = useId()
@@ -60,16 +59,12 @@ export function VysionMusicCreatePlaylistModal({
           body: JSON.stringify({ name: trimmed }),
         },
       )
-      const json = (await res.json()) as {
-        error?: string
-        ok?: boolean
-        playlists?: VysionMusicLibraryItem[]
-      }
+      const json = (await res.json()) as { error?: string; ok?: boolean }
       if (!res.ok || json.ok === false) {
         setError(json.error || t('vysionMusic.createPlaylistError'))
         return
       }
-      await onCreated(json.playlists)
+      await onCreated()
       onClose()
     } catch {
       setError(t('vysionMusic.errorNetwork'))

@@ -61,6 +61,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
     const created = await createManualPlaylistInMusicLibrary(zoneId, name)
     const playlists = await listSoundtrackLibraryPlaylists(zoneId)
+    if (!playlists.some((p) => p.id === created.id)) {
+      throw new SoundtrackApiError(
+        'Playlist not in Soundtrack music library list after create',
+        502,
+      )
+    }
     return NextResponse.json({ ok: true, playlist: created, playlists })
   } catch (e) {
     if (e instanceof SoundtrackConfigError) {

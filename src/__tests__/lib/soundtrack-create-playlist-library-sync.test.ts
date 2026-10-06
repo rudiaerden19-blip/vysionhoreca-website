@@ -1,7 +1,4 @@
-import {
-  createManualPlaylistInMusicLibrary,
-  isBenignSoundtrackLibraryDuplicateError,
-} from '@/lib/soundtrack/soundtrack-playlists'
+import { createManualPlaylistInMusicLibrary } from '@/lib/soundtrack/soundtrack-playlists'
 import { soundtrackGraphql } from '@/lib/soundtrack/soundtrack-server'
 
 jest.mock('@/lib/soundtrack/soundtrack-server', () => {
@@ -14,12 +11,12 @@ jest.mock('@/lib/soundtrack/soundtrack-server', () => {
 
 const graphql = soundtrackGraphql as jest.MockedFunction<typeof soundtrackGraphql>
 
-describe('createManualPlaylistInMusicLibrary player library sync', () => {
+describe('createManualPlaylistInMusicLibrary', () => {
   beforeEach(() => {
     graphql.mockReset()
   })
 
-  it('calls addToLibrary before addToMusicLibrary for Soundtrack Player libraryUpdate', async () => {
+  it('uses createManualPlaylist then addToMusicLibrary and verifies musicLibrary membership', async () => {
     graphql.mockImplementation(async (query: string) => {
       if (query.includes('soundZone')) {
         return {
@@ -27,52 +24,45 @@ describe('createManualPlaylistInMusicLibrary player library sync', () => {
         }
       }
       if (query.includes('createManualPlaylist')) {
-        return { createManualPlaylist: { id: 'pl-1', name: 'Lunch' } }
-      }
-      if (query.includes('musicLibraryId') && query.includes('library(owner')) {
-        return {
-          library: { ids: ['pl-1'], version: 'rev-10' },
-          musicLibrary: { ids: ['pl-1'], revision: '2' },
-        }
-      }
-      if (query.includes('library(owner') && query.includes('version') && !query.includes('ids')) {
-        return { library: { version: 'rev-9' } }
-      }
-      if (query.includes('addToLibrary')) {
-        return { addToLibrary: { version: 'rev-10' } }
+        return { createManualPlaylist: { id: 'pl-test', name: 'TEST' } }
       }
       if (query.includes('addToMusicLibrary')) {
-        return { addToMusicLibrary: { musicLibrary: { revision: '2', ids: ['pl-1'] } } }
+        return { addToMusicLibrary: { musicLibrary: { revision: '3', ids: ['pl-test'] } } }
       }
-      if (query.includes('playlist(id') && query.includes('tracks(first: 1)')) {
-        return { playlist: null }
+      if (query.includes('playlist(id') && query.includes('name')) {
+        return { playlist: { id: 'pl-test', name: 'TEST' } }
+      }
+      if (query.includes('musicLibrary(id') && query.includes('ids')) {
+        return { musicLibrary: { ids: ['pl-test'], revision: '3' } }
       }
       throw new Error(`unexpected graphql: ${query.slice(0, 120)}`)
     })
 
-    await createManualPlaylistInMusicLibrary('zone-1', 'Lunch')
+    const out = await createManualPlaylistInMusicLibrary('zone-1', 'TEST')
+    expect(out).toEqual({ id: 'pl-test', name: 'TEST' })
 
-    const addToLibraryIdx = graphql.mock.calls.findIndex(([q]) => String(q).includes('addToLibrary'))
-    const addToMusicIdx = graphql.mock.calls.findIndex(([q]) =>
-      String(q).includes('addToMusicLibrary'),
-    )
-    expect(addToLibraryIdx).toBeGreaterThan(-1)
-    expect(addToMusicIdx).toBeGreaterThan(addToLibraryIdx)
-
-    const addToLibraryCall = graphql.mock.calls[addToLibraryIdx]
-    expect(addToLibraryCall[1]).toEqual({
-      owner: 'acc-1',
-      input: {
-        version: 'rev-9',
-        items: [{ id: 'pl-1', itemKind: 'PLAYLIST' }],
-      },
+    expect(graphql.mock.calls.some(([q]) => String(q).includes('createManualPlaylist'))).toBe(true)
+    const addCall = graphql.mock.calls.find(([q]) => String(q).includes('addToMusicLibrary'))
+    expect(addCall?.[1]).toEqual({
+      input: { parent: 'acc-1', source: 'pl-test' },
     })
   })
-})
 
-describe('isBenignSoundtrackLibraryDuplicateError', () => {
-  it('recognizes duplicate library item errors', () => {
-    expect(isBenignSoundtrackLibraryDuplicateError('Item already in library')).toBe(true)
-    expect(isBenignSoundtrackLibraryDuplicateError('Forbidden')).toBe(false)
+  it('throws when Soundtrack returns no playlist id', async () => {
+    graphql.mockImplementation(async (query: string) => {
+      if (query.includes('soundZone')) {
+        return {
+          soundZone: { account: { id: 'acc-1', musicLibrary: { id: 'ml-1' } } },
+        }
+      }
+      if (query.includes('createManualPlaylist')) {
+        return { createManualPlaylist: null }
+      }
+      throw new Error('unexpected')
+    })
+
+    await expect(createManualPlaylistInMusicLibrary('zone-1', 'TEST')).rejects.toThrow(
+      'Soundtrack created no playlist',
+    )
   })
 })
