@@ -6896,8 +6896,6 @@
   },
   "vysionMusic": {
     "backToKassa": "レジ",
-    "blankSlateTitle": "Soundtrack連携 — 白紙から",
-    "blankSlateHint": "すべて削除しました。Soundtrack連携なし、APIなし、ゾーンロジックなし — 白紙から。",
     "soundtrackLiveReadonly": "SOUNDTRACK ライブ（読み取り専用）",
     "nothingPlaying": "ゾーンに曲がありません。",
     "nowPlaying": "再生中",
@@ -6913,23 +6911,6 @@
     "stop": "停止",
     "prev": "前へ",
     "prevUnavailable": "前の曲：Soundtrackプレイヤーアプリのみ",
-    "settingsOpen": "設定",
-    "playerLinkTitle": "プレイヤーをリンク",
-    "playerLinkHint": "店内プレイヤーと同じメール/パスワード。テナントごとに保存；操作はサーバー鍵（Vercel）経由。",
-    "playerLinkEmail": "Soundtrackメール",
-    "playerLinkPassword": "パスワード",
-    "playerLinkPasswordKeep": "空のままにすると保存済みパスワードを維持",
-    "playerLinkConnect": "リンク",
-    "playerLinkSaving": "リンク中…",
-    "playerLinkClose": "閉じる",
-    "playerLinkLinked": "プレイヤー連携済み",
-    "playerLinkSaved": "保存してリンクしました",
-    "playerLinkLoadError": "リンク状態を読み込めませんでした",
-    "playerLinkSaveError": "リンクに失敗しました",
-    "playerLinkDisconnect": "リンク解除",
-    "playerLinkUnlinked": "プレイヤーのリンクを解除しました",
-    "playerLinkUnlinkError": "リンク解除に失敗しました",
-    "playerLinkUnlinkConfirm": "この店舗の Soundtrack プレイヤーのリンクを解除しますか？保存されたログイン情報は削除されます。",
     "next": "次へ",
     "actionPlaylist": "プレイリスト",
     "actionNewList": "新しいリスト",
@@ -6987,6 +6968,6 @@
     "errorNetwork": "ネットワークエラー。",
     "resultsPrefix": "結果",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Soundtrackリモート · PCプレイヤーを起動したまま · Vysion Music @ 2026"
   }
 }

@@ -6896,8 +6896,6 @@
   },
   "vysionMusic": {
     "backToKassa": "收银",
-    "blankSlateTitle": "Soundtrack 连接 — 空白起点",
-    "blankSlateHint": "已全部移除。无 Soundtrack 连接、无 API、无区域逻辑 — 空白起点。",
     "soundtrackLiveReadonly": "SOUNDTRACK 实时（只读）",
     "nothingPlaying": "区域上没有曲目。",
     "nowPlaying": "正在播放",
@@ -6913,23 +6911,6 @@
     "stop": "停止",
     "prev": "上一首",
     "prevUnavailable": "上一首：请使用 Soundtrack 播放器应用",
-    "settingsOpen": "设置",
-    "playerLinkTitle": "链接播放器",
-    "playerLinkHint": "与店内 Soundtrack 播放器相同的邮箱/密码。按租户保存；通过服务器密钥（Vercel）控制。",
-    "playerLinkEmail": "Soundtrack 邮箱",
-    "playerLinkPassword": "密码",
-    "playerLinkPasswordKeep": "留空以保留已保存的密码",
-    "playerLinkConnect": "链接",
-    "playerLinkSaving": "正在链接…",
-    "playerLinkClose": "关闭",
-    "playerLinkLinked": "播放器已链接",
-    "playerLinkSaved": "已保存并链接",
-    "playerLinkLoadError": "无法加载链接状态",
-    "playerLinkSaveError": "链接失败",
-    "playerLinkDisconnect": "取消链接",
-    "playerLinkUnlinked": "已取消链接播放器",
-    "playerLinkUnlinkError": "取消链接失败",
-    "playerLinkUnlinkConfirm": "要取消此门店的 Soundtrack 播放器链接吗？将删除已保存的登录信息。",
     "next": "下一首",
     "actionPlaylist": "播放列表",
     "actionNewList": "新建列表",
@@ -6987,6 +6968,6 @@
     "errorNetwork": "网络错误。",
     "resultsPrefix": "结果",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Soundtrack 遥控 · 请保持 PC 播放器运行 · Vysion Music @ 2026"
   }
 }

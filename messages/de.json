@@ -6919,8 +6919,6 @@
   },
   "vysionMusic": {
     "backToKassa": "Kasse",
-    "blankSlateTitle": "Soundtrack-Anbindung — leere Seite",
-    "blankSlateHint": "Alles ist weg. Keine Soundtrack-Anbindung, keine API, keine Zonen-Logik — leere Seite.",
     "soundtrackLiveReadonly": "LIVE VON SOUNDTRACK (nur lesen)",
     "nothingPlaying": "Kein Titel in der Zone.",
     "nowPlaying": "spielt gerade ab",
@@ -6936,23 +6934,6 @@
     "stop": "Stop",
     "prev": "Zurück",
     "prevUnavailable": "Vorheriger Titel: nur in der Soundtrack-Player-App",
-    "settingsOpen": "Einstellungen",
-    "playerLinkTitle": "Player koppeln",
-    "playerLinkHint": "Gleiche E-Mail/Passwort wie der Soundtrack-Player vor Ort. Pro Betrieb gespeichert; Steuerung über Server-Key (Vercel).",
-    "playerLinkEmail": "Soundtrack-E-Mail",
-    "playerLinkPassword": "Passwort",
-    "playerLinkPasswordKeep": "Leer lassen, um gespeichertes Passwort zu behalten",
-    "playerLinkConnect": "Koppeln",
-    "playerLinkSaving": "Wird gekoppelt…",
-    "playerLinkClose": "Schließen",
-    "playerLinkLinked": "Player gekoppelt",
-    "playerLinkSaved": "Gespeichert und gekoppelt",
-    "playerLinkLoadError": "Koppelstatus konnte nicht geladen werden",
-    "playerLinkSaveError": "Koppeln fehlgeschlagen",
-    "playerLinkDisconnect": "Trennen",
-    "playerLinkUnlinked": "Player getrennt",
-    "playerLinkUnlinkError": "Trennen fehlgeschlagen",
-    "playerLinkUnlinkConfirm": "Soundtrack-Player für diesen Betrieb trennen? Gespeicherte Anmeldung wird entfernt.",
     "next": "Weiter",
     "actionPlaylist": "Wiedergabeliste",
     "actionNewList": "Neue Liste",
@@ -7010,6 +6991,6 @@
     "errorNetwork": "Netzwerkfehler.",
     "resultsPrefix": "ERGEBNISSE",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Fernbedienung für Soundtrack · Player am PC laufen lassen · Vysion Music @ 2026"
   }
 }

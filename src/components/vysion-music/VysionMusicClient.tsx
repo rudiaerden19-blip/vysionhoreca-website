@@ -9,11 +9,9 @@ import {
   VYSION_MUSIC_TRACK_FADE_MS,
   trackIdentity,
 } from '@/lib/vysion-music-track-fade'
-import { VysionMusicPlayerLinkModal } from '@/components/vysion-music/VysionMusicPlayerLinkModal'
 import {
   VmPause,
   VmPlay,
-  VmSettings,
   VmSkipBack,
   VmSkipForward,
   VmStop,
@@ -86,8 +84,6 @@ export function VysionMusicClient({
   const [tick, setTick] = useState(0)
   const [volumeUi, setVolumeUi] = useState(0)
   const [coverBroken, setCoverBroken] = useState(false)
-  const [playerSettingsOpen, setPlayerSettingsOpen] = useState(false)
-  const [playerLinked, setPlayerLinked] = useState(false)
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const volumeSyncGeneration = useRef(0)
@@ -192,16 +188,6 @@ export function VysionMusicClient({
     return () => window.clearInterval(id)
   }, [snapshot?.playbackState, snapshot?.nowPlaying.startedAt])
 
-  useEffect(() => {
-    void fetch(`/api/tenant/soundtrack-player?tenant=${encodeURIComponent(tenant)}`, {
-      headers: getAuthHeaders(),
-      cache: 'no-store',
-    })
-      .then((r) => r.json())
-      .then((j: { linked?: boolean }) => setPlayerLinked(!!j.linked))
-      .catch(() => {})
-  }, [tenant])
-
   const syncVolume = useCallback(
     (v: number, immediate?: boolean) => {
       if (immediate && lastVolumeSentRef.current === v) return
@@ -291,16 +277,6 @@ export function VysionMusicClient({
             <div className={styles.clockDate}>{clockDate}</div>
             <div className={styles.clockTime}>{clockTime}</div>
           </div>
-          <button
-            type="button"
-            className={styles.settingsBtn}
-            aria-label={t('vysionMusic.settingsOpen')}
-            title={t('vysionMusic.settingsOpen')}
-            onClick={() => setPlayerSettingsOpen(true)}
-          >
-            <VmSettings strokeWidth={VM_ICON_STROKE} />
-            {playerLinked ? <span className={styles.settingsLinkedDot} aria-hidden /> : null}
-          </button>
         </div>
       </header>
 
@@ -432,13 +408,6 @@ export function VysionMusicClient({
           </div>
         </div>
       </section>
-
-      <VysionMusicPlayerLinkModal
-        tenant={tenant}
-        open={playerSettingsOpen}
-        onClose={() => setPlayerSettingsOpen(false)}
-        onLinkedChange={setPlayerLinked}
-      />
 
       <div className={styles.statusBar}>{t('vysionMusic.statusFooter')}</div>
     </div>

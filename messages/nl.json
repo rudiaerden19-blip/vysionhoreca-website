@@ -6855,26 +6855,6 @@
   },
   "vysionMusic": {
     "backToKassa": "Kassa",
-    "blankSlateTitle": "Schone lei",
-    "blankSlateHint": "Stap 1: koppel je Soundtrack-speler via het tandwiel (zelfde e-mail en wachtwoord als de player op je PC).",
-    "settingsOpen": "Instellingen",
-    "playerLinkTitle": "Speler koppelen",
-    "playerLinkHint": "Zelfde e-mail en wachtwoord als de Soundtrack-player in je zaak. We slaan dit per zaak op; bediening loopt via Soundtrack op de server (Vercel-key).",
-    "playerLinkEmail": "E-mail Soundtrack",
-    "playerLinkPassword": "Wachtwoord",
-    "playerLinkPasswordKeep": "Laat leeg om het opgeslagen wachtwoord te behouden",
-    "playerLinkConnect": "Koppelen",
-    "playerLinkSaving": "Bezig…",
-    "playerLinkClose": "Sluiten",
-    "playerLinkLinked": "Speler gekoppeld",
-    "playerLinkSaved": "Opgeslagen en gekoppeld",
-    "playerLinkPrompt": "Nog geen speler gekoppeld — open",
-    "playerLinkLoadError": "Kon koppeling niet laden",
-    "playerLinkSaveError": "Koppelen mislukt",
-    "playerLinkDisconnect": "Ontkoppelen",
-    "playerLinkUnlinked": "Speler ontkoppeld",
-    "playerLinkUnlinkError": "Ontkoppelen mislukt",
-    "playerLinkUnlinkConfirm": "Soundtrack-speler ontkoppelen voor deze zaak? Opgeslagen login wordt verwijderd.",
     "soundtrackLiveReadonly": "LIVE VAN SOUNDTRACK (alleen lezen)",
     "nothingPlaying": "Geen track op de zone.",
     "nowPlaying": "SPEELT NU AF",
@@ -6947,6 +6927,6 @@
     "errorNoPlaybackChange": "Soundtrack reageerde niet (zelfde nummer). Controleer zone, token en device in Soundtrack.",
     "errorNetwork": "Netwerkfout.",
     "errorDismiss": "Melding sluiten",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Afstandsbediening voor Soundtrack · player op de PC laten draaien · Vysion Music @ 2026"
   }
 }

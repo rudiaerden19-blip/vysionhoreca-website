@@ -6896,8 +6896,6 @@
   },
   "vysionMusic": {
     "backToKassa": "Caja",
-    "blankSlateTitle": "Enlace Soundtrack — pizarra limpia",
-    "blankSlateHint": "Todo eliminado. Sin enlace Soundtrack, sin API, sin lógica de zonas — pizarra limpia.",
     "soundtrackLiveReadonly": "EN VIVO DE SOUNDTRACK (solo lectura)",
     "nothingPlaying": "Ninguna pista en la zona.",
     "nowPlaying": "reproduciendo ahora",
@@ -6913,23 +6911,6 @@
     "stop": "Detener",
     "prev": "Anterior",
     "prevUnavailable": "Pista anterior: solo en la app Soundtrack",
-    "settingsOpen": "Ajustes",
-    "playerLinkTitle": "Vincular reproductor",
-    "playerLinkHint": "Mismo correo/contraseña que el reproductor Soundtrack. Guardado por local; control vía clave del servidor (Vercel).",
-    "playerLinkEmail": "Correo Soundtrack",
-    "playerLinkPassword": "Contraseña",
-    "playerLinkPasswordKeep": "Dejar vacío para mantener la contraseña guardada",
-    "playerLinkConnect": "Vincular",
-    "playerLinkSaving": "Vinculando…",
-    "playerLinkClose": "Cerrar",
-    "playerLinkLinked": "Reproductor vinculado",
-    "playerLinkSaved": "Guardado y vinculado",
-    "playerLinkLoadError": "No se pudo cargar el estado del vínculo",
-    "playerLinkSaveError": "Error al vincular",
-    "playerLinkDisconnect": "Desvincular",
-    "playerLinkUnlinked": "Reproductor desvinculado",
-    "playerLinkUnlinkError": "Error al desvincular",
-    "playerLinkUnlinkConfirm": "¿Desvincular el reproductor Soundtrack de este local? Se eliminará el inicio de sesión guardado.",
     "next": "Siguiente",
     "actionPlaylist": "Lista de reproducción",
     "actionNewList": "Lista nueva",
@@ -6987,6 +6968,6 @@
     "errorNetwork": "Error de red.",
     "resultsPrefix": "RESULTADOS",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Mando a distancia Soundtrack · deja el reproductor en el PC · Vysion Music @ 2026"
   }
 }

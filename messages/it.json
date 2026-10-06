@@ -6896,8 +6896,6 @@
   },
   "vysionMusic": {
     "backToKassa": "Cassa",
-    "blankSlateTitle": "Collegamento Soundtrack — foglio pulito",
-    "blankSlateHint": "Tutto rimosso. Nessun collegamento Soundtrack, nessuna API, nessuna logica zone — foglio pulito.",
     "soundtrackLiveReadonly": "LIVE DA SOUNDTRACK (sola lettura)",
     "nothingPlaying": "Nessun brano nella zona.",
     "nowPlaying": "in riproduzione",
@@ -6913,23 +6911,6 @@
     "stop": "Stop",
     "prev": "Precedente",
     "prevUnavailable": "Brano precedente: solo dall’app Soundtrack",
-    "settingsOpen": "Impostazioni",
-    "playerLinkTitle": "Collega player",
-    "playerLinkHint": "Stessa e-mail/password del player Soundtrack in locale. Salvato per locale; controllo via chiave server (Vercel).",
-    "playerLinkEmail": "E-mail Soundtrack",
-    "playerLinkPassword": "Password",
-    "playerLinkPasswordKeep": "Lascia vuoto per mantenere la password salvata",
-    "playerLinkConnect": "Collega",
-    "playerLinkSaving": "Collegamento…",
-    "playerLinkClose": "Chiudi",
-    "playerLinkLinked": "Player collegato",
-    "playerLinkSaved": "Salvato e collegato",
-    "playerLinkLoadError": "Impossibile caricare lo stato del collegamento",
-    "playerLinkSaveError": "Collegamento non riuscito",
-    "playerLinkDisconnect": "Scollega",
-    "playerLinkUnlinked": "Player scollegato",
-    "playerLinkUnlinkError": "Scollegamento non riuscito",
-    "playerLinkUnlinkConfirm": "Scollegare il player Soundtrack per questo locale? L'accesso salvato verrà rimosso.",
     "next": "Successivo",
     "actionPlaylist": "Playlist",
     "actionNewList": "Nuova lista",
@@ -6987,6 +6968,6 @@
     "errorNetwork": "Errore di rete.",
     "resultsPrefix": "RISULTATI",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Telecomando Soundtrack · lascia attivo il player sul PC · Vysion Music @ 2026"
   }
 }

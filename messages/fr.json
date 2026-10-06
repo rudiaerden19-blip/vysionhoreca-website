@@ -6919,8 +6919,6 @@
   },
   "vysionMusic": {
     "backToKassa": "Caisse",
-    "blankSlateTitle": "Liaison Soundtrack — page blanche",
-    "blankSlateHint": "Tout est supprimé. Pas de liaison Soundtrack, pas d’API, pas de logique de zone — page blanche.",
     "soundtrackLiveReadonly": "EN DIRECT SOUNDTRACK (lecture seule)",
     "nothingPlaying": "Aucun morceau sur la zone.",
     "nowPlaying": "en cours de lecture",
@@ -6936,23 +6934,6 @@
     "stop": "Stop",
     "prev": "Précédent",
     "prevUnavailable": "Morceau précédent : via l’app Soundtrack uniquement",
-    "settingsOpen": "Paramètres",
-    "playerLinkTitle": "Lier le lecteur",
-    "playerLinkHint": "Même e-mail/mot de passe que le lecteur Soundtrack sur place. Enregistré par établissement ; commande via la clé serveur (Vercel).",
-    "playerLinkEmail": "E-mail Soundtrack",
-    "playerLinkPassword": "Mot de passe",
-    "playerLinkPasswordKeep": "Laisser vide pour conserver le mot de passe enregistré",
-    "playerLinkConnect": "Lier",
-    "playerLinkSaving": "Liaison…",
-    "playerLinkClose": "Fermer",
-    "playerLinkLinked": "Lecteur lié",
-    "playerLinkSaved": "Enregistré et lié",
-    "playerLinkLoadError": "Impossible de charger le statut de liaison",
-    "playerLinkSaveError": "Échec de la liaison",
-    "playerLinkDisconnect": "Délier",
-    "playerLinkUnlinked": "Lecteur délié",
-    "playerLinkUnlinkError": "Échec de la déliaison",
-    "playerLinkUnlinkConfirm": "Délier le lecteur Soundtrack pour cet établissement ? La connexion enregistrée sera supprimée.",
     "next": "Suivant",
     "actionPlaylist": "Liste de lecture",
     "actionNewList": "Nouvelle liste",
@@ -7010,6 +6991,6 @@
     "errorNetwork": "Erreur réseau.",
     "resultsPrefix": "RÉSULTATS",
     "errorDismiss": "Dismiss",
-    "statusFooter": "Vysion Music @ 2026"
+    "statusFooter": "Télécommande Soundtrack · laissez le lecteur PC actif · Vysion Music @ 2026"
   }
 }
