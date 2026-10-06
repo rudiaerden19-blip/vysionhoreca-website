@@ -314,12 +314,32 @@ export function VysionMusicClient({
     }
   }, [])
 
-  const playPlaylistTrack = useCallback(
-    async (source: string, trackId: string) => {
+  /** Zelfde keten als Soundtrack-speler: setPlayFrom → play → skipTracks(index). */
+  const playPlaylistAtIndex = useCallback(
+    async (source: string, trackIndex: number) => {
       setSwitchingTrack(true)
-      await postOp({ op: 'setPlayFrom', source, trackId })
+      setError(null)
+      const ok1 = await postOp({ op: 'setPlayFrom', source }, { silent: true })
+      if (!ok1) {
+        setError(t('vysionMusic.errorControl'))
+        setSwitchingTrack(false)
+        return
+      }
+      const ok2 = await postOp({ op: 'play' }, { silent: true })
+      if (!ok2) {
+        setError(t('vysionMusic.errorControl'))
+        setSwitchingTrack(false)
+        return
+      }
+      if (trackIndex > 0) {
+        const ok3 = await postOp(
+          { op: 'skipTracks', tracksToSkip: trackIndex, crossfade: true },
+          { silent: true },
+        )
+        if (!ok3) setError(t('vysionMusic.errorControl'))
+      }
       setSwitchingTrack(false)
-      window.setTimeout(() => void loadSnapshot(), 800)
+      void loadSnapshot()
     },
     [loadSnapshot, postOp],
   )
@@ -479,8 +499,7 @@ export function VysionMusicClient({
                   const idx = queueRows.findIndex(
                     (r) => r.id === nowTrack.id && r.name === nowTrack.name,
                   )
-                  const prev = idx > 0 ? queueRows[idx - 1] : null
-                  if (prev?.id) void playPlaylistTrack(playFromId, prev.id)
+                  if (idx > 0) void playPlaylistAtIndex(playFromId, idx - 1)
                 }}
               >
                 <VmSkipBack className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -518,7 +537,7 @@ export function VysionMusicClient({
                 disabled={transportPending === 'skipNext'}
                 aria-label={t('vysionMusic.next')}
                 onClick={() =>
-                  void postOp({ op: 'skipTracks', tracksToSkip: 1 }, { transportPending: 'skipNext' })
+                  void postOp({ op: 'skipTrack' }, { transportPending: 'skipNext' })
                 }
               >
                 <VmSkipForward className={styles.transportIcon} strokeWidth={VM_ICON_STROKE} />
@@ -579,7 +598,7 @@ export function VysionMusicClient({
                       className={`${styles.listRow} ${active ? styles.listRowActive : ''}`}
                       disabled={switchingTrack || !playFromId}
                       onClick={() => {
-                        if (playFromId) void playPlaylistTrack(playFromId, row.id)
+                        if (playFromId) void playPlaylistAtIndex(playFromId, idx)
                       }}
                     >
                       <span className={styles.rowNum}>{idx + 1}</span>

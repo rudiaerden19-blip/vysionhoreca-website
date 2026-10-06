@@ -712,10 +712,6 @@ export async function skipSoundZoneTracks(
   )
 }
 
-async function skipSoundZoneTracksWithCrossfade(zoneId: string): Promise<void> {
-  await skipSoundZoneTracks(zoneId, 1, true)
-}
-
 /** Soundtrack `play` mutation. */
 export async function soundtrackPlayZone(zoneId: string): Promise<void> {
   await soundtrackGraphql(
@@ -732,7 +728,7 @@ export async function soundtrackPauseZone(zoneId: string): Promise<void> {
   )
 }
 
-/** Soundtrack `setPlayFrom` (+ optioneel `soundZoneSetPlaybackOrder`). */
+/** Soundtrack `setPlayFrom` — alleen `SetPlayFromInput` (soundZone + source). */
 export async function soundtrackSetPlayFrom(zoneId: string, sourceId: string): Promise<void> {
   const source = sourceId.trim()
   if (!source) throw new SoundtrackApiError('source playlist id required')
@@ -740,78 +736,14 @@ export async function soundtrackSetPlayFrom(zoneId: string, sourceId: string): P
     `mutation($input: SetPlayFromInput!) { setPlayFrom(input: $input) { __typename } }`,
     { input: { soundZone: zoneId, source } },
   )
-  try {
-    await soundtrackGraphql(
-      `mutation($input: SoundZoneSetPlaybackOrderInput!) {
-        soundZoneSetPlaybackOrder(input: $input) { __typename }
-      }`,
-      { input: { soundZone: zoneId, playbackOrder: 'LINEAR' } },
-    )
-  } catch {
-    /* playbackOrder niet overal verplicht */
-  }
 }
 
-async function waitForNowPlayingTrackId(
-  zoneId: string,
-  trackId: string,
-  maxMs = 6000,
-): Promise<void> {
-  const want = trackId.trim()
-  if (!want) return
-  const deadline = Date.now() + maxMs
-  while (Date.now() < deadline) {
-    const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
-    if (snap.nowPlaying.track?.id === want) return
-    await new Promise((r) => setTimeout(r, 300))
-  }
-}
-
-/**
- * Spring naar een track in de actieve playlist — volgorde altijd uit Soundtrack `playlist.tracks`.
- * Zelfde playFrom + vooruit: alleen `skipTracks`. Terug / andere bron: `pause` → `setPlayFrom` → `play` → wacht op track 1 → `skipTracks`.
- */
-export async function soundtrackJumpToPlaylistTrack(
-  zoneId: string,
-  playlistId: string,
-  trackId: string,
-): Promise<void> {
-  const source = playlistId.trim()
-  const wantId = trackId.trim()
-  if (!source || !wantId) throw new SoundtrackApiError('playlistId and trackId required')
-
-  const rows = await fetchPlaylistTrackRows(source)
-  const ids = rows.map((r) => r.id)
-  const targetIndex = ids.indexOf(wantId)
-  if (targetIndex < 0) throw new SoundtrackApiError('Track not in this playlist')
-
-  const snap = await fetchSoundtrackPlayerSnapshot(zoneId)
-  const samePlayFrom = snap.playFromPlaylistId === source
-  const nowId = snap.nowPlaying.track?.id ?? null
-  const currentIndex = nowId ? ids.indexOf(nowId) : -1
-
-  if (samePlayFrom && currentIndex >= 0) {
-    if (targetIndex === currentIndex) {
-      await soundtrackPauseZone(zoneId)
-      await soundtrackPlayZone(zoneId)
-      return
-    }
-    if (targetIndex > currentIndex) {
-      await skipSoundZoneTracks(zoneId, targetIndex - currentIndex, true)
-      return
-    }
-  }
-
-  await soundtrackPauseZone(zoneId)
-  await soundtrackSetPlayFrom(zoneId, source)
-  await soundtrackPlayZone(zoneId)
-
-  const firstId = ids[0]
-  if (firstId) await waitForNowPlayingTrackId(zoneId, firstId)
-
-  if (targetIndex > 0) {
-    await skipSoundZoneTracks(zoneId, targetIndex, true)
-  }
+/** Soundtrack `skipTrack` (één track vooruit). */
+export async function soundtrackSkipTrack(zoneId: string): Promise<void> {
+  await soundtrackGraphql(
+    `mutation($input: SkipTrackInput!) { skipTrack(input: $input) { __typename } }`,
+    { input: { soundZone: zoneId } },
+  )
 }
 
 export async function fetchPlaylistTrackRows(playlistId: string): Promise<SoundtrackTrackRow[]> {
@@ -892,7 +824,7 @@ export async function soundtrackControl(
       await soundtrackPauseZone(zoneId)
       return
     case 'skipNext':
-      await skipSoundZoneTracksWithCrossfade(zoneId)
+      await soundtrackSkipTrack(zoneId)
       return
     case 'setVolume': {
       const ui = typeof opts?.volume === 'number' ? opts.volume : 0

@@ -3,15 +3,15 @@ import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import {
   SoundtrackApiError,
   SoundtrackConfigError,
-  ensureSoundZoneCrossfadeSettings,
   fetchSoundtrackPlayerSnapshot,
   resolveSoundZoneIdForTenant,
   skipSoundZoneTracks,
   soundtrackControl,
-  soundtrackJumpToPlaylistTrack,
   soundtrackSearchTracks,
   soundtrackSetPlayFrom,
   soundtrackPlayZone,
+  soundtrackPauseZone,
+  soundtrackSkipTrack,
 } from '@/lib/soundtrack/soundtrack-server'
 
 export const dynamic = 'force-dynamic'
@@ -19,11 +19,7 @@ export const maxDuration = 60
 
 type RouteContext = { params: { tenant: string } }
 
-/**
- * BFF → Soundtrack GraphQL (1:1):
- * GET  snapshot: soundZone + playFrom playlist tracks | search(type: track)
- * POST play | pause | stop | setVolume | playTrack (queue+play) | skipTracks | setPlayFrom (+ play [+ skipTracks])
- */
+/** Elke POST `op` = precies één Soundtrack GraphQL-mutatie (behalve auth + zone-id). */
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant
   const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
@@ -41,7 +37,6 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }
 
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-    await ensureSoundZoneCrossfadeSettings(zoneId)
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
     return NextResponse.json({ ok: true, snapshot })
   } catch (e) {
@@ -68,8 +63,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     trackId?: string
     source?: string
     playlistId?: string
-    trackIndex?: number
     tracksToSkip?: number
+    crossfade?: boolean
   }
   try {
     body = (await request.json()) as typeof body
@@ -84,8 +79,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     'stop',
     'setVolume',
     'playTrack',
+    'skipTrack',
     'skipTracks',
-    'skipNext',
     'setPlayFrom',
   ] as const
   if (!op || !allowed.includes(op as (typeof allowed)[number])) {
@@ -94,35 +89,44 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const zoneId = await resolveSoundZoneIdForTenant(tenantSlug)
-    await ensureSoundZoneCrossfadeSettings(zoneId)
 
-    if (op === 'setPlayFrom') {
-      const source = (body.source ?? body.playlistId)?.trim() || ''
-      if (!source) {
-        return NextResponse.json({ error: 'source or playlistId required' }, { status: 400 })
-      }
-      const jumpTrackId = body.trackId?.trim()
-      if (jumpTrackId) {
-        await soundtrackJumpToPlaylistTrack(zoneId, source, jumpTrackId)
-      } else {
+    switch (op) {
+      case 'setPlayFrom': {
+        const source = (body.source ?? body.playlistId)?.trim() || ''
+        if (!source) {
+          return NextResponse.json({ error: 'source or playlistId required' }, { status: 400 })
+        }
         await soundtrackSetPlayFrom(zoneId, source)
-        await soundtrackPlayZone(zoneId)
+        break
       }
-    } else if (op === 'skipTracks') {
-      const n =
-        typeof body.tracksToSkip === 'number' && Number.isFinite(body.tracksToSkip)
-          ? Math.max(1, Math.floor(body.tracksToSkip))
-          : 1
-      await skipSoundZoneTracks(zoneId, n, true)
-    } else {
-      await soundtrackControl(
-        zoneId,
-        op as 'play' | 'pause' | 'skipNext' | 'stop' | 'setVolume' | 'playTrack',
-        {
-          volume: op === 'setVolume' ? body.volume : undefined,
+      case 'play':
+        await soundtrackPlayZone(zoneId)
+        break
+      case 'pause':
+      case 'stop':
+        await soundtrackPauseZone(zoneId)
+        break
+      case 'skipTrack':
+        await soundtrackSkipTrack(zoneId)
+        break
+      case 'skipTracks': {
+        const n =
+          typeof body.tracksToSkip === 'number' && Number.isFinite(body.tracksToSkip)
+            ? Math.max(0, Math.floor(body.tracksToSkip))
+            : 1
+        const crossfade = body.crossfade !== false
+        if (n > 0) await skipSoundZoneTracks(zoneId, n, crossfade)
+        break
+      }
+      case 'setVolume':
+      case 'playTrack':
+        await soundtrackControl(zoneId, op, {
+          volume: body.volume,
           trackId: body.trackId,
-        },
-      )
+        })
+        break
+      default:
+        break
     }
 
     const snapshot = await fetchSoundtrackPlayerSnapshot(zoneId)
