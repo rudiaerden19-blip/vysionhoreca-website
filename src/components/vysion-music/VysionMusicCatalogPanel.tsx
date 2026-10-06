@@ -112,6 +112,7 @@ export function VysionMusicCatalogPanel({
   const [listsLoading, setListsLoading] = useState(() => !getCachedPlaylists(tenant))
   const [listsError, setListsError] = useState<string | null>(null)
   const listsLoadedOnceRef = useRef(Boolean(getCachedPlaylists(tenant)))
+  const libraryPanelRef = useRef<HTMLElement>(null)
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [tracks, setTracks] = useState<TrackItem[]>([])
@@ -126,6 +127,17 @@ export function VysionMusicCatalogPanel({
   const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
   const [soundtrackReloadBusy, setSoundtrackReloadBusy] = useState(false)
   const [soundtrackReloadError, setSoundtrackReloadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'F5') return
+      e.preventDefault()
+      if (soundtrackReloadBusy) return
+      void refreshSoundtrackPlayer()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [refreshSoundtrackPlayer, soundtrackReloadBusy])
   const [searchMenuTrackId, setSearchMenuTrackId] = useState<string | null>(null)
   const [addToPlaylistTrackId, setAddToPlaylistTrackId] = useState<string | null>(null)
   const [libraryMenuPlaylistId, setLibraryMenuPlaylistId] = useState<string | null>(null)
@@ -442,7 +454,11 @@ export function VysionMusicCatalogPanel({
   }
 
   return (
-    <section className={styles.libraryPanel} aria-label={t('vysionMusic.libraryTitle')}>
+    <section
+      ref={libraryPanelRef}
+      className={styles.libraryPanel}
+      aria-label={t('vysionMusic.libraryTitle')}
+    >
       <div className={styles.catalogGrid}>
         <div className={styles.catalogCol}>
           <div className={styles.catalogColHead}>
@@ -472,12 +488,10 @@ export function VysionMusicCatalogPanel({
                 type="button"
                 className={styles.libraryTab}
                 disabled={soundtrackReloadBusy}
-                title={t('vysionMusic.libraryRefreshSoundtrackTitle')}
+                aria-label={t('vysionMusic.libraryRefreshSoundtrack')}
                 onClick={() => void refreshSoundtrackPlayer()}
               >
-                {soundtrackReloadBusy
-                  ? t('vysionMusic.libraryRefreshSoundtrackBusy')
-                  : t('vysionMusic.libraryRefreshSoundtrack')}
+                {t('vysionMusic.libraryRefreshSoundtrack')}
               </button>
             </div>
           </div>
