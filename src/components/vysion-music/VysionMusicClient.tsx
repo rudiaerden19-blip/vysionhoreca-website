@@ -165,6 +165,8 @@ export function VysionMusicClient({
   const playlistsApiBase = `${apiBase}/playlists`
 
   const volumeSyncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const volumeSyncGeneration = useRef(0)
+  const lastVolumeSentRef = useRef<number | null>(null)
   const volumeDraggingRef = useRef(false)
   const playlistPanelRef = useRef<HTMLDivElement>(null)
   const nowLeftRef = useRef<HTMLDivElement>(null)
@@ -210,12 +212,12 @@ export function VysionMusicClient({
     setSavedSoundtrackPlaylistId(pin.soundtrackPlaylistId)
   }, [])
 
-  const mergeSnapshot = useCallback((snap: Snapshot) => {
+  const mergeSnapshot = useCallback((snap: Snapshot, opts?: { ignoreVolume?: boolean }) => {
     setSnapshot((prev) => {
-      if (volumeDraggingRef.current && prev) {
-        return { ...snap, volume: prev.volume }
-      }
-      return snap
+      let volume = snap.volume
+      if (opts?.ignoreVolume && prev) volume = prev.volume
+      if (volumeDraggingRef.current && prev) volume = prev.volume
+      return volume === snap.volume ? snap : { ...snap, volume }
     })
   }, [])
 
@@ -367,9 +369,10 @@ export function VysionMusicClient({
     async (
       op: string,
       extra?: { volume?: number; trackId?: string; trackIds?: string[] },
-      opts?: { silent?: boolean },
+      opts?: { silent?: boolean; volumeGeneration?: number },
     ) => {
       if (!opts?.silent) setBusy(true)
+      const volumeGeneration = opts?.volumeGeneration
       try {
         const res = await fetch(apiBase, {
           method: 'POST',
@@ -388,7 +391,13 @@ export function VysionMusicClient({
           }
         } else {
           if (!(opts?.silent && op === 'setVolume')) setError(null)
-          if (json.snapshot) mergeSnapshot(json.snapshot)
+          if (json.snapshot) {
+            const staleVolume =
+              op === 'setVolume' &&
+              volumeGeneration != null &&
+              volumeGeneration !== volumeSyncGeneration.current
+            mergeSnapshot(json.snapshot, { ignoreVolume: staleVolume })
+          }
         }
       } catch {
         if (!(opts?.silent && op === 'setVolume')) {
@@ -403,8 +412,13 @@ export function VysionMusicClient({
 
   const syncVolume = useCallback(
     (v: number, immediate?: boolean) => {
+      if (immediate && lastVolumeSentRef.current === v) return
       if (volumeSyncTimer.current) clearTimeout(volumeSyncTimer.current)
-      const send = () => void control('setVolume', { volume: v }, { silent: true })
+      const send = () => {
+        lastVolumeSentRef.current = v
+        const gen = ++volumeSyncGeneration.current
+        void control('setVolume', { volume: v }, { silent: true, volumeGeneration: gen })
+      }
       if (immediate) send()
       else volumeSyncTimer.current = setTimeout(send, 320)
     },

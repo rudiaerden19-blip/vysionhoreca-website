@@ -26,12 +26,18 @@ export function VolumeSliderVertical({
   const innerRef = useRef<HTMLDivElement>(null)
   const draggingRef = useRef(false)
   const activePointerRef = useRef<number | null>(null)
+  const lastCommittedStepRef = useRef(quantizeVolumeUiPercent(value))
+  const lastDragShownRef = useRef<number | null>(null)
   const [dragValue, setDragValue] = useState<number | null>(null)
 
   const shown = dragValue ?? quantizeVolumeUiPercent(value)
 
   useEffect(() => {
-    if (!draggingRef.current) setDragValue(null)
+    if (!draggingRef.current) {
+      setDragValue(null)
+      lastDragShownRef.current = null
+      lastCommittedStepRef.current = quantizeVolumeUiPercent(value)
+    }
   }, [value])
 
   const rawFromClientY = useCallback((clientY: number): number => {
@@ -45,12 +51,18 @@ export function VolumeSliderVertical({
 
   const applyAt = useCallback(
     (clientY: number) => {
-      const v = rawFromClientY(clientY)
+      const v = quantizeVolumeUiPercent(rawFromClientY(clientY))
+      if (v === lastDragShownRef.current) return v
+      lastDragShownRef.current = v
       setDragValue(v)
       onChange(v)
+      if (v !== lastCommittedStepRef.current) {
+        lastCommittedStepRef.current = v
+        onCommit?.(v)
+      }
       return v
     },
-    [onChange, rawFromClientY],
+    [onChange, onCommit, rawFromClientY],
   )
 
   const finishDrag = useCallback(
@@ -65,7 +77,10 @@ export function VolumeSliderVertical({
       const committed = quantizeVolumeUiPercent(raw)
       setDragValue(null)
       onChange(committed)
-      onCommit?.(committed)
+      if (committed !== lastCommittedStepRef.current) {
+        lastCommittedStepRef.current = committed
+        onCommit?.(committed)
+      }
     },
     [dragValue, onChange, onCommit, onDragChange, rawFromClientY, value],
   )
@@ -130,18 +145,13 @@ export function VolumeSliderVertical({
         e.stopPropagation()
         draggingRef.current = true
         activePointerRef.current = e.pointerId
+        lastCommittedStepRef.current = quantizeVolumeUiPercent(value)
         onDragChange?.(true)
         try {
           e.currentTarget.setPointerCapture(e.pointerId)
         } catch {
           /* Windows touch: window listeners vangen move/end */
         }
-        applyAt(e.clientY)
-      }}
-      onPointerMove={(e) => {
-        if (disabled || !draggingRef.current) return
-        if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return
-        e.preventDefault()
         applyAt(e.clientY)
       }}
       onPointerUp={(e) => {
