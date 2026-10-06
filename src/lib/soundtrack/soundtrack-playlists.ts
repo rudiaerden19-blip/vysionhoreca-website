@@ -219,3 +219,53 @@ export async function listSoundtrackLibraryPlaylists(
   const library = await fetchAccountLibrary(id, soundtrackGraphql)
   return library.playlists
 }
+
+async function resolveZoneAccountId(zoneId: string): Promise<string> {
+  const data = await soundtrackGraphql<{
+    soundZone: { account: { id: string } | null } | null
+  }>(ZONE_ACCOUNT_QUERY, { id: zoneId.trim() })
+  const accountId = data.soundZone?.account?.id?.trim()
+  if (!accountId) {
+    throw new SoundtrackApiError('Soundtrack zone has no account', 502)
+  }
+  return accountId
+}
+
+/** Soundtrack `createManualPlaylist` + `addToMusicLibrary` (zelfde account-bibliotheek als lijst-UI). */
+export async function createManualPlaylistInMusicLibrary(
+  zoneId: string,
+  playlistName: string,
+): Promise<{ id: string; name: string }> {
+  const zid = zoneId.trim()
+  const name = playlistName.trim()
+  if (!zid) throw new SoundtrackApiError('sound zone id required', 400)
+  if (!name) throw new SoundtrackApiError('playlist name required', 400)
+
+  const ownerId = await resolveZoneAccountId(zid)
+
+  const created = await soundtrackGraphql<{
+    createManualPlaylist: { id: string; name: string } | null
+  }>(
+    `mutation($input: CreateManualPlaylistInput!) {
+      createManualPlaylist(input: $input) { id name }
+    }`,
+    { input: { ownerId, name } },
+  )
+
+  const id = created.createManualPlaylist?.id?.trim()
+  if (!id) {
+    throw new SoundtrackApiError('Soundtrack created no playlist', 502)
+  }
+
+  await soundtrackGraphql(
+    `mutation($input: AddToMusicLibraryInput!) {
+      addToMusicLibrary(input: $input) { __typename }
+    }`,
+    { input: { parent: ownerId, source: id } },
+  )
+
+  return {
+    id,
+    name: created.createManualPlaylist?.name?.trim() || name,
+  }
+}

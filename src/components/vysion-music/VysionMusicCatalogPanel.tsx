@@ -19,6 +19,7 @@ import {
   vysionMusicTrackRowIsNowPlaying,
   type VysionMusicNowPlayingMatch,
 } from './vysion-music-track-match'
+import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
 import styles from './vysion-music.module.css'
 
 type LibraryItem = VysionMusicLibraryItem
@@ -79,6 +80,7 @@ export function VysionMusicCatalogPanel({
   const [searchResults, setSearchResults] = useState<TrackItem[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
   const [brokenThumbIds, setBrokenThumbIds] = useState<Set<string>>(() => new Set())
+  const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
 
   const prefetchTracksForSource = useCallback(
     async (sourceId: string) => {
@@ -319,9 +321,7 @@ export function VysionMusicCatalogPanel({
               <button
                 type="button"
                 className={styles.libraryTab}
-                onClick={() =>
-                  window.open('https://business.soundtrackyourbrand.com/', '_blank', 'noopener,noreferrer')
-                }
+                onClick={() => setCreatePlaylistOpen(true)}
               >
                 {t('vysionMusic.libraryCreatePlaylist')}
               </button>
@@ -489,6 +489,15 @@ export function VysionMusicCatalogPanel({
           </ul>
         </div>
       </div>
+      <VysionMusicCreatePlaylistModal
+        tenant={tenant}
+        open={createPlaylistOpen}
+        onClose={() => setCreatePlaylistOpen(false)}
+        onCreated={() => {
+          setTab('lists')
+          return loadLists({ background: true })
+        }}
+      />
     </section>
   )
 }
