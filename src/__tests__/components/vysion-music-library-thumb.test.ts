@@ -1,5 +1,6 @@
 import {
   vysionMusicLibraryCoverProxyUrl,
+  vysionMusicLibraryListArtUrl,
   vysionMusicLibraryPlaceholderLetter,
 } from '@/components/vysion-music/vysion-music-library-thumb'
 
@@ -10,6 +11,30 @@ describe('vysionMusicLibraryPlaceholderLetter', () => {
 
   it('falls back to music symbol when name is empty', () => {
     expect(vysionMusicLibraryPlaceholderLetter('   ')).toBe('♪')
+  })
+})
+
+describe('vysionMusicLibraryListArtUrl', () => {
+  it('manual playlist: ignore Soundtrack display placeholder, use track art only', () => {
+    expect(
+      vysionMusicLibraryListArtUrl(
+        'playlist',
+        'https://i.soundcdn.com/default-playlist.png',
+        null,
+      ),
+    ).toBeNull()
+    expect(
+      vysionMusicLibraryListArtUrl(
+        'playlist',
+        'https://i.soundcdn.com/default-playlist.png',
+        'https://i.soundcdn.com/k/1/1/soundtrack:artwork:x/t.jpg',
+      ),
+    ).toContain('soundtrack:artwork')
+  })
+
+  it('soundtrack station keeps display image', () => {
+    const url = 'https://i.soundcdn.com/k/1/1/soundtrack:artwork:station/t.jpg'
+    expect(vysionMusicLibraryListArtUrl('soundtrack', url, null)).toBe(url)
   })
 })
 

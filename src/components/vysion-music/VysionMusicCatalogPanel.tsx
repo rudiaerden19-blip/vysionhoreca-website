@@ -25,6 +25,7 @@ import {
 import { VysionMusicCreatePlaylistModal } from './VysionMusicCreatePlaylistModal'
 import {
   vysionMusicLibraryCoverProxyUrl,
+  vysionMusicLibraryListArtUrl,
   vysionMusicLibraryPlaceholderLetter,
 } from './vysion-music-library-thumb'
 import { VysionMusicDeletePlaylistModal } from './VysionMusicDeletePlaylistModal'
@@ -414,7 +415,11 @@ export function VysionMusicCatalogPanel({
               const cachedTrackArt =
                 getCachedPlaylistTracks(tenant, pl.id)?.find((t) => t.imageUrl?.trim())?.imageUrl ??
                 null
-              const listArtUrl = pl.imageUrl?.trim() || cachedTrackArt?.trim() || null
+              const listArtUrl = vysionMusicLibraryListArtUrl(
+                pl.sourceKind,
+                pl.imageUrl,
+                cachedTrackArt,
+              )
               const thumbSrc = vysionMusicLibraryCoverProxyUrl(listArtUrl)
               const libraryMenuOpen = libraryMenuPlaylistId === pl.id
               const showPlaylistMenu = isManualLibraryPlaylist(pl.sourceKind)

@@ -10,3 +10,28 @@ export function vysionMusicLibraryCoverProxyUrl(imageUrl: string | null | undefi
   if (!url || !url.startsWith('http')) return null
   return `/api/soundtrack/cover?url=${encodeURIComponent(url)}`
 }
+
+export type VysionMusicLibraryListArtSourceKind =
+  | 'playlist'
+  | 'soundtrack'
+  | 'schedule'
+  | 'unknown'
+
+/**
+ * Manual playlists: geen Soundtrack default-icoon uit display.image — letter-placeholder
+ * tot er echte track-art is. Stations/schedules: display.image blijft leidend.
+ */
+export function vysionMusicLibraryListArtUrl(
+  sourceKind: VysionMusicLibraryListArtSourceKind,
+  displayImageUrl: string | null | undefined,
+  cachedTrackArtUrl: string | null | undefined,
+): string | null {
+  const track = cachedTrackArtUrl?.trim()
+  const display = displayImageUrl?.trim()
+  const manual = sourceKind === 'playlist' || sourceKind === 'unknown'
+  if (manual) {
+    return track && track.startsWith('http') ? track : null
+  }
+  if (display?.startsWith('http')) return display
+  return track && track.startsWith('http') ? track : null
+}
