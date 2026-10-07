@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import PinGate from '@/components/PinGate'
+import { getAuthHeaders } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { parseKlantschermSlideshowUploads } from '@/lib/klantscherm-slideshow-server'
 import {
@@ -12,7 +12,7 @@ import {
   type KlantschermSlideshowMediaType,
 } from '@/lib/klantscherm-slideshow-media'
 import { uploadKlantschermPromoMedia } from '@/lib/klantscherm-promo-upload'
-import { notifyKlantschermSlideshowRefresh } from '@/lib/klantscherm-slideshow-playback'
+import { notifyKlantschermSlideshowRefresh } from '@/lib/klantscherm-slideshow-server'
 import {
   getOrCreateKlantschermSessionToken,
   klantschermPublicUrl,
@@ -73,25 +73,37 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
 
   const load = useCallback(async () => {
     setLoading(true)
-    const { data } = await supabase
-      .from('tenant_settings')
-      .select(
-        'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads, klantscherm_bank_iban, klantscherm_bank_account_name',
-      )
-      .eq('tenant_slug', tenant)
-      .maybeSingle()
-    if (data) {
-      setEnabled(data.klantscherm_enabled === true)
-      setSlideshowEnabled(data.klantscherm_slideshow_enabled !== false)
-      setUploads(
-        parseKlantschermSlideshowUploads(data.klantscherm_slideshow_uploads).map((row) => ({
-          url: row.url,
-          sort: row.sort,
-          mediaType: row.mediaType ?? inferKlantschermMediaTypeFromUrl(row.url),
-        })),
-      )
-      setBankIban(String(data.klantscherm_bank_iban ?? '').trim())
-      setBankAccountName(String(data.klantscherm_bank_account_name ?? '').trim())
+    try {
+      const r = await fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/settings`, {
+        credentials: 'same-origin',
+        headers: getAuthHeaders(),
+      })
+      const json = (await r.json()) as {
+        ok?: boolean
+        settings?: {
+          klantscherm_enabled?: boolean
+          klantscherm_slideshow_enabled?: boolean
+          klantscherm_bank_iban?: string | null
+          klantscherm_bank_account_name?: string | null
+        } | null
+        uploads?: ReturnType<typeof parseKlantschermSlideshowUploads>
+      }
+      if (json.ok && json.settings) {
+        const data = json.settings
+        setEnabled(data.klantscherm_enabled === true)
+        setSlideshowEnabled(data.klantscherm_slideshow_enabled !== false)
+        setUploads(
+          (json.uploads ?? []).map((row) => ({
+            url: row.url,
+            sort: row.sort,
+            mediaType: row.mediaType ?? inferKlantschermMediaTypeFromUrl(row.url),
+          })),
+        )
+        setBankIban(String(data.klantscherm_bank_iban ?? '').trim())
+        setBankAccountName(String(data.klantscherm_bank_account_name ?? '').trim())
+      }
+    } catch {
+      /* ignore */
     }
     setLoading(false)
   }, [tenant])
@@ -113,17 +125,20 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   }, [uploadBusy])
 
   const persistSettings = async (uploadRows: UploadRow[]) => {
-    const { error } = await supabase
-      .from('tenant_settings')
-      .update({
+    const r = await fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/settings`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({
         klantscherm_enabled: enabled,
         klantscherm_slideshow_enabled: slideshowEnabled,
         klantscherm_slideshow_uploads: uploadRows,
-        klantscherm_bank_iban: bankIban.replace(/\s/g, '').toUpperCase() || null,
-        klantscherm_bank_account_name: bankAccountName.trim() || null,
-      })
-      .eq('tenant_slug', tenant)
-    if (error) return { ok: false as const, error }
+        klantscherm_bank_iban: bankIban,
+        klantscherm_bank_account_name: bankAccountName,
+      }),
+    })
+    const json = (await r.json()) as { ok?: boolean; error?: string }
+    if (!r.ok || !json.ok) return { ok: false as const, error: json.error }
     notifyKlantschermSlideshowRefresh(tenant)
     return { ok: true as const }
   }
@@ -134,7 +149,11 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     const result = await persistSettings(uploads)
     setSaving(false)
     if (!result.ok) {
-      alert(t('adminPages.common.saveFailed'))
+      alert(
+        result.error
+          ? `${t('adminPages.common.saveFailed')} (${result.error})`
+          : t('adminPages.common.saveFailed'),
+      )
       return
     }
     setSaved(true)

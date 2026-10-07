@@ -10,7 +10,7 @@ import {
 import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-window'
 import { KLANTSCHERM_NL } from '@/lib/klantscherm-nl-copy'
 import { KlantschermSlideshow } from '@/components/klantscherm/KlantschermSlideshow'
-import { klantschermSlideshowRefreshChannel } from '@/lib/klantscherm-slideshow-playback'
+import { klantschermSlideshowRefreshChannel } from '@/lib/klantscherm-slideshow-server'
 import { KlantschermQrPayView } from '@/components/klantscherm/KlantschermQrPayView'
 
 function klantschermOrderDensityStyle(lineCount: number) {

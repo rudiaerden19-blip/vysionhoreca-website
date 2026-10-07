@@ -3,10 +3,10 @@ import {
   inferKlantschermMediaTypeFromUrl,
   validateKlantschermPromoFile,
 } from '@/lib/klantscherm-slideshow-media'
-import { sortKlantschermSlidesForPlayback } from '@/lib/klantscherm-slideshow-playback'
 import {
   mergeKlantschermSlideshowSlides,
   parseKlantschermSlideshowUploads,
+  sortKlantschermSlidesForPlayback,
 } from '@/lib/klantscherm-slideshow-server'
 
 describe('klantscherm slideshow media', () => {
