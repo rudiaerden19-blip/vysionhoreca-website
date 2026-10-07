@@ -4295,7 +4295,11 @@
     "floorPlanStatusHeading": "Status",
     "openCustomerDisplay": "Customer display",
     "customerDisplayHint": "Tries to open on the second screen automatically. Allow pop-ups; Chrome/Edge may ask for display permission. F11 = fullscreen.",
-    "customerDisplayOpenFailed": "Could not open customer display. Allow pop-ups for this site."
+    "customerDisplayOpenFailed": "Could not open customer display. Allow pop-ups for this site.",
+    "klantschermQrPaidTitle": "Customer display: payment successful",
+    "klantschermQrPaidBody": "The customer paid via QR. Complete the sale on the POS (card/Bancontact).",
+    "klantschermQrFailedTitle": "Customer display: payment declined",
+    "klantschermQrFailedBody": "QR payment failed or was cancelled. Choose a payment method again."
   },
   "kassaCustomerDisplay": {
     "missingToken": "Invalid session. Open the customer display from the register.",

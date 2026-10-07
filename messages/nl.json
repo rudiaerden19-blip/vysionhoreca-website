@@ -4295,7 +4295,11 @@
     "floorPlanStatusHeading": "Status",
     "openCustomerDisplay": "Klantscherm",
     "customerDisplayHint": "Probeert automatisch op het tweede scherm te openen. Sta pop-ups toe; Chrome/Edge kan om schermtoestemming vragen. F11 = volledig scherm.",
-    "customerDisplayOpenFailed": "Kon klantscherm niet openen. Sta pop-ups toe voor deze site."
+    "customerDisplayOpenFailed": "Kon klantscherm niet openen. Sta pop-ups toe voor deze site.",
+    "klantschermQrPaidTitle": "Klantscherm: betaling geslaagd",
+    "klantschermQrPaidBody": "De klant heeft via de QR-code betaald. Rond de verkoop af op de kassa (Bancontact/kaart).",
+    "klantschermQrFailedTitle": "Klantscherm: betaling geweigerd",
+    "klantschermQrFailedBody": "De QR-betaling is mislukt of geannuleerd. Kies opnieuw een betaalmethode."
   },
   "kassaCustomerDisplay": {
     "missingToken": "Ongeldige sessie. Open het klantscherm vanuit de kassa.",
