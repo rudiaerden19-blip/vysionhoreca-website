@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Orbitron } from 'next/font/google'
+import { KlantschermHtmlShell } from '@/components/klantscherm/KlantschermHtmlShell'
 
 const klantschermDigital = Orbitron({
   subsets: ['latin'],
@@ -42,10 +43,13 @@ export async function generateViewport(): Promise<Viewport> {
 
 export default function KlantschermLayout({ children }: { children: ReactNode }) {
   return (
-    <div
-      className={`${klantschermDigital.variable} fixed inset-0 z-[2147483646] box-border m-0 flex h-[100dvh] max-h-[100dvh] w-screen max-w-none flex-col overflow-x-hidden overflow-y-auto overscroll-none bg-black p-0 text-white subpixel-antialiased [-webkit-tap-highlight-color:transparent]`}
-    >
-      {children}
-    </div>
+    <>
+      <KlantschermHtmlShell />
+      <div
+        className={`vysion-klantscherm-shell ${klantschermDigital.variable} fixed inset-0 z-[2147483646] box-border m-0 flex h-[100dvh] max-h-[100dvh] min-h-[100dvh] w-screen max-w-none flex-col overflow-hidden overscroll-none bg-black p-0 text-white subpixel-antialiased [-webkit-tap-highlight-color:transparent]`}
+      >
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+      </div>
+    </>
   )
 }

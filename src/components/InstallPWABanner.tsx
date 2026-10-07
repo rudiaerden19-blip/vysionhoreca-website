@@ -57,6 +57,7 @@ export function InstallPWABanner() {
     if (typeof window === 'undefined') return
     const path = window.location.pathname
     if (path.startsWith('/admin') || path.includes('/admin/')) return
+    if (path.includes('/klantscherm')) return
     const host = window.location.hostname
     if (!isTenantOrdervysionHost(host)) return
 

@@ -62,17 +62,6 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }, [tenant, token])
 
   useEffect(() => {
-    const html = document.documentElement
-    const body = document.body
-    html.classList.add('vysion-klantscherm-root')
-    body.classList.add('vysion-klantscherm-root')
-    return () => {
-      html.classList.remove('vysion-klantscherm-root')
-      body.classList.remove('vysion-klantscherm-root')
-    }
-  }, [])
-
-  useEffect(() => {
     if (!channelName || typeof BroadcastChannel === 'undefined') return
     const bc = new BroadcastChannel(channelName)
     bc.onmessage = (ev: MessageEvent<unknown>) => {
@@ -200,6 +189,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   const shellCart =
     'box-border flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-black px-3 py-4 text-white sm:px-5 sm:py-6 md:px-8 md:py-8'
+  const shellFill = 'flex min-h-0 w-full flex-1 flex-col bg-black'
 
   if (!token) {
     return (
@@ -212,7 +202,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   if (msg?.phase === 'thankYou') {
     const amountStr = formatMoney(msg.totalInclVat)
     return (
-      <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-10 bg-black px-6 py-8 text-center">
+      <div className={`${shellFill} items-center justify-center gap-10 px-6 py-8 text-center`}>
         <p className="max-w-[96vw] text-[clamp(1.75rem,5.5vw,4rem)] font-bold leading-tight text-white">
           {KLANTSCHERM_NL.thankYouToPay.replace('{amount}', amountStr)}
         </p>
@@ -229,16 +219,16 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }
     if (klantschermActive) {
       return (
-        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-6 text-center text-white/70">
+        <div className={`${shellFill} items-center justify-center px-6 text-center text-white/70`}>
           <p className="max-w-lg text-lg font-medium sm:text-xl">{KLANTSCHERM_NL.waitingForKassa}</p>
         </div>
       )
     }
-    return <div className="min-h-0 w-full flex-1 bg-black" aria-hidden />
+    return <div className={shellFill} aria-hidden />
   }
 
   if (msg.phase !== 'cart' && msg.phase !== 'checkout') {
-    return <div className="min-h-0 w-full flex-1 bg-black" />
+    return <div className={shellFill} />
   }
 
   const lines = msg.lines

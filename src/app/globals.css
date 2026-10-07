@@ -22,15 +22,19 @@ body.vysion-floor-plan-grabbing {
 
 /* Klantscherm: geen witte rand door body/html-defaults; vol zwart canvas.
  * color-scheme: hint aan browser voor donkere UI-randen waar ondersteund (geen controle over adresbalktekst zelf). */
+html:has(.vysion-klantscherm-shell),
 html.vysion-klantscherm-root,
+html:has(.vysion-klantscherm-shell) body,
 html.vysion-klantscherm-root body {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
   max-width: none !important;
   min-height: 100dvh !important;
+  height: 100% !important;
   background: #000000 !important;
   color-scheme: dark !important;
+  overflow: hidden !important;
   overflow-x: hidden !important;
   /* LCD tweede scherm: subpixel-RGB i.p.v. grijs-antialiased — vaak scherper op klassieke panels */
   -webkit-font-smoothing: auto !important;

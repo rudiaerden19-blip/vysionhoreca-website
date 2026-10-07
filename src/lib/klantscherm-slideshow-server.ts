@@ -1,4 +1,8 @@
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import {
+  looksLikeBelgiumDrinkCategory,
+  looksLikeBelgiumDrinkName,
+} from '@/lib/order-vat'
 
 export type KlantschermSlideshowUpload = { url: string; sort: number }
 
@@ -36,17 +40,36 @@ export async function loadKlantschermSlideshowImageUrls(tenantSlug: string): Pro
     (u) => u.url,
   )
 
-  const { data: products } = await supabase
-    .from('menu_products')
-    .select('image_url')
-    .eq('tenant_slug', slug)
-    .eq('is_active', true)
-    .limit(200)
+  const [{ data: categories }, { data: products }] = await Promise.all([
+    supabase
+      .from('menu_categories')
+      .select('id, name')
+      .eq('tenant_slug', slug)
+      .eq('is_active', true),
+    supabase
+      .from('menu_products')
+      .select('image_url, name, category_id')
+      .eq('tenant_slug', slug)
+      .eq('is_active', true)
+      .limit(400),
+  ])
+
+  const categoryNameById = new Map<string, string>()
+  for (const c of categories ?? []) {
+    const id = String(c.id ?? '').trim()
+    if (!id) continue
+    categoryNameById.set(id, String(c.name ?? ''))
+  }
 
   const menuUrls: string[] = []
   for (const p of products ?? []) {
     const url = String(p.image_url ?? '').trim()
-    if (url) menuUrls.push(url)
+    if (!url) continue
+    const catId = String(p.category_id ?? '').trim()
+    const catName = catId ? categoryNameById.get(catId) ?? '' : ''
+    if (looksLikeBelgiumDrinkCategory(catName)) continue
+    if (looksLikeBelgiumDrinkName(String(p.name ?? ''))) continue
+    menuUrls.push(url)
   }
 
   const seen = new Set<string>()
