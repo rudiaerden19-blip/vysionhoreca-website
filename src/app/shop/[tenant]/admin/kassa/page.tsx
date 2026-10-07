@@ -3290,6 +3290,52 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       .replace(/\{zone\}/g, zoneLabel)
   }, [orderType, tableNumber, dineInFloorZone, t])
 
+  const customerDisplayBusinessName = useMemo(
+    () =>
+      tenantInfo?.business_name ??
+      tenant
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' '),
+    [tenant, tenantInfo?.business_name],
+  )
+
+  /** Alleen bij klantscherm aan: bedankfase direct naar tweede scherm (geen impact zonder klantscherm). */
+  const showKlantschermThankYou = useCallback(
+    (paidTotal: number) => {
+      if (!klantschermEnabled) return
+      const totalInclVat = Math.round(paidTotal * 100) / 100
+      const until = Date.now() + KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS
+      setCustomerDisplayThankYou({
+        total: totalInclVat,
+        until,
+        dineInSubtitle: customerDisplayDineInSubtitle,
+      })
+      const bc = customerDisplayBcRef.current
+      if (!bc || !customerDisplayToken) return
+      const msg: KassaCustomerDisplayMessage = {
+        v: 1,
+        phase: 'thankYou',
+        tenantSlug: tenant,
+        businessName: customerDisplayBusinessName,
+        totalInclVat,
+        dineInSubtitle: customerDisplayDineInSubtitle,
+      }
+      try {
+        bc.postMessage(msg)
+      } catch {
+        /* ignore */
+      }
+    },
+    [
+      klantschermEnabled,
+      customerDisplayDineInSubtitle,
+      customerDisplayToken,
+      tenant,
+      customerDisplayBusinessName,
+    ],
+  )
+
   const openKlantschermWindow = useCallback(() => {
     if (typeof window === 'undefined' || !klantschermEnabled) return
     let tok = customerDisplayToken ?? readKlantschermSessionToken(tenant)
@@ -3918,21 +3964,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setCustomerDisplayThankYou(null)
     }
 
-    setCustomerDisplayThankYou({
-      total: Math.round(total * 100) / 100,
-      until: Date.now() + KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
-      dineInSubtitle:
-        orderType === 'DINE_IN' && tableNumber
-          ? t('kassaCustomerDisplay.dineInTableZoneLine')
-              .replace(/\{number\}/g, String(tableNumber))
-              .replace(
-                /\{zone\}/g,
-                dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE
-                  ? t('kassaApp.floorZoneTerrace')
-                  : t('kassaApp.floorZoneInside'),
-              )
-          : undefined,
-    })
+    showKlantschermThankYou(total)
 
     flushSync(() => {
       setLastOrder({
@@ -7268,8 +7300,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onConfirm={() => {
           const pending = klantschermBankPayPending
           if (!pending || payInFlightRef.current) return
-          setKlantschermBankPayPending(null)
           if (!lockPayInFlight()) return
+          const paidTotal =
+            pending.kind === 'split' ? pending.cash + pending.card : total
+          flushSync(() => {
+            setKlantschermBankPayPending(null)
+            setCustomerDisplayShowQr(false)
+            showKlantschermThankYou(paidTotal)
+          })
           if (pending.kind === 'split') {
             void completePayment('SPLIT', { cash: pending.cash, card: pending.card }, { preLocked: true })
           } else {

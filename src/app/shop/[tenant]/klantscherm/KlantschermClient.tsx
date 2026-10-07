@@ -206,15 +206,17 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }
 
   if (msg?.phase === 'thankYou') {
-    const amountStr = formatMoney(msg.totalInclVat)
     return (
-      <div className={`${shellFill} items-center justify-center gap-10 px-6 py-8 text-center`}>
-        <p className="max-w-[96vw] text-[clamp(1.75rem,5.5vw,4rem)] font-bold leading-tight text-white">
-          {KLANTSCHERM_NL.thankYouToPay.replace('{amount}', amountStr)}
+      <div className={`${shellFill} items-center justify-center gap-8 px-6 py-8 text-center`}>
+        <p className="max-w-[96vw] text-[clamp(2rem,6vw,4.25rem)] font-black leading-tight text-emerald-400">
+          {KLANTSCHERM_NL.paymentSuccessTitle}
         </p>
-        <p className="max-w-[96vw] text-[clamp(1.35rem,3.8vw,2.75rem)] font-semibold text-white/90">
+        <p className="max-w-[96vw] text-[clamp(1.35rem,3.8vw,2.75rem)] font-semibold text-white/95">
           {KLANTSCHERM_NL.thankYouClosing}
         </p>
+        {msg.dineInSubtitle ? (
+          <p className="max-w-2xl text-lg font-medium text-white/75">{msg.dineInSubtitle}</p>
+        ) : null}
       </div>
     )
   }

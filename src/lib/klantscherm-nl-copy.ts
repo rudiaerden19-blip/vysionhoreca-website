@@ -6,7 +6,7 @@ export const KLANTSCHERM_NL = {
   checkoutTitle: 'Afrekenen',
   totalInclVat: 'Totaal incl. btw',
   emptyCartHint: 'Geen artikelen in de mand',
-  thankYouToPay: 'Te betalen {amount}',
+  paymentSuccessTitle: 'Betaling geslaagd',
   thankYouClosing: 'Bedankt voor uw bestelling',
   qrHint: 'Scan de QR-code met uw bankapp (overschrijving) en bevestig',
   qrScanFallback: 'Scannen lukt niet? Maak een overschrijving handmatig naar het rekeningnummer hieronder.',
