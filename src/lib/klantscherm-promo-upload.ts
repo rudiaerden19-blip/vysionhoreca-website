@@ -1,6 +1,7 @@
 'use client'
 
 import { supabase } from '@/lib/supabase'
+import { klantschermPromoStorageSizeHint } from '@/lib/klantscherm-media-bucket-server'
 import {
   KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
   type KlantschermSlideshowMediaType,
@@ -150,9 +151,10 @@ async function uploadWithSignedUrl(
   }
 
   if (!signRes.ok || !signJson.ok || !signJson.path || !signJson.token || !signJson.publicUrl) {
+    const raw = signJson.error || `Signed URL mislukt (${signRes.status})`
     return {
       ok: false,
-      message: signJson.error || `Signed URL mislukt (${signRes.status})`,
+      message: klantschermPromoStorageSizeHint(raw),
     }
   }
 
@@ -198,7 +200,7 @@ async function uploadWithSignedUrl(
     const polled = await pollObjectExists(tenantSlug, storagePath, onProgress, file.size)
     if (!polled) {
       const msg = e instanceof Error ? e.message : String(e)
-      return { ok: false, message: msg }
+      return { ok: false, message: klantschermPromoStorageSizeHint(msg) }
     }
   } finally {
     if (estimateTimer) clearInterval(estimateTimer)

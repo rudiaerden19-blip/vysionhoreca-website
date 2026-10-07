@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import {
   ensureKlantschermPromoVideoBucket,
+  klantschermPromoBucketErrorForApi,
   KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
 } from '@/lib/klantscherm-media-bucket-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
@@ -47,7 +48,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json(
       {
         ok: false,
-        error: `klantscherm-promo bucket: ${bucketReady.error}. Voer supabase/klantscherm_promo_video_bucket.sql uit.`,
+        error: klantschermPromoBucketErrorForApi(bucketReady.error),
       },
       { status: 503 },
     )

@@ -1,5 +1,9 @@
 -- Klantscherm promo-mp4 (~500 MB). Eénmalig in Supabase SQL Editor.
--- Daarna: Dashboard → Storage → Settings → «Global file size limit» minstens 500 MB.
+--
+-- VERPLICHT (anders blijft «exceeded the maximum allowed size»):
+--   Supabase Dashboard → Storage → Settings (tandwiel)
+--   → «Global file size limit» / «Maximum upload size» → minstens 500 MB → Save
+-- SQL zet alleen de bucket; uploads worden ook door deze project-limiet begrensd.
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
