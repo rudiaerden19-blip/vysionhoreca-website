@@ -1964,6 +1964,7 @@
       "uploadElapsed": "Läuft seit {sec} s.",
       "uploadFailedDetail": "Upload fehlgeschlagen: {detail}",
       "uploadAddedReminder": "Zur Liste hinzugefügt. Speichern klicken.",
+      "uploadSavedAuto": "Gespeichert — Kundendisplay wird aktualisiert.",
       "openDisplay": "Kundendisplay auf diesem Computer",
       "openDisplayHint": "Normalerweise nicht nötig: die Kasse öffnet das Display beim Start, wenn «Kundendisplay verwenden» an ist. Nur zum erneuten Öffnen (z. B. Pop-up blockiert).",
       "openDisplayButton": "Kundendisplay öffnen",

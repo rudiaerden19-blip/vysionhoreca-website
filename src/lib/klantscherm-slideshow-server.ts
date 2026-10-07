@@ -3,6 +3,7 @@ import {
   inferKlantschermMediaTypeFromUrl,
   type KlantschermSlideshowMediaType,
 } from '@/lib/klantscherm-slideshow-media'
+import { sortKlantschermSlidesForPlayback } from '@/lib/klantscherm-slideshow-playback'
 import {
   looksLikeBelgiumDrinkCategory,
   looksLikeBelgiumDrinkName,
@@ -116,7 +117,9 @@ export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promis
     menuUrls.push(url)
   }
 
-  return mergeKlantschermSlideshowSlides(uploads, menuUrls, includeMenuPhotos)
+  return sortKlantschermSlidesForPlayback(
+    mergeKlantschermSlideshowSlides(uploads, menuUrls, includeMenuPhotos),
+  )
 }
 
 /** @deprecated gebruik loadKlantschermSlideshowSlides */

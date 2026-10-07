@@ -2464,6 +2464,7 @@
       "uploadElapsed": "جاري منذ {sec} ث.",
       "uploadFailedDetail": "فشل الرفع: {detail}",
       "uploadAddedReminder": "أُضيف إلى القائمة. اضغط حفظ.",
+      "uploadSavedAuto": "تم الحفظ — سيتم تحديث شاشة العميل.",
       "openDisplay": "شاشة العميل على هذا الجهاز",
       "openDisplayHint": "عادة غير مطلوب: الكassa تفتح الشاشة عند التشغيل إذا «استخدام شاشة العميل» مفعّل. الزر لإعادة الفتح فقط (مثل حظر النافذة).",
       "openDisplayButton": "فتح شاشة العميل",

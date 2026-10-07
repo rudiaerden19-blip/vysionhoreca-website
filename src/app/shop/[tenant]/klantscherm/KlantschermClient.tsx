@@ -10,6 +10,7 @@ import {
 import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-window'
 import { KLANTSCHERM_NL } from '@/lib/klantscherm-nl-copy'
 import { KlantschermSlideshow } from '@/components/klantscherm/KlantschermSlideshow'
+import { klantschermSlideshowRefreshChannel } from '@/lib/klantscherm-slideshow-playback'
 import { KlantschermQrPayView } from '@/components/klantscherm/KlantschermQrPayView'
 
 function klantschermOrderDensityStyle(lineCount: number) {
@@ -124,10 +125,20 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }
     document.addEventListener('visibilitychange', onVisible)
 
+    let refreshBc: BroadcastChannel | null = null
+    if (typeof BroadcastChannel !== 'undefined') {
+      refreshBc = new BroadcastChannel(klantschermSlideshowRefreshChannel(tenant))
+      refreshBc.onmessage = (ev: MessageEvent<unknown>) => {
+        const data = ev.data as { type?: string }
+        if (data?.type === 'reload-slideshow') loadSlides()
+      }
+    }
+
     return () => {
       cancelled = true
       window.clearInterval(intervalId)
       document.removeEventListener('visibilitychange', onVisible)
+      refreshBc?.close()
     }
   }, [tenant, token])
 

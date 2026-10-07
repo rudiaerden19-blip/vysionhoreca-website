@@ -12,6 +12,7 @@ import {
   type KlantschermSlideshowMediaType,
 } from '@/lib/klantscherm-slideshow-media'
 import { uploadKlantschermPromoMedia } from '@/lib/klantscherm-promo-upload'
+import { notifyKlantschermSlideshowRefresh } from '@/lib/klantscherm-slideshow-playback'
 import {
   getOrCreateKlantschermSessionToken,
   klantschermPublicUrl,
@@ -111,21 +112,28 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     return () => window.clearInterval(id)
   }, [uploadBusy])
 
-  const saveSettings = async () => {
-    setSaving(true)
-    setSaved(false)
+  const persistSettings = async (uploadRows: UploadRow[]) => {
     const { error } = await supabase
       .from('tenant_settings')
       .update({
         klantscherm_enabled: enabled,
         klantscherm_slideshow_enabled: slideshowEnabled,
-        klantscherm_slideshow_uploads: uploads,
+        klantscherm_slideshow_uploads: uploadRows,
         klantscherm_bank_iban: bankIban.replace(/\s/g, '').toUpperCase() || null,
         klantscherm_bank_account_name: bankAccountName.trim() || null,
       })
       .eq('tenant_slug', tenant)
+    if (error) return { ok: false as const, error }
+    notifyKlantschermSlideshowRefresh(tenant)
+    return { ok: true as const }
+  }
+
+  const saveSettings = async () => {
+    setSaving(true)
+    setSaved(false)
+    const result = await persistSettings(uploads)
     setSaving(false)
-    if (error) {
+    if (!result.ok) {
       alert(t('adminPages.common.saveFailed'))
       return
     }
@@ -183,11 +191,20 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
         )
         return
       }
-      setUploads((prev) => [
-        ...prev,
-        { url: result.publicUrl, sort: prev.length, mediaType: check.mediaType },
-      ])
-      setUploadStatusLabel(t('adminPages.klantscherm.uploadAddedReminder'))
+      const nextUploads: UploadRow[] = [
+        ...uploads,
+        { url: result.publicUrl, sort: uploads.length, mediaType: check.mediaType },
+      ]
+      setUploads(nextUploads)
+      const saved = await persistSettings(nextUploads)
+      setUploadStatusLabel(
+        saved.ok
+          ? t('adminPages.klantscherm.uploadSavedAuto')
+          : t('adminPages.klantscherm.uploadAddedReminder'),
+      )
+      if (!saved.ok) {
+        alert(t('adminPages.common.saveFailed'))
+      }
     } catch (err) {
       const detail = err instanceof Error ? err.message : String(err)
       alert(t('adminPages.klantscherm.uploadFailedDetail').replace('{detail}', detail))

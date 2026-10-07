@@ -9,21 +9,28 @@ import {
 
 const IMAGE_MS = 5000
 
-/** Zelfde 16:9-kader voor elke slide; schermrand = wazige fill (geen crop op voorgrond). */
+function tryPlayVideo(el: HTMLVideoElement) {
+  el.muted = true
+  el.playsInline = true
+  void el.play().catch(() => {
+    window.setTimeout(() => void el.play().catch(() => {}), 400)
+  })
+}
+
 function KlantschermSlideFrame({
   url,
   visible,
   kind,
+  loopVideo,
   videoRef,
   onVideoEnded,
-  onVideoError,
 }: {
   url: string
   visible: boolean
   kind: 'image' | 'video'
+  loopVideo: boolean
   videoRef?: RefObject<HTMLVideoElement>
   onVideoEnded?: () => void
-  onVideoError?: () => void
 }) {
   const fade = visible ? 'opacity-100' : 'opacity-0'
 
@@ -45,10 +52,12 @@ function KlantschermSlideFrame({
               muted
               playsInline
               autoPlay
+              loop={loopVideo}
               preload="auto"
               className="absolute inset-0 h-full w-full object-contain object-center"
-              onEnded={onVideoEnded}
-              onError={onVideoError}
+              onLoadedData={(e) => tryPlayVideo(e.currentTarget)}
+              onCanPlay={(e) => tryPlayVideo(e.currentTarget)}
+              onEnded={loopVideo ? undefined : onVideoEnded}
             />
           ) : (
             /* eslint-disable-next-line @next/next/no-img-element */
@@ -86,6 +95,8 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
   }, [slides])
 
   const current = slides[index] ?? slides[0]
+  const loopSingleVideo =
+    slides.length === 1 && slides[0]?.type === 'video'
 
   useEffect(() => {
     if (!current || slides.length <= 1) return
@@ -99,10 +110,8 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
     const el = videoRef.current
     if (!el) return
     el.currentTime = 0
-    void el.play().catch(() => {
-      advance()
-    })
-  }, [current?.url, current?.type, advance])
+    tryPlayVideo(el)
+  }, [current?.url, current?.type])
 
   if (slides.length === 0 || !current) return null
 
@@ -112,9 +121,9 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
         url={current.url}
         visible={visible}
         kind={current.type}
+        loopVideo={loopSingleVideo}
         videoRef={current.type === 'video' ? videoRef : undefined}
         onVideoEnded={advance}
-        onVideoError={advance}
       />
     </div>
   )

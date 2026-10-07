@@ -1964,6 +1964,7 @@
       "uploadElapsed": "En cours depuis {sec} s.",
       "uploadFailedDetail": "Échec du téléversement : {detail}",
       "uploadAddedReminder": "Ajouté à la liste. Cliquez Enregistrer.",
+      "uploadSavedAuto": "Enregistré — l'écran client se met à jour.",
       "openDisplay": "Écran client sur cet ordinateur",
       "openDisplayHint": "En principe inutile : la caisse ouvre l'écran au démarrage si « Utiliser l'écran client » est activé. Bouton seulement pour rouvrir (ex. pop-up bloquée).",
       "openDisplayButton": "Ouvrir l'écran client",

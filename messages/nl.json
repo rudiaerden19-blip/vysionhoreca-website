@@ -2800,6 +2800,7 @@
       "uploadElapsed": "Bezig sinds {sec} s.",
       "uploadFailedDetail": "Upload mislukt: {detail}",
       "uploadAddedReminder": "Toegevoegd aan de lijst. Klik Opslaan om te bewaren.",
+      "uploadSavedAuto": "Video/foto opgeslagen — klantscherm wordt bijgewerkt.",
       "openDisplay": "Klantscherm op deze computer",
       "openDisplayHint": "Normaal niet nodig: de kassa opent het klantscherm zelf bij opstarten als «Klantscherm gebruiken» aan staat. Gebruik deze knop alleen om het scherm opnieuw te openen (bv. pop-up geblokkeerd).",
       "openDisplayButton": "Klantscherm openen",

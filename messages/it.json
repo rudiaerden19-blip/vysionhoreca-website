@@ -2464,6 +2464,7 @@
       "uploadElapsed": "In corso da {sec} s.",
       "uploadFailedDetail": "Caricamento non riuscito: {detail}",
       "uploadAddedReminder": "Aggiunto all'elenco. Clicca Salva.",
+      "uploadSavedAuto": "Salvato — il display clienti si aggiorna.",
       "openDisplay": "Schermo cliente su questo computer",
       "openDisplayHint": "Di solito non serve: la cassa apre lo schermo all'avvio se «Usa schermo cliente» è attivo. Usa il pulsante solo per riaprire (es. pop-up bloccato).",
       "openDisplayButton": "Apri schermo cliente",

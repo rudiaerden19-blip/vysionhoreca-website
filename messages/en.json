@@ -2800,6 +2800,7 @@
       "uploadElapsed": "Running for {sec} s.",
       "uploadFailedDetail": "Upload failed: {detail}",
       "uploadAddedReminder": "Added to the list. Click Save to keep it.",
+      "uploadSavedAuto": "Saved — customer display will refresh.",
       "openDisplay": "Customer display on this computer",
       "openDisplayHint": "Usually not needed: the POS opens the display on startup when «Use customer display» is on. Use this button only to reopen (e.g. pop-up blocked).",
       "openDisplayButton": "Open customer display",

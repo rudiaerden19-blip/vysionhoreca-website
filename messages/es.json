@@ -2464,6 +2464,7 @@
       "uploadElapsed": "En curso desde hace {sec} s.",
       "uploadFailedDetail": "Error al subir: {detail}",
       "uploadAddedReminder": "Añadido a la lista. Pulse Guardar.",
+      "uploadSavedAuto": "Guardado — la pantalla cliente se actualiza.",
       "openDisplay": "Pantalla del cliente en este equipo",
       "openDisplayHint": "Normalmente no hace falta: la caja abre la pantalla al iniciar si «Usar pantalla del cliente» está activo. Use el botón solo para reabrir (p. ej. pop-up bloqueado).",
       "openDisplayButton": "Abrir pantalla del cliente",

@@ -3,6 +3,7 @@ import {
   inferKlantschermMediaTypeFromUrl,
   validateKlantschermPromoFile,
 } from '@/lib/klantscherm-slideshow-media'
+import { sortKlantschermSlidesForPlayback } from '@/lib/klantscherm-slideshow-playback'
 import {
   mergeKlantschermSlideshowSlides,
   parseKlantschermSlideshowUploads,
@@ -18,6 +19,14 @@ describe('klantscherm slideshow media', () => {
     const f = new File(['x'], 'clip.mp4', { type: 'video/mp4' })
     expect(detectKlantschermUploadMediaType(f)).toBe('video')
     expect(validateKlantschermPromoFile(f)).toEqual({ ok: true, mediaType: 'video' })
+  })
+
+  it('plays videos before menu images', () => {
+    const sorted = sortKlantschermSlidesForPlayback([
+      { url: 'https://cdn/menu.jpg', type: 'image' },
+      { url: 'https://cdn/promo.mp4', type: 'video' },
+    ])
+    expect(sorted[0]?.type).toBe('video')
   })
 
   it('keeps promo uploads when menu slideshow is off', () => {
