@@ -4304,7 +4304,11 @@
     "klantschermQrPaidTitle": "Customer display: payment successful",
     "klantschermQrPaidBody": "The customer paid via QR. Complete the sale on the POS (card/Bancontact).",
     "klantschermQrFailedTitle": "Customer display: payment declined",
-    "klantschermQrFailedBody": "QR payment failed or was cancelled. Choose a payment method again."
+    "klantschermQrFailedBody": "QR payment failed or was cancelled. Choose a payment method again.",
+    "klantschermBankPayWaitTitle": "QR on customer display",
+    "klantschermBankPayWaitBody": "The customer pays via the QR on the display. Check «payment successful» on their phone, then tap Payment received.",
+    "klantschermBankPayConfirm": "Payment received",
+    "klantschermBankPayCancel": "Cancel"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Invalid session. Open the customer display from the register.",

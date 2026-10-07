@@ -4304,7 +4304,11 @@
     "klantschermQrPaidTitle": "Klantscherm: betaling geslaagd",
     "klantschermQrPaidBody": "De klant heeft via de QR-code betaald. Rond de verkoop af op de kassa (Bancontact/kaart).",
     "klantschermQrFailedTitle": "Klantscherm: betaling geweigerd",
-    "klantschermQrFailedBody": "De QR-betaling is mislukt of geannuleerd. Kies opnieuw een betaalmethode."
+    "klantschermQrFailedBody": "De QR-betaling is mislukt of geannuleerd. Kies opnieuw een betaalmethode.",
+    "klantschermBankPayWaitTitle": "QR op klantscherm",
+    "klantschermBankPayWaitBody": "De klant betaalt via de QR op het klantscherm. Controleer «betaling geslaagd» op zijn gsm, druk daarna op Betaling ontvangen.",
+    "klantschermBankPayConfirm": "Betaling ontvangen",
+    "klantschermBankPayCancel": "Annuleren"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Ongeldige sessie. Open het klantscherm vanuit de kassa.",

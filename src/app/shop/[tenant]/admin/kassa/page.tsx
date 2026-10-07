@@ -199,6 +199,7 @@ import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaKlantschermQrResultModal } from '@/components/kassa/KassaKlantschermQrResultModal'
+import { KassaKlantschermBankPayWaitModal } from '@/components/kassa/KassaKlantschermBankPayWaitModal'
 import { KassaTerminalPayModal } from '@/components/kassa/KassaTerminalPayModal'
 import { kassaCardPayGoesToCloudTerminal } from '@/lib/kassa-payment-terminal'
 import { useKassaCloudTerminals } from '@/lib/kassa-payment-terminal-client'
@@ -2575,6 +2576,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [klantschermQrPayAlert, setKlantschermQrPayAlert] = useState<
     'paid' | 'failed' | 'canceled' | null
   >(null)
+  /** Alleen klantscherm + IBAN-QR: wacht op gsm klant vóór completePayment (gewone kassa ongewijzigd). */
+  const [klantschermBankPayPending, setKlantschermBankPayPending] = useState<
+    | { kind: 'single'; method: 'CARD' | 'BANCONTACT' }
+    | { kind: 'split'; cash: number; card: number }
+    | null
+  >(null)
+  const paymentModalOpenRef = useRef(false)
   /** Korte bedankmelding op klantscherm na betaling */
   const [customerDisplayThankYou, setCustomerDisplayThankYou] = useState<{
     total: number
@@ -2886,9 +2894,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setCustomerDisplayShowQr(splitCard > 0)
   }, [showSplitModal, splitCard])
 
-  /** QR pas na expliciete keuze kaart/Bancontact — niet carry-over vorige bon. */
+  /** QR pas bij openen betaalmodal resetten (niet bij elke render terwijl modal open blijft). */
   useEffect(() => {
-    if (showPaymentModal) setCustomerDisplayShowQr(false)
+    if (showPaymentModal && !paymentModalOpenRef.current) {
+      setCustomerDisplayShowQr(false)
+    }
+    paymentModalOpenRef.current = showPaymentModal
   }, [showPaymentModal])
 
   useEffect(() => {
@@ -3388,10 +3399,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         totalInclVat: customerDisplayThankYou.total,
         dineInSubtitle: customerDisplayThankYou.dineInSubtitle,
       }
-    } else if (billLines.length === 0 && !showPaymentModal && !showSplitModal) {
+    } else if (
+      billLines.length === 0 &&
+      !showPaymentModal &&
+      !showSplitModal &&
+      !showTerminalPayModal &&
+      !klantschermBankPayPending
+    ) {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
     } else if (
-      (showPaymentModal || showSplitModal || showTerminalPayModal) &&
+      (showPaymentModal ||
+        showSplitModal ||
+        showTerminalPayModal ||
+        klantschermBankPayPending) &&
       billLines.length > 0
     ) {
       const splitCd = computeInclusiveVatSplitFromCart(billLines, resolveCartLineVat)
@@ -3403,12 +3423,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : undefined
       const vatRate = splitCd.byRate.length === 1 ? splitCd.byRate[0].rate : fallbackVatRate
       const qrPayAmount =
-        showSplitModal && splitCard > 0
-          ? Math.round(splitCard * 100) / 100
-          : totalInclVat
+        klantschermBankPayPending?.kind === 'split'
+          ? Math.round(klantschermBankPayPending.card * 100) / 100
+          : showSplitModal && splitCard > 0
+            ? Math.round(splitCard * 100) / 100
+            : totalInclVat
       const showKlantschermQr =
         customerDisplayShowQr &&
-        (showTerminalPayModal ||
+        (klantschermBankPayPending != null ||
+          showTerminalPayModal ||
           (showSplitModal ? splitCard > 0 : showPaymentModal || showTerminalPayModal))
       msg = {
         v: 1,
@@ -3458,6 +3481,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     showSplitModal,
     showTerminalPayModal,
     customerDisplayShowQr,
+    klantschermBankPayPending,
     splitCard,
     tenantInfo?.business_name,
     tenantInfo?.btw_percentage,
@@ -3817,6 +3841,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setShowPaymentModal(false)
       setShowSplitModal(false)
       setCustomerDisplayShowQr(false)
+      setKlantschermBankPayPending(null)
     })
 
     const freshVatLookup = categoryVatLookup
@@ -7173,13 +7198,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (payInFlightRef.current) return
           if (method === 'CASH') {
             setCustomerDisplayShowQr(false)
-          } else {
+          } else if (klantschermEnabled) {
             setCustomerDisplayShowQr(true)
           }
           if (kassaCardPayGoesToCloudTerminal(method, paymentTerminals)) {
             setTerminalPayMethod(method === 'BANCONTACT' ? 'BANCONTACT' : 'CARD')
             setShowPaymentModal(false)
             setShowTerminalPayModal(true)
+            return
+          }
+          if (
+            klantschermEnabled &&
+            (method === 'CARD' || method === 'BANCONTACT')
+          ) {
+            setKlantschermBankPayPending({ kind: 'single', method })
+            setShowPaymentModal(false)
             return
           }
           if (!lockPayInFlight()) return
@@ -7189,7 +7222,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (payInFlightRef.current) return
           setSplitCash(0)
           setSplitCard(total)
-          setCustomerDisplayShowQr(total > 0)
+          if (klantschermEnabled) setCustomerDisplayShowQr(total > 0)
           setShowSplitModal(true)
           setShowPaymentModal(false)
         }}
@@ -7222,6 +7255,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
       />
 
+      <KassaKlantschermBankPayWaitModal
+        open={klantschermBankPayPending != null}
+        appearance={kassaAppearanceDark ? 'dark' : 'light'}
+        onCancel={() => {
+          const wasSplit = klantschermBankPayPending?.kind === 'split'
+          setKlantschermBankPayPending(null)
+          setCustomerDisplayShowQr(false)
+          if (wasSplit) setShowSplitModal(true)
+          else setShowPaymentModal(true)
+        }}
+        onConfirm={() => {
+          const pending = klantschermBankPayPending
+          if (!pending || payInFlightRef.current) return
+          setKlantschermBankPayPending(null)
+          if (!lockPayInFlight()) return
+          if (pending.kind === 'split') {
+            void completePayment('SPLIT', { cash: pending.cash, card: pending.card }, { preLocked: true })
+          } else {
+            void completePayment(pending.method, undefined, { preLocked: true })
+          }
+        }}
+      />
+
       <KassaSplitPaymentModal
         open={showSplitModal}
         total={total}
@@ -7238,6 +7294,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onConfirm={() => {
           if (payInFlightRef.current) return
+          if (
+            klantschermEnabled &&
+            splitCard > 0 &&
+            !kassaCardPayGoesToCloudTerminal('CARD', paymentTerminals)
+          ) {
+            setCustomerDisplayShowQr(true)
+            setKlantschermBankPayPending({
+              kind: 'split',
+              cash: splitCash,
+              card: splitCard,
+            })
+            setShowSplitModal(false)
+            return
+          }
           if (!lockPayInFlight()) return
           void completePayment('SPLIT', { cash: splitCash, card: splitCard }, { preLocked: true })
         }}
