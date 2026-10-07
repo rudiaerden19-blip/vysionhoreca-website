@@ -9,6 +9,16 @@ export function isPlausibleIban(iban: string): boolean {
   return /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(n)
 }
 
+/** Bankapps (BE) lezen EPC069-12 het best met ASCII-naam en vaste 12 regels. */
+export function sanitizeEpcBeneficiaryName(name: string): string {
+  const trimmed = name.trim().slice(0, 70)
+  return trimmed
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7E]/g, '')
+    .trim() || 'Betaling'
+}
+
 export function buildSepaEpcQrPayload(opts: {
   beneficiaryName: string
   iban: string
@@ -16,10 +26,13 @@ export function buildSepaEpcQrPayload(opts: {
   remittanceInfo?: string
 }): string {
   const iban = normalizeIban(opts.iban)
-  const name = opts.beneficiaryName.trim().slice(0, 70)
+  const name = sanitizeEpcBeneficiaryName(opts.beneficiaryName)
   const amount = Math.max(0, opts.amountEur).toFixed(2)
-  const info = (opts.remittanceInfo || 'Betaling').trim().slice(0, 140)
-  return [
+  const info = (opts.remittanceInfo || 'Betaling')
+    .trim()
+    .slice(0, 140)
+    .replace(/[\r\n]+/g, ' ')
+  const lines = [
     'BCD',
     '002',
     '1',
@@ -31,5 +44,7 @@ export function buildSepaEpcQrPayload(opts: {
     '',
     '',
     info,
-  ].join('\n')
+    '',
+  ]
+  return `${lines.join('\n')}\n`
 }

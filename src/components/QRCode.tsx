@@ -7,15 +7,19 @@ interface QRCodeProps {
   url: string
   size?: number
   className?: string
+  /** Hogere foutcorrectie + marge — beter scannen van scherm (klantscherm EPC). */
+  bankScan?: boolean
 }
 
 // Memoized QR Code component - prevents re-renders
-const QRCode = memo(function QRCode({ url, size = 200, className = ''}: QRCodeProps) {
+const QRCode = memo(function QRCode({ url, size = 200, className = '', bankScan = false }: QRCodeProps) {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState(false)
-  
-  // Generate QR code URL (cached by browser)
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&format=svg&data=${encodeURIComponent(url)}`
+
+  const px = Math.min(Math.max(size, 120), 512)
+  const qrUrl = bankScan
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&format=png&ecc=H&margin=12&data=${encodeURIComponent(url)}`
+    : `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&format=svg&data=${encodeURIComponent(url)}`
   
   if (error) {
     return (

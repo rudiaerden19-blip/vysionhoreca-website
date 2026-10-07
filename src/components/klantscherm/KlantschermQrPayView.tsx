@@ -46,10 +46,15 @@ export function KlantschermQrPayView({
     )
   }
 
+  const qrSize = 260
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-black px-4 py-8 text-center">
-      <div className="mt-2 scale-[min(1,calc(72vw/420))] origin-center sm:scale-100">
-        <QRCode url={qrPayload} size={420} className="mx-auto shadow-2xl ring-4 ring-white/10" />
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-black px-4 py-6 text-center">
+      <div
+        className="mx-auto shrink-0 rounded-2xl bg-white p-3 shadow-2xl ring-2 ring-white/20"
+        style={{ width: qrSize + 24, maxWidth: 'min(284px, 58vw)' }}
+      >
+        <QRCode url={qrPayload} size={qrSize} bankScan className="mx-auto" />
       </div>
       <p className="mt-8 text-[clamp(1.75rem,4vw,2.75rem)] font-black tabular-nums text-white">
         {formatMoney(amount)}
@@ -64,6 +69,9 @@ export function KlantschermQrPayView({
       ) : null}
       <p className="mt-6 max-w-2xl text-[clamp(1.1rem,2.8vw,1.65rem)] font-semibold leading-snug text-white/90">
         {KLANTSCHERM_NL.qrHint}
+      </p>
+      <p className="mt-3 max-w-2xl text-sm font-medium text-white/65 sm:text-base">
+        {KLANTSCHERM_NL.qrScanFallback}
       </p>
       <p className="mt-4 max-w-2xl text-[clamp(1.05rem,2.5vw,1.45rem)] font-bold text-emerald-300/95">
         {KLANTSCHERM_NL.qrShowPhone}

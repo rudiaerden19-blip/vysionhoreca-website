@@ -17,6 +17,19 @@ describe('klantscherm bank EPC QR', () => {
     expect(payload).toContain('BE68539007547034')
     expect(payload).toContain('EUR12.50')
     expect(payload).toContain('Tafel 3')
+    expect(payload.split('\n').length).toBe(13)
+    expect(payload.endsWith('\n')).toBe(true)
+  })
+
+  it('builds payload for BE IBAN frituur example', () => {
+    const payload = buildSepaEpcQrPayload({
+      beneficiaryName: 'Frituur nolim',
+      iban: 'BE18737074081165',
+      amountEur: 3.6,
+    })
+    expect(payload).toContain('Frituur nolim')
+    expect(payload).toContain('BE18737074081165')
+    expect(payload).toContain('EUR3.60')
   })
 
   it('validates plausible IBAN shape', () => {
