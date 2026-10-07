@@ -95,10 +95,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }) => {
       if (cancelled) return
       setKlantschermActive(json.klantschermEnabled === true)
-      if (!Array.isArray(json.slides)) {
-        setSlideshowSlides([])
-        return
-      }
+      if (!Array.isArray(json.slides)) return
       setSlideshowSlides(json.slides.filter((s) => s?.url && s.type === 'image'))
     }
 
