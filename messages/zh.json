@@ -2457,11 +2457,11 @@
       "openDisplayButton": "打开顾客显示屏",
       "displayUrlLabel": "此屏固定链接",
       "openFailed": "无法打开顾客显示屏（弹窗被拦截？）。",
-      "bankQrHint": "二维码支付：顾客用银行 App 扫描（转账至您的 IBAN）。无需 Mollie。",
-      "bankQrTitle": "结账银行二维码",
-      "bankQrDesc": "填写顾客转账账户。二维码将打开银行 App 并填入金额与收款人。",
+      "bankQrHint": "客显二维码：顾客用银行 App 转账至 IBAN，并向店员展示「支付成功」页面。",
+      "bankQrTitle": "二维码收款账户",
+      "bankQrDesc": "店主/商户 IBAN。二维码含账号、名称与金额。无需 Mollie 或刷卡机。",
       "bankIban": "IBAN",
-      "bankAccountName": "收款人姓名（可选）",
+      "bankAccountName": "账户名称（可选）",
       "bankAccountNameHint": "留空则使用设置中的商户名称。"
     },
     "categorieen": {

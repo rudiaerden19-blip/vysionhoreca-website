@@ -2793,11 +2793,11 @@
       "openDisplayButton": "Klantscherm openen",
       "displayUrlLabel": "Vaste link voor dit scherm",
       "openFailed": "Kon het klantscherm niet openen (pop-up geblokkeerd?).",
-      "bankQrHint": "QR-betaling: klant scant met de bankapp (overschrijving naar jullie IBAN). Geen Mollie nodig.",
-      "bankQrTitle": "Bank-QR bij afrekenen",
-      "bankQrDesc": "Vul het rekeningnummer in waar klanten naartoe overschrijven. De QR opent de bankapp met bedrag en begunstigde.",
+      "bankQrHint": "QR op klantscherm: klant scant en betaalt via bankapp naar jullie IBAN. Daarna toont hij «betaling geslaagd» op zijn gsm aan de kassa.",
+      "bankQrTitle": "Rekening voor QR-betaling",
+      "bankQrDesc": "IBAN van de eigenaar/zaak. De QR bevat rekeningnummer, naam en bedrag. Geen Mollie of terminal nodig.",
       "bankIban": "IBAN",
-      "bankAccountName": "Naam begunstigde (optioneel)",
+      "bankAccountName": "Naam op rekening (optioneel)",
       "bankAccountNameHint": "Leeg = zaaknaam uit instellingen."
     },
     "categorieen": {
@@ -4302,7 +4302,7 @@
     "customerDisplayHint": "Probeert automatisch op het tweede scherm te openen. Sta pop-ups toe; Chrome/Edge kan om schermtoestemming vragen. F11 = volledig scherm.",
     "customerDisplayOpenFailed": "Kon klantscherm niet openen. Sta pop-ups toe voor deze site.",
     "klantschermQrPaidTitle": "Klantscherm: betaling geslaagd",
-    "klantschermQrPaidBody": "De klant heeft via de QR-code betaald. Rond de verkoop af op de kassa.",
+    "klantschermQrPaidBody": "De klant heeft via de QR-code betaald. Rond de verkoop af op de kassa (Bancontact/kaart).",
     "klantschermQrFailedTitle": "Klantscherm: betaling geweigerd",
     "klantschermQrFailedBody": "De QR-betaling is mislukt of geannuleerd. Kies opnieuw een betaalmethode."
   },

@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic'
 
 type RouteContext = { params: { tenant: string } }
 
+/** Bank-QR (SEPA/EPC): IBAN + bedrag; bevestiging = klant toont gsm aan kassa. */
 export async function POST(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant?.trim()
   if (!tenantSlug) {
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'invalid_iban' }, { status: 400 })
   }
 
+  const iban = normalizeIban(ibanRaw)
   const beneficiary =
     String(settings?.klantscherm_bank_account_name ?? '').trim() ||
     String(settings?.business_name ?? auth.tenantSlug).trim()
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const ref = typeof body.reference === 'string' ? body.reference.trim().slice(0, 140) : ''
   const qrPayload = buildSepaEpcQrPayload({
     beneficiaryName: beneficiary,
-    iban: normalizeIban(ibanRaw),
+    iban,
     amountEur,
     remittanceInfo: ref || `Betaling ${beneficiary}`,
   })
@@ -68,5 +70,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     ok: true,
     qr_payload: qrPayload,
     amount_cents: amountCents,
+    iban,
+    beneficiary_name: beneficiary,
   })
 }

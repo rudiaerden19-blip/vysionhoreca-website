@@ -2457,11 +2457,11 @@
       "openDisplayButton": "Apri schermo cliente",
       "displayUrlLabel": "Link fisso per questo schermo",
       "openFailed": "Impossibile aprire lo schermo cliente (pop-up bloccato?).",
-      "bankQrHint": "Pagamento QR: il cliente scansiona con l'app bancaria (bonifico al vostro IBAN). Nessun Mollie necessario.",
-      "bankQrTitle": "QR bancario alla cassa",
-      "bankQrDesc": "Inserite il conto su cui i clienti bonificano. Il QR apre l'app bancaria con importo e beneficiario.",
+      "bankQrHint": "QR display: il cliente paga con l'app bancaria sul vostro IBAN e mostra «pagamento riuscito» sul telefono.",
+      "bankQrTitle": "Conto per pagamento QR",
+      "bankQrDesc": "IBAN del titolare/attività. Il QR include conto, nome e importo. Nessun Mollie o terminale.",
       "bankIban": "IBAN",
-      "bankAccountName": "Nome beneficiario (facoltativo)",
+      "bankAccountName": "Intestatario (facoltativo)",
       "bankAccountNameHint": "Vuoto = nome attività dalle impostazioni."
     },
     "categorieen": {

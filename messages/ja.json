@@ -2457,12 +2457,12 @@
       "openDisplayButton": "客席ディスプレイを開く",
       "displayUrlLabel": "この画面の固定リンク",
       "openFailed": "客席ディスプレイを開けませんでした（ポップアップがブロック？）。",
-      "bankQrHint": "QR決済：お客様が銀行アプリでスキャン（指定IBANへ振込）。Mollieは不要です。",
-      "bankQrTitle": "会計時の銀行QR",
-      "bankQrDesc": "お客様の振込先口座を入力。QRで銀行アプリが金額と受取人を開きます。",
+      "bankQrHint": "ディスプレイQR：お客様が銀行アプリでIBANへ振込み、完了画面を見せます。",
+      "bankQrTitle": "QR決済用口座",
+      "bankQrDesc": "オーナー/店舗のIBAN。QRに口座・名義・金額。Mollieや端末不要。",
       "bankIban": "IBAN",
-      "bankAccountName": "受取人名（任意）",
-      "bankAccountNameHint": "空欄＝設定の店舗名を使用。"
+      "bankAccountName": "口座名義（任意）",
+      "bankAccountNameHint": "空欄＝設定の店舗名。"
     },
     "categorieen": {
       "title": "カテゴリー",

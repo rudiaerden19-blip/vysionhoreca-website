@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-/** Bank-QR (SEPA/EPC): geen online status — alleen nog voor oude clients. */
+/** IBAN-QR: geen online betaalstatus — bevestiging via bankapp op gsm van klant. */
 export const dynamic = 'force-dynamic'
 
 export async function GET() {

@@ -2457,11 +2457,11 @@
       "openDisplayButton": "Abrir pantalla del cliente",
       "displayUrlLabel": "Enlace fijo para esta pantalla",
       "openFailed": "No se pudo abrir la pantalla (¿ventana emergente bloqueada?).",
-      "bankQrHint": "Pago QR: el cliente escanea con su app bancaria (transferencia a su IBAN). No hace falta Mollie.",
-      "bankQrTitle": "QR bancario al cobrar",
-      "bankQrDesc": "Indique la cuenta a la que transfieren los clientes. El QR abre la app bancaria con importe y beneficiario.",
+      "bankQrHint": "QR en pantalla: el cliente paga con su app bancaria a su IBAN y muestra «pago correcto» en el móvil.",
+      "bankQrTitle": "Cuenta para pago QR",
+      "bankQrDesc": "IBAN del propietario/negocio. El QR incluye cuenta, nombre e importe. Sin Mollie ni terminal.",
       "bankIban": "IBAN",
-      "bankAccountName": "Nombre del beneficiario (opcional)",
+      "bankAccountName": "Nombre de cuenta (opcional)",
       "bankAccountNameHint": "Vacío = nombre del negocio en ajustes."
     },
     "categorieen": {

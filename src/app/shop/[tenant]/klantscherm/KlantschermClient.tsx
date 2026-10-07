@@ -42,6 +42,8 @@ function klantschermOrderDensityStyle(lineCount: number) {
 type QrSession = {
   qrPayload: string
   amount: number
+  iban?: string
+  beneficiaryName?: string
 }
 
 export function KlantschermClient({ tenant }: { tenant: string }) {
@@ -150,6 +152,8 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
           ok?: boolean
           error?: string
           qr_payload?: string
+          iban?: string
+          beneficiary_name?: string
         }) => {
           if (cancelled) return
           if (!json.ok || !json.qr_payload) {
@@ -161,7 +165,12 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
             }
             return
           }
-          setQrSession({ qrPayload: json.qr_payload, amount })
+          setQrSession({
+            qrPayload: json.qr_payload,
+            amount,
+            iban: json.iban,
+            beneficiaryName: json.beneficiary_name,
+          })
           setQrState('ready')
         },
       )
@@ -235,6 +244,8 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       <KlantschermQrPayView
         amount={qrPayAmount}
         qrPayload={qrSession?.qrPayload ?? ''}
+        iban={qrSession?.iban}
+        beneficiaryName={qrSession?.beneficiaryName}
         status={viewStatus}
         failureMessage={qrFailureMessage}
       />

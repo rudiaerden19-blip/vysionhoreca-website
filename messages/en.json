@@ -2793,12 +2793,12 @@
       "openDisplayButton": "Open customer display",
       "displayUrlLabel": "Fixed link for this screen",
       "openFailed": "Could not open the customer display (pop-up blocked?).",
-      "bankQrHint": "QR payment: customer scans with their banking app (transfer to your IBAN). No Mollie required.",
-      "bankQrTitle": "Bank QR at checkout",
-      "bankQrDesc": "Enter the account customers transfer to. The QR opens the banking app with amount and beneficiary.",
+      "bankQrHint": "Display QR: customer pays via banking app to your IBAN, then shows «payment successful» on their phone to staff.",
+      "bankQrTitle": "Account for QR payment",
+      "bankQrDesc": "Owner/business IBAN. QR includes account, name and amount. No Mollie or terminal required.",
       "bankIban": "IBAN",
-      "bankAccountName": "Beneficiary name (optional)",
-      "bankAccountNameHint": "Leave empty to use your business name from settings."
+      "bankAccountName": "Account name (optional)",
+      "bankAccountNameHint": "Leave empty to use business name from settings."
     },
     "categorieen": {
       "title": "Categories",

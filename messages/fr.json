@@ -1957,11 +1957,11 @@
       "openDisplayButton": "Ouvrir l'écran client",
       "displayUrlLabel": "Lien fixe pour cet écran",
       "openFailed": "Impossible d'ouvrir l'écran client (pop-up bloquée ?).",
-      "bankQrHint": "Paiement QR : le client scanne avec son app bancaire (virement vers votre IBAN). Pas besoin de Mollie.",
-      "bankQrTitle": "QR bancaire à l'encaissement",
-      "bankQrDesc": "Indiquez le compte où les clients vireront. Le QR ouvre l'app bancaire avec montant et bénéficiaire.",
+      "bankQrHint": "QR écran : le client paie via son app bancaire sur votre IBAN, puis montre « paiement réussi » sur son téléphone.",
+      "bankQrTitle": "Compte pour paiement QR",
+      "bankQrDesc": "IBAN du propriétaire/établissement. Le QR contient compte, nom et montant. Pas de Mollie ni terminal.",
       "bankIban": "IBAN",
-      "bankAccountName": "Nom du bénéficiaire (facultatif)",
+      "bankAccountName": "Nom du compte (facultatif)",
       "bankAccountNameHint": "Vide = nom de l'établissement dans les paramètres."
     },
     "categorieen": {
