@@ -99,7 +99,7 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
       headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({
         klantscherm_enabled: enabled,
-        klantscherm_slideshow_enabled: true,
+        klantscherm_slideshow_enabled: false,
         klantscherm_custom_promos: rows,
         klantscherm_bank_iban: bankIban,
         klantscherm_bank_account_name: bankAccountName,
