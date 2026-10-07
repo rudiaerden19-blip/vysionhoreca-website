@@ -2,10 +2,7 @@
 
 import { supabase } from '@/lib/supabase'
 import { klantschermPromoStorageSizeHint } from '@/lib/klantscherm-media-bucket-server'
-import {
-  KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
-  type KlantschermSlideshowMediaType,
-} from '@/lib/klantscherm-slideshow-media'
+import type { KlantschermSlideshowMediaType } from '@/lib/klantscherm-slideshow-media'
 
 const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').replace(/\/$/, '')
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
@@ -40,24 +37,35 @@ function reportUploadProgress(
   })
 }
 
-/** Echte voortgang — geen geschatte 99%-hang. */
-function uploadFileViaXhr(
-  url: string,
+/**
+ * Zelfde contract als @supabase/storage-js uploadToSignedUrl (FormData + PUT),
+ * maar met xhr.upload.onprogress — geen dubbele pogingen die % terug naar 0 zetten.
+ */
+function uploadSignedUrlViaXhr(
+  signedUrl: string,
   file: File,
-  contentType: string,
   onProgress?: (p: KlantschermPromoUploadProgress) => void,
-  method: 'PUT' | 'POST' = 'PUT',
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   return new Promise((resolve) => {
+    if (!SUPABASE_ANON) {
+      resolve({ ok: false, message: 'Supabase niet geconfigureerd' })
+      return
+    }
+
+    const form = new FormData()
+    form.append('cacheControl', '3600')
+    form.append('', file)
+
     const xhr = new XMLHttpRequest()
-    xhr.open(method, url)
-    xhr.setRequestHeader('Content-Type', contentType || 'application/octet-stream')
+    xhr.open('PUT', signedUrl)
+    xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON}`)
+    xhr.setRequestHeader('apikey', SUPABASE_ANON)
     xhr.setRequestHeader('x-upsert', 'false')
     xhr.timeout = 0
 
     xhr.upload.onprogress = (ev) => {
-      const loaded = ev.lengthComputable ? ev.loaded : Math.min(file.size, ev.loaded)
-      reportUploadProgress(file, loaded, onProgress)
+      if (!ev.lengthComputable) return
+      reportUploadProgress(file, ev.loaded, onProgress)
     }
 
     xhr.onerror = () => resolve({ ok: false, message: 'Netwerkfout tijdens upload' })
@@ -79,7 +87,7 @@ function uploadFileViaXhr(
     }
 
     reportUploadProgress(file, 0, onProgress)
-    xhr.send(file)
+    xhr.send(form)
   })
 }
 
@@ -89,7 +97,6 @@ function uploadFormDataViaXhr(
   file: File,
   cacheControl: string,
   onProgress?: (p: KlantschermPromoUploadProgress) => void,
-  opts?: { signedTokenUpload?: boolean },
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   return new Promise((resolve) => {
     if (!SUPABASE_URL || !SUPABASE_ANON) {
@@ -103,16 +110,14 @@ function uploadFormDataViaXhr(
 
     const xhr = new XMLHttpRequest()
     xhr.open(method, url)
-    if (!opts?.signedTokenUpload) {
-      xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON}`)
-      xhr.setRequestHeader('apikey', SUPABASE_ANON)
-    }
+    xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON}`)
+    xhr.setRequestHeader('apikey', SUPABASE_ANON)
     xhr.setRequestHeader('x-upsert', 'false')
     xhr.timeout = 0
 
     xhr.upload.onprogress = (ev) => {
-      const loaded = ev.lengthComputable ? ev.loaded : ev.loaded
-      reportUploadProgress(file, loaded, onProgress)
+      if (!ev.lengthComputable) return
+      reportUploadProgress(file, ev.loaded, onProgress)
     }
 
     xhr.onerror = () => resolve({ ok: false, message: 'Netwerkfout tijdens upload' })
@@ -145,9 +150,7 @@ async function uploadWithSignedUrl(
   contentType: string,
   onProgress?: (p: KlantschermPromoUploadProgress) => void,
 ): Promise<{ ok: true; publicUrl: string } | { ok: false; message: string }> {
-  if (!supabase) {
-    return { ok: false, message: 'Supabase niet geconfigureerd' }
-  }
+  void contentType
 
   onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'preparing' })
 
@@ -162,15 +165,12 @@ async function uploadWithSignedUrl(
   )
   const signJson = (await signRes.json()) as {
     ok?: boolean
-    bucket?: string
-    path?: string
-    token?: string
     signedUrl?: string
     publicUrl?: string
     error?: string
   }
 
-  if (!signRes.ok || !signJson.ok || !signJson.path || !signJson.token || !signJson.publicUrl) {
+  if (!signRes.ok || !signJson.ok || !signJson.signedUrl || !signJson.publicUrl) {
     const raw = signJson.error || `Signed URL mislukt (${signRes.status})`
     return {
       ok: false,
@@ -178,31 +178,9 @@ async function uploadWithSignedUrl(
     }
   }
 
-  const bucketId = signJson.bucket?.trim() || KLANTSCHERM_PROMO_VIDEO_BUCKET_ID
-  const storagePath = signJson.path
-
-  if (signJson.signedUrl) {
-    const xhrPut = await uploadFileViaXhr(signJson.signedUrl, file, contentType, onProgress, 'PUT')
-    if (xhrPut.ok) {
-      onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
-      return { ok: true, publicUrl: signJson.publicUrl }
-    }
-    const xhrPost = await uploadFileViaXhr(signJson.signedUrl, file, contentType, onProgress, 'POST')
-    if (xhrPost.ok) {
-      onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
-      return { ok: true, publicUrl: signJson.publicUrl }
-    }
-  }
-
-  onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'uploading' })
-  const { error } = await supabase.storage.from(bucketId).uploadToSignedUrl(storagePath, signJson.token, file, {
-    cacheControl: '3600',
-    contentType,
-    upsert: false,
-  })
-
-  if (error) {
-    return { ok: false, message: klantschermPromoStorageSizeHint(error.message) }
+  const xhrResult = await uploadSignedUrlViaXhr(signJson.signedUrl, file, onProgress)
+  if (!xhrResult.ok) {
+    return xhrResult
   }
 
   onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })

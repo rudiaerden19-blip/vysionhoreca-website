@@ -314,10 +314,14 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                   <p className="text-sm font-medium text-gray-800">{uploadStatusLabel}</p>
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200">
                     <div
-                      className={`h-full bg-[#3C4D6B] transition-[width] duration-300 ${
-                        (uploadProgress ?? 0) <= 0 ? 'w-[28%] animate-pulse' : ''
-                      }`}
-                      style={(uploadProgress ?? 0) > 0 ? { width: `${uploadProgress}%` } : undefined}
+                      className="h-full bg-[#3C4D6B] transition-[width] duration-300"
+                      style={{
+                        width:
+                          (uploadProgress ?? 0) > 0
+                            ? `${uploadProgress}%`
+                            : '12%',
+                        opacity: (uploadProgress ?? 0) > 0 ? 1 : 0.55,
+                      }}
                     />
                   </div>
                   <p className="mt-2 text-xs text-gray-600">
