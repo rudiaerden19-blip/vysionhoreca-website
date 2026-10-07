@@ -308,7 +308,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   return (
     <KlantschermDisplayShell>
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-[3vmin] py-[4vmin]">
-        <div className="flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/[0.08] px-6 py-7 shadow-[0_32px_90px_rgba(0,0,0,0.35)] backdrop-blur-md sm:rounded-[2rem] sm:px-10 sm:py-9">
+        <div className="flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden rounded-[1.75rem] border border-white/35 bg-white/20 px-6 py-7 shadow-[0_32px_90px_rgba(49,46,129,0.45)] backdrop-blur-xl sm:rounded-[2rem] sm:px-10 sm:py-9">
           <header className={`text-center ${d.headerWrap}`}>
             <h1 className={d.businessName}>{msg.businessName}</h1>
             <p className={d.phaseTitle}>{title}</p>

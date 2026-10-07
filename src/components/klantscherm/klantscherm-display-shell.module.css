@@ -1,0 +1,90 @@
+.shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  height: 100dvh;
+  width: 100vw;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mesh {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    #4338ca 0%,
+    #7c3aed 22%,
+    #db2777 48%,
+    #ea580c 72%,
+    #f59e0b 100%
+  );
+  background-size: 200% 200%;
+  animation: klantschermMeshShift 18s ease-in-out infinite alternate;
+}
+
+.blobA,
+.blobB,
+.blobC {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(72px);
+  opacity: 0.85;
+}
+
+.blobA {
+  top: -12%;
+  left: -8%;
+  width: 58vmin;
+  height: 58vmin;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.95) 0%, transparent 68%);
+}
+
+.blobB {
+  top: 18%;
+  right: -14%;
+  width: 62vmin;
+  height: 62vmin;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.9) 0%, transparent 70%);
+}
+
+.blobC {
+  bottom: -18%;
+  left: 22%;
+  width: 70vmin;
+  height: 70vmin;
+  background: radial-gradient(circle, rgba(244, 114, 182, 0.88) 0%, transparent 72%);
+}
+
+.vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 45%,
+    rgba(30, 27, 75, 0.35) 100%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+@keyframes klantschermMeshShift {
+  0% {
+    background-position: 0% 40%;
+  }
+  100% {
+    background-position: 100% 60%;
+  }
+}

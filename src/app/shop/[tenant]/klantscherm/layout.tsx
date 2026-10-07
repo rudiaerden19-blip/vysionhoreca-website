@@ -46,7 +46,7 @@ export default function KlantschermLayout({ children }: { children: ReactNode })
     <>
       <KlantschermHtmlShell />
       <div
-        className={`vysion-klantscherm-shell ${klantschermDigital.variable} fixed inset-0 z-[2147483646] box-border m-0 flex h-[100dvh] max-h-[100dvh] min-h-[100dvh] w-screen max-w-none flex-col overflow-hidden overscroll-none bg-black p-0 text-white subpixel-antialiased [-webkit-tap-highlight-color:transparent]`}
+        className={`vysion-klantscherm-shell ${klantschermDigital.variable} fixed inset-0 z-[2147483646] box-border m-0 flex h-[100dvh] max-h-[100dvh] min-h-[100dvh] w-screen max-w-none flex-col overflow-hidden overscroll-none bg-transparent p-0 text-white subpixel-antialiased [-webkit-tap-highlight-color:transparent]`}
       >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
       </div>
