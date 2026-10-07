@@ -5,7 +5,9 @@ import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-serv
 
 const IMAGE_MS = 5000
 
-/** Eén scherm, één media-element: volledig zichtbaar (contain), zwarte rand indien nodig. */
+/** Vult 15″ landscape — geen zwarte balken links/rechts (object-cover). */
+const MEDIA_CLASS = 'absolute inset-0 h-full w-full object-cover object-center'
+
 export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowSlide[] }) {
   const [index, setIndex] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -47,10 +49,8 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
   if (slides.length === 0 || !current) return null
 
   return (
-    <div className="relative flex min-h-0 w-full flex-1 items-center justify-center bg-black">
-      <div
-        className={`flex h-full w-full max-h-[100dvh] max-w-[100vw] items-center justify-center transition-opacity duration-400 ${fade}`}
-      >
+    <div className="relative min-h-0 w-full flex-1 bg-black">
+      <div className={`absolute inset-0 overflow-hidden transition-opacity duration-400 ${fade}`}>
         {current.type === 'video' ? (
           <KlantschermVideo
             url={current.url}
@@ -63,7 +63,7 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
           <img
             src={current.url}
             alt=""
-            className="max-h-full max-w-full object-contain object-center"
+            className={MEDIA_CLASS}
             referrerPolicy="no-referrer"
           />
         )}
@@ -94,7 +94,7 @@ function KlantschermVideo({
       autoPlay
       loop={loop}
       preload="auto"
-      className="max-h-full max-w-full object-contain object-center"
+      className={MEDIA_CLASS}
       onLoadedData={(e) => {
         e.currentTarget.muted = true
         void e.currentTarget.play().catch(() => {})

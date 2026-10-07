@@ -103,7 +103,7 @@ export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promis
     .eq('tenant_slug', slug)
     .maybeSingle()
 
-  const includeMenuPhotos = settings?.klantscherm_slideshow_enabled !== false
+  const includeMenuPhotos = settings?.klantscherm_slideshow_enabled === true
 
   const uploads: KlantschermSlideshowSlide[] = parseKlantschermSlideshowUploads(
     settings?.klantscherm_slideshow_uploads,

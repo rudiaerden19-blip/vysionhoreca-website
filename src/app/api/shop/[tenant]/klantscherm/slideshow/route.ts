@@ -23,17 +23,23 @@ export async function GET(_request: Request, context: RouteContext) {
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
-  const menuSlideshowEnabled = settings?.klantscherm_slideshow_enabled !== false
+  const menuSlideshowEnabled = settings?.klantscherm_slideshow_enabled === true
   const slides =
     settings?.klantscherm_enabled === true
       ? await loadKlantschermSlideshowSlides(tenantSlug)
       : []
 
-  return NextResponse.json({
-    ok: true,
-    slideshowEnabled: menuSlideshowEnabled,
-    klantschermEnabled: settings?.klantscherm_enabled === true,
-    slides,
-    images: slides.map((s) => s.url),
-  })
+  return NextResponse.json(
+    {
+      ok: true,
+      slideshowEnabled: menuSlideshowEnabled,
+      klantschermEnabled: settings?.klantscherm_enabled === true,
+      slides,
+    },
+    {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+      },
+    },
+  )
 }

@@ -124,15 +124,23 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     return () => window.clearInterval(id)
   }, [uploadBusy])
 
-  const persistSettings = async (uploadRows: UploadRow[]) => {
+  const persistSettings = async (
+    uploadRows: UploadRow[],
+    opts?: { slideshowEnabled?: boolean },
+  ) => {
+    const menuSlideshowOn = opts?.slideshowEnabled ?? slideshowEnabled
     const r = await fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/settings`, {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({
         klantscherm_enabled: enabled,
-        klantscherm_slideshow_enabled: slideshowEnabled,
-        klantscherm_slideshow_uploads: uploadRows,
+        klantscherm_slideshow_enabled: menuSlideshowOn,
+        klantscherm_slideshow_uploads: uploadRows.map((row) => ({
+          url: row.url,
+          sort: row.sort,
+          mediaType: row.mediaType,
+        })),
         klantscherm_bank_iban: bankIban,
         klantscherm_bank_account_name: bankAccountName,
       }),
@@ -324,7 +332,24 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                 type="checkbox"
                 checked={slideshowEnabled}
                 disabled={!enabled}
-                onChange={(e) => setSlideshowEnabled(e.target.checked)}
+                onChange={(e) => {
+                  const next = e.target.checked
+                  setSlideshowEnabled(next)
+                  void (async () => {
+                    const result = await persistSettings(uploads, { slideshowEnabled: next })
+                    if (!result.ok) {
+                      setSlideshowEnabled(!next)
+                      alert(
+                        result.error
+                          ? `${t('adminPages.common.saveFailed')} (${result.error})`
+                          : t('adminPages.common.saveFailed'),
+                      )
+                      return
+                    }
+                    setSaved(true)
+                    setTimeout(() => setSaved(false), 2000)
+                  })()
+                }}
                 className="h-5 w-5 disabled:opacity-40"
               />
               <span>

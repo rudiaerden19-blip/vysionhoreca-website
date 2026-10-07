@@ -2782,7 +2782,7 @@
       "subtitle": "Tweede monitor aan de kassa: bestelling, promo-foto's en QR-betaling.",
       "enabled": "Klantscherm gebruiken",
       "enabledDesc": "Eenmalig aan en opslaan. Bij elke kassa-start opent het klantscherm automatisch (zelfde browser). Uit = geen klantscherm.",
-      "slideshow": "Promo-slideshow (idle)",
+      "slideshow": "Menufoto's op klantscherm (aan/uit)",
       "slideshowDesc": "Uit = geen menufoto's op het klantscherm. Jouw promo-foto's en video's blijven wel draaien (idle).",
       "uploadsTitle": "Eigen promo-foto's en video's",
       "uploadsDesc": "JPG, PNG, WebP, GIF of MP4 (video max. 500 MB). Altijd op klantscherm zolang er geen bestelling is — daarna Opslaan.",
