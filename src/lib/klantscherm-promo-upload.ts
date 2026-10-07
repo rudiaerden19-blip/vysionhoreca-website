@@ -10,7 +10,7 @@ export type KlantschermPromoUploadProgress = {
   loaded: number
   total: number
   percent: number
-  phase?: 'preparing' | 'uploading'
+  phase?: 'preparing' | 'uploading' | 'finalizing'
 }
 
 function buildStorageObjectPostUrl(bucket: string, objectPath: string): string {
@@ -82,6 +82,57 @@ function uploadFormDataViaXhr(
   })
 }
 
+/** Signed upload URL: raw bytes (geen multipart — voorkomt hangen op 99%). */
+function uploadRawPutViaXhr(
+  putUrl: string,
+  file: File,
+  contentType: string,
+  onProgress?: (p: KlantschermPromoUploadProgress) => void,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', putUrl)
+    xhr.setRequestHeader('Content-Type', contentType || 'application/octet-stream')
+    xhr.setRequestHeader('cache-control', 'max-age=3600')
+    xhr.setRequestHeader('x-upsert', 'false')
+    xhr.timeout = 0
+
+    xhr.upload.onprogress = (ev) => {
+      const loaded = ev.loaded
+      const pct = file.size > 0 ? Math.round((loaded / file.size) * 100) : 0
+      const phase: KlantschermPromoUploadProgress['phase'] =
+        loaded >= file.size * 0.995 ? 'finalizing' : 'uploading'
+      onProgress?.({
+        loaded,
+        total: file.size,
+        percent: Math.min(phase === 'finalizing' ? 99 : 100, Math.max(0, pct)),
+        phase,
+      })
+    }
+
+    xhr.onerror = () => resolve({ ok: false, message: 'Netwerkfout tijdens upload' })
+    xhr.onabort = () => resolve({ ok: false, message: 'Upload geannuleerd' })
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
+        resolve({ ok: true })
+        return
+      }
+      let message = `Upload geweigerd (HTTP ${xhr.status})`
+      try {
+        const body = JSON.parse(xhr.responseText) as { message?: string; error?: string }
+        message = body.message || body.error || message
+      } catch {
+        if (xhr.responseText) message = xhr.responseText.slice(0, 240)
+      }
+      resolve({ ok: false, message })
+    }
+
+    onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'uploading' })
+    xhr.send(file)
+  })
+}
+
 async function uploadWithSignedUrl(
   tenantSlug: string,
   file: File,
@@ -125,9 +176,7 @@ async function uploadWithSignedUrl(
     putUrl = `${SUPABASE_URL}/storage/v1/object/upload/sign/${pathPart}?token=${encodeURIComponent(signJson.token)}`
   }
 
-  const xhrResult = await uploadFormDataViaXhr('PUT', putUrl, file, '3600', onProgress, {
-    signedTokenUpload: true,
-  })
+  const xhrResult = await uploadRawPutViaXhr(putUrl, file, contentType, onProgress)
   if (xhrResult.ok) {
     return { ok: true, publicUrl: signJson.publicUrl }
   }

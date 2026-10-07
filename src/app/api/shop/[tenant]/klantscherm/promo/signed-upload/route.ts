@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { ensureKlantschermMediaBucketAcceptsVideo } from '@/lib/klantscherm-media-bucket-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
@@ -35,6 +36,18 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (!settings) {
     return NextResponse.json({ ok: false, error: 'tenant_not_found' }, { status: 404 })
+  }
+
+  const bucketReady = await ensureKlantschermMediaBucketAcceptsVideo(supabase)
+  if (!bucketReady.ok) {
+    console.error('[klantscherm/promo/signed-upload] bucket', bucketReady.error)
+    return NextResponse.json(
+      {
+        ok: false,
+        error: `media_bucket: ${bucketReady.error}. Voer supabase/klantscherm_media_bucket_video_limit.sql uit.`,
+      },
+      { status: 503 },
+    )
   }
 
   const objectPath = `${tenantSlug}/klantscherm/${Date.now()}.${ext}`

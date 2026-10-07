@@ -165,6 +165,12 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
           )
           return
         }
+        if (p.phase === 'finalizing') {
+          setUploadStatusLabel(
+            t('adminPages.klantscherm.uploadFinalizing').replace('{name}', file.name),
+          )
+          return
+        }
         setUploadStatusLabel(
           t('adminPages.klantscherm.uploadProgress')
             .replace('{percent}', String(p.percent))

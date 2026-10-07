@@ -2457,6 +2457,7 @@
       "uploadKindPhoto": "照片",
       "uploadKindVideo": "视频",
       "uploadPreparing": "正在准备上传… {name}",
+      "uploadFinalizing": "即将完成 — 服务器正在处理 {name}…",
       "uploadProgressStart": "正在上传：{name}（{size}）…",
       "uploadProgress": "上传中… {percent}% — {name}",
       "uploadWaitHint": "大视频需几分钟；开头 0% 属正常。若卡住，请在 Supabase 运行 klantscherm_media_bucket_video_limit.sql（media 500 MB）。",

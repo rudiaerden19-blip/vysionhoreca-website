@@ -2457,6 +2457,7 @@
       "uploadKindPhoto": "写真",
       "uploadKindVideo": "動画",
       "uploadPreparing": "アップロード準備中… {name}",
+      "uploadFinalizing": "もうすぐ完了 — サーバーが {name} を処理中…",
       "uploadProgressStart": "アップロード中: {name} ({size})…",
       "uploadProgress": "アップロード… {percent}% — {name}",
       "uploadWaitHint": "大きな動画は数分かかります。最初の0%は正常です。止まったら Supabase で klantscherm_media_bucket_video_limit.sql（media 500 MB）。",

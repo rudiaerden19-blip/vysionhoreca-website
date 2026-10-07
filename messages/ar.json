@@ -2457,6 +2457,7 @@
       "uploadKindPhoto": "صورة",
       "uploadKindVideo": "فيديو",
       "uploadPreparing": "جاري تجهيز الرفع… {name}",
+      "uploadFinalizing": "على وشك الانتهاء — المعالجة {name}…",
       "uploadProgressStart": "جاري الرفع: {name} ({size})…",
       "uploadProgress": "رفع… {percent}% — {name}",
       "uploadWaitHint": "الفيديوهات الكبيرة تستغرق دقائق؛ 0% في البداية طبيعي. عالق؟ نفّذ klantscherm_media_bucket_video_limit.sql في Supabase (media → 500 م.ب).",

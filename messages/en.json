@@ -2793,6 +2793,7 @@
       "uploadKindPhoto": "Photo",
       "uploadKindVideo": "Video",
       "uploadPreparing": "Preparing upload… {name}",
+      "uploadFinalizing": "Almost done — server processing {name}…",
       "uploadProgressStart": "Uploading: {name} ({size})…",
       "uploadProgress": "Uploading… {percent}% — {name}",
       "uploadWaitHint": "Large videos take several minutes; 0% at first is normal. Stuck or an error? Run klantscherm_media_bucket_video_limit.sql in Supabase (media bucket → 500 MB).",

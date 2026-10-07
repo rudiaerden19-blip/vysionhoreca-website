@@ -2457,6 +2457,7 @@
       "uploadKindPhoto": "Foto",
       "uploadKindVideo": "Video",
       "uploadPreparing": "Preparazione caricamento… {name}",
+      "uploadFinalizing": "Quasi fatto — elaborazione di {name}…",
       "uploadProgressStart": "Caricamento: {name} ({size})…",
       "uploadProgress": "Caricamento… {percent}% — {name}",
       "uploadWaitHint": "I video grandi richiedono diversi minuti; 0% all'inizio è normale. Bloccato? Esegui klantscherm_media_bucket_video_limit.sql in Supabase (bucket media → 500 MB).",
