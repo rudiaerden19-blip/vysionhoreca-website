@@ -5,8 +5,101 @@ import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-serv
 
 const IMAGE_MS = 5000
 
-/** Vult 15″ landscape — geen zwarte balken links/rechts (object-cover). */
-const MEDIA_CLASS = 'absolute inset-0 h-full w-full object-cover object-center'
+const BACKDROP_CLASS =
+  'pointer-events-none absolute inset-0 h-full w-full scale-110 object-cover object-center blur-2xl brightness-[0.55] saturate-125'
+const FRONT_CLASS =
+  'absolute inset-0 z-10 m-auto h-full w-full max-h-full max-w-full object-contain object-center'
+
+function tryPlayVideo(el: HTMLVideoElement) {
+  el.muted = true
+  el.playsInline = true
+  void el.play().catch(() => {
+    window.setTimeout(() => void el.play().catch(() => {}), 400)
+  })
+}
+
+/** Volledige promo zichtbaar (geen crop); randen opgevuld met wazige laag — geen zwarte balken. */
+function KlantschermSlideshowSlideView({
+  slide,
+  visible,
+  loopVideo,
+  videoRef,
+  onVideoEnded,
+  onVideoError,
+}: {
+  slide: KlantschermSlideshowSlide
+  visible: boolean
+  loopVideo: boolean
+  videoRef?: RefObject<HTMLVideoElement>
+  onVideoEnded?: () => void
+  onVideoError?: () => void
+}) {
+  const fade = visible ? 'opacity-100' : 'opacity-0'
+
+  const wirePlay = (el: HTMLVideoElement) => {
+    tryPlayVideo(el)
+  }
+
+  return (
+    <div className="absolute inset-0 overflow-hidden bg-black">
+      {slide.type === 'video' ? (
+        <>
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video
+            key={`${slide.url}-bg`}
+            src={slide.url}
+            muted
+            playsInline
+            autoPlay
+            loop={loopVideo}
+            preload="auto"
+            tabIndex={-1}
+            aria-hidden
+            className={`${BACKDROP_CLASS} transition-opacity duration-500 ${fade}`}
+            onLoadedData={(e) => wirePlay(e.currentTarget)}
+            onCanPlay={(e) => wirePlay(e.currentTarget)}
+          />
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video
+            ref={videoRef}
+            key={slide.url}
+            src={slide.url}
+            muted
+            playsInline
+            autoPlay
+            loop={loopVideo}
+            preload="auto"
+            className={`${FRONT_CLASS} transition-opacity duration-500 ${fade}`}
+            onLoadedData={(e) => wirePlay(e.currentTarget)}
+            onCanPlay={(e) => wirePlay(e.currentTarget)}
+            onEnded={loopVideo ? undefined : onVideoEnded}
+            onError={onVideoError}
+          />
+        </>
+      ) : (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={`${slide.url}-bg`}
+            src={slide.url}
+            alt=""
+            aria-hidden
+            className={`${BACKDROP_CLASS} transition-opacity duration-500 ${fade}`}
+            referrerPolicy="no-referrer"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={slide.url}
+            src={slide.url}
+            alt=""
+            className={`${FRONT_CLASS} transition-opacity duration-500 ${fade}`}
+            referrerPolicy="no-referrer"
+          />
+        </>
+      )}
+    </div>
+  )
+}
 
 export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowSlide[] }) {
   const [index, setIndex] = useState(0)
@@ -19,7 +112,7 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
     window.setTimeout(() => {
       setIndex((i) => (i + 1) % slides.length)
       setVisible(true)
-    }, 400)
+    }, 450)
   }, [slides.length])
 
   useEffect(() => {
@@ -29,7 +122,6 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
 
   const current = slides[index] ?? slides[0]
   const loopVideo = slides.length === 1 && current?.type === 'video'
-  const fade = visible ? 'opacity-100' : 'opacity-0'
 
   useEffect(() => {
     if (!current || slides.length <= 1 || current.type === 'video') return
@@ -41,65 +133,22 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
     if (!current || current.type !== 'video') return
     const el = videoRef.current
     if (!el) return
-    el.muted = true
     el.currentTime = 0
-    void el.play().catch(() => {})
+    tryPlayVideo(el)
   }, [current?.url, current?.type])
 
   if (slides.length === 0 || !current) return null
 
   return (
     <div className="relative min-h-0 w-full flex-1 bg-black">
-      <div className={`absolute inset-0 overflow-hidden transition-opacity duration-400 ${fade}`}>
-        {current.type === 'video' ? (
-          <KlantschermVideo
-            url={current.url}
-            loop={loopVideo}
-            videoRef={videoRef}
-            onEnded={loopVideo ? undefined : advance}
-          />
-        ) : (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={current.url}
-            alt=""
-            className={MEDIA_CLASS}
-            referrerPolicy="no-referrer"
-          />
-        )}
-      </div>
+      <KlantschermSlideshowSlideView
+        slide={current}
+        visible={visible}
+        loopVideo={loopVideo}
+        videoRef={videoRef}
+        onVideoEnded={advance}
+        onVideoError={advance}
+      />
     </div>
-  )
-}
-
-function KlantschermVideo({
-  url,
-  loop,
-  videoRef,
-  onEnded,
-}: {
-  url: string
-  loop: boolean
-  videoRef: RefObject<HTMLVideoElement>
-  onEnded?: () => void
-}) {
-  return (
-    /* eslint-disable-next-line jsx-a11y/media-has-caption */
-    <video
-      ref={videoRef}
-      key={url}
-      src={url}
-      muted
-      playsInline
-      autoPlay
-      loop={loop}
-      preload="auto"
-      className={MEDIA_CLASS}
-      onLoadedData={(e) => {
-        e.currentTarget.muted = true
-        void e.currentTarget.play().catch(() => {})
-      }}
-      onEnded={onEnded}
-    />
   )
 }
