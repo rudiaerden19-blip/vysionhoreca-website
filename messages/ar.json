@@ -2457,7 +2457,12 @@
       "openDisplayButton": "فتح شاشة العميل",
       "displayUrlLabel": "رابط ثابت لهذه الشاشة",
       "openFailed": "تعذّر فتح شاشة العميل (هل تم حظر النافذة المنبثقة؟).",
-      "mollieHint": "يتطلب الدفع عبر QR إعداد Mollie في صفحة طرق الدفع (Bancontact)."
+      "bankQrHint": "الدفع عبر QR: يمسح العميل بتطبيق البنك (تحويل إلى IBAN الخاص بكم). لا حاجة إلى Mollie.",
+      "bankQrTitle": "QR البنك عند الدفع",
+      "bankQrDesc": "أدخلوا الحساب الذي يحوّل إليه العملاء. يفتح QR تطبيق البنك بالمبلغ والمستفيد.",
+      "bankIban": "IBAN",
+      "bankAccountName": "اسم المستفيد (اختياري)",
+      "bankAccountNameHint": "فارغ = اسم المنشأة من الإعدادات."
     },
     "categorieen": {
       "title": "الفئات",

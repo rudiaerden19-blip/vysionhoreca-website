@@ -1957,7 +1957,12 @@
       "openDisplayButton": "Ouvrir l'écran client",
       "displayUrlLabel": "Lien fixe pour cet écran",
       "openFailed": "Impossible d'ouvrir l'écran client (pop-up bloquée ?).",
-      "mollieHint": "Le paiement QR nécessite Mollie sur la page Moyens de paiement (Bancontact)."
+      "bankQrHint": "Paiement QR : le client scanne avec son app bancaire (virement vers votre IBAN). Pas besoin de Mollie.",
+      "bankQrTitle": "QR bancaire à l'encaissement",
+      "bankQrDesc": "Indiquez le compte où les clients vireront. Le QR ouvre l'app bancaire avec montant et bénéficiaire.",
+      "bankIban": "IBAN",
+      "bankAccountName": "Nom du bénéficiaire (facultatif)",
+      "bankAccountNameHint": "Vide = nom de l'établissement dans les paramètres."
     },
     "categorieen": {
       "title": "Catégories",

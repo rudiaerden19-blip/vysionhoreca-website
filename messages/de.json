@@ -1957,7 +1957,12 @@
       "openDisplayButton": "Kundendisplay öffnen",
       "displayUrlLabel": "Fester Link für dieses Display",
       "openFailed": "Kundendisplay konnte nicht geöffnet werden (Pop-up blockiert?).",
-      "mollieHint": "QR-Zahlung erfordert Mollie auf der Seite Zahlungsmethoden (Bancontact)."
+      "bankQrHint": "QR-Zahlung: Kunde scannt mit der Banking-App (Überweisung auf Ihre IBAN). Kein Mollie nötig.",
+      "bankQrTitle": "Bank-QR an der Kasse",
+      "bankQrDesc": "Konto angeben, auf das Kunden überweisen. Der QR öffnet die Banking-App mit Betrag und Empfänger.",
+      "bankIban": "IBAN",
+      "bankAccountName": "Name des Begünstigten (optional)",
+      "bankAccountNameHint": "Leer = Firmenname aus den Einstellungen."
     },
     "categorieen": {
       "title": "Kategorien",

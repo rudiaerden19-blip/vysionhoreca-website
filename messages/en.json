@@ -2793,7 +2793,12 @@
       "openDisplayButton": "Open customer display",
       "displayUrlLabel": "Fixed link for this screen",
       "openFailed": "Could not open the customer display (pop-up blocked?).",
-      "mollieHint": "QR payment requires Mollie on the Payment methods page (Bancontact)."
+      "bankQrHint": "QR payment: customer scans with their banking app (transfer to your IBAN). No Mollie required.",
+      "bankQrTitle": "Bank QR at checkout",
+      "bankQrDesc": "Enter the account customers transfer to. The QR opens the banking app with amount and beneficiary.",
+      "bankIban": "IBAN",
+      "bankAccountName": "Beneficiary name (optional)",
+      "bankAccountNameHint": "Leave empty to use your business name from settings."
     },
     "categorieen": {
       "title": "Categories",

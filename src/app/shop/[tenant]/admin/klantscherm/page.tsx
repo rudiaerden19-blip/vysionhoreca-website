@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import PinGate from '@/components/PinGate'
 import { useLanguage } from '@/i18n'
@@ -29,6 +28,8 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   const [uploads, setUploads] = useState<UploadRow[]>([])
   const [uploadBusy, setUploadBusy] = useState(false)
   const [displayUrl, setDisplayUrl] = useState('')
+  const [bankIban, setBankIban] = useState('')
+  const [bankAccountName, setBankAccountName] = useState('')
 
   useEffect(() => {
     if (typeof window === 'undefined' || !enabled) {
@@ -63,13 +64,17 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     setLoading(true)
     const { data } = await supabase
       .from('tenant_settings')
-      .select('klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads')
+      .select(
+        'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads, klantscherm_bank_iban, klantscherm_bank_account_name',
+      )
       .eq('tenant_slug', tenant)
       .maybeSingle()
     if (data) {
       setEnabled(data.klantscherm_enabled === true)
       setSlideshowEnabled(data.klantscherm_slideshow_enabled !== false)
       setUploads(parseKlantschermSlideshowUploads(data.klantscherm_slideshow_uploads))
+      setBankIban(String(data.klantscherm_bank_iban ?? '').trim())
+      setBankAccountName(String(data.klantscherm_bank_account_name ?? '').trim())
     }
     setLoading(false)
   }, [tenant])
@@ -87,6 +92,8 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
         klantscherm_enabled: enabled,
         klantscherm_slideshow_enabled: slideshowEnabled,
         klantscherm_slideshow_uploads: uploads,
+        klantscherm_bank_iban: bankIban.replace(/\s/g, '').toUpperCase() || null,
+        klantscherm_bank_account_name: bankAccountName.trim() || null,
       })
       .eq('tenant_slug', tenant)
     setSaving(false)
@@ -129,11 +136,7 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.klantscherm.title')}</h1>
           <p className="text-gray-500">{t('adminPages.klantscherm.subtitle')}</p>
-          <p className="mt-2 text-sm text-gray-600">
-            <Link href={`/shop/${tenant}/admin/betaling`} className="text-[#3C4D6B] underline">
-              {t('adminPages.klantscherm.mollieHint')}
-            </Link>
-          </p>
+          <p className="mt-2 text-sm text-gray-600">{t('adminPages.klantscherm.bankQrHint')}</p>
         </div>
 
         {loading ? (
@@ -152,6 +155,41 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                 <span className="mt-1 block text-sm text-gray-500">{t('adminPages.klantscherm.enabledDesc')}</span>
               </span>
             </label>
+
+            <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+              <div>
+                <p className="font-semibold text-gray-900">{t('adminPages.klantscherm.bankQrTitle')}</p>
+                <p className="mt-1 text-sm text-gray-500">{t('adminPages.klantscherm.bankQrDesc')}</p>
+              </div>
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">{t('adminPages.klantscherm.bankIban')}</span>
+                <input
+                  type="text"
+                  value={bankIban}
+                  disabled={!enabled}
+                  onChange={(e) => setBankIban(e.target.value)}
+                  placeholder="BE68 5390 0754 7034"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-40"
+                  autoComplete="off"
+                />
+              </label>
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">
+                  {t('adminPages.klantscherm.bankAccountName')}
+                </span>
+                <input
+                  type="text"
+                  value={bankAccountName}
+                  disabled={!enabled}
+                  onChange={(e) => setBankAccountName(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-40"
+                  autoComplete="organization"
+                />
+                <span className="mt-1 block text-xs text-gray-500">
+                  {t('adminPages.klantscherm.bankAccountNameHint')}
+                </span>
+              </label>
+            </div>
 
             <div className="rounded-xl border border-[#3C4D6B]/30 bg-[#3C4D6B]/5 p-4">
               <p className="font-semibold text-gray-900">{t('adminPages.klantscherm.openDisplay')}</p>

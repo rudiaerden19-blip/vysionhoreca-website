@@ -40,8 +40,7 @@ function klantschermOrderDensityStyle(lineCount: number) {
 }
 
 type QrSession = {
-  providerPaymentId: string
-  qrCheckoutUrl: string
+  qrPayload: string
   amount: number
 }
 
@@ -53,10 +52,9 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const [klantschermActive, setKlantschermActive] = useState(false)
   const [slideshowImages, setSlideshowImages] = useState<string[]>([])
   const [qrSession, setQrSession] = useState<QrSession | null>(null)
-  const [qrPayStatus, setQrPayStatus] = useState<'idle' | 'pending' | 'paid' | 'failed'>('idle')
+  const [qrState, setQrState] = useState<'idle' | 'loading' | 'ready' | 'failed'>('idle')
+  const [qrFailureMessage, setQrFailureMessage] = useState<string | undefined>()
   const qrCreateKeyRef = useRef<string>('')
-  const qrNotifyRef = useRef<string>('')
-  const bcRef = useRef<BroadcastChannel | null>(null)
 
   const channelName = useMemo(() => {
     if (!token) return null
@@ -66,7 +64,6 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     if (!channelName || typeof BroadcastChannel === 'undefined') return
     const bc = new BroadcastChannel(channelName)
-    bcRef.current = bc
     bc.onmessage = (ev: MessageEvent<unknown>) => {
       const data = ev.data
       if (!isKassaCustomerDisplayMessage(data)) return
@@ -75,31 +72,12 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }
     return () => {
       bc.close()
-      bcRef.current = null
     }
   }, [channelName, tenant])
 
   const checkoutShowQr = msg?.phase === 'checkout' && msg.showKlantschermQr === true
   const qrPayAmount =
     msg?.phase === 'checkout' ? (msg.qrPayAmount ?? msg.totalInclVat) : 0
-
-  const notifyKassaQrStatus = (
-    status: 'paid' | 'failed' | 'canceled',
-    providerPaymentId: string,
-  ) => {
-    const bc = bcRef.current
-    if (!bc) return
-    const dedupe = `${providerPaymentId}-${status}`
-    if (qrNotifyRef.current === dedupe) return
-    qrNotifyRef.current = dedupe
-    bc.postMessage({
-      v: 1,
-      kind: 'klantscherm_qr_pay_status',
-      tenantSlug: tenant,
-      status,
-      providerPaymentId,
-    })
-  }
 
   useEffect(() => {
     if (!token) return
@@ -148,16 +126,17 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     if (!checkoutShowQr) {
       setQrSession(null)
-      setQrPayStatus('idle')
+      setQrState('idle')
+      setQrFailureMessage(undefined)
       qrCreateKeyRef.current = ''
-      qrNotifyRef.current = ''
       return
     }
     const amount = qrPayAmount
     const key = `${amount}-${msg?.phase === 'checkout' ? msg.lines.length : 0}`
     if (qrCreateKeyRef.current === key && qrSession) return
     qrCreateKeyRef.current = key
-    setQrPayStatus('pending')
+    setQrState('loading')
+    setQrFailureMessage(undefined)
     let cancelled = false
     void fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/qr/create`, {
       method: 'POST',
@@ -169,59 +148,33 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       .then(
         (json: {
           ok?: boolean
-          provider_payment_id?: string
-          qr_checkout_url?: string
+          error?: string
+          qr_payload?: string
         }) => {
-          if (cancelled || !json.ok || !json.provider_payment_id || !json.qr_checkout_url) {
-            if (!cancelled) setQrPayStatus('failed')
+          if (cancelled) return
+          if (!json.ok || !json.qr_payload) {
+            setQrState('failed')
+            if (json.error === 'iban_missing' || json.error === 'invalid_iban') {
+              setQrFailureMessage(KLANTSCHERM_NL.qrIbanMissing)
+            } else {
+              setQrFailureMessage(KLANTSCHERM_NL.qrCreateFailed)
+            }
             return
           }
-          setQrSession({
-            providerPaymentId: json.provider_payment_id,
-            qrCheckoutUrl: json.qr_checkout_url,
-            amount,
-          })
+          setQrSession({ qrPayload: json.qr_payload, amount })
+          setQrState('ready')
         },
       )
       .catch(() => {
-        if (!cancelled) setQrPayStatus('failed')
+        if (!cancelled) {
+          setQrState('failed')
+          setQrFailureMessage(KLANTSCHERM_NL.qrCreateFailed)
+        }
       })
     return () => {
       cancelled = true
     }
   }, [checkoutShowQr, qrPayAmount, msg, tenant])
-
-  useEffect(() => {
-    if (!qrSession || qrPayStatus === 'paid' || qrPayStatus === 'failed') return
-    let cancelled = false
-    const poll = async () => {
-      if (cancelled) return
-      try {
-        const q = new URLSearchParams({ provider_payment_id: qrSession.providerPaymentId })
-        const res = await fetch(
-          `/api/shop/${encodeURIComponent(tenant)}/klantscherm/qr/status?${q.toString()}`,
-          { credentials: 'include', cache: 'no-store' },
-        )
-        const json = (await res.json()) as { ok?: boolean; status?: string }
-        if (!json.ok || cancelled) return
-        if (json.status === 'paid') {
-          setQrPayStatus('paid')
-          notifyKassaQrStatus('paid', qrSession.providerPaymentId)
-        } else if (json.status === 'failed' || json.status === 'canceled') {
-          setQrPayStatus('failed')
-          notifyKassaQrStatus(json.status === 'canceled' ? 'canceled' : 'failed', qrSession.providerPaymentId)
-        }
-      } catch {
-        /* retry */
-      }
-    }
-    void poll()
-    const id = window.setInterval(() => void poll(), 2500)
-    return () => {
-      cancelled = true
-      window.clearInterval(id)
-    }
-  }, [qrSession, tenant, qrPayStatus])
 
   const formatMoney = (n: number) =>
     new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)
@@ -276,13 +229,14 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const d = klantschermOrderDensityStyle(lines.length)
 
   if (isCheckout && msg.showKlantschermQr) {
+    const viewStatus =
+      qrState === 'ready' ? 'ready' : qrState === 'failed' ? 'failed' : 'loading'
     return (
       <KlantschermQrPayView
         amount={qrPayAmount}
-        qrCheckoutUrl={qrSession?.qrCheckoutUrl ?? ''}
-        status={
-          qrPayStatus === 'paid' ? 'paid' : qrPayStatus === 'failed' ? 'failed' : 'pending'
-        }
+        qrPayload={qrSession?.qrPayload ?? ''}
+        status={viewStatus}
+        failureMessage={qrFailureMessage}
       />
     )
   }

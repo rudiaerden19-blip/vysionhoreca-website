@@ -2457,7 +2457,12 @@
       "openDisplayButton": "Apri schermo cliente",
       "displayUrlLabel": "Link fisso per questo schermo",
       "openFailed": "Impossibile aprire lo schermo cliente (pop-up bloccato?).",
-      "mollieHint": "Il pagamento QR richiede Mollie in Metodi di pagamento (Bancontact)."
+      "bankQrHint": "Pagamento QR: il cliente scansiona con l'app bancaria (bonifico al vostro IBAN). Nessun Mollie necessario.",
+      "bankQrTitle": "QR bancario alla cassa",
+      "bankQrDesc": "Inserite il conto su cui i clienti bonificano. Il QR apre l'app bancaria con importo e beneficiario.",
+      "bankIban": "IBAN",
+      "bankAccountName": "Nome beneficiario (facoltativo)",
+      "bankAccountNameHint": "Vuoto = nome attività dalle impostazioni."
     },
     "categorieen": {
       "title": "Categorie",

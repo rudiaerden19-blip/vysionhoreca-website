@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import {
-  authorizeKassaTerminalTenant,
-  isMissingRelationError,
-  loadTenantTerminalSecrets,
-} from '@/lib/kassa-payment-terminal-server'
-import { createKlantschermMollieQrPayment } from '@/lib/klantscherm-mollie-qr-pay'
+import { authorizeKassaTerminalTenant } from '@/lib/kassa-payment-terminal-server'
 import { eurosToCents } from '@/lib/kassa-payment-terminal'
+import {
+  buildSepaEpcQrPayload,
+  isPlausibleIban,
+  normalizeIban,
+} from '@/lib/klantscherm-bank-epc-qr'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  let body: { amount?: number }
+  let body: { amount?: number; reference?: string }
   try {
     body = await request.json()
   } catch {
@@ -29,7 +29,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   const { data: settings } = await auth.supabase
     .from('tenant_settings')
-    .select('klantscherm_enabled, business_name')
+    .select(
+      'klantscherm_enabled, business_name, klantscherm_bank_iban, klantscherm_bank_account_name',
+    )
     .eq('tenant_slug', auth.tenantSlug)
     .maybeSingle()
 
@@ -42,45 +44,29 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'invalid_amount' }, { status: 400 })
   }
 
-  const secrets = await loadTenantTerminalSecrets(auth.supabase, auth.tenantSlug)
-  const origin = request.nextUrl.origin
-  const redirectUrl = `${origin}/shop/${encodeURIComponent(auth.tenantSlug)}/klantscherm?paid=1`
-  const description = `${settings?.business_name || auth.tenantSlug} klantscherm`
+  const ibanRaw = String(settings?.klantscherm_bank_iban ?? '').trim()
+  if (!ibanRaw) {
+    return NextResponse.json({ ok: false, error: 'iban_missing' }, { status: 400 })
+  }
+  if (!isPlausibleIban(ibanRaw)) {
+    return NextResponse.json({ ok: false, error: 'invalid_iban' }, { status: 400 })
+  }
 
-  const created = await createKlantschermMollieQrPayment({
-    secrets,
-    amountCents,
-    description,
-    redirectUrl,
+  const beneficiary =
+    String(settings?.klantscherm_bank_account_name ?? '').trim() ||
+    String(settings?.business_name ?? auth.tenantSlug).trim()
+  const amountEur = amountCents / 100
+  const ref = typeof body.reference === 'string' ? body.reference.trim().slice(0, 140) : ''
+  const qrPayload = buildSepaEpcQrPayload({
+    beneficiaryName: beneficiary,
+    iban: normalizeIban(ibanRaw),
+    amountEur,
+    remittanceInfo: ref || `Betaling ${beneficiary}`,
   })
-  if (!created.ok) {
-    return NextResponse.json({ ok: false, error: created.error }, { status: 400 })
-  }
-
-  const { data: payment, error: pErr } = await auth.supabase
-    .from('kassa_terminal_payments')
-    .insert({
-      tenant_slug: auth.tenantSlug,
-      terminal_id: null,
-      provider: 'mollie',
-      provider_payment_id: created.providerPaymentId,
-      provider_reader_id: 'klantscherm_qr',
-      amount_cents: amountCents,
-      currency: 'eur',
-      status: 'pending',
-      payment_method: 'BANCONTACT',
-    })
-    .select('id')
-    .single()
-
-  if (pErr && !isMissingRelationError(pErr.message)) {
-    console.error('[shop/klantscherm/qr/create]', pErr)
-  }
 
   return NextResponse.json({
     ok: true,
-    provider_payment_id: created.providerPaymentId,
-    qr_checkout_url: created.qrCheckoutUrl,
+    qr_payload: qrPayload,
     amount_cents: amountCents,
   })
 }

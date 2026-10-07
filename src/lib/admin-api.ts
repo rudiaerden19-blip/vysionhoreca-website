@@ -232,6 +232,9 @@ export interface TenantSettings {
   klantscherm_enabled?: boolean
   klantscherm_slideshow_enabled?: boolean
   klantscherm_slideshow_uploads?: { url: string; sort: number }[]
+  /** SEPA/EPC bank-QR op klantscherm */
+  klantscherm_bank_iban?: string | null
+  klantscherm_bank_account_name?: string | null
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null
