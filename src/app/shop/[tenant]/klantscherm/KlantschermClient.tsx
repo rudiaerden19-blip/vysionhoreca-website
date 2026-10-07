@@ -110,8 +110,15 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
           credentials: 'include',
         },
       )
-        .then((r) => r.json())
-        .then(applySlideshowJson)
+        .then(async (r) => {
+          const json = (await r.json()) as {
+            ok?: boolean
+            slides?: KlantschermPromoSlide[]
+            klantschermEnabled?: boolean
+          }
+          if (!r.ok || json.ok === false) return
+          applySlideshowJson(json)
+        })
         .catch(() => {})
     }
 

@@ -127,6 +127,16 @@ export async function POST(request: NextRequest, context: RouteContext) {
   let error = first.error
   let data = first.data
 
+  if (!error && !data && Object.keys(patch).length > 0) {
+    const upsert = await supabase
+      .from('tenant_settings')
+      .upsert({ tenant_slug: tenantSlug, ...patch }, { onConflict: 'tenant_slug' })
+      .select('klantscherm_custom_promos, klantscherm_slideshow_uploads')
+      .maybeSingle()
+    error = upsert.error
+    data = upsert.data
+  }
+
   if (error && isKlantschermCustomPromosColumnError(error.message) && patch.klantscherm_custom_promos) {
     const legacyPatch = { ...patch }
     delete legacyPatch.klantscherm_custom_promos

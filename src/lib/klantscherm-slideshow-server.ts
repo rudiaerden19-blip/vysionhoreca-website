@@ -7,6 +7,7 @@ import {
   type KlantschermPromoSlide,
 } from '@/lib/klantscherm-custom-promos'
 import { mapKlantschermSlidesPlaybackUrls } from '@/lib/klantscherm-slideshow-playback-url'
+import { klantschermPromoSlidesFromStorage } from '@/lib/klantscherm-slideshow-storage-fallback'
 
 export function klantschermSlideshowRefreshChannel(tenantSlug: string): string {
   return `vysion-klantscherm-slideshow-${tenantSlug.trim()}`
@@ -87,7 +88,10 @@ export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promis
     legacyRaw = settings.klantscherm_slideshow_uploads
   }
 
-  const slides = resolveCustomPromos(customRaw, legacyRaw)
+  let slides = resolveCustomPromos(customRaw, legacyRaw)
+  if (slides.length === 0) {
+    slides = await klantschermPromoSlidesFromStorage(supabase, slug)
+  }
 
   return mapKlantschermSlidesPlaybackUrls(slug, slides) as KlantschermPromoSlide[]
 }
