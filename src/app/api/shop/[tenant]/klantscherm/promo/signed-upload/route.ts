@@ -69,19 +69,11 @@ export async function POST(request: Request, context: RouteContext) {
 
   const { data: pub } = supabase.storage.from(KLANTSCHERM_PROMO_VIDEO_BUCKET_ID).getPublicUrl(data.path)
 
-  const signedUrl =
-    typeof data.signedUrl === 'string' && data.signedUrl.length > 0
-      ? data.signedUrl
-      : null
-  if (!signedUrl) {
-    return NextResponse.json({ ok: false, error: 'signed_url_missing' }, { status: 500 })
-  }
-
   return NextResponse.json({
     ok: true,
     bucket: KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
     path: data.path,
-    signedUrl,
+    token: data.token,
     publicUrl: pub.publicUrl,
     contentType,
   })

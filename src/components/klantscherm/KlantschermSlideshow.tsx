@@ -147,7 +147,10 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
         loopVideo={loopVideo}
         videoRef={videoRef}
         onVideoEnded={advance}
-        onVideoError={advance}
+        onVideoError={() => {
+          const el = videoRef.current
+          if (el) tryPlayVideo(el)
+        }}
       />
     </div>
   )

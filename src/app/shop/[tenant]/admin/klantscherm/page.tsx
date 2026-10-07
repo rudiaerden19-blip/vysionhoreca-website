@@ -14,6 +14,7 @@ import {
 } from '@/lib/klantscherm-slideshow-media'
 import { uploadKlantschermPromoMedia } from '@/lib/klantscherm-promo-upload'
 import { notifyKlantschermSlideshowRefresh } from '@/lib/klantscherm-slideshow-server'
+import { klantschermSlideshowPlaybackUrl } from '@/lib/klantscherm-slideshow-playback-url'
 import {
   getOrCreateKlantschermSessionToken,
   klantschermPublicUrl,
@@ -529,12 +530,14 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                 <p className="mt-3 text-sm font-medium text-emerald-700">{uploadStatusLabel}</p>
               ) : null}
               <ul className="mt-4 space-y-2">
-                {uploads.map((row, i) => (
+                {uploads.map((row, i) => {
+                  const previewSrc = klantschermSlideshowPlaybackUrl(tenant, row.url)
+                  return (
                   <li key={row.url} className="flex flex-wrap items-center gap-3 border-b border-gray-100 pb-2">
                     {row.mediaType === 'video' ? (
                       // eslint-disable-next-line jsx-a11y/media-has-caption
                       <video
-                        src={row.url}
+                        src={previewSrc}
                         muted
                         playsInline
                         controls
@@ -543,7 +546,7 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                       />
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={row.url} alt="" className="h-14 w-14 rounded object-cover" />
+                      <img src={previewSrc} alt="" className="h-14 w-14 rounded object-cover" />
                     )}
                     <label className="flex flex-col gap-0.5">
                       <span className="text-xs font-medium text-gray-600">
@@ -578,7 +581,8 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                       {t('adminPages.klantscherm.removeUpload')}
                     </button>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </div>
 
