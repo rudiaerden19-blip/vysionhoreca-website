@@ -6,6 +6,12 @@ import PinGate from '@/components/PinGate'
 import { useLanguage } from '@/i18n'
 import { parseKlantschermSlideshowUploads } from '@/lib/klantscherm-slideshow-server'
 import {
+  inferKlantschermMediaTypeFromUrl,
+  KLANTSCHERM_PROMO_FILE_ACCEPT,
+  validateKlantschermPromoFile,
+  type KlantschermSlideshowMediaType,
+} from '@/lib/klantscherm-slideshow-media'
+import {
   getOrCreateKlantschermSessionToken,
   klantschermPublicUrl,
 } from '@/lib/klantscherm-session-token'
@@ -15,7 +21,7 @@ import {
   readCachedSecondaryBounds,
 } from '@/lib/kassa-customer-display-window'
 
-type UploadRow = { url: string; sort: number }
+type UploadRow = { url: string; sort: number; mediaType: KlantschermSlideshowMediaType }
 
 export default function KlantschermAdminPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -72,7 +78,13 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     if (data) {
       setEnabled(data.klantscherm_enabled === true)
       setSlideshowEnabled(data.klantscherm_slideshow_enabled !== false)
-      setUploads(parseKlantschermSlideshowUploads(data.klantscherm_slideshow_uploads))
+      setUploads(
+        parseKlantschermSlideshowUploads(data.klantscherm_slideshow_uploads).map((row) => ({
+          url: row.url,
+          sort: row.sort,
+          mediaType: row.mediaType ?? inferKlantschermMediaTypeFromUrl(row.url),
+        })),
+      )
       setBankIban(String(data.klantscherm_bank_iban ?? '').trim())
       setBankAccountName(String(data.klantscherm_bank_account_name ?? '').trim())
     }
@@ -107,18 +119,28 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
 
   const onPickUpload = async (file: File | null) => {
     if (!file || !supabase) return
+    const check = validateKlantschermPromoFile(file)
+    if (!check.ok) {
+      alert(
+        check.reason === 'size'
+          ? t('adminPages.klantscherm.uploadTooLarge')
+          : t('adminPages.klantscherm.uploadInvalidType'),
+      )
+      return
+    }
     setUploadBusy(true)
     try {
-      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const ext = file.name.split('.').pop()?.toLowerCase() || (check.mediaType === 'video' ? 'mp4' : 'jpg')
       const path = `${tenant}/klantscherm/${Date.now()}.${ext}`
       const { error: upErr } = await supabase.storage.from('media').upload(path, file, {
         cacheControl: '3600',
         upsert: false,
+        contentType: file.type || undefined,
       })
       if (upErr) throw upErr
       const { data: pub } = supabase.storage.from('media').getPublicUrl(path)
       const url = pub.publicUrl
-      setUploads((prev) => [...prev, { url, sort: prev.length }])
+      setUploads((prev) => [...prev, { url, sort: prev.length, mediaType: check.mediaType }])
     } catch {
       alert(t('adminPages.klantscherm.uploadFailed'))
     } finally {
@@ -230,15 +252,33 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
               <p className="mb-4 text-sm text-gray-500">{t('adminPages.klantscherm.uploadsDesc')}</p>
               <input
                 type="file"
-                accept="image/*"
+                accept={KLANTSCHERM_PROMO_FILE_ACCEPT}
                 disabled={uploadBusy || !enabled}
-                onChange={(e) => void onPickUpload(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  void onPickUpload(e.target.files?.[0] ?? null)
+                  e.target.value = ''
+                }}
               />
               <ul className="mt-4 space-y-2">
                 {uploads.map((row, i) => (
                   <li key={row.url} className="flex items-center gap-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={row.url} alt="" className="h-14 w-14 rounded object-cover" />
+                    {row.mediaType === 'video' ? (
+                      // eslint-disable-next-line jsx-a11y/media-has-caption
+                      <video
+                        src={row.url}
+                        muted
+                        playsInline
+                        className="h-14 w-14 rounded object-cover bg-black"
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={row.url} alt="" className="h-14 w-14 rounded object-cover" />
+                    )}
+                    <span className="text-xs text-gray-500">
+                      {row.mediaType === 'video'
+                        ? t('adminPages.klantscherm.uploadKindVideo')
+                        : t('adminPages.klantscherm.uploadKindPhoto')}
+                    </span>
                     <button
                       type="button"
                       className="text-sm text-red-600 underline"

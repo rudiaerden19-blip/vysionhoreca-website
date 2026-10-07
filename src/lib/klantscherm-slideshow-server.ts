@@ -1,10 +1,23 @@
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import {
+  inferKlantschermMediaTypeFromUrl,
+  type KlantschermSlideshowMediaType,
+} from '@/lib/klantscherm-slideshow-media'
+import {
   looksLikeBelgiumDrinkCategory,
   looksLikeBelgiumDrinkName,
 } from '@/lib/order-vat'
 
-export type KlantschermSlideshowUpload = { url: string; sort: number }
+export type KlantschermSlideshowUpload = {
+  url: string
+  sort: number
+  mediaType?: KlantschermSlideshowMediaType
+}
+
+export type KlantschermSlideshowSlide = {
+  url: string
+  type: KlantschermSlideshowMediaType
+}
 
 export function parseKlantschermSlideshowUploads(raw: unknown): KlantschermSlideshowUpload[] {
   if (!Array.isArray(raw)) return []
@@ -14,14 +27,23 @@ export function parseKlantschermSlideshowUploads(raw: unknown): KlantschermSlide
     const url = String((row as { url?: unknown }).url ?? '').trim()
     if (!url) continue
     const sort = Number((row as { sort?: unknown }).sort)
-    out.push({ url, sort: Number.isFinite(sort) ? sort : 0 })
+    const rawType = (row as { mediaType?: unknown }).mediaType
+    const mediaType =
+      rawType === 'video' || rawType === 'image'
+        ? rawType
+        : inferKlantschermMediaTypeFromUrl(url)
+    out.push({
+      url,
+      sort: Number.isFinite(sort) ? sort : 0,
+      mediaType,
+    })
   }
   out.sort((a, b) => a.sort - b.sort || a.url.localeCompare(b.url))
   return out
 }
 
-/** Menu-foto''s + tenant-uploads; unieke URLs, uploads eerst. */
-export async function loadKlantschermSlideshowImageUrls(tenantSlug: string): Promise<string[]> {
+/** Menu-foto's + tenant-uploads; unieke URLs, uploads eerst. */
+export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promise<KlantschermSlideshowSlide[]> {
   const slug = tenantSlug.trim()
   if (!slug) return []
 
@@ -36,9 +58,12 @@ export async function loadKlantschermSlideshowImageUrls(tenantSlug: string): Pro
 
   if (settings?.klantscherm_slideshow_enabled === false) return []
 
-  const uploads = parseKlantschermSlideshowUploads(settings?.klantscherm_slideshow_uploads).map(
-    (u) => u.url,
-  )
+  const uploads: KlantschermSlideshowSlide[] = parseKlantschermSlideshowUploads(
+    settings?.klantscherm_slideshow_uploads,
+  ).map((u) => ({
+    url: u.url,
+    type: u.mediaType ?? inferKlantschermMediaTypeFromUrl(u.url),
+  }))
 
   const [{ data: categories }, { data: products }] = await Promise.all([
     supabase
@@ -73,11 +98,20 @@ export async function loadKlantschermSlideshowImageUrls(tenantSlug: string): Pro
   }
 
   const seen = new Set<string>()
-  const merged: string[] = []
-  for (const url of [...uploads, ...menuUrls]) {
-    if (seen.has(url)) continue
-    seen.add(url)
-    merged.push(url)
+  const merged: KlantschermSlideshowSlide[] = []
+  for (const slide of [
+    ...uploads,
+    ...menuUrls.map((url) => ({ url, type: 'image' as const })),
+  ]) {
+    if (seen.has(slide.url)) continue
+    seen.add(slide.url)
+    merged.push(slide)
   }
   return merged
+}
+
+/** @deprecated gebruik loadKlantschermSlideshowSlides */
+export async function loadKlantschermSlideshowImageUrls(tenantSlug: string): Promise<string[]> {
+  const slides = await loadKlantschermSlideshowSlides(tenantSlug)
+  return slides.map((s) => s.url)
 }

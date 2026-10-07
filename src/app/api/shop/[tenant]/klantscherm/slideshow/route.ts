@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { loadKlantschermSlideshowImageUrls } from '@/lib/klantscherm-slideshow-server'
+import { loadKlantschermSlideshowSlides } from '@/lib/klantscherm-slideshow-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
@@ -24,15 +24,16 @@ export async function GET(_request: Request, context: RouteContext) {
     .maybeSingle()
 
   const enabled = settings?.klantscherm_slideshow_enabled !== false
-  const images =
+  const slides =
     settings?.klantscherm_enabled === true && enabled
-      ? await loadKlantschermSlideshowImageUrls(tenantSlug)
+      ? await loadKlantschermSlideshowSlides(tenantSlug)
       : []
 
   return NextResponse.json({
     ok: true,
     slideshowEnabled: enabled,
     klantschermEnabled: settings?.klantscherm_enabled === true,
-    images,
+    slides,
+    images: slides.map((s) => s.url),
   })
 }

@@ -52,7 +52,9 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   const [msg, setMsg] = useState<KassaCustomerDisplayMessage | null>(null)
   const [klantschermActive, setKlantschermActive] = useState(false)
-  const [slideshowImages, setSlideshowImages] = useState<string[]>([])
+  const [slideshowSlides, setSlideshowSlides] = useState<
+    { url: string; type: 'image' | 'video' }[]
+  >([])
   const [qrSession, setQrSession] = useState<QrSession | null>(null)
   const [qrState, setQrState] = useState<'idle' | 'loading' | 'ready' | 'failed'>('idle')
   const [qrFailureMessage, setQrFailureMessage] = useState<string | undefined>()
@@ -89,11 +91,27 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       credentials: 'include',
     })
       .then((r) => r.json())
-      .then((json: { images?: string[]; klantschermEnabled?: boolean }) => {
+      .then(
+        (json: {
+          slides?: { url: string; type: 'image' | 'video' }[]
+          images?: string[]
+          klantschermEnabled?: boolean
+        }) => {
         if (cancelled) return
         setKlantschermActive(json.klantschermEnabled === true)
-        setSlideshowImages(Array.isArray(json.images) ? json.images.filter(Boolean) : [])
-      })
+        if (Array.isArray(json.slides) && json.slides.length > 0) {
+          setSlideshowSlides(
+            json.slides.filter((s) => s?.url && (s.type === 'image' || s.type === 'video')),
+          )
+        } else if (Array.isArray(json.images)) {
+          setSlideshowSlides(
+            json.images.filter(Boolean).map((url) => ({ url, type: 'image' as const })),
+          )
+        } else {
+          setSlideshowSlides([])
+        }
+      },
+      )
       .catch(() => {})
     return () => {
       cancelled = true
@@ -222,8 +240,8 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }
 
   if (!msg || msg.phase === 'idle') {
-    if (slideshowImages.length > 0) {
-      return <KlantschermSlideshow images={slideshowImages} />
+    if (slideshowSlides.length > 0) {
+      return <KlantschermSlideshow slides={slideshowSlides} />
     }
     if (klantschermActive) {
       return (

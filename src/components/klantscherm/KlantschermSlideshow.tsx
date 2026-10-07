@@ -1,41 +1,79 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-server'
 
-const FADE_MS = 5000
+const IMAGE_MS = 5000
 
-export function KlantschermSlideshow({ images }: { images: string[] }) {
+export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowSlide[] }) {
   const [index, setIndex] = useState(0)
   const [visible, setVisible] = useState(true)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  const advance = useCallback(() => {
+    if (slides.length <= 1) return
+    setVisible(false)
+    window.setTimeout(() => {
+      setIndex((i) => (i + 1) % slides.length)
+      setVisible(true)
+    }, 450)
+  }, [slides.length])
 
   useEffect(() => {
-    if (images.length <= 1) return
-    const id = window.setInterval(() => {
-      setVisible(false)
-      window.setTimeout(() => {
-        setIndex((i) => (i + 1) % images.length)
-        setVisible(true)
-      }, 450)
-    }, FADE_MS)
+    setIndex(0)
+    setVisible(true)
+  }, [slides])
+
+  const current = slides[index] ?? slides[0]
+
+  useEffect(() => {
+    if (!current || slides.length <= 1) return
+    if (current.type === 'video') return
+    const id = window.setInterval(advance, IMAGE_MS)
     return () => window.clearInterval(id)
-  }, [images.length])
+  }, [slides.length, current?.url, current?.type, advance])
 
-  if (images.length === 0) return null
+  useEffect(() => {
+    if (!current || current.type !== 'video') return
+    const el = videoRef.current
+    if (!el) return
+    el.currentTime = 0
+    void el.play().catch(() => {
+      advance()
+    })
+  }, [current?.url, current?.type, advance])
 
-  const src = images[index] ?? images[0]
+  if (slides.length === 0 || !current) return null
 
   return (
     <div className="relative min-h-0 w-full flex-1 bg-black">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        key={src}
-        src={src}
-        alt=""
-        className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${
-          visible ? 'opacity-100' : 'opacity-0'
-        }`}
-        referrerPolicy="no-referrer"
-      />
+      {current.type === 'video' ? (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <video
+          ref={videoRef}
+          key={current.url}
+          src={current.url}
+          muted
+          playsInline
+          autoPlay
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${
+            visible ? 'opacity-100' : 'opacity-0'
+          }`}
+          onEnded={advance}
+          onError={advance}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={current.url}
+          src={current.url}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${
+            visible ? 'opacity-100' : 'opacity-0'
+          }`}
+          referrerPolicy="no-referrer"
+        />
+      )}
     </div>
   )
 }
