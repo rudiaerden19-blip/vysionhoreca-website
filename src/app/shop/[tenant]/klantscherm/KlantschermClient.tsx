@@ -86,35 +86,48 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     if (!token) return
     let cancelled = false
-    void fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/slideshow`, {
-      cache: 'no-store',
-      credentials: 'include',
-    })
-      .then((r) => r.json())
-      .then(
-        (json: {
-          slides?: { url: string; type: 'image' | 'video' }[]
-          images?: string[]
-          klantschermEnabled?: boolean
-        }) => {
-        if (cancelled) return
-        setKlantschermActive(json.klantschermEnabled === true)
-        if (Array.isArray(json.slides) && json.slides.length > 0) {
-          setSlideshowSlides(
-            json.slides.filter((s) => s?.url && (s.type === 'image' || s.type === 'video')),
-          )
-        } else if (Array.isArray(json.images)) {
-          setSlideshowSlides(
-            json.images.filter(Boolean).map((url) => ({ url, type: 'image' as const })),
-          )
-        } else {
-          setSlideshowSlides([])
-        }
-      },
-      )
-      .catch(() => {})
+
+    const applySlideshowJson = (json: {
+      slides?: { url: string; type: 'image' | 'video' }[]
+      images?: string[]
+      klantschermEnabled?: boolean
+    }) => {
+      if (cancelled) return
+      setKlantschermActive(json.klantschermEnabled === true)
+      if (Array.isArray(json.slides) && json.slides.length > 0) {
+        setSlideshowSlides(
+          json.slides.filter((s) => s?.url && (s.type === 'image' || s.type === 'video')),
+        )
+      } else if (Array.isArray(json.images) && json.images.length > 0) {
+        setSlideshowSlides(
+          json.images.filter(Boolean).map((url) => ({ url, type: 'image' as const })),
+        )
+      } else {
+        setSlideshowSlides([])
+      }
+    }
+
+    const loadSlides = () => {
+      void fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/slideshow`, {
+        cache: 'no-store',
+        credentials: 'include',
+      })
+        .then((r) => r.json())
+        .then(applySlideshowJson)
+        .catch(() => {})
+    }
+
+    loadSlides()
+    const intervalId = window.setInterval(loadSlides, 45_000)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') loadSlides()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+
     return () => {
       cancelled = true
+      window.clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [tenant, token])
 

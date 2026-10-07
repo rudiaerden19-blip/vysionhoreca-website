@@ -42,7 +42,26 @@ export function parseKlantschermSlideshowUploads(raw: unknown): KlantschermSlide
   return out
 }
 
-/** Menu-foto's + tenant-uploads; unieke URLs, uploads eerst. */
+/** Promo-uploads eerst; menu-foto's optioneel (slideshow-toggle). */
+export function mergeKlantschermSlideshowSlides(
+  uploads: KlantschermSlideshowSlide[],
+  menuUrls: string[],
+  includeMenuPhotos: boolean,
+): KlantschermSlideshowSlide[] {
+  const menuSlides = includeMenuPhotos
+    ? menuUrls.map((url) => ({ url, type: 'image' as const }))
+    : []
+  const seen = new Set<string>()
+  const merged: KlantschermSlideshowSlide[] = []
+  for (const slide of [...uploads, ...menuSlides]) {
+    if (seen.has(slide.url)) continue
+    seen.add(slide.url)
+    merged.push(slide)
+  }
+  return merged
+}
+
+/** Tenant-uploads (promo/video) altijd; menu-foto's alleen als slideshow aan staat. */
 export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promise<KlantschermSlideshowSlide[]> {
   const slug = tenantSlug.trim()
   if (!slug) return []
@@ -56,7 +75,7 @@ export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promis
     .eq('tenant_slug', slug)
     .maybeSingle()
 
-  if (settings?.klantscherm_slideshow_enabled === false) return []
+  const includeMenuPhotos = settings?.klantscherm_slideshow_enabled !== false
 
   const uploads: KlantschermSlideshowSlide[] = parseKlantschermSlideshowUploads(
     settings?.klantscherm_slideshow_uploads,
@@ -97,17 +116,7 @@ export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promis
     menuUrls.push(url)
   }
 
-  const seen = new Set<string>()
-  const merged: KlantschermSlideshowSlide[] = []
-  for (const slide of [
-    ...uploads,
-    ...menuUrls.map((url) => ({ url, type: 'image' as const })),
-  ]) {
-    if (seen.has(slide.url)) continue
-    seen.add(slide.url)
-    merged.push(slide)
-  }
-  return merged
+  return mergeKlantschermSlideshowSlides(uploads, menuUrls, includeMenuPhotos)
 }
 
 /** @deprecated gebruik loadKlantschermSlideshowSlides */

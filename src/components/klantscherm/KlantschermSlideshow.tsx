@@ -5,9 +5,59 @@ import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-serv
 
 const IMAGE_MS = 5000
 
-/** Eén laag: vult 15″-scherm (geen dubbele video/blur). */
-const PROMO_MEDIA_CLASS =
-  'absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500'
+/** Volledige foto zichtbaar; rand vult met dezelfde afbeelding (geen crop, geen lege balk). */
+function KlantschermPromoImage({ url, visible }: { url: string; visible: boolean }) {
+  const fade = visible ? 'opacity-100' : 'opacity-0'
+  return (
+    <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fade}`}>
+      <div
+        className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl saturate-[1.25]"
+        style={{ backgroundImage: `url("${url.replace(/"/g, '%22')}")` }}
+        aria-hidden
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={url}
+        alt=""
+        className="relative z-10 mx-auto h-full w-full object-contain object-center"
+        referrerPolicy="no-referrer"
+      />
+    </div>
+  )
+}
+
+function KlantschermPromoVideo({
+  url,
+  visible,
+  videoRef,
+  onVideoEnded,
+  onVideoError,
+}: {
+  url: string
+  visible: boolean
+  videoRef?: RefObject<HTMLVideoElement>
+  onVideoEnded?: () => void
+  onVideoError?: () => void
+}) {
+  const fade = visible ? 'opacity-100' : 'opacity-0'
+  return (
+    <div className={`absolute inset-0 flex items-center justify-center overflow-hidden bg-black transition-opacity duration-500 ${fade}`}>
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        ref={videoRef}
+        key={url}
+        src={url}
+        muted
+        playsInline
+        autoPlay
+        preload="auto"
+        className="max-h-full max-w-full object-contain object-center"
+        onEnded={onVideoEnded}
+        onError={onVideoError}
+      />
+    </div>
+  )
+}
 
 function KlantschermSlideshowSlideView({
   slide,
@@ -22,35 +72,18 @@ function KlantschermSlideshowSlideView({
   onVideoEnded?: () => void
   onVideoError?: () => void
 }) {
-  const fade = visible ? 'opacity-100' : 'opacity-0'
-
-  return (
-    <div className="absolute inset-0 overflow-hidden bg-black">
-      {slide.type === 'video' ? (
-        /* eslint-disable-next-line jsx-a11y/media-has-caption */
-        <video
-          ref={videoRef}
-          key={slide.url}
-          src={slide.url}
-          muted
-          playsInline
-          autoPlay
-          className={`${PROMO_MEDIA_CLASS} ${fade}`}
-          onEnded={onVideoEnded}
-          onError={onVideoError}
-        />
-      ) : (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          key={slide.url}
-          src={slide.url}
-          alt=""
-          className={`${PROMO_MEDIA_CLASS} ${fade}`}
-          referrerPolicy="no-referrer"
-        />
-      )}
-    </div>
-  )
+  if (slide.type === 'video') {
+    return (
+      <KlantschermPromoVideo
+        url={slide.url}
+        visible={visible}
+        videoRef={videoRef}
+        onVideoEnded={onVideoEnded}
+        onVideoError={onVideoError}
+      />
+    )
+  }
+  return <KlantschermPromoImage url={slide.url} visible={visible} />
 }
 
 export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowSlide[] }) {

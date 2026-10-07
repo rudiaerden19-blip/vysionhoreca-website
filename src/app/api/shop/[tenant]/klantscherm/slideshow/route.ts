@@ -23,15 +23,15 @@ export async function GET(_request: Request, context: RouteContext) {
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
-  const enabled = settings?.klantscherm_slideshow_enabled !== false
+  const menuSlideshowEnabled = settings?.klantscherm_slideshow_enabled !== false
   const slides =
-    settings?.klantscherm_enabled === true && enabled
+    settings?.klantscherm_enabled === true
       ? await loadKlantschermSlideshowSlides(tenantSlug)
       : []
 
   return NextResponse.json({
     ok: true,
-    slideshowEnabled: enabled,
+    slideshowEnabled: menuSlideshowEnabled,
     klantschermEnabled: settings?.klantscherm_enabled === true,
     slides,
     images: slides.map((s) => s.url),

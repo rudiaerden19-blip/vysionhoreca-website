@@ -3,7 +3,10 @@ import {
   inferKlantschermMediaTypeFromUrl,
   validateKlantschermPromoFile,
 } from '@/lib/klantscherm-slideshow-media'
-import { parseKlantschermSlideshowUploads } from '@/lib/klantscherm-slideshow-server'
+import {
+  mergeKlantschermSlideshowSlides,
+  parseKlantschermSlideshowUploads,
+} from '@/lib/klantscherm-slideshow-server'
 
 describe('klantscherm slideshow media', () => {
   it('infers video from mp4 url', () => {
@@ -15,6 +18,15 @@ describe('klantscherm slideshow media', () => {
     const f = new File(['x'], 'clip.mp4', { type: 'video/mp4' })
     expect(detectKlantschermUploadMediaType(f)).toBe('video')
     expect(validateKlantschermPromoFile(f)).toEqual({ ok: true, mediaType: 'video' })
+  })
+
+  it('keeps promo uploads when menu slideshow is off', () => {
+    const merged = mergeKlantschermSlideshowSlides(
+      [{ url: 'https://cdn/promo.mp4', type: 'video' }],
+      ['https://cdn/menu.jpg'],
+      false,
+    )
+    expect(merged).toEqual([{ url: 'https://cdn/promo.mp4', type: 'video' }])
   })
 
   it('parses uploads with mediaType', () => {
