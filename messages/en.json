@@ -2777,6 +2777,19 @@
       "onlinePaymentsTitle": "Activate Online Payments?",
       "onlinePaymentsDesc": "We can set up Stripe or Mollie for you so customers can pay online."
     },
+    "klantscherm": {
+      "title": "Customer display",
+      "subtitle": "Second monitor at the POS: order, promo photos and QR payment.",
+      "enabled": "Use customer display",
+      "enabledDesc": "Shows the button on the POS and enables the customer display for this venue.",
+      "slideshow": "Promo slideshow (idle)",
+      "slideshowDesc": "When the cart is empty: menu and upload photos, every 5 seconds.",
+      "uploadsTitle": "Custom promo photos",
+      "uploadsDesc": "Extra images besides menu photos. Uploads appear before menu items in the slideshow.",
+      "removeUpload": "Remove",
+      "uploadFailed": "Upload failed.",
+      "mollieHint": "QR payment requires Mollie on the Payment methods page (Bancontact)."
+    },
     "categorieen": {
       "title": "Categories",
       "subtitle": "Manage your menu categories",

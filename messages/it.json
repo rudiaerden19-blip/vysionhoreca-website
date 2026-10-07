@@ -2441,6 +2441,19 @@
       "onlinePaymentsTitle": "Attivare i Pagamenti Online?",
       "onlinePaymentsDesc": "Possiamo configurare Stripe o Mollie per voi in modo che i clienti possano pagare online."
     },
+    "klantscherm": {
+      "title": "Schermo cliente",
+      "subtitle": "Secondo monitor alla cassa: ordine, foto promo e pagamento QR.",
+      "enabled": "Usa schermo cliente",
+      "enabledDesc": "Mostra il pulsante in cassa e attiva lo schermo cliente per questo locale.",
+      "slideshow": "Slideshow promo (inattivo)",
+      "slideshowDesc": "Senza ordine attivo: foto dal menu e caricamenti, ogni 5 secondi.",
+      "uploadsTitle": "Foto promo proprie",
+      "uploadsDesc": "Immagini extra oltre al menu. I caricamenti precedono il menu nello slideshow.",
+      "removeUpload": "Rimuovi",
+      "uploadFailed": "Caricamento non riuscito.",
+      "mollieHint": "Il pagamento QR richiede Mollie in Metodi di pagamento (Bancontact)."
+    },
     "categorieen": {
       "title": "Categorie",
       "subtitle": "Gestisci le categorie del menu",

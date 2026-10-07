@@ -1941,6 +1941,19 @@
       "onlinePaymentsTitle": "Online-Zahlungen Aktivieren?",
       "onlinePaymentsDesc": "Wir können Stripe oder Mollie für Sie einrichten, damit Kunden online bezahlen können."
     },
+    "klantscherm": {
+      "title": "Kundendisplay",
+      "subtitle": "Zweiter Monitor an der Kasse: Bestellung, Promo-Fotos und QR-Zahlung.",
+      "enabled": "Kundendisplay nutzen",
+      "enabledDesc": "Zeigt die Schaltfläche an der Kasse und aktiviert das Display für diesen Betrieb.",
+      "slideshow": "Promo-Diashow (Leerlauf)",
+      "slideshowDesc": "Wenn der Warenkorb leer ist: Menü- und Upload-Fotos, alle 5 Sekunden.",
+      "uploadsTitle": "Eigene Promo-Fotos",
+      "uploadsDesc": "Zusätzliche Bilder neben Menüfotos. Uploads erscheinen vor dem Menü in der Diashow.",
+      "removeUpload": "Entfernen",
+      "uploadFailed": "Upload fehlgeschlagen.",
+      "mollieHint": "QR-Zahlung erfordert Mollie auf der Seite Zahlungsmethoden (Bancontact)."
+    },
     "categorieen": {
       "title": "Kategorien",
       "subtitle": "Verwalten Sie Ihre Menükategorien",

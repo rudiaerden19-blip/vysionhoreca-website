@@ -2777,6 +2777,19 @@
       "onlinePaymentsTitle": "Online Betalingen Activeren?",
       "onlinePaymentsDesc": "Wij kunnen Stripe of Mollie voor je instellen zodat klanten online kunnen betalen."
     },
+    "klantscherm": {
+      "title": "Klantscherm",
+      "subtitle": "Tweede monitor aan de kassa: bestelling, promo-foto's en QR-betaling.",
+      "enabled": "Klantscherm gebruiken",
+      "enabledDesc": "Toont de knop op de kassa en activeert het klantscherm voor deze zaak.",
+      "slideshow": "Promo-slideshow (idle)",
+      "slideshowDesc": "Als er niets in de mand staat: foto's uit menu + uploads, elke 5 seconden.",
+      "uploadsTitle": "Eigen promo-foto's",
+      "uploadsDesc": "Extra beelden naast menu-foto's. Uploads komen vóór het menu in de slideshow.",
+      "removeUpload": "Verwijderen",
+      "uploadFailed": "Upload mislukt.",
+      "mollieHint": "QR-betaling vereist Mollie op de pagina Betaalmethodes (Bancontact)."
+    },
     "categorieen": {
       "title": "Categorieën",
       "subtitle": "Beheer je menucategorieën",

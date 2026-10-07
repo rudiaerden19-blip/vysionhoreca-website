@@ -2441,6 +2441,19 @@
       "onlinePaymentsTitle": "¿Activar Pagos en Línea?",
       "onlinePaymentsDesc": "Podemos configurar Stripe o Mollie para que los clientes puedan pagar en línea."
     },
+    "klantscherm": {
+      "title": "Pantalla del cliente",
+      "subtitle": "Segundo monitor en caja: pedido, fotos promocionales y pago QR.",
+      "enabled": "Usar pantalla del cliente",
+      "enabledDesc": "Muestra el botón en caja y activa la pantalla del cliente para este local.",
+      "slideshow": "Presentación promocional (inactivo)",
+      "slideshowDesc": "Sin pedido activo: fotos del menú y subidas, cada 5 segundos.",
+      "uploadsTitle": "Fotos promocionales propias",
+      "uploadsDesc": "Imágenes extra además del menú. Las subidas van antes del menú en la presentación.",
+      "removeUpload": "Eliminar",
+      "uploadFailed": "Error al subir.",
+      "mollieHint": "El pago QR requiere Mollie en Métodos de pago (Bancontact)."
+    },
     "categorieen": {
       "title": "Categorías",
       "subtitle": "Gestiona las categorías de tu menú",

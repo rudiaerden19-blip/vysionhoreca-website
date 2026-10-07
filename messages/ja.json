@@ -2441,6 +2441,19 @@
       "onlinePaymentsTitle": "オンライン決済を有効化しますか？",
       "onlinePaymentsDesc": "StripeまたはMollieを設定して、お客様がオンラインで支払えるようにします。"
     },
+    "klantscherm": {
+      "title": "客席ディスプレイ",
+      "subtitle": "レジ横の第二モニター：注文、プロモ写真、QR決済。",
+      "enabled": "客席ディスプレイを使う",
+      "enabledDesc": "レジにボタンを表示し、この店舗の客席ディスプレイを有効にします。",
+      "slideshow": "プロモスライドショー（待機）",
+      "slideshowDesc": "注文がないとき：メニューとアップロード画像を5秒ごとに表示。",
+      "uploadsTitle": "独自プロモ写真",
+      "uploadsDesc": "メニュー以外の画像。スライドショーではメニューより先に表示されます。",
+      "removeUpload": "削除",
+      "uploadFailed": "アップロードに失敗しました。",
+      "mollieHint": "QR決済には支払方法ページでMollie（Bancontact）の設定が必要です。"
+    },
     "categorieen": {
       "title": "カテゴリー",
       "subtitle": "メニューカテゴリーを管理",

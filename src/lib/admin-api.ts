@@ -228,6 +228,10 @@ export interface TenantSettings {
   z_report_send_articles_to_accountant?: boolean
   /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */
   z_report_owner_evening_close?: boolean
+  /** Tweede scherm aan kassa (klantscherm). */
+  klantscherm_enabled?: boolean
+  klantscherm_slideshow_enabled?: boolean
+  klantscherm_slideshow_uploads?: { url: string; sort: number }[]
   /** Beginsaldo handmatig kasboek (optioneel) */
   kasboek_opening_balance?: number
   kasboek_opening_balance_date?: string | null

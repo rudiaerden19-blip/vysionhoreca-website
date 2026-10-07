@@ -2441,6 +2441,19 @@
       "onlinePaymentsTitle": "开通在线支付？",
       "onlinePaymentsDesc": "我们可以为您设置Stripe或Mollie，让客户在线支付。"
     },
+    "klantscherm": {
+      "title": "顾客显示屏",
+      "subtitle": "收银台第二屏：订单、促销图片与二维码支付。",
+      "enabled": "使用顾客显示屏",
+      "enabledDesc": "在收银台显示按钮并为本店启用顾客显示屏。",
+      "slideshow": "促销幻灯片（空闲）",
+      "slideshowDesc": "无订单时：菜单与上传图片，每5秒切换。",
+      "uploadsTitle": "自有促销图片",
+      "uploadsDesc": "除菜单外的额外图片。幻灯片中优先于菜单显示。",
+      "removeUpload": "删除",
+      "uploadFailed": "上传失败。",
+      "mollieHint": "二维码支付需在支付方式页面配置 Mollie（Bancontact）。"
+    },
     "categorieen": {
       "title": "分类",
       "subtitle": "管理菜单分类",
