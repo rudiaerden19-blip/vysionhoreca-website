@@ -1,8 +1,6 @@
 'use client'
 
 import { supabase } from '@/lib/supabase'
-import { klantschermPromoStorageSizeHint } from '@/lib/klantscherm-media-bucket-server'
-import type { KlantschermSlideshowMediaType } from '@/lib/klantscherm-slideshow-media'
 
 const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').replace(/\/$/, '')
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
@@ -11,7 +9,6 @@ export type KlantschermPromoUploadProgress = {
   loaded: number
   total: number
   percent: number
-  phase?: 'preparing' | 'uploading' | 'finalizing'
 }
 
 function buildStorageObjectPostUrl(bucket: string, objectPath: string): string {
@@ -33,15 +30,12 @@ function reportUploadProgress(
     loaded,
     total,
     percent: Math.min(100, Math.max(0, pct)),
-    phase: 'uploading',
   })
 }
 
 function uploadFormDataViaXhr(
-  method: 'POST' | 'PUT',
   url: string,
   file: File,
-  cacheControl: string,
   onProgress?: (p: KlantschermPromoUploadProgress) => void,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   return new Promise((resolve) => {
@@ -51,11 +45,11 @@ function uploadFormDataViaXhr(
     }
 
     const form = new FormData()
-    form.append('cacheControl', cacheControl)
+    form.append('cacheControl', '3600')
     form.append('', file)
 
     const xhr = new XMLHttpRequest()
-    xhr.open(method, url)
+    xhr.open('POST', url)
     xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON}`)
     xhr.setRequestHeader('apikey', SUPABASE_ANON)
     xhr.setRequestHeader('x-upsert', 'false')
@@ -81,7 +75,7 @@ function uploadFormDataViaXhr(
       } catch {
         if (xhr.responseText) message = xhr.responseText.slice(0, 240)
       }
-      resolve({ ok: false, message: klantschermPromoStorageSizeHint(message) })
+      resolve({ ok: false, message })
     }
 
     reportUploadProgress(file, 0, onProgress)
@@ -89,93 +83,21 @@ function uploadFormDataViaXhr(
   })
 }
 
-async function uploadWithSignedUrl(
+/** Promo-foto naar bucket `media` (alleen afbeeldingen). */
+export async function uploadKlantschermPromoImage(
   tenantSlug: string,
   file: File,
-  ext: string,
-  contentType: string,
-  onProgress?: (p: KlantschermPromoUploadProgress) => void,
-): Promise<{ ok: true; publicUrl: string } | { ok: false; message: string }> {
-  onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'preparing' })
-
-  const signRes = await fetch(
-    `/api/shop/${encodeURIComponent(tenantSlug)}/klantscherm/promo/signed-upload`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify({ ext, contentType }),
-    },
-  )
-  const signJson = (await signRes.json()) as {
-    ok?: boolean
-    bucket?: string
-    path?: string
-    token?: string
-    publicUrl?: string
-    contentType?: string
-    error?: string
-  }
-
-  if (
-    !signRes.ok ||
-    !signJson.ok ||
-    !signJson.bucket ||
-    !signJson.path ||
-    !signJson.token ||
-    !signJson.publicUrl
-  ) {
-    const raw = signJson.error || `Signed URL mislukt (${signRes.status})`
-    return {
-      ok: false,
-      message: klantschermPromoStorageSizeHint(raw),
-    }
-  }
-
-  if (!supabase) {
-    return { ok: false, message: 'Supabase niet geconfigureerd' }
-  }
-
-  reportUploadProgress(file, 0, onProgress)
-  const { error: upErr } = await supabase.storage
-    .from(signJson.bucket)
-    .uploadToSignedUrl(signJson.path, signJson.token, file, {
-      contentType: signJson.contentType || contentType,
-      cacheControl: '3600',
-      upsert: false,
-    })
-
-  if (upErr) {
-    return { ok: false, message: klantschermPromoStorageSizeHint(upErr.message) }
-  }
-
-  onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
-  return { ok: true, publicUrl: signJson.publicUrl }
-}
-
-export async function uploadKlantschermPromoMedia(
-  tenantSlug: string,
-  file: File,
-  mediaType: KlantschermSlideshowMediaType,
   onProgress?: (p: KlantschermPromoUploadProgress) => void,
 ): Promise<{ ok: true; publicUrl: string } | { ok: false; message: string }> {
   if (!supabase) {
     return { ok: false, message: 'Supabase niet geconfigureerd' }
   }
 
-  const ext =
-    file.name.split('.').pop()?.toLowerCase() ||
-    (mediaType === 'video' ? 'mp4' : 'jpg')
-  const contentType =
-    file.type || (mediaType === 'video' ? 'video/mp4' : 'image/jpeg')
-
-  if (mediaType === 'video') {
-    return uploadWithSignedUrl(tenantSlug, file, ext, contentType, onProgress)
-  }
-
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+  const contentType = file.type || 'image/jpeg'
   const objectPath = `${tenantSlug}/klantscherm/${Date.now()}.${ext}`
   const postUrl = buildStorageObjectPostUrl('media', objectPath)
-  const xhrResult = await uploadFormDataViaXhr('POST', postUrl, file, '3600', onProgress)
+  const xhrResult = await uploadFormDataViaXhr(postUrl, file, onProgress)
   if (xhrResult.ok) {
     const { data: pub } = supabase.storage.from('media').getPublicUrl(objectPath)
     return { ok: true, publicUrl: pub.publicUrl }
@@ -191,7 +113,7 @@ export async function uploadKlantschermPromoMedia(
     return { ok: false, message: error.message }
   }
 
-  onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
+  onProgress?.({ loaded: file.size, total: file.size, percent: 100 })
   const { data: pub } = supabase.storage.from('media').getPublicUrl(objectPath)
   return { ok: true, publicUrl: pub.publicUrl }
 }

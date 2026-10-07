@@ -3,9 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 /** Menu-foto’s blijven in `media`. */
 export const KLANTSCHERM_MEDIA_BUCKET_ID = 'media'
 
-import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-slideshow-media'
-
-export { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID }
+export const KLANTSCHERM_PROMO_VIDEO_BUCKET_ID = 'klantscherm-promo'
 
 export const KLANTSCHERM_PROMO_VIDEO_FILE_SIZE_BYTES = 524_288_000
 

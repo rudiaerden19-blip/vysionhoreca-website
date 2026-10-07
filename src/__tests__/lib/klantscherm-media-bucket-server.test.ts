@@ -4,7 +4,7 @@ import {
   klantschermPromoStorageSizeHint,
   klantschermPromoVideoBucketReady,
 } from '@/lib/klantscherm-media-bucket-server'
-import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-slideshow-media'
+import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-media-bucket-server'
 
 describe('klantscherm media bucket', () => {
   it('includes video/mp4 in allowed mime list', () => {

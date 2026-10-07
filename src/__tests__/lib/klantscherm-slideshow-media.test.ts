@@ -1,55 +1,36 @@
+import { validateKlantschermPromoImageFile } from '@/lib/klantscherm-slideshow-media'
 import {
-  detectKlantschermUploadMediaType,
-  inferKlantschermMediaTypeFromUrl,
-  normalizeKlantschermPromoUrl,
-  validateKlantschermPromoFile,
-} from '@/lib/klantscherm-slideshow-media'
-import {
-  mergeKlantschermSlideshowSlides,
-  parseKlantschermSlideshowUploads,
-  sortKlantschermSlidesForPlayback,
-} from '@/lib/klantscherm-slideshow-server'
+  KLANTSCHERM_CUSTOM_PROMO_MAX,
+  mergeKlantschermCustomPromosForSave,
+  parseKlantschermCustomPromos,
+} from '@/lib/klantscherm-custom-promos'
 
 describe('klantscherm slideshow media', () => {
-  it('normalizes promo https urls', () => {
-    expect(normalizeKlantschermPromoUrl('  https://cdn/x/promo.mp4  ')).toBe('https://cdn/x/promo.mp4')
-    expect(normalizeKlantschermPromoUrl('ftp://x/y')).toBeNull()
+  it('validates promo image file', () => {
+    const f = new File(['x'], 'clip.jpg', { type: 'image/jpeg' })
+    expect(validateKlantschermPromoImageFile(f)).toEqual({ ok: true })
   })
 
-  it('infers video from mp4 url', () => {
-    expect(inferKlantschermMediaTypeFromUrl('https://x.com/a/promo.mp4')).toBe('video')
-    expect(inferKlantschermMediaTypeFromUrl('https://x.com/a/promo.jpg')).toBe('image')
+  it('parses custom promos and caps at 10', () => {
+    const rows = Array.from({ length: 12 }, (_, i) => ({
+      url: `https://cdn/p${i}.jpg`,
+      sort: i,
+      title: `T${i}`,
+    }))
+    expect(parseKlantschermCustomPromos(rows)).toHaveLength(KLANTSCHERM_CUSTOM_PROMO_MAX)
   })
 
-  it('detects mp4 file type', () => {
-    const f = new File(['x'], 'clip.mp4', { type: 'video/mp4' })
-    expect(detectKlantschermUploadMediaType(f)).toBe('video')
-    expect(validateKlantschermPromoFile(f)).toEqual({ ok: true, mediaType: 'video' })
-  })
-
-  it('plays videos before menu images', () => {
-    const sorted = sortKlantschermSlidesForPlayback([
-      { url: 'https://cdn/menu.jpg', type: 'image' },
-      { url: 'https://cdn/promo.mp4', type: 'video' },
+  it('merge keeps display fields', () => {
+    const merged = mergeKlantschermCustomPromosForSave([
+      {
+        url: 'https://cdn/a.jpg',
+        sort: 0,
+        title: 'Friet',
+        description: 'Lekker',
+        displayPrice: '5.50',
+        promoText: '50% vandaag',
+      },
     ])
-    expect(sorted[0]?.type).toBe('video')
-  })
-
-  it('keeps promo uploads when menu slideshow is off', () => {
-    const merged = mergeKlantschermSlideshowSlides(
-      [{ url: 'https://cdn/promo.mp4', type: 'video' }],
-      ['https://cdn/menu.jpg'],
-      false,
-    )
-    expect(merged).toEqual([{ url: 'https://cdn/promo.mp4', type: 'video' }])
-  })
-
-  it('parses uploads with mediaType', () => {
-    const rows = parseKlantschermSlideshowUploads([
-      { url: 'https://cdn/a.mp4', sort: 0 },
-      { url: 'https://cdn/b.png', sort: 1, mediaType: 'image' },
-    ])
-    expect(rows[0]?.mediaType).toBe('video')
-    expect(rows[1]?.mediaType).toBe('image')
+    expect(merged[0]?.promoText).toBe('50% vandaag')
   })
 })

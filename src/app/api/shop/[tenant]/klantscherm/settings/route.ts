@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { parseKlantschermSlideshowUploads } from '@/lib/klantscherm-slideshow-server'
+import {
+  klantschermCustomPromosFromLegacy,
+  mergeKlantschermCustomPromosForSave,
+  parseKlantschermCustomPromos,
+} from '@/lib/klantscherm-custom-promos'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantAccess } from '@/lib/verify-tenant-access'
 
@@ -8,7 +12,7 @@ export const dynamic = 'force-dynamic'
 type RouteContext = { params: { tenant: string } }
 
 const SELECT =
-  'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads, klantscherm_bank_iban, klantscherm_bank_account_name'
+  'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads, klantscherm_custom_promos, klantscherm_bank_iban, klantscherm_bank_account_name'
 
 export async function GET(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant?.trim()
@@ -36,10 +40,15 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
   }
 
+  let customPromos = parseKlantschermCustomPromos(data?.klantscherm_custom_promos)
+  if (customPromos.length === 0) {
+    customPromos = klantschermCustomPromosFromLegacy(data?.klantscherm_slideshow_uploads)
+  }
+
   return NextResponse.json({
     ok: true,
     settings: data ?? null,
-    uploads: parseKlantschermSlideshowUploads(data?.klantscherm_slideshow_uploads),
+    customPromos,
   })
 }
 
@@ -71,8 +80,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
   if (typeof body.klantscherm_slideshow_enabled === 'boolean') {
     patch.klantscherm_slideshow_enabled = body.klantscherm_slideshow_enabled
   }
-  if (Array.isArray(body.klantscherm_slideshow_uploads)) {
-    patch.klantscherm_slideshow_uploads = body.klantscherm_slideshow_uploads
+  if (Array.isArray(body.klantscherm_custom_promos)) {
+    patch.klantscherm_custom_promos = mergeKlantschermCustomPromosForSave(
+      body.klantscherm_custom_promos as Parameters<typeof mergeKlantschermCustomPromosForSave>[0],
+    )
+    patch.klantscherm_slideshow_uploads = []
   }
   if (body.klantscherm_bank_iban !== undefined) {
     patch.klantscherm_bank_iban =
@@ -91,7 +103,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     .from('tenant_settings')
     .update(patch)
     .eq('tenant_slug', tenantSlug)
-    .select('klantscherm_slideshow_uploads')
+    .select('klantscherm_custom_promos')
     .maybeSingle()
 
   if (error) {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { KLANTSCHERM_MEDIA_BUCKET_ID } from '@/lib/klantscherm-media-bucket-server'
-import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-slideshow-media'
+import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-media-bucket-server'
 import { klantschermPromoPathBelongsToTenant } from '@/lib/klantscherm-promo-storage-parse'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 

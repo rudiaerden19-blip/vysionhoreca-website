@@ -1,5 +1,5 @@
 import { KLANTSCHERM_MEDIA_BUCKET_ID } from '@/lib/klantscherm-media-bucket-server'
-import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-slideshow-media'
+import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-media-bucket-server'
 
 const PROMO_BUCKETS = new Set([KLANTSCHERM_PROMO_VIDEO_BUCKET_ID, KLANTSCHERM_MEDIA_BUCKET_ID])
 

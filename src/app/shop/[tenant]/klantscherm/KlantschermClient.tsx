@@ -11,6 +11,7 @@ import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-wind
 import { KLANTSCHERM_NL } from '@/lib/klantscherm-nl-copy'
 import { KlantschermSlideshow } from '@/components/klantscherm/KlantschermSlideshow'
 import { klantschermSlideshowRefreshChannel } from '@/lib/klantscherm-slideshow-server'
+import type { KlantschermPromoSlide } from '@/lib/klantscherm-custom-promos'
 import { KlantschermQrPayView } from '@/components/klantscherm/KlantschermQrPayView'
 import { KlantschermDisplayShell } from '@/components/klantscherm/KlantschermDisplayShell'
 
@@ -55,9 +56,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   const [msg, setMsg] = useState<KassaCustomerDisplayMessage | null>(null)
   const [klantschermActive, setKlantschermActive] = useState(false)
-  const [slideshowSlides, setSlideshowSlides] = useState<
-    { url: string; type: 'image' | 'video' }[]
-  >([])
+  const [slideshowSlides, setSlideshowSlides] = useState<KlantschermPromoSlide[]>([])
   const [qrSession, setQrSession] = useState<QrSession | null>(null)
   const [qrState, setQrState] = useState<'idle' | 'loading' | 'ready' | 'failed'>('idle')
   const [qrFailureMessage, setQrFailureMessage] = useState<string | undefined>()
@@ -91,7 +90,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     let cancelled = false
 
     const applySlideshowJson = (json: {
-      slides?: { url: string; type: 'image' | 'video' }[]
+      slides?: KlantschermPromoSlide[]
       klantschermEnabled?: boolean
     }) => {
       if (cancelled) return
@@ -100,9 +99,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
         setSlideshowSlides([])
         return
       }
-      setSlideshowSlides(
-        json.slides.filter((s) => s?.url && (s.type === 'image' || s.type === 'video')),
-      )
+      setSlideshowSlides(json.slides.filter((s) => s?.url && s.type === 'image'))
     }
 
     const loadSlides = () => {
