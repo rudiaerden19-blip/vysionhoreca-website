@@ -241,7 +241,11 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   if (!msg || msg.phase === 'idle') {
     if (slideshowSlides.length > 0) {
-      return <KlantschermSlideshow slides={slideshowSlides} />
+      return (
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-black">
+          <KlantschermSlideshow slides={slideshowSlides} />
+        </div>
+      )
     }
     if (klantschermActive) {
       return (
