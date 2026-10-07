@@ -2,88 +2,68 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-server'
+import {
+  KLANTSCHERM_SLIDE_FRAME_CLASS,
+  klantschermSlideBackdropStyle,
+} from '@/lib/klantscherm-slideshow-frame'
 
 const IMAGE_MS = 5000
 
-/** Volledige foto zichtbaar; rand vult met dezelfde afbeelding (geen crop, geen lege balk). */
-function KlantschermPromoImage({ url, visible }: { url: string; visible: boolean }) {
-  const fade = visible ? 'opacity-100' : 'opacity-0'
-  return (
-    <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fade}`}>
-      <div
-        className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl saturate-[1.25]"
-        style={{ backgroundImage: `url("${url.replace(/"/g, '%22')}")` }}
-        aria-hidden
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={url}
-        alt=""
-        className="relative z-10 mx-auto h-full w-full object-contain object-center"
-        referrerPolicy="no-referrer"
-      />
-    </div>
-  )
-}
-
-function KlantschermPromoVideo({
+/** Zelfde 16:9-kader voor elke slide; schermrand = wazige fill (geen crop op voorgrond). */
+function KlantschermSlideFrame({
   url,
   visible,
+  kind,
   videoRef,
   onVideoEnded,
   onVideoError,
 }: {
   url: string
   visible: boolean
+  kind: 'image' | 'video'
   videoRef?: RefObject<HTMLVideoElement>
   onVideoEnded?: () => void
   onVideoError?: () => void
 }) {
   const fade = visible ? 'opacity-100' : 'opacity-0'
+
   return (
-    <div className={`absolute inset-0 flex items-center justify-center overflow-hidden bg-black transition-opacity duration-500 ${fade}`}>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video
-        ref={videoRef}
-        key={url}
-        src={url}
-        muted
-        playsInline
-        autoPlay
-        preload="auto"
-        className="max-h-full max-w-full object-contain object-center"
-        onEnded={onVideoEnded}
-        onError={onVideoError}
+    <div className={`absolute inset-0 overflow-hidden bg-black transition-opacity duration-500 ${fade}`}>
+      <div
+        className="absolute inset-0 scale-110 bg-cover bg-center blur-3xl saturate-[1.2]"
+        style={klantschermSlideBackdropStyle(url)}
+        aria-hidden
       />
+      <div className="absolute inset-0 flex items-center justify-center p-[2vmin]">
+        <div className={KLANTSCHERM_SLIDE_FRAME_CLASS}>
+          {kind === 'video' ? (
+            /* eslint-disable-next-line jsx-a11y/media-has-caption */
+            <video
+              ref={videoRef}
+              key={url}
+              src={url}
+              muted
+              playsInline
+              autoPlay
+              preload="auto"
+              className="absolute inset-0 h-full w-full object-contain object-center"
+              onEnded={onVideoEnded}
+              onError={onVideoError}
+            />
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={url}
+              src={url}
+              alt=""
+              className="absolute inset-0 h-full w-full object-contain object-center"
+              referrerPolicy="no-referrer"
+            />
+          )}
+        </div>
+      </div>
     </div>
   )
-}
-
-function KlantschermSlideshowSlideView({
-  slide,
-  visible,
-  videoRef,
-  onVideoEnded,
-  onVideoError,
-}: {
-  slide: KlantschermSlideshowSlide
-  visible: boolean
-  videoRef?: RefObject<HTMLVideoElement>
-  onVideoEnded?: () => void
-  onVideoError?: () => void
-}) {
-  if (slide.type === 'video') {
-    return (
-      <KlantschermPromoVideo
-        url={slide.url}
-        visible={visible}
-        videoRef={videoRef}
-        onVideoEnded={onVideoEnded}
-        onVideoError={onVideoError}
-      />
-    )
-  }
-  return <KlantschermPromoImage url={slide.url} visible={visible} />
 }
 
 export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowSlide[] }) {
@@ -128,10 +108,11 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
 
   return (
     <div className="relative min-h-0 w-full flex-1 bg-black">
-      <KlantschermSlideshowSlideView
-        slide={current}
+      <KlantschermSlideFrame
+        url={current.url}
         visible={visible}
-        videoRef={videoRef}
+        kind={current.type}
+        videoRef={current.type === 'video' ? videoRef : undefined}
         onVideoEnded={advance}
         onVideoError={advance}
       />
