@@ -48,6 +48,10 @@ export type KassaCustomerDisplayMessage =
       vatLines?: { rate: number; amount: number }[]
       totalInclVat: number
       dineInSubtitle?: string
+      /** true = klantscherm toont Bancontact-QR (niet bij contant). */
+      showKlantschermQr?: boolean
+      /** Bedrag op QR (split: kaartdeel). */
+      qrPayAmount?: number
     }
   | {
       v: 1
@@ -61,5 +65,26 @@ export type KassaCustomerDisplayMessage =
 export function isKassaCustomerDisplayMessage(x: unknown): x is KassaCustomerDisplayMessage {
   if (!x || typeof x !== 'object') return false
   const o = x as Record<string, unknown>
+  if (o.kind != null) return false
   return o.v === 1 && typeof o.phase === 'string' && typeof o.tenantSlug === 'string'
+}
+
+/** Klantscherm → kassa: Mollie QR-status (zelfde BroadcastChannel). */
+export type KlantschermQrPayStatusMessage = {
+  v: 1
+  kind: 'klantscherm_qr_pay_status'
+  tenantSlug: string
+  status: 'paid' | 'failed' | 'canceled'
+  providerPaymentId?: string
+}
+
+export function isKlantschermQrPayStatusMessage(x: unknown): x is KlantschermQrPayStatusMessage {
+  if (!x || typeof x !== 'object') return false
+  const o = x as Record<string, unknown>
+  return (
+    o.v === 1 &&
+    o.kind === 'klantscherm_qr_pay_status' &&
+    typeof o.tenantSlug === 'string' &&
+    (o.status === 'paid' || o.status === 'failed' || o.status === 'canceled')
+  )
 }

@@ -198,6 +198,7 @@ import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
+import { KassaKlantschermQrResultModal } from '@/components/kassa/KassaKlantschermQrResultModal'
 import { KassaTerminalPayModal } from '@/components/kassa/KassaTerminalPayModal'
 import { kassaCardPayGoesToCloudTerminal } from '@/lib/kassa-payment-terminal'
 import { useKassaCloudTerminals } from '@/lib/kassa-payment-terminal-client'
@@ -227,6 +228,7 @@ import {
 } from '@/lib/kassa-floor-plan-zone'
 import {
   kassaCustomerDisplayChannelName,
+  isKlantschermQrPayStatusMessage,
   type KassaCustomerDisplayMessage,
   type KassaCustomerDisplayLine,
   KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
@@ -2568,6 +2570,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [])
   /** BroadcastChannel-sessie voor tweede scherm (klant); optioneel — geen impact zonder token */
   const [customerDisplayToken, setCustomerDisplayToken] = useState<string | null>(null)
+  /** Klantscherm Bancontact-QR alleen na keuze kaart/Bancontact (niet contant). */
+  const [customerDisplayShowQr, setCustomerDisplayShowQr] = useState(false)
+  const [klantschermQrPayAlert, setKlantschermQrPayAlert] = useState<
+    'paid' | 'failed' | 'canceled' | null
+  >(null)
   /** Korte bedankmelding op klantscherm na betaling */
   const [customerDisplayThankYou, setCustomerDisplayThankYou] = useState<{
     total: number
@@ -2860,12 +2867,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     const name = kassaCustomerDisplayChannelName(tenant, customerDisplayToken)
     customerDisplayBcRef.current?.close()
-    customerDisplayBcRef.current = new BroadcastChannel(name)
+    const bc = new BroadcastChannel(name)
+    bc.onmessage = (ev: MessageEvent<unknown>) => {
+      const data = ev.data
+      if (!isKlantschermQrPayStatusMessage(data)) return
+      if (data.tenantSlug !== tenant) return
+      setKlantschermQrPayAlert(data.status)
+    }
+    customerDisplayBcRef.current = bc
     return () => {
       customerDisplayBcRef.current?.close()
       customerDisplayBcRef.current = null
     }
   }, [tenant, customerDisplayToken, klantschermEnabled])
+
+  useEffect(() => {
+    if (!showSplitModal) return
+    setCustomerDisplayShowQr(splitCard > 0)
+  }, [showSplitModal, splitCard])
 
   useEffect(() => {
     if (!customerDisplayThankYou) return
@@ -3366,7 +3385,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     } else if (billLines.length === 0 && !showPaymentModal && !showSplitModal) {
       msg = { v: 1, phase: 'idle', tenantSlug: tenant, businessName }
-    } else if ((showPaymentModal || showSplitModal) && billLines.length > 0) {
+    } else if (
+      (showPaymentModal || showSplitModal || showTerminalPayModal) &&
+      billLines.length > 0
+    ) {
       const splitCd = computeInclusiveVatSplitFromCart(billLines, resolveCartLineVat)
       const subtotalExVat = splitCd.subtotalExcl
       const vatAmount = splitCd.totalTax
@@ -3375,6 +3397,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ? splitCd.byRate.map((l) => ({ rate: l.rate, amount: l.tax }))
           : undefined
       const vatRate = splitCd.byRate.length === 1 ? splitCd.byRate[0].rate : fallbackVatRate
+      const qrPayAmount =
+        showSplitModal && splitCard > 0
+          ? Math.round(splitCard * 100) / 100
+          : totalInclVat
+      const showKlantschermQr =
+        customerDisplayShowQr &&
+        (showTerminalPayModal ||
+          (showSplitModal ? splitCard > 0 : showPaymentModal || showTerminalPayModal))
       msg = {
         v: 1,
         phase: 'checkout',
@@ -3387,6 +3417,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ...(vatLines ? { vatLines } : {}),
         totalInclVat,
         dineInSubtitle: customerDisplayDineInSubtitle,
+        showKlantschermQr,
+        qrPayAmount,
       }
     } else if (billLines.length > 0) {
       msg = {
@@ -3419,6 +3451,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     total,
     showPaymentModal,
     showSplitModal,
+    showTerminalPayModal,
+    customerDisplayShowQr,
+    splitCard,
     tenantInfo?.business_name,
     tenantInfo?.btw_percentage,
     customerDisplayThankYou,
@@ -7125,10 +7160,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         payBusy={payInFlight}
         onClose={() => {
           if (payInFlight) return
+          setCustomerDisplayShowQr(false)
           setShowPaymentModal(false)
         }}
         onPay={(method) => {
           if (payInFlightRef.current) return
+          if (method === 'CASH') {
+            setCustomerDisplayShowQr(false)
+          } else {
+            setCustomerDisplayShowQr(true)
+          }
           if (kassaCardPayGoesToCloudTerminal(method, paymentTerminals)) {
             setTerminalPayMethod(method === 'BANCONTACT' ? 'BANCONTACT' : 'CARD')
             setShowPaymentModal(false)
@@ -7142,6 +7183,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (payInFlightRef.current) return
           setSplitCash(0)
           setSplitCard(total)
+          setCustomerDisplayShowQr(total > 0)
           setShowSplitModal(true)
           setShowPaymentModal(false)
         }}
@@ -7162,8 +7204,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         onCancelBack={() => {
           setShowTerminalPayModal(false)
+          setCustomerDisplayShowQr(false)
           setShowPaymentModal(true)
         }}
+      />
+
+      <KassaKlantschermQrResultModal
+        open={klantschermQrPayAlert != null}
+        status={klantschermQrPayAlert}
+        onClose={() => setKlantschermQrPayAlert(null)}
+        appearance={kassaAppearanceDark ? 'dark' : 'light'}
       />
 
       <KassaSplitPaymentModal
@@ -7176,6 +7226,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         payBusy={payInFlight}
         onCloseBack={() => {
           if (payInFlight) return
+          setCustomerDisplayShowQr(false)
           setShowSplitModal(false)
           setShowPaymentModal(true)
         }}

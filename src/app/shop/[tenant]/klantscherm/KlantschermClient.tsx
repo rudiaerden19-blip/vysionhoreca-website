@@ -10,7 +10,7 @@ import {
 import { positionCustomerDisplayWindow } from '@/lib/kassa-customer-display-window'
 import { KLANTSCHERM_NL } from '@/lib/klantscherm-nl-copy'
 import { KlantschermSlideshow } from '@/components/klantscherm/KlantschermSlideshow'
-import QRCode from '@/components/QRCode'
+import { KlantschermQrPayView } from '@/components/klantscherm/KlantschermQrPayView'
 
 function klantschermOrderDensityStyle(lineCount: number) {
   if (lineCount <= 6) {
@@ -53,8 +53,10 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const [klantschermActive, setKlantschermActive] = useState(false)
   const [slideshowImages, setSlideshowImages] = useState<string[]>([])
   const [qrSession, setQrSession] = useState<QrSession | null>(null)
-  const [qrPaidHint, setQrPaidHint] = useState(false)
+  const [qrPayStatus, setQrPayStatus] = useState<'idle' | 'pending' | 'paid' | 'failed'>('idle')
   const qrCreateKeyRef = useRef<string>('')
+  const qrNotifyRef = useRef<string>('')
+  const bcRef = useRef<BroadcastChannel | null>(null)
 
   const channelName = useMemo(() => {
     if (!token) return null
@@ -64,14 +66,40 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   useEffect(() => {
     if (!channelName || typeof BroadcastChannel === 'undefined') return
     const bc = new BroadcastChannel(channelName)
+    bcRef.current = bc
     bc.onmessage = (ev: MessageEvent<unknown>) => {
       const data = ev.data
       if (!isKassaCustomerDisplayMessage(data)) return
       if (data.tenantSlug !== tenant) return
       setMsg(data)
     }
-    return () => bc.close()
+    return () => {
+      bc.close()
+      bcRef.current = null
+    }
   }, [channelName, tenant])
+
+  const checkoutShowQr = msg?.phase === 'checkout' && msg.showKlantschermQr === true
+  const qrPayAmount =
+    msg?.phase === 'checkout' ? (msg.qrPayAmount ?? msg.totalInclVat) : 0
+
+  const notifyKassaQrStatus = (
+    status: 'paid' | 'failed' | 'canceled',
+    providerPaymentId: string,
+  ) => {
+    const bc = bcRef.current
+    if (!bc) return
+    const dedupe = `${providerPaymentId}-${status}`
+    if (qrNotifyRef.current === dedupe) return
+    qrNotifyRef.current = dedupe
+    bc.postMessage({
+      v: 1,
+      kind: 'klantscherm_qr_pay_status',
+      tenantSlug: tenant,
+      status,
+      providerPaymentId,
+    })
+  }
 
   useEffect(() => {
     if (!token) return
@@ -118,16 +146,18 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }, [token])
 
   useEffect(() => {
-    if (msg?.phase !== 'checkout') {
+    if (!checkoutShowQr) {
       setQrSession(null)
-      setQrPaidHint(false)
+      setQrPayStatus('idle')
       qrCreateKeyRef.current = ''
+      qrNotifyRef.current = ''
       return
     }
-    const amount = msg.totalInclVat
-    const key = `${amount}-${msg.lines.length}`
+    const amount = qrPayAmount
+    const key = `${amount}-${msg?.phase === 'checkout' ? msg.lines.length : 0}`
     if (qrCreateKeyRef.current === key && qrSession) return
     qrCreateKeyRef.current = key
+    setQrPayStatus('pending')
     let cancelled = false
     void fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/qr/create`, {
       method: 'POST',
@@ -141,9 +171,11 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
           ok?: boolean
           provider_payment_id?: string
           qr_checkout_url?: string
-          amount_cents?: number
         }) => {
-          if (cancelled || !json.ok || !json.provider_payment_id || !json.qr_checkout_url) return
+          if (cancelled || !json.ok || !json.provider_payment_id || !json.qr_checkout_url) {
+            if (!cancelled) setQrPayStatus('failed')
+            return
+          }
           setQrSession({
             providerPaymentId: json.provider_payment_id,
             qrCheckoutUrl: json.qr_checkout_url,
@@ -151,14 +183,16 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
           })
         },
       )
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setQrPayStatus('failed')
+      })
     return () => {
       cancelled = true
     }
-  }, [msg, tenant])
+  }, [checkoutShowQr, qrPayAmount, msg, tenant])
 
   useEffect(() => {
-    if (!qrSession) return
+    if (!qrSession || qrPayStatus === 'paid' || qrPayStatus === 'failed') return
     let cancelled = false
     const poll = async () => {
       if (cancelled) return
@@ -169,8 +203,13 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
           { credentials: 'include', cache: 'no-store' },
         )
         const json = (await res.json()) as { ok?: boolean; status?: string }
-        if (json.ok && json.status === 'paid') {
-          setQrPaidHint(true)
+        if (!json.ok || cancelled) return
+        if (json.status === 'paid') {
+          setQrPayStatus('paid')
+          notifyKassaQrStatus('paid', qrSession.providerPaymentId)
+        } else if (json.status === 'failed' || json.status === 'canceled') {
+          setQrPayStatus('failed')
+          notifyKassaQrStatus(json.status === 'canceled' ? 'canceled' : 'failed', qrSession.providerPaymentId)
         }
       } catch {
         /* retry */
@@ -182,7 +221,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       cancelled = true
       window.clearInterval(id)
     }
-  }, [qrSession, tenant])
+  }, [qrSession, tenant, qrPayStatus])
 
   const formatMoney = (n: number) =>
     new Intl.NumberFormat('nl-BE', { style: 'currency', currency: 'EUR' }).format(n)
@@ -236,6 +275,18 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const title = isCheckout ? KLANTSCHERM_NL.checkoutTitle : KLANTSCHERM_NL.yourOrder
   const d = klantschermOrderDensityStyle(lines.length)
 
+  if (isCheckout && msg.showKlantschermQr) {
+    return (
+      <KlantschermQrPayView
+        amount={qrPayAmount}
+        qrCheckoutUrl={qrSession?.qrCheckoutUrl ?? ''}
+        status={
+          qrPayStatus === 'paid' ? 'paid' : qrPayStatus === 'failed' ? 'failed' : 'pending'
+        }
+      />
+    )
+  }
+
   return (
     <div
       className={`box-border flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-black text-white lg:flex-row ${d.shellPad}`}
@@ -273,26 +324,6 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
         </footer>
       </div>
 
-      {isCheckout ? (
-        <div className="mt-6 flex shrink-0 flex-col items-center justify-center border-t border-white/20 pt-6 text-center lg:mt-0 lg:w-[min(42vw,420px)] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-          <p className="text-lg font-semibold sm:text-xl">{KLANTSCHERM_NL.qrTitle}</p>
-          <p className="mt-1 text-sm text-white/75">{KLANTSCHERM_NL.qrHint}</p>
-          <p className="mt-3 text-3xl font-black tabular-nums sm:text-4xl">
-            {formatMoney(msg.totalInclVat)}
-          </p>
-          {qrPaidHint ? (
-            <p className="mt-6 max-w-xs text-lg font-semibold text-emerald-400">
-              {KLANTSCHERM_NL.qrPaidStaffHint}
-            </p>
-          ) : qrSession ? (
-            <div className="mt-4">
-              <QRCode url={qrSession.qrCheckoutUrl} size={280} className="mx-auto shadow-2xl" />
-            </div>
-          ) : (
-            <p className="mt-6 text-sm text-white/60">{KLANTSCHERM_NL.qrCreateFailed}</p>
-          )}
-        </div>
-      ) : null}
     </div>
   )
 }
