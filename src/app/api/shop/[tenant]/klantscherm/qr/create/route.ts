@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authorizeKassaTerminalTenant } from '@/lib/kassa-payment-terminal-server'
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { eurosToCents } from '@/lib/kassa-payment-terminal'
 import {
   buildSepaEpcQrPayload,
@@ -11,7 +11,11 @@ export const dynamic = 'force-dynamic'
 
 type RouteContext = { params: { tenant: string } }
 
-/** Bank-QR (SEPA/EPC): IBAN + bedrag; bevestiging = klant toont gsm aan kassa. */
+function isMissingColumnError(message: string | undefined): boolean {
+  return !!message && /42703|klantscherm_bank|column/.test(message)
+}
+
+/** Bank-QR voor klantscherm — geen kassa-login nodig (zelfde als slideshow). */
 export async function POST(request: NextRequest, context: RouteContext) {
   const tenantSlug = context.params.tenant?.trim()
   if (!tenantSlug) {
@@ -25,16 +29,38 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const auth = await authorizeKassaTerminalTenant(request, tenantSlug)
-  if (!auth.ok) return auth.response
+  const supabase = getServerSupabaseClient()
+  if (!supabase) {
+    return NextResponse.json({ ok: false, error: 'server_config' }, { status: 503 })
+  }
 
-  const { data: settings } = await auth.supabase
+  const full = await supabase
     .from('tenant_settings')
     .select(
       'klantscherm_enabled, business_name, klantscherm_bank_iban, klantscherm_bank_account_name',
     )
-    .eq('tenant_slug', auth.tenantSlug)
+    .eq('tenant_slug', tenantSlug)
     .maybeSingle()
+
+  let settings = full.data
+  if (full.error && isMissingColumnError(full.error.message)) {
+    const retry = await supabase
+      .from('tenant_settings')
+      .select('klantscherm_enabled, business_name')
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+    settings =
+      retry.data != null
+        ? {
+            ...retry.data,
+            klantscherm_bank_iban: null,
+            klantscherm_bank_account_name: null,
+          }
+        : null
+  } else if (full.error) {
+    console.error('[klantscherm/qr/create] settings', full.error)
+    return NextResponse.json({ ok: false, error: 'settings_load_failed' }, { status: 500 })
+  }
 
   if (settings?.klantscherm_enabled !== true) {
     return NextResponse.json({ ok: false, error: 'klantscherm_disabled' }, { status: 403 })
@@ -56,7 +82,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   const iban = normalizeIban(ibanRaw)
   const beneficiary =
     String(settings?.klantscherm_bank_account_name ?? '').trim() ||
-    String(settings?.business_name ?? auth.tenantSlug).trim()
+    String(settings?.business_name ?? tenantSlug).trim()
   const amountEur = amountCents / 100
   const ref = typeof body.reference === 'string' ? body.reference.trim().slice(0, 140) : ''
   const qrPayload = buildSepaEpcQrPayload({

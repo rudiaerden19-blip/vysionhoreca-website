@@ -142,24 +142,30 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     let cancelled = false
     void fetch(`/api/shop/${encodeURIComponent(tenant)}/klantscherm/qr/create`, {
       method: 'POST',
-      credentials: 'include',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount }),
     })
-      .then((r) => r.json())
-      .then(
-        (json: {
+      .then(async (r) => {
+        const json = (await r.json()) as {
           ok?: boolean
           error?: string
           qr_payload?: string
           iban?: string
           beneficiary_name?: string
-        }) => {
+        }
+        return { status: r.status, json }
+      })
+      .then(({ status, json }) => {
           if (cancelled) return
           if (!json.ok || !json.qr_payload) {
             setQrState('failed')
             if (json.error === 'iban_missing' || json.error === 'invalid_iban') {
               setQrFailureMessage(KLANTSCHERM_NL.qrIbanMissing)
+            } else if (json.error === 'klantscherm_disabled') {
+              setQrFailureMessage(KLANTSCHERM_NL.qrCreateFailed)
+            } else if (status === 403 || json.error === 'unauthorized') {
+              setQrFailureMessage(KLANTSCHERM_NL.qrCreateFailed)
             } else {
               setQrFailureMessage(KLANTSCHERM_NL.qrCreateFailed)
             }
@@ -172,8 +178,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
             beneficiaryName: json.beneficiary_name,
           })
           setQrState('ready')
-        },
-      )
+      })
       .catch(() => {
         if (!cancelled) {
           setQrState('failed')
