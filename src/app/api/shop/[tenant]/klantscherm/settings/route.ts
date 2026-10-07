@@ -5,7 +5,7 @@ import {
   parseKlantschermCustomPromos,
 } from '@/lib/klantscherm-custom-promos'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifyTenantAccess } from '@/lib/verify-tenant-access'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const access = await verifyTenantAccess(request, tenantSlug)
+  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
   if (!access.authorized) {
     return NextResponse.json({ ok: false, error: access.error ?? 'unauthorized' }, { status: 403 })
   }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const access = await verifyTenantAccess(request, tenantSlug)
+  const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
   if (!access.authorized) {
     return NextResponse.json({ ok: false, error: access.error ?? 'unauthorized' }, { status: 403 })
   }

@@ -30,11 +30,11 @@ function promoSlideHasCopy(copy?: KlantschermPromoSlideCopy): boolean {
   )
 }
 
-/** Admin-mini: zelfde blur + frame als op klantscherm (WYSIWYG). */
+/** Admin-preview: zelfde blur + grote foto als op het 15″ klantscherm (landscape). */
 export function KlantschermPromoSlideAdminPreview({
   url,
   copy,
-  className = 'h-40 w-[17.5rem] shrink-0',
+  className = 'aspect-video w-full max-w-2xl',
 }: {
   url: string
   copy?: KlantschermPromoSlideCopy
@@ -44,29 +44,29 @@ export function KlantschermPromoSlideAdminPreview({
   const hasCopy = promoSlideHasCopy(copy)
   return (
     <div
-      className={`relative overflow-hidden rounded-[1rem] shadow-[0_8px_28px_rgba(0,0,0,0.25)] ring-2 ring-white/40 ${className}`}
+      className={`relative overflow-hidden rounded-[1.25rem] shadow-[0_12px_40px_rgba(0,0,0,0.28)] ring-2 ring-white/40 ${className}`}
       style={klantschermSlideBackdropStyle(url)}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt="" aria-hidden className={`${BLUR_IMG_CLASS} opacity-90`} referrerPolicy="no-referrer" />
-      <div className={`${BLUR_CSS_CLASS} opacity-90`} style={klantschermSlideBackdropStyle(url)} aria-hidden />
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 p-1.5">
-        <div className={`max-h-[72%] max-w-full overflow-hidden rounded-lg ${FRAME_RING} ring-1`}>
+      <img src={url} alt="" aria-hidden className={BLUR_IMG_CLASS} referrerPolicy="no-referrer" />
+      <div className={BLUR_CSS_CLASS} style={klantschermSlideBackdropStyle(url)} aria-hidden />
+      <div className="absolute inset-0 z-10 flex h-full w-full flex-col items-center justify-center gap-[2%] p-[2%]">
+        <div className={`max-h-[78%] max-w-[96%] ${FRAME_RING}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={url}
             alt=""
-            className="block max-h-[5.5rem] w-auto max-w-full object-contain object-center"
+            className="block max-h-[min(52vh,22rem)] w-auto max-w-[96vw] object-contain object-center"
             referrerPolicy="no-referrer"
           />
         </div>
         {hasCopy ? (
-          <div className="w-full rounded-md border border-white/30 bg-white/20 px-2 py-1 text-center backdrop-blur-md">
+          <div className="w-full max-w-[92%] rounded-xl border border-white/35 bg-white/20 px-3 py-2 text-center backdrop-blur-xl">
             {copy?.promoText?.trim() ? (
-              <p className="truncate text-[0.55rem] font-bold uppercase text-amber-200">{copy.promoText.trim()}</p>
+              <p className="truncate text-xs font-bold uppercase text-amber-200">{copy.promoText.trim()}</p>
             ) : null}
             {copy?.title?.trim() ? (
-              <p className="truncate text-[0.65rem] font-black text-white">{copy.title.trim()}</p>
+              <p className="truncate text-sm font-black text-white">{copy.title.trim()}</p>
             ) : null}
           </div>
         ) : null}
@@ -87,7 +87,8 @@ export function KlantschermPromoSlideFrame({
 }) {
   const fade = visible ? 'opacity-100' : 'opacity-0'
   const hasCopy = promoSlideHasCopy(copy)
-  const imageHeightClass = hasCopy ? 'h-[68vh] max-h-[68vh]' : 'h-[96vh] max-h-[96vh]'
+  /** Tekst onder de foto — foto blijft groot op 15″ landscape (niet inkrimpen naar 68vh). */
+  const imageHeightClass = hasCopy ? 'h-[88vh] max-h-[88vh]' : 'h-[96vh] max-h-[96vh]'
 
   const formatDisplayPrice = (raw: string) => {
     const t = raw.trim()

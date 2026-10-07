@@ -288,7 +288,7 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
               <div className="space-y-6">
                 {promos.map((row, index) => (
                   <div key={`promo-${index}-${row.url}`} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <div className="flex flex-wrap items-start gap-4">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
                       {row.url ? (
                         <KlantschermPromoSlideAdminPreview
                           url={row.url}
@@ -300,11 +300,11 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                           }}
                         />
                       ) : (
-                        <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-gray-200 text-xs text-gray-500">
+                        <div className="flex aspect-video w-full max-w-2xl items-center justify-center rounded-xl bg-gray-200 text-sm text-gray-500">
                           {t('adminPages.klantscherm.customPromoNoPhoto')}
                         </div>
                       )}
-                      <div className="min-w-0 flex-1 space-y-3">
+                      <div className="min-w-0 flex-1 space-y-3 lg:min-w-[16rem]">
                         <input
                           type="file"
                           accept={KLANTSCHERM_PROMO_FILE_ACCEPT}
