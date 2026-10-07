@@ -12,19 +12,21 @@ import { KLANTSCHERM_NL } from '@/lib/klantscherm-nl-copy'
 import { KlantschermSlideshow } from '@/components/klantscherm/KlantschermSlideshow'
 import { klantschermSlideshowRefreshChannel } from '@/lib/klantscherm-slideshow-server'
 import { KlantschermQrPayView } from '@/components/klantscherm/KlantschermQrPayView'
+import { KlantschermDisplayShell } from '@/components/klantscherm/KlantschermDisplayShell'
 
 function klantschermOrderDensityStyle(lineCount: number) {
   if (lineCount <= 6) {
     return {
       shellPad: 'px-3 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8',
-      headerWrap: 'mb-4 border-b border-white/25 pb-4 sm:mb-6 sm:pb-5',
-      businessName: 'text-xl font-black tracking-tight sm:text-2xl md:text-3xl',
-      phaseTitle: 'mt-2 text-base font-semibold text-white/90 sm:text-lg',
+      headerWrap: 'mb-5 border-b border-white/20 pb-5 sm:mb-6 sm:pb-6',
+      businessName: 'text-[clamp(1.75rem,4vw,2.75rem)] font-black tracking-tight text-white',
+      phaseTitle: 'mt-2 text-[clamp(1.1rem,2.5vw,1.5rem)] font-medium text-orange-100/90',
       listGap: 'gap-2 sm:gap-3',
       row:
-        'flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-white/15 pb-2 text-sm leading-snug sm:text-base md:text-lg',
-      footerWrap: 'mt-auto border-t border-white/25 pt-4 sm:pt-6',
-      totalCart: 'flex items-center justify-between text-lg font-black sm:text-2xl md:text-3xl',
+        'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-white/10 pb-3 text-[clamp(1rem,2.2vw,1.35rem)] leading-snug',
+      footerWrap: 'mt-auto border-t border-white/20 pt-5 sm:pt-6',
+      totalCart:
+        'flex items-center justify-between text-[clamp(1.35rem,3.2vw,2.25rem)] font-black text-white',
     }
   }
   return {
@@ -247,8 +249,8 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
   if (msg?.phase === 'thankYou') {
     return (
-      <div className={`${shellFill} items-center justify-center gap-8 px-6 py-8 text-center`}>
-        <p className="max-w-[96vw] text-[clamp(2rem,6vw,4.25rem)] font-black leading-tight text-emerald-400">
+      <KlantschermDisplayShell className="items-center justify-center gap-8 px-6 py-8 text-center">
+        <p className="max-w-[96vw] text-[clamp(2rem,6vw,4.25rem)] font-black leading-tight text-emerald-300">
           {KLANTSCHERM_NL.paymentSuccessTitle}
         </p>
         <p className="max-w-[96vw] text-[clamp(1.35rem,3.8vw,2.75rem)] font-semibold text-white/95">
@@ -257,7 +259,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
         {msg.dineInSubtitle ? (
           <p className="max-w-2xl text-lg font-medium text-white/75">{msg.dineInSubtitle}</p>
         ) : null}
-      </div>
+      </KlantschermDisplayShell>
     )
   }
 
@@ -304,42 +306,41 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   }
 
   return (
-    <div
-      className={`box-border flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-black text-white lg:flex-row ${d.shellPad}`}
-    >
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className={`text-center lg:text-left ${d.headerWrap}`}>
-          <h1 className={d.businessName}>{msg.businessName}</h1>
-          <p className={d.phaseTitle}>{title}</p>
-          {msg.dineInSubtitle ? (
-            <p className="mt-1 text-sm font-semibold text-white/80">{msg.dineInSubtitle}</p>
-          ) : null}
-        </header>
+    <KlantschermDisplayShell>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-[3vmin] py-[4vmin]">
+        <div className="flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/[0.08] px-6 py-7 shadow-[0_32px_90px_rgba(0,0,0,0.35)] backdrop-blur-md sm:rounded-[2rem] sm:px-10 sm:py-9">
+          <header className={`text-center ${d.headerWrap}`}>
+            <h1 className={d.businessName}>{msg.businessName}</h1>
+            <p className={d.phaseTitle}>{title}</p>
+            {msg.dineInSubtitle ? (
+              <p className="mt-2 text-sm font-medium text-white/75">{msg.dineInSubtitle}</p>
+            ) : null}
+          </header>
 
-        {lines.length === 0 ? (
-          <p className="text-center text-lg text-white/70 lg:text-left">{KLANTSCHERM_NL.emptyCartHint}</p>
-        ) : (
-          <ul className={`flex min-h-0 flex-1 flex-col ${d.listGap} overflow-hidden`}>
-            {lines.map((line, idx) => (
-              <li key={`${idx}-${line.label}`} className={d.row}>
-                <span className="min-w-0 flex-1 break-words font-medium">
-                  <span className="text-white/80">{line.qty} × </span>
-                  {line.label}
-                </span>
-                <span className="shrink-0 font-bold tabular-nums">{formatMoney(line.lineTotal)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+          {lines.length === 0 ? (
+            <p className="text-center text-lg text-white/75">{KLANTSCHERM_NL.emptyCartHint}</p>
+          ) : (
+            <ul className={`flex min-h-0 flex-1 flex-col ${d.listGap} overflow-y-auto`}>
+              {lines.map((line, idx) => (
+                <li key={`${idx}-${line.label}`} className={d.row}>
+                  <span className="min-w-0 flex-1 break-words font-medium text-white/95">
+                    <span className="text-orange-200/90">{line.qty} × </span>
+                    {line.label}
+                  </span>
+                  <span className="shrink-0 font-bold tabular-nums text-white">{formatMoney(line.lineTotal)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
 
-        <footer className={d.footerWrap}>
-          <div className={d.totalCart}>
-            <span>{KLANTSCHERM_NL.totalInclVat}</span>
-            <span className="tabular-nums">{formatMoney(msg.totalInclVat)}</span>
-          </div>
-        </footer>
+          <footer className={d.footerWrap}>
+            <div className={d.totalCart}>
+              <span className="text-white/90">{KLANTSCHERM_NL.totalInclVat}</span>
+              <span className="tabular-nums">{formatMoney(msg.totalInclVat)}</span>
+            </div>
+          </footer>
+        </div>
       </div>
-
-    </div>
+    </KlantschermDisplayShell>
   )
 }
