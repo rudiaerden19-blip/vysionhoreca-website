@@ -116,7 +116,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
     }
 
     loadSlides()
-    const intervalId = window.setInterval(loadSlides, 45_000)
+    const intervalId = window.setInterval(loadSlides, 15_000)
     const onVisible = () => {
       if (document.visibilityState === 'visible') loadSlides()
     }

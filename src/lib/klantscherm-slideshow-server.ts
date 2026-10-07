@@ -1,5 +1,6 @@
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import {
+  isKlantschermCustomPromosColumnError,
   klantschermCustomPromosFromLegacy,
   klantschermCustomPromosToSlides,
   parseKlantschermCustomPromos,
@@ -65,16 +66,28 @@ export async function loadKlantschermSlideshowSlides(tenantSlug: string): Promis
   const supabase = getServerSupabaseClient()
   if (!supabase) return []
 
-  const { data: settings } = await supabase
+  let customRaw: unknown
+  let legacyRaw: unknown
+
+  const { data: settings, error } = await supabase
     .from('tenant_settings')
     .select('klantscherm_custom_promos, klantscherm_slideshow_uploads')
     .eq('tenant_slug', slug)
     .maybeSingle()
 
-  const slides = resolveCustomPromos(
-    settings?.klantscherm_custom_promos,
-    settings?.klantscherm_slideshow_uploads,
-  )
+  if (error && isKlantschermCustomPromosColumnError(error.message)) {
+    const { data: legacyOnly } = await supabase
+      .from('tenant_settings')
+      .select('klantscherm_slideshow_uploads')
+      .eq('tenant_slug', slug)
+      .maybeSingle()
+    legacyRaw = legacyOnly?.klantscherm_slideshow_uploads
+  } else if (settings) {
+    customRaw = settings.klantscherm_custom_promos
+    legacyRaw = settings.klantscherm_slideshow_uploads
+  }
+
+  const slides = resolveCustomPromos(customRaw, legacyRaw)
 
   return mapKlantschermSlidesPlaybackUrls(slug, slides) as KlantschermPromoSlide[]
 }

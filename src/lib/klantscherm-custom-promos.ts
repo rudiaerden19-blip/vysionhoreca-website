@@ -73,3 +73,19 @@ export function mergeKlantschermCustomPromosForSave(
 export function klantschermCustomPromosToSlides(promos: KlantschermCustomPromo[]): KlantschermPromoSlide[] {
   return parseKlantschermCustomPromos(promos).map((p) => ({ ...p, type: 'image' as const }))
 }
+
+/** Spiegel voor legacy kolom `klantscherm_slideshow_uploads` (slideshow blijft werken zonder migratie). */
+export function klantschermCustomPromosToLegacyUploads(
+  promos: KlantschermCustomPromo[],
+): { url: string; sort: number; mediaType: 'image' }[] {
+  return mergeKlantschermCustomPromosForSave(promos).map((p) => ({
+    url: p.url,
+    sort: p.sort,
+    mediaType: 'image' as const,
+  }))
+}
+
+export function isKlantschermCustomPromosColumnError(message: string | undefined): boolean {
+  if (!message) return false
+  return /42703|PGRST204|klantscherm_custom_promos|schema cache/i.test(message)
+}

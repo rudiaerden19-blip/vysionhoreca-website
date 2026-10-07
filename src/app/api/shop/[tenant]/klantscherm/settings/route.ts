@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
+  isKlantschermCustomPromosColumnError,
   klantschermCustomPromosFromLegacy,
+  klantschermCustomPromosToLegacyUploads,
   mergeKlantschermCustomPromosForSave,
   parseKlantschermCustomPromos,
 } from '@/lib/klantscherm-custom-promos'
@@ -30,14 +32,29 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'server_config' }, { status: 503 })
   }
 
-  const { data, error } = await supabase
+  let data: Record<string, unknown> | null = null
+  const { data: fullRow, error: fullError } = await supabase
     .from('tenant_settings')
     .select(SELECT)
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
-  if (error) {
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (fullError && isKlantschermCustomPromosColumnError(fullError.message)) {
+    const { data: legacyRow, error: legacyError } = await supabase
+      .from('tenant_settings')
+      .select(
+        'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads, klantscherm_bank_iban, klantscherm_bank_account_name',
+      )
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+    if (legacyError) {
+      return NextResponse.json({ ok: false, error: legacyError.message }, { status: 500 })
+    }
+    data = legacyRow as Record<string, unknown> | null
+  } else if (fullError) {
+    return NextResponse.json({ ok: false, error: fullError.message }, { status: 500 })
+  } else {
+    data = fullRow as Record<string, unknown> | null
   }
 
   let customPromos = parseKlantschermCustomPromos(data?.klantscherm_custom_promos)
@@ -81,10 +98,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
     patch.klantscherm_slideshow_enabled = body.klantscherm_slideshow_enabled
   }
   if (Array.isArray(body.klantscherm_custom_promos)) {
-    patch.klantscherm_custom_promos = mergeKlantschermCustomPromosForSave(
+    const rows = mergeKlantschermCustomPromosForSave(
       body.klantscherm_custom_promos as Parameters<typeof mergeKlantschermCustomPromosForSave>[0],
     )
-    patch.klantscherm_slideshow_uploads = []
+    patch.klantscherm_custom_promos = rows
+    patch.klantscherm_slideshow_uploads = klantschermCustomPromosToLegacyUploads(rows)
   }
   if (body.klantscherm_bank_iban !== undefined) {
     patch.klantscherm_bank_iban =
@@ -99,12 +117,28 @@ export async function POST(request: NextRequest, context: RouteContext) {
         : null
   }
 
-  const { data, error } = await supabase
+  const first = await supabase
     .from('tenant_settings')
     .update(patch)
     .eq('tenant_slug', tenantSlug)
-    .select('klantscherm_custom_promos')
+    .select('klantscherm_custom_promos, klantscherm_slideshow_uploads')
     .maybeSingle()
+
+  let error = first.error
+  let data = first.data
+
+  if (error && isKlantschermCustomPromosColumnError(error.message) && patch.klantscherm_custom_promos) {
+    const legacyPatch = { ...patch }
+    delete legacyPatch.klantscherm_custom_promos
+    const retry = await supabase
+      .from('tenant_settings')
+      .update(legacyPatch)
+      .eq('tenant_slug', tenantSlug)
+      .select('klantscherm_slideshow_uploads')
+      .maybeSingle()
+    error = retry.error
+    data = retry.data ? { ...retry.data, klantscherm_custom_promos: null } : null
+  }
 
   if (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
