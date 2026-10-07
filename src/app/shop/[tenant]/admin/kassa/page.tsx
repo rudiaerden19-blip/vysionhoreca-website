@@ -233,6 +233,8 @@ import {
 } from '@/lib/kassa-customer-display'
 import {
   createKlantschermSessionToken,
+  getOrCreateKlantschermSessionToken,
+  klantschermAutoOpenSessionKey,
   klantschermPublicUrl,
   klantschermStorageKey,
   readKlantschermSessionToken,
@@ -1760,6 +1762,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
+  const klantschermEnabled = tenantInfo?.klantscherm_enabled === true
 
   useEffect(() => {
     if (kassaNameAccountV2) prefetchKassaNameTabs(tenant)
@@ -2820,9 +2823,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, loadMenu])
 
   useEffect(() => {
-    const tok = readKlantschermSessionToken(tenant)
-    if (tok) setCustomerDisplayToken(tok)
-  }, [tenant])
+    if (!klantschermEnabled) {
+      setCustomerDisplayToken(null)
+      return
+    }
+    setCustomerDisplayToken(getOrCreateKlantschermSessionToken(tenant))
+  }, [tenant, klantschermEnabled])
 
   useEffect(() => {
     const key = klantschermStorageKey(tenant)
@@ -3288,6 +3294,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void reposition()
   }, [tenant, customerDisplayToken, t])
 
+  /** Klantscherm aan in instellingen → token + popup één keer per kassa-sessie. */
+  useEffect(() => {
+    if (!klantschermEnabled || typeof window === 'undefined') return
+    const sk = klantschermAutoOpenSessionKey(tenant)
+    try {
+      if (sessionStorage.getItem(sk) === '1') return
+    } catch {
+      return
+    }
+    const id = window.setTimeout(() => {
+      openKlantschermWindow()
+      try {
+        sessionStorage.setItem(sk, '1')
+      } catch {
+        /* ignore */
+      }
+    }, 900)
+    return () => window.clearTimeout(id)
+  }, [klantschermEnabled, tenant, openKlantschermWindow])
+
   /** Mand + bon: categorievolgorde uit menu (niet tikvolgorde). */
   const cartLinesByCategory = useMemo(
     () => sortKassaCartLinesByMenuCategory(cart, categories),
@@ -3306,7 +3332,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     const bc = customerDisplayBcRef.current
-    if (!bc || !customerDisplayToken) return
+    if (!bc || !customerDisplayToken || !klantschermEnabled) return
 
     const businessName =
       tenantInfo?.business_name ??
@@ -3379,6 +3405,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [
     tenant,
     customerDisplayToken,
+    klantschermEnabled,
     billLines,
     billLinesByCategory,
     total,

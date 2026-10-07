@@ -47,6 +47,11 @@ export function getOrCreateKlantschermSessionToken(tenantSlug: string): string {
   return tok
 }
 
+/** Eén auto-open per browser-tab-sessie als kassa start (klantscherm_enabled). */
+export function klantschermAutoOpenSessionKey(tenantSlug: string): string {
+  return `vysion_klantscherm_auto_open_${tenantSlug.trim()}`
+}
+
 export function klantschermPublicUrl(tenantSlug: string, token: string, origin?: string): string {
   const base = (origin ?? (typeof window !== 'undefined' ? window.location.origin : '')).replace(/\/+$/, '')
   return `${base}/shop/${encodeURIComponent(tenantSlug)}/klantscherm?t=${encodeURIComponent(token)}`
