@@ -2886,6 +2886,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setCustomerDisplayShowQr(splitCard > 0)
   }, [showSplitModal, splitCard])
 
+  /** QR pas na expliciete keuze kaart/Bancontact — niet carry-over vorige bon. */
+  useEffect(() => {
+    if (showPaymentModal) setCustomerDisplayShowQr(false)
+  }, [showPaymentModal])
+
   useEffect(() => {
     if (!customerDisplayThankYou) return
     const ms = customerDisplayThankYou.until - Date.now()
@@ -3811,6 +3816,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     flushSync(() => {
       setShowPaymentModal(false)
       setShowSplitModal(false)
+      setCustomerDisplayShowQr(false)
     })
 
     const freshVatLookup = categoryVatLookup
