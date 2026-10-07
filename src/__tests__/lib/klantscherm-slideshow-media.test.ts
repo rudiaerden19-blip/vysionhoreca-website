@@ -1,6 +1,7 @@
 import {
   detectKlantschermUploadMediaType,
   inferKlantschermMediaTypeFromUrl,
+  normalizeKlantschermPromoUrl,
   validateKlantschermPromoFile,
 } from '@/lib/klantscherm-slideshow-media'
 import {
@@ -10,6 +11,11 @@ import {
 } from '@/lib/klantscherm-slideshow-server'
 
 describe('klantscherm slideshow media', () => {
+  it('normalizes promo https urls', () => {
+    expect(normalizeKlantschermPromoUrl('  https://cdn/x/promo.mp4  ')).toBe('https://cdn/x/promo.mp4')
+    expect(normalizeKlantschermPromoUrl('ftp://x/y')).toBeNull()
+  })
+
   it('infers video from mp4 url', () => {
     expect(inferKlantschermMediaTypeFromUrl('https://x.com/a/promo.mp4')).toBe('video')
     expect(inferKlantschermMediaTypeFromUrl('https://x.com/a/promo.jpg')).toBe('image')

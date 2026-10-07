@@ -8,6 +8,7 @@ import { parseKlantschermSlideshowUploads } from '@/lib/klantscherm-slideshow-se
 import {
   inferKlantschermMediaTypeFromUrl,
   KLANTSCHERM_PROMO_FILE_ACCEPT,
+  normalizeKlantschermPromoUrl,
   validateKlantschermPromoFile,
   type KlantschermSlideshowMediaType,
 } from '@/lib/klantscherm-slideshow-media'
@@ -39,6 +40,9 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   const [uploadStatusLabel, setUploadStatusLabel] = useState('')
   const [uploadElapsedSec, setUploadElapsedSec] = useState(0)
   const [displayUrl, setDisplayUrl] = useState('')
+  const [displayUrlCopied, setDisplayUrlCopied] = useState(false)
+  const [promoUrlDraft, setPromoUrlDraft] = useState('')
+  const [promoUrlKind, setPromoUrlKind] = useState<KlantschermSlideshowMediaType | 'auto'>('auto')
   const [bankIban, setBankIban] = useState('')
   const [bankAccountName, setBankAccountName] = useState('')
 
@@ -242,8 +246,74 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     }
   }
 
+  const flashSaved = () => {
+    setSaved(true)
+    window.setTimeout(() => setSaved(false), 2000)
+  }
+
   const removeUpload = (index: number) => {
-    setUploads((prev) => prev.filter((_, i) => i !== index))
+    const next = uploads.filter((_, i) => i !== index).map((row, sort) => ({ ...row, sort }))
+    setUploads(next)
+    void (async () => {
+      const result = await persistSettings(next)
+      if (!result.ok) {
+        alert(t('adminPages.common.saveFailed'))
+        void load()
+        return
+      }
+      flashSaved()
+    })()
+  }
+
+  const setUploadMediaType = (index: number, mediaType: KlantschermSlideshowMediaType) => {
+    const next = uploads.map((row, i) => (i === index ? { ...row, mediaType } : row))
+    setUploads(next)
+    void (async () => {
+      const result = await persistSettings(next)
+      if (!result.ok) {
+        alert(t('adminPages.common.saveFailed'))
+        void load()
+        return
+      }
+      flashSaved()
+    })()
+  }
+
+  const addPromoUrl = () => {
+    const url = normalizeKlantschermPromoUrl(promoUrlDraft)
+    if (!url) {
+      alert(t('adminPages.klantscherm.promoUrlInvalid'))
+      return
+    }
+    if (uploads.some((row) => row.url === url)) {
+      alert(t('adminPages.klantscherm.promoUrlDuplicate'))
+      return
+    }
+    const mediaType =
+      promoUrlKind === 'auto' ? inferKlantschermMediaTypeFromUrl(url) : promoUrlKind
+    const next: UploadRow[] = [...uploads, { url, sort: uploads.length, mediaType }]
+    setUploads(next)
+    setPromoUrlDraft('')
+    void (async () => {
+      const result = await persistSettings(next)
+      if (!result.ok) {
+        alert(t('adminPages.common.saveFailed'))
+        void load()
+        return
+      }
+      flashSaved()
+    })()
+  }
+
+  const copyDisplayUrl = async () => {
+    if (!displayUrl || typeof navigator === 'undefined' || !navigator.clipboard) return
+    try {
+      await navigator.clipboard.writeText(displayUrl)
+      setDisplayUrlCopied(true)
+      window.setTimeout(() => setDisplayUrlCopied(false), 2000)
+    } catch {
+      /* ignore */
+    }
   }
 
   return (
@@ -321,9 +391,30 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                 </button>
               </div>
               {displayUrl ? (
-                <p className="mt-3 break-all text-xs text-gray-500">
-                  {t('adminPages.klantscherm.displayUrlLabel')}: {displayUrl}
-                </p>
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs font-medium text-gray-600">
+                    {t('adminPages.klantscherm.displayUrlLabel')}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <a
+                      href={displayUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="break-all text-xs text-[#3C4D6B] underline"
+                    >
+                      {displayUrl}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => void copyDisplayUrl()}
+                      className="shrink-0 rounded-lg border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                      {displayUrlCopied
+                        ? t('adminPages.klantscherm.displayUrlCopied')
+                        : t('adminPages.klantscherm.displayUrlCopy')}
+                    </button>
+                  </div>
+                </div>
               ) : null}
             </div>
 
@@ -361,6 +452,48 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
             <div className="rounded-xl border border-gray-200 bg-white p-4">
               <p className="font-semibold text-gray-900">{t('adminPages.klantscherm.uploadsTitle')}</p>
               <p className="mb-4 text-sm text-gray-500">{t('adminPages.klantscherm.uploadsDesc')}</p>
+              <div className="mb-4 space-y-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3">
+                <p className="text-sm font-medium text-gray-800">{t('adminPages.klantscherm.promoUrlTitle')}</p>
+                <p className="text-xs text-gray-500">{t('adminPages.klantscherm.promoUrlDesc')}</p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <label className="min-w-0 flex-1">
+                    <span className="sr-only">{t('adminPages.klantscherm.promoUrlTitle')}</span>
+                    <input
+                      type="url"
+                      value={promoUrlDraft}
+                      disabled={!enabled || uploadBusy}
+                      onChange={(e) => setPromoUrlDraft(e.target.value)}
+                      placeholder={t('adminPages.klantscherm.promoUrlPlaceholder')}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-40"
+                    />
+                  </label>
+                  <label className="shrink-0">
+                    <span className="mb-1 block text-xs font-medium text-gray-600">
+                      {t('adminPages.klantscherm.uploadKindLabel')}
+                    </span>
+                    <select
+                      value={promoUrlKind}
+                      disabled={!enabled || uploadBusy}
+                      onChange={(e) =>
+                        setPromoUrlKind(e.target.value as KlantschermSlideshowMediaType | 'auto')
+                      }
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm disabled:opacity-40 sm:w-auto"
+                    >
+                      <option value="auto">{t('adminPages.klantscherm.uploadKindAuto')}</option>
+                      <option value="image">{t('adminPages.klantscherm.uploadKindPhoto')}</option>
+                      <option value="video">{t('adminPages.klantscherm.uploadKindVideo')}</option>
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    disabled={!enabled || uploadBusy || !promoUrlDraft.trim()}
+                    onClick={addPromoUrl}
+                    className="shrink-0 rounded-lg bg-[#3C4D6B] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2D3A52] disabled:opacity-40"
+                  >
+                    {t('adminPages.klantscherm.promoUrlAdd')}
+                  </button>
+                </div>
+              </div>
               <input
                 type="file"
                 accept={KLANTSCHERM_PROMO_FILE_ACCEPT}
@@ -397,24 +530,46 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
               ) : null}
               <ul className="mt-4 space-y-2">
                 {uploads.map((row, i) => (
-                  <li key={row.url} className="flex items-center gap-3">
+                  <li key={row.url} className="flex flex-wrap items-center gap-3 border-b border-gray-100 pb-2">
                     {row.mediaType === 'video' ? (
                       // eslint-disable-next-line jsx-a11y/media-has-caption
                       <video
                         src={row.url}
                         muted
                         playsInline
-                        className="h-14 w-14 rounded object-cover bg-black"
+                        controls
+                        preload="metadata"
+                        className="h-14 w-24 rounded object-contain bg-black"
                       />
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={row.url} alt="" className="h-14 w-14 rounded object-cover" />
                     )}
-                    <span className="text-xs text-gray-500">
-                      {row.mediaType === 'video'
-                        ? t('adminPages.klantscherm.uploadKindVideo')
-                        : t('adminPages.klantscherm.uploadKindPhoto')}
-                    </span>
+                    <label className="flex flex-col gap-0.5">
+                      <span className="text-xs font-medium text-gray-600">
+                        {t('adminPages.klantscherm.uploadKindLabel')}
+                      </span>
+                      <select
+                        value={row.mediaType}
+                        disabled={!enabled}
+                        onChange={(e) =>
+                          setUploadMediaType(i, e.target.value as KlantschermSlideshowMediaType)
+                        }
+                        className="rounded-lg border border-gray-300 px-2 py-1 text-sm disabled:opacity-40"
+                      >
+                        <option value="image">{t('adminPages.klantscherm.uploadKindPhoto')}</option>
+                        <option value="video">{t('adminPages.klantscherm.uploadKindVideo')}</option>
+                      </select>
+                    </label>
+                    <a
+                      href={row.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="min-w-0 flex-1 truncate text-xs text-[#3C4D6B] underline"
+                      title={row.url}
+                    >
+                      {row.url}
+                    </a>
                     <button
                       type="button"
                       className="text-sm text-red-600 underline"
