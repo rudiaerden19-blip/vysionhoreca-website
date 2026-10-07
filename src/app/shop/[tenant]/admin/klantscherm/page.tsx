@@ -31,10 +31,13 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   const [displayUrl, setDisplayUrl] = useState('')
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !enabled) {
+      setDisplayUrl('')
+      return
+    }
     const tok = getOrCreateKlantschermSessionToken(tenant)
     setDisplayUrl(klantschermPublicUrl(tenant, tok))
-  }, [tenant])
+  }, [tenant, enabled])
 
   const openCustomerDisplay = () => {
     if (typeof window === 'undefined') return

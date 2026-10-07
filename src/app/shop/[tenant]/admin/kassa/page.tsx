@@ -2823,14 +2823,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, loadMenu])
 
   useEffect(() => {
+    if (tenantInfo == null) return
     if (!klantschermEnabled) {
       setCustomerDisplayToken(null)
       return
     }
     setCustomerDisplayToken(getOrCreateKlantschermSessionToken(tenant))
-  }, [tenant, klantschermEnabled])
+  }, [tenant, klantschermEnabled, tenantInfo])
 
   useEffect(() => {
+    if (!klantschermEnabled) return
     const key = klantschermStorageKey(tenant)
     const onStorage = (ev: StorageEvent) => {
       if (ev.key !== key) return
@@ -2839,14 +2841,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
-  }, [tenant])
+  }, [tenant, klantschermEnabled])
 
   useEffect(() => {
+    if (!klantschermEnabled) return
     void prefetchCustomerDisplayBounds(window)
-  }, [tenant])
+  }, [tenant, klantschermEnabled])
 
   useEffect(() => {
-    if (!customerDisplayToken || typeof BroadcastChannel === 'undefined') {
+    if (
+      !klantschermEnabled ||
+      !customerDisplayToken ||
+      typeof BroadcastChannel === 'undefined'
+    ) {
       customerDisplayBcRef.current?.close()
       customerDisplayBcRef.current = null
       return
@@ -2858,7 +2865,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       customerDisplayBcRef.current?.close()
       customerDisplayBcRef.current = null
     }
-  }, [tenant, customerDisplayToken])
+  }, [tenant, customerDisplayToken, klantschermEnabled])
 
   useEffect(() => {
     if (!customerDisplayThankYou) return
@@ -3249,7 +3256,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [orderType, tableNumber, dineInFloorZone, t])
 
   const openKlantschermWindow = useCallback(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !klantschermEnabled) return
     let tok = customerDisplayToken ?? readKlantschermSessionToken(tenant)
     if (!tok) {
       tok = createKlantschermSessionToken()
@@ -3292,11 +3299,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     }
     void reposition()
-  }, [tenant, customerDisplayToken, t])
+  }, [tenant, customerDisplayToken, klantschermEnabled, t])
 
   /** Klantscherm aan in instellingen → token + popup één keer per kassa-sessie. */
   useEffect(() => {
     if (!klantschermEnabled || typeof window === 'undefined') return
+    if (tenantInfo == null) return
     const sk = klantschermAutoOpenSessionKey(tenant)
     try {
       if (sessionStorage.getItem(sk) === '1') return
@@ -3312,7 +3320,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }
     }, 900)
     return () => window.clearTimeout(id)
-  }, [klantschermEnabled, tenant, openKlantschermWindow])
+  }, [klantschermEnabled, tenant, tenantInfo, openKlantschermWindow])
 
   /** Mand + bon: categorievolgorde uit menu (niet tikvolgorde). */
   const cartLinesByCategory = useMemo(
