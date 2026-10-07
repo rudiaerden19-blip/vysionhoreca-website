@@ -1,19 +1,27 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-/** Promo + bestaande menu-foto’s in bucket `media`. */
+/** Menu-foto’s blijven in `media`. */
 export const KLANTSCHERM_MEDIA_BUCKET_ID = 'media'
 
-export const KLANTSCHERM_MEDIA_BUCKET_FILE_SIZE_BYTES = 524_288_000
+import { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID } from '@/lib/klantscherm-slideshow-media'
+
+export { KLANTSCHERM_PROMO_VIDEO_BUCKET_ID }
+
+export const KLANTSCHERM_PROMO_VIDEO_FILE_SIZE_BYTES = 524_288_000
+
+export const KLANTSCHERM_PROMO_VIDEO_MIME_TYPES = [
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+  'video/x-m4v',
+] as const
 
 export const KLANTSCHERM_MEDIA_BUCKET_MIME_TYPES = [
   'image/jpeg',
   'image/png',
   'image/webp',
   'image/gif',
-  'video/mp4',
-  'video/webm',
-  'video/quicktime',
-  'video/x-m4v',
+  ...KLANTSCHERM_PROMO_VIDEO_MIME_TYPES,
 ] as const
 
 function bucketFileSizeBytes(raw: unknown): number | null {
@@ -27,7 +35,37 @@ function bucketNeedsVideoMime(allowed: string[] | null | undefined): boolean {
   return !allowed.some((m) => m === 'video/mp4' || m.startsWith('video/'))
 }
 
-/** Service role: zorg dat grote mp4-uploads niet door bucket-whitelist geblokkeerd worden. */
+/** Promo-video bucket (multi-tenant paden `{tenant}/klantscherm/...`). */
+export async function ensureKlantschermPromoVideoBucket(
+  supabase: SupabaseClient,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const opts = {
+    public: true,
+    fileSizeLimit: KLANTSCHERM_PROMO_VIDEO_FILE_SIZE_BYTES,
+    allowedMimeTypes: [...KLANTSCHERM_PROMO_VIDEO_MIME_TYPES],
+  }
+
+  const { data: buckets, error: listErr } = await supabase.storage.listBuckets()
+  if (listErr) {
+    return { ok: false, error: listErr.message }
+  }
+
+  const exists = buckets?.some((b) => b.name === KLANTSCHERM_PROMO_VIDEO_BUCKET_ID)
+  if (!exists) {
+    const { error } = await supabase.storage.createBucket(KLANTSCHERM_PROMO_VIDEO_BUCKET_ID, opts)
+    if (error) {
+      return { ok: false, error: error.message }
+    }
+  }
+
+  const { error: upErr } = await supabase.storage.updateBucket(KLANTSCHERM_PROMO_VIDEO_BUCKET_ID, opts)
+  if (upErr) {
+    return { ok: false, error: upErr.message }
+  }
+  return { ok: true }
+}
+
+/** Optioneel: foto’s in `media` mogen ook video (kleine tenants zonder promo-bucket-fallback). */
 export async function ensureKlantschermMediaBucketAcceptsVideo(
   supabase: SupabaseClient,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -47,7 +85,7 @@ export async function ensureKlantschermMediaBucketAcceptsVideo(
 
   const needsMime = bucketNeedsVideoMime(allowed ?? null)
   const needsSize =
-    sizeBytes != null && sizeBytes > 0 && sizeBytes < KLANTSCHERM_MEDIA_BUCKET_FILE_SIZE_BYTES
+    sizeBytes != null && sizeBytes > 0 && sizeBytes < KLANTSCHERM_PROMO_VIDEO_FILE_SIZE_BYTES
 
   if (!needsMime && !needsSize) {
     return { ok: true }
@@ -60,7 +98,7 @@ export async function ensureKlantschermMediaBucketAcceptsVideo(
   const { error: upErr } = await supabase.storage.updateBucket(KLANTSCHERM_MEDIA_BUCKET_ID, {
     public: bucket.public,
     allowedMimeTypes: nextAllowed ?? null,
-    fileSizeLimit: KLANTSCHERM_MEDIA_BUCKET_FILE_SIZE_BYTES,
+    fileSizeLimit: KLANTSCHERM_PROMO_VIDEO_FILE_SIZE_BYTES,
   })
 
   if (upErr) {

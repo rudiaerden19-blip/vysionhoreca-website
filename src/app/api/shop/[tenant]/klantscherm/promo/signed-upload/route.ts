@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
-import { ensureKlantschermMediaBucketAcceptsVideo } from '@/lib/klantscherm-media-bucket-server'
+import {
+  ensureKlantschermPromoVideoBucket,
+  KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
+} from '@/lib/klantscherm-media-bucket-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
@@ -38,20 +41,22 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'tenant_not_found' }, { status: 404 })
   }
 
-  const bucketReady = await ensureKlantschermMediaBucketAcceptsVideo(supabase)
+  const bucketReady = await ensureKlantschermPromoVideoBucket(supabase)
   if (!bucketReady.ok) {
     console.error('[klantscherm/promo/signed-upload] bucket', bucketReady.error)
     return NextResponse.json(
       {
         ok: false,
-        error: `media_bucket: ${bucketReady.error}. Voer supabase/klantscherm_media_bucket_video_limit.sql uit.`,
+        error: `klantscherm-promo bucket: ${bucketReady.error}. Voer supabase/klantscherm_promo_video_bucket.sql uit.`,
       },
       { status: 503 },
     )
   }
 
   const objectPath = `${tenantSlug}/klantscherm/${Date.now()}.${ext}`
-  const { data, error } = await supabase.storage.from('media').createSignedUploadUrl(objectPath)
+  const { data, error } = await supabase.storage
+    .from(KLANTSCHERM_PROMO_VIDEO_BUCKET_ID)
+    .createSignedUploadUrl(objectPath)
 
   if (error || !data?.token || !data.path) {
     console.error('[klantscherm/promo/signed-upload]', error)
@@ -61,10 +66,11 @@ export async function POST(request: Request, context: RouteContext) {
     )
   }
 
-  const { data: pub } = supabase.storage.from('media').getPublicUrl(data.path)
+  const { data: pub } = supabase.storage.from(KLANTSCHERM_PROMO_VIDEO_BUCKET_ID).getPublicUrl(data.path)
 
   return NextResponse.json({
     ok: true,
+    bucket: KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
     path: data.path,
     token: data.token,
     signedUrl: data.signedUrl,

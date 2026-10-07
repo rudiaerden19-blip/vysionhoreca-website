@@ -2796,7 +2796,7 @@
       "uploadFinalizing": "Almost done — server processing {name}…",
       "uploadProgressStart": "Uploading: {name} ({size})…",
       "uploadProgress": "Uploading… {percent}% — {name}",
-      "uploadWaitHint": "Large videos take several minutes; 0% at first is normal. Stuck or an error? Run klantscherm_media_bucket_video_limit.sql in Supabase (media bucket → 500 MB).",
+      "uploadWaitHint": "Large videos take several minutes. Size error? Run klantscherm_promo_video_bucket.sql and set Supabase Storage → Settings global limit to at least 500 MB.",
       "uploadElapsed": "Running for {sec} s.",
       "uploadFailedDetail": "Upload failed: {detail}",
       "uploadAddedReminder": "Added to the list. Click Save to keep it.",

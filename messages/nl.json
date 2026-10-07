@@ -2796,7 +2796,7 @@
       "uploadFinalizing": "Bijna klaar — server verwerkt {name}…",
       "uploadProgressStart": "Bezig met uploaden: {name} ({size})…",
       "uploadProgress": "Uploaden… {percent}% — {name}",
-      "uploadWaitHint": "Grote video’s duren enkele minuten; 0% in het begin is normaal. Blijft het hangen of een fout? Voer klantscherm_media_bucket_video_limit.sql uit in Supabase (bucket media → 500 MB).",
+      "uploadWaitHint": "Grote video’s duren enkele minuten. Fout over bestandsgrootte? Voer klantscherm_promo_video_bucket.sql uit en zet in Supabase Storage → Settings de globale limiet op minstens 500 MB.",
       "uploadElapsed": "Bezig sinds {sec} s.",
       "uploadFailedDetail": "Upload mislukt: {detail}",
       "uploadAddedReminder": "Toegevoegd aan de lijst. Klik Opslaan om te bewaren.",

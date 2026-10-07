@@ -1,7 +1,10 @@
 'use client'
 
 import { supabase } from '@/lib/supabase'
-import type { KlantschermSlideshowMediaType } from '@/lib/klantscherm-slideshow-media'
+import {
+  KLANTSCHERM_PROMO_VIDEO_BUCKET_ID,
+  type KlantschermSlideshowMediaType,
+} from '@/lib/klantscherm-slideshow-media'
 
 const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').replace(/\/$/, '')
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
@@ -21,7 +24,6 @@ function buildStorageObjectPostUrl(bucket: string, objectPath: string): string {
   return `${SUPABASE_URL}/storage/v1/object/${full}`
 }
 
-/** Zelfde FormData als @supabase/storage-js (Blob → multipart). */
 function uploadFormDataViaXhr(
   method: 'POST' | 'PUT',
   url: string,
@@ -47,54 +49,6 @@ function uploadFormDataViaXhr(
       xhr.setRequestHeader('apikey', SUPABASE_ANON)
     }
     xhr.setRequestHeader('x-upsert', 'false')
-
-    xhr.upload.onprogress = (ev) => {
-      const total = ev.lengthComputable ? ev.total : file.size
-      const loaded = ev.loaded
-      const percent =
-        total > 0 ? Math.min(99, Math.max(1, Math.round((loaded / total) * 100))) : 1
-      onProgress?.({ loaded, total: file.size, percent, phase: 'uploading' })
-    }
-
-    xhr.onerror = () => resolve({ ok: false, message: 'Netwerkfout tijdens upload' })
-    xhr.onabort = () => resolve({ ok: false, message: 'Upload geannuleerd' })
-    xhr.ontimeout = () => resolve({ ok: false, message: 'Upload time-out' })
-    xhr.timeout = 0
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
-        resolve({ ok: true })
-        return
-      }
-      let message = `Upload geweigerd (HTTP ${xhr.status})`
-      try {
-        const body = JSON.parse(xhr.responseText) as { message?: string; error?: string }
-        message = body.message || body.error || message
-      } catch {
-        if (xhr.responseText) message = xhr.responseText.slice(0, 240)
-      }
-      resolve({ ok: false, message })
-    }
-
-    onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'uploading' })
-    xhr.send(form)
-  })
-}
-
-/** Signed upload URL: raw bytes (geen multipart — voorkomt hangen op 99%). */
-function uploadRawPutViaXhr(
-  putUrl: string,
-  file: File,
-  contentType: string,
-  onProgress?: (p: KlantschermPromoUploadProgress) => void,
-): Promise<{ ok: true } | { ok: false; message: string }> {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open('PUT', putUrl)
-    xhr.setRequestHeader('Content-Type', contentType || 'application/octet-stream')
-    xhr.setRequestHeader('cache-control', 'max-age=3600')
-    xhr.setRequestHeader('x-upsert', 'false')
     xhr.timeout = 0
 
     xhr.upload.onprogress = (ev) => {
@@ -105,7 +59,7 @@ function uploadRawPutViaXhr(
       onProgress?.({
         loaded,
         total: file.size,
-        percent: Math.min(phase === 'finalizing' ? 99 : 100, Math.max(0, pct)),
+        percent: Math.min(phase === 'finalizing' ? 99 : 100, Math.max(1, pct)),
         phase,
       })
     }
@@ -129,8 +83,38 @@ function uploadRawPutViaXhr(
     }
 
     onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'uploading' })
-    xhr.send(file)
+    xhr.send(form)
   })
+}
+
+async function pollObjectExists(
+  tenantSlug: string,
+  storagePath: string,
+  onProgress?: (p: KlantschermPromoUploadProgress) => void,
+  fileSize = 0,
+): Promise<boolean> {
+  const started = Date.now()
+  const maxMs = 12 * 60 * 1000
+  while (Date.now() - started < maxMs) {
+    onProgress?.({
+      loaded: fileSize,
+      total: fileSize,
+      percent: 99,
+      phase: 'finalizing',
+    })
+    try {
+      const r = await fetch(
+        `/api/shop/${encodeURIComponent(tenantSlug)}/klantscherm/promo/object-exists?path=${encodeURIComponent(storagePath)}`,
+        { credentials: 'same-origin', cache: 'no-store' },
+      )
+      const json = (await r.json()) as { exists?: boolean }
+      if (json.exists) return true
+    } catch {
+      /* retry */
+    }
+    await new Promise((res) => setTimeout(res, 3000))
+  }
+  return false
 }
 
 async function uploadWithSignedUrl(
@@ -140,6 +124,10 @@ async function uploadWithSignedUrl(
   contentType: string,
   onProgress?: (p: KlantschermPromoUploadProgress) => void,
 ): Promise<{ ok: true; publicUrl: string } | { ok: false; message: string }> {
+  if (!supabase) {
+    return { ok: false, message: 'Supabase niet geconfigureerd' }
+  }
+
   onProgress?.({ loaded: 0, total: file.size, percent: 0, phase: 'preparing' })
 
   const signRes = await fetch(
@@ -153,6 +141,7 @@ async function uploadWithSignedUrl(
   )
   const signJson = (await signRes.json()) as {
     ok?: boolean
+    bucket?: string
     path?: string
     token?: string
     signedUrl?: string
@@ -167,32 +156,54 @@ async function uploadWithSignedUrl(
     }
   }
 
-  let putUrl = signJson.signedUrl?.trim()
-  if (!putUrl) {
-    const pathPart = `media/${signJson.path}`
-      .split('/')
-      .map((seg) => encodeURIComponent(seg))
-      .join('/')
-    putUrl = `${SUPABASE_URL}/storage/v1/object/upload/sign/${pathPart}?token=${encodeURIComponent(signJson.token)}`
+  const storagePath = signJson.path
+  const bucketId = signJson.bucket?.trim() || KLANTSCHERM_PROMO_VIDEO_BUCKET_ID
+  let estimateTimer: ReturnType<typeof setInterval> | null = null
+  const started = Date.now()
+  estimateTimer = setInterval(() => {
+    const elapsed = (Date.now() - started) / 1000
+    const assumedRate = 2.5 * 1024 * 1024
+    const loaded = Math.min(file.size, elapsed * assumedRate)
+    const pct = file.size > 0 ? Math.round((loaded / file.size) * 100) : 0
+    const phase: KlantschermPromoUploadProgress['phase'] =
+      loaded >= file.size * 0.98 ? 'finalizing' : 'uploading'
+    onProgress?.({
+      loaded,
+      total: file.size,
+      percent: Math.min(phase === 'finalizing' ? 99 : 98, Math.max(1, pct)),
+      phase,
+    })
+  }, 800)
+
+  const uploadTask = supabase.storage
+    .from(bucketId)
+    .uploadToSignedUrl(storagePath, signJson.token, file, {
+      cacheControl: '3600',
+      contentType,
+      upsert: false,
+    })
+    .then(({ error }) => {
+      if (error) throw new Error(error.message)
+    })
+
+  const pollTask = (async () => {
+    await new Promise((r) => setTimeout(r, 15_000))
+    const ok = await pollObjectExists(tenantSlug, storagePath, onProgress, file.size)
+    if (!ok) throw new Error('Upload time-out — bestand niet zichtbaar in Storage')
+  })()
+
+  try {
+    await Promise.race([uploadTask, pollTask])
+  } catch (e) {
+    const polled = await pollObjectExists(tenantSlug, storagePath, onProgress, file.size)
+    if (!polled) {
+      const msg = e instanceof Error ? e.message : String(e)
+      return { ok: false, message: msg }
+    }
+  } finally {
+    if (estimateTimer) clearInterval(estimateTimer)
   }
 
-  const xhrResult = await uploadRawPutViaXhr(putUrl, file, contentType, onProgress)
-  if (xhrResult.ok) {
-    return { ok: true, publicUrl: signJson.publicUrl }
-  }
-
-  if (!supabase) {
-    return xhrResult
-  }
-
-  const { error } = await supabase.storage.from('media').uploadToSignedUrl(signJson.path, signJson.token, file, {
-    cacheControl: '3600',
-    contentType,
-    upsert: false,
-  })
-  if (error) {
-    return { ok: false, message: `${xhrResult.message} — ${error.message}` }
-  }
   onProgress?.({ loaded: file.size, total: file.size, percent: 100, phase: 'uploading' })
   return { ok: true, publicUrl: signJson.publicUrl }
 }

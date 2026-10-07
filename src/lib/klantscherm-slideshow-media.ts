@@ -1,5 +1,7 @@
 /** Klantscherm promo-slideshow: foto's + video (mp4). */
 
+export const KLANTSCHERM_PROMO_VIDEO_BUCKET_ID = 'klantscherm-promo'
+
 export type KlantschermSlideshowMediaType = 'image' | 'video'
 
 const VIDEO_EXT = new Set(['mp4', 'webm', 'mov', 'm4v'])
