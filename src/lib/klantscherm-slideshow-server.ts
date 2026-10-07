@@ -11,7 +11,6 @@ import {
   type KlantschermSlideshowMediaType,
 } from '@/lib/klantscherm-slideshow-media'
 import { mapKlantschermSlidesPlaybackUrls } from '@/lib/klantscherm-slideshow-playback-url'
-import { klantschermPromoSlidesFromStorage } from '@/lib/klantscherm-slideshow-storage-fallback'
 
 export function klantschermSlideshowRefreshChannel(tenantSlug: string): string {
   return `vysion-klantscherm-slideshow-${tenantSlug.trim()}`
@@ -59,19 +58,10 @@ export function parseKlantschermSlideshowUploads(raw: unknown): KlantschermSlide
   return out
 }
 
-/** Alleen admin-promo's (custom JSON); legacy uploads alleen als custom nog leeg is. Geen menufoto's. */
-function promoSlidesFromTenantSettings(
-  customRaw: unknown,
-  legacyUploadsRaw: unknown,
-): KlantschermPromoSlide[] {
-  const fromCustom = parseKlantschermCustomPromos(customRaw)
-  if (fromCustom.length > 0) {
-    return klantschermCustomPromosToSlides(fromCustom)
-  }
-  return klantschermCustomPromosToSlides(klantschermCustomPromosFromLegacy(legacyUploadsRaw))
-}
-
-/** Eigen promos op klantscherm — exact wat in admin staat (max 10). */
+/**
+ * Klantscherm = alleen `klantscherm_custom_promos` in de database.
+ * Geen Storage-scan, geen menufoto's, geen legacy-mix (legacy alleen als kolom nog niet gemigreerd is).
+ */
 export async function loadKlantschermSlideshowSlides(
   tenantSlug: string,
 ): Promise<KlantschermPromoSlide[]> {
@@ -81,14 +71,13 @@ export async function loadKlantschermSlideshowSlides(
   const supabase = getServerSupabaseClient()
   if (!supabase) return []
 
-  let customRaw: unknown
-  let legacyUploadsRaw: unknown
-
   const { data: settings, error } = await supabase
     .from('tenant_settings')
     .select('klantscherm_custom_promos, klantscherm_slideshow_uploads')
     .eq('tenant_slug', slug)
     .maybeSingle()
+
+  let slides: KlantschermPromoSlide[] = []
 
   if (error && isKlantschermCustomPromosColumnError(error.message)) {
     const { data: legacyOnly } = await supabase
@@ -96,16 +85,13 @@ export async function loadKlantschermSlideshowSlides(
       .select('klantscherm_slideshow_uploads')
       .eq('tenant_slug', slug)
       .maybeSingle()
-    legacyUploadsRaw = legacyOnly?.klantscherm_slideshow_uploads
-  } else if (settings) {
-    customRaw = settings.klantscherm_custom_promos
-    legacyUploadsRaw = settings.klantscherm_slideshow_uploads
-  }
-
-  let slides = promoSlidesFromTenantSettings(customRaw, legacyUploadsRaw)
-
-  if (slides.length === 0) {
-    slides = await klantschermPromoSlidesFromStorage(supabase, slug)
+    slides = klantschermCustomPromosToSlides(
+      klantschermCustomPromosFromLegacy(legacyOnly?.klantscherm_slideshow_uploads),
+    )
+  } else {
+    slides = klantschermCustomPromosToSlides(
+      parseKlantschermCustomPromos(settings?.klantscherm_custom_promos),
+    )
   }
 
   return mapKlantschermSlidesPlaybackUrls(slug, slides) as KlantschermPromoSlide[]

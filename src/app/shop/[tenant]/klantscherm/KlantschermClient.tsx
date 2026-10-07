@@ -101,7 +101,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
 
     const loadSlides = () => {
       void fetch(
-        `/api/shop/${encodeURIComponent(tenant)}/klantscherm/slideshow?_=${Date.now()}`,
+        `/api/shop/${encodeURIComponent(tenant)}/klantscherm/slideshow?v=2&_=${Date.now()}`,
         {
           cache: 'no-store',
           credentials: 'include',

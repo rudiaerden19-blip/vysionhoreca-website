@@ -35,10 +35,12 @@ export async function GET(_request: Request, context: RouteContext) {
       slideshowEnabled: menuSlideshowEnabled,
       klantschermEnabled: settings?.klantscherm_enabled === true,
       slides,
+      slideCount: slides.length,
     },
     {
       headers: {
-        'Cache-Control': 'no-store, max-age=0',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        Pragma: 'no-cache',
       },
     },
   )

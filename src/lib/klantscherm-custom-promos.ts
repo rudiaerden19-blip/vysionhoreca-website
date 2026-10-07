@@ -20,21 +20,27 @@ function trimField(raw: unknown, maxLen: number): string {
   return s.length > maxLen ? s.slice(0, maxLen) : s
 }
 
+function rowField(row: Record<string, unknown>, camel: string, snake: string): unknown {
+  if (row[camel] !== undefined && row[camel] !== null) return row[camel]
+  return row[snake]
+}
+
 export function parseKlantschermCustomPromos(raw: unknown): KlantschermCustomPromo[] {
   if (!Array.isArray(raw)) return []
   const out: KlantschermCustomPromo[] = []
   for (const row of raw) {
     if (!row || typeof row !== 'object') continue
-    const url = String((row as { url?: unknown }).url ?? '').trim()
+    const o = row as Record<string, unknown>
+    const url = String(o.url ?? '').trim()
     if (!url) continue
-    const sort = Number((row as { sort?: unknown }).sort)
+    const sort = Number(o.sort)
     out.push({
       url,
       sort: Number.isFinite(sort) ? sort : out.length,
-      title: trimField((row as { title?: unknown }).title, 120),
-      description: trimField((row as { description?: unknown }).description, 500),
-      displayPrice: trimField((row as { displayPrice?: unknown }).displayPrice, 32),
-      promoText: trimField((row as { promoText?: unknown }).promoText, 160),
+      title: trimField(rowField(o, 'title', 'title'), 120),
+      description: trimField(rowField(o, 'description', 'description'), 500),
+      displayPrice: trimField(rowField(o, 'displayPrice', 'display_price'), 32),
+      promoText: trimField(rowField(o, 'promoText', 'promo_text'), 160),
     })
   }
   out.sort((a, b) => a.sort - b.sort || a.url.localeCompare(b.url))
