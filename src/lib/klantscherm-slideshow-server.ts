@@ -58,10 +58,24 @@ export function parseKlantschermSlideshowUploads(raw: unknown): KlantschermSlide
   return out
 }
 
-/**
- * Klantscherm = alleen `klantscherm_custom_promos` in de database.
- * Geen Storage-scan, geen menufoto's, geen legacy-mix (legacy alleen als kolom nog niet gemigreerd is).
- */
+type TenantPromoSettingsRow = {
+  klantscherm_custom_promos?: unknown
+  klantscherm_slideshow_uploads?: unknown
+}
+
+/** Exact wat in tenant_settings staat — geen menu, geen Storage. */
+export function klantschermSlidesFromSettingsRow(
+  row: TenantPromoSettingsRow | null | undefined,
+): KlantschermPromoSlide[] {
+  const custom = parseKlantschermCustomPromos(row?.klantscherm_custom_promos)
+  if (custom.length > 0) {
+    return klantschermCustomPromosToSlides(custom)
+  }
+  return klantschermCustomPromosToSlides(
+    klantschermCustomPromosFromLegacy(row?.klantscherm_slideshow_uploads),
+  )
+}
+
 export async function loadKlantschermSlideshowSlides(
   tenantSlug: string,
 ): Promise<KlantschermPromoSlide[]> {
@@ -77,23 +91,21 @@ export async function loadKlantschermSlideshowSlides(
     .eq('tenant_slug', slug)
     .maybeSingle()
 
-  let slides: KlantschermPromoSlide[] = []
-
   if (error && isKlantschermCustomPromosColumnError(error.message)) {
     const { data: legacyOnly } = await supabase
       .from('tenant_settings')
       .select('klantscherm_slideshow_uploads')
       .eq('tenant_slug', slug)
       .maybeSingle()
-    slides = klantschermCustomPromosToSlides(
-      klantschermCustomPromosFromLegacy(legacyOnly?.klantscherm_slideshow_uploads),
-    )
-  } else {
-    slides = klantschermCustomPromosToSlides(
-      parseKlantschermCustomPromos(settings?.klantscherm_custom_promos),
-    )
+    const slides = klantschermSlidesFromSettingsRow({
+      klantscherm_slideshow_uploads: legacyOnly?.klantscherm_slideshow_uploads,
+    })
+    return mapKlantschermSlidesPlaybackUrls(slug, slides) as KlantschermPromoSlide[]
   }
 
+  if (error || !settings) return []
+
+  const slides = klantschermSlidesFromSettingsRow(settings)
   return mapKlantschermSlidesPlaybackUrls(slug, slides) as KlantschermPromoSlide[]
 }
 
