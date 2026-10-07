@@ -36,6 +36,7 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   const [uploadBusy, setUploadBusy] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
   const [uploadStatusLabel, setUploadStatusLabel] = useState('')
+  const [uploadElapsedSec, setUploadElapsedSec] = useState(0)
   const [displayUrl, setDisplayUrl] = useState('')
   const [bankIban, setBankIban] = useState('')
   const [bankAccountName, setBankAccountName] = useState('')
@@ -98,6 +99,18 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     void load()
   }, [load])
 
+  useEffect(() => {
+    if (!uploadBusy) {
+      setUploadElapsedSec(0)
+      return
+    }
+    const started = Date.now()
+    const id = window.setInterval(() => {
+      setUploadElapsedSec(Math.floor((Date.now() - started) / 1000))
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [uploadBusy])
+
   const saveSettings = async () => {
     setSaving(true)
     setSaved(false)
@@ -146,6 +159,12 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     try {
       const result = await uploadKlantschermPromoMedia(tenant, file, check.mediaType, (p) => {
         setUploadProgress(p.percent)
+        if (p.phase === 'preparing') {
+          setUploadStatusLabel(
+            t('adminPages.klantscherm.uploadPreparing').replace('{name}', file.name),
+          )
+          return
+        }
         setUploadStatusLabel(
           t('adminPages.klantscherm.uploadProgress')
             .replace('{percent}', String(p.percent))
@@ -295,7 +314,12 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                       style={(uploadProgress ?? 0) > 0 ? { width: `${uploadProgress}%` } : undefined}
                     />
                   </div>
-                  <p className="mt-2 text-xs text-gray-600">{t('adminPages.klantscherm.uploadWaitHint')}</p>
+                  <p className="mt-2 text-xs text-gray-600">
+                    {t('adminPages.klantscherm.uploadWaitHint')}{' '}
+                    {uploadElapsedSec > 0
+                      ? t('adminPages.klantscherm.uploadElapsed').replace('{sec}', String(uploadElapsedSec))
+                      : ''}
+                  </p>
                 </div>
               ) : uploadStatusLabel ? (
                 <p className="mt-3 text-sm font-medium text-emerald-700">{uploadStatusLabel}</p>

@@ -54,6 +54,7 @@ export async function POST(request: Request, context: RouteContext) {
     ok: true,
     path: data.path,
     token: data.token,
+    signedUrl: data.signedUrl,
     publicUrl: pub.publicUrl,
     contentType,
   })
