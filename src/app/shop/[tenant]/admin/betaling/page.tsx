@@ -1,7 +1,6 @@
 'use client'
 
 import { Suspense, useState, useEffect } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
@@ -153,17 +152,9 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
       </motion.button>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.betaling.title')}</h1>
-          <p className="text-gray-500">{t('adminPages.betaling.subtitle')}</p>
-        </div>
-        <Link
-          href={`/shop/${params.tenant}/admin/klantscherm`}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
-        >
-          {t('adminPages.klantscherm.title')}
-        </Link>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.betaling.title')}</h1>
+        <p className="text-gray-500">{t('adminPages.betaling.subtitle')}</p>
       </div>
 
       {/* Payment Methods */}

@@ -50,6 +50,7 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   const token = searchParams.get('t')?.trim() ?? ''
 
   const [msg, setMsg] = useState<KassaCustomerDisplayMessage | null>(null)
+  const [klantschermActive, setKlantschermActive] = useState(false)
   const [slideshowImages, setSlideshowImages] = useState<string[]>([])
   const [qrSession, setQrSession] = useState<QrSession | null>(null)
   const [qrPaidHint, setQrPaidHint] = useState(false)
@@ -91,8 +92,9 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       credentials: 'include',
     })
       .then((r) => r.json())
-      .then((json: { images?: string[] }) => {
+      .then((json: { images?: string[]; klantschermEnabled?: boolean }) => {
         if (cancelled) return
+        setKlantschermActive(json.klantschermEnabled === true)
         setSlideshowImages(Array.isArray(json.images) ? json.images.filter(Boolean) : [])
       })
       .catch(() => {})
@@ -224,6 +226,13 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
   if (!msg || msg.phase === 'idle') {
     if (slideshowImages.length > 0) {
       return <KlantschermSlideshow images={slideshowImages} />
+    }
+    if (klantschermActive) {
+      return (
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center bg-black px-6 text-center text-white/70">
+          <p className="max-w-lg text-lg font-medium sm:text-xl">{KLANTSCHERM_NL.waitingForKassa}</p>
+        </div>
+      )
     }
     return <div className="min-h-0 w-full flex-1 bg-black" aria-hidden />
   }

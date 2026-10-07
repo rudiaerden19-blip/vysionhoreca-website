@@ -294,6 +294,8 @@ export function isTenantSubmenuEffectiveOn(
   }
   if (subId === 'sm_rpt_kasboek') return kasboekSubmenuVisible(enabledJson)
   if (subId === 'sm_inst_boekhouding') return boekhoudingSubmenuVisible(enabledJson)
+  /** Klantscherm-instellingen: standaard aan met module Instellingen. */
+  if (subId === 'sm_inst_klantscherm') return klantschermInstellingenSubmenuVisible(enabledJson)
   return false
 }
 
@@ -301,6 +303,15 @@ export function isTenantSubmenuEffectiveOn(
  * Digitaal kasboek volgt Rapporten. Ontbrekende key bij bestaande zaken = aan
  * zodra rapporten of het Z-rapport aan staat. Expliciet uit blijft uit.
  */
+export function klantschermInstellingenSubmenuVisible(
+  enabledJson: Record<string, boolean> | null | undefined,
+): boolean {
+  if (!enabledJson) return false
+  if (enabledJson.sm_inst_klantscherm === false) return false
+  if (enabledJson.sm_inst_klantscherm === true) return true
+  return enabledJson.instellingen === true
+}
+
 export function boekhoudingSubmenuVisible(
   enabledJson: Record<string, boolean> | null | undefined,
 ): boolean {

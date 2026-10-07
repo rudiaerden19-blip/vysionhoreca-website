@@ -1,6 +1,7 @@
 /** Klantscherm: altijd Nederlands (niet mee met kassa-taal). */
 export const KLANTSCHERM_NL = {
-  missingToken: 'Ongeldige sessie. Open het klantscherm vanuit de kassa.',
+  missingToken: 'Ongeldige link. Open het klantscherm via Instellingen → Klantscherm → «Klantscherm openen».',
+  waitingForKassa: 'Verbonden. Wacht op bestelling aan de kassa…',
   yourOrder: 'Uw bestelling',
   checkoutTitle: 'Afrekenen',
   totalInclVat: 'Totaal incl. btw',

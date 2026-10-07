@@ -232,6 +232,13 @@ import {
   KASSA_CUSTOMER_DISPLAY_THANK_YOU_MS,
 } from '@/lib/kassa-customer-display'
 import {
+  createKlantschermSessionToken,
+  klantschermPublicUrl,
+  klantschermStorageKey,
+  readKlantschermSessionToken,
+  writeKlantschermSessionToken,
+} from '@/lib/klantscherm-session-token'
+import {
   buildCustomerDisplayPopupFeatures,
   heuristicSecondaryBoundsSync,
   prefetchCustomerDisplayBounds,
@@ -2813,12 +2820,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, loadMenu])
 
   useEffect(() => {
-    try {
-      const tok = sessionStorage.getItem(`vysion_klantscherm_${tenant}`)?.trim()
-      if (tok) setCustomerDisplayToken(tok)
-    } catch {
-      /* ignore */
+    const tok = readKlantschermSessionToken(tenant)
+    if (tok) setCustomerDisplayToken(tok)
+  }, [tenant])
+
+  useEffect(() => {
+    const key = klantschermStorageKey(tenant)
+    const onStorage = (ev: StorageEvent) => {
+      if (ev.key !== key) return
+      const next = ev.newValue?.trim()
+      if (next) setCustomerDisplayToken(next)
     }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
   }, [tenant])
 
   useEffect(() => {
@@ -3230,31 +3244,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const openKlantschermWindow = useCallback(() => {
     if (typeof window === 'undefined') return
-    let tok = customerDisplayToken
+    let tok = customerDisplayToken ?? readKlantschermSessionToken(tenant)
     if (!tok) {
-      try {
-        const saved = sessionStorage.getItem(`vysion_klantscherm_${tenant}`)?.trim()
-        if (saved) {
-          tok = saved
-          setCustomerDisplayToken(saved)
-        }
-      } catch {
-        /* ignore */
-      }
-    }
-    if (!tok) {
-      tok =
-        typeof crypto !== 'undefined' && 'randomUUID'in crypto
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random().toString(36).slice(2)}`
-      try {
-        sessionStorage.setItem(`vysion_klantscherm_${tenant}`, tok)
-      } catch {
-        /* ignore */
-      }
+      tok = createKlantschermSessionToken()
+      writeKlantschermSessionToken(tenant, tok)
       setCustomerDisplayToken(tok)
     }
-    const url = `${window.location.origin}/shop/${tenant}/klantscherm?t=${encodeURIComponent(tok)}`
+    const url = klantschermPublicUrl(tenant, tok, window.location.origin)
     const winName = `vysion_klantscherm_${tenant}`
 
     const cached = readCachedSecondaryBounds()

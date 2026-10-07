@@ -6,6 +6,15 @@ import { supabase } from '@/lib/supabase'
 import PinGate from '@/components/PinGate'
 import { useLanguage } from '@/i18n'
 import { parseKlantschermSlideshowUploads } from '@/lib/klantscherm-slideshow-server'
+import {
+  getOrCreateKlantschermSessionToken,
+  klantschermPublicUrl,
+} from '@/lib/klantscherm-session-token'
+import {
+  buildCustomerDisplayPopupFeatures,
+  heuristicSecondaryBoundsSync,
+  readCachedSecondaryBounds,
+} from '@/lib/kassa-customer-display-window'
 
 type UploadRow = { url: string; sort: number }
 
@@ -19,6 +28,33 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   const [slideshowEnabled, setSlideshowEnabled] = useState(true)
   const [uploads, setUploads] = useState<UploadRow[]>([])
   const [uploadBusy, setUploadBusy] = useState(false)
+  const [displayUrl, setDisplayUrl] = useState('')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const tok = getOrCreateKlantschermSessionToken(tenant)
+    setDisplayUrl(klantschermPublicUrl(tenant, tok))
+  }, [tenant])
+
+  const openCustomerDisplay = () => {
+    if (typeof window === 'undefined') return
+    const tok = getOrCreateKlantschermSessionToken(tenant)
+    const url = klantschermPublicUrl(tenant, tok)
+    setDisplayUrl(url)
+    const winName = `vysion_klantscherm_${tenant}`
+    const cached = readCachedSecondaryBounds()
+    const heuristic = heuristicSecondaryBoundsSync(window.screen)
+    const syncBounds = cached ?? heuristic
+    let features =
+      'popup=yes,width=520,height=380,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes'
+    if (syncBounds) {
+      features = buildCustomerDisplayPopupFeatures(syncBounds)
+    }
+    const w = window.open(url, winName, features)
+    if (!w) {
+      alert(t('adminPages.klantscherm.openFailed'))
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -113,6 +149,26 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                 <span className="mt-1 block text-sm text-gray-500">{t('adminPages.klantscherm.enabledDesc')}</span>
               </span>
             </label>
+
+            <div className="rounded-xl border border-[#3C4D6B]/30 bg-[#3C4D6B]/5 p-4">
+              <p className="font-semibold text-gray-900">{t('adminPages.klantscherm.openDisplay')}</p>
+              <p className="mt-1 text-sm text-gray-600">{t('adminPages.klantscherm.openDisplayHint')}</p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  disabled={!enabled}
+                  onClick={openCustomerDisplay}
+                  className="rounded-xl bg-[#3C4D6B] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2D3A52] disabled:opacity-40"
+                >
+                  {t('adminPages.klantscherm.openDisplayButton')}
+                </button>
+              </div>
+              {displayUrl ? (
+                <p className="mt-3 break-all text-xs text-gray-500">
+                  {t('adminPages.klantscherm.displayUrlLabel')}: {displayUrl}
+                </p>
+              ) : null}
+            </div>
 
             <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-4">
               <input

@@ -9,6 +9,7 @@ import {
   isShopAdminRetailKassaPosPath,
   isTenantSubmenuEffectiveOn,
   boekhoudingSubmenuVisible,
+  klantschermInstellingenSubmenuVisible,
   kasboekSubmenuVisible,
   retailBackofficeSubmenuVisible,
   parseEnabledModulesJson,
@@ -664,6 +665,13 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           href: `${baseUrl}/betaling`,
         },
         {
+          id: 'sm_inst_klantscherm',
+          icon: '',
+          label: 'Klantscherm',
+          labelKey: itemLabelKey('sm_inst_klantscherm'),
+          href: `${baseUrl}/klantscherm`,
+        },
+        {
           id: 'sm_inst_boekhouding',
           icon: '',
           label: 'Boekhouding',
@@ -870,6 +878,9 @@ export function isAdminSubmenuEnabled(
     }
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledJson)) return true
+    if (subId === 'sm_inst_klantscherm' && klantschermInstellingenSubmenuVisible(enabledJson)) {
+      return true
+    }
     return false
   }
 
@@ -955,6 +966,9 @@ export function hasShopAdminPathAccess(
     }
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true
+    if (subId === 'sm_inst_klantscherm' && klantschermInstellingenSubmenuVisible(enabledModulesJson)) {
+      return true
+    }
     if (subId === 'sm_kassa_muziek') {
       if (enabledModulesJson.sm_kassa_muziek === false) return false
       return isHorecaKassaPosScreenEnabled(moduleAccess)
@@ -1060,6 +1074,12 @@ export function filterHamburgerModulesForAccess(
           }
           if (item.id === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
           if (item.id === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true
+          if (
+            item.id === 'sm_inst_klantscherm' &&
+            klantschermInstellingenSubmenuVisible(enabledModulesJson)
+          ) {
+            return true
+          }
           return false
         }
         let parentOn = effectiveAccess[m.key]
