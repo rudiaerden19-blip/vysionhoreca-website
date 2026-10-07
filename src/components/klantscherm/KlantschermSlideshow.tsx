@@ -7,10 +7,12 @@ import { KlantschermPromoSlideFrame } from '@/components/klantscherm/Klantscherm
 const IMAGE_MS = 5000
 
 export function KlantschermSlideshow({ slides }: { slides: KlantschermPromoSlide[] }) {
-  const photoSlides = useMemo(
-    () => slides.filter((s) => s.type === 'image' && s.url),
-    [slides],
-  )
+  const photoSlides = useMemo(() => {
+    const filtered = slides.filter((s) => s.type === 'image' && s.url.trim())
+    return [...filtered].sort(
+      (a, b) => a.sort - b.sort || a.url.localeCompare(b.url),
+    )
+  }, [slides])
   /** Stabiele key — niet op elke poll opnieuw naar slide 0 springen. */
   const slideSequenceKey = useMemo(
     () => photoSlides.map((s) => `${s.sort}:${s.url}`).join('|'),
@@ -36,10 +38,10 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermPromoSlide
   const current = photoSlides[index] ?? photoSlides[0]
 
   useEffect(() => {
-    if (!current || photoSlides.length <= 1) return
+    if (photoSlides.length <= 1) return
     const id = window.setInterval(advance, IMAGE_MS)
     return () => window.clearInterval(id)
-  }, [photoSlides.length, current?.url, advance])
+  }, [slideSequenceKey, advance, photoSlides.length])
 
   if (photoSlides.length === 0 || !current) return null
 
