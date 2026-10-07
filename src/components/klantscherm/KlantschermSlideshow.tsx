@@ -5,48 +5,43 @@ import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-serv
 
 const IMAGE_MS = 5000
 
-const BLUR_LAYER =
-  'pointer-events-none absolute left-1/2 top-1/2 h-[140%] w-[140%] min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-110 object-cover blur-[72px] saturate-[1.85] contrast-[1.05]'
-
 function klantschermSlideBackdropStyle(url: string): { backgroundImage: string } {
   const safe = url.replace(/"/g, '%22')
   return { backgroundImage: `url("${safe}")` }
 }
 
-/** Foto scherp + vol scherm kleur-blur (geen zwarte balken). */
+/** 15″ landscape: vol scherm kleur-blur + foto zo groot mogelijk (≈96% hoogte). */
 function KlantschermPhotoSlideView({ url, visible }: { url: string; visible: boolean }) {
   const fade = visible ? 'opacity-100' : 'opacity-0'
 
   return (
-    <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fade}`}>
-      <div
-        className="pointer-events-none absolute -inset-[25%] bg-cover bg-center blur-[80px] saturate-[2] contrast-[1.05]"
-        style={klantschermSlideBackdropStyle(url)}
-        aria-hidden
-      />
+    <div
+      className={`fixed inset-0 h-[100dvh] w-screen overflow-hidden transition-opacity duration-500 ${fade}`}
+      style={klantschermSlideBackdropStyle(url)}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         key={`${url}-blur`}
         src={url}
         alt=""
         aria-hidden
-        className={BLUR_LAYER}
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[160%] w-[160%] min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-125 object-cover blur-[88px] saturate-[2.1] contrast-[1.08] brightness-105"
         referrerPolicy="no-referrer"
       />
-      {/* zachte rand — geen zwart vlak in het midden */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(0,0,0,0.22)_100%)]"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center blur-[96px] saturate-[2.15] contrast-[1.05] brightness-105"
+        style={klantschermSlideBackdropStyle(url)}
         aria-hidden
       />
 
-      <div className="absolute inset-0 z-10 flex items-center justify-center p-[2vmin]">
-        <div className="overflow-hidden rounded-[1.65rem] shadow-[0_24px_70px_rgba(0,0,0,0.45)] ring-2 ring-white/35 sm:rounded-[2rem]">
+      <div className="absolute inset-0 z-10 flex h-full w-full items-center justify-center p-[1.5vmin]">
+        <div className="max-h-[96vh] max-w-[98vw] overflow-hidden rounded-[1.75rem] shadow-[0_20px_60px_rgba(0,0,0,0.35)] ring-2 ring-white/40 sm:rounded-[2.25rem]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             key={url}
             src={url}
             alt=""
-            className="block max-h-[88vh] max-w-[94vw] w-auto h-auto object-contain"
+            className="block h-[96vh] w-auto max-w-[98vw] object-contain object-center"
             referrerPolicy="no-referrer"
           />
         </div>
@@ -87,9 +82,5 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermSlideshowS
 
   if (photoSlides.length === 0 || !current) return null
 
-  return (
-    <div className="relative min-h-0 w-full flex-1">
-      <KlantschermPhotoSlideView url={current.url} visible={visible} />
-    </div>
-  )
+  return <KlantschermPhotoSlideView url={current.url} visible={visible} />
 }
