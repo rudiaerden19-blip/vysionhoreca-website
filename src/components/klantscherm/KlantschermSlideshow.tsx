@@ -5,9 +5,9 @@ import type { KlantschermSlideshowSlide } from '@/lib/klantscherm-slideshow-serv
 
 const IMAGE_MS = 5000
 
-/** Vult het scherm (cover + blur), geen grijze/zwarte balken; voorgrond = volledige promo zonder crop. */
-const BLUR_FILL =
-  'pointer-events-none absolute left-1/2 top-1/2 min-h-[115%] min-w-[115%] -translate-x-1/2 -translate-y-1/2 object-cover object-center blur-3xl saturate-[1.35]'
+/** Eén laag: vult 15″-scherm (geen dubbele video/blur). */
+const PROMO_MEDIA_CLASS =
+  'absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500'
 
 function KlantschermSlideshowSlideView({
   slide,
@@ -27,57 +27,27 @@ function KlantschermSlideshowSlideView({
   return (
     <div className="absolute inset-0 overflow-hidden bg-black">
       {slide.type === 'video' ? (
-        <>
-          <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fade}`} aria-hidden>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video
-              key={`${slide.url}-bg`}
-              src={slide.url}
-              muted
-              playsInline
-              autoPlay
-              tabIndex={-1}
-              className={BLUR_FILL}
-            />
-          </div>
-          <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${fade}`}>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video
-              ref={videoRef}
-              key={slide.url}
-              src={slide.url}
-              muted
-              playsInline
-              autoPlay
-              className="max-h-full max-w-full object-contain object-center"
-              onEnded={onVideoEnded}
-              onError={onVideoError}
-            />
-          </div>
-        </>
+        /* eslint-disable-next-line jsx-a11y/media-has-caption */
+        <video
+          ref={videoRef}
+          key={slide.url}
+          src={slide.url}
+          muted
+          playsInline
+          autoPlay
+          className={`${PROMO_MEDIA_CLASS} ${fade}`}
+          onEnded={onVideoEnded}
+          onError={onVideoError}
+        />
       ) : (
-        <>
-          <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${fade}`} aria-hidden>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              key={`${slide.url}-bg`}
-              src={slide.url}
-              alt=""
-              className={BLUR_FILL}
-              referrerPolicy="no-referrer"
-            />
-          </div>
-          <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${fade}`}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              key={slide.url}
-              src={slide.url}
-              alt=""
-              className="max-h-full max-w-full object-contain object-center"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-        </>
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          key={slide.url}
+          src={slide.url}
+          alt=""
+          className={`${PROMO_MEDIA_CLASS} ${fade}`}
+          referrerPolicy="no-referrer"
+        />
       )}
     </div>
   )

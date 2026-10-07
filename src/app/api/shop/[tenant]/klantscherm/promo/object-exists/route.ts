@@ -26,8 +26,7 @@ export async function GET(request: Request, context: RouteContext) {
   const folder = path.split('/').slice(0, -1).join('/')
   const name = path.split('/').pop() ?? ''
   const { data, error } = await supabase.storage.from(KLANTSCHERM_PROMO_VIDEO_BUCKET_ID).list(folder, {
-    limit: 100,
-    search: name,
+    limit: 200,
   })
 
   if (error) {
