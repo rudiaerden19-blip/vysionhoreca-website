@@ -96,7 +96,13 @@ export function KlantschermClient({ tenant }: { tenant: string }) {
       if (cancelled) return
       setKlantschermActive(json.klantschermEnabled === true)
       if (!Array.isArray(json.slides)) return
-      setSlideshowSlides(json.slides.filter((s) => s?.url && s.type === 'image'))
+      const next = json.slides.filter((s) => s?.url && s.type === 'image')
+      setSlideshowSlides((prev) => {
+        const prevKey = prev.map((s) => `${s.sort}:${s.url}`).join('|')
+        const nextKey = next.map((s) => `${s.sort}:${s.url}`).join('|')
+        if (prevKey === nextKey) return prev
+        return next
+      })
     }
 
     const loadSlides = () => {

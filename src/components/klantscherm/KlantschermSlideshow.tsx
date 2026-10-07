@@ -11,6 +11,11 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermPromoSlide
     () => slides.filter((s) => s.type === 'image' && s.url),
     [slides],
   )
+  /** Stabiele key — niet op elke poll opnieuw naar slide 0 springen. */
+  const slideSequenceKey = useMemo(
+    () => photoSlides.map((s) => `${s.sort}:${s.url}`).join('|'),
+    [photoSlides],
+  )
   const [index, setIndex] = useState(0)
   const [visible, setVisible] = useState(true)
 
@@ -26,7 +31,7 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermPromoSlide
   useEffect(() => {
     setIndex(0)
     setVisible(true)
-  }, [photoSlides])
+  }, [slideSequenceKey])
 
   const current = photoSlides[index] ?? photoSlides[0]
 
