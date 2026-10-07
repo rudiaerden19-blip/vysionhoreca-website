@@ -11,6 +11,7 @@ import {
   validateKlantschermPromoFile,
   type KlantschermSlideshowMediaType,
 } from '@/lib/klantscherm-slideshow-media'
+import { uploadKlantschermPromoMedia } from '@/lib/klantscherm-promo-upload'
 import {
   getOrCreateKlantschermSessionToken,
   klantschermPublicUrl,
@@ -33,6 +34,8 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
   const [slideshowEnabled, setSlideshowEnabled] = useState(true)
   const [uploads, setUploads] = useState<UploadRow[]>([])
   const [uploadBusy, setUploadBusy] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
+  const [uploadStatusLabel, setUploadStatusLabel] = useState('')
   const [displayUrl, setDisplayUrl] = useState('')
   const [bankIban, setBankIban] = useState('')
   const [bankAccountName, setBankAccountName] = useState('')
@@ -117,8 +120,13 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
     setTimeout(() => setSaved(false), 2000)
   }
 
+  const formatUploadSize = (bytes: number) => {
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  }
+
   const onPickUpload = async (file: File | null) => {
-    if (!file || !supabase) return
+    if (!file) return
     const check = validateKlantschermPromoFile(file)
     if (!check.ok) {
       alert(
@@ -129,22 +137,39 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
       return
     }
     setUploadBusy(true)
+    setUploadProgress(0)
+    setUploadStatusLabel(
+      t('adminPages.klantscherm.uploadProgressStart')
+        .replace('{name}', file.name)
+        .replace('{size}', formatUploadSize(file.size)),
+    )
     try {
-      const ext = file.name.split('.').pop()?.toLowerCase() || (check.mediaType === 'video' ? 'mp4' : 'jpg')
-      const path = `${tenant}/klantscherm/${Date.now()}.${ext}`
-      const { error: upErr } = await supabase.storage.from('media').upload(path, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type || undefined,
+      const result = await uploadKlantschermPromoMedia(tenant, file, check.mediaType, (p) => {
+        setUploadProgress(p.percent)
+        setUploadStatusLabel(
+          t('adminPages.klantscherm.uploadProgress')
+            .replace('{percent}', String(p.percent))
+            .replace('{name}', file.name),
+        )
       })
-      if (upErr) throw upErr
-      const { data: pub } = supabase.storage.from('media').getPublicUrl(path)
-      const url = pub.publicUrl
-      setUploads((prev) => [...prev, { url, sort: prev.length, mediaType: check.mediaType }])
-    } catch {
-      alert(t('adminPages.klantscherm.uploadFailed'))
+      if (!result.ok) {
+        alert(
+          t('adminPages.klantscherm.uploadFailedDetail').replace('{detail}', result.message),
+        )
+        return
+      }
+      setUploads((prev) => [
+        ...prev,
+        { url: result.publicUrl, sort: prev.length, mediaType: check.mediaType },
+      ])
+      setUploadStatusLabel(t('adminPages.klantscherm.uploadAddedReminder'))
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err)
+      alert(t('adminPages.klantscherm.uploadFailedDetail').replace('{detail}', detail))
     } finally {
       setUploadBusy(false)
+      setUploadProgress(null)
+      window.setTimeout(() => setUploadStatusLabel(''), 8000)
     }
   }
 
@@ -259,6 +284,22 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
                   e.target.value = ''
                 }}
               />
+              {uploadBusy ? (
+                <div className="mt-4 rounded-lg border border-[#3C4D6B]/30 bg-[#3C4D6B]/5 p-4">
+                  <p className="text-sm font-medium text-gray-800">{uploadStatusLabel}</p>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className={`h-full bg-[#3C4D6B] transition-[width] duration-300 ${
+                        (uploadProgress ?? 0) <= 0 ? 'w-[28%] animate-pulse' : ''
+                      }`}
+                      style={(uploadProgress ?? 0) > 0 ? { width: `${uploadProgress}%` } : undefined}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-gray-600">{t('adminPages.klantscherm.uploadWaitHint')}</p>
+                </div>
+              ) : uploadStatusLabel ? (
+                <p className="mt-3 text-sm font-medium text-emerald-700">{uploadStatusLabel}</p>
+              ) : null}
               <ul className="mt-4 space-y-2">
                 {uploads.map((row, i) => (
                   <li key={row.url} className="flex items-center gap-3">
