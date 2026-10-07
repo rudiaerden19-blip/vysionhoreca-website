@@ -9,7 +9,10 @@ const IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'
 const VIDEO_MIME = new Set(['video/mp4', 'video/webm', 'video/quicktime', 'video/x-m4v'])
 
 export const KLANTSCHERM_PROMO_MAX_IMAGE_BYTES = 12 * 1024 * 1024
-export const KLANTSCHERM_PROMO_MAX_VIDEO_BYTES = 80 * 1024 * 1024
+/** Promo-video’s (4K mp4); moet ≤ Supabase bucket `media`.file_size_limit. */
+export const KLANTSCHERM_PROMO_MAX_VIDEO_BYTES = 500 * 1024 * 1024
+export const KLANTSCHERM_PROMO_MAX_VIDEO_MB = 500
+export const KLANTSCHERM_PROMO_MAX_IMAGE_MB = 12
 
 export const KLANTSCHERM_PROMO_FILE_ACCEPT =
   'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm'
