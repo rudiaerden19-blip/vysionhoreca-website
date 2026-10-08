@@ -1,4 +1,4 @@
-import { fetchKlantschermPromoSettingsRow } from '@/lib/klantscherm-slideshow-server'
+import { readKlantschermPromoSettingsRow as fetchKlantschermPromoSettingsRow } from '@/lib/klantscherm-promo-settings-server'
 
 describe('fetchKlantschermPromoSettingsRow', () => {
   const originalFetch = global.fetch

@@ -74,12 +74,14 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
         } | null
         customPromos?: KlantschermCustomPromo[]
       }
-      if (json.ok && json.settings) {
-        const data = json.settings
-        setEnabled(data.klantscherm_enabled === true)
+      if (json.ok) {
+        if (json.settings) {
+          const data = json.settings
+          setEnabled(data.klantscherm_enabled === true)
+          setBankIban(String(data.klantscherm_bank_iban ?? '').trim())
+          setBankAccountName(String(data.klantscherm_bank_account_name ?? '').trim())
+        }
         setPromos(json.customPromos ?? [])
-        setBankIban(String(data.klantscherm_bank_iban ?? '').trim())
-        setBankAccountName(String(data.klantscherm_bank_account_name ?? '').trim())
       }
     } catch {
       /* ignore */
@@ -124,9 +126,9 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
       )
       return
     }
-    if (result.rows) setPromos(result.rows)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+    await load()
   }
 
   const updatePromo = (index: number, patch: Partial<KlantschermCustomPromo>) => {

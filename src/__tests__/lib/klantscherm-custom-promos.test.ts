@@ -3,6 +3,7 @@ import {
   klantschermCustomPromosToLegacyUploads,
   mergeKlantschermCustomPromoSources,
   parseKlantschermCustomPromos,
+  shouldSkipEmptyKlantschermPromoOverwrite,
 } from '@/lib/klantscherm-custom-promos'
 import { klantschermSlidesFromSettingsRow } from '@/lib/klantscherm-slideshow-server'
 
@@ -121,6 +122,19 @@ describe('klantscherm custom promos legacy', () => {
       'Donderdag pizza dag',
       'Promo deal',
     ])
+  })
+
+  it('blokkeert lege save wanneer DB promos heeft', () => {
+    expect(
+      shouldSkipEmptyKlantschermPromoOverwrite([], [{ url: 'https://cdn/a.jpg', sort: 0, title: '', description: '', displayPrice: '', promoText: '' }]),
+    ).toBe(true)
+    expect(shouldSkipEmptyKlantschermPromoOverwrite([], [])).toBe(false)
+    expect(
+      shouldSkipEmptyKlantschermPromoOverwrite(
+        [{ url: 'https://cdn/b.jpg', sort: 0, title: '', description: '', displayPrice: '', promoText: '' }],
+        [{ url: 'https://cdn/a.jpg', sort: 0, title: '', description: '', displayPrice: '', promoText: '' }],
+      ),
+    ).toBe(false)
   })
 
   it('mirrors custom promos to legacy slideshow uploads', () => {

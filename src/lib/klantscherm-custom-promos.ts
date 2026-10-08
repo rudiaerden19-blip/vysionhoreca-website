@@ -141,6 +141,14 @@ export function klantschermCustomPromosToLegacyUploads(
   }))
 }
 
+/** Lege save mag DB-promo's niet wissen (load-fout / lege UI + Opslaan voor IBAN). */
+export function shouldSkipEmptyKlantschermPromoOverwrite(
+  incomingRows: KlantschermCustomPromo[],
+  existingMerged: KlantschermCustomPromo[],
+): boolean {
+  return incomingRows.length === 0 && existingMerged.length > 0
+}
+
 export function isKlantschermCustomPromosColumnError(message: string | undefined): boolean {
   if (!message) return false
   return /42703|PGRST204|klantscherm_custom_promos|schema cache/i.test(message)
