@@ -6183,6 +6183,8 @@
   "adminLayout": {
     "loading": "Caricamento...",
     "redirectLogin": "Reindirizzamento al login...",
+    "blockedTitle": "La sua cassa è bloccata",
+    "blockedDesc": "Dopo il pagamento dell’importo della fattura riattiveremo la sua licenza.",
     "shopNotFound": "Negozio non trovato",
     "shopNotFoundDesc": "Questo negozio non esiste o è stato rimosso.",
     "backToVysion": "← Torna a Vysion",

@@ -343,12 +343,19 @@ export async function POST(req: NextRequest) {
 
     // ── BLOCK / UNBLOCK ────────────────────────────────────────────────
     if (body.action === 'block') {
-      const { error } = await supabase
-        .from('tenant_settings')
-        .update({ is_blocked: body.isBlocked })
-        .eq('id', body.tenantSettingsId)
+      if (!body.slug) {
+        return NextResponse.json({ error: 'slug ontbreekt' }, { status: 400 })
+      }
+      const { data: blockedRows, error } = await supabase
+        .from('tenants')
+        .update({ is_blocked: body.isBlocked === true })
+        .eq('slug', body.slug)
+        .select('slug')
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 400 })
+      }
+      if (!blockedRows || blockedRows.length === 0) {
+        return NextResponse.json({ error: `Tenant ${body.slug} niet gevonden` }, { status: 404 })
       }
 
       await recordAudit(supabase, {
@@ -357,8 +364,8 @@ export async function POST(req: NextRequest) {
         actorId,
         actorEmail,
         action: body.isBlocked ? 'block_tenant': 'unblock_tenant',
-        resourceType: 'tenant_settings',
-        resourceId: body.tenantSettingsId,
+        resourceType: 'tenants',
+        resourceId: body.slug,
         before: { is_blocked: !body.isBlocked },
         after: { is_blocked: body.isBlocked },
         ip: meta.ip,

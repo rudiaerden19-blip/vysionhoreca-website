@@ -6206,6 +6206,8 @@
   "adminLayout": {
     "loading": "Chargement...",
     "redirectLogin": "Redirection vers la connexion...",
+    "blockedTitle": "Votre caisse est bloquée",
+    "blockedDesc": "Après paiement du montant de la facture, nous réactiverons votre licence.",
     "shopNotFound": "Boutique introuvable",
     "shopNotFoundDesc": "Cette boutique n'existe pas ou a été supprimée.",
     "backToVysion": "← Retour à Vysion",

@@ -6142,6 +6142,8 @@
   "adminLayout": {
     "loading": "Laden...",
     "redirectLogin": "Doorverwijzen naar inloggen...",
+    "blockedTitle": "Uw kassa is geblokkeerd",
+    "blockedDesc": "Na betaling van het factuurbedrag activeren we uw licentie terug.",
     "shopNotFound": "Shop niet gevonden",
     "shopNotFoundDesc": "Deze shop bestaat niet of is verwijderd.",
     "backToVysion": "← Terug naar Vysion",

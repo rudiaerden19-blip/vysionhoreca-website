@@ -6142,6 +6142,8 @@
   "adminLayout": {
     "loading": "Loading...",
     "redirectLogin": "Redirecting to sign-in…",
+    "blockedTitle": "Your POS has been blocked",
+    "blockedDesc": "Once the invoice amount has been paid, we will reactivate your licence.",
     "shopNotFound": "Shop not found",
     "shopNotFoundDesc": "This shop does not exist or was removed.",
     "backToVysion": "← Back to Vysion",

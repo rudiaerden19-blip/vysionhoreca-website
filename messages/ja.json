@@ -6183,6 +6183,8 @@
   "adminLayout": {
     "loading": "読み込み中...",
     "redirectLogin": "ログインへリダイレクト中...",
+    "blockedTitle": "レジがブロックされています",
+    "blockedDesc": "請求額のお支払い後、ライセンスを再有効化いたします。",
     "shopNotFound": "ショップが見つかりません",
     "shopNotFoundDesc": "このショップは存在しないか削除されました。",
     "backToVysion": "← Vysion に戻る",

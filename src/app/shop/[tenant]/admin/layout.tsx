@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage, type Locale } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
+import { isTenantBlocked } from '@/lib/tenant-blocked'
 import {
   adminPathToModule,
   getAdminKassaEntryHref,
@@ -92,6 +93,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
+  const [tenantBlocked, setTenantBlocked] = useState(false)
   const [adminHeaderTitle, setAdminHeaderTitle] = useState(() =>
     params.tenant
       .split('-')
@@ -130,6 +132,17 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       setLoading(false)
     }
     checkTenant()
+  }, [params.tenant])
+
+  useEffect(() => {
+    let cancelled = false
+    setTenantBlocked(false)
+    void isTenantBlocked(params.tenant).then((blocked) => {
+      if (!cancelled) setTenantBlocked(blocked)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [params.tenant])
 
   useEffect(() => {
@@ -466,6 +479,10 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     return null
   }
 
+  if (tenantBlocked) {
+    return <TenantBlockedScreen />
+  }
+
   /**
    * Kassa-POS: geen admin-laadschermen na login; vóór login geen kassa/audio (leeg grijs).
    */
@@ -676,6 +693,30 @@ function ReservationOnlineTopBarLink({
         </span>
       )}
     </Link>
+  )
+}
+
+function TenantBlockedScreen() {
+  const { t } = useLanguage()
+  return (
+    <div
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 p-4"
+      role="alertdialog"
+      aria-modal="true"
+      data-testid="tenant-blocked-screen"
+    >
+      <div className="w-full max-w-lg rounded-3xl border-4 border-red-600 bg-white p-8 text-center shadow-2xl sm:p-10">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-red-600 text-3xl font-black text-white">
+          !
+        </div>
+        <h1 className="mb-4 text-2xl font-black text-red-600 sm:text-3xl">
+          {t('adminLayout.blockedTitle')}
+        </h1>
+        <p className="text-base font-semibold text-gray-800 sm:text-lg">
+          {t('adminLayout.blockedDesc')}
+        </p>
+      </div>
+    </div>
   )
 }
 

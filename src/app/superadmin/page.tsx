@@ -118,7 +118,14 @@ export default function SuperAdminDashboard() {
       .order('created_at', { ascending: false })
 
     if (tenantsData) {
-      setTenants(tenantsData)
+      const { data: blockedData } = await supabase
+        .from('tenants')
+        .select('slug, is_blocked')
+        .eq('is_blocked', true)
+      const blockedSlugs = new Set((blockedData || []).map((r: { slug: string }) => r.slug))
+      setTenants(
+        tenantsData.map((t: Tenant) => ({ ...t, is_blocked: blockedSlugs.has(t.tenant_slug) }))
+      )
     }
 
     // Load subscriptions

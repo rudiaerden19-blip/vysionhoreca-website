@@ -6206,6 +6206,8 @@
   "adminLayout": {
     "loading": "Laden...",
     "redirectLogin": "Weiterleitung zur Anmeldung...",
+    "blockedTitle": "Ihre Kasse wurde gesperrt",
+    "blockedDesc": "Nach Zahlung des Rechnungsbetrags aktivieren wir Ihre Lizenz wieder.",
     "shopNotFound": "Shop nicht gefunden",
     "shopNotFoundDesc": "Dieser Shop existiert nicht oder wurde entfernt.",
     "backToVysion": "← Zurück zu Vysion",

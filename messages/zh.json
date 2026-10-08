@@ -6183,6 +6183,8 @@
   "adminLayout": {
     "loading": "加载中...",
     "redirectLogin": "正在跳转到登录…",
+    "blockedTitle": "您的收银系统已被锁定",
+    "blockedDesc": "支付发票金额后，我们将重新激活您的许可证。",
     "shopNotFound": "找不到店铺",
     "shopNotFoundDesc": "该店铺不存在或已被删除。",
     "backToVysion": "← 返回 Vysion",
