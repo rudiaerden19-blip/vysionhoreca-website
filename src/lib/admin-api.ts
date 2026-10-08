@@ -1001,58 +1001,51 @@ export async function getQrCodes(tenantSlug: string): Promise<QrCode[]> {
 }
 
 export async function saveQrCode(qrCode: QrCode): Promise<QrCode | null> {
-  if (qrCode.id) {
-    // Update existing
-    const { data, error } = await supabase
-      .from('qr_codes')
-      .update({
-        name: qrCode.name,
-        type: qrCode.type,
-        target_url: qrCode.target_url,
-        table_number: qrCode.table_number,
-        is_active: qrCode.is_active,
-      })
-      .eq('id', qrCode.id)
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error updating QR code:', error)
-      return null
-    }
-    return data
-  } else {
-    // Create new
-    const { data, error } = await supabase
-      .from('qr_codes')
-      .insert({
-        tenant_slug: qrCode.tenant_slug,
-        name: qrCode.name,
-        type: qrCode.type,
-        target_url: qrCode.target_url,
-        table_number: qrCode.table_number,
-        scans: 0,
-        is_active: true,
-      })
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating QR code:', error)
-      return null
-    }
-    return data
+  const tenantSlug = qrCode.tenant_slug?.trim()
+  if (!tenantSlug) return null
+
+  const row = {
+    name: qrCode.name,
+    type: qrCode.type,
+    target_url: qrCode.target_url,
+    table_number: qrCode.table_number ?? null,
+    is_active: qrCode.is_active ?? true,
   }
+
+  if (qrCode.id) {
+    const r = await adminDb.update(
+      'qr_codes',
+      row,
+      { id: qrCode.id, tenant_slug: tenantSlug },
+      { tenantSlug, select: '*' },
+    )
+    if (!r.ok) {
+      console.error('Error updating QR code:', r.error)
+      return null
+    }
+    const data = Array.isArray(r.data) ? r.data[0] : r.data
+    return (data as QrCode) ?? null
+  }
+
+  const r = await adminDb.insert(
+    'qr_codes',
+    { ...row, tenant_slug: tenantSlug, scans: qrCode.scans ?? 0 },
+    { tenantSlug, select: '*' },
+  )
+  if (!r.ok) {
+    console.error('Error creating QR code:', r.error)
+    return null
+  }
+  const data = Array.isArray(r.data) ? r.data[0] : r.data
+  return (data as QrCode) ?? null
 }
 
-export async function deleteQrCode(id: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('qr_codes')
-    .delete()
-    .eq('id', id)
-  
-  if (error) {
-    console.error('Error deleting QR code:', error)
+export async function deleteQrCode(id: string, tenantSlug?: string): Promise<boolean> {
+  const slug = tenantSlug?.trim()
+  if (!slug || !id) return false
+  const r = await adminDb.delete('qr_codes', { id, tenant_slug: slug }, { tenantSlug: slug })
+  if (!r.ok) {
+    console.error('Error deleting QR code:', r.error)
     return false
   }
   return true

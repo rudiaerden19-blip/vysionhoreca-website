@@ -83,6 +83,8 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
       setShowModal(false)
       setSelectedType(null)
       setFormData({ name: '', type: 'menu', table_number: ''})
+    } else {
+      alert('QR-code aanmaken mislukt. Vernieuw de pagina en probeer opnieuw.')
     }
     setSaving(false)
   }
@@ -96,7 +98,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
     }
     if (!(await ask(t('marketingQr.confirmDelete')))) return
 
-    const success = await deleteQrCode(id)
+    const success = await deleteQrCode(id, params.tenant)
     if (success) {
       setQrCodes(prev => prev.filter(qr => qr.id !== id))
     } else {
