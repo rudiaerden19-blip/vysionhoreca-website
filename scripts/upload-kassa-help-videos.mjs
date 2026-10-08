@@ -106,6 +106,10 @@ const MANIFEST = [
     topicId: 'qr-codes',
     files: [{ local: path.join(DESKTOP, 'qr codes.mp4'), storage: 'kassa-help/qr-codes/01.mp4' }],
   },
+  {
+    topicId: 'cashbook',
+    files: [{ local: path.join(DESKTOP, 'digitale kasboek.mp4'), storage: 'kassa-help/cashbook/01.mp4' }],
+  },
 ]
 
 function loadEnvFile(relPath) {

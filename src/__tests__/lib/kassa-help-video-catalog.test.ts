@@ -7,8 +7,8 @@ import {
 } from '@/lib/kassa-help-video-catalog'
 
 describe('kassa-help-video-catalog', () => {
-  it('has fourteen help topics with at least one step each', () => {
-    expect(KASSA_HELP_VIDEO_TOPICS).toHaveLength(14)
+  it('has fifteen help topics with at least one step each', () => {
+    expect(KASSA_HELP_VIDEO_TOPICS).toHaveLength(15)
     for (const topic of KASSA_HELP_VIDEO_TOPICS) {
       expect(topic.id).toBeTruthy()
       expect(topic.titleKey.startsWith('kassaApp.helpVideoTopic')).toBe(true)
@@ -89,6 +89,7 @@ describe('kassa-help-video-catalog', () => {
       'colors-design',
       'reviews-approve',
       'qr-codes',
+      'cashbook',
     ]) {
       expect(findKassaHelpTopic(id)?.steps.map((s) => s.videoPath)).toEqual([
         `kassa-help/${id}/01.mp4`,

@@ -198,6 +198,17 @@ export const KASSA_HELP_VIDEO_TOPICS: KassaHelpVideoTopic[] = [
       },
     ],
   },
+  {
+    id: 'cashbook',
+    titleKey: 'kassaApp.helpVideoTopicCashbook',
+    // Desktop/digitale kasboek.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/cashbook/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintCashbook1',
+      },
+    ],
+  },
 ]
 
 /** Public bucket voor help-mp4 (apart van `media` dat vaak geen video/mp4 toelaat). */
