@@ -2716,7 +2716,9 @@
       "min30BeforeClose": "30 min voor sluiting",
       "min45BeforeClose": "45 min voor sluiting",
       "hour1BeforeClose": "1 uur voor sluiting",
-      "customTime": "Eigen tijd"
+      "customTime": "Eigen tijd",
+      "incompleteTimes": "Vul voor elke open dag een geldige opening- en sluitingstijd in (bv. 11:00).",
+      "incompleteShift2Times": "Vul voor shift 2 een geldige opening- en sluitingstijd in, of verwijder shift 2."
     },
     "levering": {
       "title": "Levering & Afhaal",

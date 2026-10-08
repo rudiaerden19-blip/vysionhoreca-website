@@ -14,7 +14,23 @@ import { AdminIconCopy } from '@/lib/admin-action-icons'
 function formatTimeInput(raw: string): string {
   const digits = raw.replace(/\D/g, '').slice(0, 4)
   if (digits.length <= 2) return digits
-  return digits.slice(0, 2) + ':'+ digits.slice(2)
+  return digits.slice(0, 2) + ':' + digits.slice(2)
+}
+
+function isValidHm(raw: string | null | undefined): boolean {
+  if (!raw?.trim()) return false
+  const m = raw.trim().match(/^(\d{1,2}):(\d{2})$/)
+  if (!m) return false
+  const h = Number(m[1])
+  const min = Number(m[2])
+  return h >= 0 && h <= 23 && min >= 0 && min <= 59
+}
+
+function displayHm(raw: string | null | undefined): string {
+  if (!raw) return ''
+  const t = String(raw).trim()
+  const m = t.match(/^(\d{1,2}):(\d{2})/)
+  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : t.slice(0, 5)
 }
 
 function TimeInput({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) {
@@ -87,8 +103,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     tenant_slug: '',
     day_of_week: index,
     is_open: index !== 6,
-    open_time: '11:00',
-    close_time: '21:00',
+    open_time: '',
+    close_time: '',
     last_order_time: null,
     has_shift2: false,
     open_time_2: null,
@@ -140,7 +156,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                 break_end: null,
               }
             }
-            return { ...defaultHour, ...loaded }
+            return {
+              ...defaultHour,
+              ...loaded,
+              open_time: displayHm(loaded.open_time),
+              close_time: displayHm(loaded.close_time),
+              open_time_2: loaded.open_time_2 ? displayHm(loaded.open_time_2) : null,
+              close_time_2: loaded.close_time_2 ? displayHm(loaded.close_time_2) : null,
+            }
           }
           return { ...defaultHour, tenant_slug: params.tenant }
         })
@@ -241,10 +264,42 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     setError('')
   }
 
+  const toggleShift2 = (dayIndex: number) => {
+    setSchedule((prev) =>
+      prev.map((day, i) => {
+        if (i !== dayIndex) return day
+        if (day.has_shift2) {
+          return { ...day, has_shift2: false, open_time_2: null, close_time_2: null }
+        }
+        return { ...day, has_shift2: true, open_time_2: '', close_time_2: '' }
+      }),
+    )
+    setSaved(false)
+    setError('')
+  }
+
   const handleSave = async () => {
     setSaving(true)
     setError('')
-    
+
+    for (let i = 0; i < schedule.length; i++) {
+      const day = schedule[i]
+      if (!day.is_open) continue
+      if (!isValidHm(day.open_time) || !isValidHm(day.close_time)) {
+        setError(t('adminPages.openingstijden.incompleteTimes'))
+        setSaving(false)
+        return
+      }
+      if (
+        day.has_shift2 &&
+        (!isValidHm(day.open_time_2) || !isValidHm(day.close_time_2))
+      ) {
+        setError(t('adminPages.openingstijden.incompleteShift2Times'))
+        setSaving(false)
+        return
+      }
+    }
+
     const success = await saveOpeningHours(schedule)
     
     if (success) {
@@ -392,25 +447,20 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                     {/* Shift 1 */}
                     <div className="flex items-center gap-2">
                       <TimeInput
-                        value={daySchedule.open_time}
+                        value={displayHm(daySchedule.open_time)}
                         onChange={(v) => updateDay(index, 'open_time', v)}
                       />
                       <span className="text-gray-400">-</span>
                       <TimeInput
-                        value={daySchedule.close_time}
+                        value={displayHm(daySchedule.close_time)}
                         onChange={(v) => updateDay(index, 'close_time', v)}
                       />
                     </div>
 
                     {/* Shift 2 Toggle */}
                     <button
-                      onClick={() => {
-                        updateDay(index, 'has_shift2', !daySchedule.has_shift2)
-                        if (!daySchedule.has_shift2) {
-                          updateDay(index, 'open_time_2', '17:00')
-                          updateDay(index, 'close_time_2', '21:00')
-                        }
-                      }}
+                      type="button"
+                      onClick={() => toggleShift2(index)}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         daySchedule.has_shift2 
                           ? 'bg-black text-white' 
@@ -446,12 +496,12 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                 >
                   <span className="text-sm text-gray-500">{t('adminPages.openingstijden.shift2')}:</span>
                   <TimeInput
-                    value={daySchedule.open_time_2 || '17:00'}
+                    value={displayHm(daySchedule.open_time_2)}
                     onChange={(v) => updateDay(index, 'open_time_2', v)}
                   />
                   <span className="text-gray-400">-</span>
                   <TimeInput
-                    value={daySchedule.close_time_2 || '21:00'}
+                    value={displayHm(daySchedule.close_time_2)}
                     onChange={(v) => updateDay(index, 'close_time_2', v)}
                   />
                 </motion.div>

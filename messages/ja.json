@@ -2380,7 +2380,9 @@
       "min30BeforeClose": "閉店30分前まで",
       "min45BeforeClose": "閉店45分前まで",
       "hour1BeforeClose": "閉店1時間前まで",
-      "customTime": "カスタム時間"
+      "customTime": "カスタム時間",
+      "incompleteTimes": "営業日ごとに有効な開店・閉店時刻を入力してください（例: 11:00）。",
+      "incompleteShift2Times": "第2シフトの有効な時刻を入力するか、第2シフトを削除してください。"
     },
     "levering": {
       "title": "配達とテイクアウト",

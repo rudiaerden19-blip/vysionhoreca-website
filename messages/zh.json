@@ -2380,7 +2380,9 @@
       "min30BeforeClose": "关门前30分钟",
       "min45BeforeClose": "关门前45分钟",
       "hour1BeforeClose": "关门前1小时",
-      "customTime": "自定义时间"
+      "customTime": "自定义时间",
+      "incompleteTimes": "请为每个营业日填写有效的开门和关门时间（例如 11:00）。",
+      "incompleteShift2Times": "请填写第二班次的有效时间，或移除第二班次。"
     },
     "levering": {
       "title": "配送和自取",

@@ -1880,7 +1880,9 @@
       "min30BeforeClose": "30 Min. vor Schließung",
       "min45BeforeClose": "45 Min. vor Schließung",
       "hour1BeforeClose": "1 Stunde vor Schließung",
-      "customTime": "Eigene Zeit"
+      "customTime": "Eigene Zeit",
+      "incompleteTimes": "Geben Sie für jeden geöffneten Tag gültige Öffnungs- und Schließzeiten ein (z. B. 11:00).",
+      "incompleteShift2Times": "Geben Sie gültige Zeiten für Schicht 2 ein oder entfernen Sie Schicht 2."
     },
     "levering": {
       "title": "Lieferung & Abholung",

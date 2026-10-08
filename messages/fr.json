@@ -1880,7 +1880,9 @@
       "min30BeforeClose": "30 min avant fermeture",
       "min45BeforeClose": "45 min avant fermeture",
       "hour1BeforeClose": "1 heure avant fermeture",
-      "customTime": "Heure personnalisée"
+      "customTime": "Heure personnalisée",
+      "incompleteTimes": "Indiquez des heures d'ouverture et de fermeture valides pour chaque jour ouvert (ex. 11:00).",
+      "incompleteShift2Times": "Indiquez des heures valides pour le 2e service, ou supprimez le 2e service."
     },
     "levering": {
       "title": "Livraison & Retrait",

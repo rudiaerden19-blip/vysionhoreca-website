@@ -2380,7 +2380,9 @@
       "min30BeforeClose": "30 min prima della chiusura",
       "min45BeforeClose": "45 min prima della chiusura",
       "hour1BeforeClose": "1 ora prima della chiusura",
-      "customTime": "Orario personalizzato"
+      "customTime": "Orario personalizzato",
+      "incompleteTimes": "Inserisci orari di apertura e chiusura validi per ogni giorno aperto (es. 11:00).",
+      "incompleteShift2Times": "Inserisci orari validi per il 2° turno oppure rimuovi il 2° turno."
     },
     "levering": {
       "title": "Consegna e Ritiro",
