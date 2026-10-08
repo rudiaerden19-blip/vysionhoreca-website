@@ -209,13 +209,24 @@ export const KASSA_HELP_VIDEO_TOPICS: KassaHelpVideoTopic[] = [
       },
     ],
   },
+  {
+    id: 'z-reports',
+    titleKey: 'kassaApp.helpVideoTopicZReports',
+    // Desktop/z raporten.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/z-reports/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintZReports1',
+      },
+    ],
+  },
 ]
 
 /** Public bucket voor help-mp4 (apart van `media` dat vaak geen video/mp4 toelaat). */
 export const KASSA_HELP_VIDEO_STORAGE_BUCKET = 'kassa-help'
 
 /** Verhoog na nieuwe upload (letterbox-crop) zodat browsers oude mp4 niet cachen. */
-export const KASSA_HELP_VIDEO_ASSET_VERSION = 2
+export const KASSA_HELP_VIDEO_ASSET_VERSION = 3
 
 export function kassaHelpVideoPublicUrl(storagePath: string): string | null {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')

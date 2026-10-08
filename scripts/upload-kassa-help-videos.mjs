@@ -110,6 +110,10 @@ const MANIFEST = [
     topicId: 'cashbook',
     files: [{ local: path.join(DESKTOP, 'digitale kasboek.mp4'), storage: 'kassa-help/cashbook/01.mp4' }],
   },
+  {
+    topicId: 'z-reports',
+    files: [{ local: path.join(DESKTOP, 'z raporten.mp4'), storage: 'kassa-help/z-reports/01.mp4' }],
+  },
 ]
 
 function loadEnvFile(relPath) {
