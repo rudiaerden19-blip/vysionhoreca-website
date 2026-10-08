@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'
+import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { AdminIconPrint, AdminIconTrash } from '@/lib/admin-action-icons'
 
@@ -77,14 +78,19 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
       is_active: true,
     }
     
-    const saved = await saveQrCode(newQr)
-    if (saved) {
-      setQrCodes(prev => [saved, ...prev])
+    const result = await saveQrCode(newQr)
+    if (result.ok) {
+      setQrCodes((prev) => [result.data, ...prev])
       setShowModal(false)
       setSelectedType(null)
-      setFormData({ name: '', type: 'menu', table_number: ''})
+      setFormData({ name: '', type: 'menu', table_number: '' })
     } else {
-      alert('QR-code aanmaken mislukt. Vernieuw de pagina en probeer opnieuw.')
+      const err = result.error
+      const authHint =
+        /ingelogd|autoriseerd|403|401|tenant/i.test(err)
+          ? '\n\nLog in via Admin (zaak-wachtwoord) of als superadmin, daarna opnieuw Aanmaken.'
+          : ''
+      alert(`QR-code aanmaken mislukt: ${err}${authHint}`)
     }
     setSaving(false)
   }
@@ -179,6 +185,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
+    <PinGate tenant={params.tenant}>
     <div className="max-w-4xl mx-auto">
       <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
@@ -419,5 +426,6 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
         )}
       </AnimatePresence>
     </div>
+    </PinGate>
   )
 }

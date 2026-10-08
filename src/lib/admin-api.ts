@@ -1000,9 +1000,15 @@ export async function getQrCodes(tenantSlug: string): Promise<QrCode[]> {
   return data || []
 }
 
-export async function saveQrCode(qrCode: QrCode): Promise<QrCode | null> {
+export type SaveQrCodeResult =
+  | { ok: true; data: QrCode }
+  | { ok: false; error: string }
+
+export async function saveQrCode(qrCode: QrCode): Promise<SaveQrCodeResult> {
   const tenantSlug = qrCode.tenant_slug?.trim()
-  if (!tenantSlug) return null
+  if (!tenantSlug) {
+    return { ok: false, error: 'Geen tenant' }
+  }
 
   const row = {
     name: qrCode.name,
@@ -1021,10 +1027,11 @@ export async function saveQrCode(qrCode: QrCode): Promise<QrCode | null> {
     )
     if (!r.ok) {
       console.error('Error updating QR code:', r.error)
-      return null
+      return { ok: false, error: r.error || 'Opslaan mislukt' }
     }
     const data = Array.isArray(r.data) ? r.data[0] : r.data
-    return (data as QrCode) ?? null
+    if (!data) return { ok: false, error: 'Geen data na opslaan' }
+    return { ok: true, data: data as QrCode }
   }
 
   const r = await adminDb.insert(
@@ -1034,10 +1041,13 @@ export async function saveQrCode(qrCode: QrCode): Promise<QrCode | null> {
   )
   if (!r.ok) {
     console.error('Error creating QR code:', r.error)
-    return null
+    return { ok: false, error: r.error || 'Opslaan mislukt' }
   }
   const data = Array.isArray(r.data) ? r.data[0] : r.data
-  return (data as QrCode) ?? null
+  if (!data) {
+    return { ok: true, data: { ...qrCode, tenant_slug: tenantSlug } }
+  }
+  return { ok: true, data: data as QrCode }
 }
 
 export async function deleteQrCode(id: string, tenantSlug?: string): Promise<boolean> {
