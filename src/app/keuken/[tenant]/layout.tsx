@@ -2,6 +2,7 @@ import type { Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { TenantWebSessionOrchestrator } from '@/components/TenantWebSessionOrchestrator'
+import { TenantBlockedGate } from '@/components/TenantBlockedGate'
 
 export async function generateViewport(): Promise<Viewport> {
   return {
@@ -22,7 +23,9 @@ export default function KeukenTenantLayout({
   return (
     <>
       <TenantWebSessionOrchestrator tenantSlug={params.tenant} />
-      {children}
+      <TenantBlockedGate tenantSlug={params.tenant} forceStaff>
+        {children}
+      </TenantBlockedGate>
     </>
   )
 }
