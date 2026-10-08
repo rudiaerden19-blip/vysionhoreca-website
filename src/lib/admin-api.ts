@@ -70,9 +70,11 @@ export type { ExceptionalClosing } from './admin-api-exceptional-closings'
 export {
   isDateInExceptionalClosing,
   getExceptionalClosings,
+} from './admin-api-exceptional-closings'
+export {
   saveExceptionalClosing,
   deleteExceptionalClosing,
-} from './admin-api-exceptional-closings'
+} from './admin-api-exceptional-closings-write'
 
 export type { OpeningHour, ShopStatus } from './admin-api-shop-hours'
 export { getOpeningHours, saveOpeningHours, getShopStatus } from './admin-api-shop-hours'

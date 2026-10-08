@@ -4,8 +4,13 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   getOpeningHours, saveOpeningHours, OpeningHour,
-  getExceptionalClosings, saveExceptionalClosing, deleteExceptionalClosing, ExceptionalClosing,
+  getExceptionalClosings,
+  ExceptionalClosing,
 } from '@/lib/admin-api'
+import {
+  saveExceptionalClosing,
+  deleteExceptionalClosing,
+} from '@/lib/admin-api-exceptional-closings-write'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { AdminIconCopy } from '@/lib/admin-action-icons'
@@ -179,18 +184,32 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   const isDateClosed = (date: string) => closings.some(c => c.date === date)
 
   const toggleHoliday = async (holiday: { key: string; label: string; date: string }) => {
-    if (isDateClosed(holiday.date)) {
-      await deleteExceptionalClosing(params.tenant, holiday.date)
-      setClosings(prev => prev.filter(c => c.date !== holiday.date))
-    } else {
-      const saved = await saveExceptionalClosing({
-        tenant_slug: params.tenant,
-        date: holiday.date,
-        reason: holiday.label.replace(/^.{2}\s*/, ''), // strip emoji
-        is_holiday: true,
-        holiday_key: holiday.key,
-      })
-      if (saved) setClosings(prev => [...prev, saved])
+    setClosingError('')
+    try {
+      if (isDateClosed(holiday.date)) {
+        const ok = await deleteExceptionalClosing(params.tenant, holiday.date)
+        if (!ok) {
+          setClosingError(t('adminPages.common.saveFailed'))
+          return
+        }
+        setClosings((prev) => prev.filter((c) => c.date !== holiday.date))
+      } else {
+        const result = await saveExceptionalClosing({
+          tenant_slug: params.tenant,
+          date: holiday.date,
+          reason: holiday.label.replace(/^.{2}\s*/, ''),
+          is_holiday: true,
+          holiday_key: holiday.key,
+        })
+        if (!result.ok) {
+          setClosingError(`Opslaan mislukt: ${result.error}`)
+          return
+        }
+        setClosings((prev) => [...prev, result.row])
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Onbekende fout'
+      setClosingError(`Opslaan mislukt: ${msg}`)
     }
   }
 
@@ -199,18 +218,20 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     setClosingError('')
     setSavingSingle(true)
     try {
-      const saved = await saveExceptionalClosing({
+      const result = await saveExceptionalClosing({
         tenant_slug: params.tenant,
         date: singleDate,
         date_end: null,
         reason: singleReason || 'Gesloten',
         is_holiday: false,
       })
-      if (saved) {
-        setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
-        setSingleDate('')
-        setSingleReason('')
+      if (!result.ok) {
+        setClosingError(`Opslaan mislukt: ${result.error}`)
+        return
       }
+      setClosings((prev) => [...prev, result.row].sort((a, b) => a.date.localeCompare(b.date)))
+      setSingleDate('')
+      setSingleReason('')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Onbekende fout'
       setClosingError(`Opslaan mislukt: ${msg}`)
@@ -223,19 +244,21 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     setClosingError('')
     setSavingClosing(true)
     try {
-      const saved = await saveExceptionalClosing({
+      const result = await saveExceptionalClosing({
         tenant_slug: params.tenant,
         date: newDateFrom,
         date_end: newDateTo,
         reason: newReason || 'Gesloten',
         is_holiday: false,
       })
-      if (saved) {
-        setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
-        setNewDateFrom('')
-        setNewDateTo('')
-        setNewReason('')
+      if (!result.ok) {
+        setClosingError(`Opslaan mislukt: ${result.error}`)
+        return
       }
+      setClosings((prev) => [...prev, result.row].sort((a, b) => a.date.localeCompare(b.date)))
+      setNewDateFrom('')
+      setNewDateTo('')
+      setNewReason('')
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Onbekende fout'
       setClosingError(`Opslaan mislukt: ${msg}`)
