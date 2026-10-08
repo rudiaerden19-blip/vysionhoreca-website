@@ -300,13 +300,13 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       }
     }
 
-    const success = await saveOpeningHours(schedule)
-    
-    if (success) {
+    const result = await saveOpeningHours(schedule)
+
+    if (result.ok) {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError(t('adminPages.common.saveFailed'))
+      setError(result.error?.trim() || t('adminPages.common.saveFailed'))
     }
     setSaving(false)
   }

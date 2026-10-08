@@ -60,20 +60,73 @@ export async function getOpeningHours(tenantSlug: string, signal?: AbortSignal):
   return cache.getOrFetch(cacheKey('opening_hours', tenantSlug), fetchHours, CACHE_TTL.OPENING_HOURS)
 }
 
-export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
-  if (hours.length === 0) return true
+const OPENING_HOURS_DB_OPEN_FALLBACK = '09:00'
+const OPENING_HOURS_DB_CLOSE_FALLBACK = '22:00'
+
+function openingHoursDbTime(raw: string | null | undefined, fallback: string): string {
+  if (!raw?.trim()) return fallback
+  const m = raw.trim().match(/^(\d{1,2}):(\d{2})/)
+  if (!m) return fallback
+  return `${Number(m[1]).toString().padStart(2, '0')}:${m[2]}`
+}
+
+function openingHoursShiftTimeValid(raw: string | null | undefined): boolean {
+  if (!raw?.trim()) return false
+  const m = raw.trim().match(/^(\d{1,2}):(\d{2})$/)
+  if (!m) return false
+  const h = Number(m[1])
+  const min = Number(m[2])
+  return h >= 0 && h <= 23 && min >= 0 && min <= 59
+}
+
+/** Alleen kolommen die in opening_hours horen — geen lege strings (TIME kolom). */
+export function prepareOpeningHoursForDb(hours: OpeningHour[]): Record<string, unknown>[] {
+  return hours.map((h) => {
+    const open =
+      h.is_open && openingHoursShiftTimeValid(h.open_time)
+        ? openingHoursDbTime(h.open_time, OPENING_HOURS_DB_OPEN_FALLBACK)
+        : openingHoursDbTime(h.open_time, OPENING_HOURS_DB_OPEN_FALLBACK)
+    const close =
+      h.is_open && openingHoursShiftTimeValid(h.close_time)
+        ? openingHoursDbTime(h.close_time, OPENING_HOURS_DB_CLOSE_FALLBACK)
+        : openingHoursDbTime(h.close_time, OPENING_HOURS_DB_CLOSE_FALLBACK)
+    const lot = h.last_order_time?.trim()
+    return {
+      tenant_slug: h.tenant_slug,
+      day_of_week: h.day_of_week,
+      is_open: h.is_open,
+      open_time: open,
+      close_time: close,
+      last_order_time: lot || null,
+      has_shift2: Boolean(h.has_shift2),
+      open_time_2:
+        h.has_shift2 && openingHoursShiftTimeValid(h.open_time_2)
+          ? openingHoursDbTime(h.open_time_2, OPENING_HOURS_DB_OPEN_FALLBACK)
+          : null,
+      close_time_2:
+        h.has_shift2 && openingHoursShiftTimeValid(h.close_time_2)
+          ? openingHoursDbTime(h.close_time_2, OPENING_HOURS_DB_CLOSE_FALLBACK)
+          : null,
+    }
+  })
+}
+
+export async function saveOpeningHours(
+  hours: OpeningHour[],
+): Promise<{ ok: boolean; error?: string }> {
+  if (hours.length === 0) return { ok: true }
+  const rows = prepareOpeningHoursForDb(hours)
   /** PHASE 1: server-side via /api/admin/db. */
-  const r = await adminDb.upsert(
-    'opening_hours',
-    hours as unknown as Record<string, unknown>[],
-    { tenantSlug: hours[0].tenant_slug, onConflict: 'tenant_slug,day_of_week'},
-  )
+  const r = await adminDb.upsert('opening_hours', rows, {
+    tenantSlug: hours[0].tenant_slug,
+    onConflict: 'tenant_slug,day_of_week',
+  })
   if (!r.ok) {
     console.error('Error saving opening hours:', r.error)
-    return false
+    return { ok: false, error: r.error }
   }
   cache.invalidate(cacheKey('opening_hours', hours[0].tenant_slug))
-  return true
+  return { ok: true }
 }
 
 export interface ShopStatus {

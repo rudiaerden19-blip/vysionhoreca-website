@@ -94,7 +94,7 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
   },
   exceptional_closings: {
     tenantSlugColumn: 'tenant_slug',
-    allowedOps: ['insert', 'update', 'delete'],
+    allowedOps: ['insert', 'update', 'upsert', 'delete'],
     forbiddenColumns: ['id', 'created_at'],
     maxRows: 200,
   },

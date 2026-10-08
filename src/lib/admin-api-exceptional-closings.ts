@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { throwIfSupabaseFetchAborted } from './admin-api-internal'
+import { adminDb } from './admin-db-client'
 
 /** Of een kalenderdag binnen een uitzonderlijke sluiting valt (inclusief periode date … date_end). */
 export function isDateInExceptionalClosing(dateStr: string, closings: ExceptionalClosing[]): boolean {
@@ -50,28 +51,27 @@ export async function saveExceptionalClosing(closing: ExceptionalClosing): Promi
   }
   if (closing.date_end) payload.date_end = closing.date_end
 
-  const { data, error } = await supabase
-    .from('exceptional_closings')
-    .upsert(payload, { onConflict: 'tenant_slug,date'})
-    .select()
-    .single()
+  const r = await adminDb.upsert('exceptional_closings', payload, {
+    tenantSlug: closing.tenant_slug,
+    onConflict: 'tenant_slug,date',
+  })
 
-  if (error) {
-    console.error('Error saving exceptional closing:', error)
-    throw new Error(error.message || 'Onbekende fout')
+  if (!r.ok) {
+    console.error('Error saving exceptional closing:', r.error)
+    throw new Error(r.error || 'Onbekende fout')
   }
-  return data
+  const row = Array.isArray(r.data) ? r.data[0] : r.data
+  return (row as ExceptionalClosing) ?? null
 }
 
 export async function deleteExceptionalClosing(tenantSlug: string, date: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('exceptional_closings')
-    .delete()
-    .eq('tenant_slug', tenantSlug)
-    .eq('date', date)
+  const r = await adminDb.delete('exceptional_closings', {
+    tenant_slug: tenantSlug,
+    date,
+  })
 
-  if (error) {
-    console.error('Error deleting exceptional closing:', error)
+  if (!r.ok) {
+    console.error('Error deleting exceptional closing:', r.error)
     return false
   }
   return true
