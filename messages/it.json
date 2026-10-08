@@ -3766,7 +3766,8 @@
     "helpVideoZoomOut": "Riduci",
     "helpVideoZoomReset": "Zoom",
     "helpVideoFullscreen": "Schermo intero",
-    "helpVideoShowHint": "Mostra istruzioni"
+    "helpVideoShowHint": "Mostra istruzioni",
+    "helpVideoSoundReminder": "Non dimenticare di attivare l’audio!"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Sessione non valida. Apri lo schermo cliente dalla cassa.",

@@ -3766,7 +3766,8 @@
     "helpVideoZoomOut": "تصغير",
     "helpVideoZoomReset": "تكبير",
     "helpVideoFullscreen": "ملء الشاشة",
-    "helpVideoShowHint": "إظهار التعليمات"
+    "helpVideoShowHint": "إظهار التعليمات",
+    "helpVideoSoundReminder": "لا تنسَ تشغيل الصوت!"
   },
   "kassaCustomerDisplay": {
     "missingToken": "جلسة غير صالحة. افتح شاشة العميل من نقطة البيع.",

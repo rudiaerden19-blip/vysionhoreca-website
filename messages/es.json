@@ -3766,7 +3766,8 @@
     "helpVideoZoomOut": "Alejar",
     "helpVideoZoomReset": "Zoom",
     "helpVideoFullscreen": "Pantalla completa",
-    "helpVideoShowHint": "Mostrar instrucciones"
+    "helpVideoShowHint": "Mostrar instrucciones",
+    "helpVideoSoundReminder": "¡No olvides activar el sonido!"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Sesión no válida. Abra la pantalla cliente desde la caja.",

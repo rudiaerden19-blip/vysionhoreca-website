@@ -3766,7 +3766,8 @@
     "helpVideoZoomOut": "缩小",
     "helpVideoZoomReset": "缩放",
     "helpVideoFullscreen": "全屏",
-    "helpVideoShowHint": "显示说明"
+    "helpVideoShowHint": "显示说明",
+    "helpVideoSoundReminder": "别忘了打开声音！"
   },
   "kassaCustomerDisplay": {
     "missingToken": "会话无效。请从收银台打开顾客显示屏。",

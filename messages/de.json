@@ -3266,7 +3266,8 @@
     "helpVideoZoomOut": "Verkleinern",
     "helpVideoZoomReset": "Zoom",
     "helpVideoFullscreen": "Vollbild",
-    "helpVideoShowHint": "Anleitung anzeigen"
+    "helpVideoShowHint": "Anleitung anzeigen",
+    "helpVideoSoundReminder": "Vergiss nicht, den Ton einzuschalten!"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Ungültige Sitzung. Öffnen Sie die Kundenanzeige von der Kasse aus.",

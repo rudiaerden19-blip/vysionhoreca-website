@@ -3266,7 +3266,8 @@
     "helpVideoZoomOut": "Zoom arrière",
     "helpVideoZoomReset": "Zoom",
     "helpVideoFullscreen": "Plein écran",
-    "helpVideoShowHint": "Afficher les instructions"
+    "helpVideoShowHint": "Afficher les instructions",
+    "helpVideoSoundReminder": "N’oubliez pas d’activer le son !"
   },
   "kassaCustomerDisplay": {
     "missingToken": "Session invalide. Ouvrez l’écran client depuis la caisse.",

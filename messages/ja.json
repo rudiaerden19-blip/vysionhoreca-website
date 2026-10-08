@@ -3766,7 +3766,8 @@
     "helpVideoZoomOut": "縮小",
     "helpVideoZoomReset": "ズーム",
     "helpVideoFullscreen": "全画面",
-    "helpVideoShowHint": "説明を表示"
+    "helpVideoShowHint": "説明を表示",
+    "helpVideoSoundReminder": "音声をオンにするのを忘れないでください！"
   },
   "kassaCustomerDisplay": {
     "missingToken": "セッションが無効です。レジからお客様画面を開いてください。",

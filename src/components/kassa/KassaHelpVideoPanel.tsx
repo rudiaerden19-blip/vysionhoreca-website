@@ -184,6 +184,13 @@ function TopicPlayer({
         ) : null}
       </div>
 
+      <p
+        className="shrink-0 px-2 pb-1 pt-1 text-center text-sm font-bold text-red-500 sm:px-3"
+        data-testid="kassa-help-sound-reminder"
+      >
+        🔊 {t('kassaApp.helpVideoSoundReminder')}
+      </p>
+
       <div className="relative min-h-0 flex-1 overflow-hidden bg-[#0b0f14]">
         {videoSrc && !videoFailed ? (
           <video
