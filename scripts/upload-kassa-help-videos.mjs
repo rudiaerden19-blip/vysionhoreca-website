@@ -102,6 +102,10 @@ const MANIFEST = [
     topicId: 'reviews-approve',
     files: [{ local: path.join(DESKTOP, 'reviews goedkeuren.mp4'), storage: 'kassa-help/reviews-approve/01.mp4' }],
   },
+  {
+    topicId: 'qr-codes',
+    files: [{ local: path.join(DESKTOP, 'qr codes.mp4'), storage: 'kassa-help/qr-codes/01.mp4' }],
+  },
 ]
 
 function loadEnvFile(relPath) {

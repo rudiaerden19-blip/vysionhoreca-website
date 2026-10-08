@@ -187,6 +187,17 @@ export const KASSA_HELP_VIDEO_TOPICS: KassaHelpVideoTopic[] = [
       },
     ],
   },
+  {
+    id: 'qr-codes',
+    titleKey: 'kassaApp.helpVideoTopicQrCodes',
+    // Desktop/qr codes.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/qr-codes/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintQrCodes1',
+      },
+    ],
+  },
 ]
 
 /** Public bucket voor help-mp4 (apart van `media` dat vaak geen video/mp4 toelaat). */
