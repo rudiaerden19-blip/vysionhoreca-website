@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
   isKlantschermCustomPromosColumnError,
-  klantschermCustomPromosFromLegacy,
   klantschermCustomPromosToLegacyUploads,
+  mergeKlantschermCustomPromoSources,
   mergeKlantschermCustomPromosForSave,
-  parseKlantschermCustomPromos,
 } from '@/lib/klantscherm-custom-promos'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
@@ -57,10 +56,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
     data = fullRow as Record<string, unknown> | null
   }
 
-  let customPromos = parseKlantschermCustomPromos(data?.klantscherm_custom_promos)
-  if (customPromos.length === 0) {
-    customPromos = klantschermCustomPromosFromLegacy(data?.klantscherm_slideshow_uploads)
-  }
+  const customPromos = mergeKlantschermCustomPromoSources(
+    data?.klantscherm_custom_promos,
+    data?.klantscherm_slideshow_uploads,
+  )
 
   return NextResponse.json({
     ok: true,

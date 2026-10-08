@@ -6,6 +6,7 @@ import { mapKlantschermSlidesPlaybackUrls } from '@/lib/klantscherm-slideshow-pl
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 type RouteContext = { params: { tenant: string } }
 

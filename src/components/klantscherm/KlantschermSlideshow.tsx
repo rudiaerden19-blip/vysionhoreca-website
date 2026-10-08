@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { KlantschermPromoSlide } from '@/lib/klantscherm-custom-promos'
 import { KlantschermPromoSlideFrame } from '@/components/klantscherm/KlantschermPromoSlideFrame'
 
@@ -20,15 +20,8 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermPromoSlide
   )
   const [index, setIndex] = useState(0)
   const [visible, setVisible] = useState(true)
-
-  const advance = useCallback(() => {
-    if (photoSlides.length <= 1) return
-    setVisible(false)
-    window.setTimeout(() => {
-      setIndex((i) => (i + 1) % photoSlides.length)
-      setVisible(true)
-    }, 450)
-  }, [photoSlides.length])
+  const photoSlidesRef = useRef(photoSlides)
+  photoSlidesRef.current = photoSlides
 
   useEffect(() => {
     setIndex(0)
@@ -38,10 +31,30 @@ export function KlantschermSlideshow({ slides }: { slides: KlantschermPromoSlide
   const current = photoSlides[index] ?? photoSlides[0]
 
   useEffect(() => {
-    if (photoSlides.length <= 1) return
-    const id = window.setInterval(advance, IMAGE_MS)
-    return () => window.clearInterval(id)
-  }, [slideSequenceKey, advance, photoSlides.length])
+    const n = photoSlides.length
+    if (n <= 1) return
+
+    let cancelled = false
+    let timeoutId = 0
+
+    const advance = () => {
+      const list = photoSlidesRef.current
+      if (list.length <= 1) return
+      setVisible(false)
+      timeoutId = window.setTimeout(() => {
+        if (cancelled) return
+        setIndex((i) => (i + 1) % list.length)
+        setVisible(true)
+      }, 450)
+    }
+
+    const intervalId = window.setInterval(advance, IMAGE_MS)
+    return () => {
+      cancelled = true
+      window.clearInterval(intervalId)
+      window.clearTimeout(timeoutId)
+    }
+  }, [slideSequenceKey, photoSlides.length])
 
   if (photoSlides.length === 0 || !current) return null
 

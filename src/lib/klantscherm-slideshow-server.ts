@@ -3,7 +3,7 @@ import {
   isKlantschermCustomPromosColumnError,
   klantschermCustomPromosFromLegacy,
   klantschermCustomPromosToSlides,
-  parseKlantschermCustomPromos,
+  mergeKlantschermCustomPromoSources,
   type KlantschermPromoSlide,
 } from '@/lib/klantscherm-custom-promos'
 import {
@@ -67,13 +67,11 @@ type TenantPromoSettingsRow = {
 export function klantschermSlidesFromSettingsRow(
   row: TenantPromoSettingsRow | null | undefined,
 ): KlantschermPromoSlide[] {
-  const custom = parseKlantschermCustomPromos(row?.klantscherm_custom_promos)
-  if (custom.length > 0) {
-    return klantschermCustomPromosToSlides(custom)
-  }
-  return klantschermCustomPromosToSlides(
-    klantschermCustomPromosFromLegacy(row?.klantscherm_slideshow_uploads),
+  const promos = mergeKlantschermCustomPromoSources(
+    row?.klantscherm_custom_promos,
+    row?.klantscherm_slideshow_uploads,
   )
+  return klantschermCustomPromosToSlides(promos)
 }
 
 export async function loadKlantschermSlideshowSlides(

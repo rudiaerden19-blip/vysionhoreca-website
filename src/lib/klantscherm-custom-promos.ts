@@ -1,3 +1,5 @@
+import { parseKlantschermPromoPublicStorageUrl } from '@/lib/klantscherm-promo-storage-parse'
+
 export const KLANTSCHERM_CUSTOM_PROMO_MAX = 10
 
 export type KlantschermCustomPromo = {
@@ -25,10 +27,58 @@ function rowField(row: Record<string, unknown>, camel: string, snake: string): u
   return row[snake]
 }
 
+/** PostgREST/JSONB kan soms een string teruggeven i.p.v. een array. */
+export function normalizeKlantschermPromosJsonRaw(raw: unknown): unknown {
+  if (typeof raw === 'string') {
+    const t = raw.trim()
+    if (!t) return []
+    try {
+      return JSON.parse(t) as unknown
+    } catch {
+      return raw
+    }
+  }
+  return raw
+}
+
+function klantschermPromoUrlMergeKey(url: string): string {
+  const ref = parseKlantschermPromoPublicStorageUrl(url)
+  if (ref?.path) return ref.path
+  return url.trim()
+}
+
+/** custom_promos + legacy uploads samenvoegen (zelfde foto niet dubbel). */
+export function mergeKlantschermCustomPromoSources(
+  customRaw: unknown,
+  legacyUploadsRaw: unknown,
+): KlantschermCustomPromo[] {
+  const custom = parseKlantschermCustomPromos(normalizeKlantschermPromosJsonRaw(customRaw))
+  const legacy = klantschermCustomPromosFromLegacy(
+    normalizeKlantschermPromosJsonRaw(legacyUploadsRaw),
+  )
+  if (custom.length === 0) return legacy
+  if (legacy.length === 0) return custom
+
+  const byKey = new Map<string, KlantschermCustomPromo>()
+  for (const p of legacy) {
+    byKey.set(klantschermPromoUrlMergeKey(p.url), p)
+  }
+  for (const p of custom) {
+    const key = klantschermPromoUrlMergeKey(p.url)
+    const prev = byKey.get(key)
+    byKey.set(key, prev ? { ...prev, ...p, url: p.url || prev.url } : p)
+  }
+  const merged = [...byKey.values()].sort(
+    (a, b) => a.sort - b.sort || a.url.localeCompare(b.url),
+  )
+  return parseKlantschermCustomPromos(merged)
+}
+
 export function parseKlantschermCustomPromos(raw: unknown): KlantschermCustomPromo[] {
-  if (!Array.isArray(raw)) return []
+  const normalized = normalizeKlantschermPromosJsonRaw(raw)
+  if (!Array.isArray(normalized)) return []
   const out: KlantschermCustomPromo[] = []
-  for (const row of raw) {
+  for (const row of normalized) {
     if (!row || typeof row !== 'object') continue
     const o = row as Record<string, unknown>
     const url = String(o.url ?? '').trim()
