@@ -162,10 +162,13 @@ export default function KlantschermAdminPage({ params }: { params: { tenant: str
         alert(t('adminPages.klantscherm.uploadFailedDetail').replace('{detail}', result.message))
         return
       }
-      const next = promos.map((row, i) =>
-        i === index ? { ...row, url: result.publicUrl } : row,
-      )
-      setPromos(next)
+      let next: KlantschermCustomPromo[] = []
+      setPromos((prev) => {
+        next = prev.map((row, i) =>
+          i === index ? { ...row, url: result.publicUrl } : row,
+        )
+        return next
+      })
       const saved = await persistAll(next)
       if (!saved.ok) {
         alert(

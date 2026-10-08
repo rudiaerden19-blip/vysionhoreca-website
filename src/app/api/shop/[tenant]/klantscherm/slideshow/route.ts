@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
 import {
+  fetchKlantschermPromoSettingsRow,
   klantschermSlidesFromSettingsRow,
 } from '@/lib/klantscherm-slideshow-server'
 import { mapKlantschermSlidesPlaybackUrls } from '@/lib/klantscherm-slideshow-playback-url'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { isKlantschermCustomPromosColumnError } from '@/lib/klantscherm-custom-promos'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -16,21 +18,38 @@ export async function GET(_request: Request, context: RouteContext) {
     return NextResponse.json({ ok: false, error: 'bad_request' }, { status: 400 })
   }
 
-  const supabase = getServerSupabaseClient()
-  if (!supabase) {
-    return NextResponse.json({ ok: false, error: 'server_config' }, { status: 503 })
-  }
+  let settings: Awaited<ReturnType<typeof fetchKlantschermPromoSettingsRow>> =
+    await fetchKlantschermPromoSettingsRow(tenantSlug)
 
-  const { data: settings, error: settingsError } = await supabase
-    .from('tenant_settings')
-    .select(
-      'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_custom_promos, klantscherm_slideshow_uploads',
-    )
-    .eq('tenant_slug', tenantSlug)
-    .maybeSingle()
+  if (!settings) {
+    const supabase = getServerSupabaseClient()
+    if (!supabase) {
+      return NextResponse.json({ ok: false, error: 'server_config' }, { status: 503 })
+    }
 
-  if (settingsError) {
-    return NextResponse.json({ ok: false, error: settingsError.message }, { status: 500 })
+    const { data, error: settingsError } = await supabase
+      .from('tenant_settings')
+      .select(
+        'klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_custom_promos, klantscherm_slideshow_uploads',
+      )
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+
+    if (settingsError && isKlantschermCustomPromosColumnError(settingsError.message)) {
+      const { data: legacyOnly, error: legacyError } = await supabase
+        .from('tenant_settings')
+        .select('klantscherm_enabled, klantscherm_slideshow_enabled, klantscherm_slideshow_uploads')
+        .eq('tenant_slug', tenantSlug)
+        .maybeSingle()
+      if (legacyError) {
+        return NextResponse.json({ ok: false, error: legacyError.message }, { status: 500 })
+      }
+      settings = legacyOnly ?? null
+    } else if (settingsError) {
+      return NextResponse.json({ ok: false, error: settingsError.message }, { status: 500 })
+    } else {
+      settings = data ?? null
+    }
   }
 
   const menuSlideshowEnabled = settings?.klantscherm_slideshow_enabled === true

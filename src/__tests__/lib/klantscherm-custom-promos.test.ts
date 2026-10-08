@@ -4,6 +4,7 @@ import {
   mergeKlantschermCustomPromoSources,
   parseKlantschermCustomPromos,
 } from '@/lib/klantscherm-custom-promos'
+import { klantschermSlidesFromSettingsRow } from '@/lib/klantscherm-slideshow-server'
 
 describe('klantscherm custom promos legacy', () => {
   it('skips video legacy uploads', () => {
@@ -70,6 +71,56 @@ describe('klantscherm custom promos legacy', () => {
     )
     expect(rows).toHaveLength(1)
     expect(rows[0]?.title).toBe('X')
+  })
+
+  it('lomichillplay: drie opgeslagen promos → drie slides', () => {
+    const settings = {
+      klantscherm_custom_promos: [
+        {
+          url: 'https://eubncywfaexrsdonavfc.supabase.co/storage/v1/object/public/media/lomichillplay/klantscherm/1791416111408.jpeg',
+          sort: 0,
+          title: 'Onze burgers',
+          displayPrice: '6,50',
+        },
+        {
+          url: 'https://eubncywfaexrsdonavfc.supabase.co/storage/v1/object/public/media/lomichillplay/klantscherm/1791417043877.jpeg',
+          sort: 1,
+          title: 'Donderdag pizza dag',
+          displayPrice: '8,5',
+        },
+        {
+          url: 'https://eubncywfaexrsdonavfc.supabase.co/storage/v1/object/public/media/lomichillplay/klantscherm/1791489838549.jpg',
+          sort: 2,
+          title: 'Promo deal',
+          description: 'Bij aankoop van 2 burgers- frietjes gratis',
+          displayPrice: '11,50',
+        },
+      ],
+      klantscherm_slideshow_uploads: [
+        {
+          url: 'https://eubncywfaexrsdonavfc.supabase.co/storage/v1/object/public/media/lomichillplay/klantscherm/1791416111408.jpeg',
+          sort: 0,
+          mediaType: 'image',
+        },
+        {
+          url: 'https://eubncywfaexrsdonavfc.supabase.co/storage/v1/object/public/media/lomichillplay/klantscherm/1791417043877.jpeg',
+          sort: 1,
+          mediaType: 'image',
+        },
+        {
+          url: 'https://eubncywfaexrsdonavfc.supabase.co/storage/v1/object/public/media/lomichillplay/klantscherm/1791489838549.jpg',
+          sort: 2,
+          mediaType: 'image',
+        },
+      ],
+    }
+    const slides = klantschermSlidesFromSettingsRow(settings)
+    expect(slides).toHaveLength(3)
+    expect(slides.map((s) => s.title)).toEqual([
+      'Onze burgers',
+      'Donderdag pizza dag',
+      'Promo deal',
+    ])
   })
 
   it('mirrors custom promos to legacy slideshow uploads', () => {

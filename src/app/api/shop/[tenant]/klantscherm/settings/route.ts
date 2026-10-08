@@ -5,6 +5,7 @@ import {
   mergeKlantschermCustomPromoSources,
   mergeKlantschermCustomPromosForSave,
 } from '@/lib/klantscherm-custom-promos'
+import { fetchKlantschermPromoSettingsRow } from '@/lib/klantscherm-slideshow-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
@@ -54,6 +55,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
     return NextResponse.json({ ok: false, error: fullError.message }, { status: 500 })
   } else {
     data = fullRow as Record<string, unknown> | null
+  }
+
+  const promoRow = await fetchKlantschermPromoSettingsRow(tenantSlug)
+  if (promoRow && data) {
+    data.klantscherm_custom_promos = promoRow.klantscherm_custom_promos
+    data.klantscherm_slideshow_uploads = promoRow.klantscherm_slideshow_uploads
   }
 
   const customPromos = mergeKlantschermCustomPromoSources(
