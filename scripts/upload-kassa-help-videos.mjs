@@ -82,6 +82,26 @@ const MANIFEST = [
       { local: path.join(PRODUCTEN, 'opties&extras', '5.mp4'), storage: 'kassa-help/options-extras/05.mp4' },
     ],
   },
+  {
+    topicId: 'business-profile',
+    files: [{ local: path.join(DESKTOP, 'zaak profiel.mp4'), storage: 'kassa-help/business-profile/01.mp4' }],
+  },
+  {
+    topicId: 'opening-hours',
+    files: [{ local: path.join(DESKTOP, 'openingstijden.mp4'), storage: 'kassa-help/opening-hours/01.mp4' }],
+  },
+  {
+    topicId: 'delivery-pickup',
+    files: [{ local: path.join(DESKTOP, 'levering en afhaal.mp4'), storage: 'kassa-help/delivery-pickup/01.mp4' }],
+  },
+  {
+    topicId: 'colors-design',
+    files: [{ local: path.join(DESKTOP, 'kleuren en design.mp4'), storage: 'kassa-help/colors-design/01.mp4' }],
+  },
+  {
+    topicId: 'reviews-approve',
+    files: [{ local: path.join(DESKTOP, 'reviews goedkeuren.mp4'), storage: 'kassa-help/reviews-approve/01.mp4' }],
+  },
 ]
 
 function loadEnvFile(relPath) {

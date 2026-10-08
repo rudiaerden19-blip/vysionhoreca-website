@@ -7,8 +7,8 @@ import {
 } from '@/lib/kassa-help-video-catalog'
 
 describe('kassa-help-video-catalog', () => {
-  it('has eight help topics with at least one step each', () => {
-    expect(KASSA_HELP_VIDEO_TOPICS).toHaveLength(8)
+  it('has thirteen help topics with at least one step each', () => {
+    expect(KASSA_HELP_VIDEO_TOPICS).toHaveLength(13)
     for (const topic of KASSA_HELP_VIDEO_TOPICS) {
       expect(topic.id).toBeTruthy()
       expect(topic.titleKey.startsWith('kassaApp.helpVideoTopic')).toBe(true)
@@ -79,6 +79,20 @@ describe('kassa-help-video-catalog', () => {
       'kassa-help/add-category/04.mp4',
       'kassa-help/add-category/05.mp4',
     ])
+  })
+
+  it('admin setup topics each use one Desktop clip as 01.mp4', () => {
+    for (const id of [
+      'business-profile',
+      'opening-hours',
+      'delivery-pickup',
+      'colors-design',
+      'reviews-approve',
+    ]) {
+      expect(findKassaHelpTopic(id)?.steps.map((s) => s.videoPath)).toEqual([
+        `kassa-help/${id}/01.mp4`,
+      ])
+    }
   })
 
   it('findKassaHelpTopic resolves ids', () => {

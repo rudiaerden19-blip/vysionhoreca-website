@@ -132,6 +132,61 @@ export const KASSA_HELP_VIDEO_TOPICS: KassaHelpVideoTopic[] = [
       },
     ],
   },
+  {
+    id: 'business-profile',
+    titleKey: 'kassaApp.helpVideoTopicBusinessProfile',
+    // Desktop/zaak profiel.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/business-profile/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintBusinessProfile1',
+      },
+    ],
+  },
+  {
+    id: 'opening-hours',
+    titleKey: 'kassaApp.helpVideoTopicOpeningHours',
+    // Desktop/openingstijden.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/opening-hours/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintOpeningHours1',
+      },
+    ],
+  },
+  {
+    id: 'delivery-pickup',
+    titleKey: 'kassaApp.helpVideoTopicDeliveryPickup',
+    // Desktop/levering en afhaal.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/delivery-pickup/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintDeliveryPickup1',
+      },
+    ],
+  },
+  {
+    id: 'colors-design',
+    titleKey: 'kassaApp.helpVideoTopicColorsDesign',
+    // Desktop/kleuren en design.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/colors-design/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintColorsDesign1',
+      },
+    ],
+  },
+  {
+    id: 'reviews-approve',
+    titleKey: 'kassaApp.helpVideoTopicReviewsApprove',
+    // Desktop/reviews goedkeuren.mp4
+    steps: [
+      {
+        videoPath: 'kassa-help/reviews-approve/01.mp4',
+        hintKey: 'kassaApp.helpVideoHintReviewsApprove1',
+      },
+    ],
+  },
 ]
 
 /** Public bucket voor help-mp4 (apart van `media` dat vaak geen video/mp4 toelaat). */
