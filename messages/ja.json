@@ -3611,6 +3611,7 @@
     "jetonPayTitle": "トークン",
     "jetonOrderLabel": "注文",
     "jetonSuggestedPay": "必要: 黒 {black} + 白 {white}",
+    "jetonCustomerMustGiveLabel": "お客様が渡す枚数",
     "jetonBlackReceivedLabel": "受け取った黒トークン",
     "jetonGiveBackLabel": "お釣り",
     "jetonChangeWhiteOnly": "白 {white} 枚",

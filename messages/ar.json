@@ -3611,6 +3611,7 @@
     "jetonPayTitle": "الرموز",
     "jetonOrderLabel": "الطلب",
     "jetonSuggestedPay": "المطلوب: {black} أسود + {white} أبيض",
+    "jetonCustomerMustGiveLabel": "ما يجب أن يدفعه الزبون",
     "jetonBlackReceivedLabel": "الرموز السوداء المستلمة",
     "jetonGiveBackLabel": "إرجاع",
     "jetonChangeWhiteOnly": "{white} رموز بيضاء",

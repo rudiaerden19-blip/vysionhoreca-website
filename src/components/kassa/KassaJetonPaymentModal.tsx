@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import {
   eurosToJetonCents,
+  kassaJetonBreakdownFromCents,
   kassaJetonChangeFromBlackReceived,
   type KassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
@@ -112,6 +113,11 @@ export function KassaJetonPaymentModal({
     setBlackIn(0)
   }, [open, totalEuros])
 
+  const customerMustGive = useMemo(
+    () => kassaJetonBreakdownFromCents(orderCents, denoms),
+    [orderCents, denoms],
+  )
+
   const tender = useMemo(
     () => kassaJetonChangeFromBlackReceived(orderCents, blackIn, denoms),
     [orderCents, blackIn, denoms],
@@ -191,6 +197,35 @@ export function KassaJetonPaymentModal({
               <span className="tabular-nums">{formatEuro(orderCents)}</span>
             </div>
           </div>
+
+          {customerMustGive && (
+            <div className="rounded-xl border border-sky-600/60 bg-sky-950/35 p-4">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-sky-200/90">
+                {t('kassaApp.jetonCustomerMustGiveLabel')}
+              </p>
+              <div className="flex flex-col items-center gap-3 text-xl font-bold text-sky-50 sm:flex-row sm:justify-center">
+                {customerMustGive.black > 0 && (
+                  <div className="flex items-center gap-2">
+                    <JetonChip kind="black" label={blackChipLabel} />
+                    <span>
+                      {customerMustGive.black} {t('kassaApp.jetonBlackLabel')}
+                    </span>
+                  </div>
+                )}
+                {customerMustGive.black > 0 && customerMustGive.white > 0 && (
+                  <span className="text-sky-300/80">+</span>
+                )}
+                {customerMustGive.white > 0 && (
+                  <div className="flex items-center gap-2">
+                    <JetonChip kind="white" label={whiteChipLabel} />
+                    <span>
+                      {customerMustGive.white} {t('kassaApp.jetonWhiteLabel')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">

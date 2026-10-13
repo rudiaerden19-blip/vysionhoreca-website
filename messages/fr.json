@@ -3111,6 +3111,7 @@
     "jetonPayTitle": "Jetons",
     "jetonOrderLabel": "Commande",
     "jetonSuggestedPay": "Exact : {black} noirs + {white} blancs",
+    "jetonCustomerMustGiveLabel": "Le client doit donner",
     "jetonBlackReceivedLabel": "Jetons noirs reçus",
     "jetonGiveBackLabel": "À rendre",
     "jetonChangeWhiteOnly": "{white} jetons blancs",

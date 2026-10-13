@@ -3611,6 +3611,7 @@
     "jetonPayTitle": "代币",
     "jetonOrderLabel": "订单",
     "jetonSuggestedPay": "应付: 黑 {black} + 白 {white}",
+    "jetonCustomerMustGiveLabel": "顾客应付",
     "jetonBlackReceivedLabel": "收到的黑色代币",
     "jetonGiveBackLabel": "找零",
     "jetonChangeWhiteOnly": "{white} 枚白色代币",

@@ -3611,6 +3611,7 @@
     "jetonPayTitle": "Fichas",
     "jetonOrderLabel": "Pedido",
     "jetonSuggestedPay": "Exacto: {black} negras + {white} blancas",
+    "jetonCustomerMustGiveLabel": "El cliente debe dar",
     "jetonBlackReceivedLabel": "Fichas negras recibidas",
     "jetonGiveBackLabel": "Devolver",
     "jetonChangeWhiteOnly": "{white} fichas blancas",

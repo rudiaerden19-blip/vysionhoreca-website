@@ -3611,6 +3611,7 @@
     "jetonPayTitle": "Gettoni",
     "jetonOrderLabel": "Ordine",
     "jetonSuggestedPay": "Esatto: {black} neri + {white} bianchi",
+    "jetonCustomerMustGiveLabel": "Il cliente deve dare",
     "jetonBlackReceivedLabel": "Gettoni neri ricevuti",
     "jetonGiveBackLabel": "Resto",
     "jetonChangeWhiteOnly": "{white} gettoni bianchi",

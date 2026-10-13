@@ -3111,6 +3111,7 @@
     "jetonPayTitle": "Jetons",
     "jetonOrderLabel": "Bestellung",
     "jetonSuggestedPay": "Passend: {black} schwarze + {white} weiße Jetons",
+    "jetonCustomerMustGiveLabel": "Gast muss geben",
     "jetonBlackReceivedLabel": "Schwarze Jetons erhalten",
     "jetonGiveBackLabel": "Rückgabe",
     "jetonChangeWhiteOnly": "{white} weiße Jetons",
