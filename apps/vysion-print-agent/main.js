@@ -21,6 +21,8 @@ const { spawnSync, spawn } = require('child_process')
 const logger = require('./logger')
 const printQueue = require('./print-queue')
 const { createCloudPrintWorker } = require('./cloud-print-worker')
+const { applyPilotCloudDefaults } = require('./pilot-cloud-defaults')
+const agentPackage = require('./package.json')
 const {
   startServer,
   listWindowsPrintersSync,
@@ -117,10 +119,15 @@ function restartPrintServer() {
   }
 
   if (serverHandle && typeof serverHandle.close === 'function') {
-    serverHandle.close(() => {
+    let finished = false
+    const finish = () => {
+      if (finished) return
+      finished = true
       serverHandle = null
       startListening()
-    })
+    }
+    serverHandle.close(() => finish())
+    setTimeout(finish, 2500)
     return
   }
   startListening()
@@ -156,7 +163,7 @@ function loadConfig() {
     const raw = fs.readFileSync(configPath(), 'utf8').replace(/^\uFEFF/, '')
     j = JSON.parse(raw)
   } catch { /* config ontbreekt of corrupt → defaults */ }
-  return {
+  const base = {
     printerName: typeof j.printerName === 'string' ? j.printerName : '',
     kassaUrl:    typeof j.kassaUrl === 'string'    ? j.kassaUrl.trim() : '',
     port:        typeof j.port === 'number'        ? j.port : PORT,
@@ -172,6 +179,7 @@ function loadConfig() {
     cloudPrintDeviceToken: typeof j.cloudPrintDeviceToken === 'string' ? j.cloudPrintDeviceToken.trim() : '',
     cloudPrintApiBase: typeof j.cloudPrintApiBase === 'string' ? j.cloudPrintApiBase.trim() : '',
   }
+  return applyPilotCloudDefaults(base, agentPackage.version)
 }
 
 function saveConfig(cfg) {
@@ -281,6 +289,10 @@ function openKassa() {
     openSettings()
     return
   }
+  if (settingsWindow && !settingsWindow.isDestroyed()) {
+    try { settingsWindow.close() } catch { /* ignore */ }
+    settingsWindow = null
+  }
   if (kassaWindow && !kassaWindow.isDestroyed()) {
     kassaWindow.focus()
     return
@@ -300,10 +312,27 @@ function openKassa() {
     },
     title: 'Vysion Kassa',
   })
-  kassaWindow.once('ready-to-show', () => {
+  const showKassaWindow = () => {
+    if (!kassaWindow || kassaWindow.isDestroyed()) return
     try { kassaWindow.maximize() } catch { /* ignore */ }
-    kassaWindow.show()
+    try { kassaWindow.show() } catch { /* ignore */ }
+    try { kassaWindow.focus() } catch { /* ignore */ }
+  }
+  kassaWindow.once('ready-to-show', showKassaWindow)
+  kassaWindow.webContents.on('did-finish-load', () => {
+    showKassaWindow()
   })
+  kassaWindow.webContents.on('did-fail-load', (_evt, code, desc, validatedURL) => {
+    console.error('[kassa] did-fail-load', code, desc, validatedURL)
+    showKassaWindow()
+    try {
+      dialog.showErrorBox(
+        'Vysion Kassa',
+        `Pagina laden mislukt (${code}).\n${desc || ''}\n\n${validatedURL || config.kassaUrl}\n\nControleer internet en de kassa-URL in Instellingen.`,
+      )
+    } catch { /* ignore */ }
+  })
+  setTimeout(() => showKassaWindow(), 6000)
   // F5 / Ctrl+R / Ctrl+Shift+R → hard reload (cache wissen)
   kassaWindow.webContents.on('before-input-event', (_evt, input) => {
     if (input.type !== 'keyDown') return
@@ -725,6 +754,7 @@ ipcMain.handle('config:save', (_evt, partial) => {
         ? partial.cloudPrintApiBase.trim()
         : (config.cloudPrintApiBase || ''),
   }
+  config = applyPilotCloudDefaults(config, app.getVersion())
   saveConfig(config)
   try {
     restartPrintServer()
