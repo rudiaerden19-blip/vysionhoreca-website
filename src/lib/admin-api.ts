@@ -233,6 +233,8 @@ export interface TenantSettings {
   /** iPad print via LAN naar Windows Print Agent op vaste PC-IP */
   kassa_lan_print_enabled?: boolean
   kassa_lan_print_host?: string | null
+  /** Cloud print job queue (pilot, default uit) */
+  kassa_cloud_print_enabled?: boolean
   /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
   z_report_send_articles_to_accountant?: boolean
   /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */

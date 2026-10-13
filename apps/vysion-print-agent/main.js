@@ -20,6 +20,7 @@ const os = require('os')
 const { spawnSync, spawn } = require('child_process')
 const logger = require('./logger')
 const printQueue = require('./print-queue')
+const { createCloudPrintWorker } = require('./cloud-print-worker')
 const {
   startServer,
   listWindowsPrintersSync,
@@ -47,6 +48,8 @@ let tray = null
 let settingsWindow = null
 let kassaWindow = null
 let serverHandle = null
+/** @type {ReturnType<typeof createCloudPrintWorker> | null} */
+let cloudPrintWorker = null
 
 function ensureWindowsLanFirewallRule(port) {
   if (process.platform !== 'win32') return
@@ -164,6 +167,10 @@ function loadConfig() {
     printerProfile: normalizePrinterProfile(j.printerProfile),
     /** iPads op WiFi → POST /print naar LAN-IP van deze pc (default uit). */
     lanListenEnabled: j.lanListenEnabled === true,
+    /** Cloud print via Vercel API (default uit). */
+    cloudPrintEnabled: j.cloudPrintEnabled === true,
+    cloudPrintDeviceToken: typeof j.cloudPrintDeviceToken === 'string' ? j.cloudPrintDeviceToken.trim() : '',
+    cloudPrintApiBase: typeof j.cloudPrintApiBase === 'string' ? j.cloudPrintApiBase.trim() : '',
   }
 }
 
@@ -705,6 +712,18 @@ ipcMain.handle('config:save', (_evt, partial) => {
       typeof partial.lanListenEnabled === 'boolean'
         ? partial.lanListenEnabled
         : config.lanListenEnabled === true,
+    cloudPrintEnabled:
+      typeof partial.cloudPrintEnabled === 'boolean'
+        ? partial.cloudPrintEnabled
+        : config.cloudPrintEnabled === true,
+    cloudPrintDeviceToken:
+      typeof partial.cloudPrintDeviceToken === 'string'
+        ? partial.cloudPrintDeviceToken.trim()
+        : (config.cloudPrintDeviceToken || ''),
+    cloudPrintApiBase:
+      typeof partial.cloudPrintApiBase === 'string'
+        ? partial.cloudPrintApiBase.trim()
+        : (config.cloudPrintApiBase || ''),
   }
   saveConfig(config)
   try {
@@ -712,11 +731,38 @@ ipcMain.handle('config:save', (_evt, partial) => {
   } catch (e) {
     console.error('[server] herstart na config mislukt', e)
   }
+  syncCloudPrintWorker()
   syncWindowsStartup()
   checkHealth()
   buildTray()
   return { ok: true }
 })
+
+function syncCloudPrintWorker() {
+  try {
+    if (!cloudPrintWorker) {
+      cloudPrintWorker = createCloudPrintWorker({
+        getConfig: () => ({
+          cloudPrintEnabled: config.cloudPrintEnabled === true,
+          cloudPrintDeviceToken: config.cloudPrintDeviceToken || '',
+          cloudPrintApiBase: config.cloudPrintApiBase || '',
+          printerName: getPrinterName(),
+          kitchenPrinterName: getKitchenPrinterName(),
+          printerProfile: getPrinterProfile(),
+          kassaUrl: config.kassaUrl || '',
+        }),
+        log: console,
+      })
+    }
+    if (config.cloudPrintEnabled === true && String(config.cloudPrintDeviceToken || '').trim()) {
+      cloudPrintWorker.start()
+    } else if (cloudPrintWorker) {
+      cloudPrintWorker.stop()
+    }
+  } catch (e) {
+    console.error('[cloud-print] worker sync mislukt (lokaal print onaangetast)', e)
+  }
+}
 
 // ---- IPC: agent:request bridge (kassa-window → printer) ------------------
 ipcMain.handle('agent:request', async (_evt, { path: reqPath, method, body }) => {
@@ -848,12 +894,14 @@ if (!gotLock) {
       setTimeout(() => checkForUpdates(false), 30_000)
       setInterval(() => checkForUpdates(false), UPDATE_CHECK_INTERVAL_MS)
     }
+    syncCloudPrintWorker()
   })
 
   app.on('window-all-closed', () => { /* tray keeps alive */ })
 
   app.on('before-quit', () => {
     if (healthTimer) clearInterval(healthTimer)
+    if (cloudPrintWorker) cloudPrintWorker.stop()
     if (serverHandle && serverHandle.close) serverHandle.close()
     console.info('==== Vysion Print Agent afsluiten ====')
   })

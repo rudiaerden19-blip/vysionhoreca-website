@@ -110,6 +110,12 @@ const UpdateKassaLanPrintEnabledSchema = z.object({
   kassaLanPrintEnabled: z.boolean(),
 })
 
+const UpdateKassaCloudPrintEnabledSchema = z.object({
+  action: z.literal('update_kassa_cloud_print_enabled'),
+  slug: z.string().min(1),
+  kassaCloudPrintEnabled: z.boolean(),
+})
+
 const BodySchema = z.discriminatedUnion('action', [
   CreateSchema,
   DeleteSchema,
@@ -123,6 +129,7 @@ const BodySchema = z.discriminatedUnion('action', [
   UpdateKassaNameAccountV2Schema,
   UpdateKassaJetonEnabledSchema,
   UpdateKassaLanPrintEnabledSchema,
+  UpdateKassaCloudPrintEnabledSchema,
 ])
 
 const CASCADE_DELETE_TABLES = [
@@ -595,6 +602,30 @@ export async function POST(req: NextRequest) {
         actorId,
         actorEmail,
         action: 'update_kassa_lan_print_enabled',
+        resourceType: 'tenant_settings',
+        resourceId: body.slug,
+        before: null,
+        after: updates,
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+        requestId,
+      })
+      return NextResponse.json({ ok: true })
+    }
+
+    if (body.action === 'update_kassa_cloud_print_enabled') {
+      const updates = { kassa_cloud_print_enabled: body.kassaCloudPrintEnabled === true }
+      const { error } = await supabase
+        .from('tenant_settings')
+        .update(updates)
+        .eq('tenant_slug', body.slug)
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      await recordAudit(supabase, {
+        tenantSlug: body.slug,
+        actorType: 'superadmin',
+        actorId,
+        actorEmail,
+        action: 'update_kassa_cloud_print_enabled',
         resourceType: 'tenant_settings',
         resourceId: body.slug,
         before: null,

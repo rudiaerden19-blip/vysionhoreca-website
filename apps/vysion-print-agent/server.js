@@ -840,6 +840,9 @@ function getDrawerScriptPath() { return getScriptPath('open-drawer.ps1') }
 /** Open de kassa-lade via PASSTHROUGH-escape (GDI) + RAW-write fallback.
  *  Werkt op Epson APD die normale RAW drawer-bytes filtert. */
 function openCashDrawerWindows(printerName) {
+  if (process.env.VYSION_AGENT_MOCK_PRINT === '1') {
+    return { ok: true, info: 'mock-drawer' }
+  }
   const ps1 = getDrawerScriptPath()
   if (!fs.existsSync(ps1)) {
     return { ok: false, error: 'open-drawer.ps1 niet gevonden.' }
@@ -862,6 +865,9 @@ function openCashDrawerWindows(printerName) {
  * Fouten alleen naar console; synchrone `/drawer`-route gebruikt nog `openCashDrawerWindows`.
  */
 function kickCashDrawerWindowsParallel(printerName) {
+  if (process.env.VYSION_AGENT_MOCK_PRINT === '1') {
+    return
+  }
   const ps1 = getDrawerScriptPath()
   if (!fs.existsSync(ps1)) {
     console.error('[drawer] parallel kick: open-drawer.ps1 niet gevonden')
@@ -897,6 +903,9 @@ function kickCashDrawerWindowsParallel(printerName) {
  * bestelling laat stuksluipen.
  */
 function printRawWindows(printerName, payloadBuffer, attempt = 1) {
+  if (process.env.VYSION_AGENT_MOCK_PRINT === '1') {
+    return { ok: true, info: 'mock-print' }
+  }
   const ps1 = getPrintScriptPath()
   if (!fs.existsSync(ps1)) {
     return { ok: false, error: 'print-raw.ps1 niet gevonden (installatie corrupt).' }
