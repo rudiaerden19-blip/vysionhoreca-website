@@ -6,10 +6,13 @@ function isPilotAgentBuild(version) {
   return String(version || '').includes('pilot')
 }
 
+const PILOT_DEFAULT_KASSA_URL = 'https://www.vysion-kassa.com/shop/thelagoon/admin/kassa'
+
 function applyPilotCloudDefaults(cfg, version) {
   if (!isPilotAgentBuild(version)) return cfg
   return {
     ...cfg,
+    kassaUrl: (cfg.kassaUrl && cfg.kassaUrl.trim()) || PILOT_DEFAULT_KASSA_URL,
     cloudPrintEnabled: true,
     lanListenEnabled: false,
     cloudPrintApiBase: PILOT_CLOUD_API_BASE,
@@ -21,4 +24,5 @@ module.exports = {
   isPilotAgentBuild,
   applyPilotCloudDefaults,
   PILOT_CLOUD_API_BASE,
+  PILOT_DEFAULT_KASSA_URL,
 }

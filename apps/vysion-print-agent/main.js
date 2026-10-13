@@ -211,6 +211,10 @@ function getPrintConfig() {
   }
 }
 
+function argvRequestsOpenKassa(argv = process.argv) {
+  return Array.isArray(argv) && argv.some((a) => a === '--open-kassa' || a === '--open-kassa-only')
+}
+
 function ensureDesktopShortcut() {
   if (process.platform !== 'win32') return
   try {
@@ -222,8 +226,9 @@ function ensureDesktopShortcut() {
       `$p = ${JSON.stringify(lnk)}`,
       `$s = (New-Object -ComObject WScript.Shell).CreateShortcut($p)`,
       `$s.TargetPath = ${JSON.stringify(exe)}`,
+      `$s.Arguments = '--open-kassa'`,
       `$s.WorkingDirectory = ${JSON.stringify(cwd)}`,
-      `$s.Description = 'Vysion Kassa + Print Agent'`,
+      `$s.Description = 'Open Vysion Kassa (Print Agent)'`,
       `$s.Save()`,
     ].join('; ')
     spawnSync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ps], {
@@ -892,7 +897,13 @@ if (!gotLock) {
   console.warn('[lock] al een instance actief → afsluiten')
   app.quit()
 } else {
-  app.on('second-instance', () => {
+  app.on('second-instance', (_event, argv) => {
+    config = loadConfig()
+    if (argvRequestsOpenKassa(argv) || argvRequestsOpenKassa(process.argv)) {
+      if (!getPrinterName() || !config.kassaUrl) openSettings()
+      else openKassa()
+      return
+    }
     if (!getPrinterName() || !config.kassaUrl) openSettings()
     else openKassa()
   })
@@ -916,7 +927,11 @@ if (!gotLock) {
     ensureDesktopShortcut()
     startHealthLoop()
     buildTray()
-    if (!getPrinterName() || !config.kassaUrl) openSettings()
+    const openFromDesktop = argvRequestsOpenKassa()
+    if (openFromDesktop) {
+      if (!getPrinterName() || !config.kassaUrl) openSettings()
+      else openKassa()
+    } else if (!getPrinterName() || !config.kassaUrl) openSettings()
     else openKassa()
 
     // Update-check 30s na opstart, daarna elke 4u
