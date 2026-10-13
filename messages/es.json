@@ -3585,6 +3585,7 @@
     "lanPrintHostInvalid": "IP no válida (p. ej. 192.168.1.50).",
     "lanPrintHostClose": "Cerrar",
     "lanPrintHostReopen": "IP PC de impresión",
+    "cloudPrintQueuedBanner": "El ticket está en la cola de impresión en la nube. El Print Agent de Windows imprimirá cuando esté en línea; esto no significa que ya se haya impreso físicamente.",
     "printAgentFallbackModalTitle": "Print Agent no disponible",
     "printAgentFallbackModalBody": "La caja no obtuvo respuesta correcta del Print Agent en este PC (127.0.0.1:9742). Se usará la vía de emergencia: el cuadro de impresión de Windows. No es un ticket ESC/POS real como con el agente — en una Epson térmica puede salir muy pequeño o ilegible. Primero restaure el agente (bandeja → Ajustes → Epson correcto → Guardar → prueba). Use Continuar solo como medida provisional.",
     "printAgentFallbackModalDownloadLink": "Página de descarga Print Agent (Windows)",

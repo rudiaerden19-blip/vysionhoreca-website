@@ -3085,6 +3085,7 @@
     "lanPrintHostInvalid": "Ungültige IP-Adresse (z. B. 192.168.1.50).",
     "lanPrintHostClose": "Schließen",
     "lanPrintHostReopen": "Print-PC-IP",
+    "cloudPrintQueuedBanner": "Beleg steht in der Cloud-Druckwarteschlange. Der Windows Print Agent druckt, sobald er online ist — das bedeutet noch nicht, dass der Beleg bereits physisch gedruckt wurde.",
     "printAgentFallbackModalTitle": "Print Agent nicht erreichbar",
     "printAgentFallbackModalBody": "Die Kassa erhielt keine erfolgreiche Antwort vom Print Agent auf diesem PC (127.0.0.1:9742). Es folgt der Notfallweg: der normale Windows-Druckdialog. Das ist kein richtiger ESC/POS-Beleg wie über den Agent — auf einem Epson-Thermodrucker kann die Ausgabe winzig oder unleserlich sein. Zuerst den Agent reparieren (Tray → Einstellungen → richtigen Epson wählen → Speichern → Testbeleg). „Weiter“ nur als Notlösung.",
     "printAgentFallbackModalDownloadLink": "Downloadseite Print Agent (Windows)",

@@ -1781,13 +1781,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
   const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
   const kassaLanPrintEnabled = tenantInfo?.kassa_lan_print_enabled === true
+  const kassaCloudPrintEnabled = tenantInfo?.kassa_cloud_print_enabled === true
   const printAgentSendContext = useMemo((): VysionPrintAgentSendContext => {
     return {
       lanPrintEnabled: kassaLanPrintEnabled,
+      cloudPrintEnabled: kassaCloudPrintEnabled,
       tenantSlug: tenant,
       tenantDefaultHost: tenantInfo?.kassa_lan_print_host ?? null,
     }
-  }, [kassaLanPrintEnabled, tenant, tenantInfo?.kassa_lan_print_host])
+  }, [kassaLanPrintEnabled, kassaCloudPrintEnabled, tenant, tenantInfo?.kassa_lan_print_host])
   const [lanPrintHostDraft, setLanPrintHostDraft] = useState('')
   const [lanPrintHostSavedFlash, setLanPrintHostSavedFlash] = useState(false)
   const [lanPrintSetupPanelOpen, setLanPrintSetupPanelOpen] = useState(false)
@@ -4603,8 +4605,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     flushSync(() => {
       if (printResult.ok) {
-        /** Zelfde op tablet/desktop: geen losse succes-toast — voorkomt verschillende UX per apparaat. */
-        setThermalPrintBanner(null)
+        if (printResult.delivery === 'cloud_queued') {
+          setThermalPrintBanner({
+            variant: 'success',
+            message: t('kassaApp.cloudPrintQueuedBanner'),
+          })
+        } else {
+          /** Zelfde op tablet/desktop: geen losse succes-toast — voorkomt verschillende UX per apparaat. */
+          setThermalPrintBanner(null)
+        }
       } else {
         setThermalPrintBanner({
           variant: 'error',

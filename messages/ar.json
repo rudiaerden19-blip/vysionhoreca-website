@@ -3585,6 +3585,7 @@
     "lanPrintHostInvalid": "IP غير صالح (مثل 192.168.1.50).",
     "lanPrintHostClose": "إغلاق",
     "lanPrintHostReopen": "IP جهاز الطباعة",
+    "cloudPrintQueuedBanner": "الإيصال في قائمة انتظار الطباعة السحابية. سيطبع Print Agent على Windows عند الاتصال — هذا لا يعني أن الإيصال طُبع فعلياً بعد.",
     "printAgentFallbackModalTitle": "تعذّر الوصول إلى Print Agent",
     "printAgentFallbackModalBody": "لم تصل الكاشيرة إلى استجابة صحيحة من Print Agent على هذا الجهاز (127.0.0.1:9742). يُفعّل مسار الطوارئ: نافذة الطباعة العادية في Windows. هذا ليس إيصال ESC/POS كما مع الوكيل — على Epson حرارية قد يصغر النص أو يصبح غير مقروء. أصلِح الوكيل أولاً (الصينية → الإعدادات → اختر Epson الصحيح → احفظ → اختبار). استخدم متابعة فقط كحل مؤقت.",
     "printAgentFallbackModalDownloadLink": "صفحة تنزيل Print Agent (Windows)",

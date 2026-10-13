@@ -118,6 +118,24 @@ export const reservationEmailTenantRateLimiter = redis
     })
   : null
 
+/** Cloud print enqueue (kassa/iPad): per tenant + IP. */
+export const printAgentEnqueueRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(90, '1 m'),
+      prefix: 'ratelimit:print-agent-enqueue',
+    })
+  : null
+
+/** Cloud print agent claim/ack: per device-id. */
+export const printAgentWorkerRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(120, '1 m'),
+      prefix: 'ratelimit:print-agent-worker',
+    })
+  : null
+
 const API_MW_EXEMPT_PREFIXES = [
   '/api/stripe-webhook',
   '/api/subscription-webhook',

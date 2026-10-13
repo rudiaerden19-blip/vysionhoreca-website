@@ -4,6 +4,15 @@ import {
   resolveVysionPrintAgentOrigin,
   type ResolveVysionPrintAgentOriginInput,
 } from '@/lib/kassa-lan-print'
+import { shouldRoutePrintViaCloudQueue } from '@/lib/print-agent-cloud/device-detect'
+import {
+  cloudEnqueueJobToUserResult,
+  postPrintAgentEnqueue,
+} from '@/lib/print-agent-cloud/enqueue-client'
+import {
+  buildDrawerOnlyIdempotencyKey,
+  buildPrintJobIdempotencyKey,
+} from '@/lib/print-agent-cloud/idempotency'
 
 const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
 
@@ -11,7 +20,12 @@ const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
 export type VysionPrintAgentSendContext = Pick<
   ResolveVysionPrintAgentOriginInput,
   'lanPrintEnabled' | 'tenantSlug' | 'tenantDefaultHost'
->
+> & {
+  /** Pilot: iPad → HTTPS cloud-wachtrij (default uit per tenant). */
+  cloudPrintEnabled?: boolean
+  /** Bewuste herdruk: unieke suffix op idempotency key. */
+  cloudPrintReprintNonce?: string
+}
 
 function printAgentTargetAddressSpace(origin: string): 'local' | 'private' {
   return /127\.0\.0\.1|localhost/i.test(origin) ? 'local' : 'private'
@@ -411,12 +425,42 @@ async function postPrintOnce(
 }
 
 /** Resultaat voor UI (alert) bij mislukte bon. */
-export type VysionPrintAgentResult = { ok: true } | { ok: false; error: string }
+export type VysionPrintAgentResult =
+  | { ok: true; delivery?: 'local' | 'cloud_queued'; jobId?: string }
+  | { ok: false; error: string }
+
+async function sendViaCloudPrintQueue(
+  body: VysionPrintAgentBody,
+  context: VysionPrintAgentSendContext,
+): Promise<VysionPrintAgentResult> {
+  const tenantSlug = context.tenantSlug?.trim()
+  if (!tenantSlug) {
+    return { ok: false, error: 'Cloud print: tenant ontbreekt in printcontext.' }
+  }
+  const idempotencyKey = buildPrintJobIdempotencyKey(body, {
+    tenantSlug,
+    reprintNonce: context.cloudPrintReprintNonce,
+  })
+  const payload = buildAgentRequestPayload(body)
+  const enq = await postPrintAgentEnqueue({
+    tenantSlug,
+    idempotencyKey,
+    payload,
+    source: 'kassa-ipad',
+  })
+  if (!enq.ok) return { ok: false, error: enq.error }
+  return cloudEnqueueJobToUserResult(enq.response.job)
+}
 
 async function sendToVysionPrintAgentCore(
   body: VysionPrintAgentBody,
   origin: string,
+  context?: VysionPrintAgentSendContext,
 ): Promise<VysionPrintAgentResult> {
+  if (context && shouldRoutePrintViaCloudQueue(context)) {
+    return sendViaCloudPrintQueue(body, context)
+  }
+
   const base = origin.replace(/\/$/, '')
   const tablet = isAndroidTabletPrintClient()
 
@@ -427,9 +471,9 @@ async function sendToVysionPrintAgentCore(
    */
   if (tablet) {
     const bridge = tryVysionKioskPrintBridge(body)
-    if (bridge.ok) return { ok: true }
+    if (bridge.ok) return { ok: true, delivery: 'local' }
     const r = await postPrintOnce(body, base)
-    if (r.ok) return { ok: true }
+    if (r.ok) return { ok: true, delivery: 'local' }
     return {
       ok: false,
       error: [
@@ -448,7 +492,7 @@ async function sendToVysionPrintAgentCore(
   /** Minder pogingen maar korter tussen herkoppeling — agent meestal wél bereikbaar; 5× lange backoff voelde als „traag“. */
   for (let i = 0; i < 3; i++) {
     const r = await postPrintOnce(body, base)
-    if (r.ok) return { ok: true }
+    if (r.ok) return { ok: true, delivery: 'local' }
     lastDetail = r.detail
     if (i < 2) await sleep(200)
   }
@@ -468,8 +512,24 @@ export async function sendToVysionPrintAgent(
   body: VysionPrintAgentBody,
   originOrContext: string | VysionPrintAgentSendContext = DEFAULT_AGENT_ORIGIN,
 ): Promise<VysionPrintAgentResult> {
+  const context =
+    originOrContext && typeof originOrContext === 'object' ? originOrContext : undefined
+
+  /** iPad + cloud: geen localhost/LAN-probe — voorkomt dubbele netwerkactie en LAN-print. */
+  if (context && shouldRoutePrintViaCloudQueue(context)) {
+    const ms = 25_000
+    const core = sendViaCloudPrintQueue(body, context)
+    const wallClock = sleep(ms).then(
+      (): VysionPrintAgentResult => ({
+        ok: false,
+        error: `Cloud print reageerde niet binnen ${Math.round(ms / 1000)} seconden. Bon is mogelijk niet in de wachtrij geplaatst.`,
+      }),
+    )
+    return await Promise.race([core, wallClock])
+  }
+
   const origin = await resolveOriginArg(originOrContext)
-  const core = sendToVysionPrintAgentCore(body, origin)
+  const core = sendToVysionPrintAgentCore(body, origin, context)
   /**
    * Altijd een muurklok: sommige Chrome/Android-combinaties laten fetch naar 127.0.0.1 of body.text()
    * vastlopen zonder nette Abort → blauwe „printer wordt aangesproken” voor altijd.
@@ -496,6 +556,29 @@ export async function sendToVysionPrintAgent(
 export async function openCashDrawer(
   originOrContext: string | VysionPrintAgentSendContext = DEFAULT_AGENT_ORIGIN,
 ): Promise<boolean> {
+  const context =
+    originOrContext && typeof originOrContext === 'object' ? originOrContext : undefined
+  if (context && shouldRoutePrintViaCloudQueue(context)) {
+    const tenantSlug = context.tenantSlug?.trim()
+    if (!tenantSlug) return false
+    const nonce =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : String(Date.now())
+    const enq = await postPrintAgentEnqueue({
+      tenantSlug,
+      idempotencyKey: buildDrawerOnlyIdempotencyKey(tenantSlug, nonce),
+      payload: buildAgentRequestPayload({
+        bonInhoud: '',
+        openDrawer: true,
+        receiptMode: 'kassa',
+        copies: 1,
+      }),
+      source: 'kassa-ipad-drawer',
+    })
+    return enq.ok && enq.response.job.status !== 'failed'
+  }
+
   const origin = await resolveOriginArg(originOrContext)
   const base = origin.replace(/\/$/, '')
   const controller = new AbortController()

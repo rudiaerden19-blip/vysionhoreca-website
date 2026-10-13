@@ -9,6 +9,11 @@ const BodySchema = z.object({
   name: z.string().max(120).optional(),
 })
 
+const RevokeSchema = z.object({
+  action: z.literal('revoke'),
+  deviceId: z.string().uuid(),
+})
+
 /** Eenmalig token tonen — opslaan als hash. Alleen superadmin (piloot). */
 export async function POST(request: NextRequest) {
   const admin = await verifySuperAdminAccess(request)
@@ -21,6 +26,23 @@ export async function POST(request: NextRequest) {
     body = await request.json()
   } catch {
     return NextResponse.json({ ok: false, error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const revokeParsed = RevokeSchema.safeParse(body)
+  if (revokeParsed.success) {
+    const supabaseRevoke = getServerSupabaseClient()
+    if (!supabaseRevoke) {
+      return NextResponse.json({ ok: false, error: 'Database niet geconfigureerd.' }, { status: 503 })
+    }
+    const { error: revErr } = await supabaseRevoke
+      .from('print_agent_devices')
+      .update({ revoked_at: new Date().toISOString() })
+      .eq('id', revokeParsed.data.deviceId)
+      .is('revoked_at', null)
+    if (revErr) {
+      return NextResponse.json({ ok: false, error: revErr.message }, { status: 500 })
+    }
+    return NextResponse.json({ ok: true, revoked: true })
   }
 
   const parsed = BodySchema.safeParse(body)

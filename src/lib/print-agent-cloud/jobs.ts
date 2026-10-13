@@ -19,6 +19,7 @@ export async function resolvePrintAgentDeviceFromToken(token: string): Promise<R
     .from('print_agent_devices')
     .select('id, tenant_slug, revoked_at')
     .eq('token_hash', tokenHash)
+    .is('revoked_at', null)
     .maybeSingle()
 
   if (error) return { ok: false, error: error.message }

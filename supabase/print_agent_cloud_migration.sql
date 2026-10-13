@@ -43,7 +43,11 @@ CREATE INDEX IF NOT EXISTS idx_print_agent_jobs_claim
 ALTER TABLE print_agent_devices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE print_agent_jobs ENABLE ROW LEVEL SECURITY;
 
--- Geen policies voor anon/authenticated: alleen service role via Next.js API.
+-- Geen policies voor anon/authenticated → geen directe client-toegang tot jobs/devices.
+-- Service role (Next.js API) bypassed RLS; tabellen niet via PostgREST anon exposed gebruiken.
+
+REVOKE ALL ON TABLE print_agent_devices FROM anon, authenticated;
+REVOKE ALL ON TABLE print_agent_jobs FROM anon, authenticated;
 
 CREATE OR REPLACE FUNCTION fail_stale_print_agent_jobs(p_max_age_minutes INT DEFAULT 15)
 RETURNS INT
@@ -96,3 +100,10 @@ BEGIN
   RETURNING j.*;
 END;
 $$;
+
+REVOKE EXECUTE ON FUNCTION fail_stale_print_agent_jobs(INT) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION fail_stale_print_agent_jobs(INT) FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION claim_next_print_agent_job(TEXT, UUID) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION claim_next_print_agent_job(TEXT, UUID) FROM anon, authenticated;
+GRANT EXECUTE ON FUNCTION fail_stale_print_agent_jobs(INT) TO service_role;
+GRANT EXECUTE ON FUNCTION claim_next_print_agent_job(TEXT, UUID) TO service_role;

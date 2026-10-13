@@ -4234,6 +4234,7 @@
     "printAgentFallbackEmergencyPrintDisabledHint": "Emergency Windows print is not available on this Android tablet. Use Vysion Kiosk or fix Print Agent on a PC.",
     "printAgentFailedDebugTitle": "Local printer print failed",
     "printAgentFailedDebugFooter": "Tip: on the tablet — open Vysion Kiosk, grant USB, run test receipt. On PC — Print Agent in the system tray. Make sure this site loads the latest version (clear cache if needed).",
+    "cloudPrintQueuedBanner": "Receipt is in the cloud print queue. The Windows Print Agent will print when online — this does not mean the receipt has already printed physically.",
     "remove": "Remove",
     "parkToTable": "Send to table {number} · {zone}",
     "parkToTableWithReceipt": "Send to table {number} · {zone} + receipt",

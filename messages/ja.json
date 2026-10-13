@@ -3585,6 +3585,7 @@
     "lanPrintHostInvalid": "無効なIP（例 192.168.1.50）。",
     "lanPrintHostClose": "閉じる",
     "lanPrintHostReopen": "印刷PCのIP",
+    "cloudPrintQueuedBanner": "レシートはクラウド印刷キューに入りました。Windows Print Agent がオンラインになると印刷します。すでに物理印刷されたとは限りません。",
     "printAgentFallbackModalTitle": "Print Agent に接続できません",
     "printAgentFallbackModalBody": "この PC の Print Agent（127.0.0.1:9742）から正しい応答がありません。Windows の画面「印刷」が開きます。これはエージェント経由の ESC/POS レシートではありません。Epson サーマルでは文字が小さく乱れることがあります。まずトレイからエージェントを修復（設定で正しい Epson を保存 → テスト印刷）。「続行」は緊急時のみ。",
     "printAgentFallbackModalDownloadLink": "Print Agent ダウンロードページ（Windows）",

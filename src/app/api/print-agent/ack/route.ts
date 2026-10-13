@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { ackPrintAgentJob, resolvePrintAgentDeviceFromToken } from '@/lib/print-agent-cloud/jobs'
 import { extractBearerToken } from '@/lib/print-agent-cloud/token'
+import { checkRateLimit, printAgentWorkerRateLimiter } from '@/lib/rate-limit'
 
 const BodySchema = z.object({
   jobId: z.string().uuid(),
@@ -19,6 +20,11 @@ export async function POST(request: NextRequest) {
   const device = await resolvePrintAgentDeviceFromToken(token)
   if (!device.ok) {
     return NextResponse.json({ ok: false, error: device.error }, { status: 401 })
+  }
+
+  const rl = await checkRateLimit(printAgentWorkerRateLimiter, `print-ack:${device.deviceId}`)
+  if (!rl.success) {
+    return NextResponse.json({ ok: false, error: 'Te veel ack-verzoeken.' }, { status: 429 })
   }
 
   let body: unknown

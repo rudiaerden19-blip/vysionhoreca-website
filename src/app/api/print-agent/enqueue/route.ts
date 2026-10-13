@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { enqueuePrintAgentJob, isCloudPrintEnabledForTenant } from '@/lib/print-agent-cloud/jobs'
+import { assertPrintJobPayloadSize } from '@/lib/print-agent-cloud/payload'
+import { checkRateLimit, getClientIP, printAgentEnqueueRateLimiter } from '@/lib/rate-limit'
 
 const BodySchema = z.object({
   tenant: z.string().min(1),
@@ -24,14 +26,28 @@ export async function POST(request: NextRequest) {
   }
 
   const { tenant, idempotencyKey, payload, source } = parsed.data
+
+  const rl = await checkRateLimit(
+    printAgentEnqueueRateLimiter,
+    `print-enqueue:${tenant}:${getClientIP(request)}`,
+  )
+  if (!rl.success) {
+    return NextResponse.json({ ok: false, error: 'Te veel printverzoeken. Probeer later opnieuw.' }, { status: 429 })
+  }
+
   const access = await verifyTenantOrSuperAdmin(request, tenant)
   if (!access.authorized) {
     return NextResponse.json({ ok: false, error: access.error || 'Forbidden' }, { status: 403 })
   }
 
   const enabled = await isCloudPrintEnabledForTenant(tenant)
-  if (!enabled && !access.isSuperAdmin) {
+  if (!enabled) {
     return NextResponse.json({ ok: false, error: 'Cloud print niet actief voor deze tenant.' }, { status: 403 })
+  }
+
+  const payloadErr = assertPrintJobPayloadSize(payload)
+  if (payloadErr) {
+    return NextResponse.json({ ok: false, error: payloadErr }, { status: 413 })
   }
 
   const result = await enqueuePrintAgentJob({
