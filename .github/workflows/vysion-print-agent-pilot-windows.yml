@@ -1,0 +1,70 @@
+# Pilot-build met cloud print — handmatig workflow_dispatch, GEEN GitHub Release update.
+name: Vysion Print Agent — Pilot (cloud print)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: print-agent-pilot-windows
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/vysion-print-agent/package-lock.json
+
+      - name: npm ci
+        working-directory: apps/vysion-print-agent
+        run: npm ci
+
+      - name: Bouw pilot installer + portable map
+        working-directory: apps/vysion-print-agent
+        run: npm run dist
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Maak pilot USB ZIP
+        shell: pwsh
+        run: |
+          $dist = "apps/vysion-print-agent/dist"
+          $unpacked = Join-Path $dist "win-unpacked"
+          if (-not (Test-Path $unpacked)) {
+            $found = Get-ChildItem $dist -Directory | Where-Object { $_.Name -like "*unpacked*" } | Select-Object -First 1
+            if ($found) { $unpacked = $found.FullName }
+            else { throw "Geen win-unpacked map gevonden." }
+          }
+          $targetDir = Join-Path $dist "VysionPrintAgent-Pilot-USB"
+          New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+          Copy-Item -Path "$unpacked\*" -Destination $targetDir -Recurse -Force
+          $startBat = "@echo off`r`nchcp 65001 >nul`r`necho Vysion Print Agent PILOT (cloud print)`r`nstart `"`" `"%~dp0Vysion Print Agent.exe`"`r`n"
+          Set-Content -LiteralPath "$targetDir\START.bat" -Value $startBat -Encoding OEM
+          $zipPath = Join-Path $dist "Vysion-Print-Agent-Pilot-USB.zip"
+          Compress-Archive -Path "$targetDir\*" -DestinationPath $zipPath -Force
+
+      - name: Vaste pilot-bestandsnamen
+        shell: pwsh
+        run: |
+          $dist = "apps/vysion-print-agent/dist"
+          $exe = Get-ChildItem -LiteralPath $dist -Filter "*Pilot*Setup*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $exe) {
+            $exe = Get-ChildItem -LiteralPath $dist -Filter "*Setup*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          }
+          if (-not $exe) { throw "Geen Setup.exe gevonden in $dist" }
+          Copy-Item -LiteralPath $exe.FullName -Destination "$dist/Vysion-Print-Agent-Pilot-Setup.exe" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Vysion-Print-Agent-Pilot-Setup
+          path: apps/vysion-print-agent/dist/Vysion-Print-Agent-Pilot-Setup.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Vysion-Print-Agent-Pilot-USB
+          path: apps/vysion-print-agent/dist/Vysion-Print-Agent-Pilot-USB.zip
