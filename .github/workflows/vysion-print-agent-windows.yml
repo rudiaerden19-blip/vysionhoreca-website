@@ -64,6 +64,7 @@ jobs:
 
           $readme = "Vysion Print Agent - USB versie`r`n================================`r`n`r`n1. Kopieer deze map naar de kassa-pc (bv. C:\VysionPrint)`r`n2. Dubbelklik START.bat`r`n3. Vysion icoon rechtsonder -> Instellingen: kies Printer + vul Kassa-URL -> Opslaan & Open Kassa`r`n4. Klaar! Geen installatie nodig.`r`n`r`nAutostart: snelkoppeling van START.bat in shell:startup plaatsen.`r`n"
           Set-Content -LiteralPath "$targetDir\LEES-MIJ.txt" -Value $readme -Encoding UTF8
+          Copy-Item -LiteralPath "tools/enable-vysion-ipad-lan.bat" -Destination "$targetDir/IPAD-PRINT-AAN.bat" -Force
 
           $zipPath = Join-Path $dist "Vysion-Print-Agent-USB.zip"
           Compress-Archive -Path "$targetDir\*" -DestinationPath $zipPath -Force
