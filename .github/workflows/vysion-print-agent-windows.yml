@@ -3,14 +3,9 @@
 #   2. Vysion-Print-Agent-USB.zip    — portable map, geen installatie, rechtstreeks van USB stick
 name: Vysion Print Agent — Windows Setup
 
+# Alleen handmatig release — NOOIT auto bij push (500+ kassa-pc's krijgen anders meteen nieuwe .exe).
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'apps/vysion-print-agent/**'
-      - '.github/workflows/vysion-print-agent-windows.yml'
 
 permissions:
   contents: write

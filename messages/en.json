@@ -3546,7 +3546,9 @@
     "kassaNameAccountV2Hint": "Cart → On account in quick menu, name list, revenue only when paid. Off = classic manual amount screen.",
     "kassaNameAccountV2RequiresSub": "Also enable submenu «On account» under Kassa module (or full package).",
     "kassaJetonEnabled": "Consumption tokens (POS)",
-    "kassaJetonEnabledHint": "Token breakdown and change on POS. For tenants with physical tokens only; off by default."
+    "kassaJetonEnabledHint": "Token breakdown and change on POS. For tenants with physical tokens only; off by default.",
+    "kassaLanPrintEnabled": "iPad print via LAN (WiFi → print PC)",
+    "kassaLanPrintEnabledHint": "iPads in Safari send receipts to the Windows Print Agent IP. Off by default; other tills unchanged."
   },
   "marketing": {
     "title": "Email Marketing",
@@ -4216,6 +4218,12 @@
     "cartBon": "Receipt",
     "cartBonTitle": "Print a draft receipt from the current cart (without checkout)",
     "printAgain": "Print again",
+    "lanPrintHostTitle": "Print PC (iPad)",
+    "lanPrintHostLabel": "Windows print PC IP address",
+    "lanPrintHostHint": "On iPad only: enter the fixed IP of the PC running Print Agent (same WiFi). On the PC itself, localhost still works.",
+    "lanPrintHostSave": "Save IP on this device",
+    "lanPrintHostSaved": "Saved",
+    "lanPrintHostInvalid": "Invalid IP address (e.g. 192.168.1.50).",
     "printAgentFallbackModalTitle": "Print Agent unreachable",
     "printAgentFallbackModalBody": "The register did not get a successful response from the Print Agent on this PC (127.0.0.1:9742). A fallback opens next: Windows’ standard Print dialog. That route is NOT a proper ESC/POS receipt like the agent sends — on an Epson thermal printer the result can look tiny or garbled. Fix the agent first (tray → Settings → correct Epson printer → Save → “Test receipt”). Only use Continue as an emergency workaround.",
     "printAgentFallbackModalDownloadLink": "Print Agent download page (Windows)",

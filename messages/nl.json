@@ -3546,7 +3546,9 @@
     "kassaNameAccountV2Hint": "Mand → Op rekening in snelmenu, namenlijst, omzet pas bij betaling. Uit = klassiek scherm (bedrag handmatig).",
     "kassaNameAccountV2RequiresSub": "Zet ook submenu «Op rekening» aan onder module Kassa (of volledig pakket).",
     "kassaJetonEnabled": "Consumptiejetons (kassa)",
-    "kassaJetonEnabledHint": "Jeton-breakdown en wisselgeld op kassa. Alleen voor tenants met fysieke jetons; standaard uit."
+    "kassaJetonEnabledHint": "Jeton-breakdown en wisselgeld op kassa. Alleen voor tenants met fysieke jetons; standaard uit.",
+    "kassaLanPrintEnabled": "iPad print via LAN (WiFi → print-PC)",
+    "kassaLanPrintEnabledHint": "iPads in Safari sturen bonnen naar het IP van de Windows Print Agent. Standaard uit; andere kassa's ongewijzigd."
   },
   "marketing": {
     "title": "Email Marketing",
@@ -4216,6 +4218,12 @@
     "cartBon": "Bon",
     "cartBonTitle": "Voorlopige bon van de huidige kar printen (zonder afrekenen)",
     "printAgain": "Print opnieuw",
+    "lanPrintHostTitle": "Print-PC (iPad)",
+    "lanPrintHostLabel": "IP-adres Windows print-PC",
+    "lanPrintHostHint": "Alleen op iPad: vul het vaste IP van de pc met Print Agent in (zelfde WiFi). Op de pc zelf blijft localhost werken.",
+    "lanPrintHostSave": "IP opslaan op dit toestel",
+    "lanPrintHostSaved": "Opgeslagen",
+    "lanPrintHostInvalid": "Ongeldig IP-adres (bv. 192.168.1.50).",
     "printAgentFallbackModalTitle": "Print Agent niet bereikbaar",
     "printAgentFallbackModalBody": "De kassa kreeg geen geldige reactie van de Print Agent op dit apparaat (127.0.0.1:9742). Daarom wordt de noodweg gebruikt: Windows opent zo het standaardvenster „Afdrukken” (zie schermafdruk). Dat is geen echte ESC/POS-bon zoals bij een werkende Agent — op een Epson-termische printer kan het resultaat heel klein of onduidelijk zijn. Herstel eerst Print Agent bij de klok (groene status), rechtsklik → Instellingen → juiste Epson kiezen en opslaan, daarna „Test bonnetje”. Liever niet op „Doorgaan” vertrouwen voor nette kassabonnen.",
     "printAgentFallbackModalDownloadLink": "Downloadpagina Print Agent (Windows)",
