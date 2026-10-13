@@ -6,7 +6,7 @@ import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import {
   eurosToJetonCents,
   kassaJetonBreakdownFromCents,
-  kassaJetonChangeFromBlackReceived,
+  kassaJetonChangeFromReceived,
   type KassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
 import type { KassaJetonSalePoint } from '@/lib/kassa-jeton-sale-point'
@@ -105,12 +105,14 @@ export function KassaJetonPaymentModal({
 }) {
   const { t } = useLanguage()
   const [blackIn, setBlackIn] = useState(0)
+  const [whiteIn, setWhiteIn] = useState(0)
 
   const orderCents = eurosToJetonCents(totalEuros)
 
   useEffect(() => {
     if (!open) return
     setBlackIn(0)
+    setWhiteIn(0)
   }, [open, totalEuros])
 
   const customerMustGive = useMemo(
@@ -119,9 +121,16 @@ export function KassaJetonPaymentModal({
   )
 
   const tender = useMemo(
-    () => kassaJetonChangeFromBlackReceived(orderCents, blackIn, denoms),
-    [orderCents, blackIn, denoms],
+    () =>
+      kassaJetonChangeFromReceived(
+        orderCents,
+        { black: blackIn, white: whiteIn },
+        denoms,
+      ),
+    [orderCents, blackIn, whiteIn, denoms],
   )
+
+  const anyReceived = blackIn > 0 || whiteIn > 0
 
   if (!open) return null
 
@@ -240,12 +249,27 @@ export function KassaJetonPaymentModal({
                 ariaLabel={t('kassaApp.jetonBlackLabel')}
               />
             </div>
-            <p className="mt-2 text-center text-sm text-zinc-400 tabular-nums">
-              {formatEuro(tender.receivedCents)}
+          </div>
+
+          <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">
+              {t('kassaApp.jetonWhiteReceivedLabel')}
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <JetonChip kind="white" label={whiteChipLabel} />
+              <CountStepper
+                value={whiteIn}
+                onChange={setWhiteIn}
+                disabled={payBusy}
+                ariaLabel={t('kassaApp.jetonWhiteLabel')}
+              />
+            </div>
+            <p className="mt-3 text-center text-base font-semibold text-zinc-200 tabular-nums">
+              {t('kassaApp.jetonReceivedTotalLabel')}: {formatEuro(tender.receivedCents)}
             </p>
           </div>
 
-          {blackIn > 0 && tender.sufficient && tender.whiteChange > 0 && (
+          {anyReceived && tender.sufficient && tender.whiteChange > 0 && (
             <div className="rounded-xl border border-emerald-700/50 bg-emerald-950/40 p-4">
               <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-emerald-200/80">
                 {t('kassaApp.jetonGiveBackLabel')}
@@ -262,13 +286,13 @@ export function KassaJetonPaymentModal({
             </div>
           )}
 
-          {blackIn > 0 && tender.sufficient && tender.whiteChange === 0 && (
+          {anyReceived && tender.sufficient && tender.whiteChange === 0 && (
             <p className="text-center text-base font-semibold text-emerald-400">
               {t('kassaApp.jetonNoChange')}
             </p>
           )}
 
-          {blackIn > 0 && !tender.sufficient && tender.changeCents < 0 && (
+          {anyReceived && !tender.sufficient && tender.changeCents < 0 && (
             <p className="text-center text-base font-semibold text-amber-400">
               {t('kassaApp.jetonInsufficient').replace(
                 '{amount}',
@@ -279,7 +303,7 @@ export function KassaJetonPaymentModal({
 
           <button
             type="button"
-            disabled={payBusy || !tender.sufficient || blackIn <= 0}
+            disabled={payBusy || !tender.sufficient || !anyReceived}
             onClick={onConfirm}
             className="w-full rounded-xl bg-emerald-600 py-4 text-lg font-bold text-white disabled:opacity-40"
           >
