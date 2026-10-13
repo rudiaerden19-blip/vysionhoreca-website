@@ -92,6 +92,13 @@ export function eurosToJetonCents(totalEuros: number): number {
   return Math.round(totalEuros * 100)
 }
 
+/** Waarde op fysieke jeton (bijv. 3 of 0,50). */
+export function kassaJetonChipFaceLabel(cents: number): string {
+  if (!Number.isFinite(cents) || cents <= 0) return '?'
+  if (cents % 100 === 0) return String(cents / 100)
+  return (cents / 100).toFixed(2).replace('.', ',')
+}
+
 /** Alleen zwarte ontvangen (wisselgeld = witte jetons). */
 export function kassaJetonChangeFromBlackReceived(
   orderTotalCents: number,

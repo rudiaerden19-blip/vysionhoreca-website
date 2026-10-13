@@ -1,5 +1,6 @@
 import {
   eurosToJetonCents,
+  kassaJetonChipFaceLabel,
   kassaJetonBreakdownFromCents,
   kassaJetonChangeFromBlackReceived,
   kassaJetonChangeFromReceived,
@@ -51,6 +52,11 @@ describe('kassa-jeton-math', () => {
 
   it('eurosToJetonCents', () => {
     expect(eurosToJetonCents(10.5)).toBe(1050)
+  })
+
+  it('chip face labels', () => {
+    expect(kassaJetonChipFaceLabel(300)).toBe('3')
+    expect(kassaJetonChipFaceLabel(50)).toBe('0,50')
   })
 
   it('€3,50 — 2 zwarte ontvangen → 5 witte terug', () => {

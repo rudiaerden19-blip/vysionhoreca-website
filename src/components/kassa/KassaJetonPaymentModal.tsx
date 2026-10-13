@@ -7,6 +7,7 @@ import {
   eurosToJetonCents,
   kassaJetonBreakdownFromCents,
   kassaJetonChangeFromReceived,
+  kassaJetonChipFaceLabel,
   type KassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
 import type { KassaJetonSalePoint } from '@/lib/kassa-jeton-sale-point'
@@ -23,9 +24,12 @@ function JetonChip({
   label: string
 }) {
   const isBlack = kind === 'black'
+  const compact = label.includes(',')
   return (
     <span
-      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
+        compact ? 'text-[10px] leading-none' : 'text-sm'
+      } ${
         isBlack
           ? 'bg-black text-white ring-2 ring-zinc-500'
           : 'bg-white text-black ring-2 ring-zinc-400'
@@ -140,14 +144,8 @@ export function KassaJetonPaymentModal({
   const card =
     'rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-zinc-600 bg-[#151a21]'
 
-  const blackChipLabel =
-    denoms.blackCents % 100 === 0
-      ? String(denoms.blackCents / 100)
-      : String(denoms.blackCents)
-  const whiteChipLabel =
-    denoms.whiteCents % 100 === 0
-      ? String(denoms.whiteCents / 100)
-      : String(denoms.whiteCents)
+  const blackChipLabel = kassaJetonChipFaceLabel(denoms.blackCents)
+  const whiteChipLabel = kassaJetonChipFaceLabel(denoms.whiteCents)
 
   return (
     <div className="fixed inset-0 z-[185] flex items-center justify-center bg-black/70 p-4">
