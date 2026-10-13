@@ -3583,6 +3583,8 @@
     "lanPrintHostSave": "Salva IP su questo dispositivo",
     "lanPrintHostSaved": "Salvato",
     "lanPrintHostInvalid": "IP non valido (es. 192.168.1.50).",
+    "lanPrintHostClose": "Chiudi",
+    "lanPrintHostReopen": "IP PC stampa",
     "printAgentFallbackModalTitle": "Print Agent non raggiungibile",
     "printAgentFallbackModalBody": "La cassa non ha ricevuto una risposta corretta dal Print Agent su questo PC (127.0.0.1:9742). Si usa il percorso di emergenza: la finestra di stampa di Windows. Non è uno scontrino ESC/POS come con l’agent — su una Epson termica l’output può essere minuscolo o illeggibile. Ripara prima l’agent (vassoio → Impostazioni → Epson corretta → Salva → prova). Usa Continua solo come soluzione temporanea.",
     "printAgentFallbackModalDownloadLink": "Pagina download Print Agent (Windows)",

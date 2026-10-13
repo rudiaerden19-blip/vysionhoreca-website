@@ -4224,6 +4224,8 @@
     "lanPrintHostSave": "IP opslaan op dit toestel",
     "lanPrintHostSaved": "Opgeslagen",
     "lanPrintHostInvalid": "Ongeldig IP-adres (bv. 192.168.1.50).",
+    "lanPrintHostClose": "Sluiten",
+    "lanPrintHostReopen": "Print-PC IP",
     "printAgentFallbackModalTitle": "Print Agent niet bereikbaar",
     "printAgentFallbackModalBody": "De kassa kreeg geen geldige reactie van de Print Agent op dit apparaat (127.0.0.1:9742). Daarom wordt de noodweg gebruikt: Windows opent zo het standaardvenster „Afdrukken” (zie schermafdruk). Dat is geen echte ESC/POS-bon zoals bij een werkende Agent — op een Epson-termische printer kan het resultaat heel klein of onduidelijk zijn. Herstel eerst Print Agent bij de klok (groene status), rechtsklik → Instellingen → juiste Epson kiezen en opslaan, daarna „Test bonnetje”. Liever niet op „Doorgaan” vertrouwen voor nette kassabonnen.",
     "printAgentFallbackModalDownloadLink": "Downloadpagina Print Agent (Windows)",

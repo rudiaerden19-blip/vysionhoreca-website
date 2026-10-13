@@ -3083,6 +3083,8 @@
     "lanPrintHostSave": "Enregistrer l’IP sur cet appareil",
     "lanPrintHostSaved": "Enregistré",
     "lanPrintHostInvalid": "Adresse IP invalide (ex. 192.168.1.50).",
+    "lanPrintHostClose": "Fermer",
+    "lanPrintHostReopen": "IP PC d’impression",
     "printAgentFallbackModalTitle": "Print Agent inaccessible",
     "printAgentFallbackModalBody": "La caisse n’a pas reçu de réponse correcte du Print Agent sur ce PC (127.0.0.1:9742). Le mode secours ouvre la boîte de dialogue d’impression Windows. Ce n’est pas un ticket ESC/POS correct comme via l’agent — sur une Epson thermique le résultat peut être minuscule ou illisible. Réparez d’abord l’agent (icône près de l’horloge → Paramètres → bonne Epson → Enregistrer → test). N’utilisez « Continuer » qu’en secours.",
     "printAgentFallbackModalDownloadLink": "Page de téléchargement Print Agent (Windows)",

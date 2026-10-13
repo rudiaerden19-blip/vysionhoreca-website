@@ -75,6 +75,7 @@ import {
 } from '@/lib/vysion-print-agent-client'
 import {
   isValidLanPrintHost,
+  probeLocalVysionPrintAgent,
   readLanPrintHostForTenant,
   writeLanPrintHostForTenant,
 } from '@/lib/kassa-lan-print'
@@ -1789,6 +1790,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [kassaLanPrintEnabled, tenant, tenantInfo?.kassa_lan_print_host])
   const [lanPrintHostDraft, setLanPrintHostDraft] = useState('')
   const [lanPrintHostSavedFlash, setLanPrintHostSavedFlash] = useState(false)
+  const [lanPrintSetupPanelOpen, setLanPrintSetupPanelOpen] = useState(false)
+  const [lanPrintHostConfigured, setLanPrintHostConfigured] = useState(false)
   useEffect(() => {
     if (!kassaLanPrintEnabled) return
     const stored = readLanPrintHostForTenant(tenant)
@@ -1797,6 +1800,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setLanPrintHostDraft(String(tenantInfo.kassa_lan_print_host))
     }
   }, [kassaLanPrintEnabled, tenant, tenantInfo?.kassa_lan_print_host])
+  useEffect(() => {
+    if (!kassaLanPrintEnabled) {
+      setLanPrintSetupPanelOpen(false)
+      setLanPrintHostConfigured(false)
+      return
+    }
+    const stored = readLanPrintHostForTenant(tenant)
+    if (stored) {
+      setLanPrintHostConfigured(true)
+      setLanPrintSetupPanelOpen(false)
+      return
+    }
+    setLanPrintHostConfigured(false)
+    let cancelled = false
+    void probeLocalVysionPrintAgent().then((localOk) => {
+      if (cancelled) return
+      setLanPrintSetupPanelOpen(!localOk)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [kassaLanPrintEnabled, tenant])
   const kassaJetonDenoms = useMemo(
     () =>
       normalizeKassaJetonDenominations(
@@ -7468,13 +7493,32 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
 
-      {kassaLanPrintEnabled && (
+      {kassaLanPrintEnabled && !lanPrintHostConfigured && !lanPrintSetupPanelOpen && (
+        <button
+          type="button"
+          className="fixed bottom-3 left-3 z-[200] rounded-lg border border-cyan-500/30 bg-slate-900/90 px-2 py-1 text-[10px] font-semibold text-cyan-200 shadow-md hover:bg-slate-800"
+          onClick={() => setLanPrintSetupPanelOpen(true)}
+        >
+          {t('kassaApp.lanPrintHostReopen')}
+        </button>
+      )}
+      {kassaLanPrintEnabled && lanPrintSetupPanelOpen && (
         <div
           className="fixed bottom-3 left-3 z-[200] max-w-[min(100vw-1.5rem,22rem)] rounded-xl border border-cyan-500/40 bg-slate-900/95 p-3 text-white shadow-lg"
           role="region"
           aria-label={t('kassaApp.lanPrintHostTitle')}
         >
-          <p className="text-xs font-bold text-cyan-200">{t('kassaApp.lanPrintHostTitle')}</p>
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-xs font-bold text-cyan-200">{t('kassaApp.lanPrintHostTitle')}</p>
+            <button
+              type="button"
+              className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-300 hover:bg-slate-800"
+              onClick={() => setLanPrintSetupPanelOpen(false)}
+              aria-label={t('kassaApp.lanPrintHostClose')}
+            >
+              ✕
+            </button>
+          </div>
           <p className="mt-1 text-[11px] leading-snug text-slate-300">{t('kassaApp.lanPrintHostHint')}</p>
           <label className="mt-2 block text-[11px] font-semibold text-slate-200" htmlFor="lan-print-host">
             {t('kassaApp.lanPrintHostLabel')}
@@ -7498,7 +7542,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 return
               }
               writeLanPrintHostForTenant(tenant, lanPrintHostDraft)
+              setLanPrintHostConfigured(true)
               setLanPrintHostSavedFlash(true)
+              setLanPrintSetupPanelOpen(false)
               window.setTimeout(() => setLanPrintHostSavedFlash(false), 2500)
             }}
           >
