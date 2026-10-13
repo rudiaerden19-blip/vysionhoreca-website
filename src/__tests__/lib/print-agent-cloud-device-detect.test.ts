@@ -21,8 +21,7 @@ function mockNavigator(partial: {
 
 describe('print-agent-cloud device detect', () => {
   afterEach(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (global as any).navigator
+    Reflect.deleteProperty(globalThis, 'navigator')
   })
 
   it('detects Windows desktop', () => {
