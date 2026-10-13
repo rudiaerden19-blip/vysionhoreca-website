@@ -4,6 +4,7 @@ echo.
 echo  Vysion: iPad-print via WiFi aanzetten op deze PC...
 echo.
 
+rem Zelfde pad als Electron app.getPath('userData') + config.json
 set "CFG=%APPDATA%\Vysion Print Agent\config.json"
 if not exist "%APPDATA%\Vysion Print Agent\" mkdir "%APPDATA%\Vysion Print Agent\"
 

@@ -51,15 +51,21 @@ let serverHandle = null
 function ensureWindowsLanFirewallRule(port) {
   if (process.platform !== 'win32') return
   if (config.lanListenEnabled !== true) return
+  const ruleName = 'Vysion Print Agent TCP 9742'
   try {
     spawnSync(
+      'netsh',
+      ['advfirewall', 'firewall', 'delete', 'rule', `name=${ruleName}`],
+      { windowsHide: true, encoding: 'utf8' },
+    )
+    const r = spawnSync(
       'netsh',
       [
         'advfirewall',
         'firewall',
         'add',
         'rule',
-        'name=Vysion Print Agent TCP 9742',
+        `name=${ruleName}`,
         'dir=in',
         'action=allow',
         'protocol=TCP',
@@ -68,24 +74,53 @@ function ensureWindowsLanFirewallRule(port) {
       ],
       { windowsHide: true, encoding: 'utf8' },
     )
+    if (r.status !== 0) {
+      console.warn('[firewall] netsh add rule exit', r.status, r.stderr || r.stdout || '')
+    }
   } catch (e) {
     console.warn('[firewall] poort', port, '— regel niet gezet:', e?.message || e)
   }
 }
 
-function restartPrintServer() {
-  if (serverHandle && typeof serverHandle.close === 'function') {
-    try {
-      serverHandle.close()
-    } catch {
-      /* ignore */
+function httpBindAddressForConfig() {
+  return config.lanListenEnabled === true ? '0.0.0.0' : '127.0.0.1'
+}
+
+function attachPrintServerListeners(srv, port, bind) {
+  srv.once('listening', () => {
+    console.info(`[server] luistert op http://${bind}:${port}/ (lanListenEnabled=${config.lanListenEnabled === true})`)
+    if (bind === '0.0.0.0') ensureWindowsLanFirewallRule(port)
+  })
+  srv.on('error', (e) => {
+    if (e && e.code === 'EADDRINUSE') {
+      console.error(
+        `[server] poort ${port} al in gebruik — HTTP-print (iPad/LAN) werkt niet. Sluit dubbele Print Agent.`,
+      )
+      lastHealth = { ok: false, reason: `Poort ${port} in gebruik (andere instance?)` }
+      return
     }
-    serverHandle = null
-  }
+    console.error('[server] error', e)
+    lastHealth = { ok: false, reason: String(e?.message || e) }
+  })
+}
+
+function restartPrintServer() {
   const port = config.port || PORT
-  const bind = config.lanListenEnabled === true ? '0.0.0.0' : '127.0.0.1'
-  serverHandle = startServer(getPrintConfig, port, {}, bind)
-  if (bind === '0.0.0.0') ensureWindowsLanFirewallRule(port)
+  const bind = httpBindAddressForConfig()
+
+  const startListening = () => {
+    serverHandle = startServer(getPrintConfig, port, {}, bind)
+    attachPrintServerListeners(serverHandle, port, bind)
+  }
+
+  if (serverHandle && typeof serverHandle.close === 'function') {
+    serverHandle.close(() => {
+      serverHandle = null
+      startListening()
+    })
+    return
+  }
+  startListening()
 }
 let healthTimer = null
 let lastHealth = { ok: false, reason: 'starting…' }
@@ -547,6 +582,10 @@ function buildDiagnoseText() {
   lines.push(`Kassa-URL: ${config.kassaUrl || '(geen)'}`)
   lines.push(`AutoStart: ${config.autoStart === true}`)
   lines.push(`AutoUpdate: ${config.autoUpdate !== false}`)
+  lines.push(`iPad LAN (lanListenEnabled): ${config.lanListenEnabled === true}`)
+  lines.push(`HTTP bind: ${httpBindAddressForConfig()}:${config.port || PORT}`)
+  lines.push(`HTTP server listening: ${serverHandle && serverHandle.listening ? 'ja' : 'nee'}`)
+  lines.push(`Config: ${configPath()}`)
   lines.push(`Health: ${lastHealth.ok ? 'OK' : 'FOUT'} — ${lastHealth.reason}`)
   lines.push('')
   lines.push('Windows printers:')
@@ -745,6 +784,23 @@ function runIntegrityCheck() {
   }
   if (missing.length === 0) {
     console.info('[integrity] alle kritieke bestanden aanwezig')
+    try {
+      const settingsPath = path.join(__dirname, 'settings.html')
+      const html = fs.readFileSync(settingsPath, 'utf8')
+      if (!/id=["']lanListen["']/.test(html)) {
+        const msg =
+          'Deze Print Agent-build mist iPad LAN in Instellingen (settings.html). ' +
+          'Download de nieuwste Vysion-Print-Agent-USB.zip van GitHub — iPad-print werkt niet met deze map.'
+        console.error('[integrity]', msg)
+        try {
+          dialog.showErrorBox('Vysion Print Agent — oude build', msg)
+        } catch {
+          /* ignore */
+        }
+      }
+    } catch (e) {
+      console.warn('[integrity] settings.html LAN-check mislukt', e?.message || e)
+    }
     return
   }
   const msg = `Integriteit-check: ontbrekende bestanden: ${missing.join(', ')}\nDe agent kan niet correct werken — herinstalleer de Print Agent via INSTALLEER.bat.`
@@ -766,6 +822,7 @@ if (!gotLock) {
   })
 
   app.whenReady().then(() => {
+    config = loadConfig()
     runIntegrityCheck()
     try {
       restartPrintServer()

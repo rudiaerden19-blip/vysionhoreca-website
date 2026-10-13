@@ -1076,6 +1076,7 @@ function listWindowsPrintersSync() {
 function createApp(
   getPrintConfig /* () => { printerName: string|null, kitchenPrinterName?: string|null } */,
   hooks = {},
+  meta = {},
 ) {
   const onOpenSettings = typeof hooks.onOpenSettings === 'function' ? hooks.onOpenSettings : null
   const app = express()
@@ -1113,6 +1114,7 @@ function createApp(
     res.json({
       ok: true,
       service: 'vysion-print-agent',
+      listenHost: meta.bindHost || '127.0.0.1',
       printerConfigured: !!name,
       printerName: name || null,
       kitchenPrinterName: k || null,
@@ -1223,8 +1225,8 @@ function createApp(
 }
 
 function startServer(getPrintConfig, port = 9742, hooks = {}, bindAddress = '127.0.0.1') {
-  const app = createApp(getPrintConfig, hooks)
   const host = bindAddress === '0.0.0.0' ? '0.0.0.0' : '127.0.0.1'
+  const app = createApp(getPrintConfig, hooks, { bindHost: host })
   const srv = app.listen(port, host, () => {
     console.log(`Vysion Print Agent luistert op http://${host}:${port}`)
   })
