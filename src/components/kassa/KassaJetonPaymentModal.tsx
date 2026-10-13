@@ -5,8 +5,7 @@ import { useLanguage } from '@/i18n'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import {
   eurosToJetonCents,
-  kassaJetonBreakdownFromCents,
-  kassaJetonChangeFromTender,
+  kassaJetonChangeFromBlackReceived,
   type KassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
 import type { KassaJetonSalePoint } from '@/lib/kassa-jeton-sale-point'
@@ -25,7 +24,7 @@ function JetonChip({
   const isBlack = kind === 'black'
   return (
     <span
-      className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
         isBlack
           ? 'bg-black text-white ring-2 ring-zinc-500'
           : 'bg-white text-black ring-2 ring-zinc-400'
@@ -49,24 +48,24 @@ function CountStepper({
   ariaLabel: string
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       <button
         type="button"
         disabled={disabled || value <= 0}
         aria-label={`${ariaLabel} −`}
-        className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-700 text-2xl font-bold text-white disabled:opacity-30"
+        className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-700 text-2xl font-bold text-white disabled:opacity-30"
         onClick={() => onChange(Math.max(0, value - 1))}
       >
         −
       </button>
-      <span className="min-w-[2.5rem] text-center text-2xl font-bold tabular-nums text-zinc-50">
+      <span className="min-w-[3rem] text-center text-3xl font-bold tabular-nums text-zinc-50">
         {value}
       </span>
       <button
         type="button"
         disabled={disabled}
         aria-label={`${ariaLabel} +`}
-        className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-700 text-2xl font-bold text-white disabled:opacity-30"
+        className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-700 text-2xl font-bold text-white disabled:opacity-30"
         onClick={() => onChange(value + 1)}
       >
         +
@@ -75,9 +74,15 @@ function CountStepper({
   )
 }
 
+export type KassaJetonOrderLine = {
+  quantity: number
+  name: string
+}
+
 export function KassaJetonPaymentModal({
   open,
   totalEuros,
+  orderLines,
   denoms,
   salePoint,
   payBusy = false,
@@ -88,6 +93,7 @@ export function KassaJetonPaymentModal({
 }: {
   open: boolean
   totalEuros: number
+  orderLines: readonly KassaJetonOrderLine[]
   denoms: KassaJetonDenominations
   salePoint: KassaJetonSalePoint
   payBusy?: boolean
@@ -98,30 +104,32 @@ export function KassaJetonPaymentModal({
 }) {
   const { t } = useLanguage()
   const [blackIn, setBlackIn] = useState(0)
-  const [whiteIn, setWhiteIn] = useState(0)
 
   const orderCents = eurosToJetonCents(totalEuros)
 
   useEffect(() => {
     if (!open) return
     setBlackIn(0)
-    setWhiteIn(0)
   }, [open, totalEuros])
 
-  const suggested = useMemo(
-    () => kassaJetonBreakdownFromCents(orderCents, denoms),
-    [orderCents, denoms],
-  )
-
   const tender = useMemo(
-    () => kassaJetonChangeFromTender(orderCents, { black: blackIn, white: whiteIn }, denoms),
-    [orderCents, blackIn, whiteIn, denoms],
+    () => kassaJetonChangeFromBlackReceived(orderCents, blackIn, denoms),
+    [orderCents, blackIn, denoms],
   )
 
   if (!open) return null
 
   const card =
     'rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-zinc-600 bg-[#151a21]'
+
+  const blackChipLabel =
+    denoms.blackCents % 100 === 0
+      ? String(denoms.blackCents / 100)
+      : String(denoms.blackCents)
+  const whiteChipLabel =
+    denoms.whiteCents % 100 === 0
+      ? String(denoms.whiteCents / 100)
+      : String(denoms.whiteCents)
 
   return (
     <div className="fixed inset-0 z-[185] flex items-center justify-center bg-black/70 p-4">
@@ -167,66 +175,66 @@ export function KassaJetonPaymentModal({
             </button>
           </div>
 
-          <div className="flex items-center justify-between text-lg text-zinc-200">
-            <span>{t('kassaApp.jetonOrderLabel')}</span>
-            <span className="font-bold tabular-nums">{formatEuro(orderCents)}</span>
-          </div>
-
-          {suggested && (
-            <p className="rounded-xl bg-zinc-800/80 px-4 py-3 text-base text-zinc-200">
-              {t('kassaApp.jetonSuggestedPay')
-                .replace('{black}', String(suggested.black))
-                .replace('{white}', String(suggested.white))}
+          <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-400">
+              {t('kassaApp.jetonOrderLabel')}
             </p>
-          )}
+            <ul className="space-y-1 text-base text-zinc-100">
+              {orderLines.map((line, idx) => (
+                <li key={`${line.name}-${idx}`}>
+                  {line.quantity}× {line.name}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-3 flex items-center justify-between border-t border-zinc-700 pt-3 text-lg font-bold text-zinc-50">
+              <span>{t('kassaApp.toPay')}</span>
+              <span className="tabular-nums">{formatEuro(orderCents)}</span>
+            </div>
+          </div>
 
           <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">
-              {t('kassaApp.jetonReceivedLabel')}
+              {t('kassaApp.jetonBlackReceivedLabel')}
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <JetonChip kind="black" label="3" />
-                <CountStepper
-                  value={blackIn}
-                  onChange={setBlackIn}
-                  disabled={payBusy}
-                  ariaLabel={t('kassaApp.jetonBlackLabel')}
-                />
-                <span className="text-zinc-400">{t('kassaApp.jetonBlackLabel')}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <JetonChip kind="white" label="50" />
-                <CountStepper
-                  value={whiteIn}
-                  onChange={setWhiteIn}
-                  disabled={payBusy}
-                  ariaLabel={t('kassaApp.jetonWhiteLabel')}
-                />
-                <span className="text-zinc-400">{t('kassaApp.jetonWhiteLabel')}</span>
-              </div>
+            <div className="flex items-center justify-center gap-4">
+              <JetonChip kind="black" label={blackChipLabel} />
+              <CountStepper
+                value={blackIn}
+                onChange={setBlackIn}
+                disabled={payBusy}
+                ariaLabel={t('kassaApp.jetonBlackLabel')}
+              />
             </div>
-            <div className="mt-3 flex justify-end text-zinc-300 tabular-nums">
+            <p className="mt-2 text-center text-sm text-zinc-400 tabular-nums">
               {formatEuro(tender.receivedCents)}
-            </div>
+            </p>
           </div>
 
-          {tender.changeCents >= 0 && tender.change && (
-            <div className="flex items-center justify-between gap-3 text-lg text-zinc-100">
-              <div className="flex items-center gap-2">
-                <JetonChip kind="white" label="50" />
+          {blackIn > 0 && tender.sufficient && tender.whiteChange > 0 && (
+            <div className="rounded-xl border border-emerald-700/50 bg-emerald-950/40 p-4">
+              <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-emerald-200/80">
+                {t('kassaApp.jetonGiveBackLabel')}
+              </p>
+              <div className="flex items-center justify-center gap-3 text-2xl font-bold text-emerald-300">
+                <JetonChip kind="white" label={whiteChipLabel} />
                 <span>
-                  {t('kassaApp.jetonChangeLabel')
-                    .replace('{black}', String(tender.change.black))
-                    .replace('{white}', String(tender.change.white))}
+                  {t('kassaApp.jetonChangeWhiteOnly').replace(
+                    '{white}',
+                    String(tender.whiteChange),
+                  )}
                 </span>
               </div>
-              <span className="tabular-nums">{formatEuro(tender.changeCents)}</span>
             </div>
           )}
 
-          {tender.changeCents < 0 && (
-            <p className="text-base font-semibold text-amber-400">
+          {blackIn > 0 && tender.sufficient && tender.whiteChange === 0 && (
+            <p className="text-center text-base font-semibold text-emerald-400">
+              {t('kassaApp.jetonNoChange')}
+            </p>
+          )}
+
+          {blackIn > 0 && !tender.sufficient && tender.changeCents < 0 && (
+            <p className="text-center text-base font-semibold text-amber-400">
               {t('kassaApp.jetonInsufficient').replace(
                 '{amount}',
                 formatEuro(-tender.changeCents),
@@ -234,22 +242,9 @@ export function KassaJetonPaymentModal({
             </p>
           )}
 
-          <div className="flex items-center justify-between border-t border-zinc-700 pt-3 text-xl">
-            <span className="font-semibold text-zinc-200">
-              {t('kassaApp.jetonNetPaidLabel')}
-            </span>
-            <span
-              className={`font-bold tabular-nums ${
-                tender.sufficient ? 'text-emerald-400' : 'text-zinc-500'
-              }`}
-            >
-              {formatEuro(tender.sufficient ? orderCents : Math.max(0, tender.netCents))}
-            </span>
-          </div>
-
           <button
             type="button"
-            disabled={payBusy || !tender.sufficient}
+            disabled={payBusy || !tender.sufficient || blackIn <= 0}
             onClick={onConfirm}
             className="w-full rounded-xl bg-emerald-600 py-4 text-lg font-bold text-white disabled:opacity-40"
           >

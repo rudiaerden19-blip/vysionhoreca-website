@@ -3254,6 +3254,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [billLines],
   )
 
+  const jetonOrderLines = useMemo(
+    () =>
+      billLines.map((line) => ({
+        quantity: line.quantity,
+        name: line.product.name,
+      })),
+    [billLines],
+  )
+
   const cartRoundTotalIncl = useMemo(
     () => cart.reduce((sum, line) => sum + kassaCartLineTotalIncl(line), 0),
     [cart],
@@ -7252,6 +7261,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <KassaJetonPaymentModal
           open={showJetonPaymentModal}
           totalEuros={total}
+          orderLines={jetonOrderLines}
           denoms={kassaJetonDenoms}
           salePoint={kassaJetonSalePoint}
           payBusy={payInFlight}

@@ -1,6 +1,7 @@
 import {
   eurosToJetonCents,
   kassaJetonBreakdownFromCents,
+  kassaJetonChangeFromBlackReceived,
   kassaJetonChangeFromTender,
   normalizeKassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
@@ -49,5 +50,12 @@ describe('kassa-jeton-math', () => {
 
   it('eurosToJetonCents', () => {
     expect(eurosToJetonCents(10.5)).toBe(1050)
+  })
+
+  it('€3,50 — 2 zwarte ontvangen → 5 witte terug', () => {
+    const r = kassaJetonChangeFromBlackReceived(350, 2, DEN)
+    expect(r.whiteChange).toBe(5)
+    expect(r.changeCents).toBe(250)
+    expect(r.sufficient).toBe(true)
   })
 })

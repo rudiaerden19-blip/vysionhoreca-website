@@ -91,3 +91,27 @@ export function kassaJetonChangeFromTender(
 export function eurosToJetonCents(totalEuros: number): number {
   return Math.round(totalEuros * 100)
 }
+
+/** Bar-flow: klant betaalt alleen met zwarte jetons; wisselgeld uitsluitend wit. */
+export function kassaJetonChangeFromBlackReceived(
+  orderTotalCents: number,
+  blackReceived: number,
+  denoms: KassaJetonDenominations,
+): {
+  receivedCents: number
+  changeCents: number
+  whiteChange: number
+  sufficient: boolean
+} {
+  const blacks = Math.max(0, Math.floor(blackReceived))
+  const receivedCents = blacks * denoms.blackCents
+  const changeCents = receivedCents - orderTotalCents
+  if (changeCents < 0) {
+    return { receivedCents, changeCents, whiteChange: 0, sufficient: false }
+  }
+  if (changeCents % denoms.whiteCents !== 0) {
+    return { receivedCents, changeCents, whiteChange: 0, sufficient: false }
+  }
+  const whiteChange = changeCents / denoms.whiteCents
+  return { receivedCents, changeCents, whiteChange, sufficient: true }
+}
