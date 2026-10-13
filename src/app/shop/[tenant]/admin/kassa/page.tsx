@@ -7278,9 +7278,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }
           }}
           onPayCash={() => {
-            if (payInFlightRef.current) return
-            if (!lockPayInFlight()) return
-            void completePayment('CASH', undefined, { preLocked: true })
+            if (payInFlight) return
+            setShowJetonPaymentModal(false)
+            setShowPaymentModal(true)
           }}
           onOpenCashCardPay={() => {
             setShowJetonPaymentModal(false)
