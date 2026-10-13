@@ -3577,6 +3577,12 @@
     "cartBon": "伝票",
     "cartBonTitle": "現在のカートから案内伝票を印刷（会計しない）",
     "printAgain": "再印刷",
+    "lanPrintHostTitle": "印刷PC（iPad）",
+    "lanPrintHostLabel": "Windows 印刷PCのIP",
+    "lanPrintHostHint": "iPadのみ：Print AgentのPCの固定IP（同一WiFi）。PC本体はlocalhostのまま。",
+    "lanPrintHostSave": "この端末にIPを保存",
+    "lanPrintHostSaved": "保存しました",
+    "lanPrintHostInvalid": "無効なIP（例 192.168.1.50）。",
     "printAgentFallbackModalTitle": "Print Agent に接続できません",
     "printAgentFallbackModalBody": "この PC の Print Agent（127.0.0.1:9742）から正しい応答がありません。Windows の画面「印刷」が開きます。これはエージェント経由の ESC/POS レシートではありません。Epson サーマルでは文字が小さく乱れることがあります。まずトレイからエージェントを修復（設定で正しい Epson を保存 → テスト印刷）。「続行」は緊急時のみ。",
     "printAgentFallbackModalDownloadLink": "Print Agent ダウンロードページ（Windows）",
@@ -4824,7 +4830,9 @@
     "kassaNameAccountV2Hint": "カート → クイックメニューの掛け。売上は支払い時のみ。オフ = 従来の手入力。",
     "kassaNameAccountV2RequiresSub": "Kassa モジュールの「掛け」サブメニューもオン（またはフルパッケージ）。",
     "kassaJetonEnabled": "消費トークン（レジ）",
-    "kassaJetonEnabledHint": "レジでトークン内訳とお釣り。物理トークン利用テナントのみ。既定はオフ。"
+    "kassaJetonEnabledHint": "レジでトークン内訳とお釣り。物理トークン利用テナントのみ。既定はオフ。",
+    "kassaLanPrintEnabled": "iPad LAN印刷（WiFi → 印刷PC）",
+    "kassaLanPrintEnabledHint": "SafariのiPadからWindows Print AgentのIPへ送信。既定オフ。他レジは変更なし。"
   },
   "marketing": {
     "title": "メールマーケティング",

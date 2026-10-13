@@ -3577,6 +3577,12 @@
     "cartBon": "Ticket",
     "cartBonTitle": "Imprimir ticket provisional del carrito (sin cobrar)",
     "printAgain": "Reimprimir",
+    "lanPrintHostTitle": "PC de impresión (iPad)",
+    "lanPrintHostLabel": "IP del PC Windows con Print Agent",
+    "lanPrintHostHint": "Solo en iPad: IP fija del PC con Print Agent (misma WiFi). En el PC sigue funcionando localhost.",
+    "lanPrintHostSave": "Guardar IP en este dispositivo",
+    "lanPrintHostSaved": "Guardado",
+    "lanPrintHostInvalid": "IP no válida (p. ej. 192.168.1.50).",
     "printAgentFallbackModalTitle": "Print Agent no disponible",
     "printAgentFallbackModalBody": "La caja no obtuvo respuesta correcta del Print Agent en este PC (127.0.0.1:9742). Se usará la vía de emergencia: el cuadro de impresión de Windows. No es un ticket ESC/POS real como con el agente — en una Epson térmica puede salir muy pequeño o ilegible. Primero restaure el agente (bandeja → Ajustes → Epson correcto → Guardar → prueba). Use Continuar solo como medida provisional.",
     "printAgentFallbackModalDownloadLink": "Página de descarga Print Agent (Windows)",
@@ -4824,7 +4830,9 @@
     "kassaNameAccountV2Hint": "Carrito → A cuenta en menú rápido; ventas solo al pagar. Off = importe manual clásico.",
     "kassaNameAccountV2RequiresSub": "Active también el submenú « A cuenta » en Kassa (o paquete completo).",
     "kassaJetonEnabled": "Fichas de consumo (TPV)",
-    "kassaJetonEnabledHint": "Desglose de fichas y cambio en caja. Solo tenants con fichas físicas; desactivado por defecto."
+    "kassaJetonEnabledHint": "Desglose de fichas y cambio en caja. Solo tenants con fichas físicas; desactivado por defecto.",
+    "kassaLanPrintEnabled": "Impresión iPad por LAN (WiFi → PC de impresión)",
+    "kassaLanPrintEnabledHint": "Los iPads en Safari envían tickets a la IP del Print Agent de Windows. Desactivado por defecto; otras cajas sin cambios."
   },
   "marketing": {
     "title": "Marketing por Email",

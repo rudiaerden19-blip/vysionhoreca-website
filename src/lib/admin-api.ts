@@ -230,6 +230,9 @@ export interface TenantSettings {
   kassa_jeton_enabled?: boolean
   kassa_jeton_black_cents?: number
   kassa_jeton_white_cents?: number
+  /** iPad print via LAN naar Windows Print Agent op vaste PC-IP */
+  kassa_lan_print_enabled?: boolean
+  kassa_lan_print_host?: string | null
   /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
   z_report_send_articles_to_accountant?: boolean
   /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */
@@ -387,6 +390,32 @@ export async function saveTenantKassaJetonEnabled(
       ok: false,
       error:
         'Geen tenant_settings bijgewerkt. Voer supabase/kassa_jeton_migration.sql uit.',
+    }
+  }
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** iPad → LAN Print Agent (pilot per tenant). */
+export async function saveTenantKassaLanPrintEnabled(
+  tenantSlug: string,
+  enabled: boolean,
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_lan_print_enabled: enabled })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantKassaLanPrintEnabled:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/kassa_lan_print_migration.sql uit.',
     }
   }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))

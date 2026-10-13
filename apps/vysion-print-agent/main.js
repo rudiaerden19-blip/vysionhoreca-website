@@ -47,6 +47,20 @@ let tray = null
 let settingsWindow = null
 let kassaWindow = null
 let serverHandle = null
+
+function restartPrintServer() {
+  if (serverHandle && typeof serverHandle.close === 'function') {
+    try {
+      serverHandle.close()
+    } catch {
+      /* ignore */
+    }
+    serverHandle = null
+  }
+  const port = config.port || PORT
+  const bind = config.lanListenEnabled === true ? '0.0.0.0' : '127.0.0.1'
+  serverHandle = startServer(getPrintConfig, port, {}, bind)
+}
 let healthTimer = null
 let lastHealth = { ok: false, reason: 'starting…' }
 
@@ -87,6 +101,8 @@ function loadConfig() {
     kitchenPrinterName: typeof j.kitchenPrinterName === 'string' ? j.kitchenPrinterName : '',
     /** Ontbrekend = Epson/Star — bestaande kassa’s blijven op de huidige bon. */
     printerProfile: normalizePrinterProfile(j.printerProfile),
+    /** iPads op WiFi → POST /print naar LAN-IP van deze pc (default uit). */
+    lanListenEnabled: j.lanListenEnabled === true,
   }
 }
 
@@ -620,8 +636,17 @@ ipcMain.handle('config:save', (_evt, partial) => {
     printerProfile: typeof partial.printerProfile === 'string'
       ? normalizePrinterProfile(partial.printerProfile)
       : getPrinterProfile(),
+    lanListenEnabled:
+      typeof partial.lanListenEnabled === 'boolean'
+        ? partial.lanListenEnabled
+        : config.lanListenEnabled === true,
   }
   saveConfig(config)
+  try {
+    restartPrintServer()
+  } catch (e) {
+    console.error('[server] herstart na config mislukt', e)
+  }
   syncWindowsStartup()
   checkHealth()
   buildTray()
@@ -717,8 +742,7 @@ if (!gotLock) {
   app.whenReady().then(() => {
     runIntegrityCheck()
     try {
-      const port = config.port || PORT
-      serverHandle = startServer(getPrintConfig, port)
+      restartPrintServer()
     } catch (e) {
       console.error('[server] start mislukt', e)
     }

@@ -3077,6 +3077,12 @@
     "cartBon": "Ticket",
     "cartBonTitle": "Imprimer un ticket provisoire du panier (sans encaissement)",
     "printAgain": "Réimprimer",
+    "lanPrintHostTitle": "PC d’impression (iPad)",
+    "lanPrintHostLabel": "Adresse IP du PC Windows Print Agent",
+    "lanPrintHostHint": "Sur iPad uniquement : IP fixe du PC avec Print Agent (même Wi‑Fi). Sur le PC, localhost reste utilisé.",
+    "lanPrintHostSave": "Enregistrer l’IP sur cet appareil",
+    "lanPrintHostSaved": "Enregistré",
+    "lanPrintHostInvalid": "Adresse IP invalide (ex. 192.168.1.50).",
     "printAgentFallbackModalTitle": "Print Agent inaccessible",
     "printAgentFallbackModalBody": "La caisse n’a pas reçu de réponse correcte du Print Agent sur ce PC (127.0.0.1:9742). Le mode secours ouvre la boîte de dialogue d’impression Windows. Ce n’est pas un ticket ESC/POS correct comme via l’agent — sur une Epson thermique le résultat peut être minuscule ou illisible. Réparez d’abord l’agent (icône près de l’horloge → Paramètres → bonne Epson → Enregistrer → test). N’utilisez « Continuer » qu’en secours.",
     "printAgentFallbackModalDownloadLink": "Page de téléchargement Print Agent (Windows)",
@@ -4847,7 +4853,9 @@
     "kassaNameAccountV2Hint": "Panier → En compte dans le menu rapide; CA seulement au paiement. Désactivé = saisie manuelle.",
     "kassaNameAccountV2RequiresSub": "Activer aussi le sous-menu « En compte » sous Kassa (ou forfait complet).",
     "kassaJetonEnabled": "Jetons de consommation (caisse)",
-    "kassaJetonEnabledHint": "Répartition jetons et monnaie à la caisse. Uniquement pour les tenants avec jetons physiques ; désactivé par défaut."
+    "kassaJetonEnabledHint": "Répartition jetons et monnaie à la caisse. Uniquement pour les tenants avec jetons physiques ; désactivé par défaut.",
+    "kassaLanPrintEnabled": "Impression iPad via LAN (Wi‑Fi → PC d’impression)",
+    "kassaLanPrintEnabledHint": "Les iPads dans Safari envoient les tickets à l’IP du Print Agent Windows. Désactivé par défaut ; autres caisses inchangées."
   },
   "marketing": {
     "title": "Marketing par Email",

@@ -1,6 +1,35 @@
 /** Lokale Vysion Print Agent (Windows): http://127.0.0.1:9742 */
 
+import {
+  resolveVysionPrintAgentOrigin,
+  type ResolveVysionPrintAgentOriginInput,
+} from '@/lib/kassa-lan-print'
+
 const DEFAULT_AGENT_ORIGIN = 'http://127.0.0.1:9742'
+
+/** Context voor LAN-print (alleen tenants met kassa_lan_print_enabled). */
+export type VysionPrintAgentSendContext = Pick<
+  ResolveVysionPrintAgentOriginInput,
+  'lanPrintEnabled' | 'tenantSlug' | 'tenantDefaultHost'
+>
+
+function printAgentTargetAddressSpace(origin: string): 'local' | 'private' {
+  return /127\.0\.0\.1|localhost/i.test(origin) ? 'local' : 'private'
+}
+
+async function resolveOriginArg(
+  originOrContext?: string | VysionPrintAgentSendContext,
+): Promise<string> {
+  if (typeof originOrContext === 'string') return originOrContext
+  if (originOrContext && typeof originOrContext === 'object') {
+    return resolveVysionPrintAgentOrigin({
+      lanPrintEnabled: originOrContext.lanPrintEnabled === true,
+      tenantSlug: originOrContext.tenantSlug,
+      tenantDefaultHost: originOrContext.tenantDefaultHost,
+    })
+  }
+  return DEFAULT_AGENT_ORIGIN
+}
 
 export type VysionPrintAgentItem = {
   quantity: number
@@ -251,8 +280,12 @@ export type PrintAgentHealth = {
 
 /** GET /health — o.a. of keukenprinter in de agent is ingesteld. */
 export async function fetchPrintAgentHealth(
-  origin = DEFAULT_AGENT_ORIGIN,
+  originOrContext: string | VysionPrintAgentSendContext = DEFAULT_AGENT_ORIGIN,
 ): Promise<PrintAgentHealth> {
+  const origin =
+    typeof originOrContext === 'string'
+      ? originOrContext
+      : await resolveOriginArg(originOrContext)
   const base = origin.replace(/\/$/, '')
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 3000)
@@ -263,7 +296,8 @@ export async function fetchPrintAgentHealth(
       credentials: 'omit',
       signal: controller.signal,
     }
-    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace =
+      printAgentTargetAddressSpace(origin)
     const r = await fetch(`${base}/health`, init)
     if (!r.ok) {
       return {
@@ -329,7 +363,8 @@ async function postPrintOnce(
       credentials: 'omit',
       signal: controller.signal,
     }
-    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace =
+      printAgentTargetAddressSpace(origin)
 
     const r = await Promise.race([
       fetch(url, init),
@@ -368,7 +403,7 @@ async function postPrintOnce(
     }
     return {
       ok: false,
-      detail: `${name}: ${msg} (geen verbinding met 127.0.0.1:9742 — typisch op Android/Chrome of agent uit).`,
+      detail: `${name}: ${msg} (geen verbinding met ${url} — agent uit of geblokkeerd).`,
     }
   } finally {
     clearTimeout(timer)
@@ -431,8 +466,9 @@ async function sendToVysionPrintAgentCore(
 
 export async function sendToVysionPrintAgent(
   body: VysionPrintAgentBody,
-  origin = DEFAULT_AGENT_ORIGIN,
+  originOrContext: string | VysionPrintAgentSendContext = DEFAULT_AGENT_ORIGIN,
 ): Promise<VysionPrintAgentResult> {
+  const origin = await resolveOriginArg(originOrContext)
   const core = sendToVysionPrintAgentCore(body, origin)
   /**
    * Altijd een muurklok: sommige Chrome/Android-combinaties laten fetch naar 127.0.0.1 of body.text()
@@ -457,7 +493,10 @@ export async function sendToVysionPrintAgent(
  * Stuurt enkel een drawer-kick (kassa-lade open) naar de Print Agent.
  * Gebruikt door de "Lade open"-knop in de kassa-UI.
  */
-export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boolean> {
+export async function openCashDrawer(
+  originOrContext: string | VysionPrintAgentSendContext = DEFAULT_AGENT_ORIGIN,
+): Promise<boolean> {
+  const origin = await resolveOriginArg(originOrContext)
   const base = origin.replace(/\/$/, '')
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 4000)
@@ -470,7 +509,8 @@ export async function openCashDrawer(origin = DEFAULT_AGENT_ORIGIN): Promise<boo
       credentials: 'omit',
       signal: controller.signal,
     }
-    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace = 'local'
+    ;(init as RequestInit & { targetAddressSpace?: string }).targetAddressSpace =
+      printAgentTargetAddressSpace(origin)
     const r = await fetch(`${base}/drawer`, init)
     const data = (await r.json().catch(() => null)) as { success?: boolean } | null
     if (r.ok && data?.success === true) return true
