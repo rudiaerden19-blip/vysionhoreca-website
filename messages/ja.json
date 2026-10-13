@@ -3608,6 +3608,19 @@
     "reservationsManyWaiting": "承認待ちの予約が {count} 件",
     "tapToView": "タップして表示",
     "payTitle": "支払い",
+    "jetonPayTitle": "トークン",
+    "jetonOrderLabel": "注文",
+    "jetonSuggestedPay": "必要: 黒 {black} + 白 {white}",
+    "jetonReceivedLabel": "受取",
+    "jetonBlackLabel": "黒",
+    "jetonWhiteLabel": "白",
+    "jetonChangeLabel": "お釣り: 黒 {black} + 白 {white}",
+    "jetonNetPaidLabel": "実支払い",
+    "jetonInsufficient": "あと {amount} 不足",
+    "jetonConfirmPay": "支払いを確定",
+    "jetonOpenCashCardPay": "現金 / Bancontact",
+    "jetonSalePointBar": "ダンスフロア / バー",
+    "jetonSalePointIjs": "アイス / テラス",
     "toPay": "お支払い金額",
     "payCash": "現金",
     "payCard": "カード",
@@ -4801,7 +4814,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "掛け v2（レジ経由タブ）",
     "kassaNameAccountV2Hint": "カート → クイックメニューの掛け。売上は支払い時のみ。オフ = 従来の手入力。",
-    "kassaNameAccountV2RequiresSub": "Kassa モジュールの「掛け」サブメニューもオン（またはフルパッケージ）。"
+    "kassaNameAccountV2RequiresSub": "Kassa モジュールの「掛け」サブメニューもオン（またはフルパッケージ）。",
+    "kassaJetonEnabled": "消費トークン（レジ）",
+    "kassaJetonEnabledHint": "レジでトークン内訳とお釣り。物理トークン利用テナントのみ。既定はオフ。"
   },
   "marketing": {
     "title": "メールマーケティング",

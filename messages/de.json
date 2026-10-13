@@ -3108,6 +3108,19 @@
     "reservationsManyWaiting": "{count} Reservierungen warten auf Freigabe",
     "tapToView": "Tippen zum Anzeigen",
     "payTitle": "Zahlung",
+    "jetonPayTitle": "Jetons",
+    "jetonOrderLabel": "Bestellung",
+    "jetonSuggestedPay": "Passend: {black} schwarze + {white} weiße Jetons",
+    "jetonReceivedLabel": "Erhalten",
+    "jetonBlackLabel": "schwarze",
+    "jetonWhiteLabel": "weiße",
+    "jetonChangeLabel": "Rückgabe: {black} schwarze + {white} weiße",
+    "jetonNetPaidLabel": "Netto bezahlt",
+    "jetonInsufficient": "Noch {amount} zu wenig in Jetons",
+    "jetonConfirmPay": "Zahlung bestätigen",
+    "jetonOpenCashCardPay": "Bar / Bancontact",
+    "jetonSalePointBar": "Dancing / Bar",
+    "jetonSalePointIjs": "Eis / Terrasse",
     "toPay": "Zu zahlen",
     "payCash": "Bar",
     "payCard": "Karte",
@@ -4824,7 +4837,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "Auf Rechnung v2 (Tabs über Kasse)",
     "kassaNameAccountV2Hint": "Warenkorb → Auf Rechnung im Schnellmenü; Umsatz erst bei Zahlung. Aus = klassisches Betragsfeld.",
-    "kassaNameAccountV2RequiresSub": "Submenü «Auf Rechnung» unter Kassa aktivieren (oder Vollpaket)."
+    "kassaNameAccountV2RequiresSub": "Submenü «Auf Rechnung» unter Kassa aktivieren (oder Vollpaket).",
+    "kassaJetonEnabled": "Verzehrjetons (Kassa)",
+    "kassaJetonEnabledHint": "Jeton-Aufschlüsselung und Wechselgeld an der Kassa. Nur für Tenants mit physischen Jetons; standardmäßig aus."
   },
   "marketing": {
     "title": "E-Mail-Marketing",

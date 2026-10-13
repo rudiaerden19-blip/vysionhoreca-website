@@ -226,6 +226,10 @@ export interface TenantSettings {
   kassa_checkout_vat_mode?: string
   /** true = tabs op naam + op rekening v2 (kassa popup; rapport pas bij betaling) */
   kassa_name_account_v2?: boolean
+  /** true = consumptiejetons op kassa (pilot per tenant) */
+  kassa_jeton_enabled?: boolean
+  kassa_jeton_black_cents?: number
+  kassa_jeton_white_cents?: number
   /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
   z_report_send_articles_to_accountant?: boolean
   /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */
@@ -357,6 +361,32 @@ export async function saveTenantKassaNameAccountV2(
       ok: false,
       error:
         'Geen tenant_settings bijgewerkt. Voer supabase/kassa_name_account_v2_migration.sql uit.',
+    }
+  }
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** Consumptiejetons (dancing) — pilot per tenant. */
+export async function saveTenantKassaJetonEnabled(
+  tenantSlug: string,
+  enabled: boolean,
+): Promise<{ ok: boolean; error?: string }> {
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_jeton_enabled: enabled })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveTenantKassaJetonEnabled:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/kassa_jeton_migration.sql uit.',
     }
   }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))

@@ -198,6 +198,13 @@ import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
+import { KassaJetonPaymentModal } from '@/components/kassa/KassaJetonPaymentModal'
+import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
+import {
+  readKassaJetonSalePoint,
+  writeKassaJetonSalePoint,
+  type KassaJetonSalePoint,
+} from '@/lib/kassa-jeton-sale-point'
 import { KassaKlantschermQrResultModal } from '@/components/kassa/KassaKlantschermQrResultModal'
 import { KassaKlantschermBankPayWaitModal } from '@/components/kassa/KassaKlantschermBankPayWaitModal'
 import { KassaTerminalPayModal } from '@/components/kassa/KassaTerminalPayModal'
@@ -1765,6 +1772,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
+  const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
+  const kassaJetonDenoms = useMemo(
+    () =>
+      normalizeKassaJetonDenominations(
+        tenantInfo?.kassa_jeton_black_cents,
+        tenantInfo?.kassa_jeton_white_cents,
+      ),
+    [tenantInfo?.kassa_jeton_black_cents, tenantInfo?.kassa_jeton_white_cents],
+  )
+  const [showJetonPaymentModal, setShowJetonPaymentModal] = useState(false)
+  const [kassaJetonSalePoint, setKassaJetonSalePoint] =
+    useState<KassaJetonSalePoint>('bar')
   const klantschermEnabled = tenantInfo?.klantscherm_enabled === true
 
   useEffect(() => {
@@ -1793,25 +1812,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () => dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry),
     [tenantDefaultBtw, tenantCountry],
   )
+  const openPaymentFlow = useCallback(() => {
+    if (kassaJetonEnabled && kassaJetonSalePoint === 'bar') {
+      setShowJetonPaymentModal(true)
+      return
+    }
+    setShowPaymentModal(true)
+  }, [kassaJetonEnabled, kassaJetonSalePoint])
+
+  useEffect(() => {
+    if (!kassaJetonEnabled) return
+    setKassaJetonSalePoint(readKassaJetonSalePoint(tenant))
+  }, [tenant, kassaJetonEnabled])
+
   const requestCheckout = useCallback(() => {
     if (payInFlightRef.current) return
     scheduleKassaTapSound(playCheckout)
     if (checkoutVatMode === 'dine_in') {
       setOrderType('DINE_IN')
-      setShowPaymentModal(true)
+      openPaymentFlow()
       return
     }
     if (checkoutVatMode === 'takeaway') {
       setOrderType('TAKEAWAY')
-      setShowPaymentModal(true)
+      openPaymentFlow()
       return
     }
     if (checkoutVatMode === 'choose' && checkoutVatRates.dineIn !== checkoutVatRates.offPremise) {
       setShowCheckoutVatModal(true)
       return
     }
-    setShowPaymentModal(true)
-  }, [checkoutVatMode, checkoutVatRates, playCheckout])
+    openPaymentFlow()
+  }, [checkoutVatMode, checkoutVatRates, playCheckout, openPaymentFlow])
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
       resolveVatPercentForCartLine(
@@ -3885,6 +3917,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     flushSync(() => {
       setShowPaymentModal(false)
+      setShowJetonPaymentModal(false)
       setShowSplitModal(false)
       setCustomerDisplayShowQr(false)
       setKlantschermBankPayPending(null)
@@ -7206,14 +7239,45 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onPickDineIn={() => {
           setOrderType('DINE_IN')
           setShowCheckoutVatModal(false)
-          setShowPaymentModal(true)
+          openPaymentFlow()
         }}
         onPickTakeaway={() => {
           setOrderType('TAKEAWAY')
           setShowCheckoutVatModal(false)
-          setShowPaymentModal(true)
+          openPaymentFlow()
         }}
       />
+
+      {kassaJetonEnabled ? (
+        <KassaJetonPaymentModal
+          open={showJetonPaymentModal}
+          totalEuros={total}
+          denoms={kassaJetonDenoms}
+          salePoint={kassaJetonSalePoint}
+          payBusy={payInFlight}
+          onClose={() => {
+            if (payInFlight) return
+            setShowJetonPaymentModal(false)
+          }}
+          onSwitchSalePoint={(next) => {
+            setKassaJetonSalePoint(next)
+            writeKassaJetonSalePoint(tenant, next)
+            if (next === 'ijs') {
+              setShowJetonPaymentModal(false)
+              setShowPaymentModal(true)
+            }
+          }}
+          onOpenCashCardPay={() => {
+            setShowJetonPaymentModal(false)
+            setShowPaymentModal(true)
+          }}
+          onConfirm={() => {
+            if (payInFlightRef.current) return
+            if (!lockPayInFlight()) return
+            void completePayment('JETON', undefined, { preLocked: true })
+          }}
+        />
+      ) : null}
 
       {/* ── Betaalmodal / split / succes ── */}
       <KassaPaymentModal
@@ -7221,6 +7285,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         total={total}
         options={paymentMethodOptions}
         payBusy={payInFlight}
+        onOpenJeton={
+          kassaJetonEnabled && kassaJetonSalePoint === 'ijs'
+            ? () => {
+                setShowPaymentModal(false)
+                setShowJetonPaymentModal(true)
+              }
+            : undefined
+        }
+        jetonLabel={
+          kassaJetonEnabled && kassaJetonSalePoint === 'ijs'
+            ? t('kassaApp.jetonPayTitle')
+            : undefined
+        }
         onClose={() => {
           if (payInFlight) return
           setCustomerDisplayShowQr(false)
@@ -7276,7 +7353,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onCancelBack={() => {
           setShowTerminalPayModal(false)
           setCustomerDisplayShowQr(false)
-          setShowPaymentModal(true)
+          openPaymentFlow()
         }}
       />
 
@@ -7295,7 +7372,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setKlantschermBankPayPending(null)
           setCustomerDisplayShowQr(false)
           if (wasSplit) setShowSplitModal(true)
-          else setShowPaymentModal(true)
+          else openPaymentFlow()
         }}
         onConfirm={() => {
           const pending = klantschermBankPayPending

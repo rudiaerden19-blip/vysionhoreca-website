@@ -90,7 +90,9 @@ export function KassaSuccessReceiptModal({
       ? t('kassaReceipt.paidSplit')
           .replace('{cash}', (order.splitCash ?? 0).toFixed(2))
           .replace('{card}', (order.splitCard ?? 0).toFixed(2))
-      : order.paymentMethod === 'CASH'
+      : order.paymentMethod === 'JETON'
+        ? t('kassaApp.jetonPayTitle')
+        : order.paymentMethod === 'CASH'
         ? t('kassaApp.payCash')
         : order.paymentMethod === 'CARD'
           ? t('kassaApp.payCard')

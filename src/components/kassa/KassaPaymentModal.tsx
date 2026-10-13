@@ -21,6 +21,8 @@ export function KassaPaymentModal({
   onClose,
   onPay,
   onOpenSplit,
+  onOpenJeton,
+  jetonLabel,
   appearance = 'light',
 }: {
   open: boolean
@@ -30,6 +32,9 @@ export function KassaPaymentModal({
   onClose: () => void
   onPay: (method: KassaQuickPayMethod) => void
   onOpenSplit: () => void
+  /** Alleen tenants met kassa_jeton_enabled (ijs/terras-profiel). */
+  onOpenJeton?: () => void
+  jetonLabel?: string
   appearance?: 'light' |  'dark'
 }) {
   const { t } = useLanguage()
@@ -86,6 +91,20 @@ export function KassaPaymentModal({
                 <span style={{ color: pm.color }}>{pm.label}</span>
               </button>
             ))}
+            {onOpenJeton && jetonLabel ? (
+              <button
+                type="button"
+                disabled={payLocked}
+                onClick={() => {
+                  if (payLocked) return
+                  onOpenJeton()
+                }}
+                className={`col-span-2 ${btnTile} disabled:opacity-40 disabled:pointer-events-none disabled:scale-100`}
+                style={{ borderColor: '#111827' }}
+              >
+                <span style={{ color: '#f3f4f6' }}>{jetonLabel}</span>
+              </button>
+            ) : null}
             <button
               type="button"
               disabled={payLocked}

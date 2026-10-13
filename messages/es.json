@@ -3608,6 +3608,19 @@
     "reservationsManyWaiting": "{count} reservas pendientes de aprobación",
     "tapToView": "Toca para ver",
     "payTitle": "Pago",
+    "jetonPayTitle": "Fichas",
+    "jetonOrderLabel": "Pedido",
+    "jetonSuggestedPay": "Exacto: {black} negras + {white} blancas",
+    "jetonReceivedLabel": "Recibido",
+    "jetonBlackLabel": "negras",
+    "jetonWhiteLabel": "blancas",
+    "jetonChangeLabel": "Devolver: {black} negras + {white} blancas",
+    "jetonNetPaidLabel": "Neto pagado",
+    "jetonInsufficient": "Faltan {amount} en fichas",
+    "jetonConfirmPay": "Confirmar pago",
+    "jetonOpenCashCardPay": "Efectivo / Bancontact",
+    "jetonSalePointBar": "Discoteca / barra",
+    "jetonSalePointIjs": "Heladería / terraza",
     "toPay": "A pagar",
     "payCash": "Efectivo",
     "payCard": "Tarjeta",
@@ -4801,7 +4814,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "A cuenta v2 (tabs vía caja)",
     "kassaNameAccountV2Hint": "Carrito → A cuenta en menú rápido; ventas solo al pagar. Off = importe manual clásico.",
-    "kassaNameAccountV2RequiresSub": "Active también el submenú « A cuenta » en Kassa (o paquete completo)."
+    "kassaNameAccountV2RequiresSub": "Active también el submenú « A cuenta » en Kassa (o paquete completo).",
+    "kassaJetonEnabled": "Fichas de consumo (TPV)",
+    "kassaJetonEnabledHint": "Desglose de fichas y cambio en caja. Solo tenants con fichas físicas; desactivado por defecto."
   },
   "marketing": {
     "title": "Marketing por Email",

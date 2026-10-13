@@ -3608,6 +3608,19 @@
     "reservationsManyWaiting": "{count} 条预订待审批",
     "tapToView": "点击查看",
     "payTitle": "付款",
+    "jetonPayTitle": "代币",
+    "jetonOrderLabel": "订单",
+    "jetonSuggestedPay": "应付: 黑 {black} + 白 {white}",
+    "jetonReceivedLabel": "收到",
+    "jetonBlackLabel": "黑",
+    "jetonWhiteLabel": "白",
+    "jetonChangeLabel": "找零: 黑 {black} + 白 {white}",
+    "jetonNetPaidLabel": "实付",
+    "jetonInsufficient": "代币还差 {amount}",
+    "jetonConfirmPay": "确认付款",
+    "jetonOpenCashCardPay": "现金 / Bancontact",
+    "jetonSalePointBar": "舞池 / 吧台",
+    "jetonSalePointIjs": "冰淇淋 / 露台",
     "toPay": "应付",
     "payCash": "现金",
     "payCard": "刷卡",
@@ -4801,7 +4814,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "挂账 v2（经收银台）",
     "kassaNameAccountV2Hint": "购物车 → 快捷菜单挂账；仅付款时计入销售。关 = 经典手动金额。",
-    "kassaNameAccountV2RequiresSub": "同时开启 Kassa 模块下的「挂账」子菜单（或完整套餐）。"
+    "kassaNameAccountV2RequiresSub": "同时开启 Kassa 模块下的「挂账」子菜单（或完整套餐）。",
+    "kassaJetonEnabled": "消费代币（收银）",
+    "kassaJetonEnabledHint": "收银台代币明细与找零。仅适用于实体代币租户；默认关闭。"
   },
   "marketing": {
     "title": "电子邮件营销",

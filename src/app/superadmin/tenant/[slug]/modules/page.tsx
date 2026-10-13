@@ -63,19 +63,21 @@ export default function SuperadminTenantModulesPage() {
   const [savingOwnerClose, setSavingOwnerClose] = useState(false)
   const [kassaNameAccountV2, setKassaNameAccountV2] = useState(false)
   const [savingKassaNameAccountV2, setSavingKassaNameAccountV2] = useState(false)
+  const [kassaJetonEnabled, setKassaJetonEnabled] = useState(false)
+  const [savingKassaJetonEnabled, setSavingKassaJetonEnabled] = useState(false)
 
   const loadData = useCallback(async () => {
     let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
       .select(
-        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2',
+        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled',
       )
       .eq('tenant_slug', slug)
       .maybeSingle()
 
     if (
       settingsErr &&
-      /z_report_send_articles_to_accountant|kassa_name_account_v2|column .* does not exist|schema cache/i.test(
+      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|column .* does not exist|schema cache/i.test(
         settingsErr.message,
       )
     ) {
@@ -102,6 +104,9 @@ export default function SuperadminTenantModulesPage() {
     )
     setKassaNameAccountV2(
       (settings as { kassa_name_account_v2?: boolean } | null)?.kassa_name_account_v2 === true,
+    )
+    setKassaJetonEnabled(
+      (settings as { kassa_jeton_enabled?: boolean } | null)?.kassa_jeton_enabled === true,
     )
 
     let { data: coreRow, error: coreErr } = await supabase
@@ -295,6 +300,39 @@ export default function SuperadminTenantModulesPage() {
                     }
                   })
                   .finally(() => setSavingKassaNameAccountV2(false))
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-amber-700/40 bg-amber-950/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">{t('superadminModules.kassaJetonEnabled')}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{t('superadminModules.kassaJetonEnabledHint')}</p>
+            </div>
+            <ModuleSlider
+              checked={kassaJetonEnabled}
+              disabled={savingKassaJetonEnabled}
+              onChange={(on) => {
+                setKassaJetonEnabled(on)
+                setSavingKassaJetonEnabled(true)
+                void authFetch('/api/superadmin/tenants', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    action: 'update_kassa_jeton_enabled',
+                    slug,
+                    kassaJetonEnabled: on,
+                  }),
+                })
+                  .then(async (res) => {
+                    if (!res.ok) {
+                      const json = await res.json().catch(() => ({}))
+                      setKassaJetonEnabled(!on)
+                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+                    }
+                  })
+                  .finally(() => setSavingKassaJetonEnabled(false))
               }}
             />
           </div>

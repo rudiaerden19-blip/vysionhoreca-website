@@ -562,6 +562,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       CARD: 0,
       IDEAL: 0,
       BANCONTACT: 0,
+      JETON: 0,
       ONLINE: 0,
     }
     for (const o of td) {
@@ -570,6 +571,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         const d = distributeOrderPaymentForZRaport(o)
         acc.CASH += d.cash
         acc.CARD += d.card
+        continue
+      }
+      if (pm === 'JETON') {
+        acc.JETON += o.total
         continue
       }
       if (pm === 'CASH' || pm === 'CONTANT') acc.CASH += o.total

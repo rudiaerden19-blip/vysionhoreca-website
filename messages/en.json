@@ -3544,7 +3544,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "On account v2 (tabs via till)",
     "kassaNameAccountV2Hint": "Cart → On account in quick menu, name list, revenue only when paid. Off = classic manual amount screen.",
-    "kassaNameAccountV2RequiresSub": "Also enable submenu «On account» under Kassa module (or full package)."
+    "kassaNameAccountV2RequiresSub": "Also enable submenu «On account» under Kassa module (or full package).",
+    "kassaJetonEnabled": "Consumption tokens (POS)",
+    "kassaJetonEnabledHint": "Token breakdown and change on POS. For tenants with physical tokens only; off by default."
   },
   "marketing": {
     "title": "Email Marketing",
@@ -4247,6 +4249,19 @@
     "reservationsManyWaiting": "{count} reservations awaiting approval",
     "tapToView": "Tap here to view",
     "payTitle": "Payment",
+    "jetonPayTitle": "Tokens",
+    "jetonOrderLabel": "Order",
+    "jetonSuggestedPay": "Exact: {black} black + {white} white tokens",
+    "jetonReceivedLabel": "Received",
+    "jetonBlackLabel": "black",
+    "jetonWhiteLabel": "white",
+    "jetonChangeLabel": "Give back: {black} black + {white} white",
+    "jetonNetPaidLabel": "Net paid",
+    "jetonInsufficient": "Still {amount} short in tokens",
+    "jetonConfirmPay": "Confirm payment",
+    "jetonOpenCashCardPay": "Cash / Bancontact",
+    "jetonSalePointBar": "Dancing / bar",
+    "jetonSalePointIjs": "Ice cream / terrace",
     "toPay": "Amount due",
     "payCash": "Cash",
     "payCard": "Card",

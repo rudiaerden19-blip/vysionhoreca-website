@@ -27,7 +27,13 @@ export function kassaReceiptTableNumber(
   return String(tableNumber ?? '').trim()
 }
 
-export type KassaPaymentMethod = 'CASH' |  'CARD' |  'IDEAL' |  'BANCONTACT' |  'SPLIT'
+export type KassaPaymentMethod =
+  | 'CASH'
+  | 'CARD'
+  | 'IDEAL'
+  | 'BANCONTACT'
+  | 'SPLIT'
+  | 'JETON'
 
 /** Afgeleid uit categorie-BTW; ontbreekt bij oude bonnen → UI valt terug op één zaak-tarief. */
 export interface KassaReceiptVatLine {

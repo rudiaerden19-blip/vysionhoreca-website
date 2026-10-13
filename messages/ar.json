@@ -3608,6 +3608,19 @@
     "reservationsManyWaiting": "{count} حجوزات بانتظار الموافقة",
     "tapToView": "اضغط للعرض",
     "payTitle": "الدفع",
+    "jetonPayTitle": "الرموز",
+    "jetonOrderLabel": "الطلب",
+    "jetonSuggestedPay": "المطلوب: {black} أسود + {white} أبيض",
+    "jetonReceivedLabel": "المستلم",
+    "jetonBlackLabel": "أسود",
+    "jetonWhiteLabel": "أبيض",
+    "jetonChangeLabel": "الباقي: {black} أسود + {white} أبيض",
+    "jetonNetPaidLabel": "صافي المدفوع",
+    "jetonInsufficient": "ينقص {amount} من الرموز",
+    "jetonConfirmPay": "تأكيد الدفع",
+    "jetonOpenCashCardPay": "نقد / Bancontact",
+    "jetonSalePointBar": "الرقص / البار",
+    "jetonSalePointIjs": "الآيس كريم / التراس",
     "toPay": "المستحق",
     "payCash": "نقداً",
     "payCard": "بطاقة",
@@ -4801,7 +4814,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "على الحساب v2 (تبويبات عبر الكاشير)",
     "kassaNameAccountV2Hint": "السلة → على الحساب في القائمة السريعة؛ الإيراد عند الدفع فقط. إيقاف = إدخال يدوي.",
-    "kassaNameAccountV2RequiresSub": "فعّل أيضًا « على الحساب » ضمن Kassa (أو الحزمة الكاملة)."
+    "kassaNameAccountV2RequiresSub": "فعّل أيضًا « على الحساب » ضمن Kassa (أو الحزمة الكاملة).",
+    "kassaJetonEnabled": "رموز الاستهلاك (الكassa)",
+    "kassaJetonEnabledHint": "تفصيل الرموز والباقي عند الدفع. للمستأجرين برموز فعلية فقط؛ مغلق افتراضيًا."
   },
   "marketing": {
     "title": "التسويق عبر البريد الإلكتروني",

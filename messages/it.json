@@ -3608,6 +3608,19 @@
     "reservationsManyWaiting": "{count} prenotazioni in attesa di approvazione",
     "tapToView": "Tocca per vedere",
     "payTitle": "Pagamento",
+    "jetonPayTitle": "Gettoni",
+    "jetonOrderLabel": "Ordine",
+    "jetonSuggestedPay": "Esatto: {black} neri + {white} bianchi",
+    "jetonReceivedLabel": "Ricevuto",
+    "jetonBlackLabel": "neri",
+    "jetonWhiteLabel": "bianchi",
+    "jetonChangeLabel": "Resto: {black} neri + {white} bianchi",
+    "jetonNetPaidLabel": "Netto pagato",
+    "jetonInsufficient": "Mancano ancora {amount} in gettoni",
+    "jetonConfirmPay": "Conferma pagamento",
+    "jetonOpenCashCardPay": "Contanti / Bancontact",
+    "jetonSalePointBar": "Discoteca / bar",
+    "jetonSalePointIjs": "Gelateria / terrazza",
     "toPay": "Da pagare",
     "payCash": "Contanti",
     "payCard": "Carta",
@@ -4801,7 +4814,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "In conto v2 (tab da cassa)",
     "kassaNameAccountV2Hint": "Carrello → In conto nel menu rapido; vendite solo al pagamento. Off = importo manuale.",
-    "kassaNameAccountV2RequiresSub": "Attivare anche il sottomenu « In conto » sotto Kassa (o pacchetto completo)."
+    "kassaNameAccountV2RequiresSub": "Attivare anche il sottomenu « In conto » sotto Kassa (o pacchetto completo).",
+    "kassaJetonEnabled": "Gettoni consumo (cassa)",
+    "kassaJetonEnabledHint": "Calcolo gettoni e resto in cassa. Solo tenant con gettoni fisici; disattivato di default."
   },
   "marketing": {
     "title": "Email Marketing",

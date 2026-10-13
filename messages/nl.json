@@ -3544,7 +3544,9 @@
   "superadminModules": {
     "kassaNameAccountV2": "Op rekening v2 (tabs via kassa)",
     "kassaNameAccountV2Hint": "Mand → Op rekening in snelmenu, namenlijst, omzet pas bij betaling. Uit = klassiek scherm (bedrag handmatig).",
-    "kassaNameAccountV2RequiresSub": "Zet ook submenu «Op rekening» aan onder module Kassa (of volledig pakket)."
+    "kassaNameAccountV2RequiresSub": "Zet ook submenu «Op rekening» aan onder module Kassa (of volledig pakket).",
+    "kassaJetonEnabled": "Consumptiejetons (kassa)",
+    "kassaJetonEnabledHint": "Jeton-breakdown en wisselgeld op kassa. Alleen voor tenants met fysieke jetons; standaard uit."
   },
   "marketing": {
     "title": "Email Marketing",
@@ -4247,6 +4249,19 @@
     "reservationsManyWaiting": "{count} reservaties wachten op goedkeuring",
     "tapToView": "Tik hier om te bekijken",
     "payTitle": "Betalen",
+    "jetonPayTitle": "Jetons",
+    "jetonOrderLabel": "Bestelling",
+    "jetonSuggestedPay": "Passend: {black} zwarte + {white} witte jetons",
+    "jetonReceivedLabel": "Ontvangen",
+    "jetonBlackLabel": "zwarte",
+    "jetonWhiteLabel": "witte",
+    "jetonChangeLabel": "Teruggeven: {black} zwarte + {white} witte",
+    "jetonNetPaidLabel": "Netto betaald",
+    "jetonInsufficient": "Nog {amount} te weinig in jetons",
+    "jetonConfirmPay": "Betaling bevestigen",
+    "jetonOpenCashCardPay": "Contant / Bancontact",
+    "jetonSalePointBar": "Dancing / bar",
+    "jetonSalePointIjs": "Ijssalon / terras",
     "toPay": "Te betalen",
     "payCash": "Contant",
     "payCard": "PIN/Kaart",
