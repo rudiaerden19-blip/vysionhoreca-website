@@ -3077,12 +3077,6 @@
     "cartBon": "Bon",
     "cartBonTitle": "Vorläufigen Bon aus aktuellem Warenkorb drucken (ohne Bezahlung)",
     "printAgain": "Erneut drucken",
-    "lanPrintHostTitle": "Print-PC (iPad)",
-    "lanPrintHostLabel": "IP-Adresse Windows Print-PC",
-    "lanPrintHostHint": "Nur auf iPad: feste IP des PCs mit Print Agent (gleiches WLAN). Am PC selbst bleibt localhost aktiv.",
-    "lanPrintHostSave": "IP auf diesem Gerät speichern",
-    "lanPrintHostSaved": "Gespeichert",
-    "lanPrintHostInvalid": "Ungültige IP-Adresse (z. B. 192.168.1.50).",
     "printAgentFallbackModalTitle": "Print Agent nicht erreichbar",
     "printAgentFallbackModalBody": "Die Kassa erhielt keine erfolgreiche Antwort vom Print Agent auf diesem PC (127.0.0.1:9742). Es folgt der Notfallweg: der normale Windows-Druckdialog. Das ist kein richtiger ESC/POS-Beleg wie über den Agent — auf einem Epson-Thermodrucker kann die Ausgabe winzig oder unleserlich sein. Zuerst den Agent reparieren (Tray → Einstellungen → richtigen Epson wählen → Speichern → Testbeleg). „Weiter“ nur als Notlösung.",
     "printAgentFallbackModalDownloadLink": "Downloadseite Print Agent (Windows)",
@@ -4853,9 +4847,7 @@
     "kassaNameAccountV2Hint": "Warenkorb → Auf Rechnung im Schnellmenü; Umsatz erst bei Zahlung. Aus = klassisches Betragsfeld.",
     "kassaNameAccountV2RequiresSub": "Submenü «Auf Rechnung» unter Kassa aktivieren (oder Vollpaket).",
     "kassaJetonEnabled": "Verzehrjetons (Kassa)",
-    "kassaJetonEnabledHint": "Jeton-Aufschlüsselung und Wechselgeld an der Kassa. Nur für Tenants mit physischen Jetons; standardmäßig aus.",
-    "kassaLanPrintEnabled": "iPad-Druck über LAN (WLAN → Print-PC)",
-    "kassaLanPrintEnabledHint": "iPads in Safari senden Bons an die IP des Windows Print Agent. Standard aus; andere Kassen unverändert."
+    "kassaJetonEnabledHint": "Jeton-Aufschlüsselung und Wechselgeld an der Kassa. Nur für Tenants mit physischen Jetons; standardmäßig aus."
   },
   "marketing": {
     "title": "E-Mail-Marketing",

@@ -3577,12 +3577,6 @@
     "cartBon": "小票",
     "cartBonTitle": "打印当前购物车预览小票（不结账）",
     "printAgain": "重新打印",
-    "lanPrintHostTitle": "打印 PC（iPad）",
-    "lanPrintHostLabel": "Windows Print Agent PC 的 IP",
-    "lanPrintHostHint": "仅 iPad：填写运行 Print Agent 的 PC 固定 IP（同一 WiFi）。PC 上仍用 localhost。",
-    "lanPrintHostSave": "在此设备保存 IP",
-    "lanPrintHostSaved": "已保存",
-    "lanPrintHostInvalid": "无效 IP（例如 192.168.1.50）。",
     "printAgentFallbackModalTitle": "无法连接 Print Agent",
     "printAgentFallbackModalBody": "此电脑上的 Print Agent（127.0.0.1:9742）未返回成功。将走应急流程：打开 Windows 标准“打印”对话框。这不是通过代理发送的 ESC/POS 小票；在爱普生热敏机上可能又小又乱。请先修复代理（托盘 → 设置 → 选择正确的爱普生 → 保存 → 测试打印）。仅在紧急时使用“继续”。",
     "printAgentFallbackModalDownloadLink": "Print Agent 下载页面（Windows）",
@@ -4830,9 +4824,7 @@
     "kassaNameAccountV2Hint": "购物车 → 快捷菜单挂账；仅付款时计入销售。关 = 经典手动金额。",
     "kassaNameAccountV2RequiresSub": "同时开启 Kassa 模块下的「挂账」子菜单（或完整套餐）。",
     "kassaJetonEnabled": "消费代币（收银）",
-    "kassaJetonEnabledHint": "收银台代币明细与找零。仅适用于实体代币租户；默认关闭。",
-    "kassaLanPrintEnabled": "iPad 局域网打印（WiFi → 打印 PC）",
-    "kassaLanPrintEnabledHint": "Safari 中的 iPad 将小票发往 Windows Print Agent 的 IP。默认关闭；其他收银台不变。"
+    "kassaJetonEnabledHint": "收银台代币明细与找零。仅适用于实体代币租户；默认关闭。"
   },
   "marketing": {
     "title": "电子邮件营销",

@@ -65,21 +65,19 @@ export default function SuperadminTenantModulesPage() {
   const [savingKassaNameAccountV2, setSavingKassaNameAccountV2] = useState(false)
   const [kassaJetonEnabled, setKassaJetonEnabled] = useState(false)
   const [savingKassaJetonEnabled, setSavingKassaJetonEnabled] = useState(false)
-  const [kassaLanPrintEnabled, setKassaLanPrintEnabled] = useState(false)
-  const [savingKassaLanPrintEnabled, setSavingKassaLanPrintEnabled] = useState(false)
 
   const loadData = useCallback(async () => {
     let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
       .select(
-        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled, kassa_lan_print_enabled',
+        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled',
       )
       .eq('tenant_slug', slug)
       .maybeSingle()
 
     if (
       settingsErr &&
-      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|kassa_lan_print_enabled|column .* does not exist|schema cache/i.test(
+      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|column .* does not exist|schema cache/i.test(
         settingsErr.message,
       )
     ) {
@@ -109,9 +107,6 @@ export default function SuperadminTenantModulesPage() {
     )
     setKassaJetonEnabled(
       (settings as { kassa_jeton_enabled?: boolean } | null)?.kassa_jeton_enabled === true,
-    )
-    setKassaLanPrintEnabled(
-      (settings as { kassa_lan_print_enabled?: boolean } | null)?.kassa_lan_print_enabled === true,
     )
 
     let { data: coreRow, error: coreErr } = await supabase
@@ -338,39 +333,6 @@ export default function SuperadminTenantModulesPage() {
                     }
                   })
                   .finally(() => setSavingKassaJetonEnabled(false))
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="mb-6 rounded-2xl border border-cyan-700/40 bg-cyan-950/30 p-5">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="font-semibold text-white">{t('superadminModules.kassaLanPrintEnabled')}</p>
-              <p className="mt-0.5 text-xs text-slate-400">{t('superadminModules.kassaLanPrintEnabledHint')}</p>
-            </div>
-            <ModuleSlider
-              checked={kassaLanPrintEnabled}
-              disabled={savingKassaLanPrintEnabled}
-              onChange={(on) => {
-                setKassaLanPrintEnabled(on)
-                setSavingKassaLanPrintEnabled(true)
-                void authFetch('/api/superadmin/tenants', {
-                  method: 'POST',
-                  body: JSON.stringify({
-                    action: 'update_kassa_lan_print_enabled',
-                    slug,
-                    kassaLanPrintEnabled: on,
-                  }),
-                })
-                  .then(async (res) => {
-                    if (!res.ok) {
-                      const json = await res.json().catch(() => ({}))
-                      setKassaLanPrintEnabled(!on)
-                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
-                    }
-                  })
-                  .finally(() => setSavingKassaLanPrintEnabled(false))
               }}
             />
           </div>

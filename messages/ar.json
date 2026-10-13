@@ -3577,12 +3577,6 @@
     "cartBon": "إيصال",
     "cartBonTitle": "طباعة إيصال مبدئي من السلة الحالية (بدون إتمام الدفع)",
     "printAgain": "طباعة مرة أخرى",
-    "lanPrintHostTitle": "PC الطباعة (iPad)",
-    "lanPrintHostLabel": "IP لـ Windows Print Agent",
-    "lanPrintHostHint": "على iPad فقط: IP ثابت للـ PC مع Print Agent (نفس WiFi). على PC يبقى localhost.",
-    "lanPrintHostSave": "حفظ IP على هذا الجهاز",
-    "lanPrintHostSaved": "تم الحفظ",
-    "lanPrintHostInvalid": "IP غير صالح (مثل 192.168.1.50).",
     "printAgentFallbackModalTitle": "تعذّر الوصول إلى Print Agent",
     "printAgentFallbackModalBody": "لم تصل الكاشيرة إلى استجابة صحيحة من Print Agent على هذا الجهاز (127.0.0.1:9742). يُفعّل مسار الطوارئ: نافذة الطباعة العادية في Windows. هذا ليس إيصال ESC/POS كما مع الوكيل — على Epson حرارية قد يصغر النص أو يصبح غير مقروء. أصلِح الوكيل أولاً (الصينية → الإعدادات → اختر Epson الصحيح → احفظ → اختبار). استخدم متابعة فقط كحل مؤقت.",
     "printAgentFallbackModalDownloadLink": "صفحة تنزيل Print Agent (Windows)",
@@ -4830,9 +4824,7 @@
     "kassaNameAccountV2Hint": "السلة → على الحساب في القائمة السريعة؛ الإيراد عند الدفع فقط. إيقاف = إدخال يدوي.",
     "kassaNameAccountV2RequiresSub": "فعّل أيضًا « على الحساب » ضمن Kassa (أو الحزمة الكاملة).",
     "kassaJetonEnabled": "رموز الاستهلاك (الكassa)",
-    "kassaJetonEnabledHint": "تفصيل الرموز والباقي عند الدفع. للمستأجرين برموز فعلية فقط؛ مغلق افتراضيًا.",
-    "kassaLanPrintEnabled": "طباعة iPad عبر LAN (WiFi → PC الطباعة)",
-    "kassaLanPrintEnabledHint": "iPad في Safari يرسل الإيصالات إلى IP لـ Windows Print Agent. مغلق افتراضيًا؛ باقي الكاشير دون تغيير."
+    "kassaJetonEnabledHint": "تفصيل الرموز والباقي عند الدفع. للمستأجرين برموز فعلية فقط؛ مغلق افتراضيًا."
   },
   "marketing": {
     "title": "التسويق عبر البريد الإلكتروني",

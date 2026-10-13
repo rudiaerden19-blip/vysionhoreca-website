@@ -1222,11 +1222,10 @@ function createApp(
   return app
 }
 
-function startServer(getPrintConfig, port = 9742, hooks = {}, bindAddress = '127.0.0.1') {
+function startServer(getPrintConfig, port = 9742, hooks = {}) {
   const app = createApp(getPrintConfig, hooks)
-  const host = bindAddress === '0.0.0.0' ? '0.0.0.0' : '127.0.0.1'
-  const srv = app.listen(port, host, () => {
-    console.log(`Vysion Print Agent luistert op http://${host}:${port}`)
+  const srv = app.listen(port, '127.0.0.1', () => {
+    console.log(`Vysion Print Agent luistert op http://127.0.0.1:${port}`)
   })
   // Robuuster: bij EADDRINUSE niet crashen — log netjes en blijf draaien zonder
   // server (de IPC-bridge in main.js werkt nog wel voor de Electron-kassa).

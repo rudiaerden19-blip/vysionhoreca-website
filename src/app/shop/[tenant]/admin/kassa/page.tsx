@@ -71,13 +71,7 @@ import {
   fetchPrintAgentHealth,
   printAgentHasDedicatedKitchenPrinter,
   openCashDrawer,
-  type VysionPrintAgentSendContext,
 } from '@/lib/vysion-print-agent-client'
-import {
-  isValidLanPrintHost,
-  readLanPrintHostForTenant,
-  writeLanPrintHostForTenant,
-} from '@/lib/kassa-lan-print'
 import { kassaShowsDrawerInsteadOfBtwBon } from '@/lib/kassa-footer-drawer'
 import {
   offlineDbLoadMenuSnapshot,
@@ -1779,24 +1773,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
   const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
-  const kassaLanPrintEnabled = tenantInfo?.kassa_lan_print_enabled === true
-  const printAgentSendContext = useMemo((): VysionPrintAgentSendContext => {
-    return {
-      lanPrintEnabled: kassaLanPrintEnabled,
-      tenantSlug: tenant,
-      tenantDefaultHost: tenantInfo?.kassa_lan_print_host ?? null,
-    }
-  }, [kassaLanPrintEnabled, tenant, tenantInfo?.kassa_lan_print_host])
-  const [lanPrintHostDraft, setLanPrintHostDraft] = useState('')
-  const [lanPrintHostSavedFlash, setLanPrintHostSavedFlash] = useState(false)
-  useEffect(() => {
-    if (!kassaLanPrintEnabled) return
-    const stored = readLanPrintHostForTenant(tenant)
-    if (stored) setLanPrintHostDraft(stored)
-    else if (tenantInfo?.kassa_lan_print_host) {
-      setLanPrintHostDraft(String(tenantInfo.kassa_lan_print_host))
-    }
-  }, [kassaLanPrintEnabled, tenant, tenantInfo?.kassa_lan_print_host])
   const kassaJetonDenoms = useMemo(
     () =>
       normalizeKassaJetonDenominations(
@@ -4522,7 +4498,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         website: tenantInfo?.website ?? undefined,
         vatRate: receiptVatRows[0]?.rate ?? fbVatRate,
       },
-    }, printAgentSendContext)
+    })
 
     /** Alleen bij Print-Agent-fout op PC: HTML voor noodafdruk. Tablet/kiosk: géén browser-print (Chrome → alleen PDF, kiosk valt om). */
     const receiptHtml = !printResult.ok
@@ -4698,7 +4674,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         let kitchenAvailable = false
         if (wantKitchen) {
-          const health = await fetchPrintAgentHealth(printAgentSendContext)
+          const health = await fetchPrintAgentHealth()
           kitchenAvailable = printAgentHasDedicatedKitchenPrinter(health)
         }
 
@@ -6042,7 +6018,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       className={kassaQuickMenuPanelBtnClass(true)}
                       onClick={() => {
                         playClick()
-                        void openCashDrawer(printAgentSendContext)
+                        void openCashDrawer()
                       }}
                     >
                       {label}
@@ -6632,7 +6608,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-open-drawer"
                 onClick={() => {
                   playClick()
-                  void openCashDrawer(printAgentSendContext)
+                  void openCashDrawer()
                 }}
                 className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
                   kassaChromeDensity,
@@ -6818,7 +6794,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-open-drawer-classic"
                 onClick={() => {
                   playClick()
-                  void openCashDrawer(printAgentSendContext)
+                  void openCashDrawer()
                 }}
                 className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
                   kassaLight
@@ -7467,45 +7443,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }}
         appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
-
-      {kassaLanPrintEnabled && (
-        <div
-          className="fixed bottom-3 left-3 z-[200] max-w-[min(100vw-1.5rem,22rem)] rounded-xl border border-cyan-500/40 bg-slate-900/95 p-3 text-white shadow-lg"
-          role="region"
-          aria-label={t('kassaApp.lanPrintHostTitle')}
-        >
-          <p className="text-xs font-bold text-cyan-200">{t('kassaApp.lanPrintHostTitle')}</p>
-          <p className="mt-1 text-[11px] leading-snug text-slate-300">{t('kassaApp.lanPrintHostHint')}</p>
-          <label className="mt-2 block text-[11px] font-semibold text-slate-200" htmlFor="lan-print-host">
-            {t('kassaApp.lanPrintHostLabel')}
-          </label>
-          <input
-            id="lan-print-host"
-            type="text"
-            inputMode="decimal"
-            autoComplete="off"
-            placeholder="192.168.1.50"
-            value={lanPrintHostDraft}
-            onChange={(e) => setLanPrintHostDraft(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-950 px-2 py-2 text-sm text-white"
-          />
-          <button
-            type="button"
-            className="mt-2 w-full rounded-lg bg-cyan-700 px-3 py-2 text-xs font-bold hover:bg-cyan-600"
-            onClick={() => {
-              if (!isValidLanPrintHost(lanPrintHostDraft)) {
-                alert(t('kassaApp.lanPrintHostInvalid'))
-                return
-              }
-              writeLanPrintHostForTenant(tenant, lanPrintHostDraft)
-              setLanPrintHostSavedFlash(true)
-              window.setTimeout(() => setLanPrintHostSavedFlash(false), 2500)
-            }}
-          >
-            {lanPrintHostSavedFlash ? t('kassaApp.lanPrintHostSaved') : t('kassaApp.lanPrintHostSave')}
-          </button>
-        </div>
-      )}
 
       {printAgentFallbackHtml !== null && (
         <div
