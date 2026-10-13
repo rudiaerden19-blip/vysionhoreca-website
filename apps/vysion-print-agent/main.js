@@ -48,6 +48,31 @@ let settingsWindow = null
 let kassaWindow = null
 let serverHandle = null
 
+function ensureWindowsLanFirewallRule(port) {
+  if (process.platform !== 'win32') return
+  if (config.lanListenEnabled !== true) return
+  try {
+    spawnSync(
+      'netsh',
+      [
+        'advfirewall',
+        'firewall',
+        'add',
+        'rule',
+        'name=Vysion Print Agent TCP 9742',
+        'dir=in',
+        'action=allow',
+        'protocol=TCP',
+        `localport=${port}`,
+        'profile=any',
+      ],
+      { windowsHide: true, encoding: 'utf8' },
+    )
+  } catch (e) {
+    console.warn('[firewall] poort', port, '— regel niet gezet:', e?.message || e)
+  }
+}
+
 function restartPrintServer() {
   if (serverHandle && typeof serverHandle.close === 'function') {
     try {
@@ -60,6 +85,7 @@ function restartPrintServer() {
   const port = config.port || PORT
   const bind = config.lanListenEnabled === true ? '0.0.0.0' : '127.0.0.1'
   serverHandle = startServer(getPrintConfig, port, {}, bind)
+  if (bind === '0.0.0.0') ensureWindowsLanFirewallRule(port)
 }
 let healthTimer = null
 let lastHealth = { ok: false, reason: 'starting…' }
