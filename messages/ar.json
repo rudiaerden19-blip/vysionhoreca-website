@@ -3609,6 +3609,7 @@
     "tapToView": "اضغط للعرض",
     "payTitle": "الدفع",
     "jetonPayTitle": "الرموز",
+    "jetonPayCash": "الدفع نقداً",
     "jetonOrderLabel": "الطلب",
     "jetonSuggestedPay": "المطلوب: {black} أسود + {white} أبيض",
     "jetonCustomerMustGiveLabel": "ما يجب أن يدفعه الزبون",

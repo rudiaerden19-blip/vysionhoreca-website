@@ -3609,6 +3609,7 @@
     "tapToView": "点击查看",
     "payTitle": "付款",
     "jetonPayTitle": "代币",
+    "jetonPayCash": "现金支付",
     "jetonOrderLabel": "订单",
     "jetonSuggestedPay": "应付: 黑 {black} + 白 {white}",
     "jetonCustomerMustGiveLabel": "顾客应付",

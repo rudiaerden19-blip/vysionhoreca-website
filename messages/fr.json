@@ -3109,6 +3109,7 @@
     "tapToView": "Appuyez pour voir",
     "payTitle": "Paiement",
     "jetonPayTitle": "Jetons",
+    "jetonPayCash": "Payer en espèces",
     "jetonOrderLabel": "Commande",
     "jetonSuggestedPay": "Exact : {black} noirs + {white} blancs",
     "jetonCustomerMustGiveLabel": "Le client doit donner",

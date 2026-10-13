@@ -3609,6 +3609,7 @@
     "tapToView": "タップして表示",
     "payTitle": "支払い",
     "jetonPayTitle": "トークン",
+    "jetonPayCash": "現金で支払う",
     "jetonOrderLabel": "注文",
     "jetonSuggestedPay": "必要: 黒 {black} + 白 {white}",
     "jetonCustomerMustGiveLabel": "お客様が渡す枚数",

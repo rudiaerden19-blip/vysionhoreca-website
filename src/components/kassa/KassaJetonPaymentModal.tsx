@@ -90,6 +90,7 @@ export function KassaJetonPaymentModal({
   onClose,
   onConfirm,
   onSwitchSalePoint,
+  onPayCash,
   onOpenCashCardPay,
 }: {
   open: boolean
@@ -101,6 +102,8 @@ export function KassaJetonPaymentModal({
   onClose: () => void
   onConfirm: () => void
   onSwitchSalePoint: (next: KassaJetonSalePoint) => void
+  /** Uitzondering dancing: klant betaalt contant i.p.v. jetons. */
+  onPayCash: () => void
   onOpenCashCardPay: () => void
 }) {
   const { t } = useLanguage()
@@ -165,6 +168,15 @@ export function KassaJetonPaymentModal({
         </div>
 
         <div className="space-y-4 p-5">
+          <button
+            type="button"
+            disabled={payBusy}
+            onClick={onPayCash}
+            className="w-full rounded-xl border-2 border-emerald-500/80 bg-emerald-950/50 py-3 text-base font-bold text-emerald-300 disabled:opacity-40"
+          >
+            {t('kassaApp.jetonPayCash')}
+          </button>
+
           <div className="flex flex-wrap gap-2">
             <button
               type="button"

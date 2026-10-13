@@ -3609,6 +3609,7 @@
     "tapToView": "Toca para ver",
     "payTitle": "Pago",
     "jetonPayTitle": "Fichas",
+    "jetonPayCash": "Pagar en efectivo",
     "jetonOrderLabel": "Pedido",
     "jetonSuggestedPay": "Exacto: {black} negras + {white} blancas",
     "jetonCustomerMustGiveLabel": "El cliente debe dar",

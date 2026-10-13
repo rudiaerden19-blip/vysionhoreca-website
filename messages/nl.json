@@ -4250,6 +4250,7 @@
     "tapToView": "Tik hier om te bekijken",
     "payTitle": "Betalen",
     "jetonPayTitle": "Jetons",
+    "jetonPayCash": "Cash betalen",
     "jetonOrderLabel": "Bestelling",
     "jetonSuggestedPay": "Passend: {black} zwarte + {white} witte jetons",
     "jetonCustomerMustGiveLabel": "Klant moet geven",

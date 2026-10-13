@@ -4250,6 +4250,7 @@
     "tapToView": "Tap here to view",
     "payTitle": "Payment",
     "jetonPayTitle": "Tokens",
+    "jetonPayCash": "Pay cash",
     "jetonOrderLabel": "Order",
     "jetonSuggestedPay": "Exact: {black} black + {white} white tokens",
     "jetonCustomerMustGiveLabel": "Customer must give",
