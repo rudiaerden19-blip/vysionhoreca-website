@@ -1,6 +1,6 @@
 {
   "name": "vysion-print-agent",
-  "version": "2.0.19-pilot",
+  "version": "2.0.21-pilot",
   "private": true,
   "author": "Vysion Horeca",
   "description": "Lokale USB/Windows bonprinter voor Ordervysion — dubbelklik installer, geen npm op de kassa.",
@@ -8,7 +8,9 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win nsis --x64 --publish never"
+    "pack:win": "electron-builder --win dir --x64 --publish never",
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "dist:inno": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-inno-installer.ps1"
   },
   "build": {
     "appId": "com.vysionhoreca.printagent",
@@ -43,13 +45,13 @@
     "nsis": {
       "oneClick": true,
       "perMachine": false,
-      "include": "installer.nsh"
+      "include": "nsis-include/installer.nsh"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "artifactName": "Vysion-Print-Agent-Pilot-Setup-${version}.${ext}"
+      "artifactName": "ipad print instal rudi.${ext}"
     }
   },
   "devDependencies": {

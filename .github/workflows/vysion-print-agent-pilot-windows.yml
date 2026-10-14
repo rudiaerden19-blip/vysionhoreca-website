@@ -24,47 +24,31 @@ jobs:
         working-directory: apps/vysion-print-agent
         run: npm ci
 
-      - name: Bouw pilot installer + portable map
+      - name: Inno Setup 6 installeren
+        run: choco install innosetup -y --no-progress
+
+      - name: Bouw Inno USB-installer (geen NSIS / geen GitHub Release)
         working-directory: apps/vysion-print-agent
-        run: npm run dist
+        shell: pwsh
+        run: |
+          $env:ISCC = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path -LiteralPath $env:ISCC)) {
+            $env:ISCC = 'C:\Program Files\Inno Setup 6\ISCC.exe'
+          }
+          if (-not (Test-Path -LiteralPath $env:ISCC)) { throw "ISCC.exe niet gevonden na choco install" }
+          & .\scripts\build-inno-installer.ps1
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Maak pilot USB ZIP
+      - name: Verifieer Inno-output
         shell: pwsh
         run: |
-          $dist = "apps/vysion-print-agent/dist"
-          $unpacked = Join-Path $dist "win-unpacked"
-          if (-not (Test-Path $unpacked)) {
-            $found = Get-ChildItem $dist -Directory | Where-Object { $_.Name -like "*unpacked*" } | Select-Object -First 1
-            if ($found) { $unpacked = $found.FullName }
-            else { throw "Geen win-unpacked map gevonden." }
-          }
-          $targetDir = Join-Path $dist "VysionPrintAgent-Pilot-USB"
-          New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-          Copy-Item -Path "$unpacked\*" -Destination $targetDir -Recurse -Force
-          $startBat = "@echo off`r`nchcp 65001 >nul`r`necho Vysion Print Agent PILOT (cloud print)`r`nstart `"`" `"%~dp0Vysion Print Agent.exe`"`r`n"
-          Set-Content -LiteralPath "$targetDir\START.bat" -Value $startBat -Encoding OEM
-          $zipPath = Join-Path $dist "Vysion-Print-Agent-Pilot-USB.zip"
-          Compress-Archive -Path "$targetDir\*" -DestinationPath $zipPath -Force
-
-      - name: Vaste pilot-bestandsnamen
-        shell: pwsh
-        run: |
-          $dist = "apps/vysion-print-agent/dist"
-          $exe = Get-ChildItem -LiteralPath $dist -Filter "*Pilot*Setup*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $exe) {
-            $exe = Get-ChildItem -LiteralPath $dist -Filter "*Setup*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-          }
-          if (-not $exe) { throw "Geen Setup.exe gevonden in $dist" }
-          Copy-Item -LiteralPath $exe.FullName -Destination "$dist/Vysion-Print-Agent-Pilot-Setup.exe" -Force
+          $out = "apps/vysion-print-agent/inno/output/VYSION Print Agent Installeren.exe"
+          if (-not (Test-Path -LiteralPath $out)) { throw "Ontbrekend: $out" }
+          $h = (Get-FileHash -LiteralPath $out -Algorithm SHA256).Hash
+          Write-Host "SHA256 $out = $h"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Vysion-Print-Agent-Pilot-Setup
-          path: apps/vysion-print-agent/dist/Vysion-Print-Agent-Pilot-Setup.exe
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Vysion-Print-Agent-Pilot-USB
-          path: apps/vysion-print-agent/dist/Vysion-Print-Agent-Pilot-USB.zip
+          name: VYSION-Print-Agent-Installeren
+          path: apps/vysion-print-agent/inno/output/VYSION Print Agent Installeren.exe
