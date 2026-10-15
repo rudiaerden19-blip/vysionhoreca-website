@@ -4858,7 +4858,9 @@
     "kassaJetonEnabled": "Verzehrjetons (Kassa)",
     "kassaJetonEnabledHint": "Jeton-Aufschlüsselung und Wechselgeld an der Kassa. Nur für Tenants mit physischen Jetons; standardmäßig aus.",
     "kassaLanPrintEnabled": "iPad-Druck über LAN (WLAN → Print-PC)",
-    "kassaLanPrintEnabledHint": "iPads in Safari senden Bons an die IP des Windows Print Agent. Standard aus; andere Kassen unverändert."
+    "kassaLanPrintEnabledHint": "iPads in Safari senden Bons an die IP des Windows Print Agent. Standard aus; andere Kassen unverändert.",
+    "kassaThermalPrintDisabled": "Kasse ohne Bondrucker (kein Bon / kein Druck-UI)",
+    "kassaThermalPrintDisabledHint": "Nur dieser Mandant: kein Thermobon, kein Print Agent, keine Druckfehler. Standard aus — alle anderen Kassen drucken normal."
   },
   "marketing": {
     "title": "E-Mail-Marketing",

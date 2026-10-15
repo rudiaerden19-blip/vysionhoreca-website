@@ -80,6 +80,7 @@ import {
   writeLanPrintHostForTenant,
 } from '@/lib/kassa-lan-print'
 import { kassaShowsDrawerInsteadOfBtwBon } from '@/lib/kassa-footer-drawer'
+import { isKassaThermalPrintDisabled } from '@/lib/kassa-thermal-print-disabled'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -1782,6 +1783,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
   const kassaLanPrintEnabled = tenantInfo?.kassa_lan_print_enabled === true
   const kassaCloudPrintEnabled = tenantInfo?.kassa_cloud_print_enabled === true
+  const kassaThermalPrintDisabled = isKassaThermalPrintDisabled(tenantInfo)
   const printAgentSendContext = useMemo((): VysionPrintAgentSendContext => {
     return {
       lanPrintEnabled: kassaLanPrintEnabled,
@@ -4230,11 +4232,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     },
   ) => {
     if (!order) {
-      setThermalPrintBanner({
-        variant: 'error',
-        message: 'Geen bon om te printen. Sluit dit bericht en probeer opnieuw.',
-      })
+      if (!kassaThermalPrintDisabled) {
+        setThermalPrintBanner({
+          variant: 'error',
+          message: 'Geen bon om te printen. Sluit dit bericht en probeer opnieuw.',
+        })
+      }
       return
+    }
+    if (kassaThermalPrintDisabled) {
+      if (opts?.barWatermarkCommit) {
+        try {
+          const { slotKey, row } = opts.barWatermarkCommit
+          const st = loadBarBonWatermarks(tenant)
+          st[slotKey] = row
+          saveBarBonWatermarks(tenant, st)
+        } catch {
+          /* ignore */
+        }
+      }
+      return true
     }
     const isVatInvoice = !!opts?.vatInvoice
     const isDraft = !!opts?.draft && !isVatInvoice
@@ -4671,11 +4688,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     showSuccessModal && lastOrder ? kassaPaidReceiptGuardKey(lastOrder) : null
 
   useEffect(() => {
+    if (kassaThermalPrintDisabled) return
     if (!paidReceiptAutoPrintKey || !lastOrder) return
     if (autoPrintPaidReceiptKeyRef.current === paidReceiptAutoPrintKey) return
     autoPrintPaidReceiptKeyRef.current = paidReceiptAutoPrintKey
     void printReceipt(lastOrder)
-  }, [paidReceiptAutoPrintKey, lastOrder])
+  }, [paidReceiptAutoPrintKey, lastOrder, kassaThermalPrintDisabled])
 
   flushBarDeltaSlipRef.current = (zone, tblNr, fullTableLines, slipOpts) => {
     void (async () => {
@@ -4687,6 +4705,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (barDeltaSlotInflightRef.current[slotKey]) return
       barDeltaSlotInflightRef.current[slotKey] = true
       try {
+        if (kassaThermalPrintDisabled) {
+          const store = loadBarBonWatermarks(tenant)
+          const rawPrev = store[slotKey]
+          const prev =
+            rawPrev != null && typeof rawPrev === 'object' && !Array.isArray(rawPrev)
+              ? (rawPrev as Record<string, number>)
+              : {}
+          const { nextWatermark } = computeBarBonDelta(fullTableLines, prev)
+          store[slotKey] = nextWatermark
+          saveBarBonWatermarks(tenant, store)
+          return
+        }
         const store = loadBarBonWatermarks(tenant)
         const rawPrev = store[slotKey]
         const prev =
@@ -4769,6 +4799,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    */
   const printDraftBonFromCart = async (opts?: { draftCopies?: 1 | 2 }) => {
     if (draftBonLineItems.length === 0) return
+    if (kassaThermalPrintDisabled) return
     try {
       setDraftBonPrinting(true)
       playClick()
@@ -4819,6 +4850,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const printStaffClockSalesSummary = async () => {
     if (!staffClockSummary) return
+    if (kassaThermalPrintDisabled) return
     playClick()
     const s = staffClockSummary
     const biz = tenantInfo
@@ -6660,7 +6692,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <div
               className={`grid grid-cols-3 touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-3'}`}
             >
-              {kassaFooterDrawerButton ? (
+              {kassaThermalPrintDisabled ? (
+              <span className="min-h-0" aria-hidden />
+              ) : kassaFooterDrawerButton ? (
               <button
                 type="button"
                 data-testid="kassa-open-drawer"
@@ -6707,6 +6741,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.btwBon')}</span>
               </button>
               )}
+              {!kassaThermalPrintDisabled ? (
               <button
                 type="button"
                 onClick={() => {
@@ -6722,6 +6757,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.cartBon')}</span>
               </button>
+              ) : (
+              <span className="min-h-0" aria-hidden />
+              )}
               <button
                 type="button"
                 onClick={clearCart}
@@ -6738,6 +6776,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
             {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
               <div className="flex w-full gap-2.5 touch-manipulation select-none" data-testid="kassa-park-table-split">
+                {kassaThermalPrintDisabled ? (
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: false, printKassaSlip: false })}
+                  title={t('kassaApp.parkTableAdd')}
+                  aria-label={t('kassaApp.parkTableAdd')}
+                  className={`w-full font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
+                    kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
+                  }`}
+                >
+                  {t('kassaApp.parkTableAdd')}
+                </button>
+                ) : (
+                <>
                 <button
                   type="button"
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
@@ -6763,6 +6815,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {t('kassaApp.parkTableAddPrint')}
                   </span>
                 </button>
+                </>
+                )}
               </div>
             )}
             <div className={`flex touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-2.5'}`}>
@@ -6846,7 +6900,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 touch-manipulation select-none">
-              {kassaFooterDrawerButton ? (
+              {kassaThermalPrintDisabled ? (
+              <span className="min-h-0" aria-hidden />
+              ) : kassaFooterDrawerButton ? (
               <button
                 type="button"
                 data-testid="kassa-open-drawer-classic"
@@ -6901,6 +6957,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className="text-center text-xs font-bold">{t('kassaApp.btwBon')}</span>
               </button>
               )}
+              {!kassaThermalPrintDisabled ? (
               <button
                 type="button"
                 onClick={() => { void printDraftBonFromCart({ draftCopies: 1 }) }}
@@ -6916,6 +6973,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className="text-center text-xs font-bold">{t('kassaApp.cartBon')}</span>
               </button>
+              ) : (
+              <span className="min-h-0" aria-hidden />
+              )}
               <button
                 type="button"
                 onClick={clearCart}
@@ -6930,6 +6990,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
             {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
               <div className="flex w-full gap-2 touch-manipulation select-none" data-testid="kassa-park-table-split">
+                {kassaThermalPrintDisabled ? (
+                <button
+                  type="button"
+                  onClick={() => parkOrder({ printKitchen: false, printKassaSlip: false })}
+                  title={t('kassaApp.parkTableAdd')}
+                  aria-label={t('kassaApp.parkTableAdd')}
+                  className={`w-full rounded-xl px-2 py-2.5 text-center text-xs font-bold active:brightness-95 ${
+                    kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_ACTION_BTN_FACE
+                  } ${kassaFooterActionTouchMinHClass(
+                    kassaChromeDensity,
+                    kassaSidebarFooterTier === 'dense',
+                  )}`}
+                >
+                  {t('kassaApp.parkTableAdd')}
+                </button>
+                ) : (
+                <>
                 <button
                   type="button"
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
@@ -6961,6 +7038,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     {t('kassaApp.parkTableAddPrint')}
                   </span>
                 </button>
+                </>
+                )}
               </div>
             )}
             <div className="flex gap-2.5 touch-manipulation select-none">
@@ -7502,7 +7581,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         appearance={kassaAppearanceDark ? 'dark': 'light'}
       />
 
-      {kassaLanPrintEnabled && !lanPrintHostConfigured && !lanPrintSetupPanelOpen && (
+      {kassaLanPrintEnabled && !kassaThermalPrintDisabled && !lanPrintHostConfigured && !lanPrintSetupPanelOpen && (
         <button
           type="button"
           className="fixed bottom-3 left-3 z-[200] rounded-lg border border-cyan-500/30 bg-slate-900/90 px-2 py-1 text-[10px] font-semibold text-cyan-200 shadow-md hover:bg-slate-800"
@@ -7511,7 +7590,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {t('kassaApp.lanPrintHostReopen')}
         </button>
       )}
-      {kassaLanPrintEnabled && lanPrintSetupPanelOpen && (
+      {kassaLanPrintEnabled && !kassaThermalPrintDisabled && lanPrintSetupPanelOpen && (
         <div
           className="fixed bottom-3 left-3 z-[200] max-w-[min(100vw-1.5rem,22rem)] rounded-xl border border-cyan-500/40 bg-slate-900/95 p-3 text-white shadow-lg"
           role="region"
@@ -7562,7 +7641,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
 
-      {printAgentFallbackHtml !== null && (
+      {printAgentFallbackHtml !== null && !kassaThermalPrintDisabled && (
         <div
           className="fixed inset-0 z-[220] flex items-center justify-center bg-black/55 p-4"
           role="dialog"
@@ -7616,7 +7695,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
 
-      {thermalPrintBanner && (
+      {thermalPrintBanner && !kassaThermalPrintDisabled && (
         <div
           className="fixed inset-x-2 bottom-2 z-[400] max-h-[45vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-left text-white shadow-xl sm:inset-x-6"
           role="alert"
@@ -7652,6 +7731,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             setShowSuccessModal(false)
             autoPrintPaidReceiptKeyRef.current = null
           }}
+          showPrintButton={!kassaThermalPrintDisabled}
           printDisabled={
             successReceiptPrintBusy ||
             (lastOrder.orderNumber <= 0 &&

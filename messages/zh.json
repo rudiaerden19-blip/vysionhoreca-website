@@ -4835,7 +4835,9 @@
     "kassaJetonEnabled": "消费代币（收银）",
     "kassaJetonEnabledHint": "收银台代币明细与找零。仅适用于实体代币租户；默认关闭。",
     "kassaLanPrintEnabled": "iPad 局域网打印（WiFi → 打印 PC）",
-    "kassaLanPrintEnabledHint": "Safari 中的 iPad 将小票发往 Windows Print Agent 的 IP。默认关闭；其他收银台不变。"
+    "kassaLanPrintEnabledHint": "Safari 中的 iPad 将小票发往 Windows Print Agent 的 IP。默认关闭；其他收银台不变。",
+    "kassaThermalPrintDisabled": "收银台无小票打印机（不打印 / 无打印界面）",
+    "kassaThermalPrintDisabledHint": "仅该租户：无热敏小票、无 Print Agent、无打印错误提示。默认关闭—其他门店正常打印。"
   },
   "marketing": {
     "title": "电子邮件营销",

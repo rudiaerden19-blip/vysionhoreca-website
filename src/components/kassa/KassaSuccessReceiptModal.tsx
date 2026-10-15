@@ -20,6 +20,7 @@ export function KassaSuccessReceiptModal({
   onClose,
   onPrint,
   printDisabled = false,
+  showPrintButton = true,
   footerActions = 'print-close',
   onEmail,
   emailDisabled = false,
@@ -36,6 +37,8 @@ export function KassaSuccessReceiptModal({
   onPrint: () => Promise<void>
   /** Voorkom dubbeltik tijdens print / guard-ref sync. */
   printDisabled?: boolean
+  /** false = geen printknop (superadmin: kassa zonder bonprinter). */
+  showPrintButton?: boolean
   /** Winkelkassa: afdrukken + naar mail + sluiten. */
   footerActions?: 'print-close' |  'print-email-close'
   onEmail?: () => Promise<void>
@@ -310,6 +313,7 @@ export function KassaSuccessReceiptModal({
         </div>
 
         <div className="flex flex-col items-center gap-2 border-t p-4">
+          {showPrintButton ? (
           <button
             type="button"
             disabled={anyBusy}
@@ -348,6 +352,7 @@ export function KassaSuccessReceiptModal({
               <span>{t('kassaReceipt.print')}</span>
             )}
           </button>
+          ) : null}
           {footerActions === 'print-email-close' && onEmail ? (
             <button
               type="button"

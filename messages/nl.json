@@ -3548,7 +3548,9 @@
     "kassaJetonEnabled": "Consumptiejetons (kassa)",
     "kassaJetonEnabledHint": "Jeton-breakdown en wisselgeld op kassa. Alleen voor tenants met fysieke jetons; standaard uit.",
     "kassaLanPrintEnabled": "iPad print via LAN (WiFi → print-PC)",
-    "kassaLanPrintEnabledHint": "iPads in Safari sturen bonnen naar het IP van de Windows Print Agent. Standaard uit; andere kassa's ongewijzigd."
+    "kassaLanPrintEnabledHint": "iPads in Safari sturen bonnen naar het IP van de Windows Print Agent. Standaard uit; andere kassa's ongewijzigd.",
+    "kassaThermalPrintDisabled": "Kassa zonder bonprinter (geen bon / geen printscherm)",
+    "kassaThermalPrintDisabledHint": "Alleen deze tenant: geen thermische bon, geen Print Agent, geen print-foutmeldingen. Standaard uit — alle andere zaken printen normaal."
   },
   "marketing": {
     "title": "Email Marketing",

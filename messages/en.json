@@ -3548,7 +3548,9 @@
     "kassaJetonEnabled": "Consumption tokens (POS)",
     "kassaJetonEnabledHint": "Token breakdown and change on POS. For tenants with physical tokens only; off by default.",
     "kassaLanPrintEnabled": "iPad print via LAN (WiFi → print PC)",
-    "kassaLanPrintEnabledHint": "iPads in Safari send receipts to the Windows Print Agent IP. Off by default; other tills unchanged."
+    "kassaLanPrintEnabledHint": "iPads in Safari send receipts to the Windows Print Agent IP. Off by default; other tills unchanged.",
+    "kassaThermalPrintDisabled": "Till without receipt printer (no receipt / no print UI)",
+    "kassaThermalPrintDisabledHint": "This tenant only: no thermal receipt, no Print Agent, no print error banners. Off by default — all other sites print as usual."
   },
   "marketing": {
     "title": "Email Marketing",

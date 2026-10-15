@@ -67,19 +67,21 @@ export default function SuperadminTenantModulesPage() {
   const [savingKassaJetonEnabled, setSavingKassaJetonEnabled] = useState(false)
   const [kassaLanPrintEnabled, setKassaLanPrintEnabled] = useState(false)
   const [savingKassaLanPrintEnabled, setSavingKassaLanPrintEnabled] = useState(false)
+  const [kassaThermalPrintDisabled, setKassaThermalPrintDisabled] = useState(false)
+  const [savingKassaThermalPrintDisabled, setSavingKassaThermalPrintDisabled] = useState(false)
 
   const loadData = useCallback(async () => {
     let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
       .select(
-        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled, kassa_lan_print_enabled',
+        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled, kassa_lan_print_enabled, kassa_thermal_print_disabled',
       )
       .eq('tenant_slug', slug)
       .maybeSingle()
 
     if (
       settingsErr &&
-      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|kassa_lan_print_enabled|column .* does not exist|schema cache/i.test(
+      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|kassa_lan_print_enabled|kassa_thermal_print_disabled|column .* does not exist|schema cache/i.test(
         settingsErr.message,
       )
     ) {
@@ -112,6 +114,9 @@ export default function SuperadminTenantModulesPage() {
     )
     setKassaLanPrintEnabled(
       (settings as { kassa_lan_print_enabled?: boolean } | null)?.kassa_lan_print_enabled === true,
+    )
+    setKassaThermalPrintDisabled(
+      (settings as { kassa_thermal_print_disabled?: boolean } | null)?.kassa_thermal_print_disabled === true,
     )
 
     let { data: coreRow, error: coreErr } = await supabase
@@ -371,6 +376,39 @@ export default function SuperadminTenantModulesPage() {
                     }
                   })
                   .finally(() => setSavingKassaLanPrintEnabled(false))
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-amber-700/40 bg-amber-950/30 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">{t('superadminModules.kassaThermalPrintDisabled')}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{t('superadminModules.kassaThermalPrintDisabledHint')}</p>
+            </div>
+            <ModuleSlider
+              checked={kassaThermalPrintDisabled}
+              disabled={savingKassaThermalPrintDisabled}
+              onChange={(on) => {
+                setKassaThermalPrintDisabled(on)
+                setSavingKassaThermalPrintDisabled(true)
+                void authFetch('/api/superadmin/tenants', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    action: 'update_kassa_thermal_print_disabled',
+                    slug,
+                    kassaThermalPrintDisabled: on,
+                  }),
+                })
+                  .then(async (res) => {
+                    if (!res.ok) {
+                      const json = await res.json().catch(() => ({}))
+                      setKassaThermalPrintDisabled(!on)
+                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+                    }
+                  })
+                  .finally(() => setSavingKassaThermalPrintDisabled(false))
               }}
             />
           </div>

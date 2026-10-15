@@ -4858,7 +4858,9 @@
     "kassaJetonEnabled": "Jetons de consommation (caisse)",
     "kassaJetonEnabledHint": "Répartition jetons et monnaie à la caisse. Uniquement pour les tenants avec jetons physiques ; désactivé par défaut.",
     "kassaLanPrintEnabled": "Impression iPad via LAN (Wi‑Fi → PC d’impression)",
-    "kassaLanPrintEnabledHint": "Les iPads dans Safari envoient les tickets à l’IP du Print Agent Windows. Désactivé par défaut ; autres caisses inchangées."
+    "kassaLanPrintEnabledHint": "Les iPads dans Safari envoient les tickets à l’IP du Print Agent Windows. Désactivé par défaut ; autres caisses inchangées.",
+    "kassaThermalPrintDisabled": "Caisse sans imprimante ticket (pas de ticket / pas d’UI d’impression)",
+    "kassaThermalPrintDisabledHint": "Ce tenant uniquement : pas de ticket thermique, pas de Print Agent, pas d’alertes d’impression. Désactivé par défaut — les autres sites impriment normalement."
   },
   "marketing": {
     "title": "Marketing par Email",

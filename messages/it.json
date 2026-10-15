@@ -4835,7 +4835,9 @@
     "kassaJetonEnabled": "Gettoni consumo (cassa)",
     "kassaJetonEnabledHint": "Calcolo gettoni e resto in cassa. Solo tenant con gettoni fisici; disattivato di default.",
     "kassaLanPrintEnabled": "Stampa iPad via LAN (WiFi → PC di stampa)",
-    "kassaLanPrintEnabledHint": "Gli iPad in Safari inviano scontrini all’IP del Print Agent Windows. Disattivato di default; altre casse invariate."
+    "kassaLanPrintEnabledHint": "Gli iPad in Safari inviano scontrini all’IP del Print Agent Windows. Disattivato di default; altre casse invariate.",
+    "kassaThermalPrintDisabled": "Cassa senza stampante scontrini (niente scontrino / niente UI stampa)",
+    "kassaThermalPrintDisabledHint": "Solo questo tenant: niente scontrino termico, niente Print Agent, niente errori di stampa. Disattivato di default — le altre sedi stampano normalmente."
   },
   "marketing": {
     "title": "Email Marketing",

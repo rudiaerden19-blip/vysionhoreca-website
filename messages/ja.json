@@ -4835,7 +4835,9 @@
     "kassaJetonEnabled": "消費トークン（レジ）",
     "kassaJetonEnabledHint": "レジでトークン内訳とお釣り。物理トークン利用テナントのみ。既定はオフ。",
     "kassaLanPrintEnabled": "iPad LAN印刷（WiFi → 印刷PC）",
-    "kassaLanPrintEnabledHint": "SafariのiPadからWindows Print AgentのIPへ送信。既定オフ。他レジは変更なし。"
+    "kassaLanPrintEnabledHint": "SafariのiPadからWindows Print AgentのIPへ送信。既定オフ。他レジは変更なし。",
+    "kassaThermalPrintDisabled": "レシートプリンターなし（印刷なし／印刷UIなし）",
+    "kassaThermalPrintDisabledHint": "このテナントのみ：感熱レシート・Print Agent・印刷エラー表示なし。既定オフ—他店舗は通常どおり印刷。"
   },
   "marketing": {
     "title": "メールマーケティング",

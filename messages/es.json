@@ -4835,7 +4835,9 @@
     "kassaJetonEnabled": "Fichas de consumo (TPV)",
     "kassaJetonEnabledHint": "Desglose de fichas y cambio en caja. Solo tenants con fichas físicas; desactivado por defecto.",
     "kassaLanPrintEnabled": "Impresión iPad por LAN (WiFi → PC de impresión)",
-    "kassaLanPrintEnabledHint": "Los iPads en Safari envían tickets a la IP del Print Agent de Windows. Desactivado por defecto; otras cajas sin cambios."
+    "kassaLanPrintEnabledHint": "Los iPads en Safari envían tickets a la IP del Print Agent de Windows. Desactivado por defecto; otras cajas sin cambios.",
+    "kassaThermalPrintDisabled": "Caja sin impresora de tickets (sin ticket / sin UI de impresión)",
+    "kassaThermalPrintDisabledHint": "Solo este tenant: sin ticket térmico, sin Print Agent, sin avisos de impresión. Desactivado por defecto; el resto imprime con normalidad."
   },
   "marketing": {
     "title": "Marketing por Email",

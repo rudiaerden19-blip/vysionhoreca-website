@@ -4835,7 +4835,9 @@
     "kassaJetonEnabled": "رموز الاستهلاك (الكassa)",
     "kassaJetonEnabledHint": "تفصيل الرموز والباقي عند الدفع. للمستأجرين برموز فعلية فقط؛ مغلق افتراضيًا.",
     "kassaLanPrintEnabled": "طباعة iPad عبر LAN (WiFi → PC الطباعة)",
-    "kassaLanPrintEnabledHint": "iPad في Safari يرسل الإيصالات إلى IP لـ Windows Print Agent. مغلق افتراضيًا؛ باقي الكاشير دون تغيير."
+    "kassaLanPrintEnabledHint": "iPad في Safari يرسل الإيصالات إلى IP لـ Windows Print Agent. مغلق افتراضيًا؛ باقي الكاشير دون تغيير.",
+    "kassaThermalPrintDisabled": "كاشير بدون طابعة إيصالات (لا إيصال / لا واجهة طباعة)",
+    "kassaThermalPrintDisabledHint": "هذا المستأجر فقط: لا إيصال حراري، لا Print Agent، لا تنبيهات طباعة. مغلق افتراضيًا — باقي المواقع تطبع كالمعتاد."
   },
   "marketing": {
     "title": "التسويق عبر البريد الإلكتروني",
