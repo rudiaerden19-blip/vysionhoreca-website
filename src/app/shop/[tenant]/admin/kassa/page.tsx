@@ -2763,6 +2763,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }>({ key: null, inFlight: false, printedOkOnce: false })
   /** Eén auto-bon per afgeronde verkoop (zelfde sleutel als print-dedupe). */
   const autoPrintPaidReceiptKeyRef = useRef<string | null>(null)
+  /** Jeton quick flow: na sluiten lastOrder wissen zodat succes niet opnieuw flitst. */
+  const clearLastOrderOnSuccessCloseRef = useRef(false)
+  const closeSuccessReceiptModal = useCallback(() => {
+    setShowSuccessModal(false)
+    autoPrintPaidReceiptKeyRef.current = null
+    if (clearLastOrderOnSuccessCloseRef.current) {
+      clearLastOrderOnSuccessCloseRef.current = false
+      setLastOrder(null)
+    }
+  }, [])
 
   const draftReceiptPrintGuardRef = useRef<{
     inFlight: boolean
@@ -4057,11 +4067,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     let holdLockUntilCartClears = false
     const dismissUnsavedReceipt = () => {
+      clearLastOrderOnSuccessCloseRef.current = false
       setShowSuccessModal(false)
+      setLastOrder(null)
       setCustomerDisplayThankYou(null)
     }
 
     showKlantschermThankYou(total)
+
+    clearLastOrderOnSuccessCloseRef.current =
+      method === 'JETON' && kassaJetonQuickSuccess
 
     flushSync(() => {
       setLastOrder({
@@ -4688,22 +4703,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const paidReceiptAutoPrintKey =
     showSuccessModal && lastOrder ? kassaPaidReceiptGuardKey(lastOrder) : null
-
-  useEffect(() => {
-    if (!showSuccessModal || !kassaJetonQuickSuccess || !lastOrder) return
-    if (String(lastOrder.paymentMethod || '').toUpperCase() !== 'JETON') return
-    const timer = window.setTimeout(() => {
-      setShowSuccessModal(false)
-      autoPrintPaidReceiptKeyRef.current = null
-    }, 3000)
-    return () => window.clearTimeout(timer)
-  }, [
-    showSuccessModal,
-    kassaJetonQuickSuccess,
-    lastOrder?.paymentMethod,
-    lastOrder?.kassaClientUuid,
-    lastOrder?.checkoutReference,
-  ])
 
   useEffect(() => {
     if (kassaThermalPrintDisabled) return
@@ -7746,10 +7745,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           order={lastOrder}
           tenantInfo={tenantInfo}
           locale={locale}
-          onClose={() => {
-            setShowSuccessModal(false)
-            autoPrintPaidReceiptKeyRef.current = null
-          }}
+          onClose={closeSuccessReceiptModal}
+          autoCloseAfterMs={
+            kassaJetonQuickSuccess &&
+            String(lastOrder.paymentMethod || '').toUpperCase() === 'JETON'
+              ? 3000
+              : undefined
+          }
           showPrintButton={!kassaThermalPrintDisabled && !kassaJetonQuickSuccess}
           printDisabled={
             successReceiptPrintBusy ||
@@ -7758,7 +7760,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               !lastOrder.kassaClientUuid)
           }
           onPrint={async () => {
-            setShowSuccessModal(false)
+            closeSuccessReceiptModal()
             try {
               setSuccessReceiptPrintBusy(true)
               await printReceipt(lastOrder)

@@ -8,7 +8,7 @@ import { useLanguage } from '@/i18n'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 import { formatEan13Display } from '@/lib/retail-kassa/receipt-ticket-barcode'
 import { buildEan13BarcodeSvg } from '@/lib/retail-loyalty/ean13-barcode-svg'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { RetailReceiptPaper } from '@/components/retail-kassa/RetailReceiptPaper'
 import type { RetailReceiptI18n } from '@/lib/retail-kassa-receipt'
 
@@ -21,6 +21,7 @@ export function KassaSuccessReceiptModal({
   onPrint,
   printDisabled = false,
   showPrintButton = true,
+  autoCloseAfterMs,
   footerActions = 'print-close',
   onEmail,
   emailDisabled = false,
@@ -39,6 +40,8 @@ export function KassaSuccessReceiptModal({
   printDisabled?: boolean
   /** false = geen printknop (superadmin: kassa zonder bonprinter). */
   showPrintButton?: boolean
+  /** >0: modal sluit automatisch (tenant jeton quick flow). */
+  autoCloseAfterMs?: number
   /** Winkelkassa: afdrukken + naar mail + sluiten. */
   footerActions?: 'print-close' |  'print-email-close'
   onEmail?: () => Promise<void>
@@ -64,6 +67,17 @@ export function KassaSuccessReceiptModal({
       setOptimisticEmailBusy(false)
     }
   }, [open])
+
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+
+  useEffect(() => {
+    if (!open || autoCloseAfterMs == null || autoCloseAfterMs <= 0) return
+    const timer = window.setTimeout(() => {
+      onCloseRef.current()
+    }, autoCloseAfterMs)
+    return () => window.clearTimeout(timer)
+  }, [open, autoCloseAfterMs])
 
   if (!open) return null
 
