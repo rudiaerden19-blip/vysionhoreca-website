@@ -275,14 +275,24 @@ export function KassaJetonPaymentModal({
               type="button"
               disabled={payBusy}
               onClick={confirmExactJetons}
-              className="flex w-full items-center justify-center rounded-xl border-2 border-emerald-500 bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-40"
+              className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-emerald-500 bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-40"
             >
-              {quickSuccessFlow
-                ? t('kassaApp.jetonExactReceivedOk')
-                : t('kassaApp.jetonExactReceivedBar').replace(
-                    '{count}',
-                    String(exactJetonPieces),
-                  )}
+              <span className="flex items-center gap-1.5" aria-hidden>
+                {customerMustGive.black > 0 && (
+                  <JetonChip kind="black" label={blackChipLabel} showFaceValue={false} />
+                )}
+                {customerMustGive.white > 0 && (
+                  <JetonChip kind="white" label={whiteChipLabel} showFaceValue={false} />
+                )}
+              </span>
+              <span>
+                {quickSuccessFlow
+                  ? t('kassaApp.jetonExactReceivedOk')
+                  : t('kassaApp.jetonExactReceivedBar').replace(
+                      '{count}',
+                      String(exactJetonPieces),
+                    )}
+              </span>
             </button>
           )}
 
