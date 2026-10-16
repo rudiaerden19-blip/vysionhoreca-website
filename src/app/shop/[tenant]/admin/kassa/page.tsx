@@ -2765,14 +2765,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const autoPrintPaidReceiptKeyRef = useRef<string | null>(null)
   /** Jeton quick flow: na sluiten lastOrder wissen zodat succes niet opnieuw flitst. */
   const clearLastOrderOnSuccessCloseRef = useRef(false)
-  const closeSuccessReceiptModal = useCallback(() => {
-    setShowSuccessModal(false)
-    autoPrintPaidReceiptKeyRef.current = null
-    if (clearLastOrderOnSuccessCloseRef.current) {
-      clearLastOrderOnSuccessCloseRef.current = false
-      setLastOrder(null)
+  const successAutoCloseTimerRef = useRef<number | null>(null)
+  const [successModalAutoCloseMs, setSuccessModalAutoCloseMs] = useState<number | undefined>(
+    undefined,
+  )
+  const clearSuccessAutoCloseTimer = useCallback(() => {
+    if (successAutoCloseTimerRef.current != null) {
+      window.clearTimeout(successAutoCloseTimerRef.current)
+      successAutoCloseTimerRef.current = null
     }
   }, [])
+  const closeSuccessReceiptModal = useCallback(() => {
+    clearSuccessAutoCloseTimer()
+    setSuccessModalAutoCloseMs(undefined)
+    autoPrintPaidReceiptKeyRef.current = null
+    flushSync(() => {
+      setShowSuccessModal(false)
+      if (clearLastOrderOnSuccessCloseRef.current) {
+        clearLastOrderOnSuccessCloseRef.current = false
+        setLastOrder(null)
+      }
+    })
+  }, [clearSuccessAutoCloseTimer])
+  useEffect(() => () => clearSuccessAutoCloseTimer(), [clearSuccessAutoCloseTimer])
 
   const draftReceiptPrintGuardRef = useRef<{
     inFlight: boolean
@@ -3968,6 +3983,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
     if (!opts?.preLocked && !lockPayInFlight()) return
 
+    clearSuccessAutoCloseTimer()
+    setSuccessModalAutoCloseMs(undefined)
+
     const createdAt = new Date()
     const kassa_client_uuid =
       typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -4067,6 +4085,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     let holdLockUntilCartClears = false
     const dismissUnsavedReceipt = () => {
+      clearSuccessAutoCloseTimer()
+      setSuccessModalAutoCloseMs(undefined)
       clearLastOrderOnSuccessCloseRef.current = false
       setShowSuccessModal(false)
       setLastOrder(null)
@@ -4075,8 +4095,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     showKlantschermThankYou(total)
 
-    clearLastOrderOnSuccessCloseRef.current =
-      method === 'JETON' && kassaJetonQuickSuccess
+    const wantJetonQuickSuccessClose = method === 'JETON' && kassaJetonQuickSuccess
+    clearLastOrderOnSuccessCloseRef.current = wantJetonQuickSuccessClose
+    if (wantJetonQuickSuccessClose) {
+      setSuccessModalAutoCloseMs(3000)
+    }
 
     flushSync(() => {
       setLastOrder({
@@ -4103,6 +4126,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       setShowSuccessModal(true)
     })
+    if (wantJetonQuickSuccessClose) {
+      successAutoCloseTimerRef.current = window.setTimeout(() => {
+        successAutoCloseTimerRef.current = null
+        closeSuccessReceiptModal()
+      }, 3000)
+    }
     playCashRegister()
     setTimeout(() => playSuccess(), 400)
 
@@ -7132,6 +7161,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             setTableOrderLinesInSidebar(false)
           }}
           onPaymentSuccess={(receipt) => {
+            clearSuccessAutoCloseTimer()
+            setSuccessModalAutoCloseMs(undefined)
+            clearLastOrderOnSuccessCloseRef.current = false
             setLastOrder(receipt)
             setShowSuccessModal(true)
           }}
@@ -7746,12 +7778,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tenantInfo={tenantInfo}
           locale={locale}
           onClose={closeSuccessReceiptModal}
-          autoCloseAfterMs={
-            kassaJetonQuickSuccess &&
-            String(lastOrder.paymentMethod || '').toUpperCase() === 'JETON'
-              ? 3000
-              : undefined
-          }
+          autoCloseAfterMs={successModalAutoCloseMs}
           showPrintButton={!kassaThermalPrintDisabled && !kassaJetonQuickSuccess}
           printDisabled={
             successReceiptPrintBusy ||
