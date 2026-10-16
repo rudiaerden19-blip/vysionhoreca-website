@@ -110,7 +110,8 @@ export function VysionMusicClient({
   const [tick, setTick] = useState(0)
   const [volumeUi, setVolumeUi] = useState(0)
   const [coverBroken, setCoverBroken] = useState(false)
-  const [playlistSelecting, setPlaylistSelecting] = useState(false)
+  /** Alleen tijdens track start (queue/assign) — niet tijdens playlist browsen. */
+  const [trackPlayInFlight, setTrackPlayInFlight] = useState(false)
   const [optimisticTrack, setOptimisticTrack] = useState<TrackRow | null>(null)
   const [playbackSourceId, setPlaybackSourceId] = useState<string | null>(null)
   const [transportPlaylistTracks, setTransportPlaylistTracks] = useState<VysionMusicCatalogTrack[]>(
@@ -365,8 +366,12 @@ export function VysionMusicClient({
   }, [loadSnapshot])
 
   const queueTrackNow = useCallback(
-    async (trackId: string, opts?: { transportPending?: TransportPending }) => {
-      setPlaylistSelecting(true)
+    async (
+      trackId: string,
+      opts?: { transportPending?: TransportPending; holdCatalogBusy?: boolean },
+    ) => {
+      const holdBusy = opts?.holdCatalogBusy !== false
+      if (holdBusy) setTrackPlayInFlight(true)
       try {
         const ok = await postMutation(
           'soundZoneQueueTracks',
@@ -378,8 +383,9 @@ export function VysionMusicClient({
           { transportPending: opts?.transportPending },
         )
         if (ok) refreshSnapshotAfterControl()
+        return ok
       } finally {
-        setPlaylistSelecting(false)
+        if (holdBusy) setTrackPlayInFlight(false)
       }
     },
     [postMutation, refreshSnapshotAfterControl],
@@ -473,13 +479,27 @@ export function VysionMusicClient({
     async (
       sourceId: string,
       trackId: string,
-      _trackIndex: number,
+      trackIndex: number,
       _playlistTracks: { id: string }[],
     ) => {
       setPlaybackSourceId(sourceId)
-      await queueTrackNow(trackId)
+      setTrackPlayInFlight(true)
+      try {
+        const ok = await postMutation('soundZoneAssignSource', {
+          source: sourceId,
+          sourceTrackIndex: Math.max(0, trackIndex),
+          immediate: true,
+        })
+        if (ok) {
+          refreshSnapshotAfterControl()
+          return
+        }
+        await queueTrackNow(trackId, { holdCatalogBusy: false })
+      } finally {
+        setTrackPlayInFlight(false)
+      }
     },
-    [queueTrackNow],
+    [postMutation, queueTrackNow, refreshSnapshotAfterControl],
   )
 
   const playSearchTrack = useCallback(
@@ -494,12 +514,12 @@ export function VysionMusicClient({
     async (sourceId: string) => {
       const id = sourceId.trim()
       if (!id) return
-      setPlaylistSelecting(true)
+      setTrackPlayInFlight(true)
       try {
         const ok = await postMutation('setPlayFrom', { source: id })
         if (ok) refreshSnapshotAfterControl()
       } finally {
-        setPlaylistSelecting(false)
+        setTrackPlayInFlight(false)
       }
     },
     [postMutation, refreshSnapshotAfterControl],
@@ -538,7 +558,7 @@ export function VysionMusicClient({
 
   const playFromId = snapshot?.playFromPlaylistId?.trim() || null
 
-  const catalogBusy = playlistSelecting || transportPending != null
+  const catalogBusy = trackPlayInFlight || transportPending != null
 
   return (
     <div className={styles.root}>
@@ -620,7 +640,7 @@ export function VysionMusicClient({
                 type="button"
                 className={styles.transportBtn}
                 disabled={
-                  !canGoPrevious || transportPending === 'prev' || playlistSelecting
+                  !canGoPrevious || transportPending === 'prev' || trackPlayInFlight
                 }
                 aria-label={t('vysionMusic.prev')}
                 title={canGoPrevious ? t('vysionMusic.prev') : t('vysionMusic.prevUnavailable')}

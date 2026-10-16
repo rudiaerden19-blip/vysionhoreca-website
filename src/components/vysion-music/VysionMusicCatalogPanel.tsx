@@ -57,7 +57,7 @@ export function VysionMusicCatalogPanel({
   nowPlaying,
   onPlayPlaylistTrack,
   onPlaySearchTrack,
-  onPlaylistSelected,
+  onPlaylistSelected: _onPlaylistSelected,
   busy,
 }: {
   tenant: string
@@ -409,7 +409,6 @@ export function VysionMusicCatalogPanel({
       setTracksLoading(false)
       perfLog('playlist-click-cached-tracks-visible', t0, { sourceId: id, count: cached.length })
     }
-    void onPlaylistSelected(id)
   }
 
   return (
