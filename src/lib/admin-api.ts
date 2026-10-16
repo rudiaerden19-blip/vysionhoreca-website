@@ -230,6 +230,8 @@ export interface TenantSettings {
   kassa_jeton_enabled?: boolean
   kassa_jeton_black_cents?: number
   kassa_jeton_white_cents?: number
+  /** Superadmin: «Juiste jetons ontvangen» + succesmodal 2s (default uit) */
+  kassa_jeton_quick_success_flow?: boolean
   /** iPad print via LAN naar Windows Print Agent op vaste PC-IP */
   kassa_lan_print_enabled?: boolean
   kassa_lan_print_host?: string | null

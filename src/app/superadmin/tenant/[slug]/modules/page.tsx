@@ -65,6 +65,8 @@ export default function SuperadminTenantModulesPage() {
   const [savingKassaNameAccountV2, setSavingKassaNameAccountV2] = useState(false)
   const [kassaJetonEnabled, setKassaJetonEnabled] = useState(false)
   const [savingKassaJetonEnabled, setSavingKassaJetonEnabled] = useState(false)
+  const [kassaJetonQuickSuccess, setKassaJetonQuickSuccess] = useState(false)
+  const [savingKassaJetonQuickSuccess, setSavingKassaJetonQuickSuccess] = useState(false)
   const [kassaLanPrintEnabled, setKassaLanPrintEnabled] = useState(false)
   const [savingKassaLanPrintEnabled, setSavingKassaLanPrintEnabled] = useState(false)
   const [kassaThermalPrintDisabled, setKassaThermalPrintDisabled] = useState(false)
@@ -74,14 +76,14 @@ export default function SuperadminTenantModulesPage() {
     let { data: settings, error: settingsErr } = await supabase
       .from('tenant_settings')
       .select(
-        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled, kassa_lan_print_enabled, kassa_thermal_print_disabled',
+        'business_name, z_report_send_articles_to_accountant, z_report_owner_evening_close, kassa_name_account_v2, kassa_jeton_enabled, kassa_jeton_quick_success_flow, kassa_lan_print_enabled, kassa_thermal_print_disabled',
       )
       .eq('tenant_slug', slug)
       .maybeSingle()
 
     if (
       settingsErr &&
-      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|kassa_lan_print_enabled|kassa_thermal_print_disabled|column .* does not exist|schema cache/i.test(
+      /z_report_send_articles_to_accountant|kassa_name_account_v2|kassa_jeton_enabled|kassa_jeton_quick_success_flow|kassa_lan_print_enabled|kassa_thermal_print_disabled|column .* does not exist|schema cache/i.test(
         settingsErr.message,
       )
     ) {
@@ -111,6 +113,10 @@ export default function SuperadminTenantModulesPage() {
     )
     setKassaJetonEnabled(
       (settings as { kassa_jeton_enabled?: boolean } | null)?.kassa_jeton_enabled === true,
+    )
+    setKassaJetonQuickSuccess(
+      (settings as { kassa_jeton_quick_success_flow?: boolean } | null)
+        ?.kassa_jeton_quick_success_flow === true,
     )
     setKassaLanPrintEnabled(
       (settings as { kassa_lan_print_enabled?: boolean } | null)?.kassa_lan_print_enabled === true,
@@ -343,6 +349,39 @@ export default function SuperadminTenantModulesPage() {
                     }
                   })
                   .finally(() => setSavingKassaJetonEnabled(false))
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mb-6 rounded-2xl border border-amber-700/30 bg-amber-950/20 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="font-semibold text-white">{t('superadminModules.kassaJetonQuickSuccess')}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{t('superadminModules.kassaJetonQuickSuccessHint')}</p>
+            </div>
+            <ModuleSlider
+              checked={kassaJetonQuickSuccess}
+              disabled={savingKassaJetonQuickSuccess || !kassaJetonEnabled}
+              onChange={(on) => {
+                setKassaJetonQuickSuccess(on)
+                setSavingKassaJetonQuickSuccess(true)
+                void authFetch('/api/superadmin/tenants', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    action: 'update_kassa_jeton_quick_success_flow',
+                    slug,
+                    kassaJetonQuickSuccessFlow: on,
+                  }),
+                })
+                  .then(async (res) => {
+                    if (!res.ok) {
+                      const json = await res.json().catch(() => ({}))
+                      setKassaJetonQuickSuccess(!on)
+                      alert('Opslaan mislukt: ' + (json?.error || `HTTP ${res.status}`))
+                    }
+                  })
+                  .finally(() => setSavingKassaJetonQuickSuccess(false))
               }}
             />
           </div>

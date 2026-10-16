@@ -1781,6 +1781,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
   const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
+  const kassaJetonQuickSuccess =
+    tenantInfo?.kassa_jeton_quick_success_flow === true
   const kassaLanPrintEnabled = tenantInfo?.kassa_lan_print_enabled === true
   const kassaCloudPrintEnabled = tenantInfo?.kassa_cloud_print_enabled === true
   const kassaThermalPrintDisabled = isKassaThermalPrintDisabled(tenantInfo)
@@ -4688,6 +4690,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     showSuccessModal && lastOrder ? kassaPaidReceiptGuardKey(lastOrder) : null
 
   useEffect(() => {
+    if (!showSuccessModal || !kassaJetonQuickSuccess || !lastOrder) return
+    if (String(lastOrder.paymentMethod || '').toUpperCase() !== 'JETON') return
+    const timer = window.setTimeout(() => {
+      setShowSuccessModal(false)
+      autoPrintPaidReceiptKeyRef.current = null
+    }, 2000)
+    return () => window.clearTimeout(timer)
+  }, [showSuccessModal, kassaJetonQuickSuccess, lastOrder])
+
+  useEffect(() => {
     if (kassaThermalPrintDisabled) return
     if (!paidReceiptAutoPrintKey || !lastOrder) return
     if (autoPrintPaidReceiptKeyRef.current === paidReceiptAutoPrintKey) return
@@ -7402,6 +7414,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           denoms={kassaJetonDenoms}
           salePoint={kassaJetonSalePoint}
           payBusy={payInFlight}
+          quickSuccessFlow={kassaJetonQuickSuccess}
           onClose={() => {
             if (payInFlight) return
             setShowJetonPaymentModal(false)
@@ -7731,7 +7744,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             setShowSuccessModal(false)
             autoPrintPaidReceiptKeyRef.current = null
           }}
-          showPrintButton={!kassaThermalPrintDisabled}
+          showPrintButton={!kassaThermalPrintDisabled && !kassaJetonQuickSuccess}
           printDisabled={
             successReceiptPrintBusy ||
             (lastOrder.orderNumber <= 0 &&

@@ -95,6 +95,7 @@ export function KassaJetonPaymentModal({
   denoms,
   salePoint,
   payBusy = false,
+  quickSuccessFlow = false,
   onClose,
   onConfirm,
   onSwitchSalePoint,
@@ -107,6 +108,8 @@ export function KassaJetonPaymentModal({
   denoms: KassaJetonDenominations
   salePoint: KassaJetonSalePoint
   payBusy?: boolean
+  /** Tenant-flag: OK-tekst zonder teller (andere tenants ongewijzigd). */
+  quickSuccessFlow?: boolean
   onClose: () => void
   onConfirm: () => void
   onSwitchSalePoint: (next: KassaJetonSalePoint) => void
@@ -272,29 +275,24 @@ export function KassaJetonPaymentModal({
               type="button"
               disabled={payBusy}
               onClick={confirmExactJetons}
-              className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-emerald-500 bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-40"
+              className="flex w-full items-center justify-center rounded-xl border-2 border-emerald-500 bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-40"
             >
-              <span className="flex items-center gap-1.5" aria-hidden>
-                {customerMustGive.black > 0 && (
-                  <JetonChip kind="black" label={blackChipLabel} showFaceValue={false} />
-                )}
-                {customerMustGive.white > 0 && (
-                  <JetonChip kind="white" label={whiteChipLabel} showFaceValue={false} />
-                )}
-              </span>
-              <span>
-                {t('kassaApp.jetonExactReceivedBar').replace(
-                  '{count}',
-                  String(exactJetonPieces),
-                )}
-              </span>
+              {quickSuccessFlow
+                ? t('kassaApp.jetonExactReceivedOk')
+                : t('kassaApp.jetonExactReceivedBar').replace(
+                    '{count}',
+                    String(exactJetonPieces),
+                  )}
             </button>
           )}
 
+          {!quickSuccessFlow && (
           <p className="text-center text-xs font-medium text-zinc-500">
             {t('kassaApp.jetonManualReceivedHint')}
           </p>
+          )}
 
+          {!quickSuccessFlow && (
           <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">
               {t('kassaApp.jetonBlackReceivedLabel')}
@@ -309,7 +307,9 @@ export function KassaJetonPaymentModal({
               />
             </div>
           </div>
+          )}
 
+          {!quickSuccessFlow && (
           <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">
               {t('kassaApp.jetonWhiteReceivedLabel')}
@@ -327,8 +327,9 @@ export function KassaJetonPaymentModal({
               {t('kassaApp.jetonReceivedTotalLabel')}: {formatEuro(tender.receivedCents)}
             </p>
           </div>
+          )}
 
-          {anyReceived && tender.sufficient && tender.whiteChange > 0 && (
+          {!quickSuccessFlow && anyReceived && tender.sufficient && tender.whiteChange > 0 && (
             <div className="rounded-xl border border-emerald-700/50 bg-emerald-950/40 p-4">
               <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-emerald-200/80">
                 {t('kassaApp.jetonGiveBackLabel')}
@@ -345,13 +346,13 @@ export function KassaJetonPaymentModal({
             </div>
           )}
 
-          {anyReceived && tender.sufficient && tender.whiteChange === 0 && (
+          {!quickSuccessFlow && anyReceived && tender.sufficient && tender.whiteChange === 0 && (
             <p className="text-center text-base font-semibold text-emerald-400">
               {t('kassaApp.jetonNoChange')}
             </p>
           )}
 
-          {anyReceived && !tender.sufficient && tender.changeCents < 0 && (
+          {!quickSuccessFlow && anyReceived && !tender.sufficient && tender.changeCents < 0 && (
             <p className="text-center text-base font-semibold text-amber-400">
               {t('kassaApp.jetonInsufficient').replace(
                 '{amount}',
@@ -360,6 +361,7 @@ export function KassaJetonPaymentModal({
             </p>
           )}
 
+          {!quickSuccessFlow && (
           <button
             type="button"
             disabled={payBusy || !tender.sufficient || !anyReceived}
@@ -368,6 +370,7 @@ export function KassaJetonPaymentModal({
           >
             {t('kassaApp.jetonConfirmPay')}
           </button>
+          )}
 
           {salePoint === 'ijs' && (
             <button
