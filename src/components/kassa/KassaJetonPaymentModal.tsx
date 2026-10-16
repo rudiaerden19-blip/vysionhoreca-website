@@ -8,6 +8,7 @@ import {
   kassaJetonBreakdownFromCents,
   kassaJetonChangeFromReceived,
   kassaJetonChipFaceLabel,
+  kassaJetonPieceCount,
   type KassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
 import type { KassaJetonSalePoint } from '@/lib/kassa-jeton-sale-point'
@@ -19,16 +20,19 @@ function formatEuro(cents: number): string {
 function JetonChip({
   kind,
   label,
+  showFaceValue = false,
 }: {
   kind: 'black' | 'white'
   label: string
+  /** Waarde op jeton (3 / 0,50) — uit in kassa-UI; alleen tekst naast chip. */
+  showFaceValue?: boolean
 }) {
   const isBlack = kind === 'black'
   const compact = label.includes(',')
   return (
     <span
       className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
-        compact ? 'text-[10px] leading-none' : 'text-sm'
+        showFaceValue && compact ? 'text-[10px] leading-none' : 'text-sm'
       } ${
         isBlack
           ? 'bg-black text-white ring-2 ring-zinc-500'
@@ -36,7 +40,7 @@ function JetonChip({
       }`}
       aria-hidden
     >
-      {label}
+      {showFaceValue ? label : null}
     </span>
   )
 }
@@ -139,6 +143,23 @@ export function KassaJetonPaymentModal({
 
   const anyReceived = blackIn > 0 || whiteIn > 0
 
+  const exactJetonPieces = customerMustGive
+    ? kassaJetonPieceCount(customerMustGive)
+    : 0
+
+  const confirmExactJetons = () => {
+    if (!customerMustGive || payBusy || exactJetonPieces <= 0) return
+    const check = kassaJetonChangeFromReceived(
+      orderCents,
+      customerMustGive,
+      denoms,
+    )
+    if (!check.sufficient) return
+    setBlackIn(customerMustGive.black)
+    setWhiteIn(customerMustGive.white)
+    onConfirm()
+  }
+
   if (!open) return null
 
   const card =
@@ -225,7 +246,7 @@ export function KassaJetonPaymentModal({
               <div className="flex flex-col items-center gap-3 text-xl font-bold text-sky-50 sm:flex-row sm:justify-center">
                 {customerMustGive.black > 0 && (
                   <div className="flex items-center gap-2">
-                    <JetonChip kind="black" label={blackChipLabel} />
+                    <JetonChip kind="black" label={blackChipLabel} showFaceValue={false} />
                     <span>
                       {customerMustGive.black} {t('kassaApp.jetonBlackLabel')}
                     </span>
@@ -236,7 +257,7 @@ export function KassaJetonPaymentModal({
                 )}
                 {customerMustGive.white > 0 && (
                   <div className="flex items-center gap-2">
-                    <JetonChip kind="white" label={whiteChipLabel} />
+                    <JetonChip kind="white" label={whiteChipLabel} showFaceValue={false} />
                     <span>
                       {customerMustGive.white} {t('kassaApp.jetonWhiteLabel')}
                     </span>
@@ -246,12 +267,40 @@ export function KassaJetonPaymentModal({
             </div>
           )}
 
+          {customerMustGive && exactJetonPieces > 0 && (
+            <button
+              type="button"
+              disabled={payBusy}
+              onClick={confirmExactJetons}
+              className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-emerald-500 bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition active:scale-[0.99] disabled:opacity-40"
+            >
+              <span className="flex items-center gap-1.5" aria-hidden>
+                {customerMustGive.black > 0 && (
+                  <JetonChip kind="black" label={blackChipLabel} showFaceValue={false} />
+                )}
+                {customerMustGive.white > 0 && (
+                  <JetonChip kind="white" label={whiteChipLabel} showFaceValue={false} />
+                )}
+              </span>
+              <span>
+                {t('kassaApp.jetonExactReceivedBar').replace(
+                  '{count}',
+                  String(exactJetonPieces),
+                )}
+              </span>
+            </button>
+          )}
+
+          <p className="text-center text-xs font-medium text-zinc-500">
+            {t('kassaApp.jetonManualReceivedHint')}
+          </p>
+
           <div className="rounded-xl border border-zinc-600 bg-zinc-900/50 p-4">
             <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">
               {t('kassaApp.jetonBlackReceivedLabel')}
             </p>
             <div className="flex items-center justify-center gap-4">
-              <JetonChip kind="black" label={blackChipLabel} />
+              <JetonChip kind="black" label={blackChipLabel} showFaceValue={false} />
               <CountStepper
                 value={blackIn}
                 onChange={setBlackIn}
@@ -266,7 +315,7 @@ export function KassaJetonPaymentModal({
               {t('kassaApp.jetonWhiteReceivedLabel')}
             </p>
             <div className="flex items-center justify-center gap-4">
-              <JetonChip kind="white" label={whiteChipLabel} />
+              <JetonChip kind="white" label={whiteChipLabel} showFaceValue={false} />
               <CountStepper
                 value={whiteIn}
                 onChange={setWhiteIn}
@@ -285,7 +334,7 @@ export function KassaJetonPaymentModal({
                 {t('kassaApp.jetonGiveBackLabel')}
               </p>
               <div className="flex items-center justify-center gap-3 text-2xl font-bold text-emerald-300">
-                <JetonChip kind="white" label={whiteChipLabel} />
+                <JetonChip kind="white" label={whiteChipLabel} showFaceValue={false} />
                 <span>
                   {t('kassaApp.jetonChangeWhiteOnly').replace(
                     '{white}',

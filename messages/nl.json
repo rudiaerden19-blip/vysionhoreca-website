@@ -4267,6 +4267,8 @@
     "jetonOrderLabel": "Bestelling",
     "jetonSuggestedPay": "Passend: {black} zwarte + {white} witte jetons",
     "jetonCustomerMustGiveLabel": "Klant moet geven",
+    "jetonExactReceivedBar": "{count} jetons — OK",
+    "jetonManualReceivedHint": "Alleen nodig bij wisselgeld of ander bedrag:",
     "jetonBlackReceivedLabel": "Zwarte jetons ontvangen",
     "jetonWhiteReceivedLabel": "Witte jetons ontvangen",
     "jetonReceivedTotalLabel": "Totaal ontvangen",

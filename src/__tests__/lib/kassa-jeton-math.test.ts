@@ -5,12 +5,18 @@ import {
   kassaJetonChangeFromBlackReceived,
   kassaJetonChangeFromReceived,
   kassaJetonChangeFromTender,
+  kassaJetonPieceCount,
   normalizeKassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
 
 const DEN = normalizeKassaJetonDenominations(300, 50)
 
 describe('kassa-jeton-math', () => {
+  it('piece count sums black and white', () => {
+    expect(kassaJetonPieceCount({ black: 3, white: 3 })).toBe(6)
+    expect(kassaJetonPieceCount({ black: 1, white: 0 })).toBe(1)
+  })
+
   it('€10,50 → 3 zwarte + 3 witte', () => {
     expect(kassaJetonBreakdownFromCents(1050, DEN)).toEqual({
       black: 3,

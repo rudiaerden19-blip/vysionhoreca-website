@@ -3622,6 +3622,8 @@
     "jetonOrderLabel": "الطلب",
     "jetonSuggestedPay": "المطلوب: {black} أسود + {white} أبيض",
     "jetonCustomerMustGiveLabel": "ما يجب أن يدفعه الزبون",
+    "jetonExactReceivedBar": "{count} عملات — OK",
+    "jetonManualReceivedHint": "فقط عند الباقي أو مبلغ مختلف:",
     "jetonBlackReceivedLabel": "الرموز السوداء المستلمة",
     "jetonWhiteReceivedLabel": "الرموز البيضاء المستلمة",
     "jetonReceivedTotalLabel": "إجمالي المستلم",

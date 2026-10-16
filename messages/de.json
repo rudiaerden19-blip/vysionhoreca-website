@@ -3122,6 +3122,8 @@
     "jetonOrderLabel": "Bestellung",
     "jetonSuggestedPay": "Passend: {black} schwarze + {white} weiße Jetons",
     "jetonCustomerMustGiveLabel": "Gast muss geben",
+    "jetonExactReceivedBar": "{count} Jetons — OK",
+    "jetonManualReceivedHint": "Nur bei Wechselgeld oder anderem Betrag:",
     "jetonBlackReceivedLabel": "Schwarze Jetons erhalten",
     "jetonWhiteReceivedLabel": "Weiße Jetons erhalten",
     "jetonReceivedTotalLabel": "Summe erhalten",

@@ -4267,6 +4267,8 @@
     "jetonOrderLabel": "Order",
     "jetonSuggestedPay": "Exact: {black} black + {white} white tokens",
     "jetonCustomerMustGiveLabel": "Customer must give",
+    "jetonExactReceivedBar": "{count} tokens — OK",
+    "jetonManualReceivedHint": "Only needed for change or a different amount:",
     "jetonBlackReceivedLabel": "Black tokens received",
     "jetonWhiteReceivedLabel": "White tokens received",
     "jetonReceivedTotalLabel": "Total received",

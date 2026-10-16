@@ -3,6 +3,11 @@ export type KassaJetonCounts = {
   white: number
 }
 
+/** Fysieke jetons (stuks), niet euro-waarde. */
+export function kassaJetonPieceCount(counts: KassaJetonCounts): number {
+  return Math.max(0, counts.black) + Math.max(0, counts.white)
+}
+
 export type KassaJetonDenominations = {
   blackCents: number
   whiteCents: number

@@ -3622,6 +3622,8 @@
     "jetonOrderLabel": "Ordine",
     "jetonSuggestedPay": "Esatto: {black} neri + {white} bianchi",
     "jetonCustomerMustGiveLabel": "Il cliente deve dare",
+    "jetonExactReceivedBar": "{count} gettoni — OK",
+    "jetonManualReceivedHint": "Solo per resto o importo diverso:",
     "jetonBlackReceivedLabel": "Gettoni neri ricevuti",
     "jetonWhiteReceivedLabel": "Gettoni bianchi ricevuti",
     "jetonReceivedTotalLabel": "Totale ricevuto",

@@ -3622,6 +3622,8 @@
     "jetonOrderLabel": "Pedido",
     "jetonSuggestedPay": "Exacto: {black} negras + {white} blancas",
     "jetonCustomerMustGiveLabel": "El cliente debe dar",
+    "jetonExactReceivedBar": "{count} fichas — OK",
+    "jetonManualReceivedHint": "Solo si hay cambio u otro importe:",
     "jetonBlackReceivedLabel": "Fichas negras recibidas",
     "jetonWhiteReceivedLabel": "Fichas blancas recibidas",
     "jetonReceivedTotalLabel": "Total recibido",

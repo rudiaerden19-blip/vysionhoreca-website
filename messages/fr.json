@@ -3122,6 +3122,8 @@
     "jetonOrderLabel": "Commande",
     "jetonSuggestedPay": "Exact : {black} noirs + {white} blancs",
     "jetonCustomerMustGiveLabel": "Le client doit donner",
+    "jetonExactReceivedBar": "{count} jetons — OK",
+    "jetonManualReceivedHint": "Uniquement pour monnaie ou montant différent :",
     "jetonBlackReceivedLabel": "Jetons noirs reçus",
     "jetonWhiteReceivedLabel": "Jetons blancs reçus",
     "jetonReceivedTotalLabel": "Total reçu",
