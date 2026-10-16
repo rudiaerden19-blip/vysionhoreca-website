@@ -4837,7 +4837,7 @@
     "kassaNameAccountV2RequiresSub": "Active también el submenú « A cuenta » en Kassa (o paquete completo).",
     "kassaJetonEnabled": "Fichas de consumo (TPV)",
     "kassaJetonEnabledHint": "Desglose de fichas y cambio en caja. Solo tenants con fichas físicas; desactivado por defecto.",
-    "kassaJetonQuickSuccess": "Fichas: OK rápido + éxito 2 s",
+    "kassaJetonQuickSuccess": "Fichas: OK rápido + éxito 3 s",
     "kassaJetonQuickSuccessHint": "Barra verde «Fichas correctas» y éxito se cierra solo. Activar solo para un tenant.",
     "kassaLanPrintEnabled": "Impresión iPad por LAN (WiFi → PC de impresión)",
     "kassaLanPrintEnabledHint": "Los iPads en Safari envían tickets a la IP del Print Agent de Windows. Desactivado por defecto; otras cajas sin cambios.",

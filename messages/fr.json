@@ -4860,7 +4860,7 @@
     "kassaNameAccountV2RequiresSub": "Activer aussi le sous-menu « En compte » sous Kassa (ou forfait complet).",
     "kassaJetonEnabled": "Jetons de consommation (caisse)",
     "kassaJetonEnabledHint": "Répartition jetons et monnaie à la caisse. Uniquement pour les tenants avec jetons physiques ; désactivé par défaut.",
-    "kassaJetonQuickSuccess": "Jetons : OK rapide + succès 2 s",
+    "kassaJetonQuickSuccess": "Jetons : OK rapide + succès 3 s",
     "kassaJetonQuickSuccessHint": "Barre verte « Bons jetons reçus » et succès se ferme seul. Activer pour un seul tenant.",
     "kassaLanPrintEnabled": "Impression iPad via LAN (Wi‑Fi → PC d’impression)",
     "kassaLanPrintEnabledHint": "Les iPads dans Safari envoient les tickets à l’IP du Print Agent Windows. Désactivé par défaut ; autres caisses inchangées.",

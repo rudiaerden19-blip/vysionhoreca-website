@@ -4695,9 +4695,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const timer = window.setTimeout(() => {
       setShowSuccessModal(false)
       autoPrintPaidReceiptKeyRef.current = null
-    }, 2000)
+    }, 3000)
     return () => window.clearTimeout(timer)
-  }, [showSuccessModal, kassaJetonQuickSuccess, lastOrder])
+  }, [
+    showSuccessModal,
+    kassaJetonQuickSuccess,
+    lastOrder?.paymentMethod,
+    lastOrder?.kassaClientUuid,
+    lastOrder?.checkoutReference,
+  ])
 
   useEffect(() => {
     if (kassaThermalPrintDisabled) return

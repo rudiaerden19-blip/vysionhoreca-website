@@ -4860,7 +4860,7 @@
     "kassaNameAccountV2RequiresSub": "Submenü «Auf Rechnung» unter Kassa aktivieren (oder Vollpaket).",
     "kassaJetonEnabled": "Verzehrjetons (Kassa)",
     "kassaJetonEnabledHint": "Jeton-Aufschlüsselung und Wechselgeld an der Kassa. Nur für Tenants mit physischen Jetons; standardmäßig aus.",
-    "kassaJetonQuickSuccess": "Jetons: schnelles OK + Erfolg 2 Sek.",
+    "kassaJetonQuickSuccess": "Jetons: schnelles OK + Erfolg 3 Sek.",
     "kassaJetonQuickSuccessHint": "Grüne Leiste «Richtige Jetons erhalten» und Erfolg schließt automatisch. Nur pro Tenant aktivieren.",
     "kassaLanPrintEnabled": "iPad-Druck über LAN (WLAN → Print-PC)",
     "kassaLanPrintEnabledHint": "iPads in Safari senden Bons an die IP des Windows Print Agent. Standard aus; andere Kassen unverändert.",
