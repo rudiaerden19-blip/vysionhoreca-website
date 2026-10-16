@@ -209,6 +209,10 @@ import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
 import { KassaJetonPaymentModal } from '@/components/kassa/KassaJetonPaymentModal'
 import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
+  isKassaJetonQuickSuccessFlowTenant,
+  KASSA_JETON_QUICK_SUCCESS_MODAL_MS,
+} from '@/lib/kassa-jeton-quick-success-flow'
+import {
   readKassaJetonSalePoint,
   writeKassaJetonSalePoint,
   type KassaJetonSalePoint,
@@ -1781,8 +1785,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
   const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
-  const kassaJetonQuickSuccess =
-    tenantInfo?.kassa_jeton_quick_success_flow === true
+  const kassaJetonQuickSuccess = isKassaJetonQuickSuccessFlowTenant(tenant, tenantInfo)
   const kassaLanPrintEnabled = tenantInfo?.kassa_lan_print_enabled === true
   const kassaCloudPrintEnabled = tenantInfo?.kassa_cloud_print_enabled === true
   const kassaThermalPrintDisabled = isKassaThermalPrintDisabled(tenantInfo)
@@ -2765,6 +2768,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const autoPrintPaidReceiptKeyRef = useRef<string | null>(null)
   /** Jeton quick flow: na sluiten lastOrder wissen zodat succes niet opnieuw flitst. */
   const clearLastOrderOnSuccessCloseRef = useRef(false)
+  const jetonQuickSuccessUiDismissedRef = useRef(false)
   const successAutoCloseTimerRef = useRef<number | null>(null)
   const [successModalAutoCloseMs, setSuccessModalAutoCloseMs] = useState<number | undefined>(
     undefined,
@@ -2779,14 +2783,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     clearSuccessAutoCloseTimer()
     setSuccessModalAutoCloseMs(undefined)
     autoPrintPaidReceiptKeyRef.current = null
+    const wipeReceipt = clearLastOrderOnSuccessCloseRef.current
+    if (wipeReceipt) {
+      jetonQuickSuccessUiDismissedRef.current = true
+      clearLastOrderOnSuccessCloseRef.current = false
+    }
     flushSync(() => {
       setShowSuccessModal(false)
-      if (clearLastOrderOnSuccessCloseRef.current) {
-        clearLastOrderOnSuccessCloseRef.current = false
-        setLastOrder(null)
-      }
+      if (wipeReceipt) setLastOrder(null)
     })
   }, [clearSuccessAutoCloseTimer])
+  const closeSuccessReceiptModalRef = useRef(closeSuccessReceiptModal)
+  closeSuccessReceiptModalRef.current = closeSuccessReceiptModal
   useEffect(() => () => clearSuccessAutoCloseTimer(), [clearSuccessAutoCloseTimer])
 
   const draftReceiptPrintGuardRef = useRef<{
@@ -4098,7 +4106,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const wantJetonQuickSuccessClose = method === 'JETON' && kassaJetonQuickSuccess
     clearLastOrderOnSuccessCloseRef.current = wantJetonQuickSuccessClose
     if (wantJetonQuickSuccessClose) {
-      setSuccessModalAutoCloseMs(3000)
+      jetonQuickSuccessUiDismissedRef.current = false
+      setSuccessModalAutoCloseMs(KASSA_JETON_QUICK_SUCCESS_MODAL_MS)
     }
 
     flushSync(() => {
@@ -4129,8 +4138,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (wantJetonQuickSuccessClose) {
       successAutoCloseTimerRef.current = window.setTimeout(() => {
         successAutoCloseTimerRef.current = null
-        closeSuccessReceiptModal()
-      }, 3000)
+        closeSuccessReceiptModalRef.current()
+      }, KASSA_JETON_QUICK_SUCCESS_MODAL_MS)
     }
     playCashRegister()
     setTimeout(() => playSuccess(), 400)
@@ -4220,15 +4229,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
 
-    setLastOrder((prev) =>
-      prev
-        ? {
-            ...prev,
-            orderNumber: allocatedOrderNumber,
-            checkoutReference: queuedOffline ? shortRef : undefined,
-          }
-        : prev,
-    )
+    setLastOrder((prev) => {
+      if (!prev || jetonQuickSuccessUiDismissedRef.current) return prev
+      return {
+        ...prev,
+        orderNumber: allocatedOrderNumber,
+        checkoutReference: queuedOffline ? shortRef : undefined,
+      }
+    })
 
     if (dineInSettleAtCheckout) {
       clearTableAfterPayment(dineInSettleAtCheckout.zone, dineInSettleAtCheckout.tblNr)
