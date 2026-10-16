@@ -3624,6 +3624,7 @@
     "jetonCustomerMustGiveLabel": "Il cliente deve dare",
     "jetonExactReceivedBar": "{count} gettoni — OK",
     "jetonExactReceivedOk": "Gettoni corretti ricevuti",
+    "jetonQuickOkLabel": "Gettoni OK",
     "jetonManualReceivedHint": "Solo per resto o importo diverso:",
     "jetonBlackReceivedLabel": "Gettoni neri ricevuti",
     "jetonWhiteReceivedLabel": "Gettoni bianchi ricevuti",

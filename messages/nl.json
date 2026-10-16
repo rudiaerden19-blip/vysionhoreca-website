@@ -4271,6 +4271,7 @@
     "jetonCustomerMustGiveLabel": "Klant moet geven",
     "jetonExactReceivedBar": "{count} jetons — OK",
     "jetonExactReceivedOk": "Juiste jetons ontvangen",
+    "jetonQuickOkLabel": "Jetons OK",
     "jetonManualReceivedHint": "Alleen nodig bij wisselgeld of ander bedrag:",
     "jetonBlackReceivedLabel": "Zwarte jetons ontvangen",
     "jetonWhiteReceivedLabel": "Witte jetons ontvangen",

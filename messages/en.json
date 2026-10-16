@@ -4271,6 +4271,7 @@
     "jetonCustomerMustGiveLabel": "Customer must give",
     "jetonExactReceivedBar": "{count} tokens — OK",
     "jetonExactReceivedOk": "Correct tokens received",
+    "jetonQuickOkLabel": "Tokens OK",
     "jetonManualReceivedHint": "Only needed for change or a different amount:",
     "jetonBlackReceivedLabel": "Black tokens received",
     "jetonWhiteReceivedLabel": "White tokens received",

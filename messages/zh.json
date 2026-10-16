@@ -3624,6 +3624,7 @@
     "jetonCustomerMustGiveLabel": "顾客应付",
     "jetonExactReceivedBar": "{count} 枚代币 — OK",
     "jetonExactReceivedOk": "已收到正确代币",
+    "jetonQuickOkLabel": "代币 OK",
     "jetonManualReceivedHint": "仅需找零或其他金额时使用:",
     "jetonBlackReceivedLabel": "收到的黑色代币",
     "jetonWhiteReceivedLabel": "收到的白色代币",

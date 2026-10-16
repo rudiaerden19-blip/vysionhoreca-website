@@ -3624,6 +3624,7 @@
     "jetonCustomerMustGiveLabel": "お客様が渡す枚数",
     "jetonExactReceivedBar": "{count} 枚 — OK",
     "jetonExactReceivedOk": "正しいトークンを受け取りました",
+    "jetonQuickOkLabel": "トークン OK",
     "jetonManualReceivedHint": "お釣りや別金額のときだけ:",
     "jetonBlackReceivedLabel": "受け取った黒トークン",
     "jetonWhiteReceivedLabel": "受け取った白トークン",

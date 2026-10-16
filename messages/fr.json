@@ -3124,6 +3124,7 @@
     "jetonCustomerMustGiveLabel": "Le client doit donner",
     "jetonExactReceivedBar": "{count} jetons — OK",
     "jetonExactReceivedOk": "Bons jetons reçus",
+    "jetonQuickOkLabel": "Jetons OK",
     "jetonManualReceivedHint": "Uniquement pour monnaie ou montant différent :",
     "jetonBlackReceivedLabel": "Jetons noirs reçus",
     "jetonWhiteReceivedLabel": "Jetons blancs reçus",

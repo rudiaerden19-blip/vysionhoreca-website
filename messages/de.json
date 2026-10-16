@@ -3124,6 +3124,7 @@
     "jetonCustomerMustGiveLabel": "Gast muss geben",
     "jetonExactReceivedBar": "{count} Jetons — OK",
     "jetonExactReceivedOk": "Richtige Jetons erhalten",
+    "jetonQuickOkLabel": "Jetons OK",
     "jetonManualReceivedHint": "Nur bei Wechselgeld oder anderem Betrag:",
     "jetonBlackReceivedLabel": "Schwarze Jetons erhalten",
     "jetonWhiteReceivedLabel": "Weiße Jetons erhalten",

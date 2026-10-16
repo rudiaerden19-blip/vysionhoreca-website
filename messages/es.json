@@ -3624,6 +3624,7 @@
     "jetonCustomerMustGiveLabel": "El cliente debe dar",
     "jetonExactReceivedBar": "{count} fichas — OK",
     "jetonExactReceivedOk": "Fichas correctas recibidas",
+    "jetonQuickOkLabel": "Fichas OK",
     "jetonManualReceivedHint": "Solo si hay cambio u otro importe:",
     "jetonBlackReceivedLabel": "Fichas negras recibidas",
     "jetonWhiteReceivedLabel": "Fichas blancas recibidas",
