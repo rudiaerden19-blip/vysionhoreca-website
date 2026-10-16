@@ -1,7 +1,7 @@
 import type { TenantSettings } from '@/lib/admin-api'
 
 /** Lagoon-pilot: succesmodal kort tonen, daarna weg. */
-export const KASSA_JETON_QUICK_SUCCESS_MODAL_MS = 2000
+export const KASSA_JETON_QUICK_SUCCESS_MODAL_MS = 1000
 
 const LAGOON_JETON_QUICK_SLUG = 'thelagoon'
 

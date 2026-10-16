@@ -23,7 +23,7 @@ describe('kassa-jeton-quick-success-flow', () => {
     ).toBe(true)
   })
 
-  it('modal duration is 2 seconds', () => {
-    expect(KASSA_JETON_QUICK_SUCCESS_MODAL_MS).toBe(2000)
+  it('modal duration is 1 second', () => {
+    expect(KASSA_JETON_QUICK_SUCCESS_MODAL_MS).toBe(1000)
   })
 })
