@@ -1,5 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { isKassaPosOrder } from '@/lib/admin-api-order-helpers'
+import {
+  filterLagoonKitchenQueueOrder,
+  isLagoonKitchenScreenTenant,
+  loadLagoonKitchenCategoryContext,
+} from '@/lib/lagoon-kitchen-screen'
 
 export function parseOrdersItemsJson<T extends Record<string, unknown>>(rows: T[]): T[] {
   return rows.map((order) => ({
@@ -77,8 +82,20 @@ export async function fetchKitchenQueueOrders(
     if (id && !byId.has(id)) byId.set(id, row as Record<string, unknown>)
   }
   const parsed = parseOrdersItemsJson([...byId.values()])
+
+  let lagoonKitchenCtx = null as Awaited<ReturnType<typeof loadLagoonKitchenCategoryContext>> | null
+  if (isLagoonKitchenScreenTenant(tenantSlug)) {
+    try {
+      lagoonKitchenCtx = await loadLagoonKitchenCategoryContext(client, tenantSlug)
+    } catch (e) {
+      console.warn('[kitchen-queue] lagoon category context failed:', e)
+    }
+  }
+
   return parsed
     .filter(isKitchenQueueOrder)
+    .map((order) => filterLagoonKitchenQueueOrder(tenantSlug, order, lagoonKitchenCtx))
+    .filter((order): order is Record<string, unknown> => order != null)
     .sort(
       (a, b) =>
         new Date(String(a.created_at ?? 0)).getTime() - new Date(String(b.created_at ?? 0)).getTime(),

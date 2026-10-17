@@ -213,6 +213,10 @@ import {
   KASSA_JETON_QUICK_SUCCESS_MODAL_MS,
 } from '@/lib/kassa-jeton-quick-success-flow'
 import {
+  filterCartLinesForLagoonKitchen,
+  isLagoonKitchenScreenTenant,
+} from '@/lib/lagoon-kitchen-screen'
+import {
   readKassaJetonSalePoint,
   writeKassaJetonSalePoint,
   type KassaJetonSalePoint,
@@ -4780,6 +4784,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const { deltaLines, nextWatermark } = computeBarBonDelta(fullTableLines, prev)
         if (deltaLines.length === 0) return
 
+        const kitchenDeltaLines =
+          wantKitchen && isLagoonKitchenScreenTenant(tenant)
+            ? filterCartLinesForLagoonKitchen(deltaLines, categories)
+            : deltaLines
+
         const draftSplit = computeInclusiveVatSplitFromCart(deltaLines, resolveCartLineVat)
         const deltaTotal = draftSplit.grossTotal
         const draftOrder: KassaLastOrderReceipt = {
@@ -4820,8 +4829,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           kitchenAvailable = printAgentHasDedicatedKitchenPrinter(health)
         }
 
-        if (wantKitchen && kitchenAvailable) {
-          await printReceipt(draftOrder, {
+        if (wantKitchen && kitchenAvailable && kitchenDeltaLines.length > 0) {
+          const kitchenSplit = computeInclusiveVatSplitFromCart(kitchenDeltaLines, resolveCartLineVat)
+          const kitchenDraftOrder: KassaLastOrderReceipt = {
+            ...draftOrder,
+            items: sortKassaCartLinesByMenuCategory(kitchenDeltaLines, categories),
+            total: kitchenSplit.grossTotal,
+            vatSplit: kitchenSplit.byRate.map((l) => ({
+              rate: l.rate,
+              baseExcl: l.baseExcl,
+              tax: l.tax,
+            })),
+            subtotalExclVat: kitchenSplit.subtotalExcl,
+            totalTax: kitchenSplit.totalTax,
+          }
+          await printReceipt(kitchenDraftOrder, {
             draft: true,
             barTableDelta: true,
             receiptMode: 'keuken',
@@ -4829,6 +4851,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })
         } else if (wantKitchen && !kitchenAvailable) {
           commitWatermarkOnly()
+        } else if (wantKitchen && kitchenAvailable && kitchenDeltaLines.length === 0) {
+          if (!printKassaSlip) commitWatermarkOnly()
         }
 
         if (printKassaSlip) {
