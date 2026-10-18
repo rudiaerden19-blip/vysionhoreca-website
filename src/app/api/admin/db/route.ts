@@ -187,6 +187,26 @@ export async function POST(req: NextRequest) {
             .limit(spec.maxRows ?? 100)) as any
           beforeData = existing
         } catch { /* ignore */ }
+
+        if (body.table === 'orders' && Array.isArray(beforeData)) {
+          const blocked = (beforeData as Record<string, unknown>[]).some((row) => {
+            const ps = String(row.payment_status ?? '').toLowerCase()
+            const st = String(row.status ?? '').toLowerCase()
+            const ot = String(row.order_type ?? '').toUpperCase()
+            const paidPos =
+              ps === 'paid' &&
+              st !== 'open' &&
+              ['DINE_IN', 'TAKEAWAY', 'DELIVERY'].includes(ot)
+            return paidPos
+          })
+          if (blocked) {
+            return NextResponse.json(
+              { error: 'Betaalde kassa-bonnen kunnen niet worden verwijderd.' },
+              { status: 403 },
+            )
+          }
+        }
+
         const { error } = await supabase.from(body.table).delete().match(body.where!)
         if (error) throw error
         result = { deleted: true }
