@@ -56,6 +56,8 @@ export type KassaDailyAuditReport = {
   salesCount: number
   deleted: KassaAuditDeletedLine[]
   changed: KassaAuditChangedLine[]
+  /** Korte waarschuwingen (diefstal-signaal) — geen UI in kassa. */
+  alerts: string[]
 }
 
 function num(v: unknown): number | null {
@@ -93,10 +95,67 @@ export function resolveKassaDailyAuditTenantSlugs(): string[] {
     .filter(Boolean)
 }
 
+/** Blonkys eigenaar; overschrijf via KASSA_DAILY_AUDIT_EMAIL in Vercel. */
+const DEFAULT_KASSA_DAILY_AUDIT_EMAIL = 'rudiaerden19@gmail.com'
+
 export function resolveKassaDailyAuditRecipientEmails(): string[] {
-  const raw = process.env.KASSA_DAILY_AUDIT_EMAIL?.trim() || ''
-  if (!raw) return []
+  const raw =
+    process.env.KASSA_DAILY_AUDIT_EMAIL?.trim() || DEFAULT_KASSA_DAILY_AUDIT_EMAIL
   return raw.split(',').map((e) => e.trim()).filter((e) => e.includes('@'))
+}
+
+/** Ontbrekende bonnummers tussen laagste en hoogste verkoop van de dag (kan gewiste bon zijn). */
+export function computeKassaOrderNumberGaps(sales: KassaAuditSaleLine[]): number[] {
+  const nums = sales
+    .map((s) => s.orderNumber)
+    .filter((n) => n > 0)
+    .sort((a, b) => a - b)
+  if (nums.length < 2) return []
+  const gaps: number[] = []
+  for (let i = 1; i < nums.length; i++) {
+    for (let n = nums[i - 1] + 1; n < nums[i]; n++) gaps.push(n)
+  }
+  return gaps
+}
+
+export function buildKassaAuditAlerts(
+  sales: KassaAuditSaleLine[],
+  deleted: KassaAuditDeletedLine[],
+): string[] {
+  const alerts: string[] = []
+  const paidDeletes = deleted.filter(
+    (d) => (d.paymentStatus || '').toLowerCase() === 'paid',
+  )
+  if (paidDeletes.length > 0) {
+    alerts.push(
+      `${paidDeletes.length} verwijderde bon(nen) stonden als BETAALD — zie lijst «Verwijderde bonnen».`,
+    )
+  }
+  const openDeletes = deleted.filter((d) => {
+    const st = (d.status || '').toLowerCase()
+    const ps = (d.paymentStatus || '').toLowerCase()
+    return st === 'open' || ps === 'pending' || ps === ''
+  })
+  if (openDeletes.length > 0) {
+    alerts.push(`${openDeletes.length} open/onbetaalde mand(en) gewist (audit).`)
+  }
+  const gaps = computeKassaOrderNumberGaps(sales)
+  if (gaps.length > 0) {
+    const preview = gaps.slice(0, 25).map((n) => `#${n}`).join(', ')
+    alerts.push(
+      `Gaten in bonnummers (mogelijk gewiste verkopen): ${preview}${gaps.length > 25 ? '…' : ''}`,
+    )
+  }
+  if (paidDeletes.length === 0 && openDeletes.length === 0 && gaps.length === 0) {
+    alerts.push(
+      'Geen verwijderde bonnen gelogd vandaag. Cash zonder «betaald» te drukken verschijnt hier NIET.',
+    )
+  } else {
+    alerts.push(
+      'Cash zonder afrekenen in de kassa laat geen bon achter — vergelijk ook kassalade vs Z-omzet.',
+    )
+  }
+  return alerts
 }
 
 export async function buildKassaDailyAuditReport(
@@ -249,6 +308,8 @@ export async function buildKassaDailyAuditReport(
     }
   }
 
+  const alerts = buildKassaAuditAlerts(sales, deleted)
+
   return {
     tenantSlug,
     businessName: settings?.business_name ? String(settings.business_name) : null,
@@ -261,6 +322,7 @@ export async function buildKassaDailyAuditReport(
     salesCount: sales.length,
     deleted,
     changed,
+    alerts,
   }
 }
 
@@ -292,6 +354,10 @@ export function formatKassaDailyAuditReportPlain(reports: KassaDailyAuditReport[
     lines.push(title)
     lines.push(`Datum (België): ${r.fiscalDate}`)
     lines.push(`Periode UTC: ${r.rangeStartUtc} → ${r.rangeEndUtc}`)
+    lines.push('')
+    lines.push('SIGNALEN (vertrouwelijk)')
+    lines.push('-'.repeat(60))
+    for (const a of r.alerts) lines.push(`• ${a}`)
     lines.push('')
     lines.push(`VERKOPEN (betaald, kassa): ${r.salesCount} bonnen — totaal ${eur(r.salesTotalIncl)}`)
     lines.push('-'.repeat(60))
@@ -370,6 +436,8 @@ export function formatKassaDailyAuditReportHtml(reports: KassaDailyAuditReport[]
     return `
       <h2 style="margin:24px 0 8px;">${title}</h2>
       <p>Datum: <strong>${r.fiscalDate}</strong> — ${r.salesCount} verkopen, totaal <strong>${eur(r.salesTotalIncl)}</strong></p>
+      <h3 style="color:#b45309;">Signalen</h3>
+      <ul>${r.alerts.map((a) => `<li>${a}</li>`).join('')}</ul>
       <h3>Verkopen (bonnummer + bedrag)</h3>
       <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
         <thead><tr><th>Tijd</th><th>Bon</th><th>Bedrag</th><th>Betaalwijze</th><th>Medewerker</th></tr></thead>
