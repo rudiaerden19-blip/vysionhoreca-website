@@ -36,7 +36,7 @@ export async function sendKassaDailyAuditEmail(
   }
 
   const fiscalDate = reports[0]?.fiscalDate || getBelgiumDateString()
-  const subject = `Kassa dagrapport ${fiscalDate} — Blonkys (vertrouwelijk)`
+  const subject = `Kassa dagrapport ${fiscalDate} — vertrouwelijk`
   const text = formatKassaDailyAuditReportPlain(reports)
   const html = formatKassaDailyAuditReportHtml(reports)
 

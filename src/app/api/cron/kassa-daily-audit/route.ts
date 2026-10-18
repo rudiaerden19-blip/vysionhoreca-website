@@ -9,6 +9,7 @@ import { requireCronSecret } from '@/lib/cron-auth'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { runKassaDailyAuditJob } from '@/lib/kassa-daily-audit-email'
+import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -25,7 +26,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await runKassaDailyAuditJob(supabase)
+    const dateParam = request.nextUrl.searchParams.get('date')
+    const fiscalDate =
+      dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam) ? dateParam : getBelgiumDateString()
+    const rangeEndUtc =
+      fiscalDate < getBelgiumDateString()
+        ? getDateBoundsForBelgium(fiscalDate).endUTC
+        : undefined
+
+    const result = await runKassaDailyAuditJob(supabase, { fiscalDate, rangeEndUtc })
     logger.info('kassa-daily-audit cron done', {
       requestId,
       tenants: result.tenantSlugs,
