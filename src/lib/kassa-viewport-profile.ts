@@ -75,11 +75,21 @@ export function readKassaIpadClientFromWindow(): boolean {
   })
 }
 
-/** Standaard menu-raster (niet SXGA / wide15): iPad max 5 kolommen op xl; desktop 6. */
+/** Standaard menu-raster (niet SXGA / wide15): iPad max 4 kolommen vanaf md; desktop 6 op xl. */
 export function kassaDefaultMenuGridTailwindCols(ipadClient: boolean): string {
   return ipadClient
-    ? 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
+    ? 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4'
     : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+}
+
+/** Klassieke tegel-kleurstriping: kolommen in het actieve menu-raster. */
+export function kassaDefaultMenuClassicGridCols(input: {
+  compactChrome: boolean
+  ipadClient: boolean
+}): number {
+  if (input.compactChrome) return 5
+  if (input.ipadClient) return 4
+  return 6
 }
 
 export function resolveKassaViewportProfile(input: {

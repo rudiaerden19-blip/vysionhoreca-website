@@ -3,6 +3,7 @@ import {
   isKassaIpadClient,
   isSxga17CssViewport,
   isWide15CssViewport,
+  kassaDefaultMenuClassicGridCols,
   kassaDefaultMenuGridTailwindCols,
   resolveKassaViewportProfile,
 } from '@/lib/kassa-viewport-profile'
@@ -70,10 +71,16 @@ describe('kassa-viewport-profile', () => {
     ).toBe(false)
   })
 
-  it('zet iPad xl-raster op 5 kolommen, desktop op 6', () => {
-    expect(kassaDefaultMenuGridTailwindCols(true)).toContain('xl:grid-cols-5')
-    expect(kassaDefaultMenuGridTailwindCols(true)).not.toContain('xl:grid-cols-6')
+  it('zet iPad raster op 4 kolommen, desktop op 6 xl', () => {
+    expect(kassaDefaultMenuGridTailwindCols(true)).toContain('xl:grid-cols-4')
+    expect(kassaDefaultMenuGridTailwindCols(true)).not.toContain('grid-cols-5')
     expect(kassaDefaultMenuGridTailwindCols(false)).toContain('xl:grid-cols-6')
+    expect(
+      kassaDefaultMenuClassicGridCols({ compactChrome: false, ipadClient: true }),
+    ).toBe(4)
+    expect(
+      kassaDefaultMenuClassicGridCols({ compactChrome: true, ipadClient: true }),
+    ).toBe(5)
   })
 
   it('laat 21–22″ en volle HD met rust', () => {

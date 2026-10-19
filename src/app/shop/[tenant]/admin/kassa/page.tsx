@@ -300,6 +300,7 @@ import {
   formatKassaVatInvoiceNumber,
 } from '@/lib/kassa-vat-invoice-layout'
 import {
+  kassaDefaultMenuClassicGridCols,
   kassaDefaultMenuGridTailwindCols,
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
@@ -1677,7 +1678,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** SXGA ~17″: dichtere titel+vierkante fotobak — alleen daar `sxgaDenseTileLayout`naar tegels */
   const [kassaSxgaDenseTiles, setKassaSxgaDenseTiles] = useState(shouldApplyKassaCompactSquareMonitorTileCap)
   const [kassaWide15Chrome, setKassaWide15Chrome] = useState(shouldApplyKassaWide15Chrome)
-  /** iPad: max 5 tegels/rij op xl (desktop 21″ blijft 6). */
+  /** iPad: max 4 tegels/rij (desktop 21″ blijft 6 op xl). */
   const [kassaIpadMenuGridCap, setKassaIpadMenuGridCap] = useState(readKassaIpadClientFromWindow)
 
   /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
@@ -5339,8 +5340,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)}`: ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
-  const kassaMenuClassicGridCols =
-    kassaCompactChrome || kassaIpadMenuGridCap ? 5 : 6
+  const kassaMenuClassicGridCols = kassaDefaultMenuClassicGridCols({
+    compactChrome: kassaCompactChrome,
+    ipadClient: kassaIpadMenuGridCap,
+  })
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
   const kassaChromeDensity: KassaChromeDensity = kassaWide15Chrome
     ? 'wide15'
