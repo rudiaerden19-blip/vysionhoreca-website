@@ -299,7 +299,11 @@ import {
   buildKassaVatInvoiceThermalLines,
   formatKassaVatInvoiceNumber,
 } from '@/lib/kassa-vat-invoice-layout'
-import { readKassaViewportProfileFromWindow } from '@/lib/kassa-viewport-profile'
+import {
+  kassaDefaultMenuGridTailwindCols,
+  readKassaIpadClientFromWindow,
+  readKassaViewportProfileFromWindow,
+} from '@/lib/kassa-viewport-profile'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -1673,6 +1677,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** SXGA ~17″: dichtere titel+vierkante fotobak — alleen daar `sxgaDenseTileLayout`naar tegels */
   const [kassaSxgaDenseTiles, setKassaSxgaDenseTiles] = useState(shouldApplyKassaCompactSquareMonitorTileCap)
   const [kassaWide15Chrome, setKassaWide15Chrome] = useState(shouldApplyKassaWide15Chrome)
+  /** iPad: max 5 tegels/rij op xl (desktop 21″ blijft 6). */
+  const [kassaIpadMenuGridCap, setKassaIpadMenuGridCap] = useState(readKassaIpadClientFromWindow)
 
   /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
   useLayoutEffect(() => {
@@ -2017,8 +2023,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     function syncSxgaDenseFromViewport() {
       const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
       const wide15 = shouldApplyKassaWide15Chrome()
+      const ipadGridCap = readKassaIpadClientFromWindow()
       setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
       setKassaWide15Chrome((prev) => (prev === wide15 ? prev : wide15))
+      setKassaIpadMenuGridCap((prev) => (prev === ipadGridCap ? prev : ipadGridCap))
     }
 
     const measure = () => {
@@ -5331,6 +5339,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)}`: ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
+  const kassaMenuClassicGridCols =
+    kassaCompactChrome || kassaIpadMenuGridCap ? 5 : 6
+  const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
   const kassaChromeDensity: KassaChromeDensity = kassaWide15Chrome
     ? 'wide15'
     : kassaSxgaDenseTiles
@@ -6040,6 +6051,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   ref={kassaCategoryGridRef}
                   data-testid="kassa-category-grid"
                   data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1': '0'}
+                  data-kassa-ipad-menu-grid-cap={kassaIpadMenuGridCap ? '1' : '0'}
                   onPointerDown={handleCategoryGridPointerDown}
                   onPointerUp={handleCategoryGridPointerUp}
                   onPointerCancel={handleCategoryGridPointerCancel}
@@ -6049,7 +6061,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                       : kassaWide15Chrome
                         ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5'
-                        : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+                        : kassaDefaultMenuGridColsClass
                   } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles ?
@@ -6065,7 +6077,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         category={cat}
                         imageUrl={tile?.url}
                         tileIndex={catIndex}
-                        classicGridCols={kassaCompactChrome ? 5 : 6}
+                        classicGridCols={kassaMenuClassicGridCols}
                         sxgaDenseTileLayout={kassaSxgaDenseTiles}
                         posLuxuryAppearance={kassaPosLuxury}
                         classicDarkAppearance={kassaClassicDark}
@@ -6087,6 +6099,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ref={kassaProductGridRef}
                     data-testid="kassa-product-grid"
                     data-kassa-sxga-tiles={kassaSxgaDenseTiles ? '1': '0'}
+                    data-kassa-ipad-menu-grid-cap={kassaIpadMenuGridCap ? '1' : '0'}
                     onPointerDown={handleProductGridPointerDown}
                     onPointerUp={handleProductGridPointerUp}
                     onPointerCancel={handleProductGridPointerCancel}
@@ -6096,7 +6109,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                         : kassaWide15Chrome
                           ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5'
-                          : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+                          : kassaDefaultMenuGridColsClass
                     } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles ?
@@ -6116,7 +6129,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           inCart={inCart}
                           hasOpts={hasOpts}
                           tileIndex={productIndex}
-                          classicGridCols={kassaCompactChrome ? 5 : 6}
+                          classicGridCols={kassaMenuClassicGridCols}
                           sxgaDenseTileLayout={kassaSxgaDenseTiles}
                           posLuxuryAppearance={kassaPosLuxury}
                           classicDarkAppearance={kassaClassicDark}

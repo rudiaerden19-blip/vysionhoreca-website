@@ -45,6 +45,43 @@ export function isIpadDisguisedAsMac(input: {
   )
 }
 
+/** iPad in kassa (UA of «Mac» + touch + coarse pointer) — geen iPhone/iPod. */
+export function isKassaIpadClient(input: {
+  userAgent: string
+  platform?: string
+  maxTouchPoints?: number
+  pointerCoarse?: boolean
+}): boolean {
+  if (/\biPhone\b|\biPod\b/.test(input.userAgent)) return false
+  if (/\biPad\b/.test(input.userAgent)) return true
+  return isIpadDisguisedAsMac({
+    platform: input.platform,
+    maxTouchPoints: input.maxTouchPoints,
+    pointerCoarse: input.pointerCoarse,
+  })
+}
+
+export function readKassaIpadClientFromWindow(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const pointerCoarse =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(pointer: coarse)').matches
+  return isKassaIpadClient({
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    maxTouchPoints: navigator.maxTouchPoints,
+    pointerCoarse,
+  })
+}
+
+/** Standaard menu-raster (niet SXGA / wide15): iPad max 5 kolommen op xl; desktop 6. */
+export function kassaDefaultMenuGridTailwindCols(ipadClient: boolean): string {
+  return ipadClient
+    ? 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
+    : 'gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+}
+
 export function resolveKassaViewportProfile(input: {
   cssW: number
   cssH: number

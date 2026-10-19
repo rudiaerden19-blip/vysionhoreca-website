@@ -1,7 +1,9 @@
 import {
   isIpadDisguisedAsMac,
+  isKassaIpadClient,
   isSxga17CssViewport,
   isWide15CssViewport,
+  kassaDefaultMenuGridTailwindCols,
   resolveKassaViewportProfile,
 } from '@/lib/kassa-viewport-profile'
 
@@ -31,6 +33,47 @@ describe('kassa-viewport-profile', () => {
     expect(
       isIpadDisguisedAsMac({ platform: 'MacIntel', maxTouchPoints: 5, pointerCoarse: true }),
     ).toBe(true)
+  })
+
+  it('herkent iPad voor menu-raster-cap, niet iPhone of desktop-Mac', () => {
+    expect(
+      isKassaIpadClient({
+        userAgent: 'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X)',
+        platform: 'MacIntel',
+        maxTouchPoints: 5,
+        pointerCoarse: true,
+      }),
+    ).toBe(true)
+    expect(
+      isKassaIpadClient({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X)',
+        platform: 'MacIntel',
+        maxTouchPoints: 5,
+        pointerCoarse: true,
+      }),
+    ).toBe(true)
+    expect(
+      isKassaIpadClient({
+        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)',
+        platform: 'iPhone',
+        maxTouchPoints: 5,
+        pointerCoarse: true,
+      }),
+    ).toBe(false)
+    expect(
+      isKassaIpadClient({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X)',
+        platform: 'MacIntel',
+        maxTouchPoints: 0,
+        pointerCoarse: false,
+      }),
+    ).toBe(false)
+  })
+
+  it('zet iPad xl-raster op 5 kolommen, desktop op 6', () => {
+    expect(kassaDefaultMenuGridTailwindCols(true)).toContain('xl:grid-cols-5')
+    expect(kassaDefaultMenuGridTailwindCols(true)).not.toContain('xl:grid-cols-6')
+    expect(kassaDefaultMenuGridTailwindCols(false)).toContain('xl:grid-cols-6')
   })
 
   it('laat 21–22″ en volle HD met rust', () => {
