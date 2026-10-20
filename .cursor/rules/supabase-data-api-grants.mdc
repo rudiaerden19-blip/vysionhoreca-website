@@ -1,0 +1,46 @@
+---
+description: Supabase Data API — GRANT bij nieuwe public-tabellen (vanaf okt 2025)
+globs: supabase/**/*.sql
+alwaysApply: false
+---
+
+# Supabase — GRANT bij nieuwe tabellen
+
+Supabase geeft **geen** automatische Data API-toegang meer aan **nieuwe** tabellen in `public` (bestaande productietabellen blijven zoals ze zijn).
+
+## Verplicht in dezelfde migratie als `CREATE TABLE`
+
+Elke nieuwe tabel in `public` (in `supabase/migrations/` of andere `supabase/*.sql` die nog op productie draait):
+
+1. **`tenant_slug TEXT NOT NULL`** (multi-tenant — zie `multi-tenant.mdc`)
+2. **RLS** `ENABLE ROW LEVEL SECURITY` + policies (geen brede anon-read op gevoelige data)
+3. **Expliciete GRANTs** — zonder GRANT faalt PostgREST / `supabase-js` met *permission denied*
+
+### Standaard template (pas rollen aan per tabel)
+
+Server-only tabellen (alleen Next.js API met service role — veel Vysion-admin):
+
+```sql
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.jouw_tabel TO service_role;
+-- Geen anon/authenticated tenzij de browser direct op deze tabel leest/schrijft
+```
+
+Publiek leesbaar menu / webshop (client anon + RLS):
+
+```sql
+GRANT SELECT ON public.jouw_tabel TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.jouw_tabel TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.jouw_tabel TO service_role;
+```
+
+Bij **sequences** (serial/`GENERATED` id): indien nodig `GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO …` voor dezelfde rollen.
+
+## Agent-checklist
+
+- Nieuwe `CREATE TABLE` → GRANTs in **dezelfde** SQL-file, niet in een aparte “later” migratie.
+- Comment in migratie kort: *wie* de tabel gebruikt (service role only vs anon).
+- Oude migraties **niet** massaal herschrijven tenzij expliciet gevraagd; alleen **nieuwe** migraties moeten compliant zijn.
+
+## Referentie
+
+Supabase mail okt 2025: nieuwe `public`-tabellen op bestaande projecten vereisen expliciete grants vóór Data API-toegang.

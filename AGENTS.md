@@ -33,6 +33,9 @@ De **horeca-kassa** (`src/app/shop/[tenant]/admin/kassa/`) **nooit aanraken**
   `src/i18n/LanguageContext.tsx` (cookie). Locale-bestanden staan in `messages/*.json` — bij tekst
   wijzigen alle talen bijwerken (zie `.cursor/rules/i18n-all-locales.mdc`).
 
+### Supabase migraties (Data API grants)
+- Nieuwe tabellen in `public` moeten in **dezelfde** migratie expliciete `GRANT` hebben voor `service_role` (en zo nodig `anon`/`authenticated`). Zie `.cursor/rules/supabase-data-api-grants.mdc`. Bestaande productietabellen hoef je niet retroactief te fixen.
+
 ### Onschuldige meldingen (geen actie nodig)
 - `⚠ Found lockfile missing swc dependencies, patching...` gevolgd door
   `⨯ Failed to patch lockfile ... reading 'os'`: Next probeert pakketinfo van de npm-registry te
