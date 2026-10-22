@@ -7498,6 +7498,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           orderLines={jetonOrderLines}
           denoms={kassaJetonDenoms}
           salePoint={kassaJetonSalePoint}
+          tenantSlug={tenant}
           payBusy={payInFlight}
           quickSuccessFlow={kassaJetonQuickSuccess}
           onClose={() => {

@@ -12,6 +12,7 @@ import {
   type KassaJetonDenominations,
 } from '@/lib/kassa-jeton-math'
 import type { KassaJetonSalePoint } from '@/lib/kassa-jeton-sale-point'
+import { isKassaJetonLagoonCompactModalTenant } from '@/lib/kassa-jeton-quick-success-flow'
 
 function formatEuro(cents: number): string {
   return `€ ${(cents / 100).toFixed(2).replace('.', ',')}`
@@ -94,6 +95,7 @@ export function KassaJetonPaymentModal({
   orderLines,
   denoms,
   salePoint,
+  tenantSlug = '',
   payBusy = false,
   quickSuccessFlow = false,
   onClose,
@@ -107,6 +109,8 @@ export function KassaJetonPaymentModal({
   orderLines: readonly KassaJetonOrderLine[]
   denoms: KassaJetonDenominations
   salePoint: KassaJetonSalePoint
+  /** Alleen The Lagoon: scroll + vaste footer (zelfde knopgrootte). */
+  tenantSlug?: string
   payBusy?: boolean
   /** Lagoon/superadmin: alleen succesmodal 2s in parent; jeton-vlak blijft volledig. */
   quickSuccessFlow?: boolean
@@ -170,11 +174,47 @@ export function KassaJetonPaymentModal({
 
   const blackChipLabel = kassaJetonChipFaceLabel(denoms.blackCents)
   const whiteChipLabel = kassaJetonChipFaceLabel(denoms.whiteCents)
+  const lagoonIpadFit = isKassaJetonLagoonCompactModalTenant(tenantSlug)
+
+  const confirmPayButton = (
+    <button
+      type="button"
+      disabled={payBusy || !tender.sufficient || !anyReceived}
+      onClick={onConfirm}
+      className="w-full rounded-xl bg-emerald-600 py-4 text-lg font-bold text-white disabled:opacity-40"
+    >
+      {t('kassaApp.jetonConfirmPay')}
+    </button>
+  )
+
+  const ijsCashCardButton =
+    salePoint === 'ijs' ? (
+      <button
+        type="button"
+        disabled={payBusy}
+        onClick={onOpenCashCardPay}
+        className="w-full rounded-xl border border-zinc-500 py-3 text-base font-semibold text-zinc-200"
+      >
+        {t('kassaApp.jetonOpenCashCardPay')}
+      </button>
+    ) : null
+
+  const bodyClass = lagoonIpadFit
+    ? 'min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-4 p-5'
+    : 'space-y-4 p-5'
 
   return (
-    <div className="fixed inset-0 z-[185] flex items-center justify-center bg-black/70 p-4">
-      <div className={card}>
-        <div className="flex items-center justify-between border-b border-zinc-600 p-4">
+    <div
+      className={`fixed inset-0 z-[185] flex bg-black/70 ${
+        lagoonIpadFit
+          ? 'items-start justify-center overflow-y-auto p-2 sm:items-center sm:p-4'
+          : 'items-center justify-center p-4'
+      }`}
+    >
+      <div
+        className={`${card}${lagoonIpadFit ? ' my-2 flex max-h-[calc(100dvh-1rem)] flex-col sm:my-0' : ''}`}
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-zinc-600 p-4">
           <h3 className="text-xl font-semibold text-zinc-50">
             {t('kassaApp.jetonPayTitle')}
           </h3>
@@ -189,7 +229,7 @@ export function KassaJetonPaymentModal({
           </button>
         </div>
 
-        <div className="space-y-4 p-5">
+        <div className={bodyClass}>
           <button
             type="button"
             disabled={payBusy}
@@ -371,26 +411,20 @@ export function KassaJetonPaymentModal({
             </p>
           )}
 
-          <button
-            type="button"
-            disabled={payBusy || !tender.sufficient || !anyReceived}
-            onClick={onConfirm}
-            className="w-full rounded-xl bg-emerald-600 py-4 text-lg font-bold text-white disabled:opacity-40"
-          >
-            {t('kassaApp.jetonConfirmPay')}
-          </button>
-
-          {salePoint === 'ijs' && (
-            <button
-              type="button"
-              disabled={payBusy}
-              onClick={onOpenCashCardPay}
-              className="w-full rounded-xl border border-zinc-500 py-3 text-base font-semibold text-zinc-200"
-            >
-              {t('kassaApp.jetonOpenCashCardPay')}
-            </button>
-          )}
+          {!lagoonIpadFit ? (
+            <>
+              {confirmPayButton}
+              {ijsCashCardButton}
+            </>
+          ) : null}
         </div>
+
+        {lagoonIpadFit ? (
+          <div className="shrink-0 space-y-3 border-t border-zinc-600 bg-[#151a21] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            {confirmPayButton}
+            {ijsCashCardButton}
+          </div>
+        ) : null}
       </div>
     </div>
   )

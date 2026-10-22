@@ -1,5 +1,6 @@
 import type { TenantSettings } from '@/lib/admin-api'
 import {
+  isKassaJetonLagoonCompactModalTenant,
   isKassaJetonQuickSuccessFlowTenant,
   KASSA_JETON_QUICK_SUCCESS_MODAL_MS,
 } from '@/lib/kassa-jeton-quick-success-flow'
@@ -25,5 +26,11 @@ describe('kassa-jeton-quick-success-flow', () => {
 
   it('modal duration is 1 second', () => {
     expect(KASSA_JETON_QUICK_SUCCESS_MODAL_MS).toBe(1000)
+  })
+
+  it('Lagoon-only iPad jeton layout flag', () => {
+    expect(isKassaJetonLagoonCompactModalTenant('thelagoon')).toBe(true)
+    expect(isKassaJetonLagoonCompactModalTenant('TheLagoon')).toBe(true)
+    expect(isKassaJetonLagoonCompactModalTenant('demo-frituur')).toBe(false)
   })
 })
