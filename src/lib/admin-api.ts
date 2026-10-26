@@ -90,6 +90,7 @@ import {
   deleteMenuCategory,
   getMenuProducts,
   saveMenuProduct,
+  saveMenuProductWithOptionLinks,
   deleteMenuProduct,
 } from './admin-api-menu-catalog'
 
@@ -103,6 +104,7 @@ export {
   deleteMenuCategory,
   getMenuProducts,
   saveMenuProduct,
+  saveMenuProductWithOptionLinks,
   deleteMenuProduct,
 }
 

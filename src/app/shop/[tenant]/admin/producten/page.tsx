@@ -25,11 +25,11 @@ import { CSS } from '@dnd-kit/utilities'
 import { 
   getMenuProducts, 
   getMenuCategories, 
-  saveMenuProduct, 
+  saveMenuProduct,
+  saveMenuProductWithOptionLinks, 
   deleteMenuProduct, 
   getProductOptions,
   getProductOptionLinks,
-  saveProductOptionLinks,
   MenuProduct,
   MenuCategory,
   ProductOption,
@@ -755,7 +755,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         retail_promo_partner_id: saveMode === 'retail' ? promoPartner : null,
       }
 
-      const { data: result, error: saveError } = await saveMenuProduct(productData)
+      const { data: result, error: saveError } =
+        saveMode === 'horeca'
+          ? await saveMenuProductWithOptionLinks(productData, {
+              syncOptionLinks: true,
+              optionIds: selectedOptionIds,
+            })
+          : await saveMenuProductWithOptionLinks(productData, { syncOptionLinks: false })
 
       if (!result) {
         setError(saveError || t('adminPages.producten.saveFailed'))
@@ -782,14 +788,6 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               retail_promo_partner_id: result.id,
             })
           }
-        }
-      }
-
-      if (result.id && saveMode === 'horeca') {
-        const linksOk = await saveProductOptionLinks(result.id, selectedOptionIds, params.tenant)
-        if (!linksOk) {
-          setError(t('adminPages.producten.saveFailed'))
-          return
         }
       }
 

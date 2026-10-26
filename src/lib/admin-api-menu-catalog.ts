@@ -409,6 +409,53 @@ export async function saveMenuProduct(product: MenuProduct): Promise<{ data: Men
   return { data: null, error: r.error }
 }
 
+/** Product + optioneel optie-koppelingen in één server-request (producten-modal). */
+export async function saveMenuProductWithOptionLinks(
+  product: MenuProduct,
+  options: { syncOptionLinks: boolean; optionIds?: string[] },
+): Promise<{ data: MenuProduct | null; error?: string }> {
+  const tenantSlug = product.tenant_slug
+  if (!tenantSlug) {
+    return { data: null, error: 'tenant_slug ontbreekt' }
+  }
+  try {
+    const res = await authFetch('/api/admin/menu/save-product', {
+      method: 'POST',
+      body: JSON.stringify({
+        tenantSlug,
+        product,
+        optionIds: options.optionIds ?? [],
+        syncOptionLinks: options.syncOptionLinks,
+      }),
+    })
+    let json: { product?: MenuProduct; error?: string } | null = null
+    try {
+      json = await res.json()
+    } catch {
+      /* ignore */
+    }
+    if (!res.ok) {
+      return { data: null, error: json?.error || `HTTP ${res.status}` }
+    }
+    const row = json?.product
+    if (!row?.id) {
+      return { data: null, error: 'leeg resultaat' }
+    }
+    cache.invalidate(cacheKey('menu_products', tenantSlug))
+    return {
+      data: {
+        ...row,
+        kassa_image_zoom: clampKassaProductImageZoom((row as { kassa_image_zoom?: unknown }).kassa_image_zoom),
+        image_display_mode: normalizeProductImageDisplayMode(
+          (row as { image_display_mode?: unknown }).image_display_mode,
+        ),
+      },
+    }
+  } catch (e: unknown) {
+    return { data: null, error: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 export async function deleteMenuProduct(id: string, tenantSlug?: string): Promise<boolean> {
   if (!tenantSlug) {
     console.error('deleteMenuProduct: tenantSlug verplicht in Phase 1')
