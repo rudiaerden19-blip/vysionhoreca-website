@@ -27,6 +27,7 @@ import {
   invalidateMenuCategoriesCache,
   getMenuProducts,
   getProductsWithOptions,
+  getAllMenuProductOptionsForTenant,
   getOptionsForProduct,
   getTenantSettings,
   TenantSettings,
@@ -93,6 +94,12 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import { cache, cacheKey } from '@/lib/cache'
+import {
+  mergeProductIdsWithOptions,
+  productIdsWithActiveOptionsFromMap,
+  readCachedProductOptions,
+  shouldFetchProductOptionsFallback,
+} from '@/lib/kassa-menu-product-options'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
@@ -1607,6 +1614,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () => new Set(productsWithOptions),
     [productsWithOptions],
   )
+  /** Batch geladen bij loadMenu; fallback naar getOptionsForProduct bij miss/leeg+link. */
+  const optionsByProductIdRef = useRef<Record<string, ProductOption[]>>({})
 
   /** gap-4 (16px) op categorie-/productgrid; zelfde waarde in ResizeObserver-formule. */
   const KASSA_MENU_GRID_GAP_PX = 16
@@ -2942,19 +2951,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     try {
-      const [cats, prods, withOpts] = await Promise.all([
+      const [cats, prods, withOpts, optionsMap] = await Promise.all([
         getMenuCategories(tenant),
         getMenuProducts(tenant),
         getProductsWithOptions(tenant),
+        getAllMenuProductOptionsForTenant(tenant).catch(() => ({} as Record<string, ProductOption[]>)),
       ])
       const activeCats = dedupeCatalogById(cats.filter(c => c.is_active))
       const activeProds = dedupeCatalogById(prods.filter(p => p.is_active))
       setCategories(activeCats)
       setProducts(activeProds)
-      setProductsWithOptions(withOpts)
+      optionsByProductIdRef.current = optionsMap
+      const withOptsMerged = mergeProductIdsWithOptions(
+        withOpts,
+        productIdsWithActiveOptionsFromMap(optionsMap),
+      )
+      setProductsWithOptions(withOptsMerged)
       const catsJson = JSON.stringify(activeCats)
       const prodsJson = JSON.stringify(activeProds)
-      const optsJson = JSON.stringify(withOpts)
+      const optsJson = JSON.stringify(withOptsMerged)
       void offlineDbSaveMenuSnapshot(tenant, {
         categoriesJson: catsJson,
         productsJson: prodsJson,
@@ -3139,6 +3154,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return parked > 0 || cartRound.length > 0
   }
 
+  const resolveKassaProductOptions = useCallback(
+    async (productId: string): Promise<ProductOption[]> => {
+      const cached = readCachedProductOptions(productId, optionsByProductIdRef.current)
+      if (!shouldFetchProductOptionsFallback(cached, productId, productIdsWithOptionsSet)) {
+        return cached ?? []
+      }
+      const opts = await getOptionsForProduct(productId)
+      if (opts.length > 0) {
+        optionsByProductIdRef.current = {
+          ...optionsByProductIdRef.current,
+          [productId]: opts,
+        }
+      }
+      return opts
+    },
+    [productIdsWithOptionsSet],
+  )
+
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
     scheduleAddToCartSound()
     const cartKey = choices.length > 0
@@ -3158,7 +3191,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   handleProductClickRef.current = async (product: MenuProduct) => {
     if (product.id && productIdsWithOptionsSet.has(product.id)) {
-      const opts = await getOptionsForProduct(product.id!)
+      const pid = product.id!
+      const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
+      if (!shouldFetchProductOptionsFallback(cached, pid, productIdsWithOptionsSet)) {
+        setOptionsModal({ product, options: cached ?? [], selected: [] })
+        return
+      }
+      const opts = await resolveKassaProductOptions(pid)
       setOptionsModal({ product, options: opts, selected: [] })
     } else {
       addToCart(product)
@@ -3188,7 +3227,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const pid = item.product.id
     if (!pid || String(pid).startsWith('custom-')) return
     if (!productIdsWithOptionsSet.has(pid)) return
-    const opts = await getOptionsForProduct(pid)
+    const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
+    const opts =
+      !shouldFetchProductOptionsFallback(cached, pid, productIdsWithOptionsSet)
+        ? (cached ?? [])
+        : await resolveKassaProductOptions(pid)
     playClick()
     setOptionsModal({
       product: item.product,

@@ -520,12 +520,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     void Promise.all(updates.map((p) => saveMenuProduct(p)))
   }
 
-  const openEditModal = async (product: MenuProduct) => {
+  const openEditModal = (product: MenuProduct) => {
     setError('')
-    // Reload categories in case new ones were added
-    const freshCategories = await getMenuCategories(params.tenant)
-    setCategories(freshCategories)
-    
     setCatalogMode(resolveCatalogModeForProduct(product))
     setFormData({
       ...product,
@@ -534,19 +530,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     const promo = product.promo_price != null ? Number(product.promo_price) : NaN
     setPromoPriceInputStr(Number.isFinite(promo) && promo > 0 ? loadedPriceToInputStr(promo) : '')
     setEditingProduct(product)
-    // Load linked options
+    setSelectedOptionIds([])
+    void getMenuCategories(params.tenant).then(setCategories)
     if (product.id) {
-      const linkedOptions = await getProductOptionLinks(product.id)
-      setSelectedOptionIds(linkedOptions)
+      void getProductOptionLinks(product.id).then(setSelectedOptionIds)
     }
   }
 
-  const openAddModal = async () => {
+  const openAddModal = () => {
     setError('')
-    // Reload categories in case new ones were added
-    const freshCategories = await getMenuCategories(params.tenant)
-    setCategories(freshCategories)
-    
     const mode = resolveCatalogModeForProduct(null)
     setCatalogMode(mode)
     setFormData({
@@ -580,6 +572,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setPriceInputStr('')
     setPromoPriceInputStr('')
     setShowAddModal(true)
+    void getMenuCategories(params.tenant).then(setCategories)
   }
 
   const closeModal = () => {
@@ -793,7 +786,11 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       }
 
       if (result.id && saveMode === 'horeca') {
-        await saveProductOptionLinks(result.id, selectedOptionIds, params.tenant)
+        const linksOk = await saveProductOptionLinks(result.id, selectedOptionIds, params.tenant)
+        if (!linksOk) {
+          setError(t('adminPages.producten.saveFailed'))
+          return
+        }
       }
 
       if (editingProduct) {
