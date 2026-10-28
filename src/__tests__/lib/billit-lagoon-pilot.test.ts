@@ -18,6 +18,16 @@ describe('billit-lagoon-pilot', () => {
     expect(billitExternalProviderId('thelagoon', '2026-10-28')).toBe('vysion-thelagoon-2026-10-28')
   })
 
+  it('accepts Billit API key UUID as credential', () => {
+    process.env.BILLIT_THELAGOON_API_KEY = '125ca4b7-2b6f-4dc7-8d93-fd0be92c231b'
+    process.env.BILLIT_THELAGOON_SANDBOX = '0'
+    const cfg = getBillitLagoonEnvConfig()
+    expect(cfg?.apiKey).toBe('125ca4b7-2b6f-4dc7-8d93-fd0be92c231b')
+    expect(cfg?.apiBaseUrl).toBe('https://api.billit.be')
+    delete process.env.BILLIT_THELAGOON_API_KEY
+    delete process.env.BILLIT_THELAGOON_SANDBOX
+  })
+
   it('returns null env config when credentials missing', () => {
     const prevId = process.env.BILLIT_THELAGOON_CLIENT_ID
     const prevSec = process.env.BILLIT_THELAGOON_CLIENT_SECRET

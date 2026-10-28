@@ -13,7 +13,9 @@ function parseTokenResponse(json: Record<string, unknown>): string | null {
   return typeof t === 'string' && t.length > 0 ? t : null
 }
 
-export async function billitFetchAccessToken(config: BillitLagoonEnvConfig): Promise<string> {
+export async function billitFetchAccessToken(
+  config: BillitLagoonEnvConfig & { clientId: string; clientSecret: string; grantType: string },
+): Promise<string> {
   if (tokenCache && tokenCache.expiresAtMs > Date.now() + 60_000) {
     return tokenCache.accessToken
   }
@@ -59,20 +61,41 @@ export async function billitFetchAccessToken(config: BillitLagoonEnvConfig): Pro
   return accessToken
 }
 
+function billitAuthHeaders(config: BillitLagoonEnvConfig): Record<string, string> {
+  if (config.apiKey?.trim()) {
+    return { ApiKey: config.apiKey.trim() }
+  }
+  return {}
+}
+
 export async function billitCreateOrder(
   config: BillitLagoonEnvConfig,
   order: BillitOrderPayload,
 ): Promise<{ orderId: string | null; raw: unknown }> {
-  const token = await billitFetchAccessToken(config)
   const url = `${config.apiBaseUrl.replace(/\/$/, '')}/v1/orders`
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...billitAuthHeaders(config),
+  }
+
+  if (!config.apiKey?.trim()) {
+    if (!config.clientId?.trim() || !config.clientSecret?.trim()) {
+      throw new Error('Billit: geen API key of OAuth credentials')
+    }
+    const token = await billitFetchAccessToken({
+      apiBaseUrl: config.apiBaseUrl,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret,
+      grantType: config.grantType || 'client_credentials',
+    })
+    headers.Authorization = `Bearer ${token}`
+  }
 
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
+    headers,
     body: JSON.stringify(order),
   })
 

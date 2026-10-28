@@ -1,6 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { billitCreateOrder } from '@/lib/billit-api-client'
 import {
+  BILLIT_LAGOON_DAILY_CUSTOMER_PARTY_ID,
+  BILLIT_LAGOON_SUPPLIER_PARTY_ID,
   billitExternalProviderId,
   getBillitLagoonEnvConfig,
   isBillitLagoonPilotTenant,
@@ -89,9 +91,19 @@ export function buildBillitOrderPayload(
     }
   })
 
+  const orderDate = closedAt
+  const expiryDate = new Date(closedAt)
+  expiryDate.setDate(expiryDate.getDate() + 30)
+
   return {
     OrderNumber: `VYSION-${reportDate}`,
-    OrderDate: closedAt,
+    OrderType: 'Invoice',
+    OrderDirection: 'Income',
+    SupplierID: BILLIT_LAGOON_SUPPLIER_PARTY_ID,
+    CustomerID: BILLIT_LAGOON_DAILY_CUSTOMER_PARTY_ID,
+    OrderDate: orderDate,
+    DeliveryDate: orderDate,
+    ExpiryDate: expiryDate.toISOString(),
     OrderTitle: `Vysion kassa dagomzet ${reportDate}`,
     Reference: extId,
     ExternalProvider: 'Vysion',

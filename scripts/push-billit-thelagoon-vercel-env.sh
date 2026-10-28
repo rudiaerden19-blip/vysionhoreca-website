@@ -17,15 +17,16 @@ set -a
 source "$ENV_FILE"
 set +a
 
+API_KEY="${BILLIT_THELAGOON_API_KEY:-}"
 ID="${BILLIT_THELAGOON_CLIENT_ID:-${BILLIT_THELAGOON_EMAIL:-}}"
 SECRET="${BILLIT_THELAGOON_CLIENT_SECRET:-${BILLIT_THELAGOON_PASSWORD:-}}"
 
-if [[ -z "$ID" || -z "$SECRET" ]]; then
-  echo "Zet BILLIT_THELAGOON_CLIENT_ID/SECRET (of EMAIL/PASSWORD) in $ENV_FILE" >&2
+if [[ -z "$API_KEY" && ( -z "$ID" || -z "$SECRET" ) ]]; then
+  echo "Zet BILLIT_THELAGOON_API_KEY (of CLIENT_ID/SECRET) in $ENV_FILE" >&2
   exit 1
 fi
 
-SANDBOX="${BILLIT_THELAGOON_SANDBOX:-1}"
+SANDBOX="${BILLIT_THELAGOON_SANDBOX:-0}"
 GRANT="${BILLIT_THELAGOON_GRANT_TYPE:-client_credentials}"
 API_BASE="${BILLIT_THELAGOON_API_BASE:-}"
 
@@ -37,8 +38,15 @@ push_env() {
 }
 
 for target in production preview; do
-  push_env BILLIT_THELAGOON_CLIENT_ID "$ID" "$target"
-  push_env BILLIT_THELAGOON_CLIENT_SECRET "$SECRET" "$target"
+  if [[ -n "$API_KEY" ]]; then
+    push_env BILLIT_THELAGOON_API_KEY "$API_KEY" "$target"
+  fi
+  if [[ -n "$ID" ]]; then
+    push_env BILLIT_THELAGOON_CLIENT_ID "$ID" "$target"
+  fi
+  if [[ -n "$SECRET" ]]; then
+    push_env BILLIT_THELAGOON_CLIENT_SECRET "$SECRET" "$target"
+  fi
   push_env BILLIT_THELAGOON_SANDBOX "$SANDBOX" "$target"
   push_env BILLIT_THELAGOON_GRANT_TYPE "$GRANT" "$target"
   if [[ -n "$API_BASE" ]]; then
