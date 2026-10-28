@@ -2833,6 +2833,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [btwBonPrintedOrderKey, setBtwBonPrintedOrderKey] = useState<string | null>(null)
 
   const [staffClockOpen, setStaffClockOpen] = useState(false)
+  /** Snelmenu: alleen in- of uitklok-lijst; null = volledige klok-modal (sidebar). */
+  const [staffClockQuickFocus, setStaffClockQuickFocus] = useState<'in' | 'out' | null>(null)
   const [staffSalesPickOpen, setStaffSalesPickOpen] = useState(false)
   const [staffClockList, setStaffClockList] = useState<
     { id: string; name: string; hasOpenSession: boolean }[]
@@ -5092,6 +5094,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     staffClockPinReqGen.current += 1
     setStaffClockBusy(false)
     setStaffClockOpen(false)
+    setStaffClockQuickFocus(null)
     setStaffClockPinModal(null)
     setStaffClockPinInput('')
     setStaffClockPinError(null)
@@ -5099,11 +5102,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void loadStaffClockList({ background: staffClockList.length > 0 })
   }, [loadStaffClockList, staffClockList.length])
 
-  const openStaffClockModal = () => {
+  const openStaffClockModal = (quickFocus?: 'in' | 'out') => {
     playClick()
     staffClockPinReqGen.current += 1
     setStaffSalesPickOpen(false)
     setStaffClockBusy(false)
+    setStaffClockQuickFocus(quickFocus ?? null)
     setStaffClockOpen(true)
     setStaffClockPinModal(null)
     setStaffClockPinInput('')
@@ -5185,6 +5189,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setKassaZoneTab(null)
       setStaffSalesPickOpen(false)
       setStaffClockOpen(false)
+      setStaffClockQuickFocus(null)
       setStaffClockPinModal(null)
       setStaffClockPinInput('')
       setStaffClockPinError(null)
@@ -5228,9 +5233,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           submenuId: 'sm_kassa_producten',
         },
         {
+          key: 'clockIn',
+          labelKey: 'kassaApp.quickMenuClockIn',
+          kind: 'clock' as const,
+          clockAction: 'in' as const,
+          submenuId: 'sm_personeel_inuitklokken',
+          requireStaffClock: true,
+        },
+        {
           key: 'clockOut',
           labelKey: 'kassaApp.quickMenuClockOut',
-          kind: 'clock'as const,
+          kind: 'clock' as const,
+          clockAction: 'out' as const,
           submenuId: 'sm_personeel_inuitklokken',
           requireStaffClock: true,
         },
@@ -5273,13 +5287,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           kind: 'nav'as const,
           href: `${baseUrl}/bestellingen`,
           submenuId: 'sm_orders_bestellingen',
-        },
-        {
-          key: 'music',
-          labelKey: 'kassaApp.quickMenuMusic',
-          kind: 'nav' as const,
-          href: `${baseUrl}/music`,
-          submenuId: 'sm_kassa_muziek',
         },
       ],
     [baseUrl, kassaNameAccountV2],
@@ -6213,7 +6220,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       className={kassaQuickMenuPanelBtnClass(enabled)}
                       onClick={() => {
                         if (!enabled) return
-                        openStaffClockModal()
+                        openStaffClockModal(action.clockAction)
                       }}
                     >
                       {label}
@@ -7263,6 +7270,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       <KassaStaffClockModal
         open={staffClockOpen}
+        quickFocus={staffClockQuickFocus}
         listLoading={staffClockListLoading}
         staffList={staffClockList}
         busy={staffClockBusy}
@@ -7274,6 +7282,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           staffClockPinReqGen.current += 1
           setStaffClockBusy(false)
           setStaffClockOpen(false)
+          setStaffClockQuickFocus(null)
           setStaffClockPinModal(null)
           setStaffClockPinInput('')
           setStaffClockPinError(null)

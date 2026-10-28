@@ -22,6 +22,7 @@ export type KassaStaffSummaryState = {
 /** Personeelsklok: lijst + gedeelde PIN-portal (document.body, focus, Enter = bevestigen). */
 export function KassaStaffClockModal({
   open,
+  quickFocus = null,
   listLoading,
   staffList,
   busy,
@@ -37,6 +38,8 @@ export function KassaStaffClockModal({
   onPinConfirm,
 }: {
   open: boolean
+  /** Snelmenu: filter lijst op in- of uitklokken. */
+  quickFocus?: 'in' | 'out' | null
   listLoading: boolean
   staffList: KassaStaffClockRow[]
   busy: boolean
@@ -62,6 +65,29 @@ export function KassaStaffClockModal({
       pinModal.staffName,
     )
 
+  const visibleStaff =
+    quickFocus === 'in'
+      ? staffList.filter((s) => !s.hasOpenSession)
+      : quickFocus === 'out'
+        ? staffList.filter((s) => s.hasOpenSession)
+        : staffList
+
+  const modalTitle =
+    quickFocus === 'in'
+      ? t('staffClock.clockIn')
+      : quickFocus === 'out'
+        ? t('staffClock.clockOut')
+        : t('staffClock.modalTitle')
+
+  const emptyMessage =
+    staffList.length === 0
+      ? t('staffClock.noStaff')
+      : quickFocus === 'in'
+        ? t('staffClock.quickInEmpty')
+        : quickFocus === 'out'
+          ? t('staffClock.quickOutEmpty')
+          : t('staffClock.noStaff')
+
   return (
     <div className="fixed inset-0 bg-black/60 z-[700] flex items-center justify-center p-3 sm:p-4">
       <div
@@ -69,7 +95,7 @@ export function KassaStaffClockModal({
         data-testid="kassa-staff-clock"
       >
         <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-4">
-          <h2 className="font-bold text-xl text-gray-900">{t('staffClock.modalTitle')}</h2>
+          <h2 className="font-bold text-xl text-gray-900">{modalTitle}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -82,10 +108,10 @@ export function KassaStaffClockModal({
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {listLoading && staffList.length === 0 ? (
             <div className="py-12 text-center text-gray-500">{t('staffClock.loadingList')}</div>
-          ) : staffList.length === 0 ? (
-            <div className="py-10 text-center text-gray-500">{t('staffClock.noStaff')}</div>
+          ) : visibleStaff.length === 0 ? (
+            <div className="py-10 text-center text-gray-500">{emptyMessage}</div>
           ) : (
-            staffList.map((s) => (
+            visibleStaff.map((s) => (
               <div
                 key={s.id}
                 className="rounded-xl border border-gray-200 bg-gray-50/80 p-4 sm:p-5 flex flex-col gap-4"
@@ -98,35 +124,49 @@ export function KassaStaffClockModal({
                     <p className="text-sm text-gray-500">{t('staffClock.statusClockedOut')}</p>
                   )}
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => onStartClockIn(s)}
-                    className="min-h-[44px] py-3 px-4 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50"
-                  >
-                    {t('staffClock.clockInCode')}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy || !s.hasOpenSession}
-                    onClick={() => onStartClockOut(s)}
-                    className="min-h-[44px] py-3 px-4 rounded-xl bg-[#3C4D6B] text-white text-sm font-bold hover:bg-[#2D3A52] disabled:opacity-40 disabled:grayscale"
-                  >
-                    {t('staffClock.clockOutCode')}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!s.hasOpenSession}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onSales(s)
-                    }}
-                    className="min-h-[44px] py-3 px-4 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
-                    title={s.hasOpenSession ? t('staffClock.salesHint') : t('staffClock.salesNeedsClock')}
-                  >
-                    {t('staffClock.sales')}
-                  </button>
+                <div
+                  className={`grid gap-3 w-full ${
+                    quickFocus === 'in'
+                      ? 'grid-cols-1'
+                      : quickFocus === 'out'
+                        ? 'grid-cols-1 sm:grid-cols-2'
+                        : 'grid-cols-1 sm:grid-cols-3'
+                  }`}
+                >
+                  {(quickFocus === null || quickFocus === 'in') && (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => onStartClockIn(s)}
+                      className="min-h-[44px] py-3 px-4 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      {t('staffClock.clockInCode')}
+                    </button>
+                  )}
+                  {(quickFocus === null || quickFocus === 'out') && (
+                    <button
+                      type="button"
+                      disabled={busy || !s.hasOpenSession}
+                      onClick={() => onStartClockOut(s)}
+                      className="min-h-[44px] py-3 px-4 rounded-xl bg-[#3C4D6B] text-white text-sm font-bold hover:bg-[#2D3A52] disabled:opacity-40 disabled:grayscale"
+                    >
+                      {t('staffClock.clockOutCode')}
+                    </button>
+                  )}
+                  {quickFocus === null && (
+                    <button
+                      type="button"
+                      disabled={!s.hasOpenSession}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onSales(s)
+                      }}
+                      className="min-h-[44px] py-3 px-4 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 disabled:opacity-40 disabled:grayscale"
+                      title={s.hasOpenSession ? t('staffClock.salesHint') : t('staffClock.salesNeedsClock')}
+                    >
+                      {t('staffClock.sales')}
+                    </button>
+                  )}
                 </div>
               </div>
             ))
