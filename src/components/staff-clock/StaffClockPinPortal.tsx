@@ -4,7 +4,7 @@
  * PIN-dialoog voor personeelsklok (kassa + admin inklokken).
  *
  * - Rendert via createPortal naar document.body → geen kapotte stacking/focus door geneste modals.
- * - type="password" → standaard maskering in alle browsers (geen non‑standard inline styles in TS).
+ * - type="tel" + numeric → cijfers zichtbaar op kiosk (donkere kassa zet anders zwart password-vlak).
  * - Form + submit → Enter bevestigt; inputMode numeric hint voor mobiele toetsenborden.
  */
 
@@ -89,7 +89,11 @@ export function StaffClockPinPortal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        data-vysion-light-form
+        data-vysion-modal-overlay
+        data-staff-clock-pin
         className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl flex flex-col gap-3"
+        style={{ colorScheme: 'light' }}
       >
         <p id={titleId} className="font-bold text-gray-900">
           {title}
@@ -103,12 +107,12 @@ export function StaffClockPinPortal({
         >
           <input
             ref={inputRef}
-            type="password"
+            type="tel"
             inputMode="numeric"
             pattern="[0-9]*"
             enterKeyHint="done"
             name="staff-pin"
-            autoComplete="new-password"
+            autoComplete="off"
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
@@ -116,7 +120,7 @@ export function StaffClockPinPortal({
             value={pinValue}
             onChange={(e) => onPinChange(e.target.value.replace(/\D/g, '').slice(0, STAFF_PIN_MAX_LEN))}
             placeholder={placeholder}
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 text-lg font-mono tracking-widest text-gray-900"
+            className="vysion-light-form-field w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-lg font-mono tracking-widest text-gray-900 placeholder:text-gray-400"
             aria-invalid={pinError ? true : undefined}
             aria-describedby={pinError ? `${titleId}-error`: undefined}
           />
