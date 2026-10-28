@@ -19,10 +19,11 @@ describe('billit-lagoon-pilot', () => {
   })
 
   it('accepts Billit API key UUID as credential', () => {
-    process.env.BILLIT_THELAGOON_API_KEY = '125ca4b7-2b6f-4dc7-8d93-fd0be92c231b'
+    const fakeKey = '00000000-0000-4000-8000-000000000001'
+    process.env.BILLIT_THELAGOON_API_KEY = fakeKey
     process.env.BILLIT_THELAGOON_SANDBOX = '0'
     const cfg = getBillitLagoonEnvConfig()
-    expect(cfg?.apiKey).toBe('125ca4b7-2b6f-4dc7-8d93-fd0be92c231b')
+    expect(cfg?.apiKey).toBe(fakeKey)
     expect(cfg?.apiBaseUrl).toBe('https://api.billit.be')
     delete process.env.BILLIT_THELAGOON_API_KEY
     delete process.env.BILLIT_THELAGOON_SANDBOX
