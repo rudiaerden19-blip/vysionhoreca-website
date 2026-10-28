@@ -2786,8 +2786,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     inFlight: boolean
     printedOkOnce: boolean
   }>({ key: null, inFlight: false, printedOkOnce: false })
-  /** Eén auto-bon per afgeronde verkoop (zelfde sleutel als print-dedupe). */
-  const autoPrintPaidReceiptKeyRef = useRef<string | null>(null)
+  /**
+   * Jeton quick flow heeft geen printknop — één auto-bon per JETON-verkoop (Lagoon + superadmin-flag).
+   * Contant/pin/card: altijd handmatig via succesmodal (geen auto-bon).
+   */
+  const autoPrintJetonQuickReceiptKeyRef = useRef<string | null>(null)
   /** Jeton quick flow: na sluiten lastOrder wissen zodat succes niet opnieuw flitst. */
   const clearLastOrderOnSuccessCloseRef = useRef(false)
   const jetonQuickSuccessUiDismissedRef = useRef(false)
@@ -2804,7 +2807,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const closeSuccessReceiptModal = useCallback(() => {
     clearSuccessAutoCloseTimer()
     setSuccessModalAutoCloseMs(undefined)
-    autoPrintPaidReceiptKeyRef.current = null
+    autoPrintJetonQuickReceiptKeyRef.current = null
     const wipeReceipt = clearLastOrderOnSuccessCloseRef.current
     if (wipeReceipt) {
       jetonQuickSuccessUiDismissedRef.current = true
@@ -4796,16 +4799,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }
 
-  const paidReceiptAutoPrintKey =
-    showSuccessModal && lastOrder ? kassaPaidReceiptGuardKey(lastOrder) : null
+  const jetonQuickAutoPrintKey =
+    showSuccessModal &&
+    kassaJetonQuickSuccess &&
+    lastOrder?.paymentMethod === 'JETON'
+      ? kassaPaidReceiptGuardKey(lastOrder)
+      : null
 
   useEffect(() => {
     if (kassaThermalPrintDisabled) return
-    if (!paidReceiptAutoPrintKey || !lastOrder) return
-    if (autoPrintPaidReceiptKeyRef.current === paidReceiptAutoPrintKey) return
-    autoPrintPaidReceiptKeyRef.current = paidReceiptAutoPrintKey
+    if (!jetonQuickAutoPrintKey || !lastOrder) return
+    if (autoPrintJetonQuickReceiptKeyRef.current === jetonQuickAutoPrintKey) return
+    autoPrintJetonQuickReceiptKeyRef.current = jetonQuickAutoPrintKey
     void printReceipt(lastOrder)
-  }, [paidReceiptAutoPrintKey, lastOrder, kassaThermalPrintDisabled])
+  }, [jetonQuickAutoPrintKey, lastOrder, kassaThermalPrintDisabled, kassaJetonQuickSuccess])
 
   flushBarDeltaSlipRef.current = (zone, tblNr, fullTableLines, slipOpts) => {
     void (async () => {
@@ -7888,10 +7895,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               !lastOrder.kassaClientUuid)
           }
           onPrint={async () => {
+            const orderToPrint = lastOrder
             closeSuccessReceiptModal()
+            if (!orderToPrint) return
             try {
               setSuccessReceiptPrintBusy(true)
-              await printReceipt(lastOrder)
+              await printReceipt(orderToPrint)
             } finally {
               setSuccessReceiptPrintBusy(false)
             }

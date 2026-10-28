@@ -335,8 +335,7 @@ export function KassaSuccessReceiptModal({
             onClick={() => {
               if (printBusy) return
               setOptimisticPrintBusy(true)
-              onClose()
-              void onPrint()
+              void onPrint().finally(() => setOptimisticPrintBusy(false))
             }}
             className={`w-full max-w-[260px] py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 touch-manipulation min-h-[48px] transition-[background-color,box-shadow,color] duration-200 disabled:pointer-events-none ${
               printBusy
