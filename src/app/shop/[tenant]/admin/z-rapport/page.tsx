@@ -45,6 +45,7 @@ import {
 } from '@/lib/order-vat'
 import { fetchZReportVatContextForTenant } from '@/lib/z-report-vat-context'
 import { buildZReportDayAmountsFromOrders } from '@/lib/z-report-day-builder'
+import { fireBillitLagoonZDaySync } from '@/lib/billit-lagoon-sync-client'
 import {
   buildZReportVatRows,
   formatZReportEuro,
@@ -627,6 +628,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       setOwnerForm(EMPTY_OWNER_FORM)
       await loadSavedReports()
       setShowCloseConfirm(false)
+      fireBillitLagoonZDaySync(params.tenant, selectedDate)
     } else {
       alert('Fout bij afsluiten: '+ (r.error || ''))
     }
