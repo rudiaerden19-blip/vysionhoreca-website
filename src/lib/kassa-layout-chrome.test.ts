@@ -3,6 +3,7 @@ import {
   kassaLayoutCheckoutBtnClass,
   kassaLayoutChromeBtnClass,
   kassaLayoutHeaderBarClass,
+  kassaLayoutMenuScrollFlatBgClass,
   kassaLayoutPlateBgClass,
   kassaLayoutPosChrome,
   kassaLayoutQuickMenuTileClass,
@@ -47,5 +48,7 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
     expect(kassaLayoutCheckoutBtnClass('speels')).toBe(kassaPosCheckoutButtonClass('speels'))
     expect(kassaLayoutPlateBgClass('speels')).toContain('kassa-speels-plate-grain')
     expect(kassaLayoutHeaderBarClass('speels')).toContain('kassa-speels-plate-grain')
+    expect(kassaLayoutMenuScrollFlatBgClass('speels')).toContain('kassa-speels-plate-grain')
+    expect(kassaLayoutMenuScrollFlatBgClass('speels')).toContain('kassa-speels-menu-scroll')
   })
 })

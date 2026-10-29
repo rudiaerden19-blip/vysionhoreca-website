@@ -46,9 +46,11 @@ export function kassaLayoutPlateBgClass(layout: KassaUiLayoutId): string {
   return 'bg-[#0b0f14]'
 }
 
-/** Effen vlak achter producttegels (recess-kleur). */
+/** Achtergrond menu-scroll — speels: korrelvlak #282828 (tegels “plakken” erop). */
 export function kassaLayoutMenuScrollFlatBgClass(layout: KassaUiLayoutId): string {
-  if (layout === 'speels') return 'bg-[#333333]'
+  if (layout === 'speels') {
+    return `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} kassa-speels-menu-scroll`
+  }
   if (layout === 'dark') return 'bg-[#151a21]'
   return ''
 }
