@@ -71,7 +71,7 @@ export function KassaStaffSalesPickModal({
                 type="button"
                 disabled={busy}
                 onClick={() => onPickStaff(s)}
-                className={`w-full min-h-[52px] break-words px-4 py-3 text-left text-base font-bold ${kassaPosButtonClass(false)}`}
+                className={`w-full min-h-[52px] break-words px-4 py-3 text-left text-base font-bold ${kassaPosButtonClass(false, 'speels')}`}
               >
                 {s.name}
               </button>
@@ -82,7 +82,7 @@ export function KassaStaffSalesPickModal({
           <button
             type="button"
             onClick={onClose}
-            className={`w-full min-h-[44px] font-bold ${kassaPosButtonClass(false)}`}
+            className={`w-full min-h-[44px] font-bold ${kassaPosButtonClass(false, 'speels')}`}
           >
             {t('staffClock.close')}
           </button>

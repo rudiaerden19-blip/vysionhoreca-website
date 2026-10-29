@@ -593,6 +593,67 @@ input[type="number"] {
   );
 }
 
+/*
+ * Speels — zwart glanzend (Afrekenen, Menu, Uitloggen, geselecteerde knoppen).
+ */
+.kassa-speels-black-gloss-btn {
+  color: #f5f5f5;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
+  background: linear-gradient(180deg, #141414 0%, #1f1f1f 46%, #0a0a0a 100%);
+  border: 1px solid #c8c8c8;
+  border-top: 1px solid #ececec;
+  border-bottom: 1px solid #3a3a3a;
+  box-shadow:
+    0 4px 9px rgba(0, 0, 0, 0.64),
+    0 11px 26px rgba(0, 0, 0, 0.51),
+    0 0 18px rgba(200, 200, 208, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.48);
+}
+
+.kassa-speels-black-gloss-btn::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 44%;
+  z-index: 0;
+  border-radius: 0.65rem 0.65rem 45% 45%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.kassa-speels-black-gloss-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.kassa-speels-black-gloss-btn:active {
+  background: linear-gradient(180deg, #0a0a0a 0%, #171717 52%, #050505 100%);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.55),
+    inset 0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+.kassa-speels-black-gloss-btn:active::before {
+  opacity: 0.4;
+}
+
+.kassa-speels-black-gloss-btn--emphasis {
+  box-shadow:
+    0 4px 9px rgba(0, 0, 0, 0.64),
+    0 11px 26px rgba(0, 0, 0, 0.51),
+    0 0 22px rgba(220, 220, 228, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.48);
+}
+
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {

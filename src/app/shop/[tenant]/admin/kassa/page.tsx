@@ -149,6 +149,8 @@ import {
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL,
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   kassaPosButtonClass,
+  kassaSpeelsBlackGlossButtonClass,
+  kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
@@ -5734,7 +5736,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaWide15Chrome ? 'gap-1 px-1.5 py-1' : 'gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3'
             } ${
               kassaPosLuxury
-                ? kassaPosButtonClass(true, posChrome)
+                ? kassaSpeelsBlackGlossButtonClass(hamburgerOpen)
                 : kassaLight
                   ? `rounded-xl ${hamburgerOpen ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
                 : `rounded-xl ${hamburgerOpen ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
@@ -5930,7 +5932,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             onClick={() => openKassaHelp()}
             className={`${
               kassaPosLuxury
-                ? `${headerQuickLinkBtnClass} ${kassaHelpOpen ? 'kassa-speels-order-type-btn--selected' : ''}`
+                ? `${kassaHeaderQuickLinkShell} ${kassaHelpOpen ? kassaSpeelsBlackGlossButtonClass(true) : kassaSpeelsGrayChromeButtonClass()}`
                 : `${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE}`
             } ${kassaHelpOpen && !kassaPosLuxury ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''}`}
             title={t('kassaApp.helpVideoButton')}
@@ -6024,7 +6026,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           title={t('kassaApp.logout')}
           className={
             kassaPosLuxury
-              ? `relative z-20 ${headerUtilityBtnClass(true)}`
+              ? `relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${kassaSpeelsBlackGlossButtonClass(true)}`
               : `relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE

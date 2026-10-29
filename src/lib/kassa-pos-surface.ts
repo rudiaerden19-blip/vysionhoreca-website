@@ -218,24 +218,43 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
   'font-bold',
 ].join(' ')
 
-/** Dark/speels — glanzend grijs (zelfde als Ter plaatse / Afhalen / Levering). */
+/** Dark/speels — glanzend grijs (Ter plaatse / Afhalen / Levering, niet geselecteerd). */
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
 
-export function kassaSpeelsChromeButtonClass(selected: boolean): string {
+export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
+
+const KASSA_SPEELS_CHROME_BTN_SHELL = [
+  'touch-manipulation select-none relative isolate overflow-hidden font-semibold',
+  'transition-transform duration-100 ease-out',
+  'active:translate-y-px',
+].join(' ')
+
+export function kassaSpeelsGrayChromeButtonClass(): string {
+  return [KASSA_POS_BTN_SHAPE, KASSA_SPEELS_ORDER_TYPE_BTN_CLASS, KASSA_SPEELS_CHROME_BTN_SHELL, 'text-white']
+    .join(' ')
+}
+
+/** Zwart + zilverrand + glans (::before) — Afrekenen, Menu, Uitloggen, actieve keuze. */
+export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
   return [
     KASSA_POS_BTN_SHAPE,
-    KASSA_SPEELS_ORDER_TYPE_BTN_CLASS,
-    selected ? 'kassa-speels-order-type-btn--selected' : '',
-    'touch-manipulation select-none relative isolate overflow-hidden font-semibold text-white',
-    'transition-transform duration-100 ease-out',
-    'active:translate-y-px',
+    KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS,
+    emphasis ? 'kassa-speels-black-gloss-btn--emphasis' : '',
+    KASSA_SPEELS_CHROME_BTN_SHELL,
+    'text-[#f5f5f5]',
   ]
     .filter(Boolean)
     .join(' ')
 }
 
+export function kassaSpeelsChromeButtonClass(selected: boolean): string {
+  if (selected) return kassaSpeelsBlackGlossButtonClass(true)
+  return kassaSpeelsGrayChromeButtonClass()
+}
+
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
-  return kassaSpeelsChromeButtonClass(selected)
+  if (selected) return kassaSpeelsBlackGlossButtonClass(true)
+  return kassaSpeelsGrayChromeButtonClass()
 }
 
 export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook = 'luxe'): string {
@@ -247,7 +266,7 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsChromeButtonClass(false)} font-bold`
+    return `${kassaSpeelsBlackGlossButtonClass(false)} font-bold`
   }
   return KASSA_POS_CHECKOUT_BTN
 }
