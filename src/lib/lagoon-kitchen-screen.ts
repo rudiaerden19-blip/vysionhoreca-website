@@ -3,9 +3,17 @@ import type { MenuCategory, MenuProduct } from '@/lib/admin-api'
 
 const LAGOON_KITCHEN_SCREEN_SLUG = 'thelagoon'
 
-/** Pilot-tenant The Lagoon (slug `thelagoon`). */
+/** Zelfde normalisatie als zaak-login (`the-lagoon` → `thelagoon`). */
+export function normalizeLagoonTenantSlug(tenantSlug: string): string {
+  return String(tenantSlug ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '')
+}
+
+/** Pilot-tenant The Lagoon (slug `thelagoon` / `the-lagoon`). */
 export function isTheLagoonTenant(tenantSlug: string): boolean {
-  return String(tenantSlug ?? '').trim().toLowerCase() === LAGOON_KITCHEN_SCREEN_SLUG
+  return normalizeLagoonTenantSlug(tenantSlug) === LAGOON_KITCHEN_SCREEN_SLUG
 }
 
 /** Lagoon bar-keuken: cocktail/mocktail + warme dranken (categorienaam). */

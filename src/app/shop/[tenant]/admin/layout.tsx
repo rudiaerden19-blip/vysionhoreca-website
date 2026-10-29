@@ -124,8 +124,11 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     if (!lagoonStrictReportsPinEnabled(params.tenant)) return
     const rest = adminPath.startsWith(baseUrl) ? adminPath.slice(baseUrl.length) : adminPath
-    if (!isLagoonStrictReportsAdminRestPath(rest)) return
-    clearOwnerPinUnlockSession(params.tenant)
+    const onReport = isLagoonStrictReportsAdminRestPath(rest)
+    if (onReport) clearOwnerPinUnlockSession(params.tenant)
+    return () => {
+      clearOwnerPinUnlockSession(params.tenant)
+    }
   }, [adminPath, baseUrl, params.tenant])
 
   useEffect(() => {

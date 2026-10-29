@@ -6,6 +6,7 @@ import {
 describe('lagoon-reports-pin-gate', () => {
   it('strict pin alleen voor thelagoon', () => {
     expect(lagoonStrictReportsPinEnabled('thelagoon')).toBe(true)
+    expect(lagoonStrictReportsPinEnabled('the-lagoon')).toBe(true)
     expect(lagoonStrictReportsPinEnabled('demo-frituur')).toBe(false)
   })
 

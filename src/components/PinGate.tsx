@@ -30,7 +30,7 @@ export default function PinGate({ tenant, children, strictReportsPin = false }: 
   const [forgotStep, setForgotStep] = useState<'email' |  'newpin'>('email')
 
   useLayoutEffect(() => {
-    if (isSuperAdminLoggedIn()) {
+    if (isSuperAdminLoggedIn() && !strictReportsPin) {
       setState('unlocked')
       return
     }
