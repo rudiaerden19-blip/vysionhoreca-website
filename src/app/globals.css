@@ -485,14 +485,23 @@ input[type="number"] {
   box-shadow: inset 0 0 0 1px #282828;
 }
 
-/* Menu-tegels Dark — dun zwart randje + vaste schaduw, geen hover-flikkern. */
+/* Grijs fotovlak op tegel — zwart kader binnen de tegel. */
+.kassa-speels-menu-tile-photo-well {
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 0 0 2px #000000,
+    inset 0 -4px 0 0 #282828;
+}
+
+/* Menu-tegels Dark — duidelijk zwart kader + schaduw, geen hover-flikkern. */
 .kassa-speels-menu-tile {
-  border: 1px solid #000000 !important;
+  border: 2px solid #000000 !important;
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
   background-color: #282828 !important;
   box-shadow:
+    0 0 0 1px #000000,
     0 6px 16px rgba(0, 0, 0, 0.72),
     0 12px 28px rgba(0, 0, 0, 0.55) !important;
 }
@@ -910,7 +919,7 @@ html.kassa-luxe-leather body {
   position: relative;
   isolation: isolate;
   background-color: #333333;
-  border: 1px solid #1a1a1a;
+  border: 2px solid #000000;
   box-shadow:
     inset 0 3px 12px rgba(0, 0, 0, 0.62),
     inset 0 1px 3px rgba(0, 0, 0, 0.48),
@@ -923,7 +932,13 @@ html.kassa-luxe-leather body {
   inset: 0;
   z-index: 3;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px #000000;
+}
+
+/* Zijbalk mand/numpad — #333 met zwart kader (zelfde leesbaarheid als tegelveld). */
+.kassa-speels-sidebar-cart-vak {
+  border: 2px solid #000000 !important;
+  box-shadow: inset 0 0 0 1px #000000;
 }
 
 /* ===========================================

@@ -31,7 +31,7 @@ export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 export const KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS = 'bg-[#333333] kassa-speels-menu-scroll'
 
 /** Zijbalk mand/numpad — effen #333 + rand, zoals menu-achtergrond achter tegels. */
-export const KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS = `${KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS} rounded-xl border border-black`
+export const KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS = `${KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS} kassa-speels-sidebar-cart-vak rounded-xl`
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
 export const KASSA_FLOOR_TERRACE_GRAIN_CLASS = 'gks-floor-terrace-grain'
@@ -468,8 +468,7 @@ export const KASSA_POS_MENU_TILE_IMAGE_FILM =
 const KASSA_SPEELS_MENU_TILE_STUDIO_BG =
   'bg-[radial-gradient(ellipse_at_50%_42%,#e8e8e8_0%,#d4d4d4_38%,#b5b5b5_68%,#909090_100%)]'
 
-const KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM =
-  'shadow-[inset_0_-4px_0_0_#282828] z-[1]'
+const KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM = 'kassa-speels-menu-tile-photo-well z-[1]'
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_WELL =
   `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG} ${KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM}`
@@ -484,10 +483,10 @@ const KASSA_SPEELS_MENU_TILE_NO_IMAGE_FACE =
   'bg-[linear-gradient(180deg,#3d3d3d_0%,#353535_50%,#303030_100%)]'
 
 export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL =
-  `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_SPEELS_MENU_TILE_NO_IMAGE_FACE}`
+  `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_SPEELS_MENU_TILE_NO_IMAGE_FACE} ${KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM}`
 
 export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
-  `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_SPEELS_MENU_TILE_NO_IMAGE_FACE}`
+  `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_SPEELS_MENU_TILE_NO_IMAGE_FACE} ${KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM}`
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_FILM =
   'pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,transparent_0%,transparent_62%,rgba(40,40,40,0.2)_88%,rgba(40,40,40,0.55)_100%)]'
