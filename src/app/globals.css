@@ -469,11 +469,11 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Speels #333 — tegel-scroll, ingesprongen bak, zijbalk-mand: subtiele korrel. */
+/* Speels lichtgrijs vlak — tegel-scroll, ingesprongen bak, zijbalk-mand: subtiele korrel. */
 .kassa-speels-menu-scroll,
 .kassa-speels-recess-tray,
 .kassa-speels-sidebar-cart-vak {
-  background-color: #333333;
+  background-color: #3d3d3d;
   background-image:
     linear-gradient(rgba(40, 40, 40, 0.045), rgba(40, 40, 40, 0.045)),
     url('/images/kassa-dark-frame-grain.png');
