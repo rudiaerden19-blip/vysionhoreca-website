@@ -10,7 +10,6 @@ import {
   KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
   KASSA_SPEELS_PRICE_ACCENT_CLASS,
   kassaPosButtonClass,
-  kassaSpeelsBlackGlossButtonClass,
   kassaSpeelsBlueGlossButtonClass,
   kassaSpeelsChromeButtonClass,
   type KassaPosChromeLook,
@@ -52,15 +51,12 @@ export function KassaProductOptionsModal({
   const speelsChromeBtn = (selected: boolean, extraClass = '') =>
     `${KASSA_POS_BTN_SHAPE} ${kassaSpeelsChromeButtonClass(selected)} ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} ${extraClass}`
 
-  const speelsOptionBadgeClass = (variant: 'required' | 'multiple') =>
-    [
-      KASSA_POS_BTN_SHAPE,
-      'inline-flex items-center text-xs px-2.5 py-1 font-semibold',
-      KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
-      variant === 'required'
-        ? kassaSpeelsBlackGlossButtonClass()
-        : kassaSpeelsBlueGlossButtonClass(false),
-    ].join(' ')
+  const speelsOptionBadgeClass = [
+    KASSA_POS_BTN_SHAPE,
+    'inline-flex items-center text-xs px-2.5 py-1 font-semibold',
+    KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+    kassaSpeelsBlueGlossButtonClass(false),
+  ].join(' ')
 
   const darkActionBtn = (selected: boolean, extraClass = '') =>
     speelsDark
@@ -136,7 +132,7 @@ export function KassaProductOptionsModal({
                   <span
                     className={
                       speelsDark
-                        ? speelsOptionBadgeClass('required')
+                        ? speelsOptionBadgeClass
                         : dark
                           ? `text-xs px-2 py-0.5 font-semibold text-red-300 ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
                           : 'text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold'
@@ -149,7 +145,7 @@ export function KassaProductOptionsModal({
                   <span
                     className={
                       speelsDark
-                        ? speelsOptionBadgeClass('multiple')
+                        ? speelsOptionBadgeClass
                         : dark
                           ? `text-xs px-2 py-0.5 font-semibold text-[#d4b483] ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
                           : 'text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full'
