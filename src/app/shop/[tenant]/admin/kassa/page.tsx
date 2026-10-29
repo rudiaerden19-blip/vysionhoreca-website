@@ -154,6 +154,7 @@ import {
   kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
+  kassaSpeelsGreenGlossButtonClass,
   kassaSpeelsCategoryStripButtonClass,
   KASSA_SPEELS_TOP_CHROME_BTN_CLASS,
   KASSA_SPEELS_TENANT_NAME_CLASS,
@@ -6015,7 +6016,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className={`inline-flex min-w-0 max-w-[6.5rem] shrink items-center justify-center gap-0.5 overflow-hidden leading-tight min-h-[2.15rem] sm:min-h-[2.35rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
                 kassaPosLuxury
                   ? isOnline
-                    ? headerQuickLinkBtnClass
+                    ? posChrome === 'speels'
+                      ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsGreenGlossButtonClass(false)}`
+                      : headerQuickLinkBtnClass
                     : `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
                   : isOnline
                     ? `rounded-xl px-3 py-2 font-bold ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
