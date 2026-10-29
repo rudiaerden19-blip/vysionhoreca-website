@@ -601,13 +601,13 @@ input[type="number"] {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
   background: linear-gradient(180deg, #0d0d0d 0%, #171717 46%, #050505 100%);
   border: 1px solid #b0b0b0;
-  border-top: 1px solid #dcdcdc;
+  border-top: 1px solid #e8e8e8;
   border-bottom: 1px solid #2e2e2e;
   box-shadow:
     0 4px 9px rgba(0, 0, 0, 0.64),
     0 11px 26px rgba(0, 0, 0, 0.51),
     0 0 18px rgba(200, 200, 208, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
     inset 0 -2px 0 rgba(0, 0, 0, 0.48);
 }
 
@@ -618,13 +618,14 @@ input[type="number"] {
   left: 2px;
   right: 2px;
   top: 2px;
-  height: 44%;
+  height: 48%;
   z-index: 0;
   border-radius: 0.65rem 0.65rem 45% 45%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.28) 0%,
-    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.22) 38%,
+    rgba(255, 255, 255, 0.06) 72%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -649,9 +650,19 @@ input[type="number"] {
   box-shadow:
     0 4px 9px rgba(0, 0, 0, 0.64),
     0 11px 26px rgba(0, 0, 0, 0.51),
-    0 0 22px rgba(220, 220, 228, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 24px rgba(220, 220, 228, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
     inset 0 -2px 0 rgba(0, 0, 0, 0.48);
+}
+
+.kassa-speels-black-gloss-btn--emphasis::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.68) 0%,
+    rgba(255, 255, 255, 0.3) 40%,
+    rgba(255, 255, 255, 0.08) 75%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
