@@ -457,14 +457,12 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. Korrel op kader/shell; tegel-scroll blijft effen (#333).
- * Grof + contrast: grote herhaaltegel, sterke overlay (geen background-attachment:fixed).
+ * Mode «Dark» (layout speels) — alle tenants. PNG-korrel (zichtbaar op iPad); tegel-scroll/recess effen #333.
  */
 .kassa-speels-plate-grain {
-  --kassa-plate-grain-tile: 208px;
-  background-color: #262626;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.55 0 0 0 -0.22 0 1.55 0 0 -0.22 0 0 1.55 0 -0.22 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.94'/%3E%3C/svg%3E");
-  background-size: var(--kassa-plate-grain-tile) var(--kassa-plate-grain-tile);
+  background-color: #282828;
+  background-image: url('/images/kassa-dark-frame-grain.png');
+  background-size: 512px 512px;
   background-repeat: repeat;
   background-blend-mode: overlay;
 }

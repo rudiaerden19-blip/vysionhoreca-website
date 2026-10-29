@@ -19,6 +19,7 @@ export const KASSA_LUXE_LEATHER_PLANE_CLASS = 'kassa-luxe-leather-plane'
 /** Luxe-kassa: tegelvloer + productenvak — warm beige met spikkels. */
 export const KASSA_LUXE_CART_GRAIN_CLASS = 'kassa-luxe-cart-grain'
 
+/** Dark mode (layout speels): `kassa-speels-plate-grain` + `/images/kassa-dark-frame-grain.png`. */
 export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 
 export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
