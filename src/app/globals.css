@@ -443,15 +443,21 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Productie-kassa POS (zelfde visueel als GKS-preview): korrel vs effen tegelvlak */
+/*
+ * POS-kaderkorrel (Speels / klassiek kader). Niet op tegel-recess.
+ * Geen background-attachment:fixed — op iOS/iPad kassa blijft dat vaak effen grijs.
+ */
+.gks-menu-plate-grain,
+.kassa-speels-plate-grain {
+  --kassa-plate-grain-tile: 144px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
+  background-size: var(--kassa-plate-grain-tile) var(--kassa-plate-grain-tile);
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+}
+
 .gks-menu-plate-grain {
   background-color: #161310;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
-  /* Grover dan 96px-tegel: zelfde noise, groter herhaald patroon (zichtbaarder korrel). */
-  background-size: 132px 132px;
-  background-repeat: repeat;
-  background-attachment: fixed;
-  background-blend-mode: overlay;
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
@@ -459,10 +465,9 @@ html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
   background-color: #d0c4b0 !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E") !important;
-  background-size: 88px 88px !important;
+  background-size: 96px 96px !important;
   background-repeat: repeat !important;
   background-blend-mode: multiply !important;
-  background-attachment: fixed !important;
 }
 
 .kassa-luxe-leather-plane {
@@ -472,7 +477,7 @@ html.kassa-luxe-leather body {
   pointer-events: none;
   background-color: #d0c4b0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
-  background-size: 88px 88px;
+  background-size: 96px 96px;
   background-repeat: repeat;
   background-blend-mode: multiply;
 }
@@ -480,7 +485,7 @@ html.kassa-luxe-leather body {
 .kassa-luxe-cart-grain {
   background-color: #d0c4b0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
-  background-size: 88px 88px;
+  background-size: 96px 96px;
   background-repeat: repeat;
   background-blend-mode: multiply;
   border-radius: 0.75rem;
@@ -494,9 +499,8 @@ html.kassa-luxe-leather body {
 .gks-floor-terrace-grain {
   background-color: #3a4d3c;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
-  background-size: 132px 132px;
+  background-size: 144px 144px;
   background-repeat: repeat;
-  background-attachment: fixed;
   background-blend-mode: overlay;
 }
 
@@ -535,11 +539,6 @@ html.kassa-luxe-leather body {
 
 .kassa-speels-plate-grain {
   background-color: #2c2c2c;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
-  background-size: 132px 132px;
-  background-repeat: repeat;
-  background-attachment: fixed;
-  background-blend-mode: overlay;
 }
 
 .kassa-speels-recess-tray {

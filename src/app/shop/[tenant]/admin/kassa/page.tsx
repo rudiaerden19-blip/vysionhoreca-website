@@ -102,6 +102,7 @@ import {
 } from '@/lib/kassa-menu-product-options'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
+import { kassaLayoutPlateBgClass } from '@/lib/kassa-layout-chrome'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
 import { KassaSoundActivationScreen } from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
@@ -111,7 +112,6 @@ import {
 import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
-  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_LUXE_HTML_CLASS,
   KASSA_LUXE_LEATHER_PLANE_CLASS,
@@ -1094,14 +1094,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaClassicDark = kassaLayout === 'dark'
   const kassaLight = kassaLayout === 'light'
   const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
-  const kassaPlateBgClass =
-    kassaLayout === 'speels'
-      ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
-      : kassaLayout === 'luxe'
-        ? 'bg-transparent'
-        : kassaAppearanceDark
-          ? 'bg-[#0b0f14]'
-          : 'bg-[#e3e3e3]'
+  const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
   const kassaRecessTrayClass =
     kassaLayout === 'speels'
       ? KASSA_SPEELS_MENU_RECESS_TRAY_CLASS
