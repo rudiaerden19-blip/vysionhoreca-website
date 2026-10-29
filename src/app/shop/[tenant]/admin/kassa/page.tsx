@@ -439,15 +439,15 @@ const KASSA_STRIP_SCROLL_DELTA_PX = 4
 const KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND = true
 
 const KASSA_HEADER_QUICK_LINK_BTN =
-  'inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52] min-h-[2.15rem] px-2 py-1.5 sm:min-h-[2.35rem] sm:px-2.5'
-const KASSA_HEADER_QUICK_LINK_LABEL = 'min-w-0 max-w-full truncate text-[11px] leading-snug sm:text-xs'
+  'inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52] min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2'
+const KASSA_HEADER_QUICK_LINK_LABEL = 'min-w-0 max-w-full truncate text-xs leading-snug sm:text-sm'
 
 /** Light mode — middelgrijs (niet zwart zoals Klassiek #2d2d2d). */
 const KASSA_LIGHT_BTN_FACE = 'bg-[#4a4a4a] text-white hover:bg-[#5a5a5a]'
 const KASSA_LIGHT_BTN_FACE_ON =
   'bg-[#4a4a4a] text-white outline outline-[3px] outline-[#3C4D6B] outline-offset-2'
 const KASSA_LIGHT_HEADER_QUICK_LINK_BTN =
-  `inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl font-bold transition-colors min-h-[2.15rem] px-2 py-1.5 sm:min-h-[2.35rem] sm:px-2.5 ${KASSA_LIGHT_BTN_FACE}`
+  `inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl font-bold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2 ${KASSA_LIGHT_BTN_FACE}`
 
 const KASSA_CLASSIC_BTN_FACE = 'bg-[#2d2d2d] text-white hover:bg-[#3a3a3a]'
 const KASSA_CLASSIC_BTN_FACE_ON =
@@ -457,7 +457,7 @@ const KASSA_CLASSIC_ACTION_BTN_FACE = 'bg-[#2d2d2d] text-white hover:bg-[#3a3a3a
 const KASSA_CLASSIC_ACTION_BTN_FACE_ON =
   'bg-[#2d2d2d] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]'
 const KASSA_CLASSIC_HEADER_QUICK_LINK_BTN =
-  `inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl font-bold transition-colors min-h-[2.15rem] px-2 py-1.5 sm:min-h-[2.35rem] sm:px-2.5 ${KASSA_CLASSIC_BTN_FACE}`
+  `inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl font-bold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2 ${KASSA_CLASSIC_BTN_FACE}`
 const KASSA_CLASSIC_TILE_NAME =
   'm-0 line-clamp-3 text-center text-base font-bold leading-tight tracking-tight text-white sm:text-lg md:text-[1.2rem]'
 const KASSA_CLASSIC_TILE_NAME_SXGA =
@@ -5434,12 +5434,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const kassaDarkHeaderBtnShell = kassaWide15Chrome
-    ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[1.85rem] px-2 py-1'
-    : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.35rem] px-3 py-2 sm:min-h-[2.6rem] sm:px-3.5 sm:py-2.5'
+    ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.15rem] px-2.5 py-1.5'
+    : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-3.5 py-2 sm:min-h-[2.85rem] sm:px-4 sm:py-2.5'
 
   const kassaHeaderQuickLinkShell = kassaWide15Chrome
-    ? 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[1.85rem] px-1.5 py-1'
-    : 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.15rem] px-2 py-1.5 sm:min-h-[2.35rem] sm:px-2.5'
+    ? 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.15rem] px-2 py-1.5'
+    : 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2'
 
   const kassaSpeelsTopChromeTextClass =
     kassaPosLuxury && posChrome === 'speels' ? KASSA_SPEELS_TOP_CHROME_BTN_CLASS : ''
@@ -5453,7 +5453,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             : kassaClassicDark
               ? KASSA_CLASSIC_BTN_FACE
               : 'rounded-xl bg-[#3C4D6B] font-bold text-white'
-      } rounded-lg text-[10px]`
+      } rounded-lg text-[11px] sm:text-xs`
     : kassaPosLuxury
     ? `${kassaHeaderQuickLinkShell} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
     : kassaLight
@@ -5766,7 +5766,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div
         className={`relative z-30 flex w-full min-w-0 shrink-0 items-center ${
-          kassaWide15Chrome ? 'min-h-[44px] gap-1 px-1.5 py-1' : 'min-h-[56px] gap-1.5 px-2 py-2 sm:gap-2 sm:px-3'
+          kassaWide15Chrome ? 'min-h-[48px] gap-1 px-1.5 py-1' : 'min-h-[64px] gap-1.5 px-2 py-2 sm:gap-2 sm:px-3'
         } ${
           kassaPosLuxury
             ? `${kassaWide15Chrome ? 'pb-1.5' : 'pb-3'} ${kassaPlateBgClass}`
@@ -6039,7 +6039,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isOnline !== null && (
             <div
-              className={`inline-flex min-w-0 max-w-[6.5rem] shrink items-center justify-center gap-0.5 overflow-hidden leading-tight min-h-[2.15rem] sm:min-h-[2.35rem] sm:max-w-[8rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
+              className={`inline-flex min-w-0 max-w-[7rem] shrink items-center justify-center gap-0.5 overflow-hidden leading-tight min-h-[2.65rem] sm:min-h-[2.85rem] sm:max-w-[9rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
                 kassaPosLuxury
                   ? isOnline
                     ? posChrome === 'speels'
