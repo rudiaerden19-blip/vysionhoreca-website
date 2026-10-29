@@ -475,11 +475,11 @@ input[type="number"] {
 .kassa-speels-sidebar-cart-vak {
   background-color: #3d3d3d;
   background-image:
-    linear-gradient(rgba(40, 40, 40, 0.045), rgba(40, 40, 40, 0.045)),
+    linear-gradient(rgba(61, 61, 61, 0.42), rgba(61, 61, 61, 0.42)),
     url('/images/kassa-dark-frame-grain.png');
-  background-size: 768px 768px;
+  background-size: auto, 1120px 1120px;
   background-repeat: repeat;
-  background-blend-mode: soft-light;
+  background-blend-mode: normal, soft-light;
 }
 
 /* Titelstrook — korrel zichtbaar; geen witte rand (Safari blend aan tegelrand). */
