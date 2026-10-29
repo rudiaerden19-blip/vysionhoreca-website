@@ -50,6 +50,10 @@ const KASSA_BTN_FACE_CHAMPAGNE =
 export const KASSA_POS_SUBTLE_LIFT_SHADOW =
   'shadow-[0_4px_9px_rgba(0,0,0,0.61),0_11px_24px_rgba(0,0,0,0.46),-6px_0_14px_rgba(0,0,0,0.38),6px_0_14px_rgba(0,0,0,0.38)]'
 
+/** Schaduw achter menu-tegel (categorie/product) — leesbaar op donker recess-vlak. */
+export const KASSA_POS_MENU_TILE_DROP_SHADOW =
+  'shadow-[0_6px_16px_rgba(0,0,0,0.72),0_12px_28px_rgba(0,0,0,0.55),0_2px_6px_rgba(0,0,0,0.48)]'
+
 export const KASSA_POS_SELECTED_LIFT_SHADOW =
   'shadow-[0_4px_9px_rgba(0,0,0,0.64),0_11px_26px_rgba(0,0,0,0.51),0_15px_37px_rgba(0,0,0,0.40),-7px_0_16px_rgba(0,0,0,0.40),7px_0_16px_rgba(0,0,0,0.40),0_7px_28px_rgba(196,164,106,0.38),0_0_22px_rgba(212,180,131,0.28),0_0_12px_rgba(212,180,131,0.32)]'
 
@@ -294,10 +298,10 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   KASSA_POS_BTN_SHAPE,
   KASSA_MENU_TILE_FACE,
   'border border-[#3d352c] border-t-[#d4b483]/28',
-  KASSA_POS_SUBTLE_LIFT_SHADOW,
+  KASSA_POS_MENU_TILE_DROP_SHADOW,
   'transition-[transform,box-shadow,filter] duration-150 ease-out',
   'hover:brightness-[1.04]',
-  'hover:shadow-[0_6px_14px_rgba(0,0,0,0.58),0_0_14px_rgba(212,180,131,0.16)]',
+  'hover:shadow-[0_8px_22px_rgba(0,0,0,0.78),0_16px_34px_rgba(0,0,0,0.58),0_0_12px_rgba(212,180,131,0.14)]',
   'active:scale-[0.96] active:translate-y-[2px] active:brightness-[0.84]',
   'active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.42)]',
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
