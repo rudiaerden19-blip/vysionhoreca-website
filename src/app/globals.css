@@ -469,17 +469,17 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Speels #333 — tegel-scroll, ingesprongen bak, zijbalk-mand: lichte korrel. */
+/* Speels #333 — tegel-scroll, ingesprongen bak, zijbalk-mand: subtiele korrel. */
 .kassa-speels-menu-scroll,
 .kassa-speels-recess-tray,
 .kassa-speels-sidebar-cart-vak {
   background-color: #333333;
   background-image:
-    linear-gradient(rgba(40, 40, 40, 0.1), rgba(40, 40, 40, 0.1)),
+    linear-gradient(rgba(40, 40, 40, 0.045), rgba(40, 40, 40, 0.045)),
     url('/images/kassa-dark-frame-grain.png');
-  background-size: 512px 512px;
+  background-size: 768px 768px;
   background-repeat: repeat;
-  background-blend-mode: overlay;
+  background-blend-mode: soft-light;
 }
 
 /* Titelstrook — korrel zichtbaar; geen witte rand (Safari blend aan tegelrand). */
