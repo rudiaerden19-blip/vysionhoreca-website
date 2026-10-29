@@ -186,7 +186,7 @@ import {
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
 import {
-  formatKassaHeaderWeekdayClock,
+  formatKassaHeaderWeekdayClockParts,
   formatKassaNumpadHeaderDate,
 } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
@@ -1265,8 +1265,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const id = window.setInterval(() => setKassaSidebarClock(new Date()), 1000)
     return () => window.clearInterval(id)
   }, [])
-  const kassaSidebarDigitalTime = useMemo(
-    () => formatKassaHeaderWeekdayClock(kassaSidebarClock, locale),
+  const kassaHeaderClockParts = useMemo(
+    () => formatKassaHeaderWeekdayClockParts(kassaSidebarClock, locale),
     [kassaSidebarClock, locale],
   )
   const numpadHeaderDateLabel = useMemo(
@@ -6071,13 +6071,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {kassaPosLuxury ? (
             <time
               dateTime={kassaSidebarClock.toISOString()}
-              className={`relative z-20 -ml-[3cm] shrink-0 font-bold tracking-[0.04em] whitespace-nowrap px-1 sm:px-2 ${
+              className={`relative z-20 -ml-[3cm] mr-2 flex shrink-0 items-center gap-3 whitespace-nowrap px-1 font-bold tracking-[0.04em] sm:gap-4 sm:px-2 ${
                 posChrome === 'speels'
                   ? 'text-sm text-[#b0b0b0] sm:text-base'
                   : 'text-sm text-zinc-100 sm:text-base'
               }`}
             >
-              {kassaSidebarDigitalTime}
+              <span>{kassaHeaderClockParts.weekday}</span>
+              <span>{kassaHeaderClockParts.datePart}</span>
+              <span className="tabular-nums">{kassaHeaderClockParts.time}</span>
             </time>
           ) : null}
 

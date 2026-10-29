@@ -79,8 +79,10 @@ export function formatKlantschermWaitingClock(date: Date, _locale: Locale, _opts
   return `${hours}:${minutes}`
 }
 
-/** Kassa header — weekdag + DD/MM/JJJJ + HH:mm (lokale systeemtijd), bv. „vrijdag 30/10/2026  00:14”. */
-export function formatKassaHeaderWeekdayClock(date: Date, locale: Locale): string {
+export function formatKassaHeaderWeekdayClockParts(
+  date: Date,
+  locale: Locale,
+): { weekday: string; datePart: string; time: string } {
   const tag = appIntlLocaleTag(locale)
   const weekday = new Intl.DateTimeFormat(tag, { weekday: 'long' }).format(date).toLocaleLowerCase(tag)
   const datePart = new Intl.DateTimeFormat(tag, {
@@ -89,6 +91,12 @@ export function formatKassaHeaderWeekdayClock(date: Date, locale: Locale): strin
     year: 'numeric',
   }).format(date)
   const time = formatKlantschermWaitingClock(date, locale)
+  return { weekday, datePart, time }
+}
+
+/** Kassa header — weekdag + DD/MM/JJJJ + HH:mm (lokale systeemtijd), bv. „vrijdag 30/10/2026  00:14”. */
+export function formatKassaHeaderWeekdayClock(date: Date, locale: Locale): string {
+  const { weekday, datePart, time } = formatKassaHeaderWeekdayClockParts(date, locale)
   return `${weekday} ${datePart}  ${time}`
 }
 
