@@ -3520,7 +3520,7 @@
     "logout": "تسجيل الخروج",
     "offlineBanner": "غير متصل – القائمة من الذاكرة المؤقتة. تُحفظ الطلبات وتُرسل عند الاتصال.",
     "offlineModeActive": "وضع عدم الاتصال نشط",
-    "onlineModeLive": "متصل مباشرة",
+    "onlineModeLive": "online",
     "onlineModeLiveTitle": "متصل — تُزامن الطلبات فورًا مع قاعدة البيانات",
     "pwaInstallBanner": "ثبّت نقطة البيع كتطبيق للعمل دون اتصال",
     "install": "تثبيت",

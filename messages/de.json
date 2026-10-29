@@ -3020,7 +3020,7 @@
     "logout": "Abmelden",
     "offlineBanner": "Offline – Menü aus dem Cache. Bestellungen werden gespeichert und bei Verbindung gesendet.",
     "offlineModeActive": "Offline-Modus aktiv",
-    "onlineModeLive": "Live",
+    "onlineModeLive": "online",
     "onlineModeLiveTitle": "Verbunden — Bestellungen werden sofort synchronisiert",
     "pwaInstallBanner": "Kasse als App installieren für vollständige Offline-Nutzung",
     "install": "Installieren",

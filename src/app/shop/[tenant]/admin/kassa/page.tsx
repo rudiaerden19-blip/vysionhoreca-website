@@ -6039,22 +6039,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isOnline !== null && (
             <div
-              className={`inline-flex min-w-0 max-w-[7rem] shrink items-center justify-center gap-0.5 overflow-hidden leading-tight min-h-[2.65rem] sm:min-h-[2.85rem] sm:max-w-[9rem] md:max-w-none ${KASSA_HEADER_QUICK_LINK_LABEL} ${
+              className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
+                isOnline && kassaPosLuxury && posChrome === 'speels'
+                  ? kassaHeaderClockParts.colonVisible
+                    ? 'opacity-100'
+                    : 'opacity-0'
+                  : 'opacity-100'
+              } ${
                 kassaPosLuxury
                   ? isOnline
                     ? posChrome === 'speels'
-                      ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsGreenGlossButtonClass(false)}`
-                      : headerQuickLinkBtnClass
-                    : `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
+                      ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)}`
+                      : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
                   : isOnline
-                    ? `rounded-xl px-3 py-2 font-bold ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
-                    : 'rounded-xl bg-red-600/95 px-3 py-2 font-bold text-white'
+                    ? `min-h-[2.65rem] rounded-xl px-4 py-2 text-sm font-bold sm:min-h-[2.85rem] sm:px-5 sm:text-base ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
+                    : 'min-h-[2.65rem] rounded-xl bg-red-600/95 px-4 py-2 text-sm font-bold text-white sm:min-h-[2.85rem] sm:px-5 sm:text-base'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
               aria-live="polite"
             >
-              <span className="truncate">{isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}</span>
+              <span className="truncate">
+                {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
+              </span>
             </div>
           )}
 

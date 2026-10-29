@@ -4167,7 +4167,7 @@
     "logout": "Uitloggen",
     "offlineBanner": "Offline – menu geladen uit cache. Bestellingen worden bewaard en verstuurd bij reconnect.",
     "offlineModeActive": "Offline modus actief",
-    "onlineModeLive": "Live",
+    "onlineModeLive": "online",
     "onlineModeLiveTitle": "Verbonden — bestellingen worden meteen gesynchroniseerd",
     "pwaInstallBanner": "Installeer de kassa als app voor volledig offline gebruik",
     "install": "Installeer",

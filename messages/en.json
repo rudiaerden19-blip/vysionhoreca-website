@@ -4167,7 +4167,7 @@
     "logout": "Log out",
     "offlineBanner": "Offline – menu loaded from cache. Orders are saved and sent when you reconnect.",
     "offlineModeActive": "Offline mode active",
-    "onlineModeLive": "Live",
+    "onlineModeLive": "online",
     "onlineModeLiveTitle": "Connected — orders sync to the database immediately",
     "pwaInstallBanner": "Install the POS as an app for full offline use",
     "install": "Install",

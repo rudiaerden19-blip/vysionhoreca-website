@@ -3020,7 +3020,7 @@
     "logout": "Déconnexion",
     "offlineBanner": "Hors ligne – menu en cache. Les commandes sont enregistrées et envoyées à la reconnexion.",
     "offlineModeActive": "Mode hors ligne actif",
-    "onlineModeLive": "En ligne",
+    "onlineModeLive": "online",
     "onlineModeLiveTitle": "Connecté — les commandes sont synchronisées immédiatement",
     "pwaInstallBanner": "Installez la caisse en application pour le mode hors ligne",
     "install": "Installer",
