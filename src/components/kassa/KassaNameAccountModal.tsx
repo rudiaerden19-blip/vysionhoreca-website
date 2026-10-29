@@ -46,8 +46,6 @@ import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
-const KASSA_NAME_ACCOUNT_PIN_Z = 260
-
 type Props = {
   open: boolean
   tenant: string
@@ -475,11 +473,13 @@ export default function KassaNameAccountModal({
   if (!open) return null
 
   return (
-    <>
     <div
       className="fixed inset-0 z-[250] flex items-end justify-center bg-black/50 p-4 sm:items-center"
       data-vysion-modal-overlay
-      onClick={onClose}
+      onClick={() => {
+        if (deletePinOpen) return
+        onClose()
+      }}
     >
       <div
         className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl [color-scheme:light]"
@@ -711,23 +711,22 @@ export default function KassaNameAccountModal({
           </div>
         )}
       </div>
+      <StaffClockPinPortal
+        nested
+        open={deletePinOpen}
+        titleId="kassa-name-account-delete-pin-title"
+        title={t('kassaNameAccount.deleteOpenTabPinTitle')}
+        placeholder={t('kassaNameAccount.deleteOpenTabPinPlaceholder')}
+        pinValue={deletePinInput}
+        onPinChange={setDeletePinInput}
+        pinError={deletePinError}
+        busy={deletePinBusy || saving}
+        cancelLabel={t('kassaApp.cancel')}
+        confirmLabel={t('pinGate.confirm')}
+        onCancel={closeDeletePinModal}
+        onConfirm={() => void submitDeleteOpenTabPin()}
+        maxPinLength={4}
+      />
     </div>
-    <StaffClockPinPortal
-      open={deletePinOpen}
-      titleId="kassa-name-account-delete-pin-title"
-      title={t('kassaNameAccount.deleteOpenTabPinTitle')}
-      placeholder={t('kassaNameAccount.deleteOpenTabPinPlaceholder')}
-      pinValue={deletePinInput}
-      onPinChange={setDeletePinInput}
-      pinError={deletePinError}
-      busy={deletePinBusy || saving}
-      cancelLabel={t('kassaApp.cancel')}
-      confirmLabel={t('pinGate.confirm')}
-      onCancel={closeDeletePinModal}
-      onConfirm={() => void submitDeleteOpenTabPin()}
-      zIndex={KASSA_NAME_ACCOUNT_PIN_Z}
-      maxPinLength={4}
-    />
-    </>
   )
 }

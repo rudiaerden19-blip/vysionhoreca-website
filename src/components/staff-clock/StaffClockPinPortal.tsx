@@ -31,6 +31,8 @@ export type StaffClockPinPortalProps = {
   zIndex?: number
   /** Standaard 12 (personeel); eigenaar/manager-PIN = 4. */
   maxPinLength?: number
+  /** In parent-modal (absolute overlay) i.p.v. portal naar body. */
+  nested?: boolean
 }
 
 export function StaffClockPinPortal({
@@ -48,17 +50,18 @@ export function StaffClockPinPortal({
   onConfirm,
   zIndex = STAFF_CLOCK_PIN_Z_INDEX,
   maxPinLength = STAFF_PIN_MAX_LEN,
+  nested = false,
 }: StaffClockPinPortalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (!open) return
+    if (!open || nested) return
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.body.style.overflow = prevOverflow
     }
-  }, [open])
+  }, [open, nested])
 
   useEffect(() => {
     if (!open) return
@@ -83,13 +86,18 @@ export function StaffClockPinPortal({
     }
   }, [open, title])
 
-  if (!open || typeof document === 'undefined') return null
+  if (!open) return null
 
-  return createPortal(
+  const shellClass = nested
+    ? 'absolute inset-0 z-[60] flex items-center justify-center bg-black/65 p-4 touch-manipulation'
+    : 'fixed inset-0 flex items-center justify-center bg-black/50 p-4 touch-manipulation'
+
+  const panel = (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50 p-4 touch-manipulation"
-      style={{ zIndex }}
+      className={shellClass}
+      style={nested ? undefined : { zIndex }}
       role="presentation"
+      onClick={(e) => e.stopPropagation()}
     >
       <div
         role="dialog"
@@ -100,6 +108,7 @@ export function StaffClockPinPortal({
         data-staff-clock-pin
         className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl flex flex-col gap-3"
         style={{ colorScheme: 'light' }}
+        onClick={(e) => e.stopPropagation()}
       >
         <p id={titleId} className="font-bold text-gray-900">
           {title}
@@ -154,7 +163,10 @@ export function StaffClockPinPortal({
           </div>
         </form>
       </div>
-    </div>,
-    document.body,
+    </div>
   )
+
+  if (nested) return panel
+  if (typeof document === 'undefined') return null
+  return createPortal(panel, document.body)
 }
