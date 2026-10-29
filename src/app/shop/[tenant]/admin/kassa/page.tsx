@@ -229,7 +229,11 @@ import {
   isLagoonKitchenScreenTenant,
   isTheLagoonTenant,
 } from '@/lib/lagoon-kitchen-screen'
-import { clearLagoonOwnerPinUnlockIfStrict } from '@/lib/lagoon-reports-pin-gate'
+import {
+  clearLagoonOwnerPinUnlockIfStrict,
+  lagoonStrictReportsPinEnabled,
+} from '@/lib/lagoon-reports-pin-gate'
+import { KassaOwnerPinOverlay } from '@/components/kassa/KassaOwnerPinOverlay'
 import {
   readKassaJetonSalePoint,
   writeKassaJetonSalePoint,
@@ -1142,6 +1146,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [personeelSubOpen, setPersoneelSubOpen] = useState<string | null>(null)
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
+  const [hamburgerMenuPinOpen, setHamburgerMenuPinOpen] = useState(false)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
   // ── Geluid activatie scherm ──────────────────────────────────────────────
   // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
@@ -5708,7 +5713,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Hamburger ── */}
         <div className="relative z-20 flex shrink-0 items-center gap-2">
-          <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
+          <button
+            onClick={() => {
+              if (hamburgerOpen) {
+                setHamburgerOpen(false)
+                setHamburgerSubOpen(null)
+                return
+              }
+              if (
+                lagoonStrictReportsPinEnabled(tenant) &&
+                !isSuperAdminLoggedIn()
+              ) {
+                setHamburgerMenuPinOpen(true)
+                return
+              }
+              setHamburgerOpen(true)
+              setHamburgerSubOpen(null)
+            }}
             className={`flex items-center transition-colors ${
               kassaWide15Chrome ? 'gap-1 px-1.5 py-1' : 'gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3'
             } ${
@@ -7371,6 +7392,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }}
         />
       ) : null}
+
+      <KassaOwnerPinOverlay
+        open={hamburgerMenuPinOpen}
+        tenant={tenant}
+        title={t('pinGate.ownerPinTitle')}
+        onCancel={() => setHamburgerMenuPinOpen(false)}
+        onVerified={() => {
+          setHamburgerMenuPinOpen(false)
+          setHamburgerOpen(true)
+          setHamburgerSubOpen(null)
+        }}
+      />
 
       <KassaStaffClockModal
         open={staffClockOpen}
