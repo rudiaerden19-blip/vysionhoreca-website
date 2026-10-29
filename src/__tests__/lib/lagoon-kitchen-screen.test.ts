@@ -13,12 +13,14 @@ describe('lagoon-kitchen-screen', () => {
       ['c2', 'Mocktails'],
       ['c3', 'Snacks'],
       ['c4', 'Burgers'],
+      ['c5', 'Warme Dranken'],
     ]),
     productCategoryByProductId: new Map([
       ['p-cock', 'c1'],
       ['p-mock', 'c2'],
       ['p-snack', 'c3'],
       ['p-burger', 'c4'],
+      ['p-warm', 'c5'],
     ]),
   }
 
@@ -27,9 +29,10 @@ describe('lagoon-kitchen-screen', () => {
     expect(isLagoonKitchenScreenTenant('demo-frituur')).toBe(false)
   })
 
-  it('matches cocktail and mocktail category names', () => {
+  it('matches cocktail, mocktail and warme dranken category names', () => {
     expect(isLagoonKitchenMenuCategoryName('Cocktails')).toBe(true)
     expect(isLagoonKitchenMenuCategoryName('Virgin Mocktails')).toBe(true)
+    expect(isLagoonKitchenMenuCategoryName('Warme Dranken')).toBe(true)
     expect(isLagoonKitchenMenuCategoryName('Snacks')).toBe(false)
     expect(isLagoonKitchenMenuCategoryName('Burgers')).toBe(false)
   })
@@ -39,15 +42,16 @@ describe('lagoon-kitchen-screen', () => {
       { quantity: 1, product: { category_id: 'c1', name: 'Mojito' } },
       { quantity: 2, product_id: 'p-snack', name: 'Friet' },
       { quantity: 1, product_id: 'p-mock', name: 'Nojito' },
+      { quantity: 1, product_id: 'p-warm', name: 'Cappuccino' },
     ]
     const out = filterOrderItemsForLagoonKitchen(items, ctx)
-    expect(out).toHaveLength(2)
+    expect(out).toHaveLength(3)
     expect(
       out.map((l) => {
         const row = l as { name?: string; product?: { name?: string } }
         return row.name ?? row.product?.name
       }),
-    ).toEqual(['Mojito', 'Nojito'])
+    ).toEqual(['Mojito', 'Nojito', 'Cappuccino'])
   })
 
   it('drops queue orders with only snacks for lagoon', () => {

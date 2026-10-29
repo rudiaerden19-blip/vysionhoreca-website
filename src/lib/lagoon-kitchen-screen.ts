@@ -3,7 +3,7 @@ import type { MenuCategory, MenuProduct } from '@/lib/admin-api'
 
 const LAGOON_KITCHEN_SCREEN_SLUG = 'thelagoon'
 
-/** Lagoon bar-keuken: alleen dranken die in cocktail/mocktail-categorieën zitten. */
+/** Lagoon bar-keuken: cocktail/mocktail + warme dranken (categorienaam). */
 export function isLagoonKitchenScreenTenant(tenantSlug: string): boolean {
   return String(tenantSlug ?? '').trim().toLowerCase() === LAGOON_KITCHEN_SCREEN_SLUG
 }
@@ -13,6 +13,10 @@ export function isLagoonKitchenMenuCategoryName(categoryName: string): boolean {
   if (!n) return false
   if (n.includes('mocktail')) return true
   if (n.includes('cocktail')) return true
+  if (n.includes('warme drank')) return true
+  if (n.includes('warm drank')) return true
+  if (n.includes('hot drink')) return true
+  if (n.includes('warm drink')) return true
   return false
 }
 
