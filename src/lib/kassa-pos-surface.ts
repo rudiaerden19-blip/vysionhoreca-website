@@ -235,6 +235,9 @@ export const KASSA_SPEELS_BLUE_GLOSS_BTN_CLASS = 'kassa-speels-blue-gloss-btn'
 export const KASSA_SPEELS_RED_GLOSS_BTN_CLASS = 'kassa-speels-red-gloss-btn'
 export const KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS = 'kassa-speels-green-gloss-btn'
 
+/** Header online-status — glow sweep links→rechts over groene gloss-knop. */
+export const KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS = 'kassa-speels-online-status-sweep'
+
 /** Mand-prijzen — zelfde groen als Afrekenen (speels green gloss). */
 export const KASSA_SPEELS_PRICE_ACCENT_CLASS = 'text-[#4aad7a]'
 

@@ -885,6 +885,44 @@ input[type="number"] {
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
 }
 
+@keyframes kassa-speels-online-glow-sweep {
+  0% {
+    transform: translateX(-130%) skewX(-16deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  88% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(230%) skewX(-16deg);
+    opacity: 0;
+  }
+}
+
+/* Online header — herhalende lichtband over groene knop (geen knipper). */
+.kassa-speels-green-gloss-btn.kassa-speels-online-status-sweep::after {
+  left: 0;
+  right: auto;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  height: 100%;
+  border-radius: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.22) 42%,
+    rgba(200, 255, 230, 0.65) 50%,
+    rgba(255, 255, 255, 0.22) 58%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: kassa-speels-online-glow-sweep 2.4s ease-in-out infinite;
+  z-index: 2;
+}
+
 .kassa-speels-red-gloss-btn:active::before,
 .kassa-speels-green-gloss-btn:active::before,
 .kassa-speels-red-gloss-btn:active::after,
