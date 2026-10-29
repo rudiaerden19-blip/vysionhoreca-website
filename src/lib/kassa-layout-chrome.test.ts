@@ -35,7 +35,7 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
     const cls = kassaLayoutChromeBtnClass('dark', false)
     expect(cls).toContain('#5a5a5a')
     expect(cls).not.toContain('#c4a46a')
-    expect(kassaLayoutPlateBgClass('dark')).toBe('bg-[#0b0f14]')
+    expect(kassaLayoutPlateBgClass('dark')).toContain('gks-menu-plate-grain')
     expect(kassaLayoutHeaderBarClass('dark')).toBe('bg-black')
     expect(kassaLayoutQuickMenuTileClass('dark')).toContain('#5a5a5a')
   })

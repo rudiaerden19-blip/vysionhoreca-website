@@ -154,7 +154,11 @@ import {
   kassaPosCartQtyButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
-import { kassaLayoutPlateBgClass, kassaLayoutRecessTrayClass } from '@/lib/kassa-layout-chrome'
+import {
+  kassaLayoutMenuScrollFlatBgClass,
+  kassaLayoutPlateBgClass,
+  kassaLayoutRecessTrayClass,
+} from '@/lib/kassa-layout-chrome'
 import {
   authFetch,
   buildShopInternalReturnPath,
@@ -6143,7 +6147,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
+            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${kassaLayoutMenuScrollFlatBgClass(kassaLayout)} ${
               kassaAppearanceDark && kassaLayout !== 'luxe' ? 'gks-menu-vignette': ''
             }`}
           >
