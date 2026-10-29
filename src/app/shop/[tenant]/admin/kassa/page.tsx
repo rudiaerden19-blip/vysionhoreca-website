@@ -5737,14 +5737,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div
-        className={`relative z-30 w-full min-w-0 shrink-0 items-center ${
-          kassaPosLuxury
-            ? `grid grid-cols-[auto_minmax(0,1fr)_auto] ${
-                kassaWide15Chrome ? 'min-h-[44px] gap-x-1 px-1.5 py-1' : 'min-h-[56px] gap-x-1.5 px-2 py-2 sm:gap-x-2 sm:px-3'
-              }`
-            : `flex ${
-                kassaWide15Chrome ? 'min-h-[44px] gap-1 px-1.5 py-1' : 'min-h-[56px] gap-1.5 px-2 py-2 sm:gap-2 sm:px-3'
-              }`
+        className={`relative z-30 flex w-full min-w-0 shrink-0 items-center ${
+          kassaWide15Chrome ? 'min-h-[44px] gap-1 px-1.5 py-1' : 'min-h-[56px] gap-1.5 px-2 py-2 sm:gap-2 sm:px-3'
         } ${
           kassaPosLuxury
             ? `${kassaWide15Chrome ? 'pb-1.5' : 'pb-3'} ${kassaPlateBgClass}`
@@ -5866,23 +5860,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
         {kassaPosLuxury ? (
-          <div className="relative z-20 flex min-w-0 items-center justify-center px-1">
-            {renderKassaTenantNameButton(
-              kassaWide15Chrome
-                ? 'text-sm sm:text-base'
-                : 'text-base sm:text-lg md:text-xl lg:text-2xl',
-              kassaWide15Chrome
-                ? 'max-w-[min(100%,14rem)]'
-                : 'max-w-[min(100%,22rem)] sm:max-w-[min(100%,26rem)] md:max-w-[min(100%,32rem)]',
-            )}
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5rem] sm:px-[8rem] md:px-[10rem]"
+            aria-hidden={false}
+          >
+            <div className="pointer-events-auto flex min-w-0 max-w-full justify-center">
+              {renderKassaTenantNameButton(
+                kassaWide15Chrome
+                  ? 'text-sm sm:text-base'
+                  : 'text-base sm:text-lg md:text-xl lg:text-2xl',
+                kassaWide15Chrome
+                  ? 'max-w-[min(100%,14rem)]'
+                  : 'max-w-[min(100%,22rem)] sm:max-w-[min(100%,26rem)] md:max-w-[min(100%,32rem)]',
+              )}
+            </div>
           </div>
         ) : null}
 
-        <div
-          className={`relative z-20 flex min-w-0 items-center justify-end gap-1 sm:gap-1.5 ${
-            kassaPosLuxury ? '' : 'min-w-0 flex-1'
-          }`}
-        >
+        <div className="relative z-20 flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
         {!kassaPosLuxury ? (
         <div
           className={`flex min-w-0 shrink-0 flex-col justify-center px-0.5 ${
@@ -5901,13 +5896,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) : null}
 
         <div
-          className={`relative flex min-h-0 min-w-0 items-center justify-end ${
-            kassaPosLuxury ? '' : 'flex-1'
+          className={`relative flex min-h-0 min-w-0 flex-1 items-center ${
+            kassaWide15Chrome ? 'ml-1.5' : kassaCompactChrome ? 'ml-[2cm]' : 'ml-[4cm]'
           }`}
         >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className={`flex min-h-0 min-w-0 items-center justify-end ${
+            className={`flex min-h-0 min-w-0 flex-1 items-center justify-start ${
               kassaWide15Chrome
                 ? 'flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
                 : 'flex-nowrap gap-1.5 sm:gap-2'
