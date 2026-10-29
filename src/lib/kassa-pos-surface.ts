@@ -442,7 +442,7 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 
-/** Speels/Dark tegels — zie `.kassa-speels-menu-tile` (geen rand/filter-hover). */
+/** Speels/Dark tegels — zie `.kassa-speels-menu-tile` (5 mm zwart kader). */
 export const KASSA_SPEELS_MENU_TILE_BUTTON_CLASS = 'kassa-speels-menu-tile'
 
 export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [

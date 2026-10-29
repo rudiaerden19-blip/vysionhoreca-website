@@ -506,15 +506,15 @@ input[type="number"] {
     inset 0 -4px 0 0 #282828;
 }
 
-/* Menu-tegels Dark — duidelijk zwart kader + schaduw, geen hover-flikkern. */
+/* Menu-tegels Dark — 5 mm zwart kader + schaduw, geen hover-flikkern. */
 .kassa-speels-menu-tile {
-  border: 2px solid #000000 !important;
+  box-sizing: border-box;
+  border: 5mm solid #000000 !important;
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
   background-color: #282828 !important;
   box-shadow:
-    0 0 0 1px #000000,
     0 6px 16px rgba(0, 0, 0, 0.72),
     0 12px 28px rgba(0, 0, 0, 0.55) !important;
 }
