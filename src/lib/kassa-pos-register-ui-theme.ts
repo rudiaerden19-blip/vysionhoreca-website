@@ -11,6 +11,7 @@ import {
   KASSA_POS_FIELD,
   KASSA_POS_NUMPAD_KEY,
   kassaSpeelsChromeButtonClass,
+  KASSA_SPEELS_PRICE_ACCENT_CLASS,
   KASSA_POS_CART_ROW,
   KASSA_POS_CART_THUMB_SHELL,
   KASSA_POS_MENU_TRANSPARENT_CLASS,
@@ -85,7 +86,7 @@ export function createKassaSpeelsRegisterUiTheme(): KassaRegisterUiTheme {
     modalConfirmBg: `${KASSA_POS_BTN_SHAPE} w-full max-w-sm shadow-lg p-6 flex flex-col gap-4 bg-[#1a332c] border border-[#0c1c18]`,
     printFallbackGhost: `mt-3 w-full py-3 px-4 text-sm font-semibold ${kassaSpeelsChromeButtonClass(false)}`,
     printFallbackPanel: `w-full max-w-md ${KASSA_POS_BTN_SHAPE} border border-[#0c1c18] bg-[#1a332c] p-5 shadow-lg sm:p-6`,
-    priceAccentClass: 'text-[#58CCFF]',
+    priceAccentClass: KASSA_SPEELS_PRICE_ACCENT_CLASS,
   }
 }
 

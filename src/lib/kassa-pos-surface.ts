@@ -231,6 +231,9 @@ export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
 export const KASSA_SPEELS_RED_GLOSS_BTN_CLASS = 'kassa-speels-red-gloss-btn'
 export const KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS = 'kassa-speels-green-gloss-btn'
 
+/** Mand-prijzen — zelfde groen als Afrekenen (speels green gloss). */
+export const KASSA_SPEELS_PRICE_ACCENT_CLASS = 'text-[#4aad7a]'
+
 const KASSA_SPEELS_CHROME_BTN_SHELL = [
   'touch-manipulation select-none relative isolate overflow-hidden font-semibold',
   'transition-transform duration-100 ease-out',

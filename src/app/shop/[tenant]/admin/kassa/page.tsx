@@ -5627,7 +5627,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {item.choices && item.choices.length > 0 ? (
             <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
           ) : null}
-          <p className={`text-xs ${ui.cartChoices}`}>
+          <p className={`text-xs font-bold ${ui.priceAccentClass}`}>
             {item.quantity}× · €{lineTotal}
           </p>
         </div>
@@ -6901,7 +6901,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   {t('kassaApp.cartTotal')}
                 </span>
                 <span
-                  className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight text-red-500 ${
+                  className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
                     kassaCompactChrome || kassaSidebarFooterTier !== 'dense'? 'text-2xl sm:text-[1.65rem]': 'text-xl'
                   }`}
                 >
