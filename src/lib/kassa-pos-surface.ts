@@ -326,6 +326,20 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 
+/** Speels/Dark tegels — geen champagne-toprand of filter-hover (flikkern witte lijnen op #333). */
+export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
+  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
+  KASSA_POS_BTN_SHAPE,
+  KASSA_MENU_TILE_FACE,
+  'border border-[#3d352c]',
+  KASSA_POS_MENU_TILE_DROP_SHADOW,
+  'transition-[transform,box-shadow] duration-150 ease-out',
+  'hover:shadow-[0_8px_22px_rgba(0,0,0,0.78),0_16px_34px_rgba(0,0,0,0.58)]',
+  'active:scale-[0.96] active:translate-y-[2px]',
+  'active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.42)]',
+  KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
+].join(' ')
+
 /** Fotovlak — studio-vignette zoals de afgesproken look: licht midden, donker naar de randen. */
 const KASSA_POS_MENU_TILE_STUDIO_BG =
   'bg-[radial-gradient(ellipse_at_50%_42%,#d4c8b4_0%,#b5a894_36%,#8a7d6c_62%,#4a4238_88%,#2a241c_100%)]'
@@ -380,12 +394,12 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
-/** Speels: titelstrook — #282828 + korrel (zelfde als kader). */
+/** Speels: titelstrook — #282828 + korrel (zelfde als kader); geen border-t (geen flitslijn). */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
-  `pointer-events-none shrink-0 w-full border-t border-[#141414] ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2 pt-1.5 sm:px-3`
+  `pointer-events-none shrink-0 w-full ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2 pt-1.5 sm:px-3`
 
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA =
-  `pointer-events-none shrink-0 w-full border-t border-[#141414] ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
+  `pointer-events-none shrink-0 w-full ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-white sm:text-[15px] md:text-base'
