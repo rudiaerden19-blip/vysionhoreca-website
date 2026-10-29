@@ -570,7 +570,12 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
           style={{ height: 56, gridTemplateColumns: 'auto 1fr auto' }}
         >
           <div className="flex min-w-0 items-center gap-2 justify-self-start">
-            <AdminHamburgerMenu tenantSlug={params.tenant} />
+            <AdminHamburgerMenu
+              tenantSlug={params.tenant}
+              requireOwnerPinToOpen={
+                isAnyKassaPos && lagoonStrictReportsPinEnabled(params.tenant)
+              }
+            />
             {!modulesLoading &&
               isReservationsSoftwareTenant(moduleAccess, enabledModulesJson) && (
               <ReservationOnlineTopBarLink baseUrl={baseUrl} alwaysVisible />

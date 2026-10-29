@@ -9,12 +9,21 @@ import {
   filterHamburgerModulesForAccess,
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
+import { KassaOwnerPinOverlay } from '@/components/kassa/KassaOwnerPinOverlay'
+import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
 /**
  * Zelfde module-structuur als kassa; alleen modules die de tenant aan heeft staan.
  * Deelt module-flags met layout via TenantModuleFlagsProvider (één fetch).
  */
-export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
+export function AdminHamburgerMenu({
+  tenantSlug,
+  requireOwnerPinToOpen = false,
+}: {
+  tenantSlug: string
+  /** Lagoon kassa: menu pas na eigenaar-PIN (superadmin uitgezonderd). */
+  requireOwnerPinToOpen?: boolean
+}) {
   const { t } = useLanguage()
   const baseUrl = `/shop/${tenantSlug}/admin`
   const {
@@ -37,6 +46,7 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
 
   const [open, setOpen] = useState(false)
   const [subOpen, setSubOpen] = useState<string | null>(null)
+  const [menuPinOpen, setMenuPinOpen] = useState(false)
 
   const closeAll = () => {
     setOpen(false)
@@ -55,8 +65,17 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
         disabled={loading}
         onClick={() => {
           if (loading) return
+          if (open) {
+            setSubOpen(null)
+            setOpen(false)
+            return
+          }
+          if (requireOwnerPinToOpen && !isSuperAdminLoggedIn()) {
+            setMenuPinOpen(true)
+            return
+          }
           setSubOpen(null)
-          setOpen((o) => !o)
+          setOpen(true)
         }}
         className={`flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-md transition-colors ${
           loading
@@ -155,6 +174,17 @@ export function AdminHamburgerMenu({ tenantSlug }: { tenantSlug: string }) {
           )}
         </div>
       )}
+      <KassaOwnerPinOverlay
+        open={menuPinOpen}
+        tenant={tenantSlug}
+        title={t('pinGate.ownerPinTitle')}
+        onCancel={() => setMenuPinOpen(false)}
+        onVerified={() => {
+          setMenuPinOpen(false)
+          setSubOpen(null)
+          setOpen(true)
+        }}
+      />
     </div>
   )
 }
