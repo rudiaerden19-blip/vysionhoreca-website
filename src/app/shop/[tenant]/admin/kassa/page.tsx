@@ -6079,7 +6079,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               <span>{kassaHeaderClockParts.weekday}</span>
               <span>{kassaHeaderClockParts.datePart}</span>
-              <span className="tabular-nums">{kassaHeaderClockParts.time}</span>
+              <span className="inline-flex tabular-nums items-baseline">
+                {kassaHeaderClockParts.hours}
+                <span
+                  className={kassaHeaderClockParts.colonVisible ? 'opacity-100' : 'opacity-0'}
+                  aria-hidden
+                >
+                  :
+                </span>
+                {kassaHeaderClockParts.minutes}
+              </span>
             </time>
           ) : null}
 

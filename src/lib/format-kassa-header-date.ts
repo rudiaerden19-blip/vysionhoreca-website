@@ -82,7 +82,7 @@ export function formatKlantschermWaitingClock(date: Date, _locale: Locale, _opts
 export function formatKassaHeaderWeekdayClockParts(
   date: Date,
   locale: Locale,
-): { weekday: string; datePart: string; time: string } {
+): { weekday: string; datePart: string; hours: string; minutes: string; colonVisible: boolean } {
   const tag = appIntlLocaleTag(locale)
   const weekday = new Intl.DateTimeFormat(tag, { weekday: 'long' }).format(date).toLocaleLowerCase(tag)
   const datePart = new Intl.DateTimeFormat(tag, {
@@ -90,14 +90,15 @@ export function formatKassaHeaderWeekdayClockParts(
     month: '2-digit',
     year: 'numeric',
   }).format(date)
-  const time = formatKlantschermWaitingClock(date, locale)
-  return { weekday, datePart, time }
+  const { hours, minutes } = formatKlantschermWaitingClockParts(date, locale)
+  const colonVisible = date.getSeconds() % 2 === 0
+  return { weekday, datePart, hours, minutes, colonVisible }
 }
 
 /** Kassa header — weekdag + DD/MM/JJJJ + HH:mm (lokale systeemtijd), bv. „vrijdag 30/10/2026  00:14”. */
 export function formatKassaHeaderWeekdayClock(date: Date, locale: Locale): string {
-  const { weekday, datePart, time } = formatKassaHeaderWeekdayClockParts(date, locale)
-  return `${weekday} ${datePart}  ${time}`
+  const { weekday, datePart, hours, minutes } = formatKassaHeaderWeekdayClockParts(date, locale)
+  return `${weekday} ${datePart}  ${hours}:${minutes}`
 }
 
 /** Uren en minuten apart voor grote digitale klok (knipperende dubbele punt). */
