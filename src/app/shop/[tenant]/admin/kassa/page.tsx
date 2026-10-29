@@ -103,6 +103,7 @@ import {
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
+import { KassaSoundActivationRestaurantBackdrop } from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 import {
   kassaUiLayoutUsesPosLuxury,
@@ -5402,14 +5403,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
   if (showSoundActivation && !soundActivated && !demoViewOnly) {
     return (
-      <div className={`fixed inset-0 z-[200] flex flex-col items-center justify-center p-8 ${ui.soundBackdrop}`}>
-        <div className={`max-w-md text-center ${ui.soundHeading}`}>
+      <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden p-8">
+        <KassaSoundActivationRestaurantBackdrop />
+        <div className="relative z-10 max-w-md text-center text-white">
           <div className="mb-8 text-8xl"></div>
-          <h1 className={`mb-4 text-4xl font-bold ${ui.soundHeading}`}>{t('kassaApp.soundTitle')}</h1>
-          <p className={`mb-8 text-xl ${ui.soundBody}`}>
+          <h1 className="mb-4 text-4xl font-bold drop-shadow-sm">{t('kassaApp.soundTitle')}</h1>
+          <p className="mb-8 text-xl text-white/90 drop-shadow-sm">
             {t('kassaApp.soundBody')}
             <br /><br />
-            <strong className={ui.soundStrong}>{t('kassaApp.soundOncePerDay')}</strong>
+            <strong className="text-white">{t('kassaApp.soundOncePerDay')}</strong>
           </p>
           <button
             onClick={activateSound}
@@ -5418,7 +5420,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <span className="text-4xl"></span>
             {t('kassaApp.soundActivateButton').toUpperCase()}
           </button>
-          <p className={`mt-6 text-sm ${ui.soundMuted}`}>
+          <p className="mt-6 text-sm text-white/70 drop-shadow-sm">
              {t('kassaApp.soundHintFooter')}
           </p>
         </div>
