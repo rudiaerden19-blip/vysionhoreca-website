@@ -489,8 +489,6 @@ function kassaFooterActionTouchMinHClass(density: KassaChromeDensity, denseBill:
 
 /** Op rekening + Verwijder: volle breedte, tekst mag wrappen. */
 const KASSA_SIDEBAR_PAIR_BTN_MIN_H = 'min-h-[3.75rem] py-2.5 sm:min-h-[4rem]'
-const kassaSidebarPairLabelClass =
-  'max-w-full text-center text-sm font-bold leading-tight tracking-[0.03em] whitespace-normal break-words px-2 sm:text-lg'
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -5477,6 +5475,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       : kassaAppearanceDark
         ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
         : 'text-center text-xs font-bold leading-tight sm:text-sm'
+
+  /** Zelfde typografie als Num pad / BTW-bon; Op rekening mag wrappen. */
+  const kassaSidebarPairLabelClass = `max-w-full whitespace-normal break-words px-2 ${kassaSidebarActionLabelClass}`
 
   const kassaLightOrderTypeButtonSizeClass = kassaCompactChrome
     ? 'min-h-[38px] px-2 py-2'
