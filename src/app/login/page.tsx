@@ -342,15 +342,13 @@ export default function LoginPage() {
 
       <aside className="relative flex min-h-[220px] flex-col justify-between overflow-hidden bg-[#141210] px-8 py-10 lg:min-h-screen lg:w-[46%] xl:w-[50%]">
         <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(232,93,4,0.22)_0%,transparent_42%),linear-gradient(220deg,rgba(0,0,0,0.88)_0%,rgba(20,18,16,0.96)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/abonnement-onboarding-pos-restaurant.png')" }}
           aria-hidden
         />
+        <div className="pointer-events-none absolute inset-0 bg-black/50" aria-hidden />
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 48px),repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 48px)',
-          }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/75 via-black/45 to-black/25"
           aria-hidden
         />
         <div className="relative z-10">
@@ -365,11 +363,12 @@ export default function LoginPage() {
           </Link>
         </div>
         <div className="relative z-10 my-auto py-8 lg:py-0">
-          <p className="text-4xl font-bold tracking-[0.2em] text-[#e85d04] sm:text-5xl lg:text-6xl">
+          <p className="text-4xl font-bold tracking-[0.2em] text-[#e85d04] drop-shadow-sm sm:text-5xl lg:text-6xl">
             VYSION
           </p>
-          <p className="mt-1 text-4xl font-light tracking-wide text-white sm:text-5xl lg:text-6xl">POS</p>
-          <p className="mt-6 max-w-md text-base leading-relaxed text-white/65 sm:text-lg">{t('login.brandPanelTagline')}</p>
+          <p className="mt-6 max-w-md text-base leading-relaxed text-white/80 drop-shadow-sm sm:text-lg">
+            {t('login.brandPanelTagline')}
+          </p>
         </div>
         <p className="relative z-10 text-xs text-white/35">
           © {new Date().getFullYear()} Vysion Group
