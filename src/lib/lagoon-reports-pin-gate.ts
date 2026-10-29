@@ -1,8 +1,28 @@
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 
 /** Pilot The Lagoon: rapporten alleen na verse eigenaar-PIN (geen gedeelde unlock voor personeel). */
-export function lagoonStrictReportsPinEnabled(tenantSlug: string): boolean {
-  return isTheLagoonTenant(tenantSlug)
+export function lagoonStrictReportsPinEnabled(
+  tenantSlug: string,
+  opts?: { kassaNameAccountV2?: boolean | null },
+): boolean {
+  if (isTheLagoonTenant(tenantSlug)) return true
+  if (opts?.kassaNameAccountV2 === true) return true
+  return false
+}
+
+/** Wis elke zaak-PIN-unlock (voorkomt thelagoon vs the-lagoon bypass). */
+export function clearAllOwnerPinUnlockSessions(): void {
+  if (typeof window === 'undefined') return
+  try {
+    const keys: string[] = []
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const k = sessionStorage.key(i)
+      if (k?.startsWith(OWNER_PIN_SESSION_PREFIX)) keys.push(k)
+    }
+    keys.forEach((k) => sessionStorage.removeItem(k))
+  } catch {
+    /* noop */
+  }
 }
 
 const OWNER_PIN_SESSION_PREFIX = 'vysion_pin_unlocked_'

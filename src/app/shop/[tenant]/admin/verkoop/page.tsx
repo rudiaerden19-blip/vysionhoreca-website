@@ -5,7 +5,6 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getSalesStats, getDailyRevenue, getTopProducts, SalesStats } from '@/lib/admin-api'
-import ReportPinGate from '@/components/ReportPinGate'
 
 export default function VerkoopPage({ params }: { params: { tenant: string } }) {
   const { t, locale } = useLanguage()
@@ -62,7 +61,6 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
 
   if (loading) {
     return (
-      <ReportPinGate tenant={params.tenant}>
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <motion.div
@@ -73,12 +71,10 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
       </div>
-      </ReportPinGate>
     )
   }
 
   return (
-    <ReportPinGate tenant={params.tenant}>
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -234,6 +230,5 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         </p>
       </motion.div>
     </div>
-    </ReportPinGate>
   )
 }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 import { loadKassaActiveStaffFromServer } from '@/lib/kassa-active-staff-preference'
+import { clearAllOwnerPinUnlockSessions } from '@/lib/lagoon-reports-pin-gate'
 
 interface Props {
   tenant: string
@@ -35,11 +36,7 @@ export default function PinGate({ tenant, children, strictReportsPin = false }: 
       return
     }
     if (strictReportsPin) {
-      try {
-        sessionStorage.removeItem(SESSION_KEY)
-      } catch {
-        /* noop */
-      }
+      clearAllOwnerPinUnlockSessions()
     }
     fetch(`/api/pin/check?tenant=${tenant}`)
       .then((r) => r.json())

@@ -28,7 +28,6 @@ import {
 } from '@/lib/z-report-vat-context'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
 import { authFetch } from '@/lib/auth-headers'
-import ReportPinGate from '@/components/ReportPinGate'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Order {
@@ -1062,7 +1061,6 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   ]
 
   return (
-      <ReportPinGate tenant={tenant}>
       <div className="max-w-6xl mx-auto">
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -1762,6 +1760,5 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         <p className="text-xs text-gray-300">Vysion kassa's @ 2026</p>
       </div>
     </div>
-      </ReportPinGate>
   )
 }

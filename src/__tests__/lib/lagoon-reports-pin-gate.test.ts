@@ -8,6 +8,7 @@ describe('lagoon-reports-pin-gate', () => {
     expect(lagoonStrictReportsPinEnabled('thelagoon')).toBe(true)
     expect(lagoonStrictReportsPinEnabled('the-lagoon')).toBe(true)
     expect(lagoonStrictReportsPinEnabled('demo-frituur')).toBe(false)
+    expect(lagoonStrictReportsPinEnabled('demo-frituur', { kassaNameAccountV2: true })).toBe(true)
   })
 
   it('herkent rapport-module paden', () => {

@@ -17,7 +17,6 @@ import {
 } from '@/lib/admin-api'
 import { getDateBoundsForBelgium, getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import { getDashboardFiscalPeriodStats } from '@/lib/revenue-fiscal-stats'
-import ReportPinGate from '@/components/ReportPinGate'
 import { useTenantModuleFlagsContext } from '@/lib/tenant-module-flags-context'
 import {
   tenantShouldLoadOrderDashboardData,
@@ -316,7 +315,6 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     : ''
 
   return (
-    <ReportPinGate tenant={params.tenant}>
     <div
       className="relative -mx-4 -mt-4 min-h-[calc(100dvh-3.5rem)] overflow-hidden pb-4 md:-mx-6 md:-mt-6 md:pb-6"
       data-testid="admin-dashboard-shell"
@@ -585,6 +583,5 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       </motion.div>
       </div>
     </div>
-    </ReportPinGate>
   )
 }

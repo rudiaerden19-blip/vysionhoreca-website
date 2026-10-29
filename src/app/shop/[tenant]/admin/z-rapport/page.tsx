@@ -64,7 +64,6 @@ import {
   type ZReportMonthDayRow,
 } from '@/lib/z-report-month'
 import { useLanguage } from '@/i18n'
-import ReportPinGate from '@/components/ReportPinGate'
 
 // SHA-256 hash voor integriteitsverificatie (GKS compliance)
 async function generateReportHash(data: {
@@ -1342,7 +1341,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   return (
-      <ReportPinGate tenant={params.tenant}>
       <div className="max-w-4xl mx-auto">
       {/* Maandmail boekhouder */}
       <div className="mb-6 p-5 bg-indigo-50 border border-indigo-200 rounded-2xl print:hidden">
@@ -2237,6 +2235,5 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         )}
       </AnimatePresence>
     </div>
-      </ReportPinGate>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import ReportPinGate from '@/components/ReportPinGate'
 import { authFetch } from '@/lib/auth-headers'
 
 const PACKAGES = [
@@ -41,7 +40,6 @@ export default function BoekhoudingPage({ params }: { params: { tenant: string }
   }, [tenant])
 
   return (
-    <ReportPinGate tenant={tenant}>
       <div className="max-w-xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Boekhouding</h1>
         <p className="text-sm text-gray-500 mb-4">Gegevens voor de boekhouder. Er is nog geen koppeling met een extern pakket.</p>
@@ -106,6 +104,5 @@ export default function BoekhoudingPage({ params }: { params: { tenant: string }
           <button type="submit" className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm">Opslaan</button>
         </form>
       </div>
-    </ReportPinGate>
   )
 }

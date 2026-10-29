@@ -62,10 +62,12 @@ import {
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
 import {
+  clearAllOwnerPinUnlockSessions,
   clearOwnerPinUnlockSession,
   isLagoonStrictReportsAdminRestPath,
   lagoonStrictReportsPinEnabled,
 } from '@/lib/lagoon-reports-pin-gate'
+import { AdminReportPinShell } from '@/components/AdminReportPinShell'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -104,6 +106,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       .join(' ')
   )
   const [loading, setLoading] = useState(true)
+  const [kassaNameAccountV2, setKassaNameAccountV2] = useState(false)
   /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant`blijven naar /login — géén automatische tenant-sessie via cookies. */
   /** `verifying`= client dacht ingelogd; wacht op `/api/auth/verify-tenant-session`(zelfde regels als schrijf-API’s). */
   const [adminAccess, setAdminAccess] = useState<'pending' |  'verifying' |  'ok' |  'login'>('pending')
@@ -122,14 +125,16 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
 
   /** Lagoon: geen gedeelde PIN-unlock op rapportroutes (personeel opzelfde tablet). */
   useEffect(() => {
-    if (!lagoonStrictReportsPinEnabled(params.tenant)) return
+    const lagoonOpts = { kassaNameAccountV2 }
+    if (!lagoonStrictReportsPinEnabled(params.tenant, lagoonOpts)) return
     const rest = adminPath.startsWith(baseUrl) ? adminPath.slice(baseUrl.length) : adminPath
     const onReport = isLagoonStrictReportsAdminRestPath(rest)
-    if (onReport) clearOwnerPinUnlockSession(params.tenant)
+    if (onReport) clearAllOwnerPinUnlockSessions()
     return () => {
       clearOwnerPinUnlockSession(params.tenant)
+      clearAllOwnerPinUnlockSessions()
     }
-  }, [adminPath, baseUrl, params.tenant])
+  }, [adminPath, baseUrl, params.tenant, kassaNameAccountV2])
 
   useEffect(() => {
     async function checkTenant() {
@@ -141,6 +146,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
       setAdminHeaderTitle(fromSlug)
       const tenantData = await getTenantSettings(params.tenant)
       setTenantExists(tenantData !== null)
+      setKassaNameAccountV2(tenantData?.kassa_name_account_v2 === true)
       const bn = tenantData?.business_name?.trim()
       setAdminHeaderTitle(bn || fromSlug)
       setLoading(false)
@@ -573,7 +579,8 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
             <AdminHamburgerMenu
               tenantSlug={params.tenant}
               requireOwnerPinToOpen={
-                isAnyKassaPos && lagoonStrictReportsPinEnabled(params.tenant)
+                isAnyKassaPos &&
+                lagoonStrictReportsPinEnabled(params.tenant, { kassaNameAccountV2 })
               }
             />
             {!modulesLoading &&
@@ -659,7 +666,14 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
             isAdminDashboardRoot ? 'pb-0': 'pb-[max(6rem,env(safe-area-inset-bottom))]'
           }`}
         >
-          {children}
+          <AdminReportPinShell
+            tenant={params.tenant}
+            adminPath={adminPath}
+            baseUrl={baseUrl}
+            kassaNameAccountV2={kassaNameAccountV2}
+          >
+            {children}
+          </AdminReportPinShell>
         </div>
       </main>
     </div>

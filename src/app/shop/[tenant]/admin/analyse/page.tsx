@@ -1,7 +1,6 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
-import ReportPinGate from '@/components/ReportPinGate'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
@@ -490,7 +489,6 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const healthInfo = monthlyReport ? HEALTH_STATUS[monthlyReport.healthStatus] : HEALTH_STATUS.GOOD
 
   return (
-    <ReportPinGate tenant={params.tenant}>
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -1440,6 +1438,5 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         )}
       </AnimatePresence>
     </div>
-    </ReportPinGate>
   )
 }
