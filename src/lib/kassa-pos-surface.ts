@@ -231,6 +231,7 @@ export const KASSA_SPEELS_TOP_CHROME_BTN_CLASS = 'kassa-speels-top-chrome-btn'
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
 
 export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
+export const KASSA_SPEELS_BLUE_GLOSS_BTN_CLASS = 'kassa-speels-blue-gloss-btn'
 export const KASSA_SPEELS_RED_GLOSS_BTN_CLASS = 'kassa-speels-red-gloss-btn'
 export const KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS = 'kassa-speels-green-gloss-btn'
 
@@ -261,6 +262,19 @@ export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
     KASSA_POS_BTN_SHAPE,
     KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS,
     emphasis ? 'kassa-speels-black-gloss-btn--emphasis' : '',
+    KASSA_SPEELS_CHROME_BTN_SHELL,
+    KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+/** Donkerblauw — zelfde gloss-stack als Snel menu (`kassa-speels-order-type-btn`). */
+export function kassaSpeelsBlueGlossButtonClass(selected = false): string {
+  return [
+    KASSA_POS_BTN_SHAPE,
+    KASSA_SPEELS_BLUE_GLOSS_BTN_CLASS,
+    selected ? 'kassa-speels-blue-gloss-btn--selected' : '',
     KASSA_SPEELS_CHROME_BTN_SHELL,
     KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
   ]
@@ -299,12 +313,9 @@ export function kassaSpeelsChromeButtonClass(selected: boolean): string {
   return kassaSpeelsGrayChromeButtonClass()
 }
 
-/** Speels categoriebalk — alle tabs zwart glanzend; actieve tab grijs glanzend. */
+/** Speels categoriebalk — donkerblauw glanzend; actieve tab lichter blauw (zelfde gloss als Snel menu). */
 export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
-  if (selected) {
-    return `${kassaSpeelsGrayChromeButtonClass()} kassa-speels-order-type-btn--selected ${KASSA_SPEELS_TOP_CHROME_BTN_CLASS}`
-  }
-  return `${kassaSpeelsBlackGlossButtonClass(false)} ${KASSA_SPEELS_TOP_CHROME_BTN_CLASS}`
+  return kassaSpeelsBlueGlossButtonClass(selected)
 }
 
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {

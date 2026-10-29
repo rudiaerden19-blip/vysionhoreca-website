@@ -588,6 +588,7 @@ input[type="number"] {
 
 /* Onderkant: lichte glans die naar boven uitfadet (Bon + alle speels-chrome knoppen). */
 .kassa-speels-order-type-btn::after,
+.kassa-speels-blue-gloss-btn::after,
 .kassa-speels-black-gloss-btn::after,
 .kassa-speels-red-gloss-btn::after,
 .kassa-speels-green-gloss-btn::after {
@@ -639,6 +640,91 @@ input[type="number"] {
 }
 
 .kassa-speels-order-type-btn--selected::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/*
+ * Speels categoriebalk — donkerblauw, zelfde chrome/gloss als Snel menu (order-type structuur).
+ */
+.kassa-speels-blue-gloss-btn {
+  color: #b0b0b0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
+  background: linear-gradient(
+    180deg,
+    #3f5a82 0%,
+    #334d70 5%,
+    #243a58 18%,
+    #1a2d45 40%,
+    #142338 62%,
+    #0e1a2c 100%
+  );
+  border: 1px solid #0a0a0a;
+  border-top-color: #4a6894;
+  border-bottom-color: #050505;
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
+}
+
+.kassa-speels-blue-gloss-btn::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 46%;
+  z-index: 0;
+  border-radius: 0.65rem 0.65rem 45% 45%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 255, 255, 0.38) 42%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.kassa-speels-blue-gloss-btn > * {
+  position: relative;
+  z-index: 1;
+}
+
+.kassa-speels-blue-gloss-btn:active {
+  background: linear-gradient(180deg, #1a2840 0%, #121e30 55%, #0c1524 100%);
+  border-top-color: #2a4060;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 3px 7px rgba(0, 0, 0, 0.55);
+}
+
+.kassa-speels-blue-gloss-btn:active::before,
+.kassa-speels-blue-gloss-btn:active::after {
+  opacity: 0.35;
+}
+
+.kassa-speels-blue-gloss-btn--selected {
+  background: linear-gradient(
+    180deg,
+    #6888b0 0%,
+    #547098 5%,
+    #405878 18%,
+    #324868 42%,
+    #283c58 100%
+  );
+  border-top-color: #5070a0;
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.kassa-speels-blue-gloss-btn--selected::before {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.92) 0%,
