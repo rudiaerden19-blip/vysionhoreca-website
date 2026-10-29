@@ -127,6 +127,8 @@ import {
   KASSA_POS_MENU_TILE_BUTTON_BASE,
   KASSA_SPEELS_MENU_TILE_BUTTON_BASE,
   KASSA_SPEELS_MENU_TILE_INNER_CLIP,
+  KASSA_SPEELS_MENU_TILE_SLAB,
+  KASSA_SPEELS_MENU_TILE_STACK,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_POS_MENU_TILE_IMG_CLASS,
@@ -879,7 +881,10 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       className={btnClass}
     >
       {look === 'speels' ? (
-        <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{categoryTileBody}</div>
+        <div className={KASSA_SPEELS_MENU_TILE_STACK}>
+          <div className={KASSA_SPEELS_MENU_TILE_SLAB} aria-hidden />
+          <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{categoryTileBody}</div>
+        </div>
       ) : (
         categoryTileBody
       )}
@@ -1048,7 +1053,10 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       className={btnClass}
     >
       {look === 'speels' ? (
-        <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{productTileBody}</div>
+        <div className={KASSA_SPEELS_MENU_TILE_STACK}>
+          <div className={KASSA_SPEELS_MENU_TILE_SLAB} aria-hidden />
+          <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{productTileBody}</div>
+        </div>
       ) : (
         productTileBody
       )}

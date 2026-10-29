@@ -495,46 +495,43 @@ input[type="number"] {
 }
 
 /*
- * Menu-tegels Dark — 5 mm op effen #333: face (inner) + donkere onderplaat (::before).
+ * Menu-tegels Dark — 5 mm op effen #333: echte slab-laag (DOM) verschoven rechts+onder.
  */
 .kassa-speels-menu-tile {
-  --kassa-speels-tile-slab: 6px;
+  --kassa-speels-tile-slab-x: 5px;
+  --kassa-speels-tile-slab-y: 6px;
   position: relative;
-  isolation: isolate;
   overflow: visible !important;
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
   border: none !important;
   background: transparent !important;
-  margin-bottom: calc(var(--kassa-speels-tile-slab) + 2px);
+  margin: 0 var(--kassa-speels-tile-slab-x) var(--kassa-speels-tile-slab-y) 0;
 }
 
-.kassa-speels-menu-tile::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
+.kassa-speels-menu-tile-stack {
+  isolation: isolate;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.78)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+}
+
+.kassa-speels-menu-tile-slab {
   z-index: 0;
-  left: 0;
-  right: 0;
-  top: var(--kassa-speels-tile-slab);
-  bottom: calc(-1 * var(--kassa-speels-tile-slab));
-  border-radius: inherit;
-  background: linear-gradient(180deg, #2a2a2a 0%, #181818 55%, #121212 100%);
+  transition: transform 150ms ease-out;
+  transform: translate(var(--kassa-speels-tile-slab-x), var(--kassa-speels-tile-slab-y));
+  background: linear-gradient(165deg, #303030 0%, #1a1a1a 45%, #101010 100%);
   box-shadow:
-    0 calc(var(--kassa-speels-tile-slab) + 1px) 0 #0f0f0f,
-    0 calc(var(--kassa-speels-tile-slab) + 4px) 16px rgba(0, 0, 0, 0.82),
-    0 calc(var(--kassa-speels-tile-slab) + 10px) 28px rgba(0, 0, 0, 0.68);
+    inset -1px 0 0 rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.65);
 }
 
 .kassa-speels-menu-tile-face {
-  position: relative;
   z-index: 1;
-  border-radius: inherit;
-  background: linear-gradient(180deg, #4a4a4a 0%, #424242 10%, #3c3c3c 100%);
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  background: linear-gradient(180deg, #4d4d4d 0%, #434343 8%, #3d3d3d 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
-    0 0 0 1px rgba(0, 0, 0, 0.45);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    inset -2px 0 4px rgba(0, 0, 0, 0.2);
 }
 
 .kassa-speels-menu-tile:hover,
@@ -543,19 +540,15 @@ input[type="number"] {
   outline: none !important;
 }
 
-.kassa-speels-menu-tile:active::before {
-  top: 2px;
-  bottom: -2px;
-  box-shadow:
-    0 3px 0 #141414,
-    0 6px 14px rgba(0, 0, 0, 0.72);
+.kassa-speels-menu-tile:active .kassa-speels-menu-tile-slab {
+  transform: translate(2px, 3px);
 }
 
 .kassa-speels-menu-tile:active .kassa-speels-menu-tile-face {
+  transform: translate(1px, 2px);
   box-shadow:
-    inset 0 3px 10px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(0, 0, 0, 0.5);
+    inset 0 3px 10px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /*

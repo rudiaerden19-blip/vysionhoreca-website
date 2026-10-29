@@ -330,17 +330,24 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
 /** Speels/Dark tegels — zie `.kassa-speels-menu-tile` (geen rand/filter-hover). */
 export const KASSA_SPEELS_MENU_TILE_BUTTON_CLASS = 'kassa-speels-menu-tile'
 
-/** Binnenste clip — schaduw/dikte zit op de button (`overflow-visible`). */
+/** Stack: donkere plaat verschoven → zichtbare dikte rechts + onder op #333. */
+export const KASSA_SPEELS_MENU_TILE_STACK =
+  'kassa-speels-menu-tile-stack relative flex h-full min-h-0 w-full min-w-0 flex-1 flex-col rounded-[inherit]'
+
+export const KASSA_SPEELS_MENU_TILE_SLAB =
+  'kassa-speels-menu-tile-slab pointer-events-none absolute inset-0 rounded-[inherit]'
+
+/** Foto + titel — boven de slab. */
 export const KASSA_SPEELS_MENU_TILE_INNER_CLIP =
-  'kassa-speels-menu-tile-face flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-[inherit]'
+  'kassa-speels-menu-tile-face relative z-[1] flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-[inherit]'
 
 export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
   'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-visible text-left',
   KASSA_SPEELS_MENU_TILE_BUTTON_CLASS,
   KASSA_POS_BTN_SHAPE,
   'border-0 bg-transparent',
-  'transition-[transform,box-shadow] duration-150 ease-out',
-  'active:scale-[0.985] active:translate-y-[4px]',
+  'transition-transform duration-150 ease-out',
+  'active:scale-[0.99]',
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 
