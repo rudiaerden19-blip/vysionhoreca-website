@@ -2508,7 +2508,9 @@
     "saveNewPin": "Nieuw PIN opslaan",
     "ownerPinTitle": "Eigenaar PIN",
     "enterPinHelp": "Voer uw 4-cijferige PIN in",
-    "forgotLink": "PIN vergeten?"
+    "forgotLink": "PIN vergeten?",
+    "reportsStrictHint": "Rapporten zijn afgeschermd: elke keer opnieuw de eigenaar-PIN.",
+    "reportsStaffClockedInHint": "Medewerker {name} staat op de kassa — alleen de eigenaar-PIN opent rapporten."
   },
   "marketingQr": {
     "title": "QR-codes",

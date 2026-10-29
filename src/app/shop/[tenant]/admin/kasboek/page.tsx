@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import PinGate from '@/components/PinGate'
+import ReportPinGate from '@/components/ReportPinGate'
 import { authFetch } from '@/lib/auth-headers'
 import {
   cashbookBadge,
@@ -489,7 +489,7 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
   const vatCheck = day ? vatReconciliation(day.vat, day.payments.grossCents, day.exclCents, day.taxCents) : null
 
   return (
-    <PinGate tenant={tenant}>
+    <ReportPinGate tenant={tenant}>
       <div className="w-full">
         <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
           <div>
@@ -942,6 +942,6 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
           </div>
         )}
       </div>
-    </PinGate>
+    </ReportPinGate>
   )
 }

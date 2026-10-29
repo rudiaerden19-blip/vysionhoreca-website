@@ -5714,7 +5714,9 @@
     "saveNewPin": "新しいPINを保存",
     "ownerPinTitle": "オーナーPIN",
     "enterPinHelp": "4桁のPINを入力",
-    "forgotLink": "PINをお忘れですか？"
+    "forgotLink": "PINをお忘れですか？",
+    "reportsStrictHint": "レポートは保護されています。アクセスのたびにオーナーPINが必要です。",
+    "reportsStaffClockedInHint": "従業員 {name} がレジ中 — オーナーPINのみレポートを開けます。"
   },
   "reservationKassa": {
     "guestsEmpty": "ゲストはまだいません。最初の予約後に表示されます。",

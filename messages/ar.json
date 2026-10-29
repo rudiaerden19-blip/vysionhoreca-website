@@ -5714,7 +5714,9 @@
     "saveNewPin": "حفظ PIN الجديد",
     "ownerPinTitle": "PIN المالك",
     "enterPinHelp": "أدخل رمز PIN المكوّن من 4 أرقام",
-    "forgotLink": "نسيت PIN؟"
+    "forgotLink": "نسيت PIN؟",
+    "reportsStrictHint": "التقارير محمية: رمز المالك في كل مرة.",
+    "reportsStaffClockedInHint": "الموظف {name} على الكاشير — فقط رمز المالك يفتح التقارير."
   },
   "reservationKassa": {
     "guestsEmpty": "لا يوجد ضيوف بعد — يظهرون تلقائياً بعد أول حجز.",

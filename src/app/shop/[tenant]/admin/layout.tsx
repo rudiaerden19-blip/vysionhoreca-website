@@ -61,6 +61,11 @@ import {
   persistPublicDemoSessionIfNeeded,
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
+import {
+  clearOwnerPinUnlockSession,
+  isLagoonStrictReportsAdminRestPath,
+  lagoonStrictReportsPinEnabled,
+} from '@/lib/lagoon-reports-pin-gate'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -114,6 +119,14 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
 
   const isAdminDashboardRoot =
     adminPath === baseUrl || adminPath === `${baseUrl}/`
+
+  /** Lagoon: geen gedeelde PIN-unlock op rapportroutes (personeel opzelfde tablet). */
+  useEffect(() => {
+    if (!lagoonStrictReportsPinEnabled(params.tenant)) return
+    const rest = adminPath.startsWith(baseUrl) ? adminPath.slice(baseUrl.length) : adminPath
+    if (!isLagoonStrictReportsAdminRestPath(rest)) return
+    clearOwnerPinUnlockSession(params.tenant)
+  }, [adminPath, baseUrl, params.tenant])
 
   useEffect(() => {
     async function checkTenant() {

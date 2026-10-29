@@ -5714,7 +5714,9 @@
     "saveNewPin": "保存新 PIN",
     "ownerPinTitle": "店主 PIN",
     "enterPinHelp": "输入您的 4 位 PIN",
-    "forgotLink": "忘记 PIN？"
+    "forgotLink": "忘记 PIN？",
+    "reportsStrictHint": "报表受保护：每次访问需输入店主 PIN。",
+    "reportsStaffClockedInHint": "员工 {name} 在收银台 — 仅店主 PIN 可打开报表。"
   },
   "reservationKassa": {
     "guestsEmpty": "尚无客人 — 首次预订后会自动显示。",

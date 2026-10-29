@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { orderCountsTowardRevenueAndZReport, type Order } from '@/lib/admin-api'
+import ReportPinGate from '@/components/ReportPinGate'
 
 /** PostgREST-range; hoog genoeg voor throughput, laag genoeg voor payload. */
 const ORDERS_PAGE = 800
@@ -258,6 +259,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
 
   if (loading) {
     return (
+      <ReportPinGate tenant={params.tenant}>
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-center min-h-[400px]">
           <motion.div
@@ -267,10 +269,12 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
           />
         </div>
       </div>
+      </ReportPinGate>
     )
   }
 
   return (
+    <ReportPinGate tenant={params.tenant}>
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -404,5 +408,6 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
         </>
       )}
     </div>
+    </ReportPinGate>
   )
 }

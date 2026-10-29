@@ -5737,7 +5737,9 @@
     "saveNewPin": "Neue PIN speichern",
     "ownerPinTitle": "Inhaber-PIN",
     "enterPinHelp": "Geben Sie Ihre 4-stellige PIN ein",
-    "forgotLink": "PIN vergessen?"
+    "forgotLink": "PIN vergessen?",
+    "reportsStrictHint": "Berichte sind geschützt: Inhaber-PIN bei jedem Zugriff.",
+    "reportsStaffClockedInHint": "Mitarbeiter {name} ist an der Kasse — nur die Inhaber-PIN öffnet Berichte."
   },
   "reservationKassa": {
     "guestsEmpty": "Noch keine Gäste — sie erscheinen nach der ersten Reservierung automatisch.",

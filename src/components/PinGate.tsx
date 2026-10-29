@@ -1,24 +1,28 @@
 'use client'
 
-import { useState, useLayoutEffect, ReactNode } from 'react'
+import { useState, useLayoutEffect, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
+import { loadKassaActiveStaffFromServer } from '@/lib/kassa-active-staff-preference'
 
 interface Props {
   tenant: string
   children: ReactNode
+  /** Geen sessionStorage-unlock: PIN opnieuw per rapportbezoek (Lagoon-pilot). */
+  strictReportsPin?: boolean
 }
 
 type State = 'loading' |  'no-pin' |  'locked' |  'unlocked' |  'forgot'
 
-export default function PinGate({ tenant, children }: Props) {
+export default function PinGate({ tenant, children, strictReportsPin = false }: Props) {
   const { t } = useLanguage()
   const router = useRouter()
   const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
   const [state, setState] = useState<State>('loading')
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
+  const [clockedInStaffName, setClockedInStaffName] = useState<string | null>(null)
   const [forgotEmail, setForgotEmail] = useState('')
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
@@ -29,6 +33,13 @@ export default function PinGate({ tenant, children }: Props) {
     if (isSuperAdminLoggedIn()) {
       setState('unlocked')
       return
+    }
+    if (strictReportsPin) {
+      try {
+        sessionStorage.removeItem(SESSION_KEY)
+      } catch {
+        /* noop */
+      }
     }
     fetch(`/api/pin/check?tenant=${tenant}`)
       .then((r) => r.json())
@@ -41,6 +52,10 @@ export default function PinGate({ tenant, children }: Props) {
             /* noop */
           }
           setState('no-pin')
+          return
+        }
+        if (strictReportsPin) {
+          setState('locked')
           return
         }
         try {
@@ -61,7 +76,21 @@ export default function PinGate({ tenant, children }: Props) {
         }
         setState('no-pin')
       })
-  }, [tenant, SESSION_KEY])
+  }, [tenant, SESSION_KEY, strictReportsPin])
+
+  useEffect(() => {
+    if (!strictReportsPin) {
+      setClockedInStaffName(null)
+      return
+    }
+    let cancelled = false
+    void loadKassaActiveStaffFromServer(tenant).then((staff) => {
+      if (!cancelled) setClockedInStaffName(staff?.name?.trim() || null)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [strictReportsPin, tenant])
 
   useLayoutEffect(() => {
     if (state !== 'no-pin') return
@@ -90,7 +119,13 @@ export default function PinGate({ tenant, children }: Props) {
     })
     const data = await res.json()
     if (data.valid) {
-      sessionStorage.setItem(SESSION_KEY, 'true')
+      if (!strictReportsPin) {
+        try {
+          sessionStorage.setItem(SESSION_KEY, 'true')
+        } catch {
+          /* noop */
+        }
+      }
       setState('unlocked')
     } else {
       setError(t('pinGate.incorrectPin'))
@@ -200,6 +235,14 @@ export default function PinGate({ tenant, children }: Props) {
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-xs w-full text-center">
         <h2 className="text-xl font-bold mb-1">{t('pinGate.ownerPinTitle')}</h2>
         <p className="text-gray-500 text-sm mb-6">{t('pinGate.enterPinHelp')}</p>
+        {strictReportsPin && clockedInStaffName ? (
+          <p className="text-amber-800 text-xs mb-4 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+            {t('pinGate.reportsStaffClockedInHint').replace('{name}', clockedInStaffName)}
+          </p>
+        ) : null}
+        {strictReportsPin ? (
+          <p className="text-gray-500 text-xs mb-4">{t('pinGate.reportsStrictHint')}</p>
+        ) : null}
 
         {/* PIN dots */}
         <div className="flex justify-center gap-4 mb-6">

@@ -5737,7 +5737,9 @@
     "saveNewPin": "Enregistrer le nouveau PIN",
     "ownerPinTitle": "Code PIN propriétaire",
     "enterPinHelp": "Entrez votre code PIN à 4 chiffres",
-    "forgotLink": "Code PIN oublié ?"
+    "forgotLink": "Code PIN oublié ?",
+    "reportsStrictHint": "Rapports protégés : code propriétaire à chaque accès.",
+    "reportsStaffClockedInHint": "Employé {name} est en caisse — seul le code propriétaire ouvre les rapports."
   },
   "reservationKassa": {
     "guestsEmpty": "Pas encore d'invités — ils apparaissent après la première réservation.",

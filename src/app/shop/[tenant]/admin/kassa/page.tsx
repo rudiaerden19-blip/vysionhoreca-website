@@ -229,6 +229,7 @@ import {
   isLagoonKitchenScreenTenant,
   isTheLagoonTenant,
 } from '@/lib/lagoon-kitchen-screen'
+import { clearLagoonOwnerPinUnlockIfStrict } from '@/lib/lagoon-reports-pin-gate'
 import {
   readKassaJetonSalePoint,
   writeKassaJetonSalePoint,
@@ -2887,6 +2888,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const setActiveKassaStaff = useCallback(
     (next: { id: string; name: string } | null) => {
       setActiveKassaStaffInner(next)
+      if (next) clearLagoonOwnerPinUnlockIfStrict(tenant)
       void persistKassaActiveStaffToServer(tenant, next)
     },
     [tenant],

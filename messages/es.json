@@ -5714,7 +5714,9 @@
     "saveNewPin": "Guardar nuevo PIN",
     "ownerPinTitle": "PIN del propietario",
     "enterPinHelp": "Introduce tu PIN de 4 dígitos",
-    "forgotLink": "¿Olvidaste el PIN?"
+    "forgotLink": "¿Olvidaste el PIN?",
+    "reportsStrictHint": "Informes protegidos: PIN del propietario en cada acceso.",
+    "reportsStaffClockedInHint": "Empleado {name} en caja — solo el PIN del propietario abre informes."
   },
   "reservationKassa": {
     "guestsEmpty": "Aún no hay invitados: aparecen tras la primera reserva.",

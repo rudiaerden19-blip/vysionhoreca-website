@@ -2508,7 +2508,9 @@
     "saveNewPin": "Save new PIN",
     "ownerPinTitle": "Owner PIN",
     "enterPinHelp": "Enter your 4-digit PIN",
-    "forgotLink": "Forgot PIN?"
+    "forgotLink": "Forgot PIN?",
+    "reportsStrictHint": "Reports are protected: enter the owner PIN each time.",
+    "reportsStaffClockedInHint": "Staff member {name} is on the POS — only the owner PIN opens reports."
   },
   "marketingQr": {
     "title": "QR Codes",
