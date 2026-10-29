@@ -2328,6 +2328,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
+        kassaSpeelsChrome={appearanceDark}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
         onConfirm={() => {
           setLogoutSoftwareConfirmOpen(false)

@@ -20,7 +20,7 @@ export function LogoutSoftwareConfirmModal({
   open: boolean
   onConfirm: () => void
   onCancel: () => void
-  /** Speels POS-kassa: donker paneel + grijs glanzende knoppen. */
+  /** Donkere kassa (alle tenants, layout speels/klassiek): korrel-paneel + grijs glanzende knoppen. */
   kassaSpeelsChrome?: boolean
 }) {
   const { t } = useLanguage()
