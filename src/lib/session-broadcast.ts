@@ -41,12 +41,6 @@ export function clearTerminalLogout(): void {
   }
 }
 
-/** Zaak-login en wachtwoord-reset: nooit door superadmin terminal-logout overschrijven. */
-export function isExplicitTenantLoginPath(pathname: string): boolean {
-  const p = (pathname || '').split('?')[0]
-  return p === '/login' || p.startsWith('/login/')
-}
-
 export function readTerminalLogout(): TerminalLogoutStamp | null {
   if (typeof window === 'undefined') return null
   try {

@@ -779,8 +779,6 @@
     "resetPassword": "Réinitialiser le mot de passe",
     "emailAddress": "Adresse e-mail",
     "password": "Mot de passe",
-    "loginCodeLabel": "Code de connexion",
-    "brandPanelTagline": "Horeca et retail — une plateforme de caisse professionnelle.",
     "emailPlaceholder": "nom@entreprise.be",
     "loginButton": "Se connecter",
     "loggingIn": "Connexion...",

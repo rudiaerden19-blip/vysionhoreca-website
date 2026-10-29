@@ -32,10 +32,7 @@ export function TenantWebSessionOrchestrator({ tenantSlug }: { tenantSlug: strin
     if (stamp.kind === 'superadmin') {
       const p = pathname || ''
       if (p.startsWith('/superadmin/login')) return
-      const origin = window.location.origin
-      const q = window.location.search || ''
-      const rawNext = `${p}${q}`
-      window.location.replace(`${origin}/login?next=${encodeURIComponent(rawNext)}`)
+      window.location.replace(`${window.location.origin}/superadmin/login`)
       return
     }
 

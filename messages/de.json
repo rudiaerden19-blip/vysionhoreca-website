@@ -779,8 +779,6 @@
     "resetPassword": "Passwort zurücksetzen",
     "emailAddress": "E-Mail-Adresse",
     "password": "Passwort",
-    "loginCodeLabel": "Anmeldecode",
-    "brandPanelTagline": "Gastronomie und Einzelhandel — eine professionelle Kassenplattform.",
     "emailPlaceholder": "name@unternehmen.de",
     "loginButton": "Anmelden",
     "loggingIn": "Anmeldung...",
