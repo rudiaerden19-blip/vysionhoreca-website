@@ -527,6 +527,13 @@ export const KASSA_POS_MENU_TILE_LABEL_CLASS =
 export const KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA =
   'm-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-[0.02em] text-white sm:text-[13px]'
 
+/** Speels: titel onder tegel — zelfde grijs als sidebar/chrome. */
+export const KASSA_SPEELS_MENU_TILE_LABEL_CLASS =
+  `m-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} sm:text-[15px] md:text-base`
+
+export const KASSA_SPEELS_MENU_TILE_LABEL_CLASS_SXGA =
+  `m-0 line-clamp-1 text-center text-xs font-bold leading-tight tracking-[0.02em] ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} sm:text-[13px]`
+
 export const KASSA_POS_MENU_TILE_QTY_BADGE = [
   'absolute top-1.5 right-1.5 z-20 flex h-7 w-7 items-center justify-center text-xs font-bold text-white',
   KASSA_POS_BTN_SHAPE,

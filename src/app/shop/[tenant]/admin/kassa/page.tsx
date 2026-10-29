@@ -137,6 +137,8 @@ import {
   KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA,
   KASSA_POS_MENU_TILE_LABEL_WRAP,
   KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA,
+  KASSA_SPEELS_MENU_TILE_LABEL_CLASS,
+  KASSA_SPEELS_MENU_TILE_LABEL_CLASS_SXGA,
   KASSA_SPEELS_MENU_TILE_LABEL_WRAP,
   KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA,
   KASSA_POS_MENU_TILE_OPTS_BADGE,
@@ -810,13 +812,17 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
         ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass =
-    luxuryChrome
+    look === 'speels'
       ? sxgaDenseTileLayout
-        ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
-        : KASSA_POS_MENU_TILE_LABEL_CLASS
-      : sxgaDenseTileLayout
-        ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
-        : KASSA_MENU_TILE_LABEL_CLASS
+        ? KASSA_SPEELS_MENU_TILE_LABEL_CLASS_SXGA
+        : KASSA_SPEELS_MENU_TILE_LABEL_CLASS
+      : luxuryChrome
+        ? sxgaDenseTileLayout
+          ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
+          : KASSA_POS_MENU_TILE_LABEL_CLASS
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
+          : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
     look === 'speels'
@@ -979,13 +985,17 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
         ? KASSA_MENU_TILE_LABEL_WRAP_SXGA
         : KASSA_MENU_TILE_LABEL_WRAP
   const labelClass =
-    luxuryChrome
+    look === 'speels'
       ? sxgaDenseTileLayout
-        ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
-        : KASSA_POS_MENU_TILE_LABEL_CLASS
-      : sxgaDenseTileLayout
-        ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
-        : KASSA_MENU_TILE_LABEL_CLASS
+        ? KASSA_SPEELS_MENU_TILE_LABEL_CLASS_SXGA
+        : KASSA_SPEELS_MENU_TILE_LABEL_CLASS
+      : luxuryChrome
+        ? sxgaDenseTileLayout
+          ? KASSA_POS_MENU_TILE_LABEL_CLASS_SXGA
+          : KASSA_POS_MENU_TILE_LABEL_CLASS
+        : sxgaDenseTileLayout
+          ? KASSA_MENU_TILE_LABEL_CLASS_SXGA
+          : KASSA_MENU_TILE_LABEL_CLASS
 
   const noImgTop =
     look === 'speels'
