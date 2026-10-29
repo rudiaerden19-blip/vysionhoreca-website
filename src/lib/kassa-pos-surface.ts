@@ -30,7 +30,7 @@ export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 /** Effen grijs tegelveld (geen korrel — korrel alleen op kader via plate-shell). */
 export const KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS = 'bg-[#2f2f2f] kassa-speels-menu-scroll'
 
-/** Zijbalk mand — effen #2f2f2f (`kassa-speels-sidebar-cart-vak` in globals.css). */
+/** Zijbalk mand — zwarte korrel (`kassa-speels-sidebar-cart-vak` in globals.css). */
 export const KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS = 'kassa-speels-sidebar-cart-vak rounded-xl'
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
@@ -520,7 +520,7 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
-/** Speels: titelstrook — #282828 + korrel; overlap foto + afgeronde onderhoek. */
+/** Speels: titelstrook — effen #2f2f2f (naam/prijs); overlap foto + afgeronde onderhoek. */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
   `pointer-events-none relative z-[2] -mt-1 box-border w-full max-w-full shrink-0 overflow-hidden rounded-b-xl ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2.5 pt-2 sm:px-3`
 

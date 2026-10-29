@@ -476,20 +476,13 @@ input[type="number"] {
   background-image: none;
 }
 
-/* Titelstrook — korrel zichtbaar; geen witte rand (Safari blend aan tegelrand). */
+/* Titelstrook (naam + prijs) — effen #2f2f2f, alle tenants Mode Dark. */
 .kassa-speels-tile-label-grain {
   box-sizing: border-box;
   width: 100%;
-  background-color: #282828;
-  background-image:
-    linear-gradient(rgba(44, 44, 44, 0.14), rgba(44, 44, 44, 0.14)),
-    url('/images/kassa-dark-frame-grain.png');
-  background-origin: padding-box;
-  background-clip: padding-box;
-  background-size: 512px 512px;
-  background-repeat: repeat;
-  background-blend-mode: overlay;
-  box-shadow: inset 0 0 0 1px #282828;
+  background-color: #2f2f2f;
+  background-image: none;
+  box-shadow: inset 0 0 0 1px #252525;
 }
 
 /* Grijs fotovlak op tegel — zwart kader binnen de tegel. */
@@ -497,7 +490,7 @@ input[type="number"] {
   box-sizing: border-box;
   box-shadow:
     inset 0 0 0 2px #000000,
-    inset 0 -4px 0 0 #282828;
+    inset 0 -4px 0 0 #2f2f2f;
 }
 
 /* Menu-tegels Dark — dun zwart randje + vaste schaduw, geen hover-flikkern. */
@@ -1066,14 +1059,17 @@ html.kassa-luxe-leather body {
   box-shadow: inset 0 0 0 1px #000000;
 }
 
-/* Zijbalk mand — zelfde effen grijs als tegelbak (#2f2f2f), alle tenants layout speels. */
+/* Zijbalk mand — zwarte korrel (niet het grijs tegelvlak). */
 .kassa-speels-sidebar-cart-vak {
-  background-color: #2f2f2f;
-  background-image: none;
-  border: 1px solid #1a1a1a !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+  background-color: #0c0c0c;
+  background-image:
+    linear-gradient(rgba(18, 18, 18, 0.2), rgba(18, 18, 18, 0.2)),
+    url('/images/kassa-dark-frame-grain.png');
+  background-size: 512px 512px;
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+  border: 2px solid #000000 !important;
+  box-shadow: inset 0 0 0 1px #000000;
 }
 
 /* ===========================================

@@ -5,7 +5,6 @@ import {
 import {
   KASSA_CLOCK_TILE_ON_BAR,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
-  KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS,
   KASSA_POS_BTN,
   KASSA_POS_BTN_LUXE,
   KASSA_POS_BTN_SHAPE,
@@ -74,8 +73,7 @@ export function createKassaSpeelsRegisterUiTheme(): KassaRegisterUiTheme {
     flyMenuRowActive: 'bg-[#1c3832]',
     langPanel: `absolute right-0 top-full z-[130] mt-1 min-w-[180px] overflow-hidden ${KASSA_POS_BTN_SHAPE} border border-[#0c1c18] bg-[#1a332c] shadow-lg`,
     langRowActive: 'bg-[#1c3832] font-semibold text-[#ff8a5b]',
-    categoryStripBg: KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS,
-    categoryStripBorder: 'border-[#1a1a1a]',
+    categoryStripBorder: 'border-[#1a332c]',
     productTileSolidBg: 'bg-[#1a332c]',
     productTileSolidBorder: 'border-[#0c1c18]',
     productTileFooterBar: `border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS}`,
