@@ -222,6 +222,9 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
 /** Tekst op speels grijs/zwart chrome-knoppen (niet rood/groen). */
 export const KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS = 'text-[#b0b0b0]'
 
+/** Header + categoriebalk — iets donkerder grijs dan overige chrome-knoppen. */
+export const KASSA_SPEELS_TOP_CHROME_BTN_CLASS = 'kassa-speels-top-chrome-btn'
+
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
 
 export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
@@ -290,9 +293,9 @@ export function kassaSpeelsChromeButtonClass(selected: boolean): string {
 /** Speels categoriebalk — alle tabs zwart glanzend; actieve tab grijs glanzend. */
 export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
   if (selected) {
-    return `${kassaSpeelsGrayChromeButtonClass()} kassa-speels-order-type-btn--selected`
+    return `${kassaSpeelsGrayChromeButtonClass()} kassa-speels-order-type-btn--selected ${KASSA_SPEELS_TOP_CHROME_BTN_CLASS}`
   }
-  return kassaSpeelsBlackGlossButtonClass(false)
+  return `${kassaSpeelsBlackGlossButtonClass(false)} ${KASSA_SPEELS_TOP_CHROME_BTN_CLASS}`
 }
 
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {

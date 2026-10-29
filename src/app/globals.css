@@ -507,6 +507,17 @@ input[type="number"] {
 }
 
 /*
+ * Speels header + categoriebalk — donkerder labelgrijs (zijbalk/footer blijft #b0b0b0).
+ */
+.kassa-speels-top-chrome-btn,
+.kassa-speels-top-chrome-btn.kassa-speels-order-type-btn,
+.kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn,
+.kassa-speels-top-chrome-btn.kassa-speels-red-gloss-btn {
+  color: #858585;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.82);
+}
+
+/*
  * Speels besteltype — chrome/glossy grijs: lichte bovenkant + glaslaag (::before), tekst erboven.
  */
 .kassa-speels-order-type-btn {

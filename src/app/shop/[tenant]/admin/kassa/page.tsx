@@ -154,6 +154,7 @@ import {
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
   kassaSpeelsCategoryStripButtonClass,
+  KASSA_SPEELS_TOP_CHROME_BTN_CLASS,
   kassaPosRemoveButtonClass,
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
@@ -5416,10 +5417,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ? 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[1.85rem] px-1.5 py-1'
     : 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.15rem] px-2 py-1.5 sm:min-h-[2.35rem] sm:px-2.5'
 
+  const kassaSpeelsTopChromeTextClass =
+    kassaPosLuxury && posChrome === 'speels' ? KASSA_SPEELS_TOP_CHROME_BTN_CLASS : ''
+
   const headerQuickLinkBtnClass = kassaWide15Chrome
     ? `${kassaHeaderQuickLinkShell} ${
         kassaPosLuxury
-          ? kassaPosButtonClass(false, posChrome)
+          ? `${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
           : kassaLight
             ? KASSA_LIGHT_BTN_FACE
             : kassaClassicDark
@@ -5427,7 +5431,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : 'rounded-xl bg-[#3C4D6B] font-bold text-white'
       } rounded-lg text-[10px]`
     : kassaPosLuxury
-    ? `${kassaHeaderQuickLinkShell} ${kassaPosButtonClass(false, posChrome)}`
+    ? `${kassaHeaderQuickLinkShell} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
     : kassaLight
       ? KASSA_LIGHT_HEADER_QUICK_LINK_BTN
       : kassaClassicDark
@@ -5435,7 +5439,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
-    kassaPosLuxury ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)}`: ''
+    kassaPosLuxury
+      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+      : ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
   const kassaMenuClassicGridCols = kassaDefaultMenuClassicGridCols({
@@ -5739,7 +5745,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaWide15Chrome ? 'gap-1 px-1.5 py-1' : 'gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3'
             } ${
               kassaPosLuxury
-                ? kassaSpeelsBlackGlossButtonClass(hamburgerOpen)
+                ? `${kassaSpeelsBlackGlossButtonClass(hamburgerOpen)} ${kassaSpeelsTopChromeTextClass}`
                 : kassaLight
                   ? `rounded-xl ${hamburgerOpen ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
                 : `rounded-xl ${hamburgerOpen ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
@@ -5935,7 +5941,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             onClick={() => openKassaHelp()}
             className={`${
               kassaPosLuxury
-                ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsRedGlossButtonClass(kassaHelpOpen)}`
+                ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsRedGlossButtonClass(kassaHelpOpen)} ${kassaSpeelsTopChromeTextClass}`
                 : `${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE}`
             } ${kassaHelpOpen && !kassaPosLuxury ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''}`}
             title={t('kassaApp.helpVideoButton')}
@@ -6029,7 +6035,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           title={t('kassaApp.logout')}
           className={
             kassaPosLuxury
-              ? `relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${kassaSpeelsBlackGlossButtonClass(true)}`
+              ? `relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${kassaSpeelsBlackGlossButtonClass(true)} ${kassaSpeelsTopChromeTextClass}`
               : `relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE
