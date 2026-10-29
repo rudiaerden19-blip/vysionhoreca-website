@@ -126,6 +126,7 @@ import {
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
   KASSA_SPEELS_MENU_TILE_BUTTON_BASE,
+  KASSA_SPEELS_MENU_TILE_INNER_CLIP,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_POS_MENU_TILE_IMG_CLASS,
@@ -837,44 +838,50 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       ? KASSA_POS_MENU_TILE_IMAGE_FILM
       : null
 
+  const categoryTileBody = imageUrl ? (
+    <>
+      <div className={imgWell}>
+        <div className={imgFrame}>
+          <img
+            src={imageUrl}
+            alt={category.name}
+            decoding="async"
+            loading="eager"
+            onError={kassaProductImageRetryOnError}
+            className={imgClass}
+          />
+        </div>
+        {imgFilm ? <div className={imgFilm} aria-hidden /> : null}
+      </div>
+      <div className={labelWrap}>
+        <p className={labelClass}>{category.name}</p>
+      </div>
+    </>
+  ) : (
+    <>
+      <div className={noImgTop}>
+        {category.icon ? (
+          <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500': 'text-neutral-400'}`}>
+            {category.icon}
+          </span>
+        ) : null}
+      </div>
+      <div className={labelWrap}>
+        <p className={labelClass}>{category.name}</p>
+      </div>
+    </>
+  )
+
   return (
     <button
       type="button"
       data-kassa-category-id={category.id != null ? String(category.id) : undefined}
       className={btnClass}
     >
-      {imageUrl ? (
-        <>
-          <div className={imgWell}>
-            <div className={imgFrame}>
-              <img
-                src={imageUrl}
-                alt={category.name}
-                decoding="async"
-                loading="eager"
-                onError={kassaProductImageRetryOnError}
-                className={imgClass}
-              />
-            </div>
-            {imgFilm ? <div className={imgFilm} aria-hidden /> : null}
-          </div>
-          <div className={labelWrap}>
-            <p className={labelClass}>{category.name}</p>
-          </div>
-        </>
+      {look === 'speels' ? (
+        <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{categoryTileBody}</div>
       ) : (
-        <>
-          <div className={noImgTop}>
-            {category.icon ? (
-              <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500': 'text-neutral-400'}`}>
-                {category.icon}
-              </span>
-            ) : null}
-          </div>
-          <div className={labelWrap}>
-            <p className={labelClass}>{category.name}</p>
-          </div>
-        </>
+        categoryTileBody
       )}
     </button>
   )
@@ -1004,40 +1011,46 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       ? KASSA_POS_MENU_TILE_IMAGE_FILM
       : null
 
+  const productTileBody = product.image_url ? (
+    <>
+      <div className={imgWell}>
+        <div className={imgFrame}>
+          <img
+            src={product.image_url}
+            alt={product.name}
+            decoding="async"
+            loading="eager"
+            onError={kassaProductImageRetryOnError}
+            className={imgClass}
+          />
+        </div>
+        {imgFilm ? <div className={imgFilm} aria-hidden /> : null}
+      </div>
+      <div className={labelWrap}>
+        <p className={labelClass}>{product.name}</p>
+      </div>
+    </>
+  ) : (
+    <>
+      <div className={noImgTop}>
+        <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500': 'text-neutral-300'}`}></span>
+      </div>
+      <div className={labelWrap}>
+        <p className={labelClass}>{product.name}</p>
+      </div>
+    </>
+  )
+
   return (
     <button
       type="button"
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
       className={btnClass}
     >
-      {product.image_url ? (
-        <>
-          <div className={imgWell}>
-            <div className={imgFrame}>
-              <img
-                src={product.image_url}
-                alt={product.name}
-                decoding="async"
-                loading="eager"
-                onError={kassaProductImageRetryOnError}
-                className={imgClass}
-              />
-            </div>
-            {imgFilm ? <div className={imgFilm} aria-hidden /> : null}
-          </div>
-          <div className={labelWrap}>
-            <p className={labelClass}>{product.name}</p>
-          </div>
-        </>
+      {look === 'speels' ? (
+        <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{productTileBody}</div>
       ) : (
-        <>
-          <div className={noImgTop}>
-            <span className={`text-5xl ${posLuxuryAppearance ? 'text-neutral-500': 'text-neutral-300'}`}></span>
-          </div>
-          <div className={labelWrap}>
-            <p className={labelClass}>{product.name}</p>
-          </div>
-        </>
+        productTileBody
       )}
       {inCart > 0 && (
         <div
