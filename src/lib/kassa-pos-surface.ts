@@ -166,7 +166,7 @@ export const KASSA_POS_QUICK_MENU_LIFT_SHADOW =
 export function kassaPosQuickMenuPanelButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
     return [
-      kassaSpeelsChromeButtonClass(false),
+      kassaSpeelsBlueGlossButtonClass(false),
       KASSA_POS_BTN_DISABLED_SAME_LOOK,
       'disabled:text-[#b0b0b0]',
     ].join(' ')
@@ -316,6 +316,11 @@ export function kassaSpeelsChromeButtonClass(selected: boolean): string {
 /** Speels categoriebalk — donkerblauw glanzend; actieve tab lichter blauw (zelfde gloss als Snel menu). */
 export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
   return kassaSpeelsBlueGlossButtonClass(selected)
+}
+
+/** Header snelkoppelingen + taal — zelfde blauw als categoriebalk. */
+export function kassaSpeelsHeaderChromeButtonClass(active = false): string {
+  return kassaSpeelsBlueGlossButtonClass(active)
 }
 
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {

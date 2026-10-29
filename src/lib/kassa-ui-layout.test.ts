@@ -96,6 +96,7 @@ describe('Speels bruine knoppen', () => {
   it('houdt champagne rand alleen op legacy luxe-snelmenu helper', () => {
     expect(kassaPosQuickMenuPanelButtonClass('luxe')).toContain('#d4b483')
     expect(kassaPosQuickMenuPanelButtonClass('speels')).not.toContain('#d4b483')
+    expect(kassaPosQuickMenuPanelButtonClass('speels')).toContain('kassa-speels-blue-gloss-btn')
   })
 
   it('maakt geselecteerde Speels-knoppen zwart glanzend', () => {
