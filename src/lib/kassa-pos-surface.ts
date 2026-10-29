@@ -280,6 +280,14 @@ export function kassaSpeelsChromeButtonClass(selected: boolean): string {
   return kassaSpeelsGrayChromeButtonClass()
 }
 
+/** Speels categoriebalk — alle tabs zwart glanzend; actieve tab grijs glanzend. */
+export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
+  if (selected) {
+    return `${kassaSpeelsGrayChromeButtonClass()} kassa-speels-order-type-btn--selected`
+  }
+  return kassaSpeelsBlackGlossButtonClass(false)
+}
+
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
   if (selected) return kassaSpeelsBlackGlossButtonClass(true)
   return kassaSpeelsGrayChromeButtonClass()

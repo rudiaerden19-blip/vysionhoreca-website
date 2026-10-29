@@ -153,6 +153,7 @@ import {
   kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
+  kassaSpeelsCategoryStripButtonClass,
   kassaPosRemoveButtonClass,
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
@@ -6128,7 +6129,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
                       } ${
                         kassaPosLuxury
-                          ? kassaPosButtonClass(active, posChrome)
+                          ? posChrome === 'speels'
+                            ? kassaSpeelsCategoryStripButtonClass(active)
+                            : kassaPosButtonClass(active, posChrome)
                           : kassaClassicDark
                             ? `rounded-lg border-transparent ${active ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                           : active
