@@ -183,7 +183,10 @@ import {
   isLikelyOfflineOrNetworkPersistFailure,
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
-import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
+import {
+  formatKassaNumpadHeaderDate,
+  formatKlantschermWaitingClock,
+} from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { KassaTablePickerGrid } from '@/components/kassa/KassaTablePickerGrid'
@@ -1247,6 +1250,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const id = window.setInterval(() => setNumpadBarDate(new Date()), 60_000)
     return () => window.clearInterval(id)
   }, [])
+  const [kassaSidebarClock, setKassaSidebarClock] = useState(() => new Date())
+  useEffect(() => {
+    const id = window.setInterval(() => setKassaSidebarClock(new Date()), 1000)
+    return () => window.clearInterval(id)
+  }, [])
+  const kassaSidebarDigitalTime = useMemo(
+    () => formatKlantschermWaitingClock(kassaSidebarClock, locale),
+    [kassaSidebarClock, locale],
+  )
   const numpadHeaderDateLabel = useMemo(
     () => formatKassaNumpadHeaderDate(numpadBarDate, locale),
     [numpadBarDate, locale],
@@ -6433,13 +6445,32 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
-        {/* Zone: Verkoop / Binnen / Terras — drie gelijke knoppen; geen aparte klok-/datumbalk. */}
+        {kassaPosLuxury ? (
+          <div
+            className={`flex shrink-0 items-center justify-center ${
+              kassaWide15Chrome ? 'px-2 pt-2 pb-0.5' : 'px-3 pt-2.5 pb-0.5 sm:px-3'
+            }`}
+          >
+            <time
+              dateTime={kassaSidebarClock.toISOString()}
+              className={`tabular-nums font-bold tracking-[0.08em] ${
+                posChrome === 'speels'
+                  ? 'text-[1.65rem] text-[#b0b0b0] sm:text-2xl'
+                  : 'text-xl text-zinc-100 sm:text-2xl'
+              }`}
+            >
+              {kassaSidebarDigitalTime}
+            </time>
+          </div>
+        ) : null}
+
+        {/* Zone: Verkoop / Binnen / Terras */}
         <div
           className={`shrink-0 ${
             kassaWide15Chrome
-              ? 'px-2 pt-2 pb-0.5'
+              ? 'px-2 pt-1 pb-0.5'
               : kassaAppearanceDark
-                ? 'px-2.5 pt-3 pb-1 sm:px-3'
+                ? 'px-2.5 pt-1 pb-1 sm:px-3'
                 : 'px-2 pt-1.5 pb-1'
           }`}
         >
