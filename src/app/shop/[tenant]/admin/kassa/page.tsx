@@ -150,6 +150,7 @@ import {
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL,
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   kassaPosButtonClass,
+  kassaSpeelsOrderTypeButtonClass,
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosCartQtyButtonClass,
@@ -5484,6 +5485,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
     }`
 
+  const kassaPosOrderTypeButtonClass = (selected: boolean) => {
+    if (!kassaPosLuxury) return kassaLightOrderTypeButtonClass(selected)
+    const shell = `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)}`
+    if (posChrome === 'speels') {
+      return `${shell} ${kassaSpeelsOrderTypeButtonClass(selected)}`
+    }
+    return `${shell} ${kassaPosButtonClass(selected, posChrome)}`
+  }
+
   const kassaSidebarZoneLabelClass =
     kassaAppearanceDark && kassaCompactChrome
       ? 'text-xs font-medium tracking-[0.02em]'
@@ -6481,11 +6491,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
               onClick={() => selectOrderType('DINE_IN')}
-              className={
-                kassaPosLuxury
-                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)} ${kassaPosButtonClass(orderType === 'DINE_IN', posChrome)}`
-                  : kassaLightOrderTypeButtonClass(orderType === 'DINE_IN')
-              }
+              className={kassaPosOrderTypeButtonClass(orderType === 'DINE_IN')}
             >
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDineIn')}</span>
               {orderType === 'DINE_IN' && tableNumber ? (
@@ -6501,11 +6507,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
               onClick={() => selectOrderType('TAKEAWAY')}
-              className={
-                kassaPosLuxury
-                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)} ${kassaPosButtonClass(orderType === 'TAKEAWAY', posChrome)}`
-                  : kassaLightOrderTypeButtonClass(orderType === 'TAKEAWAY')
-              }
+              className={kassaPosOrderTypeButtonClass(orderType === 'TAKEAWAY')}
             >
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeTakeaway')}</span>
             </button>
@@ -6513,11 +6515,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
               onClick={() => selectOrderType('DELIVERY')}
-              className={
-                kassaPosLuxury
-                  ? `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)} ${kassaPosButtonClass(orderType === 'DELIVERY', posChrome)}`
-                  : kassaLightOrderTypeButtonClass(orderType === 'DELIVERY')
-              }
+              className={kassaPosOrderTypeButtonClass(orderType === 'DELIVERY')}
             >
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDelivery')}</span>
             </button>

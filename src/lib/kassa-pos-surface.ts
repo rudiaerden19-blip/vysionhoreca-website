@@ -215,6 +215,22 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
   return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN_LUXE}`
 }
 
+/** Dark/speels — prototype: Ter plaatse / Afhalen / Levering (zelfde bruine vlak + reflectie). */
+export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
+
+export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
+  return [
+    KASSA_POS_BTN_SHAPE,
+    KASSA_SPEELS_ORDER_TYPE_BTN_CLASS,
+    selected ? 'kassa-speels-order-type-btn--selected' : '',
+    'border border-[#3d352c]',
+    KASSA_POS_SUBTLE_LIFT_SHADOW,
+    KASSA_POS_BTN_PRESS,
+    KASSA_BTN_PRESS_FACE,
+    'relative overflow-hidden text-[#f0f0f0] font-bold',
+  ].join(' ')
+}
+
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   return look === 'speels' ? KASSA_SPEELS_CHECKOUT_BTN : KASSA_POS_CHECKOUT_BTN
 }
