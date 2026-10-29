@@ -39,7 +39,7 @@ type SoundUi = Pick<
 >
 
 /**
- * Eén groen toestemmingsscherm per browsersessie (sessionStorage).
+ * Eén toestemmingsscherm per browsersessie (sessionStorage).
  */
 export function useKassaSoundActivationGate(tenant: string) {
   const sessionKey = kassaSoundSessionKey(tenant)
