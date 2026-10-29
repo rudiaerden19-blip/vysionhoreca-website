@@ -481,20 +481,38 @@ input[type="number"] {
   background-clip: padding-box;
 }
 
-/* Menu-tegels Dark mode — geen witte 1px-rand (schaduw/rand/Safari contrast). */
+/*
+ * Menu-tegels Dark mode — witte 1px-rand: Safari/iPad antialias bij rounded + filter.
+ * Constante filter/compositing (niet alleen :hover); geen brightness-toggle op de knop.
+ */
 .kassa-speels-menu-tile {
   border: none !important;
   box-shadow: none !important;
-  outline: none !important;
   -webkit-tap-highlight-color: transparent;
   -webkit-appearance: none;
   appearance: none;
+  isolation: isolate;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Zelfde pad als :hover brightness — voorkomt flikkern witte rand */
+  filter: brightness(1.03);
+  outline: 1px solid #333333;
+  outline-offset: -1px;
 }
 
 .kassa-speels-menu-tile:focus,
 .kassa-speels-menu-tile:focus-visible {
-  outline: none !important;
+  outline: 1px solid #333333;
+  outline-offset: -1px;
   box-shadow: none !important;
+}
+
+@media (hover: hover) {
+  .kassa-speels-menu-tile:hover {
+    filter: brightness(1.03);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+  }
 }
 
 .kassa-speels-menu-tile img {

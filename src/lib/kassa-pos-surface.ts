@@ -314,9 +314,8 @@ export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
   KASSA_SPEELS_MENU_TILE_BUTTON_CLASS,
   KASSA_POS_BTN_SHAPE,
   'border-0 bg-[#333333] shadow-none outline-none',
-  'transition-[transform,filter] duration-150 ease-out',
-  'hover:brightness-[1.03]',
-  'active:scale-[0.96] active:translate-y-[1px] active:brightness-[0.84]',
+  'transition-transform duration-150 ease-out',
+  'active:scale-[0.96] active:translate-y-[1px]',
   'active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.42)]',
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
