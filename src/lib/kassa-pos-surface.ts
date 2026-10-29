@@ -445,7 +445,7 @@ export const KASSA_POS_MENU_TILE_IMAGE_FILM =
 
 /** Speels: zelfde tegel, veel minder cream-shimmer. */
 const KASSA_SPEELS_MENU_TILE_STUDIO_BG =
-  'bg-[radial-gradient(ellipse_at_50%_42%,#f7f7f7_0%,#e6e6e6_38%,#c8c8c8_68%,#9a9a9a_100%)]'
+  'bg-[radial-gradient(ellipse_at_50%_42%,#e8e8e8_0%,#d4d4d4_38%,#b5b5b5_68%,#909090_100%)]'
 
 const KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM =
   'shadow-[inset_0_-4px_0_0_#282828] z-[1]'
