@@ -498,25 +498,29 @@ input[type="number"] {
   box-shadow: inset 0 0 0 1px #282828;
 }
 
-/* Grijs fotovlak op tegel — zwart kader binnen de tegel. */
+/* Fotovlak — naad naar titelstrook, geen binnen-kader. */
 .kassa-speels-menu-tile-photo-well {
   box-sizing: border-box;
-  box-shadow:
-    inset 0 0 0 2px #000000,
-    inset 0 -4px 0 0 #282828;
+  box-shadow: inset 0 -4px 0 0 #282828;
 }
 
-/* Menu-tegels Dark — 5 mm zwart kader + schaduw, geen hover-flikkern. */
+/*
+ * Menu-tegels — 5 mm “plaklaag” op het grijze vlak (geen kader om de inhoud).
+ * Harde offset-schaduw = zichtbare dikte; zachte schaduw = contact met achtergrond.
+ */
 .kassa-speels-menu-tile {
   box-sizing: border-box;
-  border: 5mm solid #000000 !important;
+  border: none !important;
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
   background-color: #282828 !important;
   box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.72),
-    0 12px 28px rgba(0, 0, 0, 0.55) !important;
+    0 0 0 1px #0a0a0a,
+    0 5mm 0 0 #141414,
+    0 5mm 0 1px #000000,
+    0 5.5mm 2.5mm rgba(0, 0, 0, 0.52),
+    0 9mm 14mm rgba(0, 0, 0, 0.38) !important;
 }
 
 .kassa-speels-menu-tile:hover,
@@ -524,8 +528,11 @@ input[type="number"] {
 .kassa-speels-menu-tile:focus-visible {
   outline: none !important;
   box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.72),
-    0 12px 28px rgba(0, 0, 0, 0.55) !important;
+    0 0 0 1px #0a0a0a,
+    0 5mm 0 0 #141414,
+    0 5mm 0 1px #000000,
+    0 5.5mm 2.5mm rgba(0, 0, 0, 0.52),
+    0 9mm 14mm rgba(0, 0, 0, 0.38) !important;
 }
 
 /*
