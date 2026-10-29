@@ -7,7 +7,11 @@ import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import {
   KASSA_POS_BTN_SHAPE,
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+  KASSA_SPEELS_PRICE_ACCENT_CLASS,
   kassaPosButtonClass,
+  kassaSpeelsChromeButtonClass,
+  type KassaPosChromeLook,
 } from '@/lib/kassa-pos-surface'
 import { KassaIconCheck, KassaIconClose } from '@/lib/kassa-ui-icons'
 
@@ -24,15 +28,33 @@ export function KassaProductOptionsModal({
   onToggleChoice,
   onConfirm,
   appearance = 'light',
+  posChrome,
 }: {
   model: KassaProductOptionsModalModel
   onClose: () => void
   onToggleChoice: (option: ProductOption, choice: ProductOptionChoice) => void
   onConfirm: () => void
-  appearance?: 'light' |  'dark'
+  appearance?: 'light' | 'dark'
+  /** Speels POS: grijs glanzend chrome + groene prijzen (zoals kassa-sidebar). */
+  posChrome?: KassaPosChromeLook | null
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
+  const speelsDark = dark && posChrome === 'speels'
+
+  const darkPriceClass = speelsDark
+    ? KASSA_SPEELS_PRICE_ACCENT_CLASS
+    : dark
+      ? 'text-[#6dd5ff]'
+      : 'text-[#3C4D6B]'
+
+  const speelsChromeBtn = (selected: boolean, extraClass = '') =>
+    `${KASSA_POS_BTN_SHAPE} ${kassaSpeelsChromeButtonClass(selected)} ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} ${extraClass}`
+
+  const darkActionBtn = (selected: boolean, extraClass = '') =>
+    speelsDark
+      ? speelsChromeBtn(selected, extraClass)
+      : `${KASSA_POS_BTN_SHAPE} ${kassaPosButtonClass(selected, posChrome ?? 'luxe')} ${extraClass}`
 
   return (
     <div
@@ -47,22 +69,22 @@ export function KassaProductOptionsModal({
         }
       >
         <div
-          className={`flex items-center gap-3 p-4 border-b ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`: ''}`}
+          className={`flex items-center gap-3 p-4 border-b ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : ''}`}
         >
           {model.product.image_url && (
             <img
               src={model.product.image_url}
               alt={model.product.name}
               onError={kassaProductImageRetryOnError}
-              className={`w-14 h-14 rounded-xl flex-shrink-0 ${model.product.image_display_mode === 'contain'? (dark ? 'object-contain bg-zinc-800': 'object-contain bg-gray-100') : 'object-cover'}`}
+              className={`w-14 h-14 rounded-xl flex-shrink-0 ${model.product.image_display_mode === 'contain' ? (dark ? 'object-contain bg-zinc-800' : 'object-contain bg-gray-100') : 'object-cover'}`}
             />
           )}
           <div className="flex-1 min-w-0">
-            <p className={dark ? 'font-bold text-lg truncate text-zinc-50': 'font-bold text-lg truncate'}>
+            <p className={dark ? 'font-bold text-lg truncate text-zinc-50' : 'font-bold text-lg truncate'}>
               {model.editingCartKey ? t('kassaApp.optionsEditPrefix') : ''}
               {model.product.name}
             </p>
-            <p className={dark ? 'text-[#6dd5ff] font-bold': 'text-[#3C4D6B] font-bold'}>
+            <p className={`${darkPriceClass} font-bold`}>
               €{(model.product.price + model.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
             </p>
           </div>
@@ -71,7 +93,9 @@ export function KassaProductOptionsModal({
             onClick={onClose}
             className={
               dark
-                ? `p-2 text-[#f0f0f0] ${KASSA_POS_BTN_SHAPE} ${kassaPosButtonClass(false)}`
+                ? speelsDark
+                  ? `p-2 ${speelsChromeBtn(false)}`
+                  : `p-2 text-[#f0f0f0] ${KASSA_POS_BTN_SHAPE} ${kassaPosButtonClass(false)}`
                 : 'p-2 hover:bg-gray-100 rounded-xl'
             }
             aria-label={t('kassaApp.closeAria')}
@@ -88,9 +112,11 @@ export function KassaProductOptionsModal({
               <div className="flex items-center gap-2 mb-3">
                 <p
                   className={
-                    dark
-                      ? 'font-bold text-base uppercase tracking-wide text-[#6dd5ff]'
-                      : 'font-bold text-base uppercase tracking-wide text-[#3C4D6B]'
+                    speelsDark
+                      ? `font-bold text-base uppercase tracking-wide ${KASSA_SPEELS_PRICE_ACCENT_CLASS}`
+                      : dark
+                        ? 'font-bold text-base uppercase tracking-wide text-[#6dd5ff]'
+                        : 'font-bold text-base uppercase tracking-wide text-[#3C4D6B]'
                   }
                 >
                   {option.name}
@@ -98,9 +124,11 @@ export function KassaProductOptionsModal({
                 {option.required && (
                   <span
                     className={
-                      dark
-                        ? `text-xs px-2 py-0.5 font-semibold text-red-300 ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
-                        : 'text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold'
+                      speelsDark
+                        ? `text-xs px-2 py-0.5 font-semibold text-red-300 ${speelsChromeBtn(false)}`
+                        : dark
+                          ? `text-xs px-2 py-0.5 font-semibold text-red-300 ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
+                          : 'text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold'
                     }
                   >
                     {t('kassaApp.optionRequired')}
@@ -109,9 +137,11 @@ export function KassaProductOptionsModal({
                 {option.type === 'multiple' && (
                   <span
                     className={
-                      dark
-                        ? `text-xs px-2 py-0.5 font-semibold text-[#d4b483] ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
-                        : 'text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full'
+                      speelsDark
+                        ? `text-xs px-2 py-0.5 font-semibold ${speelsChromeBtn(false)}`
+                        : dark
+                          ? `text-xs px-2 py-0.5 font-semibold text-[#d4b483] ${KASSA_POS_BTN_SHAPE} border border-[#3d3d3d] ${kassaPosButtonClass(false)}`
+                          : 'text-xs bg-blue-50 text-blue-500 border border-blue-200 px-2 py-0.5 rounded-full'
                     }
                   >
                     {t('kassaApp.optionMultiple')}
@@ -128,7 +158,7 @@ export function KassaProductOptionsModal({
                       onClick={() => onToggleChoice(option, choice)}
                       className={`relative flex flex-col items-center justify-center px-2 py-3 text-sm font-medium transition-all ${
                         dark
-                          ? `${kassaPosButtonClass(isSelected)} min-h-[4.25rem] ${isSelected ? 'scale-[1.02]': ''}`
+                          ? `${darkActionBtn(isSelected, `min-h-[4.25rem] ${isSelected ? 'scale-[1.02]' : ''}`)}`
                           : isSelected
                             ? 'rounded-xl border-2 border-[#3C4D6B] bg-[#3C4D6B]/10 ring-2 ring-[#3C4D6B] scale-[1.03]'
                             : 'rounded-xl border-2 border-gray-200 hover:border-[#3C4D6B] bg-white text-gray-700'
@@ -137,17 +167,27 @@ export function KassaProductOptionsModal({
                       {isSelected && (
                         <div
                           className={
-                            dark
-                              ? 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-md border border-[#3d3d3d] bg-[#1c1c1c] text-[10px] font-bold text-[#d4b483]'
-                              : 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3C4D6B] text-xs font-bold text-white'
+                            speelsDark
+                              ? `absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center text-[10px] font-bold ${speelsChromeBtn(true)}`
+                              : dark
+                                ? 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-md border border-[#3d3d3d] bg-[#1c1c1c] text-[10px] font-bold text-[#d4b483]'
+                                : 'absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3C4D6B] text-xs font-bold text-white'
                           }
                         >
-                          <KassaIconCheck className={dark ? 'h-3 w-3 text-[#d4b483]' : 'h-3.5 w-3.5'} />
+                          <KassaIconCheck className={speelsDark ? 'h-3 w-3' : dark ? 'h-3 w-3 text-[#d4b483]' : 'h-3.5 w-3.5'} />
                         </div>
                       )}
                       <span
                         className={`text-center leading-tight font-semibold ${
-                          isSelected ? (dark ? 'text-[#6dd5ff]': 'text-[#3C4D6B]') : dark ? 'text-zinc-100': 'text-gray-800'
+                          speelsDark
+                            ? KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS
+                            : isSelected
+                              ? dark
+                                ? 'text-[#6dd5ff]'
+                                : 'text-[#3C4D6B]'
+                              : dark
+                                ? 'text-zinc-100'
+                                : 'text-gray-800'
                         }`}
                       >
                         {choice.name}
@@ -155,7 +195,7 @@ export function KassaProductOptionsModal({
                       {choice.price > 0 ? (
                         <span
                           className={`text-xs font-bold mt-1 ${
-                            dark ? 'text-[#d4b483]' : 'text-amber-500'
+                            speelsDark ? KASSA_SPEELS_PRICE_ACCENT_CLASS : dark ? 'text-[#d4b483]' : 'text-amber-500'
                           }`}
                         >
                           {`+€${choice.price.toFixed(2)}`}
@@ -182,7 +222,7 @@ export function KassaProductOptionsModal({
             onClick={onClose}
             className={
               dark
-                ? `flex-1 py-3 font-semibold ${kassaPosButtonClass(false)}`
+                ? `flex-1 py-3 font-semibold ${darkActionBtn(false)}`
                 : 'flex-1 py-3 rounded-xl bg-white border border-gray-200 font-semibold text-gray-600 hover:bg-gray-100 transition-colors'
             }
           >
@@ -194,7 +234,7 @@ export function KassaProductOptionsModal({
             onClick={onConfirm}
             className={
               dark
-                ? `flex-[2] py-3.5 text-lg font-bold ${kassaPosButtonClass(false)}`
+                ? `flex-[2] py-3.5 text-lg font-bold ${darkActionBtn(false)}`
                 : 'flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors'
             }
           >

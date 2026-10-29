@@ -7536,7 +7536,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onClose={() => setOptionsModal(null)}
           onToggleChoice={toggleChoice}
           onConfirm={confirmOptions}
-          appearance={kassaAppearanceDark ? 'dark': 'light'}
+          appearance={kassaAppearanceDark ? 'dark' : 'light'}
+          posChrome={kassaPosLuxury ? posChrome : null}
         />
       ) : null}
 
