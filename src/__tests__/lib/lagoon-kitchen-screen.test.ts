@@ -4,6 +4,7 @@ import {
   filterOrderItemsForLagoonKitchen,
   isLagoonKitchenMenuCategoryName,
   isLagoonKitchenScreenTenant,
+  isTheLagoonTenant,
 } from '@/lib/lagoon-kitchen-screen'
 
 describe('lagoon-kitchen-screen', () => {
@@ -25,6 +26,8 @@ describe('lagoon-kitchen-screen', () => {
   }
 
   it('only thelagoon tenant uses lagoon kitchen filter', () => {
+    expect(isTheLagoonTenant('thelagoon')).toBe(true)
+    expect(isTheLagoonTenant('demo-frituur')).toBe(false)
     expect(isLagoonKitchenScreenTenant('thelagoon')).toBe(true)
     expect(isLagoonKitchenScreenTenant('demo-frituur')).toBe(false)
   })

@@ -227,6 +227,7 @@ import {
 import {
   filterCartLinesForLagoonKitchen,
   isLagoonKitchenScreenTenant,
+  isTheLagoonTenant,
 } from '@/lib/lagoon-kitchen-screen'
 import {
   readKassaJetonSalePoint,
@@ -1216,7 +1217,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useEffect(() => {
     if (typeof window === 'undefined') return
     setOwnerCanDeleteOpenNameTab(
-      isOwnerSessionFreshForTenant(tenant) || isSuperAdminLoggedIn(),
+      isTheLagoonTenant(tenant) &&
+        (isOwnerSessionFreshForTenant(tenant) || isSuperAdminLoggedIn()),
     )
   }, [tenant])
   useEffect(() => {
@@ -5332,10 +5334,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const showSidebarOpRekeningButton = useMemo(
     () =>
+      isTheLagoonTenant(tenant) &&
       kassaNameAccountV2 &&
       !demoViewOnly &&
       quickMenuAllowedSubmenuIds.has('sm_kassa_op_rekening'),
-    [kassaNameAccountV2, demoViewOnly, quickMenuAllowedSubmenuIds],
+    [tenant, kassaNameAccountV2, demoViewOnly, quickMenuAllowedSubmenuIds],
   )
 
   const openNameAccountModalFromSidebar = useCallback(() => {

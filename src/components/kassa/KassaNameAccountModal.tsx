@@ -42,6 +42,7 @@ import {
   nameAccountOpenTotalDisplay,
   parseOpenAmountInput,
 } from '@/lib/kassa-name-account-modal-ui'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 
 type Props = {
   open: boolean
@@ -391,6 +392,7 @@ export default function KassaNameAccountModal({
   }
 
   const cartHasItems = cart.length > 0
+  const lagoonOpRekeningUi = isTheLagoonTenant(tenant)
   const showPayPanel = !cartHasItems && payerOpenTotal > 0.001 && !!normName(name)
   const showOwnerDeleteOpenTab =
     ownerCanDeleteOpenTab &&
@@ -484,7 +486,7 @@ export default function KassaNameAccountModal({
             <p className="text-sm text-gray-600">{t('kassaNameAccount.openGrandTotalHint')}</p>
           ) : null}
 
-          {cartHasItems && openList.length > 0 ? (
+          {lagoonOpRekeningUi && cartHasItems && openList.length > 0 ? (
             <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950">
               {t('kassaNameAccount.openListAddHint')}
             </p>
@@ -517,7 +519,7 @@ export default function KassaNameAccountModal({
                       >
                         <span className="font-medium text-gray-900">{item.name}</span>
                         <span className="flex flex-col items-end gap-0.5">
-                          {cartHasItems ? (
+                          {lagoonOpRekeningUi && cartHasItems ? (
                             <span className="text-xs font-medium text-teal-800">
                               {t('kassaNameAccount.listAddCartHint').replace('{amount}', money(cartTotalIncl))}
                             </span>
