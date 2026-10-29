@@ -113,9 +113,6 @@ import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
-  KASSA_LUXE_HTML_CLASS,
-  KASSA_LUXE_LEATHER_PLANE_CLASS,
-  KASSA_LUXE_CART_GRAIN_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
@@ -1099,7 +1096,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaPosLuxury = kassaUiLayoutUsesPosLuxury(kassaLayout)
   const kassaClassicDark = kassaLayout === 'dark'
   const kassaLight = kassaLayout === 'light'
-  const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
+  const posChrome: KassaPosChromeLook = 'speels'
   const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
   const kassaRecessTrayClass =
     kassaLayout === 'speels'
@@ -1184,20 +1181,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const body = document.body
     html.classList.add('vysion-kassa-root')
     body.classList.add('vysion-kassa-root')
-    if (kassaLayout === 'luxe') {
-      html.classList.add(KASSA_LUXE_HTML_CLASS)
-      body.classList.add(KASSA_LUXE_HTML_CLASS)
-    } else {
-      html.classList.remove(KASSA_LUXE_HTML_CLASS)
-      body.classList.remove(KASSA_LUXE_HTML_CLASS)
-    }
     return () => {
       html.classList.remove('vysion-kassa-root')
       body.classList.remove('vysion-kassa-root')
-      html.classList.remove(KASSA_LUXE_HTML_CLASS)
-      body.classList.remove(KASSA_LUXE_HTML_CLASS)
     }
-  }, [kassaLayout])
+  }, [])
 
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
   const audioUnlockOnceRef = useRef(false)
@@ -5686,9 +5674,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-testid="kassa-app"
       data-kassa-vp={kassaChromeDensity}
     >
-      {kassaLayout === 'luxe' ? (
-        <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
-      ) : null}
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
@@ -6160,7 +6145,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
             className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${kassaLayoutMenuScrollFlatBgClass(kassaLayout)} ${
-              kassaAppearanceDark && kassaLayout !== 'luxe' ? 'gks-menu-vignette': ''
+              kassaLayout === 'speels' ? 'gks-menu-vignette' : ''
             }`}
           >
             {menuLoading ? (
@@ -6367,11 +6352,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
-            kassaLayout === 'luxe'
-              ? kassaPlateBgClass
-              : kassaPosLuxury
-                ? `border-l ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
-                : ui.sidebarBg
+            kassaPosLuxury
+              ? `border-l ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
+              : ui.sidebarBg
           }`}
         >
 
@@ -6546,7 +6529,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
             kassaAppearanceDark ? 'px-3 pt-1': 'px-2.5 pt-1.5'
-          } ${kassaLayout === 'luxe' ? `${KASSA_LUXE_CART_GRAIN_CLASS} mx-3 mb-2` : ''}`}
+          }`}
         >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {sidebarShowsLegacyParkedHeader ? (
@@ -6858,7 +6841,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Totaal + knoppen — zelfde flow/labels als vóór UI-pass; donker = alleen POS-styling */}
         {kassaPosLuxury ? (
           <div
-            className={`sticky bottom-0 z-10 shrink-0 ${kassaLayout === 'luxe' ? '' : `border-t ${KASSA_POS_RULE_BLACK}`} ${kassaPlateBgClass} ${
+            className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass} ${
               kassaWide15Chrome ? 'px-2 py-1.5 space-y-1.5' : kassaCompactChrome ? 'px-2.5 py-2 space-y-2': 'px-3 py-2.5 space-y-2.5'
             }`}
           >

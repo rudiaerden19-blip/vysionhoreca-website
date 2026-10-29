@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { fetchKassaPosState, patchKassaPosState } from '@/lib/kassa-pos-state-client'
 import {
-  isKassaUiLayoutId,
+  isKnownLayoutRaw,
   kassaUiLayoutIsDark,
+  parseKassaUiLayout,
   resolveKassaUiLayout,
   type KassaUiLayoutId,
 } from '@/lib/kassa-ui-layout'
@@ -26,7 +27,8 @@ export function readKassaUiLayoutPreference(tenantSlug: string): KassaUiLayoutId
   if (typeof window === 'undefined') return null
   try {
     const raw = window.localStorage.getItem(kassaUiLayoutStorageKey(tenantSlug))
-    return isKassaUiLayoutId(raw) ? raw : null
+    if (!raw || !isKnownLayoutRaw(raw)) return null
+    return parseKassaUiLayout(raw, undefined)
   } catch {
     return null
   }
@@ -46,7 +48,7 @@ export function readKassaUiDarkPreference(_tenantSlug: string): boolean {
 }
 
 export function writeKassaUiDarkPreference(tenantSlug: string, dark: boolean): void {
-  writeKassaUiLayoutPreference(tenantSlug, dark ? 'luxe' : 'light')
+  writeKassaUiLayoutPreference(tenantSlug, dark ? 'speels' : 'light')
 }
 
 export function writeKassaUiLayoutPreference(tenantSlug: string, layout: KassaUiLayoutId): void {
@@ -73,7 +75,7 @@ export function useKassaUiLayoutSync(tenantSlug: string): {
   toggle: () => void
 } {
   const [layout, setLayoutState] = useState<KassaUiLayoutId>(
-    () => readKassaUiLayoutPreference(tenantSlug) ?? 'luxe',
+    () => readKassaUiLayoutPreference(tenantSlug) ?? 'speels',
   )
   const [hydrated, setHydrated] = useState(false)
   const dark = kassaUiLayoutIsDark(layout)
@@ -112,7 +114,7 @@ export function useKassaUiLayoutSync(tenantSlug: string): {
         return
       }
       if (typeof ce.detail.dark === 'boolean') {
-        setLayoutState(ce.detail.dark ? 'luxe' : 'light')
+        setLayoutState(ce.detail.dark ? 'speels' : 'light')
       }
     }
 
@@ -130,7 +132,7 @@ export function useKassaUiLayoutSync(tenantSlug: string): {
 
   const setDark = useCallback(
     (next: boolean) => {
-      setLayout(next ? 'luxe' : 'light')
+      setLayout(next ? 'speels' : 'light')
     },
     [setLayout],
   )

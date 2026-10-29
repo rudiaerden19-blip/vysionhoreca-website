@@ -21,35 +21,37 @@ describe('parseKassaUiLayout', () => {
   it('mapt oude ids', () => {
     expect(parseKassaUiLayout('slate', true)).toBe('dark')
     expect(parseKassaUiLayout('navy', false)).toBe('speels')
+    expect(parseKassaUiLayout('luxe', true)).toBe('speels')
   })
 
-  it('valt terug op luxe als donker, light als licht', () => {
-    expect(parseKassaUiLayout(null, true)).toBe('luxe')
-    expect(parseKassaUiLayout(undefined, null)).toBe('luxe')
+  it('valt terug op speels als donker, light als licht', () => {
+    expect(parseKassaUiLayout(null, true)).toBe('speels')
+    expect(parseKassaUiLayout(undefined, null)).toBe('speels')
     expect(parseKassaUiLayout('nope', false)).toBe('light')
   })
 })
 
 describe('resolveKassaUiLayout', () => {
   it('houdt de server-id als die bekend is', () => {
-    expect(resolveKassaUiLayout('dark', true, 'luxe')).toBe('dark')
+    expect(resolveKassaUiLayout('dark', true, 'speels')).toBe('dark')
     expect(resolveKassaUiLayout('light', true, 'speels')).toBe('light')
   })
 
   it('gebruikt de lokale keuze als de server geen layout heeft', () => {
     expect(resolveKassaUiLayout(null, true, 'dark')).toBe('dark')
     expect(resolveKassaUiLayout(undefined, true, 'light')).toBe('light')
+    expect(resolveKassaUiLayout(null, true, 'luxe')).toBe('speels')
   })
 
-  it('valt alleen terug op luxe zonder server- of lokale id', () => {
-    expect(resolveKassaUiLayout(null, true, null)).toBe('luxe')
+  it('valt alleen terug op speels zonder server- of lokale id', () => {
+    expect(resolveKassaUiLayout(null, true, null)).toBe('speels')
     expect(resolveKassaUiLayout(null, false, null)).toBe('light')
   })
 })
 
 describe('KASSA_UI_LAYOUT_OPTIONS', () => {
-  it('zet de huidige Speels-look als Dark onder Light', () => {
-    expect(KASSA_UI_LAYOUT_OPTIONS.map((o) => o.id)).toEqual(['light', 'speels', 'luxe', 'dark'])
+  it('Light, Dark (speels) en Klassiek — geen Luxe meer', () => {
+    expect(KASSA_UI_LAYOUT_OPTIONS.map((o) => o.id)).toEqual(['light', 'speels', 'dark'])
     expect(KASSA_UI_LAYOUT_OPTIONS[1]?.labelKey).toBe('kassaApp.modeDark')
   })
 })
@@ -57,13 +59,11 @@ describe('KASSA_UI_LAYOUT_OPTIONS', () => {
 describe('kassaUiLayout flags', () => {
   it('alleen light is niet-donker', () => {
     expect(kassaUiLayoutIsDark('light')).toBe(false)
-    expect(kassaUiLayoutIsDark('luxe')).toBe(true)
     expect(kassaUiLayoutIsDark('dark')).toBe(true)
     expect(kassaUiLayoutIsDark('speels')).toBe(true)
   })
 
-  it('POS-luxe alleen voor luxe en speels', () => {
-    expect(kassaUiLayoutUsesPosLuxury('luxe')).toBe(true)
+  it('POS-chrome alleen voor speels (Dark)', () => {
     expect(kassaUiLayoutUsesPosLuxury('speels')).toBe(true)
     expect(kassaUiLayoutUsesPosLuxury('dark')).toBe(false)
     expect(kassaUiLayoutUsesPosLuxury('light')).toBe(false)
@@ -86,26 +86,23 @@ describe('isMissingKassaUiLayoutColumn', () => {
 })
 
 describe('Speels bruine knoppen', () => {
-  it('laat ongeselecteerde Speels- en Luxe-knoppen zonder beige rand', () => {
+  it('laat ongeselecteerde Speels-knoppen zonder beige rand', () => {
     expect(kassaPosButtonClass(false, 'speels')).not.toContain('#d4b483')
-    expect(kassaPosButtonClass(false, 'luxe')).not.toContain('#d4b483')
   })
 
-  it('houdt de gele kader alleen op Luxe-snelmenu-knoppen', () => {
+  it('houdt champagne rand alleen op legacy luxe-snelmenu helper', () => {
     expect(kassaPosQuickMenuPanelButtonClass('luxe')).toContain('#d4b483')
     expect(kassaPosQuickMenuPanelButtonClass('speels')).not.toContain('#d4b483')
   })
 
-  it('maakt geselecteerde knoppen zwart met zilveren rand', () => {
+  it('maakt geselecteerde Speels-knoppen zwart met zilveren rand', () => {
     const selected = kassaPosButtonClass(true, 'speels')
     expect(selected).toContain('#c8c8c8')
     expect(selected).not.toContain('#c4a46a')
-    expect(kassaPosButtonClass(true, 'luxe')).toContain('#c4a46a')
   })
 
   it('maakt Afrekenen in Speels zwart met zilveren rand', () => {
     expect(kassaPosCheckoutButtonClass('speels')).toContain('#c8c8c8')
     expect(kassaPosCheckoutButtonClass('speels')).not.toContain('#c4a46a')
-    expect(kassaPosCheckoutButtonClass('luxe')).toContain('#c4a46a')
   })
 })

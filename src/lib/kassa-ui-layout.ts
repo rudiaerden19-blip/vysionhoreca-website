@@ -1,37 +1,38 @@
 /** Per-tenant kassa-look. Eigenaar kiest via Mode-kiezer. */
 
-export const KASSA_UI_LAYOUT_IDS = ['light', 'dark', 'luxe', 'speels'] as const
+export const KASSA_UI_LAYOUT_IDS = ['light', 'dark', 'speels'] as const
 
 export type KassaUiLayoutId = (typeof KASSA_UI_LAYOUT_IDS)[number]
 
 export const KASSA_UI_LAYOUT_OPTIONS: { id: KassaUiLayoutId; labelKey: string }[] = [
   { id: 'light', labelKey: 'kassaApp.modeLight' },
   { id: 'speels', labelKey: 'kassaApp.modeDark' },
-  { id: 'luxe', labelKey: 'kassaApp.modeLuxe' },
   { id: 'dark', labelKey: 'kassaApp.modeClassic' },
 ]
 
+/** Oude DB/localStorage-waarden → huidige layouts (luxe → Dark/speels). */
 const LEGACY_LAYOUT_MAP: Record<string, KassaUiLayoutId> = {
   slate: 'dark',
   navy: 'speels',
+  luxe: 'speels',
 }
 
 export function isKassaUiLayoutId(value: unknown): value is KassaUiLayoutId {
   return typeof value === 'string' && (KASSA_UI_LAYOUT_IDS as readonly string[]).includes(value)
 }
 
-function isKnownLayoutRaw(value: unknown): boolean {
+export function isKnownLayoutRaw(value: unknown): boolean {
   return isKassaUiLayoutId(value) || (typeof value === 'string' && value in LEGACY_LAYOUT_MAP)
 }
 
-/** Ontbrekende layout: donker → luxe (huidige default), licht → light. Oude ids worden gemapt. */
+/** Ontbrekende layout: donker → Dark (speels), licht → light. Oude ids worden gemapt. */
 export function parseKassaUiLayout(
   raw: unknown,
   darkFallback: boolean | null | undefined,
 ): KassaUiLayoutId {
+  if (typeof raw === 'string' && raw in LEGACY_LAYOUT_MAP) return LEGACY_LAYOUT_MAP[raw]!
   if (isKassaUiLayoutId(raw)) return raw
-  if (typeof raw === 'string' && raw in LEGACY_LAYOUT_MAP) return LEGACY_LAYOUT_MAP[raw]
-  return darkFallback === false ? 'light' : 'luxe'
+  return darkFallback === false ? 'light' : 'speels'
 }
 
 /** Server-id wint; ontbreekt die, gebruik lokaal; anders de donker/licht-fallback. */
@@ -49,9 +50,9 @@ export function kassaUiLayoutIsDark(layout: KassaUiLayoutId): boolean {
   return layout !== 'light'
 }
 
-/** Luxe-POS-chrome. Speels is de huidige Dark-look; `dark` is de oude gunmetal-kassa. */
+/** Donkere POS-chrome (korrel + tegelstijl) — alleen layout Dark (speels). */
 export function kassaUiLayoutUsesPosLuxury(layout: KassaUiLayoutId): boolean {
-  return layout === 'luxe' || layout === 'speels'
+  return layout === 'speels'
 }
 
 /** Kolom nog niet in productie-DB — staff/bon mogen niet meevallen. */

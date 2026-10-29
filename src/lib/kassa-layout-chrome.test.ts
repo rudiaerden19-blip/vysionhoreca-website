@@ -10,12 +10,11 @@ import {
 import { kassaPosButtonClass, kassaPosCheckoutButtonClass } from './kassa-pos-surface'
 
 describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
-  it('kent Light, Dark, Luxe en Klassiek', () => {
-    expect(KASSA_UI_LAYOUT_OPTIONS.map((o) => o.id)).toEqual(['light', 'speels', 'luxe', 'dark'])
+  it('kent Light, Dark (speels) en Klassiek', () => {
+    expect(KASSA_UI_LAYOUT_OPTIONS.map((o) => o.id)).toEqual(['light', 'speels', 'dark'])
     expect(KASSA_UI_LAYOUT_OPTIONS.map((o) => o.labelKey)).toEqual([
       'kassaApp.modeLight',
       'kassaApp.modeDark',
-      'kassaApp.modeLuxe',
       'kassaApp.modeClassic',
     ])
   })
@@ -42,17 +41,11 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
 
   it('Dark (speels) houdt afrekenen, knoppen zijn lichter grijs', () => {
     expect(kassaLayoutPosChrome('speels')).toBe('speels')
+    expect(kassaLayoutPosChrome('dark')).toBe('speels')
     expect(kassaLayoutChromeBtnClass('speels', false)).toContain('#5a5a5a')
     expect(kassaLayoutChromeBtnClass('speels', false)).not.toBe(kassaPosButtonClass(false, 'speels'))
     expect(kassaLayoutCheckoutBtnClass('speels')).toBe(kassaPosCheckoutButtonClass('speels'))
-  })
-
-  it('Luxe houdt het kader, knoppen zijn lichter grijs', () => {
-    expect(kassaLayoutPosChrome('luxe')).toBe('luxe')
-    expect(kassaLayoutChromeBtnClass('luxe', false)).toContain('#5a5a5a')
-    expect(kassaLayoutChromeBtnClass('luxe', true)).toContain('#707070')
-    expect(kassaLayoutChromeBtnClass('luxe', false)).not.toBe(kassaPosButtonClass(false, 'luxe'))
-    expect(kassaLayoutCheckoutBtnClass('luxe')).toBe(kassaPosCheckoutButtonClass('luxe'))
-    expect(kassaLayoutHeaderBarClass('luxe')).toContain('bg-transparent')
+    expect(kassaLayoutPlateBgClass('speels')).toContain('kassa-speels-plate-grain')
+    expect(kassaLayoutHeaderBarClass('speels')).toContain('kassa-speels-plate-grain')
   })
 })

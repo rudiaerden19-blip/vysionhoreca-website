@@ -134,7 +134,7 @@ export async function PATCH(request: NextRequest) {
   } else if ('kassa_ui_dark' in body) {
     patch.kassa_ui_dark = body.kassa_ui_dark ?? null
     if (typeof body.kassa_ui_dark === 'boolean') {
-      patch.kassa_ui_layout = body.kassa_ui_dark ? 'luxe' : 'light'
+      patch.kassa_ui_layout = body.kassa_ui_dark ? 'speels' : 'light'
     }
   }
   if ('bar_bon_watermarks' in body && body.bar_bon_watermarks && typeof body.bar_bon_watermarks === 'object') {

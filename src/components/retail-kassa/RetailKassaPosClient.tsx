@@ -36,8 +36,6 @@ import {
   KASSA_POS_RULE_BLACK,
   KASSA_POS_BTN_SHAPE,
   KASSA_SIDEBAR_FOOTER_LEFT_COL,
-  KASSA_LUXE_HTML_CLASS,
-  KASSA_LUXE_LEATHER_PLANE_CLASS,
   KASSA_NUMPAD_PANEL_SLIDE_MOTION,
 } from '@/lib/kassa-pos-surface'
 
@@ -467,18 +465,11 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     body.classList.add('vysion-kassa-root')
     if (appearanceDark) html.classList.add('kassa-dark-appearance')
     else html.classList.remove('kassa-dark-appearance')
-    if (kassaLayout === 'luxe') {
-      html.classList.add(KASSA_LUXE_HTML_CLASS)
-      body.classList.add(KASSA_LUXE_HTML_CLASS)
-    } else {
-      html.classList.remove(KASSA_LUXE_HTML_CLASS)
-      body.classList.remove(KASSA_LUXE_HTML_CLASS)
-    }
     return () => {
-      html.classList.remove('kassa-dark-appearance', 'vysion-kassa-root', KASSA_LUXE_HTML_CLASS)
-      body.classList.remove('vysion-kassa-root', KASSA_LUXE_HTML_CLASS)
+      html.classList.remove('kassa-dark-appearance', 'vysion-kassa-root')
+      body.classList.remove('vysion-kassa-root')
     }
-  }, [appearanceDark, kassaLayout])
+  }, [appearanceDark])
 
   const focusBarcodeCapture = useCallback(() => {
     if (priceFixNameInputRef.current && document.activeElement === priceFixNameInputRef.current) return
@@ -2335,9 +2326,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       data-testid="retail-kassa-app"
       data-kassa-layout={kassaLayout}
     >
-      {kassaLayout === 'luxe' ? (
-        <div aria-hidden className={KASSA_LUXE_LEATHER_PLANE_CLASS} />
-      ) : null}
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}

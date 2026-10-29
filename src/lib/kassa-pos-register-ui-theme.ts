@@ -91,6 +91,5 @@ export function createKassaSpeelsRegisterUiTheme(): KassaRegisterUiTheme {
 export function createKassaThemeForLayout(layout: KassaUiLayoutId): KassaRegisterUiTheme {
   if (layout === 'light') return createKassaRegisterUiTheme(false)
   if (layout === 'dark') return createKassaRegisterUiTheme(true)
-  if (layout === 'speels') return createKassaSpeelsRegisterUiTheme()
-  return createKassaPosRegisterUiTheme(true)
+  return createKassaSpeelsRegisterUiTheme()
 }
