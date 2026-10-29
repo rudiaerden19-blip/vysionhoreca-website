@@ -155,6 +155,7 @@ import {
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
   kassaSpeelsGreenGlossButtonClass,
+  kassaSpeelsBlueGlossButtonClass,
   kassaSpeelsCategoryStripButtonClass,
   KASSA_SPEELS_TOP_CHROME_BTN_CLASS,
   KASSA_SPEELS_TENANT_NAME_CLASS,
@@ -5442,7 +5443,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const headerUtilityBtnClass = (selected: boolean) =>
     kassaPosLuxury
-      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${
+          posChrome === 'speels'
+            ? kassaSpeelsBlueGlossButtonClass(selected)
+            : `${kassaPosButtonClass(selected, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+        }`
       : ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
