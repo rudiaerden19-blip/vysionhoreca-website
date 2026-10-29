@@ -339,7 +339,7 @@ export const KASSA_SPEELS_MENU_TILE_SLAB =
 
 /** Foto + titel — boven de slab. */
 export const KASSA_SPEELS_MENU_TILE_INNER_CLIP =
-  'kassa-speels-menu-tile-face relative z-[1] flex h-full min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-[inherit]'
+  'kassa-speels-menu-tile-face relative z-[1] flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[inherit]'
 
 export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
   'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-visible text-left',
