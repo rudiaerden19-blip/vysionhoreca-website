@@ -218,7 +218,7 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
   return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN_LUXE}`
 }
 
-/** Dark/speels — Ter plaatse / Afhalen / Levering (mat grijs, subtiele diepte — geen overlay-gloed). */
+/** Dark/speels — Ter plaatse / Afhalen / Levering (glanzend grijs via CSS-gradient). */
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
 
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
