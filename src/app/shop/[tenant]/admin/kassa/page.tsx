@@ -102,7 +102,7 @@ import {
 } from '@/lib/kassa-menu-product-options'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
-import { kassaLayoutPlateBgClass } from '@/lib/kassa-layout-chrome'
+import { kassaLayoutMenuScrollFlatBgClass, kassaLayoutPlateBgClass } from '@/lib/kassa-layout-chrome'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
 import { KassaSoundActivationScreen } from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
@@ -6144,7 +6144,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
+            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${kassaLayoutMenuScrollFlatBgClass(kassaLayout)} ${
               kassaAppearanceDark && kassaLayout !== 'luxe' ? 'gks-menu-vignette': ''
             }`}
           >

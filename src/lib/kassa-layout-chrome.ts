@@ -48,6 +48,14 @@ export function kassaLayoutPlateBgClass(layout: KassaUiLayoutId): string {
   return 'bg-[#0b0f14]'
 }
 
+/** Effen vlak achter producttegels (recess-kleur). */
+export function kassaLayoutMenuScrollFlatBgClass(layout: KassaUiLayoutId): string {
+  if (layout === 'speels') return 'bg-[#333333]'
+  if (kassaUiLayoutUsesPosLuxury(layout)) return 'bg-[#1a1612]'
+  if (layout === 'dark') return 'bg-[#151a21]'
+  return ''
+}
+
 export function kassaLayoutRecessTrayClass(layout: KassaUiLayoutId): string {
   if (layout === 'speels') return KASSA_SPEELS_MENU_RECESS_TRAY_CLASS
   if (layout === 'luxe') return `${KASSA_POS_MENU_RECESS_TRAY_CLASS} gks-menu-vignette`
