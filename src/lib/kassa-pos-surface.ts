@@ -30,8 +30,11 @@ export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 /** Effen grijs tegelveld (geen korrel — korrel alleen op kader via plate-shell). */
 export const KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS = 'bg-[#2f2f2f] kassa-speels-menu-scroll'
 
-/** Zijbalk mand — effen zwart (`kassa-speels-sidebar-cart-vak` in globals.css). */
+/** Zijbalk mand — effen zwarte buitenkader (`kassa-speels-sidebar-cart-vak`). */
 export const KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS = 'kassa-speels-sidebar-cart-vak rounded-xl'
+/** Lijst waar productregels in de mand verschijnen — effen #2f2f2f. */
+export const KASSA_SPEELS_SIDEBAR_CART_LINES_CLASS =
+  'kassa-speels-sidebar-cart-lines rounded-lg min-h-0 flex-1 flex flex-col overflow-hidden'
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
 export const KASSA_FLOOR_TERRACE_GRAIN_CLASS = 'gks-floor-terrace-grain'

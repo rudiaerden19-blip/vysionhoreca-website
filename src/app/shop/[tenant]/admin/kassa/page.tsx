@@ -119,6 +119,7 @@ import {
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
+  KASSA_SPEELS_SIDEBAR_CART_LINES_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
@@ -6722,6 +6723,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   numpadPanelVisible ? 'pointer-events-none opacity-[0.28]': 'opacity-100'
                 } ${
                   kassaSidebarFooterTier === 'comfort'? 'gap-2': kassaSidebarFooterTier === 'compact'? 'gap-1.5': 'gap-1'
+                } ${
+                  kassaLayout === 'speels' ? `${KASSA_SPEELS_SIDEBAR_CART_LINES_CLASS} px-2 py-1.5` : ''
                 }`}
               >
               {showParkedTableLinesInSidebar && sidebarShowsOrderPanel ? (
