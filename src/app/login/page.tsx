@@ -28,8 +28,10 @@ import { LocaleFlagEmoji, LocaleFlagWithCode } from '@/components/LocaleFlagEmoj
 import { LoginKassaCloseHintModal } from '@/components/LoginKassaCloseHintModal'
 import { LOGIN_QUERY_KASSA_CLOSE_TIP } from '@/lib/shop-login-kassa-tip'
 import { isVysionMainPortalHost } from '@/lib/vysion-site'
-import { kassaPosButtonClass } from '@/lib/kassa-pos-surface'
 import { marketingHomeHrefFromSearchParams } from '@/lib/registration-product-line'
+
+const LOGIN_PRIMARY_BTN =
+  'flex w-full touch-manipulation select-none items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-[#0c5273] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50'
 
 /** Zelfde hosts als middleware `exactMainDomains`(+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -290,50 +292,60 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#e3e3e3]">
+    <main className="relative flex min-h-screen flex-col bg-slate-50">
+      <div
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(14,93,130,0.12),transparent_55%)]"
+        aria-hidden
+      />
       <LoginKassaCloseHintModal open={showKassaCloseHint} onDismiss={dismissKassaCloseHint} />
-      {/* Header */}
-      <header className="p-6 flex items-center justify-between">
-        <Link href={marketingHomeHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
+        <Link
+          href={marketingHomeHref}
+          className="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-white/60 hover:text-slate-900"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           {t('login.backToHome')}
         </Link>
 
-        {/* Language Selector */}
         <div className="relative" ref={langRef}>
           <button
+            type="button"
             onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-3 py-2 text-slate-800 shadow-sm backdrop-blur-sm transition-colors hover:border-slate-300 hover:bg-white"
+            aria-expanded={isLangOpen}
+            aria-haspopup="listbox"
           >
             <LocaleFlagWithCode locale={locale} />
-            <span className="hidden sm:inline text-sm text-gray-600">{localeNames[locale]}</span>
-            <svg 
-              className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180': ''}`} 
-              fill="none" 
-              stroke="currentColor" 
+            <span className="hidden text-sm text-slate-600 sm:inline">{localeNames[locale]}</span>
+            <svg
+              className={`h-4 w-4 text-slate-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
-          {/* Dropdown */}
           {isLangOpen && (
-            <div className="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-xl">
+            <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg ring-1 ring-black/5">
               {locales.map((langCode) => (
                 <button
                   key={langCode}
+                  type="button"
                   onClick={() => handleLanguageSelect(langCode)}
-                  className={`flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-100 ${
-                    locale === langCode ? 'text-accent': 'text-gray-800'
+                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-slate-50 ${
+                    locale === langCode ? 'bg-accent/5 font-medium text-accent' : 'text-slate-800'
                   }`}
                 >
                   <LocaleFlagEmoji locale={langCode} className="text-xl" />
                   <span>{localeNames[langCode]}</span>
                   {locale === langCode && (
-                    <svg className="w-5 h-5 ml-auto text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="ml-auto h-4 w-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -344,122 +356,128 @@ export default function LoginPage() {
         </div>
       </header>
 
-      {/* Login Form */}
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="text-center mb-10">
-            <Link href={marketingHomeHref}>
-              <span className="text-3xl font-bold">
-                <span className="text-accent">Vysion</span>
-              </span>
-            </Link>
-            <p className="mt-3 text-gray-800">
-              {t('login.logInToAccount')}
-            </p>
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-8 sm:py-12">
+        <div className="w-full max-w-[420px]">
+          <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_48px_-24px_rgba(14,93,130,0.35)]">
+            <div className="h-1 bg-gradient-to-r from-accent via-[#12739f] to-[#0a4a68]" aria-hidden />
+            <div className="px-6 pb-8 pt-8 sm:px-8">
+              <div className="mb-8 text-center">
+                <Link href={marketingHomeHref} className="inline-block">
+                  <span className="text-[1.75rem] font-bold tracking-tight text-accent sm:text-3xl">Vysion</span>
+                </Link>
+                <p className="mt-2 text-sm text-slate-600 sm:text-base">{t('login.logInToAccount')}</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5" autoComplete="on" method="post">
+                <div>
+                  <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-800">
+                    {t('login.emailAddress')} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="username"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    placeholder={t('login.emailPlaceholder')}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-800">
+                    {t('login.password')} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    ref={passwordInputRef}
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    placeholder=""
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
+                  />
+                  <p className="mt-2 text-xs leading-relaxed text-slate-500">{t('login.staySignedInHint')}</p>
+                </div>
+
+                {error && (
+                  <div className="rounded-xl border border-red-200/80 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isLoading || !email || !password.trim()}
+                  aria-busy={isLoading}
+                  className={LOGIN_PRIMARY_BTN}
+                >
+                  {isLoading ? (
+                    <>
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
+                        aria-hidden
+                      />
+                      <span>{t('login.loggingIn')}</span>
+                    </>
+                  ) : (
+                    <span>{`${t('login.loginButton')} →`}</span>
+                  )}
+                </button>
+
+                <Link
+                  href="/login/forgot-password"
+                  className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-[#0c5273]"
+                >
+                  {t('login.forgotPassword')}
+                </Link>
+              </form>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="relative space-y-6" autoComplete="on" method="post">
-              <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-800">
-                  {t('login.emailAddress')} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="username"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  placeholder={t('login.emailPlaceholder')}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-800">
-                  {t('login.password')} <span className="text-red-500">*</span>
-                </label>
-                <input
-                  ref={passwordInputRef}
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                  placeholder=""
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition-all placeholder:text-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/25"
-                />
-                <p className="mt-2 text-xs text-gray-500">{t('login.staySignedInHint')}</p>
-              </div>
-
-              {error && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isLoading || !email || !password.trim()}
-                aria-busy={isLoading}
-                className={`flex w-full touch-manipulation select-none items-center justify-center gap-2 py-4 font-semibold disabled:opacity-50 ${kassaPosButtonClass(false)}`}
-              >
-                {isLoading ? (
-                  <>
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear'}}
-                      className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
-                      aria-hidden
-                    />
-                    <span>{t('login.loggingIn')}</span>
-                  </>
-                ) : (
-                  <span>{`${t('login.loginButton')} →`}</span>
-                )}
-              </button>
-
-              <Link
-                href="/login/forgot-password"
-                className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-accent/80"
-              >
-                {t('login.forgotPassword')}
-              </Link>
-            </form>
-
-          {/* Help Links */}
-          <div className="mt-8 space-y-4">
-              <Link
-                href="/login/troubleshooting"
-                className="group flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm transition-colors hover:border-gray-300 hover:bg-gray-50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15">
-                    <svg className="h-5 w-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{t('login.troubleshooting.title')}</p>
-                    <p className="text-sm text-gray-600">{t('login.troubleshooting.subtitle')}</p>
-                  </div>
-                </div>
-                <svg className="h-5 w-5 text-gray-400 transition-colors group-hover:text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          <Link
+            href="/login/troubleshooting"
+            className="group mt-5 flex w-full items-center justify-between rounded-xl border border-slate-200/90 bg-white/80 px-4 py-3.5 shadow-sm backdrop-blur-sm transition-colors hover:border-slate-300 hover:bg-white"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                <svg className="h-5 w-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
                 </svg>
-              </Link>
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="font-medium text-slate-900">{t('login.troubleshooting.title')}</p>
+                <p className="truncate text-sm text-slate-600 sm:whitespace-normal">{t('login.troubleshooting.subtitle')}</p>
+              </div>
             </div>
+            <svg
+              className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-hover:text-accent"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="p-6 text-center text-sm text-gray-600">
+      <footer className="relative z-10 px-4 py-6 text-center text-xs text-slate-500 sm:text-sm">
         © {new Date().getFullYear()} Vysion Group. {t('login.copyright')}
       </footer>
     </main>
