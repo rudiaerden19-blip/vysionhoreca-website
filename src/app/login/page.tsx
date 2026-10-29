@@ -69,10 +69,7 @@ export default function LoginPage() {
     if (typeof window === 'undefined') return
     const origin = window.location.origin
     const term = readTerminalLogout()
-    if (term?.kind === 'superadmin') {
-      window.location.replace(`${origin}/superadmin/login`)
-      return
-    }
+    // Superadmin terminal-logout: /login blijft zaak-login (geen redirect naar /superadmin/login).
 
     const params = new URLSearchParams(window.location.search)
     const nextRaw = params.get('next')
