@@ -435,7 +435,7 @@ export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
   'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
   KASSA_SPEELS_MENU_TILE_BUTTON_CLASS,
   KASSA_POS_BTN_SHAPE,
-  'border-0 bg-[#282828]',
+  'bg-[#282828]',
   'transition-transform duration-150 ease-out',
   'active:scale-[0.96] active:translate-y-[1px]',
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
