@@ -380,7 +380,7 @@ export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
   `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_FILM =
-  'pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,transparent_0%,transparent_62%,rgba(40,40,40,0.2)_88%,rgba(40,40,40,0.55)_100%)]'
+  'pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,transparent_0%,transparent_58%,rgba(40,40,40,0.35)_86%,rgba(40,40,40,0.85)_100%)]'
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_POS_MENU_TILE_STUDIO_BG}`
@@ -394,12 +394,12 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
-/** Speels: titelstrook — #282828 + korrel; overlap + onderhoek = tegel-radius. */
+/** Speels: titelstrook — #282828 + korrel; hoeken = tegel overflow-hidden (geen dubbele radius). */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
-  `pointer-events-none relative z-[2] -mt-0.5 box-border w-full max-w-full shrink-0 overflow-hidden rounded-b-xl ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2 pt-2 sm:px-3`
+  `pointer-events-none relative z-[2] -mt-1 box-border w-full max-w-full shrink-0 bg-[#282828] ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2 pt-2 sm:px-3`
 
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA =
-  `pointer-events-none relative z-[2] -mt-0.5 box-border w-full max-w-full shrink-0 overflow-hidden rounded-b-xl ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-1.5 pt-1.5 sm:px-3 sm:pb-2`
+  `pointer-events-none relative z-[2] -mt-1 box-border w-full max-w-full shrink-0 bg-[#282828] ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-1.5 pt-1.5 sm:px-3 sm:pb-2`
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-white sm:text-[15px] md:text-base'
