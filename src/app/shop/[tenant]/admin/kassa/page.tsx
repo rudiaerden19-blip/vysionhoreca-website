@@ -490,7 +490,7 @@ function kassaFooterActionTouchMinHClass(density: KassaChromeDensity, denseBill:
 /** Op rekening + Verwijder: volle breedte, tekst mag wrappen. */
 const KASSA_SIDEBAR_PAIR_BTN_MIN_H = 'min-h-[3.75rem] py-2.5 sm:min-h-[4rem]'
 const kassaSidebarPairLabelClass =
-  'max-w-full text-center text-[11px] font-bold leading-snug whitespace-normal break-words px-2 sm:text-xs'
+  'max-w-full text-center text-sm font-bold leading-tight tracking-[0.03em] whitespace-normal break-words px-2 sm:text-lg'
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
