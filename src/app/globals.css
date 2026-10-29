@@ -919,7 +919,7 @@ input[type="number"] {
     rgba(255, 255, 255, 0.22) 58%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: kassa-speels-online-glow-sweep 2.4s ease-in-out infinite;
+  animation: kassa-speels-online-glow-sweep 8s ease-in-out infinite;
   z-index: 2;
 }
 
