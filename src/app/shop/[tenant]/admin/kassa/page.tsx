@@ -5896,11 +5896,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <div className="pointer-events-auto flex min-w-0 max-w-full justify-center">
               {renderKassaTenantNameButton(
                 kassaWide15Chrome
-                  ? 'text-sm sm:text-base'
-                  : 'text-base sm:text-lg md:text-xl lg:text-2xl',
+                  ? 'text-base sm:text-lg'
+                  : 'text-lg sm:text-xl md:text-2xl lg:text-3xl',
                 kassaWide15Chrome
-                  ? 'max-w-[min(100%,14rem)]'
-                  : 'max-w-[min(100%,22rem)] sm:max-w-[min(100%,26rem)] md:max-w-[min(100%,32rem)]',
+                  ? 'max-w-[min(100%,16rem)]'
+                  : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
               )}
             </div>
           </div>
@@ -5918,7 +5918,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
           {renderKassaTenantNameButton(
-            'text-sm sm:text-base md:text-lg',
+            'text-base sm:text-lg md:text-xl',
             'w-full',
           )}
         </div>
