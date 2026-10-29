@@ -3,7 +3,6 @@ import {
   type KassaUiLayoutId,
 } from '@/lib/kassa-ui-layout'
 import {
-  KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_POS_MENU_RECESS_TRAY_CLASS,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -46,8 +45,7 @@ export function kassaLayoutPlateBgClass(layout: KassaUiLayoutId): string {
   if (layout === 'speels') return KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
   if (layout === 'luxe') return 'bg-transparent'
   if (layout === 'light') return 'bg-[#e3e3e3]'
-  /** Korrelkader (klassiek); tegel-scroll blijft effen via kassaLayoutMenuScrollFlatBgClass. */
-  return KASSA_POS_MENU_PLATE_SHELL_BG_CLASS
+  return 'bg-[#0b0f14]'
 }
 
 /** Effen vlak achter tegels — geen korrel in het raster zelf. */
