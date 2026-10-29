@@ -477,7 +477,23 @@ input[type="number"] {
     url('/images/kassa-dark-frame-grain.png');
   background-size: 512px 512px;
   background-repeat: repeat;
-  background-blend-mode: soft-light;
+  background-blend-mode: overlay;
+}
+
+/* Menu-tegels Dark — vaste compositing, geen flikkern bij hover (Safari 1px-lijn). */
+.kassa-speels-menu-tile {
+  border: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.kassa-speels-menu-tile:hover,
+.kassa-speels-menu-tile:focus,
+.kassa-speels-menu-tile:focus-visible {
+  outline: none !important;
 }
 
 /*
