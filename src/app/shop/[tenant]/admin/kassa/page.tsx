@@ -6071,7 +6071,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {kassaPosLuxury ? (
             <time
               dateTime={kassaSidebarClock.toISOString()}
-              className={`relative z-20 shrink-0 font-bold tracking-[0.04em] whitespace-nowrap px-1 sm:px-2 ${
+              className={`relative z-20 -ml-[3cm] shrink-0 font-bold tracking-[0.04em] whitespace-nowrap px-1 sm:px-2 ${
                 posChrome === 'speels'
                   ? 'text-sm text-[#b0b0b0] sm:text-base'
                   : 'text-sm text-zinc-100 sm:text-base'
