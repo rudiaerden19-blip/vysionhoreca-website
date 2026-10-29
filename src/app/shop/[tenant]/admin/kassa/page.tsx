@@ -5755,6 +5755,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
+        kassaSpeelsChrome={kassaPosLuxury && posChrome === 'speels'}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
         onConfirm={() => {
           setLogoutSoftwareConfirmOpen(false)
