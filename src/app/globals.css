@@ -469,6 +469,17 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
+/* Titelstrook menu-tegels — alle tenants, layout Dark (speels); zelfde korrel als kader. */
+.kassa-speels-tile-label-grain {
+  background-color: #282828;
+  background-image:
+    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
+    url('/images/kassa-dark-frame-grain.png');
+  background-size: 512px 512px;
+  background-repeat: repeat;
+  background-blend-mode: soft-light;
+}
+
 /* Speels besteltype (Ter plaatse / Afhalen / Levering) — midden ~#363636 + reflectieschijn. */
 .kassa-speels-order-type-btn {
   background: linear-gradient(180deg, #2a2a2a 0%, #363636 46%, #2c2c2c 100%);
