@@ -222,6 +222,8 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
 
 export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
+export const KASSA_SPEELS_RED_GLOSS_BTN_CLASS = 'kassa-speels-red-gloss-btn'
+export const KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS = 'kassa-speels-green-gloss-btn'
 
 const KASSA_SPEELS_CHROME_BTN_SHELL = [
   'touch-manipulation select-none relative isolate overflow-hidden font-semibold',
@@ -234,7 +236,7 @@ export function kassaSpeelsGrayChromeButtonClass(): string {
     .join(' ')
 }
 
-/** Zwart + zilverrand + glans (::before) — Afrekenen, Menu, Uitloggen, actieve keuze. */
+/** Zwart + zilverrand + glans (::before) — Menu, Uitloggen, actieve keuze. */
 export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
   return [
     KASSA_POS_BTN_SHAPE,
@@ -242,6 +244,32 @@ export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
     emphasis ? 'kassa-speels-black-gloss-btn--emphasis' : '',
     KASSA_SPEELS_CHROME_BTN_SHELL,
     'text-[#f5f5f5]',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+/** Rood + glans — Verwijder, help video's. */
+export function kassaSpeelsRedGlossButtonClass(emphasis = false): string {
+  return [
+    KASSA_POS_BTN_SHAPE,
+    KASSA_SPEELS_RED_GLOSS_BTN_CLASS,
+    emphasis ? 'kassa-speels-red-gloss-btn--emphasis' : '',
+    KASSA_SPEELS_CHROME_BTN_SHELL,
+    'text-white',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+/** Groen + glans — Afrekenen. */
+export function kassaSpeelsGreenGlossButtonClass(emphasis = false): string {
+  return [
+    KASSA_POS_BTN_SHAPE,
+    KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS,
+    emphasis ? 'kassa-speels-green-gloss-btn--emphasis' : '',
+    KASSA_SPEELS_CHROME_BTN_SHELL,
+    'text-white',
   ]
     .filter(Boolean)
     .join(' ')
@@ -266,9 +294,17 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsBlackGlossButtonClass(false)} font-bold`
+    return `${kassaSpeelsGreenGlossButtonClass(true)} font-bold`
   }
   return KASSA_POS_CHECKOUT_BTN
+}
+
+/** Zijbalk Verwijder — speels rood glanzend. */
+export function kassaPosRemoveButtonClass(look: KassaPosChromeLook = 'luxe'): string {
+  if (look === 'speels') {
+    return `${kassaSpeelsRedGlossButtonClass(false)} font-semibold`
+  }
+  return kassaPosButtonClass(false, look)
 }
 
 export function kassaPosRaisedStripClass(look: KassaPosChromeLook = 'luxe'): string {

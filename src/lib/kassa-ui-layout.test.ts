@@ -95,14 +95,14 @@ describe('Speels bruine knoppen', () => {
     expect(kassaPosQuickMenuPanelButtonClass('speels')).not.toContain('#d4b483')
   })
 
-  it('maakt geselecteerde Speels-knoppen zwart met zilveren rand', () => {
+  it('maakt geselecteerde Speels-knoppen zwart glanzend', () => {
     const selected = kassaPosButtonClass(true, 'speels')
-    expect(selected).toContain('#c8c8c8')
+    expect(selected).toContain('kassa-speels-black-gloss-btn')
     expect(selected).not.toContain('#c4a46a')
   })
 
-  it('maakt Afrekenen in Speels zwart met zilveren rand', () => {
-    expect(kassaPosCheckoutButtonClass('speels')).toContain('#c8c8c8')
-    expect(kassaPosCheckoutButtonClass('speels')).not.toContain('#c4a46a')
+  it('maakt Afrekenen in Speels groen glanzend', () => {
+    expect(kassaPosCheckoutButtonClass('speels')).toContain('kassa-speels-green-gloss-btn')
+    expect(kassaPosCheckoutButtonClass('speels')).not.toContain('kassa-speels-black-gloss-btn')
   })
 })

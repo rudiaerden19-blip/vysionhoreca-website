@@ -152,6 +152,8 @@ import {
   kassaSpeelsBlackGlossButtonClass,
   kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsOrderTypeButtonClass,
+  kassaSpeelsRedGlossButtonClass,
+  kassaPosRemoveButtonClass,
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosCartQtyButtonClass,
@@ -5932,7 +5934,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             onClick={() => openKassaHelp()}
             className={`${
               kassaPosLuxury
-                ? `${kassaHeaderQuickLinkShell} ${kassaHelpOpen ? kassaSpeelsBlackGlossButtonClass(true) : kassaSpeelsGrayChromeButtonClass()}`
+                ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsRedGlossButtonClass(kassaHelpOpen)}`
                 : `${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE}`
             } ${kassaHelpOpen && !kassaPosLuxury ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''}`}
             title={t('kassaApp.helpVideoButton')}
@@ -6967,7 +6969,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                  className={`flex items-center justify-center px-1 ${kassaPosRemoveButtonClass(posChrome)} ${kassaFooterActionTouchMinHClass(
                     kassaChromeDensity,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -6997,7 +6999,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${kassaPosButtonClass(false, posChrome)}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${kassaPosRemoveButtonClass(posChrome)}`}
                   title={t('kassaApp.remove')}
                   aria-label={t('kassaApp.remove')}
                 >
