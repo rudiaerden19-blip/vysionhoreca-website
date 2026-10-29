@@ -125,6 +125,8 @@ import {
   KASSA_NUMPAD_CART_RECESS_MOTION,
   KASSA_NUMPAD_PANEL_SLIDE_MOTION,
   KASSA_POS_CART_THUMB_SHELL,
+  KASSA_MENU_TILE_TOUCH_PRESS,
+  KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
@@ -668,8 +670,12 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 })
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
-const KASSA_MENU_TILE_BUTTON_CLASS_BASE =
-  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)] active:brightness-95'
+const KASSA_MENU_TILE_BUTTON_CLASS_BASE = [
+  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)]',
+  'active:shadow-[inset_0_3px_10px_rgba(0,0,0,0.22)] active:ring-2 active:ring-inset active:ring-accent/45',
+  KASSA_MENU_TILE_TOUCH_PRESS,
+  KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
+].join(' ')
 
 /** Standaard: rastercel wordt **items-stretch** ⇒ knop moet **`h-full`**. */
 const KASSA_MENU_TILE_BUTTON_CLASS = `${KASSA_MENU_TILE_BUTTON_CLASS_BASE} h-full`
@@ -751,7 +757,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       <button
         type="button"
         data-kassa-category-id={category.id != null ? String(category.id) : undefined}
-        className={`touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+        className={`relative overflow-hidden touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left ${KASSA_MENU_TILE_TOUCH_PRESS} ${KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY} ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
       >
         <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {category.name}
@@ -903,7 +909,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       <button
         type="button"
         data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-        className={`touch-manipulation select-none relative flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left active:brightness-95 ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+        className={`relative overflow-hidden touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left ${KASSA_MENU_TILE_TOUCH_PRESS} ${KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY} ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
       >
         <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {product.name}

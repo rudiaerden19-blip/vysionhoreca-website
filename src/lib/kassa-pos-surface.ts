@@ -267,6 +267,22 @@ export const KASSA_POS_ZONE_BTN_LABEL =
 const KASSA_MENU_TILE_FACE =
   'bg-[linear-gradient(180deg,#3a3228_0%,#2a241c_48%,#1c1814_100%)]'
 
+/** Zichtbare tik op categorie-/producttegels (menu-grid, alle tenants/themes). */
+export const KASSA_MENU_TILE_TOUCH_PRESS = [
+  'transition-[transform,filter,box-shadow] duration-100 ease-out',
+  'active:scale-[0.96]',
+  'active:brightness-[0.86]',
+  'motion-reduce:transition-none motion-reduce:active:scale-100',
+].join(' ')
+
+/** Donkere flash over tegel tijdens `:active` (knop moet `relative overflow-hidden` zijn). */
+export const KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY = [
+  'after:pointer-events-none after:absolute after:inset-0 after:z-[8]',
+  'after:rounded-[inherit] after:opacity-0 after:content-[""]',
+  'after:transition-opacity after:duration-75 after:bg-black/22',
+  'active:after:opacity-100',
+].join(' ')
+
 /** Categorie-/producttegel — luxe donkere kaart op korrelvlak. */
 export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
@@ -277,7 +293,9 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   'transition-[transform,box-shadow,filter] duration-150 ease-out',
   'hover:brightness-[1.04]',
   'hover:shadow-[0_6px_14px_rgba(0,0,0,0.58),0_0_14px_rgba(212,180,131,0.16)]',
-  'active:translate-y-[1px] active:brightness-[0.93]',
+  'active:scale-[0.96] active:translate-y-[2px] active:brightness-[0.84]',
+  'active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.42)]',
+  KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 
 /** Fotovlak — studio-vignette zoals de afgesproken look: licht midden, donker naar de randen. */
