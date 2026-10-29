@@ -186,7 +186,6 @@ import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-numbe
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
-import { KassaAnalogClock } from '@/components/kassa/KassaAnalogClock'
 import { KassaTablePickerGrid } from '@/components/kassa/KassaTablePickerGrid'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { LocalePickerPortalMenu } from '@/components/LocalePickerPortalMenu'
@@ -6693,22 +6692,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
               <div className="flex min-h-[15rem] flex-1 flex-col justify-end">
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {kassaStaffClockEnabled && !demoViewOnly ? (
-                  <button
-                    type="button"
-                    onClick={() => openStaffClockModal()}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={72} />
-                  </button>
-                ) : null}
-                <div
-                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${
-                    kassaStaffClockEnabled && !demoViewOnly ? 'flex-1': 'w-full'
-                  }`}
-                >
+                <div className="flex min-w-0 w-full flex-col justify-center gap-0.5">
                   {!kassaAppearanceDark ? (
                     <p
                       className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
@@ -6788,21 +6772,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`}
               >
               <div
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg} ${kassaStaffClockEnabled && !demoViewOnly ? '' : 'justify-end'}`}
+                  className={`flex shrink-0 items-center justify-end gap-2 rounded-lg px-2 py-1 ${ui.numpadBarBg}`}
                 >
-                  {kassaStaffClockEnabled && !demoViewOnly ? (
-                    <button
-                      type="button"
-                      onClick={() => openStaffClockModal()}
-                      className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                      title={t('staffClock.buttonTitle')}
-                      aria-label={t('staffClock.buttonTitle')}
-                    >
-                      <KassaAnalogClock size={48} />
-                    </button>
-                  ) : null}
                   <p
-                    className={`min-w-0 truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta} ${kassaStaffClockEnabled && !demoViewOnly ? 'flex-1': 'w-full'}`}
+                    className={`min-w-0 w-full truncate whitespace-nowrap text-right text-[11px] font-semibold leading-tight tracking-tight ${ui.numpadMeta}`}
                     title={numpadHeaderDateLabel}
                     aria-live="polite"
                   >
@@ -6848,22 +6821,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-numpad-panel"
               >
               <div className={`mb-3 flex shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-2 ${ui.numpadBarBg}`}>
-                {kassaStaffClockEnabled && !demoViewOnly ? (
-                  <button
-                    type="button"
-                    onClick={() => openStaffClockModal()}
-                    className={`shrink-0 active:scale-[0.98] transition-all ${ui.clockTileBg} ${ui.clockTileHover}`}
-                    title={t('staffClock.buttonTitle')}
-                    aria-label={t('staffClock.buttonTitle')}
-                  >
-                    <KassaAnalogClock size={72} />
-                  </button>
-                ) : null}
-                <div
-                  className={`min-w-0 flex flex-col justify-center gap-0.5 ${
-                    kassaStaffClockEnabled && !demoViewOnly ? 'flex-1': 'w-full'
-                  }`}
-                >
+                <div className="flex min-w-0 w-full flex-col justify-center gap-0.5">
                   {!kassaAppearanceDark ? (
                     <p
                       className={`truncate whitespace-nowrap text-right text-xs font-semibold leading-tight tracking-tight sm:text-sm ${ui.numpadMeta}`}
