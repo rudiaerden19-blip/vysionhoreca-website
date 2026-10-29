@@ -79,6 +79,16 @@ export function formatKlantschermWaitingClock(date: Date, _locale: Locale, _opts
   return `${hours}:${minutes}`
 }
 
+/** Kassa header — volledige weekdag + HH:mm in app-taal (lokale systeemtijd). */
+export function formatKassaHeaderWeekdayClock(date: Date, locale: Locale): string {
+  const tag = appIntlLocaleTag(locale)
+  let weekday = new Intl.DateTimeFormat(tag, { weekday: 'long' }).format(date)
+  if (weekday.length > 0) {
+    weekday = weekday.charAt(0).toLocaleUpperCase(tag) + weekday.slice(1)
+  }
+  return `${weekday} ${formatKlantschermWaitingClock(date, locale)}`
+}
+
 /** Uren en minuten apart voor grote digitale klok (knipperende dubbele punt). */
 export function formatKlantschermWaitingClockParts(
   date: Date,

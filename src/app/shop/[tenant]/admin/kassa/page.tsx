@@ -186,8 +186,8 @@ import {
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
 import {
+  formatKassaHeaderWeekdayClock,
   formatKassaNumpadHeaderDate,
-  formatKlantschermWaitingClock,
 } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
@@ -1266,7 +1266,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return () => window.clearInterval(id)
   }, [])
   const kassaSidebarDigitalTime = useMemo(
-    () => formatKlantschermWaitingClock(kassaSidebarClock, locale),
+    () => formatKassaHeaderWeekdayClock(kassaSidebarClock, locale),
     [kassaSidebarClock, locale],
   )
   const numpadHeaderDateLabel = useMemo(
@@ -6068,6 +6068,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </nav>
         </div>
 
+          {kassaPosLuxury ? (
+            <time
+              dateTime={kassaSidebarClock.toISOString()}
+              className={`relative z-20 shrink-0 font-bold tracking-[0.04em] whitespace-nowrap px-1 sm:px-2 ${
+                posChrome === 'speels'
+                  ? 'text-sm text-[#b0b0b0] sm:text-base'
+                  : 'text-sm text-zinc-100 sm:text-base'
+              }`}
+            >
+              {kassaSidebarDigitalTime}
+            </time>
+          ) : null}
+
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
               ref={langTriggerRef}
@@ -6455,32 +6468,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
-        {kassaPosLuxury ? (
-          <div
-            className={`flex shrink-0 items-center justify-center ${
-              kassaWide15Chrome ? 'px-2 pt-2 pb-0.5' : 'px-3 pt-2.5 pb-0.5 sm:px-3'
-            }`}
-          >
-            <time
-              dateTime={kassaSidebarClock.toISOString()}
-              className={`tabular-nums font-bold tracking-[0.08em] ${
-                posChrome === 'speels'
-                  ? 'text-[1.65rem] text-[#b0b0b0] sm:text-2xl'
-                  : 'text-xl text-zinc-100 sm:text-2xl'
-              }`}
-            >
-              {kassaSidebarDigitalTime}
-            </time>
-          </div>
-        ) : null}
-
         {/* Zone: Verkoop / Binnen / Terras */}
         <div
           className={`shrink-0 ${
             kassaWide15Chrome
-              ? 'px-2 pt-1 pb-0.5'
+              ? 'px-2 pt-2 pb-0.5'
               : kassaAppearanceDark
-                ? 'px-2.5 pt-1 pb-1 sm:px-3'
+                ? 'px-2.5 pt-3 pb-1 sm:px-3'
                 : 'px-2 pt-1.5 pb-1'
           }`}
         >
