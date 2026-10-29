@@ -84,7 +84,10 @@ export function formatKassaHeaderWeekdayClockParts(
   locale: Locale,
 ): { weekday: string; datePart: string; hours: string; minutes: string; colonVisible: boolean } {
   const tag = appIntlLocaleTag(locale)
-  const weekday = new Intl.DateTimeFormat(tag, { weekday: 'long' }).format(date).toLocaleLowerCase(tag)
+  let weekday = new Intl.DateTimeFormat(tag, { weekday: 'long' }).format(date)
+  if (weekday.length > 0) {
+    weekday = weekday.charAt(0).toLocaleUpperCase(tag) + weekday.slice(1).toLocaleLowerCase(tag)
+  }
   const datePart = new Intl.DateTimeFormat(tag, {
     day: '2-digit',
     month: '2-digit',
@@ -95,7 +98,7 @@ export function formatKassaHeaderWeekdayClockParts(
   return { weekday, datePart, hours, minutes, colonVisible }
 }
 
-/** Kassa header — weekdag + DD/MM/JJJJ + HH:mm (lokale systeemtijd), bv. „vrijdag 30/10/2026  00:14”. */
+/** Kassa header — weekdag + DD/MM/JJJJ + HH:mm (lokale systeemtijd), bv. „Vrijdag 30/10/2026  00:14”. */
 export function formatKassaHeaderWeekdayClock(date: Date, locale: Locale): string {
   const { weekday, datePart, hours, minutes } = formatKassaHeaderWeekdayClockParts(date, locale)
   return `${weekday} ${datePart}  ${hours}:${minutes}`
