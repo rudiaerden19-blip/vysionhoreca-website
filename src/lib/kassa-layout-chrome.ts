@@ -37,8 +37,9 @@ export const KASSA_CLASSIC_BTN_FACE_ON =
 export const KASSA_CLASSIC_ACTION_BTN_FACE = KASSA_CLASSIC_BTN_FACE
 export const KASSA_CLASSIC_ACTION_BTN_FACE_ON = KASSA_CLASSIC_BTN_FACE_ON
 
-export function kassaLayoutPosChrome(_layout: KassaUiLayoutId): KassaPosChromeLook {
-  return 'speels'
+/** Alleen Mode Dark (`speels`) gebruikt gloss-chrome; andere modes ongemoeid. */
+export function kassaLayoutPosChrome(layout: KassaUiLayoutId): KassaPosChromeLook {
+  return layout === 'speels' ? 'speels' : 'luxe'
 }
 
 export function kassaLayoutPlateBgClass(layout: KassaUiLayoutId): string {

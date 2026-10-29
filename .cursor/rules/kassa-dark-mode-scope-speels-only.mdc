@@ -1,0 +1,19 @@
+# Kassa — alleen Mode Dark (`speels`)
+
+**Scope eigenaar:** UI-werk **uitsluitend** voor **Mode Dark** (`kassa_ui_layout = 'speels'`, `kassaUiLayoutUsesPosLuxury`).
+
+## Verplicht
+
+- Conditionals: `kassaLayout === 'speels'` of `kassaPosLuxury` / `kassaUiLayoutUsesPosLuxury`.
+- CSS/classes: `kassa-speels-*`, `KASSA_SPEELS_*`, `createKassaSpeelsRegisterUiTheme`.
+- Multi-tenant: geen slug; zelfde code voor elke tenant met `speels`.
+
+## Niet doen (tenzij expliciete opdracht)
+
+- **Light** (`light`) en **Klassiek** (`dark`) niet stylen, refactoren of gelijk trekken met Dark.
+- Geen migraties `dark` → `speels`.
+- Geen uitleg/tests die Light/Klassiek “meenemen” — die modes laten zoals ze zijn.
+
+## Horeca-kassa
+
+Dark-pass: `src/app/shop/[tenant]/admin/kassa/page.tsx` + `globals.css` speels + `kassa-pos-surface.ts` speels helpers.

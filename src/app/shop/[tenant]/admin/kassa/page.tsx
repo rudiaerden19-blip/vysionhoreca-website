@@ -103,7 +103,11 @@ import {
 } from '@/lib/kassa-menu-product-options'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
-import { kassaLayoutMenuScrollFlatBgClass, kassaLayoutPlateBgClass } from '@/lib/kassa-layout-chrome'
+import {
+  kassaLayoutMenuScrollFlatBgClass,
+  kassaLayoutPlateBgClass,
+  kassaLayoutPosChrome,
+} from '@/lib/kassa-layout-chrome'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
 import { KassaSoundActivationScreen } from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
@@ -162,7 +166,6 @@ import {
   KASSA_SPEELS_TOP_CHROME_BTN_CLASS,
   KASSA_SPEELS_TENANT_NAME_CLASS,
   kassaPosRemoveButtonClass,
-  type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosCartQtyButtonClass,
   kassaPosCartTrashButtonClass,
@@ -1122,7 +1125,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaPosLuxury = kassaUiLayoutUsesPosLuxury(kassaLayout)
   const kassaClassicDark = kassaLayout === 'dark'
   const kassaLight = kassaLayout === 'light'
-  const posChrome: KassaPosChromeLook = 'speels'
+  const posChrome = kassaLayoutPosChrome(kassaLayout)
   const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
   const kassaRecessTrayClass =
     kassaLayout === 'speels'
@@ -5525,13 +5528,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : 'bg-[#2a3548] text-white/75 hover:bg-[#354158]'
     }`
 
-  const kassaPosOrderTypeButtonClass = (selected: boolean) => {
-    if (!kassaPosLuxury) return kassaLightOrderTypeButtonClass(selected)
+  const kassaSpeelsSidebarChromeButtonClass = (selected: boolean) => {
     const shell = `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)}`
-    if (posChrome === 'speels') {
-      return `${shell} ${kassaSpeelsOrderTypeButtonClass(selected)}`
-    }
-    return `${shell} ${kassaPosButtonClass(selected, posChrome)}`
+    return `${shell} ${kassaSpeelsOrderTypeButtonClass(selected)}`
+  }
+
+  const kassaPosOrderTypeButtonClass = (selected: boolean) => {
+    if (kassaLayout === 'speels') return kassaSpeelsSidebarChromeButtonClass(selected)
+    return kassaLightOrderTypeButtonClass(selected)
   }
 
   const kassaSidebarZoneLabelClass =
@@ -5755,7 +5759,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
-        kassaSpeelsChrome={kassaAppearanceDark}
+        kassaSpeelsChrome={kassaPosLuxury}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
         onConfirm={() => {
           setLogoutSoftwareConfirmOpen(false)
@@ -6529,8 +6533,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex min-w-0 flex-1 items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaChromeDensity,
                 )} ${
-                  kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'sales', posChrome)}`
+                  kassaLayout === 'speels'
+                    ? `font-semibold ${kassaSpeelsOrderTypeButtonClass(kassaZoneTab === 'sales')}`
                     : kassaLight
                       ? `rounded-xl font-bold ${kassaZoneTab === 'sales' ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
                     : `rounded-xl font-bold ${kassaZoneTab === 'sales' ? KASSA_CLASSIC_ACTION_BTN_FACE_ON : KASSA_CLASSIC_ACTION_BTN_FACE}`
@@ -6558,8 +6562,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaChromeDensity,
                 )} ${
-                  kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'inside', posChrome)}`
+                  kassaLayout === 'speels'
+                    ? `font-semibold ${kassaSpeelsOrderTypeButtonClass(kassaZoneTab === 'inside')}`
                     : kassaLight
                       ? `rounded-xl font-bold ${kassaZoneTab === 'inside' ? KASSA_LIGHT_BTN_FACE_ON : KASSA_LIGHT_BTN_FACE}`
                     : `rounded-xl font-bold ${kassaZoneTab === 'inside' ? KASSA_CLASSIC_ACTION_BTN_FACE_ON : KASSA_CLASSIC_ACTION_BTN_FACE}`
@@ -6591,8 +6595,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaChromeDensity,
                 )} ${
-                  kassaPosLuxury
-                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace', posChrome)}`
+                  kassaLayout === 'speels'
+                    ? `font-semibold ${kassaSpeelsOrderTypeButtonClass(kassaZoneTab === 'terrace')}`
                     : `rounded-xl font-bold ${kassaZoneTab === 'terrace' ? KASSA_TERRACE_BTN_FACE_ON : KASSA_TERRACE_BTN_FACE}`
                 }`}
               >

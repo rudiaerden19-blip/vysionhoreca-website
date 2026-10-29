@@ -42,7 +42,7 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
 
   it('Dark (speels) houdt afrekenen, knoppen zijn lichter grijs', () => {
     expect(kassaLayoutPosChrome('speels')).toBe('speels')
-    expect(kassaLayoutPosChrome('dark')).toBe('speels')
+    expect(kassaLayoutPosChrome('dark')).toBe('luxe')
     expect(kassaLayoutChromeBtnClass('speels', false)).toContain('#5a5a5a')
     expect(kassaLayoutChromeBtnClass('speels', false)).not.toBe(kassaPosButtonClass(false, 'speels'))
     expect(kassaLayoutCheckoutBtnClass('speels')).toBe(kassaPosCheckoutButtonClass('speels'))

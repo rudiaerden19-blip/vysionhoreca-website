@@ -15,6 +15,7 @@ import {
   KASSA_UI_APPEARANCE_TOGGLE_ENABLED,
   useKassaUiLayoutSync,
 } from '@/lib/kassa-register-ui-dark-preference'
+import { kassaUiLayoutUsesPosLuxury } from '@/lib/kassa-ui-layout'
 import {
   RETAIL_GRAY_BTN_FACE,
   kassaLayoutCheckoutBtnClass,
@@ -2328,7 +2329,7 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
-        kassaSpeelsChrome={appearanceDark}
+        kassaSpeelsChrome={kassaUiLayoutUsesPosLuxury(kassaLayout)}
         onCancel={() => setLogoutSoftwareConfirmOpen(false)}
         onConfirm={() => {
           setLogoutSoftwareConfirmOpen(false)
