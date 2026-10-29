@@ -456,14 +456,17 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Mode «Dark» (layout speels): grovere, zichtbaardere korrel op kader — niet in tegel-recess. */
+/*
+ * Mode «Dark» (layout speels) — alle tenants. Korrel op kader/shell; tegel-scroll blijft effen (#333).
+ * Grof + contrast: grote herhaaltegel, sterke overlay (geen background-attachment:fixed).
+ */
 .kassa-speels-plate-grain {
-  --kassa-plate-grain-tile: 176px;
-  background-color: #2a2a2a;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.45 0 0 0 -0.18 0 1.45 0 0 -0.18 0 0 1.45 0 -0.18 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.82'/%3E%3C/svg%3E");
+  --kassa-plate-grain-tile: 208px;
+  background-color: #262626;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.55 0 0 0 -0.22 0 1.55 0 0 -0.22 0 0 1.55 0 -0.22 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.94'/%3E%3C/svg%3E");
   background-size: var(--kassa-plate-grain-tile) var(--kassa-plate-grain-tile);
   background-repeat: repeat;
-  background-blend-mode: soft-light;
+  background-blend-mode: overlay;
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
