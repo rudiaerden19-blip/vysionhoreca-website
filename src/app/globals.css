@@ -461,7 +461,9 @@ input[type="number"] {
  */
 .kassa-speels-plate-grain {
   background-color: #282828;
-  background-image: url('/images/kassa-dark-frame-grain.png');
+  background-image:
+    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
+    url('/images/kassa-dark-frame-grain.png');
   background-size: 512px 512px;
   background-repeat: repeat;
   background-blend-mode: overlay;
