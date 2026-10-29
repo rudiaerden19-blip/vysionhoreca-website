@@ -6,6 +6,7 @@ import {
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
+  KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS,
   kassaPosCheckoutButtonClass,
   kassaPosRaisedStripClass,
   type KassaPosChromeLook,
@@ -46,11 +47,9 @@ export function kassaLayoutPlateBgClass(layout: KassaUiLayoutId): string {
   return 'bg-[#0b0f14]'
 }
 
-/** Achtergrond menu-scroll — speels: korrelvlak #282828 (tegels “plakken” erop). */
+/** Achtergrond menu-scroll — speels: effen #333 (korrel alleen op kader). */
 export function kassaLayoutMenuScrollFlatBgClass(layout: KassaUiLayoutId): string {
-  if (layout === 'speels') {
-    return `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} kassa-speels-menu-scroll`
-  }
+  if (layout === 'speels') return KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS
   if (layout === 'dark') return 'bg-[#151a21]'
   return ''
 }

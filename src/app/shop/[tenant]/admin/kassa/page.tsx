@@ -6157,9 +6157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${kassaLayoutMenuScrollFlatBgClass(kassaLayout)} ${
-              kassaLayout === 'speels' ? 'gks-menu-vignette' : ''
-            }`}
+            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${kassaLayoutMenuScrollFlatBgClass(kassaLayout)}`}
           >
             {menuLoading ? (
               <div data-testid="kassa-menu-loading" className={`flex items-center justify-center min-h-[12rem] text-lg ${ui.menuEmptyMuted}`}>{t('kassaApp.loading')}</div>

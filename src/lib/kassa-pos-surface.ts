@@ -6,7 +6,7 @@
 /**
  * Korrel op POS-kader (header/zijbalk/marge). Layout: Speels → `kassa-speels-plate-grain`;
  * Luxe → `kassa-luxe-leather-plane`; Klassiek (`dark`) → effen `#0b0f14` (geen korrel-class).
- * Speels menu-recess + scroll: korrel (#282828); tegels lichter met schaduw erop.
+ * Speels: korrel alleen op kader; tegel-scroll effen #333 — tegels 5 mm erop (CSS slab).
  */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
@@ -26,6 +26,9 @@ export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 export const KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS = 'kassa-speels-tile-label-grain'
 
 export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
+
+/** Effen grijs tegelveld (geen korrel — korrel alleen op kader via plate-shell). */
+export const KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS = 'bg-[#333333] kassa-speels-menu-scroll'
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
 export const KASSA_FLOOR_TERRACE_GRAIN_CLASS = 'gks-floor-terrace-grain'
