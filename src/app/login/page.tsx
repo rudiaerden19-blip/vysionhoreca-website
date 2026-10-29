@@ -343,12 +343,12 @@ export default function LoginPage() {
       <aside className="relative flex min-h-[220px] flex-col justify-between overflow-hidden bg-[#141210] px-8 py-10 lg:min-h-screen lg:w-[46%] xl:w-[50%]">
         <div
           className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/images/abonnement-onboarding-pos-restaurant.png')" }}
+          style={{ backgroundImage: "url('/images/login-brand-restaurant.jpg')" }}
           aria-hidden
         />
-        <div className="pointer-events-none absolute inset-0 bg-black/50" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-black/25" aria-hidden />
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/75 via-black/45 to-black/25"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/35 via-black/15 to-transparent"
           aria-hidden
         />
         <div className="relative z-10">
