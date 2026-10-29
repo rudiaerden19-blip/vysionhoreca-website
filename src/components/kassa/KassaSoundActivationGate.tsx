@@ -9,8 +9,8 @@ export function kassaSoundSessionKey(tenant: string): string {
   return `vysion_kassa_audio_ok_${tenant}`
 }
 
-/** Zelfde sfeerbeeld als login — met overlay leesbaar op alle kassa-thema’s. */
-export const KASSA_SOUND_ACTIVATION_RESTAURANT_BG = '/images/login-brand-restaurant.jpg'
+/** Kassa-in-horeca sfeerbeeld — met overlay leesbaar op alle kassa-thema’s. */
+export const KASSA_SOUND_ACTIVATION_RESTAURANT_BG = '/images/kassa-sound-activation-restaurant.jpg'
 
 export function KassaSoundActivationRestaurantBackdrop() {
   return (
