@@ -226,8 +226,8 @@ export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
     KASSA_POS_BTN_SHAPE,
     KASSA_SPEELS_ORDER_TYPE_BTN_CLASS,
     selected ? 'kassa-speels-order-type-btn--selected' : '',
-    'touch-manipulation select-none relative overflow-hidden font-semibold',
-    'transition-[transform,box-shadow] duration-100 ease-out',
+    'touch-manipulation select-none relative isolate overflow-hidden font-semibold',
+    'transition-transform duration-100 ease-out',
     'active:translate-y-px',
   ].join(' ')
 }

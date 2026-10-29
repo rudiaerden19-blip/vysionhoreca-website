@@ -497,55 +497,90 @@ input[type="number"] {
 }
 
 /*
- * Speels besteltype — blinkend/glanzend grijs: glans over volle bovenhelft (niet mat, geen oval over tekst).
+ * Speels besteltype — chrome/glossy grijs: lichte bovenkant + glaslaag (::before), tekst erboven.
  */
 .kassa-speels-order-type-btn {
-  color: #fafafa;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.85),
+    0 -1px 0 rgba(255, 255, 255, 0.12);
   background: linear-gradient(
     180deg,
-    #6a6a6a 0%,
-    #525252 8%,
-    rgba(255, 255, 255, 0.2) 9%,
-    #454545 22%,
-    #383838 48%,
-    #2e2e2e 72%,
-    #262626 100%
+    #c4c4c4 0%,
+    #9a9a9a 5%,
+    #6e6e6e 18%,
+    #565656 40%,
+    #484848 62%,
+    #3a3a3a 100%
   );
-  border: 1px solid #1a1a1a;
-  border-top: 1px solid rgba(255, 255, 255, 0.38);
+  border: 1px solid #222222;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #141414;
   box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.35);
+    0 3px 7px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
+}
+
+.kassa-speels-order-type-btn::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 46%;
+  z-index: 0;
+  border-radius: 0.65rem 0.65rem 45% 45%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 255, 255, 0.38) 42%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.kassa-speels-order-type-btn > * {
+  position: relative;
+  z-index: 1;
 }
 
 .kassa-speels-order-type-btn:active {
-  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 45%, #222222 100%);
-  border-top-color: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #5a5a5a 0%, #424242 55%, #353535 100%);
+  border-top-color: rgba(255, 255, 255, 0.35);
   box-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.45),
-    inset 0 3px 8px rgba(0, 0, 0, 0.5);
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 3px 7px rgba(0, 0, 0, 0.55);
+}
+
+.kassa-speels-order-type-btn:active::before {
+  opacity: 0.35;
 }
 
 .kassa-speels-order-type-btn--selected {
-  color: #ffffff;
   background: linear-gradient(
     180deg,
-    #787878 0%,
-    #5e5e5e 8%,
-    rgba(255, 255, 255, 0.28) 10%,
-    #505050 24%,
-    #424242 52%,
-    #343434 100%
+    #d8d8d8 0%,
+    #aaaaaa 5%,
+    #787878 18%,
+    #606060 42%,
+    #505050 100%
   );
-  border-color: #2a2a2a;
-  border-top-color: rgba(255, 255, 255, 0.48);
+  border-top-color: #ffffff;
   box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+    0 3px 9px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.kassa-speels-order-type-btn--selected::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
