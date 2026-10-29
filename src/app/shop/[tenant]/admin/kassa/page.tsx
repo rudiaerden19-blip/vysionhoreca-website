@@ -156,7 +156,6 @@ import {
   kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
-  KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS,
   kassaSpeelsGreenGlossButtonClass,
   kassaSpeelsBlueGlossButtonClass,
   kassaSpeelsCategoryStripButtonClass,
@@ -6099,7 +6098,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
                   ? posChrome === 'speels'
-                    ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS}`
+                    ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)}`
                     : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
                   : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
               }`}
