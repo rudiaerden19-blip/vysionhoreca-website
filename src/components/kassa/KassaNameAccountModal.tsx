@@ -43,8 +43,7 @@ import {
   parseOpenAmountInput,
 } from '@/lib/kassa-name-account-modal-ui'
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
-import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
-import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
+import { KassaOwnerPinOverlay } from '@/components/kassa/KassaOwnerPinOverlay'
 
 type Props = {
   open: boolean
@@ -96,9 +95,6 @@ export default function KassaNameAccountModal({
   const [payAmountEdited, setPayAmountEdited] = useState(false)
   const [payMethod, setPayMethod] = useState<KassaPaymentMethod>('CASH')
   const [deletePinOpen, setDeletePinOpen] = useState(false)
-  const [deletePinInput, setDeletePinInput] = useState('')
-  const [deletePinError, setDeletePinError] = useState<string | null>(null)
-  const [deletePinBusy, setDeletePinBusy] = useState(false)
   const nameInputRef = useRef<HTMLInputElement>(null)
 
   const focusNameInput = useCallback(() => {
@@ -126,9 +122,6 @@ export default function KassaNameAccountModal({
     setError(fresh.error)
     setPayAmountEdited(false)
     setDeletePinOpen(false)
-    setDeletePinInput('')
-    setDeletePinError(null)
-    setDeletePinBusy(false)
   }, [open, focusNameInput])
 
   const loadTabs = useCallback(
@@ -322,52 +315,17 @@ export default function KassaNameAccountModal({
     }
     const open = tabOpenTotalIncl(Array.isArray(tab.items) ? tab.items : [])
     if (open <= 0.001) return
-    if (isSuperAdminLoggedIn()) {
-      void performDeleteSelectedOpenTab()
-      return
-    }
-    setDeletePinInput('')
-    setDeletePinError(null)
     setDeletePinOpen(true)
   }
 
   const closeDeletePinModal = () => {
-    if (deletePinBusy) return
+    if (saving) return
     setDeletePinOpen(false)
-    setDeletePinInput('')
-    setDeletePinError(null)
   }
 
-  const submitDeleteOpenTabPin = async () => {
-    const pin = deletePinInput.trim()
-    if (!/^\d{4}$/.test(pin)) {
-      setDeletePinError(t('pinGate.invalidPin'))
-      return
-    }
-    setDeletePinBusy(true)
-    setDeletePinError(null)
-    try {
-      const res = await fetch('/api/pin/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tenant, pin }),
-      })
-      const data = (await res.json()) as { valid?: boolean; error?: string }
-      if (data.valid) {
-        setDeletePinOpen(false)
-        setDeletePinInput('')
-        await performDeleteSelectedOpenTab()
-        return
-      }
-      setDeletePinError(
-        res.status === 429 && data.error ? data.error : t('pinGate.incorrectPin'),
-      )
-      setDeletePinInput('')
-    } catch {
-      setDeletePinError(t('kassaNameAccount.deleteOpenTabFailed'))
-    } finally {
-      setDeletePinBusy(false)
-    }
+  const onDeletePinVerified = async () => {
+    setDeletePinOpen(false)
+    await performDeleteSelectedOpenTab()
   }
 
   const registerPayment = async () => {
@@ -711,21 +669,13 @@ export default function KassaNameAccountModal({
           </div>
         )}
       </div>
-      <StaffClockPinPortal
-        nested
+      <KassaOwnerPinOverlay
         open={deletePinOpen}
-        titleId="kassa-name-account-delete-pin-title"
+        tenant={tenant}
         title={t('kassaNameAccount.deleteOpenTabPinTitle')}
-        placeholder={t('kassaNameAccount.deleteOpenTabPinPlaceholder')}
-        pinValue={deletePinInput}
-        onPinChange={setDeletePinInput}
-        pinError={deletePinError}
-        busy={deletePinBusy || saving}
-        cancelLabel={t('kassaApp.cancel')}
-        confirmLabel={t('pinGate.confirm')}
+        busy={saving}
         onCancel={closeDeletePinModal}
-        onConfirm={() => void submitDeleteOpenTabPin()}
-        maxPinLength={4}
+        onVerified={onDeletePinVerified}
       />
     </div>
   )
