@@ -155,6 +155,7 @@ import {
   kassaSpeelsRedGlossButtonClass,
   kassaSpeelsCategoryStripButtonClass,
   KASSA_SPEELS_TOP_CHROME_BTN_CLASS,
+  KASSA_SPEELS_TENANT_NAME_CLASS,
   kassaPosRemoveButtonClass,
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
@@ -5849,7 +5850,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               if (draftBonLineItems.length === 0 || draftBonPrinting) return
               void printDraftBonFromCart({ draftCopies: 2 })
             }}
-            className="max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight text-white transition-colors hover:bg-white/15 active:bg-white/25 sm:text-base md:text-lg"
+            className={`max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight transition-colors sm:text-base md:text-lg ${
+              kassaPosLuxury && posChrome === 'speels'
+                ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#d06060] active:text-[#9a3838]`
+                : 'text-white hover:bg-white/15 active:bg-white/25'
+            }`}
             title={t('kassaApp.cartBonTitle')}
             aria-label={`${tenantInfo?.business_name || tenant} — ${t('kassaApp.cartBonTitle')}`}
           >
