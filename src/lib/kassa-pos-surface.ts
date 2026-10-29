@@ -319,7 +319,7 @@ export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
 }
 
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
-  if (selected) return kassaSpeelsBlackGlossButtonClass(true)
+  if (selected) return kassaSpeelsBlueGlossButtonClass(true)
   return kassaSpeelsGrayChromeButtonClass()
 }
 
