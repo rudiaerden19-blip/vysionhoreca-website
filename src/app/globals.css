@@ -481,6 +481,26 @@ input[type="number"] {
   background-clip: padding-box;
 }
 
+/* Menu-tegels Dark mode — geen witte 1px-rand (schaduw/rand/Safari contrast). */
+.kassa-speels-menu-tile {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.kassa-speels-menu-tile:focus,
+.kassa-speels-menu-tile:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.kassa-speels-menu-tile img {
+  image-rendering: auto;
+}
+
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {

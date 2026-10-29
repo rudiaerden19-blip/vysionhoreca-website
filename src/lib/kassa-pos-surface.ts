@@ -306,16 +306,17 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 
-/** Speels/Dark menu-tegel — geen champagne-rand of goud-gloed (witte halo op #333). */
+/** Speels/Dark menu-tegel — vlak op #333-recess; geen rand/schaduw (witte halo iPad). */
+export const KASSA_SPEELS_MENU_TILE_BUTTON_CLASS = 'kassa-speels-menu-tile'
+
 export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
   'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
+  KASSA_SPEELS_MENU_TILE_BUTTON_CLASS,
   KASSA_POS_BTN_SHAPE,
-  'bg-[#282828]',
-  'border border-[#1a1a1a]',
-  'shadow-[0_3px_10px_rgba(0,0,0,0.55)]',
-  'transition-[transform,box-shadow,filter] duration-150 ease-out',
+  'border-0 bg-[#333333] shadow-none outline-none',
+  'transition-[transform,filter] duration-150 ease-out',
   'hover:brightness-[1.03]',
-  'active:scale-[0.96] active:translate-y-[2px] active:brightness-[0.84]',
+  'active:scale-[0.96] active:translate-y-[1px] active:brightness-[0.84]',
   'active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.42)]',
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
@@ -340,15 +341,18 @@ export const KASSA_POS_MENU_TILE_IMG_FRAME =
 export const KASSA_POS_MENU_TILE_IMAGE_FILM =
   'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_42%,transparent_0%,transparent_62%,rgba(22,19,16,0.12)_88%,rgba(16,13,10,0.22)_100%)]'
 
-/** Speels: zelfde tegel, veel minder cream-shimmer. */
+/** Speels: licht midden, donkere rand (geen lichtgrijze rand tegen #333). */
 const KASSA_SPEELS_MENU_TILE_STUDIO_BG =
-  'bg-[radial-gradient(ellipse_at_50%_42%,#f7f7f7_0%,#e6e6e6_38%,#c8c8c8_68%,#9a9a9a_100%)]'
+  'bg-[radial-gradient(ellipse_at_50%_42%,#f7f7f7_0%,#e6e6e6_38%,#c8c8c8_68%,#3a3a3a_100%)]'
+
+const KASSA_SPEELS_MENU_TILE_IMAGE_WELL_EDGE =
+  'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.55),inset_0_0_14px_rgba(0,0,0,0.28)]'
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_WELL =
-  `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+  `pointer-events-none relative min-h-0 w-full min-w-0 flex-1 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG} ${KASSA_SPEELS_MENU_TILE_IMAGE_WELL_EDGE}`
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SXGA =
-  `pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
+  `pointer-events-none relative w-full shrink-0 flex-none aspect-square overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG} ${KASSA_SPEELS_MENU_TILE_IMAGE_WELL_EDGE}`
 
 export const KASSA_SPEELS_MENU_TILE_IMG_FRAME =
   `pointer-events-none relative z-0 h-full w-full min-h-0 min-w-0 overflow-hidden ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
@@ -360,7 +364,11 @@ export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
   `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_SPEELS_MENU_TILE_STUDIO_BG}`
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_FILM =
-  'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_42%,transparent_0%,transparent_70%,rgba(0,0,0,0.08)_100%)]'
+  'pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_50%_42%,transparent_0%,transparent_58%,rgba(51,51,51,0.22)_90%,rgba(40,40,40,0.48)_100%)]'
+
+/** Speels: geen mix-blend-multiply (lichte rand rond foto op grijs). */
+export const KASSA_SPEELS_MENU_TILE_IMG_CLASS =
+  'pointer-events-none absolute inset-0 box-border h-full w-full select-none object-contain object-center'
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_POS_MENU_TILE_STUDIO_BG}`
