@@ -6,7 +6,9 @@ import {
   kassaLayoutPlateBgClass,
   kassaLayoutPosChrome,
   kassaLayoutQuickMenuTileClass,
+  kassaLayoutRecessTrayClass,
 } from './kassa-layout-chrome'
+import { KASSA_POS_MENU_PLATE_SHELL_BG_CLASS, KASSA_POS_MENU_RECESS_TRAY_CLASS } from './kassa-pos-surface'
 import { kassaPosButtonClass, kassaPosCheckoutButtonClass } from './kassa-pos-surface'
 
 describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
@@ -35,7 +37,9 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
     const cls = kassaLayoutChromeBtnClass('dark', false)
     expect(cls).toContain('#5a5a5a')
     expect(cls).not.toContain('#c4a46a')
-    expect(kassaLayoutPlateBgClass('dark')).toBe('bg-[#0b0f14]')
+    expect(kassaLayoutPlateBgClass('dark')).toBe(KASSA_POS_MENU_PLATE_SHELL_BG_CLASS)
+    expect(kassaLayoutRecessTrayClass('dark')).toBe(KASSA_POS_MENU_RECESS_TRAY_CLASS)
+    expect(kassaLayoutRecessTrayClass('luxe')).toContain(KASSA_POS_MENU_RECESS_TRAY_CLASS)
     expect(kassaLayoutHeaderBarClass('dark')).toBe('bg-black')
     expect(kassaLayoutQuickMenuTileClass('dark')).toContain('#5a5a5a')
   })

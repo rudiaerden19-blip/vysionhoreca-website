@@ -112,7 +112,6 @@ import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
-  KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_LUXE_HTML_CLASS,
   KASSA_LUXE_LEATHER_PLANE_CLASS,
   KASSA_LUXE_CART_GRAIN_CLASS,
@@ -155,6 +154,7 @@ import {
   kassaPosCartQtyButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
+import { kassaLayoutPlateBgClass, kassaLayoutRecessTrayClass } from '@/lib/kassa-layout-chrome'
 import {
   authFetch,
   buildShopInternalReturnPath,
@@ -1094,18 +1094,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaClassicDark = kassaLayout === 'dark'
   const kassaLight = kassaLayout === 'light'
   const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
-  const kassaPlateBgClass =
-    kassaLayout === 'speels'
-      ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
-      : kassaLayout === 'luxe'
-        ? 'bg-transparent'
-        : kassaAppearanceDark
-          ? 'bg-[#0b0f14]'
-          : 'bg-[#e3e3e3]'
-  const kassaRecessTrayClass =
-    kassaLayout === 'speels'
-      ? KASSA_SPEELS_MENU_RECESS_TRAY_CLASS
-      : ''
+  const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
+  const kassaRecessTrayClass = kassaLayoutRecessTrayClass(kassaLayout)
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
