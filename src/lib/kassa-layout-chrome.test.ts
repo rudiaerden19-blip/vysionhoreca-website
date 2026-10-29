@@ -48,7 +48,7 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
     expect(kassaLayoutCheckoutBtnClass('speels')).toBe(kassaPosCheckoutButtonClass('speels'))
     expect(kassaLayoutPlateBgClass('speels')).toContain('kassa-speels-plate-grain')
     expect(kassaLayoutHeaderBarClass('speels')).toContain('kassa-speels-plate-grain')
-    expect(kassaLayoutMenuScrollFlatBgClass('speels')).toContain('bg-[#3d3d3d]')
+    expect(kassaLayoutMenuScrollFlatBgClass('speels')).toContain('bg-[#363636]')
     expect(kassaLayoutMenuScrollFlatBgClass('speels')).toContain('kassa-speels-menu-scroll')
     expect(kassaLayoutMenuScrollFlatBgClass('speels')).not.toContain('kassa-speels-plate-grain')
   })
