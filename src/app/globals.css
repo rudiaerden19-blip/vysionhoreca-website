@@ -457,7 +457,7 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. PNG-korrel (zichtbaar op iPad); tegel-scroll/recess effen #333.
+ * Mode «Dark» (layout speels) — alle tenants. PNG-korrel op kader + tegel-titelstrook; scroll/recess effen #333.
  */
 .kassa-speels-plate-grain {
   background-color: #282828;

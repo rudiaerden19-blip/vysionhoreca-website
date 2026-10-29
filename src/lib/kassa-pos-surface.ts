@@ -357,12 +357,12 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
-/** Speels: titelstrook dezelfde bruine knopkleur als snelmenu (afb. 2). */
+/** Speels: titelstrook = zelfde #282828 + PNG-korrel als POS-kader (niet espresso-gradient). */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
-  `pointer-events-none shrink-0 w-full border-t border-[#3d352c] ${KASSA_BTN_FACE} px-2 pb-2 pt-1.5 sm:px-3`
+  `pointer-events-none shrink-0 w-full border-t border-[#1a1a1a] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} px-2 pb-2 pt-1.5 sm:px-3`
 
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA =
-  `pointer-events-none shrink-0 w-full border-t border-[#3d352c] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
+  `pointer-events-none shrink-0 w-full border-t border-[#1a1a1a] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-white sm:text-[15px] md:text-base'
