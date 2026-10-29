@@ -664,114 +664,49 @@ input[type="number"] {
 }
 
 /*
- * Speels — rood glanzend (Verwijder, help video's).
+ * Speels — rood/groen met dezelfde chrome-gloss als Bon (.kassa-speels-order-type-btn).
  */
-.kassa-speels-red-gloss-btn {
-  color: #ffffff;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
-  background-color: #9b1c1c;
-  background-image: linear-gradient(180deg, #d32f2f 0%, #b71c1c 32%, #8b0000 68%, #6b0505 100%);
-  border: 1px solid #ffcdd2;
-  border-top: 1px solid #ffebee;
-  border-bottom: 1px solid #5c1010;
-  box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.58),
-    0 11px 26px rgba(0, 0, 0, 0.48),
-    0 0 20px rgba(239, 68, 68, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
-}
-
-.kassa-speels-red-gloss-btn::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  height: 48%;
-  z-index: 0;
-  border-radius: 0.65rem 0.65rem 45% 45%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.38) 0%,
-    rgba(255, 255, 255, 0.14) 38%,
-    rgba(255, 255, 255, 0.04) 72%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-
-.kassa-speels-red-gloss-btn > * {
-  position: relative;
-  z-index: 1;
-}
-
-.kassa-speels-red-gloss-btn:active {
-  background-color: #7a1515;
-  background-image: linear-gradient(180deg, #8b0000 0%, #a31515 52%, #5c0505 100%);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.55),
-    inset 0 3px 8px rgba(0, 0, 0, 0.55);
-}
-
-.kassa-speels-red-gloss-btn:active::before {
-  opacity: 0.4;
-}
-
-.kassa-speels-red-gloss-btn--emphasis {
-  box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.58),
-    0 11px 26px rgba(0, 0, 0, 0.48),
-    0 0 26px rgba(248, 113, 113, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
-}
-
-.kassa-speels-red-gloss-btn--emphasis::before {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.48) 0%,
-    rgba(255, 255, 255, 0.2) 40%,
-    rgba(255, 255, 255, 0.06) 75%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
-
-.kassa-speels-red-gloss-btn:disabled {
-  opacity: 1;
-  cursor: not-allowed;
-  pointer-events: none;
-  background-color: #6b1515;
-  background-image: linear-gradient(180deg, #8b2020 0%, #721818 45%, #5c1010 100%);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
-}
-
-.kassa-speels-red-gloss-btn:disabled::before {
-  opacity: 0.2;
-}
-
-/*
- * Speels — groen glanzend (Afrekenen).
- */
+.kassa-speels-red-gloss-btn,
 .kassa-speels-green-gloss-btn {
-  color: #ffffff;
+  color: #b0b0b0;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
-  background-color: #047857;
-  background-image: linear-gradient(180deg, #10b981 0%, #059669 36%, #047857 68%, #065f46 100%);
-  border: 1px solid #a7f3d0;
-  border-top: 1px solid #d1fae5;
-  border-bottom: 1px solid #064e3b;
   box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.58),
-    0 11px 26px rgba(0, 0, 0, 0.48),
-    0 0 20px rgba(16, 185, 129, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 3px 7px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
     inset 0 -2px 0 rgba(0, 0, 0, 0.42);
 }
 
+.kassa-speels-red-gloss-btn {
+  background: linear-gradient(
+    180deg,
+    #b84848 0%,
+    #9a3838 5%,
+    #7a2222 18%,
+    #621818 40%,
+    #4f1010 62%,
+    #3d0c0c 100%
+  );
+  border: 1px solid #2a0808;
+  border-top: 1px solid #d8a0a0;
+  border-bottom: 1px solid #1a0505;
+}
+
+.kassa-speels-green-gloss-btn {
+  background: linear-gradient(
+    180deg,
+    #3d9a72 0%,
+    #2f8560 5%,
+    #1f6b4a 18%,
+    #165a3d 40%,
+    #0f4a32 62%,
+    #0a3d28 100%
+  );
+  border: 1px solid #062a1c;
+  border-top: 1px solid #9fd4b8;
+  border-bottom: 1px solid #051f15;
+}
+
+.kassa-speels-red-gloss-btn::before,
 .kassa-speels-green-gloss-btn::before {
   content: '';
   pointer-events: none;
@@ -779,68 +714,89 @@ input[type="number"] {
   left: 2px;
   right: 2px;
   top: 2px;
-  height: 48%;
+  height: 46%;
   z-index: 0;
   border-radius: 0.65rem 0.65rem 45% 45%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.38) 0%,
-    rgba(255, 255, 255, 0.14) 38%,
-    rgba(255, 255, 255, 0.04) 72%,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 255, 255, 0.38) 42%,
     rgba(255, 255, 255, 0) 100%
   );
 }
 
+.kassa-speels-red-gloss-btn > *,
 .kassa-speels-green-gloss-btn > * {
   position: relative;
   z-index: 1;
 }
 
-.kassa-speels-green-gloss-btn:active {
-  background-color: #065f46;
-  background-image: linear-gradient(180deg, #047857 0%, #059669 52%, #064e3b 100%);
+.kassa-speels-red-gloss-btn:active {
+  background: linear-gradient(180deg, #5c1818 0%, #481212 55%, #360e0e 100%);
+  border-top-color: rgba(255, 255, 255, 0.35);
   box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.55),
-    inset 0 3px 8px rgba(0, 0, 0, 0.55);
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 3px 7px rgba(0, 0, 0, 0.55);
 }
 
+.kassa-speels-green-gloss-btn:active {
+  background: linear-gradient(180deg, #145a3d 0%, #0f4a32 55%, #0a3826 100%);
+  border-top-color: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 3px 7px rgba(0, 0, 0, 0.55);
+}
+
+.kassa-speels-red-gloss-btn:active::before,
 .kassa-speels-green-gloss-btn:active::before {
-  opacity: 0.4;
+  opacity: 0.35;
+}
+
+.kassa-speels-red-gloss-btn--emphasis,
+.kassa-speels-green-gloss-btn--emphasis {
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.kassa-speels-red-gloss-btn--emphasis {
+  border-top-color: #e8b8b8;
 }
 
 .kassa-speels-green-gloss-btn--emphasis {
-  box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.58),
-    0 11px 26px rgba(0, 0, 0, 0.48),
-    0 0 26px rgba(52, 211, 153, 0.44),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
+  border-top-color: #b8e0c8;
 }
 
+.kassa-speels-red-gloss-btn--emphasis::before,
 .kassa-speels-green-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.48) 0%,
-    rgba(255, 255, 255, 0.2) 40%,
-    rgba(255, 255, 255, 0.06) 75%,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.45) 45%,
     rgba(255, 255, 255, 0) 100%
   );
 }
 
+.kassa-speels-red-gloss-btn:disabled,
 .kassa-speels-green-gloss-btn:disabled {
   opacity: 1;
   cursor: not-allowed;
   pointer-events: none;
-  background-color: #064e3b;
-  background-image: linear-gradient(180deg, #0a6b52 0%, #065f46 45%, #064e3b 100%);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
 }
 
+.kassa-speels-red-gloss-btn:disabled {
+  background: linear-gradient(180deg, #6a2828 0%, #521818 55%, #401212 100%);
+}
+
+.kassa-speels-green-gloss-btn:disabled {
+  background: linear-gradient(180deg, #1a5240 0%, #124030 55%, #0c3024 100%);
+}
+
+.kassa-speels-red-gloss-btn:disabled::before,
 .kassa-speels-green-gloss-btn:disabled::before {
-  opacity: 0.2;
+  opacity: 0.35;
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */

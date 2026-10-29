@@ -263,7 +263,7 @@ export function kassaSpeelsRedGlossButtonClass(emphasis = false): string {
     KASSA_SPEELS_RED_GLOSS_BTN_CLASS,
     emphasis ? 'kassa-speels-red-gloss-btn--emphasis' : '',
     KASSA_SPEELS_CHROME_BTN_SHELL,
-    'text-white',
+    KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
   ]
     .filter(Boolean)
     .join(' ')
@@ -276,7 +276,7 @@ export function kassaSpeelsGreenGlossButtonClass(emphasis = false): string {
     KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS,
     emphasis ? 'kassa-speels-green-gloss-btn--emphasis' : '',
     KASSA_SPEELS_CHROME_BTN_SHELL,
-    'text-white',
+    KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
   ]
     .filter(Boolean)
     .join(' ')
