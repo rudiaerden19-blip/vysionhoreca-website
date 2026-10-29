@@ -103,7 +103,10 @@ import {
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
-import { KassaSoundActivationRestaurantBackdrop } from '@/components/kassa/KassaSoundActivationGate'
+import {
+  KassaSoundActivationRestaurantBackdrop,
+  kassaSoundActivationPrimaryButtonClass,
+} from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 import {
   kassaUiLayoutUsesPosLuxury,
@@ -5415,7 +5418,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </p>
           <button
             onClick={activateSound}
-            className="flex w-full transform items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600"
+            className={kassaSoundActivationPrimaryButtonClass}
           >
             <span className="text-4xl"></span>
             {t('kassaApp.soundActivateButton').toUpperCase()}

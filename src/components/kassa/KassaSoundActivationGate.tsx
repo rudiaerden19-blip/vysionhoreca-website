@@ -12,6 +12,10 @@ export function kassaSoundSessionKey(tenant: string): string {
 /** Kassa-in-horeca sfeerbeeld — met overlay leesbaar op alle kassa-thema’s. */
 export const KASSA_SOUND_ACTIVATION_RESTAURANT_BG = '/images/kassa-sound-activation-restaurant.jpg'
 
+/** Zelfde CTA-blauw als login / marketing (tailwind `accent`). */
+export const kassaSoundActivationPrimaryButtonClass =
+  'flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-accent py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-[#0c5273] active:bg-accent/90'
+
 export function KassaSoundActivationRestaurantBackdrop() {
   return (
     <>
@@ -123,7 +127,7 @@ export function KassaSoundActivationScreen({
             e.stopPropagation()
             onActivate()
           }}
-          className="flex w-full transform touch-manipulation items-center justify-center gap-4 rounded-2xl bg-green-500 py-6 text-2xl font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-green-600 active:bg-green-700"
+          className={kassaSoundActivationPrimaryButtonClass}
         >
           <span className="text-4xl"></span>
           {t('kassaApp.soundActivateButton').toUpperCase()}
