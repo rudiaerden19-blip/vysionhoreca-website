@@ -469,31 +469,39 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Titelstrook menu-tegels — alle tenants, layout Dark (speels); zelfde korrel als kader. */
+/* Titelstrook menu-tegels — korrel binnen padding; geen witte rand (Safari blend aan rand). */
 .kassa-speels-tile-label-grain {
+  box-sizing: border-box;
+  width: 100%;
   background-color: #282828;
   background-image:
-    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
+    linear-gradient(rgba(44, 44, 44, 0.14), rgba(44, 44, 44, 0.14)),
     url('/images/kassa-dark-frame-grain.png');
+  background-origin: padding-box;
+  background-clip: padding-box;
   background-size: 512px 512px;
   background-repeat: repeat;
-  background-blend-mode: overlay;
+  background-blend-mode: normal;
+  box-shadow: inset 0 0 0 1px #282828;
 }
 
-/* Menu-tegels Dark — vaste compositing, geen flikkern bij hover (Safari 1px-lijn). */
+/* Menu-tegels Dark — alleen donkere schaduw; geen GPU-rand-artefact. */
 .kassa-speels-menu-tile {
   border: none !important;
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
-  isolation: isolate;
-  transform: translateZ(0);
-  backface-visibility: hidden;
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.72),
+    0 12px 28px rgba(0, 0, 0, 0.55) !important;
 }
 
 .kassa-speels-menu-tile:hover,
 .kassa-speels-menu-tile:focus,
 .kassa-speels-menu-tile:focus-visible {
   outline: none !important;
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.72),
+    0 12px 28px rgba(0, 0, 0, 0.55) !important;
 }
 
 /*
