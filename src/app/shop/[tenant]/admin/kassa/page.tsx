@@ -231,9 +231,13 @@ import {
 } from '@/lib/lagoon-kitchen-screen'
 import {
   clearLagoonOwnerPinUnlockIfStrict,
-  lagoonStrictReportsPinEnabled,
+  lagoonKassaMenuPinRequired,
+  resolveLagoonPinTenantSlug,
 } from '@/lib/lagoon-reports-pin-gate'
-import { KassaOwnerPinOverlay } from '@/components/kassa/KassaOwnerPinOverlay'
+import {
+  KassaOwnerPinOverlay,
+  KASSA_OWNER_PIN_OVERLAY_MENU_Z,
+} from '@/components/kassa/KassaOwnerPinOverlay'
 import {
   readKassaJetonSalePoint,
   writeKassaJetonSalePoint,
@@ -1829,6 +1833,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaFloorPlanEnabled = tenantInfo?.kassa_floor_plan_enabled ?? true
   /** Tabs op naam + op rekening v2 (tenant_settings; default uit). */
   const kassaNameAccountV2 = tenantInfo?.kassa_name_account_v2 === true
+
+  const lagoonKassaMenuPinRequiredFlag = useMemo(
+    () =>
+      lagoonKassaMenuPinRequired(tenant, {
+        settingsTenantSlug: tenantInfo?.tenant_slug,
+        businessName: tenantInfo?.business_name,
+      }),
+    [tenant, tenantInfo?.tenant_slug, tenantInfo?.business_name],
+  )
+
+  const lagoonPinTenantSlug = useMemo(
+    () => resolveLagoonPinTenantSlug(tenant, tenantInfo?.tenant_slug),
+    [tenant, tenantInfo?.tenant_slug],
+  )
   const kassaJetonEnabled = tenantInfo?.kassa_jeton_enabled === true
   const kassaJetonQuickSuccess = isKassaJetonQuickSuccessFlowTenant(tenant, tenantInfo)
   const kassaLanPrintEnabled = tenantInfo?.kassa_lan_print_enabled === true
@@ -5720,10 +5738,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 setHamburgerSubOpen(null)
                 return
               }
-              if (
-                lagoonStrictReportsPinEnabled(tenant) &&
-                !isSuperAdminLoggedIn()
-              ) {
+              if (lagoonKassaMenuPinRequiredFlag && !isSuperAdminLoggedIn()) {
+                setHamburgerOpen(false)
+                setHamburgerSubOpen(null)
                 setHamburgerMenuPinOpen(true)
                 return
               }
@@ -5746,7 +5763,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <svg className="h-5 w-5 shrink-0 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
             <span className="font-bold text-[11px] leading-tight sm:text-xs">{t('kassaApp.hamburgerMenu')}</span>
           </button>
-          {hamburgerOpen && (() => {
+          {hamburgerOpen && !hamburgerMenuPinOpen && (() => {
             const modules = filteredHamburgerModules
             const activeMod = modules.find(m => m.rowKey === hamburgerSubOpen)
             return (
@@ -7395,7 +7412,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       <KassaOwnerPinOverlay
         open={hamburgerMenuPinOpen}
-        tenant={tenant}
+        tenant={lagoonPinTenantSlug}
+        zIndex={KASSA_OWNER_PIN_OVERLAY_MENU_Z}
         title={t('pinGate.ownerPinTitle')}
         onCancel={() => setHamburgerMenuPinOpen(false)}
         onVerified={() => {

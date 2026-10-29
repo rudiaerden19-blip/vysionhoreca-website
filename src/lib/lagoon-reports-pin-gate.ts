@@ -5,6 +5,31 @@ export function lagoonStrictReportsPinEnabled(tenantSlug: string): boolean {
   return isTheLagoonTenant(tenantSlug)
 }
 
+/** Header-naam «The Lagoon» (fallback als route-slug afwijkt van DB). */
+export function isLagoonBusinessDisplayName(businessName: string | null | undefined): boolean {
+  return String(businessName ?? '').trim().toLowerCase() === 'the lagoon'
+}
+
+/** Kassa hamburger Menu → eigenaar-PIN (alleen deze zaak). */
+export function lagoonKassaMenuPinRequired(
+  routeTenantSlug: string,
+  opts?: { settingsTenantSlug?: string | null; businessName?: string | null },
+): boolean {
+  if (isTheLagoonTenant(routeTenantSlug)) return true
+  const settingsSlug = String(opts?.settingsTenantSlug ?? '').trim()
+  if (settingsSlug && isTheLagoonTenant(settingsSlug)) return true
+  return isLagoonBusinessDisplayName(opts?.businessName)
+}
+
+export function resolveLagoonPinTenantSlug(
+  routeTenantSlug: string,
+  settingsTenantSlug?: string | null,
+): string {
+  const fromSettings = String(settingsTenantSlug ?? '').trim()
+  if (fromSettings && isTheLagoonTenant(fromSettings)) return fromSettings
+  return routeTenantSlug
+}
+
 /** Wis elke zaak-PIN-unlock (voorkomt thelagoon vs the-lagoon bypass). */
 export function clearAllOwnerPinUnlockSessions(): void {
   if (typeof window === 'undefined') return

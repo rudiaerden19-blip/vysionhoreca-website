@@ -4,8 +4,9 @@ import { useEffect, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
 
-/** Boven op-rekening-modal (z 250) en meeste kassa-lagen. */
+/** Boven op-rekening-modal (z 250) en kassa-header; menu-PIN gebruikt 450. */
 export const KASSA_OWNER_PIN_OVERLAY_Z = 290
+export const KASSA_OWNER_PIN_OVERLAY_MENU_Z = 450
 
 type Props = {
   open: boolean
@@ -15,9 +16,18 @@ type Props = {
   onCancel: () => void
   /** Alleen na geldige eigenaar-PIN (4 cijfers). */
   onVerified: () => void | Promise<void>
+  zIndex?: number
 }
 
-export function KassaOwnerPinOverlay({ open, tenant, title, busy = false, onCancel, onVerified }: Props) {
+export function KassaOwnerPinOverlay({
+  open,
+  tenant,
+  title,
+  busy = false,
+  onCancel,
+  onVerified,
+  zIndex = KASSA_OWNER_PIN_OVERLAY_Z,
+}: Props) {
   const { t } = useLanguage()
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
@@ -92,7 +102,7 @@ export function KassaOwnerPinOverlay({ open, tenant, title, busy = false, onCanc
   return createPortal(
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/70 p-4 touch-manipulation"
-      style={{ zIndex: KASSA_OWNER_PIN_OVERLAY_Z }}
+      style={{ zIndex }}
       role="presentation"
       data-kassa-owner-pin-overlay
       onClick={() => {
