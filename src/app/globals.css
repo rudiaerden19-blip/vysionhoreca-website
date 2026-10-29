@@ -457,7 +457,7 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. PNG-korrel op kader (#282828); #333-vlakken subtieler.
+ * Mode «Dark» (layout speels) — alle tenants. Zelfde PNG-korrel op kader (#282828) en #3d3d3d-vlakken.
  */
 .kassa-speels-plate-grain {
   background-color: #282828;
@@ -469,17 +469,17 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Speels lichtgrijs vlak — tegel-scroll, ingesprongen bak, zijbalk-mand: subtiele korrel. */
+/* Speels #3d3d3d — zelfde rustige korrel-stack als kassa-speels-plate-grain (zwart kader). */
 .kassa-speels-menu-scroll,
 .kassa-speels-recess-tray,
 .kassa-speels-sidebar-cart-vak {
   background-color: #3d3d3d;
   background-image:
-    linear-gradient(rgba(61, 61, 61, 0.78), rgba(61, 61, 61, 0.78)),
+    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
     url('/images/kassa-dark-frame-grain.png');
-  background-size: auto, 1680px 1680px;
+  background-size: 512px 512px;
   background-repeat: repeat;
-  background-blend-mode: normal, soft-light;
+  background-blend-mode: overlay;
 }
 
 /* Titelstrook — korrel zichtbaar; geen witte rand (Safari blend aan tegelrand). */

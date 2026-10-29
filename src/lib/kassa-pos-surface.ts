@@ -6,7 +6,7 @@
 /**
  * Korrel op POS-kader (header/zijbalk/marge). Layout: Speels → `kassa-speels-plate-grain`;
  * Luxe → `kassa-luxe-leather-plane`; Klassiek (`dark`) → effen `#0b0f14` (geen korrel-class).
- * Speels: sterke korrel op kader; #333-vlakken (`kassa-speels-menu-scroll`) subtiele korrel.
+ * Speels: zelfde korrel op kader (#282828) en #3d3d3d-vlakken (`kassa-speels-menu-scroll`).
  */
 export const KASSA_POS_MENU_PLATE_SHELL_BG_CLASS = 'gks-menu-plate-grain'
 
