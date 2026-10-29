@@ -5691,6 +5691,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ? 'min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-y-contain py-0.5'
     : 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
 
+  const kassaTenantDisplayName =
+    tenantInfo?.business_name ||
+    tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+
+  const kassaTenantNameColorClass =
+    kassaPosLuxury && posChrome === 'speels'
+      ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#d06060] active:text-[#9a3838]`
+      : 'text-white hover:bg-white/15 active:bg-white/25'
+
+  const renderKassaTenantNameButton = (sizeClass: string, maxWidthClass: string) => (
+    <button
+      type="button"
+      onClick={() => {
+        if (draftBonLineItems.length === 0 || draftBonPrinting) return
+        void printDraftBonFromCart({ draftCopies: 2 })
+      }}
+      className={`max-w-full truncate rounded-md px-2 py-0.5 text-center font-bold leading-tight tracking-tight transition-colors ${sizeClass} ${maxWidthClass} ${kassaTenantNameColorClass}`}
+      title={t('kassaApp.cartBonTitle')}
+      aria-label={`${kassaTenantDisplayName} — ${t('kassaApp.cartBonTitle')}`}
+    >
+      {kassaTenantDisplayName}
+    </button>
+  )
+
   return (
     <div
       className={`relative flex min-h-0 flex-col overflow-hidden ${
@@ -5713,8 +5737,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       {/* ── Blauwe balk: één rij — kleine tenantnaam zodat snelkoppelingen naast elkaar passen zonder horizontale scrollbar ── */}
       <div
-        className={`relative z-30 flex w-full min-w-0 shrink-0 items-center ${
-          kassaWide15Chrome ? 'min-h-[44px] gap-1 px-1.5 py-1' : 'min-h-[56px] gap-1.5 px-2 py-2 sm:gap-2 sm:px-3'
+        className={`relative z-30 w-full min-w-0 shrink-0 items-center ${
+          kassaPosLuxury
+            ? `grid grid-cols-[auto_minmax(0,1fr)_auto] ${
+                kassaWide15Chrome ? 'min-h-[44px] gap-x-1 px-1.5 py-1' : 'min-h-[56px] gap-x-1.5 px-2 py-2 sm:gap-x-2 sm:px-3'
+              }`
+            : `flex ${
+                kassaWide15Chrome ? 'min-h-[44px] gap-1 px-1.5 py-1' : 'min-h-[56px] gap-1.5 px-2 py-2 sm:gap-2 sm:px-3'
+              }`
         } ${
           kassaPosLuxury
             ? `${kassaWide15Chrome ? 'pb-1.5' : 'pb-3'} ${kassaPlateBgClass}`
@@ -5835,9 +5865,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
+        {kassaPosLuxury ? (
+          <div className="relative z-20 flex min-w-0 items-center justify-center px-1">
+            {renderKassaTenantNameButton(
+              kassaWide15Chrome
+                ? 'text-sm sm:text-base'
+                : 'text-base sm:text-lg md:text-xl lg:text-2xl',
+              kassaWide15Chrome
+                ? 'max-w-[min(100%,14rem)]'
+                : 'max-w-[min(100%,22rem)] sm:max-w-[min(100%,26rem)] md:max-w-[min(100%,32rem)]',
+            )}
+          </div>
+        ) : null}
+
         <div
-          className={`relative z-20 flex min-w-0 shrink-0 flex-col justify-center px-0.5 ${
+          className={`relative z-20 flex min-w-0 items-center justify-end gap-1 sm:gap-1.5 ${
+            kassaPosLuxury ? '' : 'min-w-0 flex-1'
+          }`}
+        >
+        {!kassaPosLuxury ? (
+        <div
+          className={`flex min-w-0 shrink-0 flex-col justify-center px-0.5 ${
             kassaWide15Chrome
               ? 'ml-1 max-w-[5.25rem]'
               : kassaCompactChrome
@@ -5845,34 +5893,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : 'ml-[1cm] max-w-[9rem] sm:max-w-[11rem] md:max-w-[14rem] lg:max-w-[16rem]'
           }`}
         >
-          <button
-            type="button"
-            onClick={() => {
-              if (draftBonLineItems.length === 0 || draftBonPrinting) return
-              void printDraftBonFromCart({ draftCopies: 2 })
-            }}
-            className={`max-w-full truncate rounded-md px-1 py-0.5 text-center text-sm font-bold leading-tight tracking-tight transition-colors sm:text-base md:text-lg ${
-              kassaPosLuxury && posChrome === 'speels'
-                ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#d06060] active:text-[#9a3838]`
-                : 'text-white hover:bg-white/15 active:bg-white/25'
-            }`}
-            title={t('kassaApp.cartBonTitle')}
-            aria-label={`${tenantInfo?.business_name || tenant} — ${t('kassaApp.cartBonTitle')}`}
-          >
-            {tenantInfo?.business_name ||
-              tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-          </button>
+          {renderKassaTenantNameButton(
+            'text-sm sm:text-base md:text-lg',
+            'w-full',
+          )}
         </div>
+        ) : null}
 
-        {/* Snelkoppelingen: 4cm naar rechts op groot scherm; op 17″ 2cm extra naast zaaknaam */}
         <div
-          className={`relative z-20 flex min-h-0 min-w-0 flex-1 items-center ${
-            kassaWide15Chrome ? 'ml-1.5' : kassaCompactChrome ? 'ml-[2cm]': 'ml-[4cm]'
+          className={`relative flex min-h-0 min-w-0 items-center justify-end ${
+            kassaPosLuxury ? '' : 'flex-1'
           }`}
         >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className={`flex min-h-0 min-w-0 flex-1 items-center justify-start ${
+            className={`flex min-h-0 min-w-0 items-center justify-end ${
               kassaWide15Chrome
                 ? 'flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
                 : 'flex-nowrap gap-1.5 sm:gap-2'
