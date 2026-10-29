@@ -159,6 +159,7 @@ import {
   type KassaPosChromeLook,
   kassaPosQuickMenuPanelButtonClass,
   kassaPosCartQtyButtonClass,
+  kassaPosCartTrashButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
 import {
@@ -5554,7 +5555,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             onClick={() => updateQty(item.cartKey, item.quantity - 1)}
             className={
               kassaAppearanceDark
-                ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)}`
+                ? `touch-manipulation ${
+                    item.quantity === 1
+                      ? kassaPosCartTrashButtonClass(cartLineQtyBtnCompact, posChrome)
+                      : kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)
+                  }`
                 : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
                     cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                   }`
@@ -5633,7 +5638,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => updateParkedOnTableQty(item.cartKey, item.quantity - 1)}
               className={
                 kassaAppearanceDark
-                  ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)}`
+                  ? `touch-manipulation ${
+                      item.quantity === 1
+                        ? kassaPosCartTrashButtonClass(cartLineQtyBtnCompact, posChrome)
+                        : kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)
+                    }`
                   : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
                       cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                     }`

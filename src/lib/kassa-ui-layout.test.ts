@@ -10,6 +10,7 @@ import {
   kassaPosButtonClass,
   kassaPosCheckoutButtonClass,
   kassaSpeelsCategoryStripButtonClass,
+  kassaPosCartTrashButtonClass,
   kassaPosQuickMenuPanelButtonClass,
 } from './kassa-pos-surface'
 
@@ -105,6 +106,11 @@ describe('Speels bruine knoppen', () => {
   it('maakt Afrekenen in Speels groen glanzend', () => {
     expect(kassaPosCheckoutButtonClass('speels')).toContain('kassa-speels-green-gloss-btn')
     expect(kassaPosCheckoutButtonClass('speels')).not.toContain('kassa-speels-black-gloss-btn')
+  })
+
+  it('maakt mand-vuilbak in Speels rood glanzend als Verwijder', () => {
+    expect(kassaPosCartTrashButtonClass(false, 'speels')).toContain('kassa-speels-red-gloss-btn')
+    expect(kassaPosCartTrashButtonClass(false, 'luxe')).not.toContain('kassa-speels-red-gloss-btn')
   })
 
   it('maakt Speels-categoriebalk zwart tenzij geselecteerd (grijs)', () => {

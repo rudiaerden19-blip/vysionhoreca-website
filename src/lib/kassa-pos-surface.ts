@@ -363,6 +363,15 @@ export function kassaPosCartQtyButtonClass(compact?: boolean, look: KassaPosChro
   return `${kassaPosButtonClass(false, look)} ${size} shrink-0 flex items-center justify-center leading-none`
 }
 
+/** Mandregel — vuilbak (qty 1) zelfde rood glanzend als Verwijder in speels. */
+export function kassaPosCartTrashButtonClass(compact?: boolean, look: KassaPosChromeLook = 'luxe'): string {
+  const size = compact ? 'h-7 w-7 min-h-7 min-w-7 text-sm': 'h-8 w-8 min-h-8 min-w-8 text-base'
+  if (look === 'speels') {
+    return `${kassaPosRemoveButtonClass('speels')} ${size} shrink-0 flex items-center justify-center leading-none`
+  }
+  return kassaPosCartQtyButtonClass(compact, look)
+}
+
 export function kassaClockBarClass(): string {
   return `${kassaPosButtonClass(false)} relative z-0`
 }
