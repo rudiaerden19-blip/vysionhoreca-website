@@ -148,7 +148,6 @@ import {
   KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_SPEELS_MENU_TILE_IMG_FRAME,
   KASSA_SPEELS_MENU_TILE_IMAGE_FILM,
-  KASSA_SPEELS_MENU_TILE_IMG_CLASS,
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL,
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   kassaPosButtonClass,
@@ -823,13 +822,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
         : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2'
 
   const imgClass =
-    look === 'speels'
-      ? KASSA_SPEELS_MENU_TILE_IMG_CLASS
-      : luxuryChrome
-        ? KASSA_POS_MENU_TILE_IMG_CLASS
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
-          : KASSA_MENU_TILE_IMG_CLASS
+    luxuryChrome
+      ? KASSA_POS_MENU_TILE_IMG_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
+        : KASSA_MENU_TILE_IMG_CLASS
 
   const imgFrame = look === 'speels'
     ? KASSA_SPEELS_MENU_TILE_IMG_FRAME
@@ -992,13 +989,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
         : 'pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden bg-white px-2 pt-4'
 
   const imgClass =
-    look === 'speels'
-      ? KASSA_SPEELS_MENU_TILE_IMG_CLASS
-      : luxuryChrome
-        ? KASSA_POS_MENU_TILE_IMG_CLASS
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
-          : KASSA_MENU_TILE_IMG_CLASS
+    luxuryChrome
+      ? KASSA_POS_MENU_TILE_IMG_CLASS
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_IMG_CLASS_SXGA_COVER
+        : KASSA_MENU_TILE_IMG_CLASS
 
   const imgFrame = look === 'speels'
     ? KASSA_SPEELS_MENU_TILE_IMG_FRAME

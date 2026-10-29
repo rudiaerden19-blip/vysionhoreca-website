@@ -515,10 +515,6 @@ input[type="number"] {
   }
 }
 
-.kassa-speels-menu-tile img {
-  image-rendering: auto;
-}
-
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
