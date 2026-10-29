@@ -6038,12 +6038,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </span>
           </button>
 
-          {isOnline !== null && !kassaPosLuxury ? (
+          {isOnline !== null && (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
-                isOnline
-                  ? `min-h-[2.65rem] rounded-xl px-4 py-2 text-sm font-bold sm:min-h-[2.85rem] sm:px-5 sm:text-base ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
-                  : 'min-h-[2.65rem] rounded-xl bg-red-600/95 px-4 py-2 text-sm font-bold text-white sm:min-h-[2.85rem] sm:px-5 sm:text-base'
+                kassaPosLuxury
+                  ? isOnline
+                    ? posChrome === 'speels'
+                      ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS}`
+                      : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
+                  : isOnline
+                    ? `min-h-[2.65rem] rounded-xl px-4 py-2 text-sm font-bold sm:min-h-[2.85rem] sm:px-5 sm:text-base ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
+                    : 'min-h-[2.65rem] rounded-xl bg-red-600/95 px-4 py-2 text-sm font-bold text-white sm:min-h-[2.85rem] sm:px-5 sm:text-base'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -6053,7 +6059,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
               </span>
             </div>
-          ) : null}
+          )}
 
           {activeKassaStaff && !demoViewOnly && (
             <div className="flex max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white md:max-w-[10rem] md:text-xs">
@@ -6066,88 +6072,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
 
           {kassaPosLuxury ? (
-            <div className="relative z-20 -ml-[3cm] flex shrink-0 items-center gap-1 sm:gap-1.5">
-              {isOnline !== null ? (
-                <div
-                  className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
-                    isOnline
-                      ? posChrome === 'speels'
-                        ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS}`
-                        : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
-                      : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
-                  }`}
-                  title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
-                  role="status"
-                  aria-live="polite"
+            <time
+              dateTime={kassaSidebarClock.toISOString()}
+              className={`relative z-20 -ml-[3cm] mr-2 flex shrink-0 items-center gap-3 whitespace-nowrap px-1 font-bold tracking-[0.04em] sm:gap-4 sm:px-2 ${
+                posChrome === 'speels'
+                  ? 'text-sm text-[#b0b0b0] sm:text-base'
+                  : 'text-sm text-zinc-100 sm:text-base'
+              }`}
+            >
+              <span>{kassaHeaderClockParts.weekday}</span>
+              <span>{kassaHeaderClockParts.datePart}</span>
+              <span className="inline-flex tabular-nums items-baseline">
+                {kassaHeaderClockParts.hours}
+                <span
+                  className={kassaHeaderClockParts.colonVisible ? 'opacity-100' : 'opacity-0'}
+                  aria-hidden
                 >
-                  <span className="truncate">
-                    {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
-                  </span>
-                </div>
-              ) : null}
-              <time
-                dateTime={kassaSidebarClock.toISOString()}
-                className={`mr-1 flex shrink-0 items-center gap-3 whitespace-nowrap px-1 font-bold tracking-[0.04em] sm:mr-2 sm:gap-4 sm:px-2 ${
-                  posChrome === 'speels'
-                    ? 'text-sm text-[#b0b0b0] sm:text-base'
-                    : 'text-sm text-zinc-100 sm:text-base'
-                }`}
-              >
-                <span>{kassaHeaderClockParts.weekday}</span>
-                <span>{kassaHeaderClockParts.datePart}</span>
-                <span className="inline-flex tabular-nums items-baseline">
-                  {kassaHeaderClockParts.hours}
-                  <span
-                    className={kassaHeaderClockParts.colonVisible ? 'opacity-100' : 'opacity-0'}
-                    aria-hidden
-                  >
-                    :
-                  </span>
-                  {kassaHeaderClockParts.minutes}
+                  :
                 </span>
-              </time>
-              <div ref={langRef} className="relative z-[40] shrink-0">
-                <button
-                  ref={langTriggerRef}
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded={langOpen}
-                  aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
-                  onClick={() => setLangOpen(o => !o)}
-                  className={headerUtilityBtnClass(langOpen)}
-                >
-                  <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
-                  <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                <LocalePickerPortalMenu
-                  isOpen={langOpen}
-                  onOpenChange={setLangOpen}
-                  triggerRef={langTriggerRef}
-                  panelClassName={
-                    kassaAppearanceDark
-                      ? 'overflow-hidden rounded-xl border border-zinc-600 bg-[#151a21] shadow-xl py-1'
-                      : 'overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl py-1'
-                  }
-                  rowHoverClassName={ui.langRowHover}
-                  rowActiveClassName={ui.langRowActive}
-                  rowInactiveClassName={ui.langRowInactive}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setLogoutSoftwareConfirmOpen(true)}
-                title={t('kassaApp.logout')}
-                className={`relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${
-                  posChrome === 'speels'
-                    ? kassaSpeelsRedGlossButtonClass(false)
-                    : `${kassaSpeelsBlackGlossButtonClass(true)} ${kassaSpeelsTopChromeTextClass}`
-                }`}
-              >
-                <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.logout')}</span>
-              </button>
-            </div>
-          ) : (
-          <>
+                {kassaHeaderClockParts.minutes}
+              </span>
+            </time>
+          ) : null}
+
           <div ref={langRef} className="relative z-[40] shrink-0">
             <button
               ref={langTriggerRef}
@@ -6206,8 +6153,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             {t('kassaApp.logout')}
           </span>
         </button>
-          </>
-          )}
         </div>
 
       </div>
