@@ -6089,7 +6089,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           title={t('kassaApp.logout')}
           className={
             kassaPosLuxury
-              ? `relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${kassaSpeelsBlackGlossButtonClass(true)} ${kassaSpeelsTopChromeTextClass}`
+              ? `relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${
+                  posChrome === 'speels'
+                    ? kassaSpeelsRedGlossButtonClass(false)
+                    : `${kassaSpeelsBlackGlossButtonClass(true)} ${kassaSpeelsTopChromeTextClass}`
+                }`
               : `relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE
