@@ -5325,6 +5325,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [quickMenuAllowedSubmenuIds, showKassaStaffClockButton, demoViewOnly],
   )
 
+  const showSidebarOpRekeningButton = useMemo(
+    () =>
+      kassaNameAccountV2 &&
+      !demoViewOnly &&
+      quickMenuAllowedSubmenuIds.has('sm_kassa_op_rekening'),
+    [kassaNameAccountV2, demoViewOnly, quickMenuAllowedSubmenuIds],
+  )
+
+  const openNameAccountModalFromSidebar = useCallback(() => {
+    playClick()
+    prefetchKassaNameTabs(tenant)
+    setShowNameAccountModal(true)
+  }, [tenant])
+
   const kassaQuickMenuPanelBtnClass = useCallback(
     (enabled: boolean) =>
       [
@@ -6923,19 +6937,42 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : (
               <span className="min-h-0" aria-hidden />
               )}
-              <button
-                type="button"
-                onClick={clearCart}
-                disabled={billLines.length === 0}
-                className={`flex items-center justify-center px-1 rounded-xl ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
-                  kassaChromeDensity,
-                  kassaSidebarFooterTier === 'dense',
-                )}`}
-                title={t('kassaApp.remove')}
-                aria-label={t('kassaApp.remove')}
+              <div
+                className={`flex min-w-0 touch-manipulation select-none ${showSidebarOpRekeningButton ? 'gap-2' : ''}`}
               >
-                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
-              </button>
+                {showSidebarOpRekeningButton ? (
+                  <button
+                    type="button"
+                    data-testid="kassa-sidebar-op-rekening"
+                    disabled={cart.length === 0}
+                    onPointerDown={() => prefetchKassaNameTabs(tenant)}
+                    onClick={openNameAccountModalFromSidebar}
+                    className={`flex min-w-0 flex-1 items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                      kassaChromeDensity,
+                      kassaSidebarFooterTier === 'dense',
+                    )}`}
+                    title={t('kassaOnAccount.title')}
+                    aria-label={t('kassaOnAccount.title')}
+                  >
+                    <span className={`${kassaSidebarActionLabelClass} text-[10px] leading-tight sm:text-[11px]`}>
+                      {t('kassaOnAccount.title')}
+                    </span>
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={clearCart}
+                  disabled={billLines.length === 0}
+                  className={`flex items-center justify-center px-1 rounded-xl ${KASSA_REMOVE_BTN_FACE} ${showSidebarOpRekeningButton ? 'min-w-0 flex-1' : 'w-full'} ${kassaFooterActionTouchMinHClass(
+                    kassaChromeDensity,
+                    kassaSidebarFooterTier === 'dense',
+                  )}`}
+                  title={t('kassaApp.remove')}
+                  aria-label={t('kassaApp.remove')}
+                >
+                  <span className={kassaSidebarActionLabelClass}>{t('kassaApp.remove')}</span>
+                </button>
+              </div>
             </div>
             {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
               <div className="flex w-full gap-2.5 touch-manipulation select-none" data-testid="kassa-park-table-split">
@@ -7139,17 +7176,40 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : (
               <span className="min-h-0" aria-hidden />
               )}
-              <button
-                type="button"
-                onClick={clearCart}
-                disabled={billLines.length === 0}
-                className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
-                  kassaChromeDensity,
-                  kassaSidebarFooterTier === 'dense',
-                )}`}
+              <div
+                className={`flex min-w-0 touch-manipulation select-none ${showSidebarOpRekeningButton ? 'gap-2' : ''}`}
               >
-                <span className="text-center text-xs font-bold">{t('kassaApp.remove')}</span>
-              </button>
+                {showSidebarOpRekeningButton ? (
+                  <button
+                    type="button"
+                    data-testid="kassa-sidebar-op-rekening-classic"
+                    disabled={cart.length === 0}
+                    onPointerDown={() => prefetchKassaNameTabs(tenant)}
+                    onClick={openNameAccountModalFromSidebar}
+                    className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${
+                      kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_ACTION_BTN_FACE
+                    } disabled:pointer-events-none disabled:opacity-45 ${kassaFooterActionTouchMinHClass(
+                      kassaChromeDensity,
+                      kassaSidebarFooterTier === 'dense',
+                    )}`}
+                    title={t('kassaOnAccount.title')}
+                    aria-label={t('kassaOnAccount.title')}
+                  >
+                    <span className="text-center text-[10px] font-bold leading-tight">{t('kassaOnAccount.title')}</span>
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={clearCart}
+                  disabled={billLines.length === 0}
+                  className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${KASSA_REMOVE_BTN_FACE} ${showSidebarOpRekeningButton ? 'min-w-0 flex-1' : 'w-full'} ${kassaFooterActionTouchMinHClass(
+                    kassaChromeDensity,
+                    kassaSidebarFooterTier === 'dense',
+                  )}`}
+                >
+                  <span className="text-center text-xs font-bold">{t('kassaApp.remove')}</span>
+                </button>
+              </div>
             </div>
             {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
               <div className="flex w-full gap-2 touch-manipulation select-none" data-testid="kassa-park-table-split">
