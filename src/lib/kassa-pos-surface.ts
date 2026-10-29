@@ -330,32 +330,13 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
 /** Speels/Dark tegels — zie `.kassa-speels-menu-tile` (geen rand/filter-hover). */
 export const KASSA_SPEELS_MENU_TILE_BUTTON_CLASS = 'kassa-speels-menu-tile'
 
-/** Alle speels menu-tegels — 5 mm CSS 3D (perspective + zijkant + onderkant). */
-export const KASSA_SPEELS_MENU_TILE_3D_BUTTON_CLASS = 'kassa-speels-menu-tile-3d'
-
-export const KASSA_SPEELS_MENU_TILE_3D_SCENE =
-  'kassa-speels-menu-tile-3d-scene relative flex h-full min-h-0 w-full min-w-0 flex-1 flex-col rounded-[inherit]'
-
-export const KASSA_SPEELS_MENU_TILE_3D_PIVOT =
-  'kassa-speels-menu-tile-3d-pivot relative h-full min-h-0 w-full rounded-[inherit]'
-
-export const KASSA_SPEELS_MENU_TILE_3D_FRONT =
-  'kassa-speels-menu-tile-3d-front flex min-h-0 min-w-0 h-full w-full flex-1 flex-col overflow-hidden rounded-[inherit]'
-
-export const KASSA_SPEELS_MENU_TILE_3D_EDGE_RIGHT =
-  'kassa-speels-menu-tile-3d-edge kassa-speels-menu-tile-3d-edge--right pointer-events-none absolute'
-
-export const KASSA_SPEELS_MENU_TILE_3D_EDGE_BOTTOM =
-  'kassa-speels-menu-tile-3d-edge kassa-speels-menu-tile-3d-edge--bottom pointer-events-none absolute'
-
 export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
-  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-visible text-left',
+  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
   KASSA_SPEELS_MENU_TILE_BUTTON_CLASS,
-  KASSA_SPEELS_MENU_TILE_3D_BUTTON_CLASS,
   KASSA_POS_BTN_SHAPE,
-  'border-0 bg-transparent',
+  'border-0 bg-[#333333]',
   'transition-transform duration-150 ease-out',
-  'active:scale-[0.99]',
+  'active:scale-[0.96] active:translate-y-[1px]',
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 

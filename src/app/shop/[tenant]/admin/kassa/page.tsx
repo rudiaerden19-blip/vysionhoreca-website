@@ -127,11 +127,6 @@ import {
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
   KASSA_SPEELS_MENU_TILE_BUTTON_BASE,
-  KASSA_SPEELS_MENU_TILE_3D_SCENE,
-  KASSA_SPEELS_MENU_TILE_3D_PIVOT,
-  KASSA_SPEELS_MENU_TILE_3D_FRONT,
-  KASSA_SPEELS_MENU_TILE_3D_EDGE_RIGHT,
-  KASSA_SPEELS_MENU_TILE_3D_EDGE_BOTTOM,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_POS_MENU_TILE_IMG_CLASS,
@@ -735,18 +730,6 @@ function kassaTileLook(posLuxury: boolean, classicDark: boolean, speels: boolean
   return 'light'
 }
 
-function KassaSpeelsMenuTile3D({ children }: { children: ReactNode }) {
-  return (
-    <div className={KASSA_SPEELS_MENU_TILE_3D_SCENE}>
-      <div className={KASSA_SPEELS_MENU_TILE_3D_PIVOT}>
-        <div className={KASSA_SPEELS_MENU_TILE_3D_FRONT}>{children}</div>
-        <div className={KASSA_SPEELS_MENU_TILE_3D_EDGE_RIGHT} aria-hidden />
-        <div className={KASSA_SPEELS_MENU_TILE_3D_EDGE_BOTTOM} aria-hidden />
-      </div>
-    </div>
-  )
-}
-
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
@@ -895,11 +878,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       data-kassa-category-id={category.id != null ? String(category.id) : undefined}
       className={btnClass}
     >
-      {look === 'speels' ? (
-        <KassaSpeelsMenuTile3D>{categoryTileBody}</KassaSpeelsMenuTile3D>
-      ) : (
-        categoryTileBody
-      )}
+      {categoryTileBody}
     </button>
   )
 })
@@ -1064,11 +1043,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       data-kassa-product-id={product.id != null ? String(product.id) : undefined}
       className={btnClass}
     >
-      {look === 'speels' ? (
-        <KassaSpeelsMenuTile3D>{productTileBody}</KassaSpeelsMenuTile3D>
-      ) : (
-        productTileBody
-      )}
+      {productTileBody}
       {inCart > 0 && (
         <div
           className={
