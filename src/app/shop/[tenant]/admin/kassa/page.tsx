@@ -1095,7 +1095,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaLight = kassaLayout === 'light'
   const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
   const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
-  const kassaRecessTrayClass = kassaLayoutRecessTrayClass(kassaLayout)
+  /** Alleen Speels: ingesprongen effen tegelbak. Luxe/klassiek: menu-scroll vlak blijft zoals vóór korrel-tweak. */
+  const kassaRecessTrayClass =
+    kassaLayout === 'speels' ? kassaLayoutRecessTrayClass('speels') : ''
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
