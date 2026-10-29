@@ -309,7 +309,7 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsGreenGlossButtonClass(true)} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
+    return `${kassaSpeelsGreenGlossButtonClass(false)} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
   }
   return KASSA_POS_CHECKOUT_BTN
 }

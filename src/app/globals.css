@@ -672,7 +672,7 @@ input[type="number"] {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   box-shadow:
     0 3px 7px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
     inset 0 -2px 0 rgba(0, 0, 0, 0.42);
 }
 
@@ -686,9 +686,9 @@ input[type="number"] {
     #4f1010 62%,
     #3d0c0c 100%
   );
-  border: 1px solid #2a0808;
-  border-top: 1px solid #d8a0a0;
-  border-bottom: 1px solid #1a0505;
+  border: 1px solid #1a0505;
+  border-top-color: #6a3030;
+  border-bottom-color: #120303;
 }
 
 .kassa-speels-green-gloss-btn {
@@ -701,9 +701,9 @@ input[type="number"] {
     #0f4a32 62%,
     #0a3d28 100%
   );
-  border: 1px solid #062a1c;
-  border-top: 1px solid #9fd4b8;
-  border-bottom: 1px solid #051f15;
+  border: 1px solid #051f15;
+  border-top-color: #2a6a4a;
+  border-bottom-color: #031810;
 }
 
 .kassa-speels-red-gloss-btn::before,
@@ -733,7 +733,7 @@ input[type="number"] {
 
 .kassa-speels-red-gloss-btn:active {
   background: linear-gradient(180deg, #5c1818 0%, #481212 55%, #360e0e 100%);
-  border-top-color: rgba(255, 255, 255, 0.35);
+  border-top-color: #4a2020;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.5),
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
@@ -741,7 +741,7 @@ input[type="number"] {
 
 .kassa-speels-green-gloss-btn:active {
   background: linear-gradient(180deg, #145a3d 0%, #0f4a32 55%, #0a3826 100%);
-  border-top-color: rgba(255, 255, 255, 0.35);
+  border-top-color: #1f5040;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.5),
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
@@ -756,25 +756,16 @@ input[type="number"] {
 .kassa-speels-green-gloss-btn--emphasis {
   box-shadow:
     0 3px 9px rgba(0, 0, 0, 0.58),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.14);
-}
-
-.kassa-speels-red-gloss-btn--emphasis {
-  border-top-color: #e8b8b8;
-}
-
-.kassa-speels-green-gloss-btn--emphasis {
-  border-top-color: #b8e0c8;
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
 }
 
 .kassa-speels-red-gloss-btn--emphasis::before,
 .kassa-speels-green-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.4) 45%,
     rgba(255, 255, 255, 0) 100%
   );
 }
