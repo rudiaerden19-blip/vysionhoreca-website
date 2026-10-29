@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { adminDb } from '@/lib/admin-db-client'
 import {
   isNameTabContextColumnError,
+  deleteOpenKassaNameTab,
   mergeIntoTabLines,
   nameTabCustomerKey,
   nameTabFullSavePayload,
@@ -56,6 +57,8 @@ type Props = {
   tableNumber?: string
   floorPlanZone?: FloorPlanZone
   staffId?: string | null
+  /** Zaak-eigenaar (of superadmin): open tab wissen vóór betaling — geen Z/omzet. */
+  ownerCanDeleteOpenTab?: boolean
   onClose: () => void
   onCommitted: () => void
   /** Na betaling: bon tonen/afdrukken via kassa (success-modal). */
@@ -72,6 +75,7 @@ export default function KassaNameAccountModal({
   tableNumber = '',
   floorPlanZone,
   staffId,
+  ownerCanDeleteOpenTab = false,
   onClose,
   onCommitted,
   onPaymentSuccess,
@@ -163,6 +167,8 @@ export default function KassaNameAccountModal({
     () => nameAccountOpenTotalDisplay(name, selectedTabId, openList),
     [name, selectedTabId, openList],
   )
+
+  const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
 
   const grandOpenTotal = useMemo(() => nameAccountGrandOpenTotal(openList), [openList])
 
@@ -268,6 +274,39 @@ export default function KassaNameAccountModal({
     void fetchKassaNameTabs(tenant, { force: true })
   }
 
+  const deleteSelectedOpenTab = async () => {
+    if (!ownerCanDeleteOpenTab || cart.length > 0) return
+    const tab = selectedTab ?? resolveTabForName(name)
+    if (!tab?.id) {
+      setError(t('kassaNameAccount.pickPayer'))
+      return
+    }
+    const open = tabOpenTotalIncl(Array.isArray(tab.items) ? tab.items : [])
+    if (open <= 0.001) return
+    const displayName = normName(tab.customer_name)
+    const ok = window.confirm(
+      t('kassaNameAccount.deleteOpenTabConfirm').replace('{name}', displayName).replace('{amount}', money(open)),
+    )
+    if (!ok) return
+    setSaving(true)
+    setError(null)
+    const res = await deleteOpenKassaNameTab({ tenantSlug: tenant, tabId: tab.id })
+    setSaving(false)
+    if (!res.ok) {
+      setError(t('kassaNameAccount.deleteOpenTabFailed'))
+      return
+    }
+    invalidateKassaNameTabsCache(tenant)
+    setSelectedTabId(null)
+    setName('')
+    setConfirmName(null)
+    setPayAmount('')
+    setPayAmountEdited(false)
+    void fetchKassaNameTabs(tenant, { force: true }).then((r) => {
+      if (r.ok) setTabs(r.tabs)
+    })
+  }
+
   const registerPayment = async () => {
     const tab = selectedTab ?? resolveTabForName(name)
     if (!tab) {
@@ -353,7 +392,12 @@ export default function KassaNameAccountModal({
 
   const cartHasItems = cart.length > 0
   const showPayPanel = !cartHasItems && payerOpenTotal > 0.001 && !!normName(name)
-  const money = (n: number) => `€ ${n.toFixed(2).replace('.', ',')}`
+  const showOwnerDeleteOpenTab =
+    ownerCanDeleteOpenTab &&
+    !cartHasItems &&
+    payerOpenTotal > 0.001 &&
+    !!normName(name) &&
+    !!(selectedTab ?? resolveTabForName(name))?.id
   const hasPayerSelected = payerOpenTotal > 0.001 && !!normName(name)
   const showGrandOpenTotal = !cartHasItems && !showPayPanel
   const payerPayFieldValue = payAmountEdited
@@ -490,6 +534,20 @@ export default function KassaNameAccountModal({
 
           {!hasPayerSelected && openList.length > 0 && !cartHasItems ? (
             <p className="text-sm text-gray-500">{t('kassaNameAccount.openBalancePickHint')}</p>
+          ) : null}
+
+          {showOwnerDeleteOpenTab ? (
+            <div className="rounded-xl border border-red-200 bg-red-50/60 px-3 py-3 space-y-2">
+              <p className="text-xs text-red-900/90">{t('kassaNameAccount.deleteOpenTabHint')}</p>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => void deleteSelectedOpenTab()}
+                className="w-full rounded-xl border border-red-300 bg-white py-3 text-sm font-semibold text-red-800 disabled:opacity-50"
+              >
+                {t('kassaNameAccount.deleteOpenTabButton')}
+              </button>
+            </div>
           ) : null}
 
           {showPayPanel ? (

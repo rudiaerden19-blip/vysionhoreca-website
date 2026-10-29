@@ -152,7 +152,12 @@ import {
   kassaPosCartQtyButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
-import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
+import {
+  authFetch,
+  buildShopInternalReturnPath,
+  isOwnerSessionFreshForTenant,
+  isSuperAdminLoggedIn,
+} from '@/lib/auth-headers'
 import {
   attemptCloseThenOrNavigate,
   applyOwnerOnlyLogoutCleanup,
@@ -1202,6 +1207,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Snelmenu-balk: standaard dicht; alleen open via knop «Snel menu» (niet na refresh). */
   const [kassaQuickMenuVisible, setKassaQuickMenuVisible] = useState(false)
   const [showNameAccountModal, setShowNameAccountModal] = useState(false)
+  const [ownerCanDeleteOpenNameTab, setOwnerCanDeleteOpenNameTab] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setOwnerCanDeleteOpenNameTab(
+      isOwnerSessionFreshForTenant(tenant) || isSuperAdminLoggedIn(),
+    )
+  }, [tenant])
   useEffect(() => {
     if (cart.length > 0) setNumpadPanelVisible(false)
   }, [cart.length])
@@ -7260,6 +7272,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           tableNumber={String(tableNumber ?? '')}
           floorPlanZone={orderType === 'DINE_IN' && tableNumber ? dineInFloorZone : undefined}
           staffId={activeKassaStaff?.id ?? null}
+          ownerCanDeleteOpenTab={ownerCanDeleteOpenNameTab}
           onClose={() => setShowNameAccountModal(false)}
           onCommitted={() => {
             setCart([])

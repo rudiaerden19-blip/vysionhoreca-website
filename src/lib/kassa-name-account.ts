@@ -2,6 +2,8 @@ import type { KassaCartItem, KassaRegisterOrderType } from '@/lib/kassa-cart-typ
 import type { FloorPlanZone } from '@/lib/kassa-floor-plan-zone'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import { onAccountCustomerKey, normalizeOnAccountCustomerName } from '@/lib/kassa-on-account'
+import { adminDb } from '@/lib/admin-db-client'
+import { normalizeNameAccountTenantSlug } from '@/lib/kassa-name-account-guard'
 
 /** Regel op tab met openstaand bedrag incl. BTW (≤ regeltotaal). */
 export type KassaNameTabLine = KassaCartItem & { unpaidIncl: number }
@@ -422,4 +424,25 @@ export function nameTabFullSavePayload(
     updated_at: updatedAt,
     ...(staff ? { kassa_staff_id: staff } : {}),
   }
+}
+
+/**
+ * Open tab wissen vóór betaling — geen order, dus geen omzet/Z/rapporten.
+ * Alleen aanroepen na eigenaar-check in de UI.
+ */
+export async function deleteOpenKassaNameTab(params: {
+  tenantSlug: string
+  tabId: string
+}): Promise<{ ok: boolean; error?: string }> {
+  const tenant = normalizeNameAccountTenantSlug(params.tenantSlug)
+  const tabId = String(params.tabId ?? '').trim()
+  if (!tenant || !tabId) return { ok: false, error: 'invalid_request' }
+
+  const res = await adminDb.delete(
+    'kassa_name_tabs',
+    { id: tabId, tenant_slug: tenant },
+    { tenantSlug: tenant, notes: 'owner_delete_open_name_tab' },
+  )
+  if (!res.ok) return { ok: false, error: res.error || 'delete_failed' }
+  return { ok: true }
 }
