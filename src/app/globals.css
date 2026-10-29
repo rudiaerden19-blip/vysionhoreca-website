@@ -469,10 +469,9 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Speels tegelbak + mand — effen donkergrijs, geen korrel. */
+/* Speels tegelbak — effen donkergrijs, geen korrel. */
 .kassa-speels-menu-scroll,
-.kassa-speels-recess-tray,
-.kassa-speels-sidebar-cart-vak {
+.kassa-speels-recess-tray {
   background-color: #2f2f2f;
   background-image: none;
 }
@@ -1067,8 +1066,15 @@ html.kassa-luxe-leather body {
   box-shadow: inset 0 0 0 1px #000000;
 }
 
-/* Zijbalk mand/numpad — #333 met zwart kader (zelfde leesbaarheid als tegelveld). */
+/* Zijbalk mand — zwarte korrel + zwart kader. */
 .kassa-speels-sidebar-cart-vak {
+  background-color: #0c0c0c;
+  background-image:
+    linear-gradient(rgba(18, 18, 18, 0.2), rgba(18, 18, 18, 0.2)),
+    url('/images/kassa-dark-frame-grain.png');
+  background-size: 512px 512px;
+  background-repeat: repeat;
+  background-blend-mode: overlay;
   border: 2px solid #000000 !important;
   box-shadow: inset 0 0 0 1px #000000;
 }
