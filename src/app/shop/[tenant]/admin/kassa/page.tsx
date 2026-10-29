@@ -114,6 +114,7 @@ import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
+  KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
   KASSA_POS_RULE_BLACK,
   KASSA_POS_QUICK_MENU_LIFT_SHADOW,
   KASSA_POS_SELECTED_ACCENT_TEXT,
@@ -6564,10 +6565,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart / numpad (toggle via footer) */}
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
-            kassaAppearanceDark ? 'px-3 pt-1': 'px-2.5 pt-1.5'
+            kassaAppearanceDark
+              ? kassaLayout === 'speels'
+                ? 'px-2 pt-1 pb-1'
+                : 'px-3 pt-1'
+              : 'px-2.5 pt-1.5'
           }`}
         >
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div
+              className={`flex min-h-0 flex-1 flex-col overflow-hidden ${
+                kassaLayout === 'speels' ? `${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS} px-2 py-1.5` : ''
+              }`}
+            >
               {sidebarShowsLegacyParkedHeader ? (
                 <div
                   className={

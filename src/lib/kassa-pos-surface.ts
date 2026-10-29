@@ -30,6 +30,9 @@ export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 /** Effen grijs tegelveld (geen korrel — korrel alleen op kader via plate-shell). */
 export const KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS = 'bg-[#333333] kassa-speels-menu-scroll'
 
+/** Zijbalk mand/numpad — effen #333 + rand, zoals menu-achtergrond achter tegels. */
+export const KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS = `${KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS} rounded-xl border border-black`
+
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
 export const KASSA_FLOOR_TERRACE_GRAIN_CLASS = 'gks-floor-terrace-grain'
 
