@@ -1,13 +1,8 @@
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 
-/** Pilot The Lagoon: rapporten alleen na verse eigenaar-PIN (geen gedeelde unlock voor personeel). */
-export function lagoonStrictReportsPinEnabled(
-  tenantSlug: string,
-  opts?: { kassaNameAccountV2?: boolean | null },
-): boolean {
-  if (isTheLagoonTenant(tenantSlug)) return true
-  if (opts?.kassaNameAccountV2 === true) return true
-  return false
+/** Pilot The Lagoon: strikte rapport-PIN — **niet** koppelen aan op-rekening v2 (andere tenants). */
+export function lagoonStrictReportsPinEnabled(tenantSlug: string): boolean {
+  return isTheLagoonTenant(tenantSlug)
 }
 
 /** Wis elke zaak-PIN-unlock (voorkomt thelagoon vs the-lagoon bypass). */
@@ -27,8 +22,8 @@ export function clearAllOwnerPinUnlockSessions(): void {
 
 const OWNER_PIN_SESSION_PREFIX = 'vysion_pin_unlocked_'
 
-/** Rapporten-module paden (zie `tenant-modules` route → module `rapporten`). */
-export function isLagoonStrictReportsAdminRestPath(rest: string): boolean {
+/** Rapporten-module paden — alle tenants (zie `tenant-modules` → module `rapporten`). */
+export function isReportsAdminRestPath(rest: string): boolean {
   const path = rest.startsWith('/') ? rest : `/${rest}`
   return (
     path.startsWith('/rapporten') ||
