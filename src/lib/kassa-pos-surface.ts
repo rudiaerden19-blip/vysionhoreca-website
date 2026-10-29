@@ -235,8 +235,11 @@ export const KASSA_SPEELS_BLUE_GLOSS_BTN_CLASS = 'kassa-speels-blue-gloss-btn'
 export const KASSA_SPEELS_RED_GLOSS_BTN_CLASS = 'kassa-speels-red-gloss-btn'
 export const KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS = 'kassa-speels-green-gloss-btn'
 
-/** Header online-status — glow sweep links→rechts over groene gloss-knop. */
-export const KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS = 'kassa-speels-online-status-sweep'
+/** Groene gloss-knoppen — herhalende glow sweep links→rechts (online, Afrekenen). */
+export const KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS = 'kassa-speels-green-glow-sweep'
+
+/** @deprecated alias — gebruik {@link KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} */
+export const KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS = KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS
 
 /** Mand-prijzen — zelfde groen als Afrekenen (speels green gloss). */
 export const KASSA_SPEELS_PRICE_ACCENT_CLASS = 'text-[#4aad7a]'
@@ -335,7 +338,7 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsGreenGlossButtonClass(false)} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
+    return `${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
   }
   return KASSA_POS_CHECKOUT_BTN
 }

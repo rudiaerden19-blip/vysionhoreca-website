@@ -902,7 +902,8 @@ input[type="number"] {
   }
 }
 
-/* Online header — herhalende lichtband over groene knop (geen knipper). */
+/* Groene gloss (online, Afrekenen) — herhalende lichtband links→rechts. */
+.kassa-speels-green-gloss-btn.kassa-speels-green-glow-sweep::after,
 .kassa-speels-green-gloss-btn.kassa-speels-online-status-sweep::after {
   left: 0;
   right: auto;
