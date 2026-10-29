@@ -5928,9 +5928,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => openKassaHelp()}
-            className={`${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE} ${
-              kassaHelpOpen ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''
-            }`}
+            className={`${
+              kassaPosLuxury
+                ? `${headerQuickLinkBtnClass} ${kassaHelpOpen ? 'kassa-speels-order-type-btn--selected' : ''}`
+                : `${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE}`
+            } ${kassaHelpOpen && !kassaPosLuxury ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''}`}
             title={t('kassaApp.helpVideoButton')}
           >
             <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.helpVideoButton')}</span>
@@ -6116,7 +6118,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       role="tab"
                       aria-selected={active}
                       data-kassa-strip-category-id={cat.id != null ? String(cat.id) : undefined}
-                      className={`shrink-0 touch-pan-x whitespace-nowrap border font-bold leading-tight transition-colors active:brightness-95 ${
+                      className={`shrink-0 touch-pan-x whitespace-nowrap leading-tight ${
                         kassaCompactChrome
                           ? 'px-3 py-1.5 text-sm'
                           : 'px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm'
@@ -6448,9 +6450,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setKassaZoneTab('terrace')
                   setShowTablePicker(true)
                 }}
-                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 rounded-xl font-bold ${kassaFloorZoneButtonTouchClass(
+                className={`flex min-w-0 flex-1 flex-col items-center justify-center px-2 transition-colors sm:px-3 ${kassaFloorZoneButtonTouchClass(
                   kassaChromeDensity,
-                )} ${kassaZoneTab === 'terrace' ? KASSA_TERRACE_BTN_FACE_ON : KASSA_TERRACE_BTN_FACE}`}
+                )} ${
+                  kassaPosLuxury
+                    ? `font-semibold ${kassaPosButtonClass(kassaZoneTab === 'terrace', posChrome)}`
+                    : `rounded-xl font-bold ${kassaZoneTab === 'terrace' ? KASSA_TERRACE_BTN_FACE_ON : KASSA_TERRACE_BTN_FACE}`
+                }`}
               >
                 <span className={kassaSidebarZoneLabelClass}>{t('kassaApp.floorZoneTerrace')}</span>
                 {orderType === 'DINE_IN' && tableNumber && dineInFloorZone === FLOOR_PLAN_ZONE_TERRACE ? (
@@ -6681,7 +6687,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     kassaAppearanceDark
                       ? kassaClassicDark
                         ? `mt-3 shrink-0 touch-manipulation rounded-xl py-4 text-base font-bold ${KASSA_CLASSIC_ACTION_BTN_FACE_ON}`
-                        : `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosButtonClass(true, posChrome)}`
+                        : `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosLuxury ? kassaPosButtonClass(false, posChrome) : kassaPosButtonClass(true, posChrome)}`
                       : 'mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
                   }
                 >
@@ -6959,7 +6965,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex items-center justify-center px-1 rounded-xl ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
+                  className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
                     kassaChromeDensity,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -6989,7 +6995,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${KASSA_REMOVE_BTN_FACE}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${kassaPosButtonClass(false, posChrome)}`}
                   title={t('kassaApp.remove')}
                   aria-label={t('kassaApp.remove')}
                 >

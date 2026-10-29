@@ -161,12 +161,19 @@ export const KASSA_POS_QUICK_MENU_LIFT_SHADOW =
 
 /** Snelmenu-balk: POS-knop met champagne-gloed achter elk tegel. */
 export function kassaPosQuickMenuPanelButtonClass(look: KassaPosChromeLook = 'luxe'): string {
+  if (look === 'speels') {
+    return [
+      kassaSpeelsChromeButtonClass(false),
+      KASSA_POS_BTN_DISABLED_SAME_LOOK,
+      'disabled:text-white',
+    ].join(' ')
+  }
   return [
     KASSA_POS_BTN_SHAPE,
     KASSA_BTN_FACE,
-    look === 'speels' ? 'border border-[#3d352c]' : 'border border-[#d4b483]',
+    'border border-[#d4b483]',
     KASSA_POS_QUICK_MENU_LIFT_SHADOW,
-    look === 'speels' ? KASSA_POS_BTN_PRESS : KASSA_LUXE_BTN_PRESS,
+    KASSA_LUXE_BTN_PRESS,
     KASSA_BTN_PRESS_FACE,
     KASSA_POS_BTN_DISABLED_SAME_LOOK,
     'text-[#f0f0f0] disabled:text-[#f0f0f0]',
@@ -211,32 +218,38 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
   'font-bold',
 ].join(' ')
 
-export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook = 'luxe'): string {
-  if (look === 'speels' && selected) {
-    return `${KASSA_POS_BTN_SHAPE} ${KASSA_SPEELS_BTN_SELECTED}`
-  }
-  if (look === 'speels') {
-    return `${KASSA_POS_BTN_SHAPE} ${KASSA_POS_BTN}`
-  }
-  return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN_LUXE}`
-}
-
-/** Dark/speels — Ter plaatse / Afhalen / Levering (glanzend grijs via CSS-gradient). */
+/** Dark/speels — glanzend grijs (zelfde als Ter plaatse / Afhalen / Levering). */
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
 
-export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
+export function kassaSpeelsChromeButtonClass(selected: boolean): string {
   return [
     KASSA_POS_BTN_SHAPE,
     KASSA_SPEELS_ORDER_TYPE_BTN_CLASS,
     selected ? 'kassa-speels-order-type-btn--selected' : '',
-    'touch-manipulation select-none relative isolate overflow-hidden font-semibold',
+    'touch-manipulation select-none relative isolate overflow-hidden font-semibold text-white',
     'transition-transform duration-100 ease-out',
     'active:translate-y-px',
-  ].join(' ')
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
+  return kassaSpeelsChromeButtonClass(selected)
+}
+
+export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook = 'luxe'): string {
+  if (look === 'speels') {
+    return kassaSpeelsChromeButtonClass(selected)
+  }
+  return `${KASSA_POS_BTN_SHAPE} ${selected ? KASSA_POS_BTN_SELECTED : KASSA_POS_BTN_LUXE}`
 }
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
-  return look === 'speels' ? KASSA_SPEELS_CHECKOUT_BTN : KASSA_POS_CHECKOUT_BTN
+  if (look === 'speels') {
+    return `${kassaSpeelsChromeButtonClass(false)} font-bold`
+  }
+  return KASSA_POS_CHECKOUT_BTN
 }
 
 export function kassaPosRaisedStripClass(look: KassaPosChromeLook = 'luxe'): string {
