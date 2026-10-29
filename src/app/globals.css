@@ -489,16 +489,19 @@ input[type="number"] {
   content: '';
   pointer-events: none;
   position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 8%;
-  height: 48%;
+  left: 11%;
+  right: 11%;
+  top: 50%;
+  height: 46%;
+  transform: translateY(-48%);
   z-index: 1;
   border-radius: 9999px;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.26) 0%,
-    rgba(255, 255, 255, 0.1) 42%,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.12) 32%,
+    rgba(255, 255, 255, 0.24) 50%,
+    rgba(255, 255, 255, 0.1) 68%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -519,8 +522,10 @@ input[type="number"] {
 .kassa-speels-order-type-btn--selected::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.32) 0%,
-    rgba(255, 255, 255, 0.14) 45%,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.16) 32%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.12) 68%,
     rgba(255, 255, 255, 0) 100%
   );
 }
