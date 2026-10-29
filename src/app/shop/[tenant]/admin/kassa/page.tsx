@@ -12,6 +12,7 @@ import {
   startTransition,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from 'react'
 import dynamic from 'next/dynamic'
 import { flushSync } from 'react-dom'
@@ -126,9 +127,11 @@ import {
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
   KASSA_SPEELS_MENU_TILE_BUTTON_BASE,
-  KASSA_SPEELS_MENU_TILE_INNER_CLIP,
-  KASSA_SPEELS_MENU_TILE_SLAB,
-  KASSA_SPEELS_MENU_TILE_STACK,
+  KASSA_SPEELS_MENU_TILE_3D_SCENE,
+  KASSA_SPEELS_MENU_TILE_3D_PIVOT,
+  KASSA_SPEELS_MENU_TILE_3D_FRONT,
+  KASSA_SPEELS_MENU_TILE_3D_EDGE_RIGHT,
+  KASSA_SPEELS_MENU_TILE_3D_EDGE_BOTTOM,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_POS_MENU_TILE_IMG_CLASS,
@@ -732,6 +735,18 @@ function kassaTileLook(posLuxury: boolean, classicDark: boolean, speels: boolean
   return 'light'
 }
 
+function KassaSpeelsMenuTile3D({ children }: { children: ReactNode }) {
+  return (
+    <div className={KASSA_SPEELS_MENU_TILE_3D_SCENE}>
+      <div className={KASSA_SPEELS_MENU_TILE_3D_PIVOT}>
+        <div className={KASSA_SPEELS_MENU_TILE_3D_FRONT}>{children}</div>
+        <div className={KASSA_SPEELS_MENU_TILE_3D_EDGE_RIGHT} aria-hidden />
+        <div className={KASSA_SPEELS_MENU_TILE_3D_EDGE_BOTTOM} aria-hidden />
+      </div>
+    </div>
+  )
+}
+
 type KassaCategoryTileButtonProps = {
   category: MenuCategory
   imageUrl?: string
@@ -881,10 +896,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       className={btnClass}
     >
       {look === 'speels' ? (
-        <div className={KASSA_SPEELS_MENU_TILE_STACK}>
-          <div className={KASSA_SPEELS_MENU_TILE_SLAB} aria-hidden />
-          <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{categoryTileBody}</div>
-        </div>
+        <KassaSpeelsMenuTile3D>{categoryTileBody}</KassaSpeelsMenuTile3D>
       ) : (
         categoryTileBody
       )}
@@ -1053,10 +1065,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       className={btnClass}
     >
       {look === 'speels' ? (
-        <div className={KASSA_SPEELS_MENU_TILE_STACK}>
-          <div className={KASSA_SPEELS_MENU_TILE_SLAB} aria-hidden />
-          <div className={KASSA_SPEELS_MENU_TILE_INNER_CLIP}>{productTileBody}</div>
-        </div>
+        <KassaSpeelsMenuTile3D>{productTileBody}</KassaSpeelsMenuTile3D>
       ) : (
         productTileBody
       )}

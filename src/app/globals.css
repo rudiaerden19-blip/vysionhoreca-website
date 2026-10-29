@@ -495,11 +495,10 @@ input[type="number"] {
 }
 
 /*
- * Menu-tegels Dark — 5 mm op effen #333: slab vult tegel; face kleiner (marge) → rand rechts+onder.
- * Geen translate (menu-scroll knipt overflow-x af).
+ * Alle speels menu-tegels — 5 mm CSS 3D op effen #333 (voorkant ongewijzigd).
  */
 .kassa-speels-menu-tile {
-  --kassa-speels-tile-slab-x: 5px;
+  --kassa-menu-tile-depth: 5mm;
   position: relative;
   overflow: visible !important;
   outline: none !important;
@@ -508,58 +507,70 @@ input[type="number"] {
   background: transparent !important;
 }
 
-.kassa-speels-menu-tile-stack {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-  width: 100%;
-  border-radius: inherit;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.38));
-}
-
-/* Zijkant ~5 mm (alleen rechts); geen horizontale strook onder titel. */
-.kassa-speels-menu-tile-slab {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  background: linear-gradient(180deg, #3a3a3a 0%, #363636 100%);
-}
-
-.kassa-speels-menu-tile-face {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 auto;
-  min-height: 0;
-  margin: 0 var(--kassa-speels-tile-slab-x) 0 0;
-  transition: margin 150ms ease-out, box-shadow 150ms ease-out;
-  background: linear-gradient(180deg, #464646 0%, #424242 10%, #3f3f3f 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 1px 0 #3b3b3b,
-    0 2px 0 #393939,
-    0 3px 0 #373737,
-    0 4px 0 #353535,
-    0 5px 0 #333333;
-}
-
 .kassa-speels-menu-tile:hover,
 .kassa-speels-menu-tile:focus,
 .kassa-speels-menu-tile:focus-visible {
   outline: none !important;
 }
 
-.kassa-speels-menu-tile:active .kassa-speels-menu-tile-face {
-  margin: 0 2px 0 0;
+.kassa-speels-menu-tile-3d-scene {
+  perspective: 820px;
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+}
+
+.kassa-speels-menu-tile-3d-pivot {
+  transform-style: preserve-3d;
+  transform: rotateX(7deg) rotateY(-2.5deg);
+  transition: transform 150ms ease-out;
+}
+
+.kassa-speels-menu-tile-3d-front {
+  position: relative;
+  transform: translateZ(var(--kassa-menu-tile-depth));
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
   box-shadow:
-    inset 0 3px 8px rgba(0, 0, 0, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 1px 0 #353535,
-    0 2px 6px rgba(0, 0, 0, 0.35);
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 10px 22px rgba(0, 0, 0, 0.38);
+}
+
+.kassa-speels-menu-tile-3d-edge {
+  backface-visibility: hidden;
+  border-radius: inherit;
+}
+
+.kassa-speels-menu-tile-3d-edge--right {
+  top: 0;
+  left: 100%;
+  width: var(--kassa-menu-tile-depth);
+  height: 100%;
+  transform-origin: left center;
+  transform: rotateY(90deg) translateZ(var(--kassa-menu-tile-depth));
+  background: linear-gradient(90deg, #3c3c3c 0%, #343434 55%, #323232 100%);
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+.kassa-speels-menu-tile-3d-edge--bottom {
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: var(--kassa-menu-tile-depth);
+  transform-origin: center top;
+  transform: rotateX(-90deg) translateZ(var(--kassa-menu-tile-depth));
+  background: linear-gradient(180deg, #3a3a3a 0%, #323232 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.kassa-speels-menu-tile-3d:active .kassa-speels-menu-tile-3d-pivot {
+  transform: rotateX(9deg) rotateY(-2.5deg) translateY(1px);
+}
+
+.kassa-speels-menu-tile-3d:active .kassa-speels-menu-tile-3d-front {
+  transform: translateZ(2mm);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.22),
+    0 5px 14px rgba(0, 0, 0, 0.42);
 }
 
 /*
