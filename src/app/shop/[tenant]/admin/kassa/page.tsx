@@ -128,7 +128,6 @@ import {
   KASSA_MENU_TILE_TOUCH_PRESS,
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
   KASSA_POS_MENU_TILE_BUTTON_BASE,
-  KASSA_SPEELS_MENU_TILE_BUTTON_BASE,
   KASSA_POS_MENU_TILE_IMAGE_WELL,
   KASSA_POS_MENU_TILE_IMAGE_WELL_SXGA,
   KASSA_POS_MENU_TILE_IMG_CLASS,
@@ -768,13 +767,11 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   }
   const luxuryChrome = look === 'luxury' || look === 'speels'
   const btnClass =
-    look === 'speels'
-      ? `${KASSA_SPEELS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start' : 'h-full'}`
-      : luxuryChrome
-        ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start' : 'h-full'}`
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
-          : KASSA_MENU_TILE_BUTTON_CLASS
+    luxuryChrome
+      ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
+        : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell =
     look === 'speels'
       ? sxgaDenseTileLayout
@@ -935,13 +932,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   }
   const luxuryChrome = look === 'luxury' || look === 'speels'
   const btnClass =
-    look === 'speels'
-      ? `${KASSA_SPEELS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start' : 'h-full'}`
-      : luxuryChrome
-        ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start' : 'h-full'}`
-        : sxgaDenseTileLayout
-          ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
-          : KASSA_MENU_TILE_BUTTON_CLASS
+    luxuryChrome
+      ? `${KASSA_POS_MENU_TILE_BUTTON_BASE} ${sxgaDenseTileLayout ? 'h-auto justify-start': 'h-full'}`
+      : sxgaDenseTileLayout
+        ? KASSA_MENU_TILE_BUTTON_CLASS_SXGA
+        : KASSA_MENU_TILE_BUTTON_CLASS
   const imgWell =
     look === 'speels'
       ? sxgaDenseTileLayout

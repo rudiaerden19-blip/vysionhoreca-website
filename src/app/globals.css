@@ -457,7 +457,7 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. PNG-korrel op kader + tegel-titelstrook; scroll/recess effen #333.
+ * Mode «Dark» (layout speels) — alle tenants. PNG-korrel (zichtbaar op iPad); tegel-scroll/recess effen #333.
  */
 .kassa-speels-plate-grain {
   background-color: #282828;
@@ -467,52 +467,6 @@ input[type="number"] {
   background-size: 512px 512px;
   background-repeat: repeat;
   background-blend-mode: overlay;
-}
-
-/* Titelstrook tegels — zelfde korrel, milder blend (voorkomt witte 1px-rand in tegel). */
-.kassa-speels-tile-label-grain {
-  background-color: #282828;
-  background-image:
-    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
-    url('/images/kassa-dark-frame-grain.png');
-  background-size: 512px 512px;
-  background-repeat: repeat;
-  background-blend-mode: soft-light;
-  background-clip: padding-box;
-}
-
-/*
- * Menu-tegels Dark mode — witte 1px-rand: Safari/iPad antialias bij rounded + filter.
- * Constante filter/compositing (niet alleen :hover); geen brightness-toggle op de knop.
- */
-.kassa-speels-menu-tile {
-  border: none !important;
-  box-shadow: none !important;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-appearance: none;
-  appearance: none;
-  isolation: isolate;
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  /* Zelfde pad als :hover brightness — voorkomt flikkern witte rand */
-  filter: brightness(1.03);
-  outline: 1px solid #333333;
-  outline-offset: -1px;
-}
-
-.kassa-speels-menu-tile:focus,
-.kassa-speels-menu-tile:focus-visible {
-  outline: 1px solid #333333;
-  outline-offset: -1px;
-  box-shadow: none !important;
-}
-
-@media (hover: hover) {
-  .kassa-speels-menu-tile:hover {
-    filter: brightness(1.03);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
-  }
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */

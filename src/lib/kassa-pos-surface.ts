@@ -22,9 +22,6 @@ export const KASSA_LUXE_CART_GRAIN_CLASS = 'kassa-luxe-cart-grain'
 /** Dark mode (layout speels): `kassa-speels-plate-grain` + `/images/kassa-dark-frame-grain.png`. */
 export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 
-/** Zelfde PNG-korrel op tegel-titelstrook — `soft-light` i.p.v. overlay (geen witte rand op iPad). */
-export const KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS = 'kassa-speels-tile-label-grain'
-
 export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
@@ -306,20 +303,6 @@ export const KASSA_POS_MENU_TILE_BUTTON_BASE = [
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
 ].join(' ')
 
-/** Speels/Dark menu-tegel — vlak op #333-recess; geen rand/schaduw (witte halo iPad). */
-export const KASSA_SPEELS_MENU_TILE_BUTTON_CLASS = 'kassa-speels-menu-tile'
-
-export const KASSA_SPEELS_MENU_TILE_BUTTON_BASE = [
-  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden text-left',
-  KASSA_SPEELS_MENU_TILE_BUTTON_CLASS,
-  KASSA_POS_BTN_SHAPE,
-  'border-0 bg-[#333333] shadow-none outline-none',
-  'transition-transform duration-150 ease-out',
-  'active:scale-[0.96] active:translate-y-[1px]',
-  'active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.42)]',
-  KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
-].join(' ')
-
 /** Fotovlak — studio-vignette zoals de afgesproken look: licht midden, donker naar de randen. */
 const KASSA_POS_MENU_TILE_STUDIO_BG =
   'bg-[radial-gradient(ellipse_at_50%_42%,#d4c8b4_0%,#b5a894_36%,#8a7d6c_62%,#4a4238_88%,#2a241c_100%)]'
@@ -374,12 +357,12 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
-/** Speels: titelstrook = zelfde #282828 + PNG-korrel als POS-kader (niet espresso-gradient). */
+/** Speels: titelstrook dezelfde bruine knopkleur als snelmenu (afb. 2). */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
-  `pointer-events-none shrink-0 w-full border-t border-[#141414] ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2 pt-1.5 sm:px-3`
+  `pointer-events-none shrink-0 w-full border-t border-[#3d352c] ${KASSA_BTN_FACE} px-2 pb-2 pt-1.5 sm:px-3`
 
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP_SXGA =
-  `pointer-events-none shrink-0 w-full border-t border-[#141414] ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
+  `pointer-events-none shrink-0 w-full border-t border-[#3d352c] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
 export const KASSA_POS_MENU_TILE_LABEL_CLASS =
   'm-0 line-clamp-1 text-center text-sm font-bold leading-tight tracking-[0.02em] text-white sm:text-[15px] md:text-base'
