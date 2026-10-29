@@ -3470,6 +3470,8 @@
     "deleteOpenTabConfirm": "Cancellare completamente il conto aperto di {name} ({amount})? Non conta in vendite o Z (non ancora pagato).",
     "deleteOpenTabFailed": "Eliminazione non riuscita.",
     "deleteOpenTabHint": "Solo titolare. Saldo aperto prima del pagamento — nessuno scontrino, nessuno Z.",
+    "deleteOpenTabPinTitle": "Codice manager",
+    "deleteOpenTabPinPlaceholder": "4 cifre",
     "cartEmpty": "Aggiungi prima prodotti al carrello.",
     "nameRequired": "Inserisci un nome.",
     "loadFailed": "Impossibile caricare le tab. Esiste kassa_name_tabs in Supabase?",

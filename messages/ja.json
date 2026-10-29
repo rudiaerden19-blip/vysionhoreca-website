@@ -3470,6 +3470,8 @@
     "deleteOpenTabConfirm": "{name} の未払い ({amount}) をすべて削除しますか？売上・Zレポートには含まれません（未払いのため）。",
     "deleteOpenTabFailed": "削除に失敗しました。",
     "deleteOpenTabHint": "オーナーのみ。支払い前の未払い — レシート・Zレポートなし。",
+    "deleteOpenTabPinTitle": "マネージャーコード",
+    "deleteOpenTabPinPlaceholder": "4桁",
     "cartEmpty": "先にカートに商品を追加してください。",
     "nameRequired": "名前を入力してください。",
     "loadFailed": "タブを読み込めません。kassa_name_tabs は Supabase にありますか？",

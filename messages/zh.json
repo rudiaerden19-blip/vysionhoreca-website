@@ -3470,6 +3470,8 @@
     "deleteOpenTabConfirm": "完全清除 {name} 的未结账户 ({amount})？不计入销售或 Z 报表（尚未付款）。",
     "deleteOpenTabFailed": "删除失败。",
     "deleteOpenTabHint": "仅店主。付款前的未结余额 — 无小票、无 Z 报表。",
+    "deleteOpenTabPinTitle": "经理码",
+    "deleteOpenTabPinPlaceholder": "4 位数字",
     "cartEmpty": "请先将商品加入购物车。",
     "nameRequired": "请输入姓名。",
     "loadFailed": "无法加载标签。Supabase 中是否有 kassa_name_tabs？",

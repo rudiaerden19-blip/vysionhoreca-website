@@ -27,6 +27,10 @@ export type StaffClockPinPortalProps = {
   confirmLabel: string
   onCancel: () => void
   onConfirm: () => void
+  /** Standaard staff-klok (230); kassa-modals erboven gebruiken bv. 260. */
+  zIndex?: number
+  /** Standaard 12 (personeel); eigenaar/manager-PIN = 4. */
+  maxPinLength?: number
 }
 
 export function StaffClockPinPortal({
@@ -42,6 +46,8 @@ export function StaffClockPinPortal({
   confirmLabel,
   onCancel,
   onConfirm,
+  zIndex = STAFF_CLOCK_PIN_Z_INDEX,
+  maxPinLength = STAFF_PIN_MAX_LEN,
 }: StaffClockPinPortalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -82,7 +88,7 @@ export function StaffClockPinPortal({
   return createPortal(
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/50 p-4 touch-manipulation"
-      style={{ zIndex: STAFF_CLOCK_PIN_Z_INDEX }}
+      style={{ zIndex }}
       role="presentation"
     >
       <div
@@ -116,9 +122,9 @@ export function StaffClockPinPortal({
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
-            maxLength={STAFF_PIN_MAX_LEN}
+            maxLength={maxPinLength}
             value={pinValue}
-            onChange={(e) => onPinChange(e.target.value.replace(/\D/g, '').slice(0, STAFF_PIN_MAX_LEN))}
+            onChange={(e) => onPinChange(e.target.value.replace(/\D/g, '').slice(0, maxPinLength))}
             placeholder={placeholder}
             className="vysion-light-form-field w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-lg font-mono tracking-widest text-gray-900 placeholder:text-gray-400"
             aria-invalid={pinError ? true : undefined}

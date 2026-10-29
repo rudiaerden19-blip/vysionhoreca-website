@@ -2970,6 +2970,8 @@
     "deleteOpenTabConfirm": "Effacer entièrement le compte ouvert de {name} ({amount}) ? Non compté en ventes ni Z (pas encore payé).",
     "deleteOpenTabFailed": "Suppression impossible.",
     "deleteOpenTabHint": "Réservé au propriétaire. Solde ouvert avant paiement — pas de ticket, pas de Z.",
+    "deleteOpenTabPinTitle": "Code manager",
+    "deleteOpenTabPinPlaceholder": "4 chiffres",
     "cartEmpty": "Ajoutez d'abord des produits au panier.",
     "nameRequired": "Saisissez un nom.",
     "loadFailed": "Impossible de charger les tabs. Table kassa_name_tabs dans Supabase ?",

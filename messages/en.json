@@ -4061,6 +4061,8 @@
     "deleteOpenTabConfirm": "Clear {name}'s open tab ({amount}) completely? This is not counted in sales or Z-report (not paid yet).",
     "deleteOpenTabFailed": "Could not remove.",
     "deleteOpenTabHint": "Owner only. Open balance before payment — no receipt, no Z-report.",
+    "deleteOpenTabPinTitle": "Manager code",
+    "deleteOpenTabPinPlaceholder": "4 digits",
     "cartEmpty": "Add products to the cart first.",
     "nameRequired": "Enter a name.",
     "loadFailed": "Could not load tabs. Is kassa_name_tabs in Supabase?",

@@ -43,6 +43,10 @@ import {
   parseOpenAmountInput,
 } from '@/lib/kassa-name-account-modal-ui'
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
+import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
+
+const KASSA_NAME_ACCOUNT_PIN_Z = 260
 
 type Props = {
   open: boolean
@@ -93,6 +97,10 @@ export default function KassaNameAccountModal({
   const [payAmount, setPayAmount] = useState('')
   const [payAmountEdited, setPayAmountEdited] = useState(false)
   const [payMethod, setPayMethod] = useState<KassaPaymentMethod>('CASH')
+  const [deletePinOpen, setDeletePinOpen] = useState(false)
+  const [deletePinInput, setDeletePinInput] = useState('')
+  const [deletePinError, setDeletePinError] = useState<string | null>(null)
+  const [deletePinBusy, setDeletePinBusy] = useState(false)
   const nameInputRef = useRef<HTMLInputElement>(null)
 
   const focusNameInput = useCallback(() => {
@@ -119,6 +127,10 @@ export default function KassaNameAccountModal({
     setPayAmount(fresh.payAmount)
     setError(fresh.error)
     setPayAmountEdited(false)
+    setDeletePinOpen(false)
+    setDeletePinInput('')
+    setDeletePinError(null)
+    setDeletePinBusy(false)
   }, [open, focusNameInput])
 
   const loadTabs = useCallback(
@@ -275,7 +287,7 @@ export default function KassaNameAccountModal({
     void fetchKassaNameTabs(tenant, { force: true })
   }
 
-  const deleteSelectedOpenTab = async () => {
+  const performDeleteSelectedOpenTab = async () => {
     if (!ownerCanDeleteOpenTab || cart.length > 0) return
     const tab = selectedTab ?? resolveTabForName(name)
     if (!tab?.id) {
@@ -284,11 +296,6 @@ export default function KassaNameAccountModal({
     }
     const open = tabOpenTotalIncl(Array.isArray(tab.items) ? tab.items : [])
     if (open <= 0.001) return
-    const displayName = normName(tab.customer_name)
-    const ok = window.confirm(
-      t('kassaNameAccount.deleteOpenTabConfirm').replace('{name}', displayName).replace('{amount}', money(open)),
-    )
-    if (!ok) return
     setSaving(true)
     setError(null)
     const res = await deleteOpenKassaNameTab({ tenantSlug: tenant, tabId: tab.id })
@@ -306,6 +313,63 @@ export default function KassaNameAccountModal({
     void fetchKassaNameTabs(tenant, { force: true }).then((r) => {
       if (r.ok) setTabs(r.tabs)
     })
+  }
+
+  const requestDeleteSelectedOpenTab = () => {
+    if (!ownerCanDeleteOpenTab || cart.length > 0) return
+    const tab = selectedTab ?? resolveTabForName(name)
+    if (!tab?.id) {
+      setError(t('kassaNameAccount.pickPayer'))
+      return
+    }
+    const open = tabOpenTotalIncl(Array.isArray(tab.items) ? tab.items : [])
+    if (open <= 0.001) return
+    if (isSuperAdminLoggedIn()) {
+      void performDeleteSelectedOpenTab()
+      return
+    }
+    setDeletePinInput('')
+    setDeletePinError(null)
+    setDeletePinOpen(true)
+  }
+
+  const closeDeletePinModal = () => {
+    if (deletePinBusy) return
+    setDeletePinOpen(false)
+    setDeletePinInput('')
+    setDeletePinError(null)
+  }
+
+  const submitDeleteOpenTabPin = async () => {
+    const pin = deletePinInput.trim()
+    if (!/^\d{4}$/.test(pin)) {
+      setDeletePinError(t('pinGate.invalidPin'))
+      return
+    }
+    setDeletePinBusy(true)
+    setDeletePinError(null)
+    try {
+      const res = await fetch('/api/pin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant, pin }),
+      })
+      const data = (await res.json()) as { valid?: boolean; error?: string }
+      if (data.valid) {
+        setDeletePinOpen(false)
+        setDeletePinInput('')
+        await performDeleteSelectedOpenTab()
+        return
+      }
+      setDeletePinError(
+        res.status === 429 && data.error ? data.error : t('pinGate.incorrectPin'),
+      )
+      setDeletePinInput('')
+    } catch {
+      setDeletePinError(t('kassaNameAccount.deleteOpenTabFailed'))
+    } finally {
+      setDeletePinBusy(false)
+    }
   }
 
   const registerPayment = async () => {
@@ -411,6 +475,7 @@ export default function KassaNameAccountModal({
   if (!open) return null
 
   return (
+    <>
     <div
       className="fixed inset-0 z-[250] flex items-end justify-center bg-black/50 p-4 sm:items-center"
       data-vysion-modal-overlay
@@ -544,7 +609,7 @@ export default function KassaNameAccountModal({
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => void deleteSelectedOpenTab()}
+                onClick={requestDeleteSelectedOpenTab}
                 className="w-full rounded-xl border border-red-300 bg-white py-3 text-sm font-semibold text-red-800 disabled:opacity-50"
               >
                 {t('kassaNameAccount.deleteOpenTabButton')}
@@ -647,5 +712,22 @@ export default function KassaNameAccountModal({
         )}
       </div>
     </div>
+    <StaffClockPinPortal
+      open={deletePinOpen}
+      titleId="kassa-name-account-delete-pin-title"
+      title={t('kassaNameAccount.deleteOpenTabPinTitle')}
+      placeholder={t('kassaNameAccount.deleteOpenTabPinPlaceholder')}
+      pinValue={deletePinInput}
+      onPinChange={setDeletePinInput}
+      pinError={deletePinError}
+      busy={deletePinBusy || saving}
+      cancelLabel={t('kassaApp.cancel')}
+      confirmLabel={t('pinGate.confirm')}
+      onCancel={closeDeletePinModal}
+      onConfirm={() => void submitDeleteOpenTabPin()}
+      zIndex={KASSA_NAME_ACCOUNT_PIN_Z}
+      maxPinLength={4}
+    />
+    </>
   )
 }

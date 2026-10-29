@@ -2970,6 +2970,8 @@
     "deleteOpenTabConfirm": "Offene Rechnung von {name} ({amount}) vollständig löschen? Zählt nicht in Umsatz oder Z-Bericht (noch nicht bezahlt).",
     "deleteOpenTabFailed": "Löschen fehlgeschlagen.",
     "deleteOpenTabHint": "Nur für den Inhaber. Offener Saldo vor Zahlung — kein Bon, kein Z-Bericht.",
+    "deleteOpenTabPinTitle": "Manager-Code",
+    "deleteOpenTabPinPlaceholder": "4 Ziffern",
     "cartEmpty": "Zuerst Produkte in den Warenkorb legen.",
     "nameRequired": "Bitte einen Namen eingeben.",
     "loadFailed": "Tabs laden fehlgeschlagen. Ist kassa_name_tabs in Supabase?",
