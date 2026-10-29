@@ -2950,8 +2950,10 @@
   "kassaNameAccount": {
     "subtitleV2": "Les articles viennent de la caisse. Le solde ouvert compte dans ventes et Z uniquement au paiement (TVA incl. par ligne).",
     "modalTitle": "En compte",
-    "modalHint": "Choisir ou saisir un nom pour ce panier",
+    "modalHint": "Panier prêt — touchez un nom pour mettre cette commande à crédit",
     "modalHintPay": "Qui paie ? Touchez un compte ouvert ou saisissez un nom.",
+    "openListAddHint": "Touchez un nom dans la liste, puis confirmez avec « Ajouter au compte » en bas.",
+    "listAddCartHint": "+ panier {amount}",
     "paySectionTitle": "Paiement de {name}",
     "pickPayer": "Choisissez une personne avec un compte ouvert.",
     "openListTitle": "Comptes ouverts",

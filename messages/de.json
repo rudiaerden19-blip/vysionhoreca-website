@@ -2950,8 +2950,10 @@
   "kassaNameAccount": {
     "subtitleV2": "Artikel kommen von der Kasse. Offener Saldo zählt in Verkauf und Z-Bericht erst bei Zahlung (inkl. MwSt. pro Bonzeile).",
     "modalTitle": "Auf Rechnung",
-    "modalHint": "Name wählen oder eingeben für diesen Warenkorb",
+    "modalHint": "Warenkorb bereit — Namen antippen, um diese Bestellung auf Rechnung zu setzen",
     "modalHintPay": "Wer zahlt? Offene Rechnung antippen oder Namen eingeben.",
+    "openListAddHint": "Namen in der Liste antippen und unten mit «Auf Rechnung setzen» bestätigen.",
+    "listAddCartHint": "+ Warenkorb {amount}",
     "paySectionTitle": "Zahlung von {name}",
     "pickPayer": "Wählen Sie jemanden mit offener Rechnung.",
     "openListTitle": "Offene Rechnungen",

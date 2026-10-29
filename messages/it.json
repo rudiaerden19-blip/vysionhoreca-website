@@ -3450,8 +3450,10 @@
   "kassaNameAccount": {
     "subtitleV2": "Gli articoli vengono dalla cassa. Il saldo aperto conta in vendite e Z solo al pagamento (IVA incl. per riga).",
     "modalTitle": "In conto",
-    "modalHint": "Scegli o digita un nome per questo carrello",
+    "modalHint": "Carrello pronto — tocca un nome per mettere questo ordine in conto",
     "modalHintPay": "Chi paga? Tocca un conto aperto o inserisci un nome.",
+    "openListAddHint": "Tocca un nome nell'elenco e conferma in basso con «Aggiungi in conto».",
+    "listAddCartHint": "+ carrello {amount}",
     "paySectionTitle": "Pagamento di {name}",
     "pickPayer": "Scegli qualcuno con conto aperto.",
     "openListTitle": "Conti aperti",

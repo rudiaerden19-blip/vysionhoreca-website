@@ -4041,8 +4041,10 @@
   "kassaNameAccount": {
     "subtitleV2": "Items come from the till. Open balance counts in sales and Z-report only when the customer pays (incl. VAT per receipt line).",
     "modalTitle": "On account",
-    "modalHint": "Pick or type a name for this cart",
+    "modalHint": "Cart ready — tap a name to put this order on their tab",
     "modalHintPay": "Choose who wants to pay — tap an open account or type a name.",
+    "openListAddHint": "Tap a name in the list, then confirm with «Add to tab» below.",
+    "listAddCartHint": "+ cart {amount}",
     "paySectionTitle": "Payment for {name}",
     "pickPayer": "Select someone with an open account to pay.",
     "openListTitle": "Open accounts",

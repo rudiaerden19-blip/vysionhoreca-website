@@ -3450,8 +3450,10 @@
   "kassaNameAccount": {
     "subtitleV2": "商品はレジから。未払い残高は支払い時のみ売上・Zレポートに計上（行ごと税込）。",
     "modalTitle": "掛け",
-    "modalHint": "このカートの名前を選択または入力",
+    "modalHint": "カートの準備完了 — 名前をタップして掛け売りに追加",
     "modalHintPay": "支払う人を選ぶ — 未払いをタップまたは名前入力。",
+    "openListAddHint": "リストの名前をタップし、下の「掛け売りに追加」で確定してください。",
+    "listAddCartHint": "+ カート {amount}",
     "paySectionTitle": "{name} の支払い",
     "pickPayer": "未払いのある人を選んでください。",
     "openListTitle": "未払いアカウント",

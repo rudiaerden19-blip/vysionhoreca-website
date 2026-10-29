@@ -4041,8 +4041,10 @@
   "kassaNameAccount": {
     "subtitleV2": "Producten komen van de kassa. Open saldo telt pas in verkoop en Z-rapport wanneer de klant betaalt (incl. BTW per bonregel).",
     "modalTitle": "Op rekening",
-    "modalHint": "Kies of typ een naam voor deze mand",
+    "modalHint": "Mand staat klaar — tik een naam om deze bestelling op rekening te zetten",
     "modalHintPay": "Kies wie wil betalen — tik een open rekening of typ een naam.",
+    "openListAddHint": "Tik een naam in de lijst en bevestig onderaan met «Toevoegen op rekening».",
+    "listAddCartHint": "+ mand {amount}",
     "paySectionTitle": "Betaling van {name}",
     "pickPayer": "Kies iemand met een open rekening om te betalen.",
     "openListTitle": "Openstaande rekeningen",

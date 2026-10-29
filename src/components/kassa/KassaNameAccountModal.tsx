@@ -440,6 +440,12 @@ export default function KassaNameAccountModal({
             <p className="text-sm text-gray-600">{t('kassaNameAccount.openGrandTotalHint')}</p>
           ) : null}
 
+          {cartHasItems && openList.length > 0 ? (
+            <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950">
+              {t('kassaNameAccount.openListAddHint')}
+            </p>
+          ) : null}
+
           <div>
             <p className="text-sm font-semibold text-gray-800">
               {t('kassaNameAccount.openListTitle')}
@@ -462,10 +468,18 @@ export default function KassaNameAccountModal({
                         className={`flex w-full items-center justify-between px-3 py-3 text-left ${
                           active ? 'bg-teal-50 ring-1 ring-inset ring-teal-200' : 'hover:bg-gray-50'
                         }`}
+                        disabled={saving}
                         onClick={() => pickExisting(item.name, item.id, item.remaining)}
                       >
                         <span className="font-medium text-gray-900">{item.name}</span>
-                        <span className="tabular-nums font-semibold text-red-700">{money(item.remaining)}</span>
+                        <span className="flex flex-col items-end gap-0.5">
+                          {cartHasItems ? (
+                            <span className="text-xs font-medium text-teal-800">
+                              {t('kassaNameAccount.listAddCartHint').replace('{amount}', money(cartTotalIncl))}
+                            </span>
+                          ) : null}
+                          <span className="tabular-nums font-semibold text-red-700">{money(item.remaining)}</span>
+                        </span>
                       </button>
                     </li>
                   )
