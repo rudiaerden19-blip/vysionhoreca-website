@@ -42,11 +42,10 @@ export function KassaProductOptionsModal({
   const dark = appearance === 'dark'
   const speelsDark = dark && posChrome === 'speels'
 
-  const darkPriceClass = speelsDark
-    ? KASSA_SPEELS_PRICE_ACCENT_CLASS
-    : dark
-      ? 'text-[#6dd5ff]'
-      : 'text-[#3C4D6B]'
+  const optionsTotal =
+    model.product.price + model.selected.reduce((s, c) => s + c.price, 0)
+
+  const darkPriceClass = dark ? KASSA_SPEELS_PRICE_ACCENT_CLASS : 'text-[#3C4D6B]'
 
   const speelsChromeBtn = (selected: boolean, extraClass = '') =>
     `${KASSA_POS_BTN_SHAPE} ${kassaSpeelsChromeButtonClass(selected)} ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} ${extraClass}`
@@ -85,7 +84,7 @@ export function KassaProductOptionsModal({
               {model.product.name}
             </p>
             <p className={`${darkPriceClass} font-bold`}>
-              €{(model.product.price + model.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
+              €{optionsTotal.toFixed(2)}
             </p>
           </div>
           <button
@@ -238,8 +237,8 @@ export function KassaProductOptionsModal({
                 : 'flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors'
             }
           >
-            {model.editingCartKey ? t('kassaApp.optionsSave') : t('kassaApp.optionsAdd')} — €
-            {(model.product.price + model.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
+            {model.editingCartKey ? t('kassaApp.optionsSave') : t('kassaApp.optionsAdd')}{' '}
+            <span className={dark ? darkPriceClass : ''}>€{optionsTotal.toFixed(2)}</span>
           </button>
         </div>
       </div>
