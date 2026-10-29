@@ -309,7 +309,7 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsGreenGlossButtonClass(true)} font-bold`
+    return `${kassaSpeelsGreenGlossButtonClass(true)} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
   }
   return KASSA_POS_CHECKOUT_BTN
 }
@@ -317,7 +317,7 @@ export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): 
 /** Zijbalk Verwijder — speels rood glanzend. */
 export function kassaPosRemoveButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsRedGlossButtonClass(false)} font-semibold`
+    return `${kassaSpeelsRedGlossButtonClass(false)} font-semibold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
   }
   return kassaPosButtonClass(false, look)
 }

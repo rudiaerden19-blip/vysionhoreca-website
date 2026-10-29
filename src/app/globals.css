@@ -669,7 +669,8 @@ input[type="number"] {
 .kassa-speels-red-gloss-btn {
   color: #ffffff;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
-  background: linear-gradient(180deg, #c62828 0%, #b71c1c 38%, #8b0000 72%, #6b0505 100%);
+  background-color: #9b1c1c;
+  background-image: linear-gradient(180deg, #d32f2f 0%, #b71c1c 32%, #8b0000 68%, #6b0505 100%);
   border: 1px solid #ffcdd2;
   border-top: 1px solid #ffebee;
   border-bottom: 1px solid #5c1010;
@@ -693,9 +694,9 @@ input[type="number"] {
   border-radius: 0.65rem 0.65rem 45% 45%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.58) 0%,
-    rgba(255, 255, 255, 0.22) 38%,
-    rgba(255, 255, 255, 0.06) 72%,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(255, 255, 255, 0.14) 38%,
+    rgba(255, 255, 255, 0.04) 72%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -706,7 +707,8 @@ input[type="number"] {
 }
 
 .kassa-speels-red-gloss-btn:active {
-  background: linear-gradient(180deg, #8b0000 0%, #a31515 52%, #5c0505 100%);
+  background-color: #7a1515;
+  background-image: linear-gradient(180deg, #8b0000 0%, #a31515 52%, #5c0505 100%);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.55),
     inset 0 3px 8px rgba(0, 0, 0, 0.55);
@@ -728,16 +730,27 @@ input[type="number"] {
 .kassa-speels-red-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(255, 255, 255, 0.32) 40%,
-    rgba(255, 255, 255, 0.08) 75%,
+    rgba(255, 255, 255, 0.48) 0%,
+    rgba(255, 255, 255, 0.2) 40%,
+    rgba(255, 255, 255, 0.06) 75%,
     rgba(255, 255, 255, 0) 100%
   );
 }
 
 .kassa-speels-red-gloss-btn:disabled {
-  opacity: 0.42;
+  opacity: 1;
+  cursor: not-allowed;
   pointer-events: none;
+  background-color: #6b1515;
+  background-image: linear-gradient(180deg, #8b2020 0%, #721818 45%, #5c1010 100%);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.kassa-speels-red-gloss-btn:disabled::before {
+  opacity: 0.2;
 }
 
 /*
@@ -746,7 +759,8 @@ input[type="number"] {
 .kassa-speels-green-gloss-btn {
   color: #ffffff;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
-  background: linear-gradient(180deg, #0d9668 0%, #059669 40%, #047857 72%, #065f46 100%);
+  background-color: #047857;
+  background-image: linear-gradient(180deg, #10b981 0%, #059669 36%, #047857 68%, #065f46 100%);
   border: 1px solid #a7f3d0;
   border-top: 1px solid #d1fae5;
   border-bottom: 1px solid #064e3b;
@@ -770,9 +784,9 @@ input[type="number"] {
   border-radius: 0.65rem 0.65rem 45% 45%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.58) 0%,
-    rgba(255, 255, 255, 0.22) 38%,
-    rgba(255, 255, 255, 0.06) 72%,
+    rgba(255, 255, 255, 0.38) 0%,
+    rgba(255, 255, 255, 0.14) 38%,
+    rgba(255, 255, 255, 0.04) 72%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -783,7 +797,8 @@ input[type="number"] {
 }
 
 .kassa-speels-green-gloss-btn:active {
-  background: linear-gradient(180deg, #047857 0%, #059669 52%, #064e3b 100%);
+  background-color: #065f46;
+  background-image: linear-gradient(180deg, #047857 0%, #059669 52%, #064e3b 100%);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.55),
     inset 0 3px 8px rgba(0, 0, 0, 0.55);
@@ -805,16 +820,27 @@ input[type="number"] {
 .kassa-speels-green-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(255, 255, 255, 0.32) 40%,
-    rgba(255, 255, 255, 0.08) 75%,
+    rgba(255, 255, 255, 0.48) 0%,
+    rgba(255, 255, 255, 0.2) 40%,
+    rgba(255, 255, 255, 0.06) 75%,
     rgba(255, 255, 255, 0) 100%
   );
 }
 
 .kassa-speels-green-gloss-btn:disabled {
-  opacity: 0.42;
+  opacity: 1;
+  cursor: not-allowed;
   pointer-events: none;
+  background-color: #064e3b;
+  background-image: linear-gradient(180deg, #0a6b52 0%, #065f46 45%, #064e3b 100%);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.kassa-speels-green-gloss-btn:disabled::before {
+  opacity: 0.2;
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
