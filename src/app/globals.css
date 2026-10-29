@@ -469,6 +469,18 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
+/* Titelstrook tegels — zelfde korrel, milder blend (voorkomt witte 1px-rand in tegel). */
+.kassa-speels-tile-label-grain {
+  background-color: #282828;
+  background-image:
+    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
+    url('/images/kassa-dark-frame-grain.png');
+  background-size: 512px 512px;
+  background-repeat: repeat;
+  background-blend-mode: soft-light;
+  background-clip: padding-box;
+}
+
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
