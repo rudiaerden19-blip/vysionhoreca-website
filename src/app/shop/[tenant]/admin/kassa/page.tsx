@@ -6038,18 +6038,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </span>
           </button>
 
-          {isOnline !== null && (
+          {isOnline !== null && !kassaPosLuxury ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
-                kassaPosLuxury
-                  ? isOnline
-                    ? posChrome === 'speels'
-                      ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS}`
-                      : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
-                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
-                  : isOnline
-                    ? `min-h-[2.65rem] rounded-xl px-4 py-2 text-sm font-bold sm:min-h-[2.85rem] sm:px-5 sm:text-base ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
-                    : 'min-h-[2.65rem] rounded-xl bg-red-600/95 px-4 py-2 text-sm font-bold text-white sm:min-h-[2.85rem] sm:px-5 sm:text-base'
+                isOnline
+                  ? `min-h-[2.65rem] rounded-xl px-4 py-2 text-sm font-bold sm:min-h-[2.85rem] sm:px-5 sm:text-base ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
+                  : 'min-h-[2.65rem] rounded-xl bg-red-600/95 px-4 py-2 text-sm font-bold text-white sm:min-h-[2.85rem] sm:px-5 sm:text-base'
               }`}
               title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
               role="status"
@@ -6059,7 +6053,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
               </span>
             </div>
-          )}
+          ) : null}
 
           {activeKassaStaff && !demoViewOnly && (
             <div className="flex max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white md:max-w-[10rem] md:text-xs">
@@ -6071,10 +6065,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </nav>
         </div>
 
+        <div
+          className={`relative z-20 flex shrink-0 items-center gap-1 sm:gap-1.5 ${
+            kassaPosLuxury ? 'ml-auto' : ''
+          }`}
+        >
           {kassaPosLuxury ? (
             <time
               dateTime={kassaSidebarClock.toISOString()}
-              className={`relative z-20 -ml-[3cm] mr-2 flex shrink-0 items-center gap-3 whitespace-nowrap px-1 font-bold tracking-[0.04em] sm:gap-4 sm:px-2 ${
+              className={`pointer-events-none absolute right-full top-1/2 z-10 flex -translate-x-[3cm] -translate-y-1/2 items-center gap-3 whitespace-nowrap px-1 font-bold tracking-[0.04em] sm:gap-4 sm:px-2 ${
                 posChrome === 'speels'
                   ? 'text-sm text-[#b0b0b0] sm:text-base'
                   : 'text-sm text-zinc-100 sm:text-base'
@@ -6093,6 +6092,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 {kassaHeaderClockParts.minutes}
               </span>
             </time>
+          ) : null}
+
+          {isOnline !== null && kassaPosLuxury ? (
+            <div
+              className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
+                isOnline
+                  ? posChrome === 'speels'
+                    ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS}`
+                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+                  : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
+              }`}
+              title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
+              role="status"
+              aria-live="polite"
+            >
+              <span className="truncate">
+                {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
+              </span>
+            </div>
           ) : null}
 
           <div ref={langRef} className="relative z-[40] shrink-0">
@@ -6153,6 +6171,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             {t('kassaApp.logout')}
           </span>
         </button>
+        </div>
         </div>
 
       </div>
