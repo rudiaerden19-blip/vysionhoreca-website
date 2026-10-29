@@ -151,7 +151,6 @@ import {
   KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA,
   kassaPosButtonClass,
   kassaSpeelsBlackGlossButtonClass,
-  kassaSpeelsHeaderChromeButtonClass,
   kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
@@ -5422,37 +5421,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaSpeelsTopChromeTextClass =
     kassaPosLuxury && posChrome === 'speels' ? KASSA_SPEELS_TOP_CHROME_BTN_CLASS : ''
 
-  const kassaSpeelsHeaderBtnFace =
-    kassaPosLuxury && posChrome === 'speels' ? kassaSpeelsHeaderChromeButtonClass(false) : null
-
   const headerQuickLinkBtnClass = kassaWide15Chrome
     ? `${kassaHeaderQuickLinkShell} ${
-        kassaSpeelsHeaderBtnFace ??
-        (kassaPosLuxury
+        kassaPosLuxury
           ? `${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
           : kassaLight
             ? KASSA_LIGHT_BTN_FACE
             : kassaClassicDark
               ? KASSA_CLASSIC_BTN_FACE
-              : 'rounded-xl bg-[#3C4D6B] font-bold text-white')
+              : 'rounded-xl bg-[#3C4D6B] font-bold text-white'
       } rounded-lg text-[10px]`
-    : kassaSpeelsHeaderBtnFace
-      ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsHeaderBtnFace}`
-      : kassaPosLuxury
-        ? `${kassaHeaderQuickLinkShell} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
-        : kassaLight
-          ? KASSA_LIGHT_HEADER_QUICK_LINK_BTN
-          : kassaClassicDark
-            ? KASSA_CLASSIC_HEADER_QUICK_LINK_BTN
-            : KASSA_HEADER_QUICK_LINK_BTN
+    : kassaPosLuxury
+    ? `${kassaHeaderQuickLinkShell} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+    : kassaLight
+      ? KASSA_LIGHT_HEADER_QUICK_LINK_BTN
+      : kassaClassicDark
+        ? KASSA_CLASSIC_HEADER_QUICK_LINK_BTN
+        : KASSA_HEADER_QUICK_LINK_BTN
 
   const headerUtilityBtnClass = (selected: boolean) =>
     kassaPosLuxury
-      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${
-          kassaPosLuxury && posChrome === 'speels'
-            ? kassaSpeelsHeaderChromeButtonClass(selected)
-            : `${kassaPosButtonClass(selected, posChrome)} ${kassaSpeelsTopChromeTextClass}`
-        }`
+      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${kassaPosButtonClass(selected, posChrome)} ${kassaSpeelsTopChromeTextClass}`
       : ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome

@@ -656,15 +656,15 @@ input[type="number"] {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   background: linear-gradient(
     180deg,
-    #2a3f5c 0%,
-    #223650 5%,
-    #182940 18%,
-    #121f32 40%,
-    #0e1828 62%,
-    #0a121e 100%
+    #1e2f48 0%,
+    #182538 5%,
+    #101c2c 18%,
+    #0c1624 40%,
+    #081018 62%,
+    #060c14 100%
   );
   border: 1px solid #0a0a0a;
-  border-top-color: #304860;
+  border-top-color: #243850;
   border-bottom-color: #050505;
   box-shadow:
     0 3px 7px rgba(0, 0, 0, 0.55),
@@ -696,8 +696,8 @@ input[type="number"] {
 }
 
 .kassa-speels-blue-gloss-btn:active {
-  background: linear-gradient(180deg, #101a28 0%, #0c1420 55%, #080e18 100%);
-  border-top-color: #1e3048;
+  background: linear-gradient(180deg, #080e18 0%, #060a12 55%, #040810 100%);
+  border-top-color: #182838;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.5),
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
@@ -711,13 +711,13 @@ input[type="number"] {
 .kassa-speels-blue-gloss-btn--selected {
   background: linear-gradient(
     180deg,
-    #4a6288 0%,
-    #3d5270 5%,
-    #2f4258 18%,
-    #263850 42%,
-    #1e3048 100%
+    #354d6a 0%,
+    #2a4058 5%,
+    #223548 18%,
+    #1a2a3c 42%,
+    #142230 100%
   );
-  border-top-color: #3d5878;
+  border-top-color: #2f4868;
   box-shadow:
     0 3px 9px rgba(0, 0, 0, 0.58),
     inset 0 1px 0 rgba(255, 255, 255, 0.88),

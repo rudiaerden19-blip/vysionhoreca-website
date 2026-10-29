@@ -318,11 +318,6 @@ export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
   return kassaSpeelsBlueGlossButtonClass(selected)
 }
 
-/** Header snelkoppelingen + taal — zelfde blauw als categoriebalk. */
-export function kassaSpeelsHeaderChromeButtonClass(active = false): string {
-  return kassaSpeelsBlueGlossButtonClass(active)
-}
-
 export function kassaSpeelsOrderTypeButtonClass(selected: boolean): string {
   if (selected) return kassaSpeelsBlueGlossButtonClass(true)
   return kassaSpeelsGrayChromeButtonClass()
