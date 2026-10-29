@@ -516,16 +516,16 @@ input[type="number"] {
     0 -1px 0 rgba(255, 255, 255, 0.12);
   background: linear-gradient(
     180deg,
-    #8e8e8e 0%,
-    #747474 5%,
-    #545454 18%,
-    #424242 40%,
-    #363636 62%,
-    #2c2c2c 100%
+    #7d7d7d 0%,
+    #656565 5%,
+    #484848 18%,
+    #383838 40%,
+    #2e2e2e 62%,
+    #242424 100%
   );
-  border: 1px solid #1a1a1a;
-  border-top: 1px solid #c8c8c8;
-  border-bottom: 1px solid #0f0f0f;
+  border: 1px solid #141414;
+  border-top: 1px solid #b8b8b8;
+  border-bottom: 1px solid #080808;
   box-shadow:
     0 3px 7px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
@@ -556,7 +556,7 @@ input[type="number"] {
 }
 
 .kassa-speels-order-type-btn:active {
-  background: linear-gradient(180deg, #454545 0%, #323232 55%, #282828 100%);
+  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 55%, #202020 100%);
   border-top-color: rgba(255, 255, 255, 0.35);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.5),
@@ -570,13 +570,13 @@ input[type="number"] {
 .kassa-speels-order-type-btn--selected {
   background: linear-gradient(
     180deg,
-    #9a9a9a 0%,
-    #7a7a7a 5%,
-    #585858 18%,
-    #464646 42%,
-    #383838 100%
+    #888888 0%,
+    #6a6a6a 5%,
+    #4a4a4a 18%,
+    #3a3a3a 42%,
+    #303030 100%
   );
-  border-top-color: #e0e0e0;
+  border-top-color: #d4d4d4;
   box-shadow:
     0 3px 9px rgba(0, 0, 0, 0.58),
     inset 0 1px 0 rgba(255, 255, 255, 0.88),
@@ -599,10 +599,10 @@ input[type="number"] {
 .kassa-speels-black-gloss-btn {
   color: #f5f5f5;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9);
-  background: linear-gradient(180deg, #141414 0%, #1f1f1f 46%, #0a0a0a 100%);
-  border: 1px solid #c8c8c8;
-  border-top: 1px solid #ececec;
-  border-bottom: 1px solid #3a3a3a;
+  background: linear-gradient(180deg, #0d0d0d 0%, #171717 46%, #050505 100%);
+  border: 1px solid #b0b0b0;
+  border-top: 1px solid #dcdcdc;
+  border-bottom: 1px solid #2e2e2e;
   box-shadow:
     0 4px 9px rgba(0, 0, 0, 0.64),
     0 11px 26px rgba(0, 0, 0, 0.51),
@@ -635,7 +635,7 @@ input[type="number"] {
 }
 
 .kassa-speels-black-gloss-btn:active {
-  background: linear-gradient(180deg, #0a0a0a 0%, #171717 52%, #050505 100%);
+  background: linear-gradient(180deg, #050505 0%, #121212 52%, #020202 100%);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.55),
     inset 0 3px 8px rgba(0, 0, 0, 0.55);
