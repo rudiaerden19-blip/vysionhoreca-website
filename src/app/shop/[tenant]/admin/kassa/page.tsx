@@ -6970,7 +6970,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <button
                   type="button"
                   data-testid="kassa-sidebar-op-rekening"
-                  disabled={cart.length === 0}
                   onPointerDown={() => prefetchKassaNameTabs(tenant)}
                   onClick={openNameAccountModalFromSidebar}
                   className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${kassaPosButtonClass(false, posChrome)}`}
@@ -7214,7 +7213,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <button
                   type="button"
                   data-testid="kassa-sidebar-op-rekening-classic"
-                  disabled={cart.length === 0}
                   onPointerDown={() => prefetchKassaNameTabs(tenant)}
                   onClick={openNameAccountModalFromSidebar}
                   className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl active:brightness-95 ${
