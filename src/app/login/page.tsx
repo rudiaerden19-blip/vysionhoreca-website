@@ -31,7 +31,10 @@ import { isVysionMainPortalHost } from '@/lib/vysion-site'
 import { marketingHomeHrefFromSearchParams } from '@/lib/registration-product-line'
 
 const LOGIN_PRIMARY_BTN =
-  'flex w-full touch-manipulation select-none items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-[#0c5273] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50'
+  'flex w-full touch-manipulation select-none items-center justify-center gap-2 rounded-lg bg-accent px-4 py-4 text-base font-semibold tracking-wide text-white transition-colors hover:bg-[#0c5273] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45'
+
+const LOGIN_FIELD =
+  'w-full border-0 border-b border-white/20 bg-transparent py-3.5 text-lg text-white outline-none transition-colors placeholder:text-white/35 focus:border-accent focus:ring-0'
 
 /** Zelfde hosts als middleware `exactMainDomains`(+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -55,6 +58,7 @@ export default function LoginPage() {
   const langRef = useRef<HTMLDivElement>(null)
   const passwordInputRef = useRef<HTMLInputElement>(null)
   const [showKassaCloseHint, setShowKassaCloseHint] = useState(false)
+  const [showLoginCodeVisible, setShowLoginCodeVisible] = useState(false)
   const [marketingHomeHref, setMarketingHomeHref] = useState('/')
 
   // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next`zonder zaak-wachtwoord.
@@ -291,195 +295,206 @@ export default function LoginPage() {
     setIsLoading(false)
   }
 
+  const langMenu = (
+    <div className="relative" ref={langRef}>
+      <button
+        type="button"
+        onClick={() => setIsLangOpen(!isLangOpen)}
+        className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-white/90 transition-colors hover:bg-white/10"
+        aria-expanded={isLangOpen}
+        aria-haspopup="listbox"
+      >
+        <LocaleFlagWithCode locale={locale} />
+        <span className="hidden text-sm sm:inline">{localeNames[locale]}</span>
+        <svg
+          className={`h-4 w-4 opacity-70 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isLangOpen && (
+        <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#252528] py-1 shadow-xl ring-1 ring-black/40">
+          {locales.map((langCode) => (
+            <button
+              key={langCode}
+              type="button"
+              onClick={() => handleLanguageSelect(langCode)}
+              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-white/10 ${
+                locale === langCode ? 'font-medium text-accent' : 'text-white/90'
+              }`}
+            >
+              <LocaleFlagEmoji locale={langCode} className="text-xl" />
+              <span>{localeNames[langCode]}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+
   return (
-    <main className="relative flex min-h-screen flex-col bg-slate-50">
-      <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(14,93,130,0.12),transparent_55%)]"
-        aria-hidden
-      />
+    <main className="flex min-h-screen flex-col lg:flex-row">
       <LoginKassaCloseHintModal open={showKassaCloseHint} onDismiss={dismissKassaCloseHint} />
 
-      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
-        <Link
-          href={marketingHomeHref}
-          className="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-white/60 hover:text-slate-900"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          {t('login.backToHome')}
-        </Link>
-
-        <div className="relative" ref={langRef}>
-          <button
-            type="button"
-            onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-3 py-2 text-slate-800 shadow-sm backdrop-blur-sm transition-colors hover:border-slate-300 hover:bg-white"
-            aria-expanded={isLangOpen}
-            aria-haspopup="listbox"
-          >
-            <LocaleFlagWithCode locale={locale} />
-            <span className="hidden text-sm text-slate-600 sm:inline">{localeNames[locale]}</span>
-            <svg
-              className={`h-4 w-4 text-slate-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      {/* Brandpaneel — geen stockfoto, wel DISH-achtige sfeer */}
+      <aside
+        className="relative flex min-h-[220px] flex-col justify-between overflow-hidden bg-[#141210] px-8 py-10 lg:min-h-screen lg:w-[46%] xl:w-[50%]"
+      >
+        <div
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(14,93,130,0.35)_0%,transparent_45%),linear-gradient(220deg,rgba(0,0,0,0.85)_0%,rgba(20,18,16,0.95)_100%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(90deg,#fff 0,#fff 1px,transparent 1px,transparent 48px),repeating-linear-gradient(0deg,#fff 0,#fff 1px,transparent 1px,transparent 48px)',
+          }}
+          aria-hidden
+        />
+        <div className="relative z-10">
+          <Link href={marketingHomeHref} className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-          </button>
-
-          {isLangOpen && (
-            <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg ring-1 ring-black/5">
-              {locales.map((langCode) => (
-                <button
-                  key={langCode}
-                  type="button"
-                  onClick={() => handleLanguageSelect(langCode)}
-                  className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-slate-50 ${
-                    locale === langCode ? 'bg-accent/5 font-medium text-accent' : 'text-slate-800'
-                  }`}
-                >
-                  <LocaleFlagEmoji locale={langCode} className="text-xl" />
-                  <span>{localeNames[langCode]}</span>
-                  {locale === langCode && (
-                    <svg className="ml-auto h-4 w-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
+            {t('login.backToHome')}
+          </Link>
         </div>
-      </header>
+        <div className="relative z-10 my-auto py-8 lg:py-0">
+          <p className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <span className="text-accent">Vysion</span>
+            <span className="ml-2 font-light text-white/95">Kassa</span>
+          </p>
+          <p className="mt-4 max-w-md text-base leading-relaxed text-white/65 sm:text-lg">{t('login.brandPanelTagline')}</p>
+        </div>
+        <p className="relative z-10 text-xs text-white/35">© {new Date().getFullYear()} Vysion Group</p>
+      </aside>
 
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-[420px]">
-          <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_48px_-24px_rgba(14,93,130,0.35)]">
-            <div className="h-1 bg-gradient-to-r from-accent via-[#12739f] to-[#0a4a68]" aria-hidden />
-            <div className="px-6 pb-8 pt-8 sm:px-8">
-              <div className="mb-8 text-center">
-                <Link href={marketingHomeHref} className="inline-block">
-                  <span className="text-[1.75rem] font-bold tracking-tight text-accent sm:text-3xl">Vysion</span>
-                </Link>
-                <p className="mt-2 text-sm text-slate-600 sm:text-base">{t('login.logInToAccount')}</p>
+      {/* Loginpaneel */}
+      <div className="flex min-h-screen flex-1 flex-col bg-[#1a1a1c] text-white">
+        <header className="flex items-center justify-end px-5 py-5 sm:px-8 lg:hidden">{langMenu}</header>
+
+        <div className="flex flex-1 flex-col items-center justify-center px-5 pb-10 pt-4 sm:px-10 lg:px-16 xl:px-24">
+          <div className="hidden w-full max-w-md justify-end lg:flex">{langMenu}</div>
+
+          <div className="mt-4 w-full max-w-md lg:mt-16">
+            <h1 className="mb-10 text-center text-2xl font-light tracking-wide text-white/90 sm:text-3xl">
+              {t('login.logInToAccount')}
+            </h1>
+
+            <form onSubmit={handleSubmit} className="space-y-10" autoComplete="on" method="post">
+              <div>
+                <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/55">
+                  {t('login.emailAddress')}
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="username"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  placeholder={t('login.emailPlaceholder')}
+                  className={LOGIN_FIELD}
+                />
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5" autoComplete="on" method="post">
-                <div>
-                  <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-800">
-                    {t('login.emailAddress')} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    autoComplete="username"
-                    autoCorrect="off"
-                    spellCheck={false}
-                    placeholder={t('login.emailPlaceholder')}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-800">
-                    {t('login.password')} <span className="text-red-500">*</span>
-                  </label>
+              <div>
+                <label htmlFor="password" className="mb-2 block text-sm font-medium text-white/55">
+                  {t('login.loginCodeLabel')}
+                </label>
+                <div className="relative flex items-center border-b border-white/20 focus-within:border-accent">
                   <input
                     ref={passwordInputRef}
                     id="password"
                     name="password"
-                    type="password"
+                    type={showLoginCodeVisible ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
                     placeholder=""
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
+                    className={`${LOGIN_FIELD} border-b-0 pr-12`}
                   />
-                  <p className="mt-2 text-xs leading-relaxed text-slate-500">{t('login.staySignedInHint')}</p>
+                  <button
+                    type="button"
+                    className="absolute right-0 p-2 text-white/45 transition-colors hover:text-white/80"
+                    onClick={() => setShowLoginCodeVisible((v) => !v)}
+                    aria-label={showLoginCodeVisible ? t('login.password') : t('login.password')}
+                  >
+                    {showLoginCodeVisible ? (
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858 3.029a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
+                <p className="mt-3 text-xs leading-relaxed text-white/40">{t('login.staySignedInHint')}</p>
+              </div>
 
-                {error && (
-                  <div className="rounded-xl border border-red-200/80 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
-                    {error}
-                  </div>
+              {error && (
+                <div className="rounded-lg border border-red-500/40 bg-red-950/50 px-4 py-3 text-sm text-red-200" role="alert">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading || !email || !password.trim()}
+                aria-busy={isLoading}
+                className={LOGIN_PRIMARY_BTN}
+              >
+                {isLoading ? (
+                  <>
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
+                      aria-hidden
+                    />
+                    <span>{t('login.loggingIn')}</span>
+                  </>
+                ) : (
+                  <span>{t('login.loginButton')}</span>
                 )}
+              </button>
 
-                <button
-                  type="submit"
-                  disabled={isLoading || !email || !password.trim()}
-                  aria-busy={isLoading}
-                  className={LOGIN_PRIMARY_BTN}
-                >
-                  {isLoading ? (
-                    <>
-                      <motion.span
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="inline-block h-5 w-5 shrink-0 rounded-full border-2 border-white border-t-transparent"
-                        aria-hidden
-                      />
-                      <span>{t('login.loggingIn')}</span>
-                    </>
-                  ) : (
-                    <span>{`${t('login.loginButton')} →`}</span>
-                  )}
-                </button>
+              <Link
+                href="/login/forgot-password"
+                className="block text-center text-sm font-medium text-accent/90 transition-colors hover:text-accent"
+              >
+                {t('login.forgotPassword')}
+              </Link>
+            </form>
 
-                <Link
-                  href="/login/forgot-password"
-                  className="block w-full text-center text-sm font-medium text-accent transition-colors hover:text-[#0c5273]"
-                >
-                  {t('login.forgotPassword')}
-                </Link>
-              </form>
-            </div>
-          </div>
-
-          <Link
-            href="/login/troubleshooting"
-            className="group mt-5 flex w-full items-center justify-between rounded-xl border border-slate-200/90 bg-white/80 px-4 py-3.5 shadow-sm backdrop-blur-sm transition-colors hover:border-slate-300 hover:bg-white"
-          >
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                <svg className="h-5 w-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              </div>
-              <div className="min-w-0 text-left">
-                <p className="font-medium text-slate-900">{t('login.troubleshooting.title')}</p>
-                <p className="truncate text-sm text-slate-600 sm:whitespace-normal">{t('login.troubleshooting.subtitle')}</p>
-              </div>
-            </div>
-            <svg
-              className="h-5 w-5 shrink-0 text-slate-400 transition-colors group-hover:text-accent"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden
+            <Link
+              href="/login/troubleshooting"
+              className="group mt-12 flex items-center justify-between border-t border-white/10 pt-6 text-sm text-white/55 transition-colors hover:text-white/80"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
+              <span>{t('login.troubleshooting.title')}</span>
+              <svg className="h-4 w-4 opacity-50 group-hover:opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
-      </div>
 
-      <footer className="relative z-10 px-4 py-6 text-center text-xs text-slate-500 sm:text-sm">
-        © {new Date().getFullYear()} Vysion Group. {t('login.copyright')}
-      </footer>
+        <footer className="px-5 pb-6 text-center text-xs text-white/30 lg:hidden">
+          © {new Date().getFullYear()} Vysion Group. {t('login.copyright')}
+        </footer>
+      </div>
     </main>
   )
 }

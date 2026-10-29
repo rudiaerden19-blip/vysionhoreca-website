@@ -779,6 +779,8 @@
     "resetPassword": "重置密码",
     "emailAddress": "电子邮件地址",
     "password": "密码",
+    "loginCodeLabel": "登录码",
+    "brandPanelTagline": "餐饮与零售 — 专业收银平台。",
     "emailPlaceholder": "name@company.cn",
     "loginButton": "登录",
     "loggingIn": "登录中...",

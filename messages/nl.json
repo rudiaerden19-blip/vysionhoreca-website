@@ -1097,6 +1097,8 @@
     "resetPassword": "Wachtwoord resetten",
     "emailAddress": "Email adres",
     "password": "Wachtwoord",
+    "loginCodeLabel": "Inlogcode",
+    "brandPanelTagline": "Horeca en retail — één professioneel kassaplatform.",
     "emailPlaceholder": "naam@bedrijf.be",
     "loginButton": "Inloggen",
     "loggingIn": "Inloggen...",
