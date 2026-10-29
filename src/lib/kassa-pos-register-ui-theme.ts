@@ -62,8 +62,7 @@ export function createKassaSpeelsRegisterUiTheme(): KassaRegisterUiTheme {
   const base = createKassaPosRegisterUiTheme(true)
   return {
     ...base,
-    /** Effen basis; korrel alleen op header/midden/zijbalk via kassaLayoutPlateBgClass (niet full-screen). */
-    shellBg: 'bg-[#2c2c2c]',
+    shellBg: KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
     soundBackdrop: 'bg-[#12241f]',
     flyMenuPanel: `${KASSA_POS_BTN_SHAPE} shadow-lg border border-[#0c1c18] ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS}`,
     flyMenuBorder: 'border-[#2a4a42]',

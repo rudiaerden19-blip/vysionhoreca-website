@@ -443,44 +443,21 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Productie-kassa POS: korrel op kader (header/zijbalk/marge) — niet op tegel-scroll. */
-.gks-menu-plate-grain,
-.kassa-speels-plate-grain {
-  position: relative;
-  isolation: isolate;
-  background-repeat: repeat;
-  background-size: 80px 80px;
-  background-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.38 0 0 0 -0.14 0 1.38 0 0 -0.14 0 0 1.38 0 -0.14 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
-}
-
-.gks-menu-plate-grain::after,
-.kassa-speels-plate-grain::after {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.42;
-  background-repeat: repeat;
-  background-size: 80px 80px;
-  background-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.1' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E");
-}
-
+/* Productie-kassa POS (zelfde visueel als GKS-preview): korrel vs effen tegelvlak */
 .gks-menu-plate-grain {
   background-color: #161310;
-}
-
-.kassa-speels-plate-grain {
-  background-color: #2c2c2c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
+  background-size: 96px 96px;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
 }
 
 /* Luxe: rustig beige zoals het productenvak (geen druk satijn). */
 html.kassa-luxe-leather,
 html.kassa-luxe-leather body {
   background-color: #d0c4b0 !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.68'/%3E%3C/svg%3E") !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E") !important;
   background-size: 64px 64px !important;
   background-repeat: repeat !important;
   background-blend-mode: multiply !important;
@@ -493,7 +470,7 @@ html.kassa-luxe-leather body {
   z-index: 0;
   pointer-events: none;
   background-color: #d0c4b0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.68'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
   background-size: 64px 64px;
   background-repeat: repeat;
   background-blend-mode: multiply;
@@ -501,7 +478,7 @@ html.kassa-luxe-leather body {
 
 .kassa-luxe-cart-grain {
   background-color: #d0c4b0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.68'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='64' height='64' filter='url(%23n)' opacity='0.58'/%3E%3C/svg%3E");
   background-size: 64px 64px;
   background-repeat: repeat;
   background-blend-mode: multiply;
@@ -515,7 +492,7 @@ html.kassa-luxe-leather body {
 /** Terras-plattegrond: gedempt groen met dezelfde korrel (niet fel). */
 .gks-floor-terrace-grain {
   background-color: #3a4d3c;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.88'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
   background-size: 96px 96px;
   background-repeat: repeat;
   background-attachment: fixed;
@@ -539,7 +516,6 @@ html.kassa-luxe-leather body {
   position: relative;
   isolation: isolate;
   background-color: #1a1612;
-  background-image: none;
   border: 1px solid #100e0c;
   box-shadow:
     inset 0 3px 12px rgba(0, 0, 0, 0.62),
@@ -556,11 +532,19 @@ html.kassa-luxe-leather body {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
+.kassa-speels-plate-grain {
+  background-color: #2c2c2c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.72'/%3E%3C/svg%3E");
+  background-size: 96px 96px;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+}
+
 .kassa-speels-recess-tray {
   position: relative;
   isolation: isolate;
   background-color: #333333;
-  background-image: none;
   border: 1px solid #1a1a1a;
   box-shadow:
     inset 0 3px 12px rgba(0, 0, 0, 0.62),

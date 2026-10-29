@@ -112,6 +112,7 @@ import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
   KASSA_LUXE_HTML_CLASS,
   KASSA_LUXE_LEATHER_PLANE_CLASS,
   KASSA_LUXE_CART_GRAIN_CLASS,
@@ -154,11 +155,6 @@ import {
   kassaPosCartQtyButtonClass,
   kassaPosRaisedStripClass,
 } from '@/lib/kassa-pos-surface'
-import {
-  kassaLayoutMenuScrollFlatBgClass,
-  kassaLayoutPlateBgClass,
-  kassaLayoutRecessTrayClass,
-} from '@/lib/kassa-layout-chrome'
 import {
   authFetch,
   buildShopInternalReturnPath,
@@ -1098,10 +1094,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaClassicDark = kassaLayout === 'dark'
   const kassaLight = kassaLayout === 'light'
   const posChrome: KassaPosChromeLook = kassaLayout === 'speels' ? 'speels' : 'luxe'
-  const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
-  /** Alleen Speels: ingesprongen effen tegelbak. Luxe/klassiek: menu-scroll vlak blijft zoals vóór korrel-tweak. */
+  const kassaPlateBgClass =
+    kassaLayout === 'speels'
+      ? KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS
+      : kassaLayout === 'luxe'
+        ? 'bg-transparent'
+        : kassaAppearanceDark
+          ? 'bg-[#0b0f14]'
+          : 'bg-[#e3e3e3]'
   const kassaRecessTrayClass =
-    kassaLayout === 'speels' ? kassaLayoutRecessTrayClass('speels') : ''
+    kassaLayout === 'speels'
+      ? KASSA_SPEELS_MENU_RECESS_TRAY_CLASS
+      : ''
   const router = useRouter()
   const searchParams = useSearchParams()
   const demoFromUrl =
@@ -6147,7 +6151,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div
             ref={kassaMenuScrollRef}
             data-testid="kassa-menu-scroll"
-            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${kassaLayoutMenuScrollFlatBgClass(kassaLayout)} ${
+            className={`relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 touch-manipulation [overflow-anchor:none] [scrollbar-gutter:stable] ${
               kassaAppearanceDark && kassaLayout !== 'luxe' ? 'gks-menu-vignette': ''
             }`}
           >
