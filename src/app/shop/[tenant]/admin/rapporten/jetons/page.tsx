@@ -164,10 +164,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Overzicht jetons</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Automatisch uit de kassa. Verkocht: artikelen met «jeton» in de naam, cash of pin.
-            Binnengekomen: bonnen betaald met jetons.
-          </p>
+          <p className="text-gray-500 text-sm mt-1">Automatisch uit de kassa.</p>
         </div>
         <div className="flex bg-gray-100 rounded-xl p-1 flex-wrap">
           {(
@@ -227,8 +224,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
         <p className="text-red-600">{error}</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <Stat title="Munten verkocht" value={String(totals?.soldPieces ?? 0)} sub="stuks" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <Stat
+              title="Jetons"
+              value={String(totals?.receivedPieces ?? 0)}
+              sub={`${fmtEuro(totals?.receivedEuro ?? 0)} · ${totals?.receivedBlack ?? 0} zwart · ${totals?.receivedWhite ?? 0} wit · ${totals?.receivedReceipts ?? 0} bonnen`}
+            />
             <Stat
               title="Cash"
               value={fmtEuro(totals?.soldCashEuro ?? 0)}
@@ -239,11 +240,6 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
               value={fmtEuro(totals?.soldPinEuro ?? 0)}
               sub={`${totals?.soldPinPieces ?? 0} stuks`}
             />
-            <Stat
-              title="Jetons binnengekomen"
-              value={String(totals?.receivedPieces ?? 0)}
-              sub={`${fmtEuro(totals?.receivedEuro ?? 0)} · ${totals?.receivedBlack ?? 0} zwart · ${totals?.receivedWhite ?? 0} wit · ${totals?.receivedReceipts ?? 0} bonnen`}
-            />
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
@@ -251,10 +247,9 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-100">
                   <th className="px-4 py-3 font-medium">Dag</th>
-                  <th className="px-4 py-3 font-medium">Verkocht</th>
+                  <th className="px-4 py-3 font-medium">Jetons</th>
                   <th className="px-4 py-3 font-medium">Cash</th>
                   <th className="px-4 py-3 font-medium">Pin</th>
-                  <th className="px-4 py-3 font-medium">Binnengekomen</th>
                 </tr>
               </thead>
               <tbody>
@@ -286,7 +281,13 @@ function DayRow({ row }: { row: JetonDayRow }) {
   return (
     <tr className={`border-b border-gray-50 ${empty ? 'text-gray-300' : 'text-gray-900'}`}>
       <td className="px-4 py-3">{fmtDay(row.date)}</td>
-      <td className="px-4 py-3">{row.soldPieces}</td>
+      <td className="px-4 py-3">
+        {row.receivedPieces} stuks
+        <span className="text-gray-400">
+          {' '}
+          · {fmtEuro(row.receivedEuro)} · {row.receivedBlack} zwart · {row.receivedWhite} wit
+        </span>
+      </td>
       <td className="px-4 py-3">
         {fmtEuro(row.soldCashEuro)}
         <span className="text-gray-400"> · {row.soldCashPieces}</span>
@@ -294,13 +295,6 @@ function DayRow({ row }: { row: JetonDayRow }) {
       <td className="px-4 py-3">
         {fmtEuro(row.soldPinEuro)}
         <span className="text-gray-400"> · {row.soldPinPieces}</span>
-      </td>
-      <td className="px-4 py-3">
-        {row.receivedPieces} stuks
-        <span className="text-gray-400">
-          {' '}
-          · {fmtEuro(row.receivedEuro)} · {row.receivedBlack} zwart · {row.receivedWhite} wit
-        </span>
       </td>
     </tr>
   )
