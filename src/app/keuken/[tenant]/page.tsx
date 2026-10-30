@@ -30,7 +30,9 @@ import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { KitchenStyleOrderCard } from '@/components/shop-display/KitchenStyleOrderCard'
+import { KitchenKdsColumn } from '@/components/keuken/KitchenKdsColumn'
+
+const KDS_COLUMN_ACCENTS = ['#e07a2f', '#1d6fdb', '#0f7f8a', '#c45c12', '#2f6fdb']
 
 interface Order {
   id: string
@@ -384,7 +386,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   return (
     <div
-      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${ui.pageShell}`}
+      className="flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden bg-[#12161c] text-white"
      
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -395,7 +397,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <OnlineDisplaySoundActivationScreen onActivate={activateSound} />
       )}
 
-      <header className={ui.header}>
+      <header className="shrink-0 border-b border-white/10 bg-[#0e1218] px-3 py-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {kassaEntryHref && (
@@ -418,8 +420,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               
             </div>
             <div className="min-w-0">
-              <h1 className={`truncate text-lg font-bold sm:text-xl ${ui.headerTitle}`}>{tx('title')}</h1>
-              <p className={`truncate text-xs sm:text-sm ${ui.headerSub}`}>{business?.business_name}</p>
+              <h1 className="truncate text-lg font-bold text-white sm:text-xl">{tx('title')}</h1>
+              <p className="truncate text-xs text-white/60 sm:text-sm">{business?.business_name}</p>
             </div>
           </div>
 
@@ -451,7 +453,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               </motion.div>
             )}
 
-            <div className={ui.clock}>
+            <div className="font-mono text-2xl font-bold tabular-nums text-white">
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
 
@@ -502,27 +504,26 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         </div>
       </header>
 
-      <div className={ui.scrollArea}>
+      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden">
         {orders.length === 0 ? (
-          <div className={`flex h-full flex-col items-center justify-center ${ui.muted}`}>
-            <span className="mb-6 text-8xl"></span>
-            <p className={ui.emptyTitle}>{tx('allDone')}</p>
-            <p className={`mt-2 text-lg ${ui.emptySub}`}>{tx('ordersAppearHere')}</p>
+          <div className="flex h-full flex-col items-center justify-center text-white/50">
+            <p className="text-2xl font-semibold text-white/80">{tx('allDone')}</p>
+            <p className="mt-2 text-lg">{tx('ordersAppearHere')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {orders.map((order) => (
-              <KitchenStyleOrderCard
+          <div className="flex h-full min-w-full">
+            {orders.map((order, index) => (
+              <KitchenKdsColumn
                 key={order.id}
                 order={order}
                 locale={locale}
-                appearance={ui.cardAppearance}
+                now={currentTime}
+                accent={KDS_COLUMN_ACCENTS[index % KDS_COLUMN_ACCENTS.length]!}
                 isNew={newOrderIds.has(order.id)}
                 headerStatus={kitchenHeaderStatus(order.status)}
                 onlineOrderLabel={t('shopDisplay.onlineOrder')}
                 orderTypeLabel={orderTypeLabel}
                 orderTypeLabelShort={orderTypeLabelShort}
-                timeSince={getTimeSince(order.created_at)}
                 printLabel={tx('print')}
                 readyLabel={tx('ready')}
                 t={t}
