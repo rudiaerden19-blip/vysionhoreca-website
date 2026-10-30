@@ -246,6 +246,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const manualTotals = sumJetonDaySales(
     days.map((row) => salesByDate[row.date] ?? emptyJetonDaySale()),
   )
+  const cashPinJetons = jetonSomBreakdown(0, manualTotals.cashEuro, manualTotals.pinEuro, denoms)
   const editRow = days.find((row) => row.date === editDate)
   const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
   const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
@@ -327,7 +328,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
         <p className="text-red-600">{error}</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
             <Stat
               title="Jetons"
               value={String(totals?.receivedPieces ?? 0)}
@@ -335,6 +336,11 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             />
             <Stat title="Cash" value={fmtEuro(manualTotals.cashEuro)} sub="" />
             <Stat title="Pin" value={fmtEuro(manualTotals.pinEuro)} sub="" />
+            <Stat
+              title="Som"
+              value={fmtEuro(cashPinJetons.euro)}
+              sub={`${fmtJetonAantal(cashPinJetons.black, true)} · ${fmtJetonAantal(cashPinJetons.white, false)}`}
+            />
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">

@@ -152,6 +152,10 @@ describe('jeton overview', () => {
     expect(jetonKassaWaardeEuro(100, 100, 0)).toBe(200)
   })
 
+  it('som van alleen cash en pin wordt zwart en wit', () => {
+    expect(jetonSomBreakdown(0, 100, 100, denoms)).toEqual({ euro: 200, black: 66, white: 4 })
+  })
+
   it('som telt jetons cash en pin om naar zwart en wit', () => {
     expect(jetonSomBreakdown(21, 100, 100, denoms)).toEqual({ euro: 221, black: 73, white: 4 })
   })
