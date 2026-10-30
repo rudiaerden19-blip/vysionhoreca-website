@@ -1067,12 +1067,6 @@ html.kassa-luxe-leather body {
   box-shadow: none;
 }
 
-/* Binnen de mand: vlak waar productregels staan — effen grijs. */
-.kassa-speels-sidebar-cart-lines {
-  background-color: #2f2f2f;
-  background-image: none;
-}
-
 /* ===========================================
    SCROLLBAR HIDE
    =========================================== */
