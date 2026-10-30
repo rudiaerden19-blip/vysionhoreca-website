@@ -6203,7 +6203,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Midden: categorieën / producten ── */}
         <div
           className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${
-            kassaPlateBgClass
+            kassaLayout === 'speels' ? 'bg-black' : kassaPlateBgClass
           }`}
         >
 

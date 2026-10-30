@@ -472,8 +472,8 @@ input[type="number"] {
 /* Speels tegelbak — effen zwart achter de tegels (niet de tegel zelf). */
 .kassa-speels-menu-scroll,
 .kassa-speels-recess-tray {
-  background-color: #000000;
-  background-image: none;
+  background-color: #000000 !important;
+  background-image: none !important;
 }
 
 /* Titelstrook (naam + prijs) — effen #2f2f2f, alle tenants Mode Dark. */
