@@ -246,7 +246,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
           <h1 className="text-2xl font-bold text-gray-900">Overzicht jetons</h1>
           <p className="text-gray-500 text-sm mt-1">Automatisch uit de kassa.</p>
         </div>
-        <div className="flex bg-gray-100 rounded-xl p-1 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {(
             [
               ['yesterday', 'Gisteren'],
@@ -259,11 +259,11 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
               key={id}
               type="button"
               onClick={() => applyPreset(id)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                preset === id ? 'bg-white shadow text-gray-900' : 'text-gray-500'
+              className={`min-w-[6.5rem] px-4 py-2.5 text-sm ${
+                preset === id ? kassaSpeelsGreenGlossButtonClass() : kassaSpeelsGrayChromeButtonClass()
               }`}
             >
-              {label}
+              <span>{label}</span>
             </button>
           ))}
         </div>
