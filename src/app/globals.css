@@ -493,17 +493,17 @@ input[type="number"] {
     inset 0 -4px 0 0 #2f2f2f;
 }
 
-/* Menu-tegels Dark — dun zwart randje + vaste schaduw, geen hover-flikkern. */
+/* Menu-tegels Dark — zwarte tegel, grijze schaduw (alle tenants speels). */
 .kassa-speels-menu-tile {
   border: 2px solid #000000 !important;
   outline: none !important;
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
-  background-color: #282828 !important;
+  background-color: #000000 !important;
   box-shadow:
     0 0 0 1px #000000,
-    0 6px 16px rgba(0, 0, 0, 0.72),
-    0 12px 28px rgba(0, 0, 0, 0.55) !important;
+    0 6px 16px rgba(120, 120, 120, 0.45),
+    0 12px 28px rgba(90, 90, 90, 0.38) !important;
 }
 
 .kassa-speels-menu-tile:hover,
@@ -511,8 +511,8 @@ input[type="number"] {
 .kassa-speels-menu-tile:focus-visible {
   outline: none !important;
   box-shadow:
-    0 6px 16px rgba(0, 0, 0, 0.72),
-    0 12px 28px rgba(0, 0, 0, 0.55) !important;
+    0 6px 16px rgba(120, 120, 120, 0.45),
+    0 12px 28px rgba(90, 90, 90, 0.38) !important;
 }
 
 /*
