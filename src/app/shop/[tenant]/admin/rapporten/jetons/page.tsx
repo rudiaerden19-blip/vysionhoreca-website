@@ -11,6 +11,7 @@ import { addDaysToBelgiumYMD, belgiumLocalToUtcIso, getBelgiumDateString } from 
 import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
   emptyJetonDaySale,
+  jetonDaySaleTotalEuro,
   jetonKassaWaardeEuro,
   parseJetonDayAmount,
   sumJetonDaySales,
@@ -239,6 +240,10 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
   const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
   const jetonEuro = whiteJetonEuro + blackJetonEuro
+  const cashPinSom = jetonDaySaleTotalEuro({
+    cashEuro: parseJetonDayAmount(draftCash),
+    pinEuro: parseJetonDayAmount(draftPin),
+  })
   const kassaWaarde = jetonKassaWaardeEuro(
     parseJetonDayAmount(draftCash),
     parseJetonDayAmount(draftPin),
@@ -328,6 +333,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                   <th className="px-4 py-3 font-medium">Jetons</th>
                   <th className="px-4 py-3 font-medium">Cash</th>
                   <th className="px-4 py-3 font-medium">Pin</th>
+                  <th className="px-4 py-3 font-medium">Som</th>
                   <th className="px-4 py-3 font-medium">Kassa waarde</th>
                   <th className="px-4 py-3 font-medium w-14" />
                 </tr>
@@ -377,6 +383,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                     className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg text-gray-900"
                   />
                 </label>
+                <div className="mt-3 text-sm text-[#d0d0d0]">
+                  Som
+                  <div className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg font-semibold text-gray-900">
+                    {fmtEuro(cashPinSom)}
+                  </div>
+                </div>
                 <div className="mt-3 text-sm text-[#d0d0d0]">
                   Kassa waarde
                   <div className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg font-semibold text-gray-900">
@@ -444,6 +456,9 @@ function DayRow({
       </td>
       <td className="px-4 py-3">{fmtEuro(sale.cashEuro)}</td>
       <td className="px-4 py-3">{fmtEuro(sale.pinEuro)}</td>
+      <td className="px-4 py-3">
+        {fmtEuro(jetonDaySaleTotalEuro({ cashEuro: sale.cashEuro, pinEuro: sale.pinEuro }))}
+      </td>
       <td className="px-4 py-3 font-semibold">
         {fmtEuro(jetonKassaWaardeEuro(sale.cashEuro, sale.pinEuro, row.receivedEuro))}
       </td>
