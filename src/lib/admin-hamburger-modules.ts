@@ -17,6 +17,8 @@ import {
   TENANT_MODULE_IDS,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import { jetonOverviewSubmenuVisible } from '@/lib/kassa-jeton-overview'
 
 /** Geen submenu’s meer geforceerd — alles via Modules-pagina. */
 export const SUBMENU_IDS_ALWAYS_ON = new Set<string>()
@@ -613,6 +615,17 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_rpt_rapporten'),
           href: `${baseUrl}/rapporten`,
         },
+        ...(isTheLagoonTenant(shopTenant)
+          ? [
+              {
+                id: 'sm_rpt_jetons',
+                icon: '',
+                label: 'Overzicht jetons',
+                labelKey: itemLabelKey('sm_rpt_jetons'),
+                href: `${baseUrl}/rapporten/jetons`,
+              },
+            ]
+          : []),
         {
           id: 'sm_rpt_kasboek',
           icon: '',
@@ -876,6 +889,7 @@ export function isAdminSubmenuEnabled(
       if (enabledJson.sm_kassa_muziek === false) return false
       return isHorecaKassaPosScreenEnabled(moduleAccess) || enabledJson.sm_kassa_muziek === true
     }
+    if (subId === 'sm_rpt_jetons' && jetonOverviewSubmenuVisible(tenantSlug, enabledJson)) return true
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledJson)) return true
     if (subId === 'sm_inst_klantscherm' && klantschermInstellingenSubmenuVisible(enabledJson)) {
@@ -964,6 +978,7 @@ export function hasShopAdminPathAccess(
     ) {
       return true
     }
+    if (subId === 'sm_rpt_jetons' && jetonOverviewSubmenuVisible(tenantSlug, enabledModulesJson)) return true
     if (subId === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
     if (subId === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true
     if (subId === 'sm_inst_klantscherm' && klantschermInstellingenSubmenuVisible(enabledModulesJson)) {
@@ -1071,6 +1086,15 @@ export function filterHamburgerModulesForAccess(
           if (item.id === 'sm_kassa_muziek') {
             if (enabledModulesJson.sm_kassa_muziek === false) return false
             return isHorecaKassaPosScreenEnabled(effectiveAccess)
+          }
+          if (
+            item.id === 'sm_rpt_jetons' &&
+            jetonOverviewSubmenuVisible(
+              item.href.match(/^\/shop\/([^/]+)\/admin\//)?.[1] ?? '',
+              enabledModulesJson,
+            )
+          ) {
+            return true
           }
           if (item.id === 'sm_rpt_kasboek' && kasboekSubmenuVisible(enabledModulesJson)) return true
           if (item.id === 'sm_inst_boekhouding' && boekhoudingSubmenuVisible(enabledModulesJson)) return true

@@ -1,0 +1,133 @@
+import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
+import {
+  isJetonSaleItemName,
+  jetonOverviewSubmenuVisible,
+  summarizeJetonOverview,
+} from '@/lib/kassa-jeton-overview'
+import { buildHamburgerModules } from '@/lib/admin-hamburger-modules'
+
+const denoms = normalizeKassaJetonDenominations(300, 50)
+
+describe('jeton overview', () => {
+  it('herkent een jeton-artikel en niet munt thee', () => {
+    expect(isJetonSaleItemName('Jeton')).toBe(true)
+    expect(isJetonSaleItemName('5 jetons')).toBe(true)
+    expect(isJetonSaleItemName('Munt thee')).toBe(false)
+    expect(isJetonSaleItemName('Espresso')).toBe(false)
+  })
+
+  it('telt verkoop cash en pin, en jetons die binnenkomen', () => {
+    const result = summarizeJetonOverview(
+      [
+        {
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: 'CASH',
+          order_type: 'DINE_IN',
+          total: 12,
+          created_at: '2026-10-29T18:00:00.000Z',
+          items: [
+            { name: 'Jeton', quantity: 4, price: 3 },
+            { name: 'Munt thee', quantity: 1, price: 3.5 },
+          ],
+        },
+        {
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: 'CARD',
+          order_type: 'DINE_IN',
+          total: 6,
+          created_at: '2026-10-29T19:00:00.000Z',
+          items: [{ name: 'Jetons', quantity: 2, price: 3 }],
+        },
+        {
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: 'JETON',
+          order_type: 'DINE_IN',
+          total: 4.5,
+          created_at: '2026-10-29T20:00:00.000Z',
+          items: [{ name: 'Espresso', quantity: 1, price: 3 }],
+        },
+        {
+          status: 'cancelled',
+          payment_status: 'paid',
+          payment_method: 'CASH',
+          order_type: 'DINE_IN',
+          total: 3,
+          created_at: '2026-10-29T21:00:00.000Z',
+          items: [{ name: 'Jeton', quantity: 1, price: 3 }],
+        },
+      ],
+      '2026-10-29',
+      '2026-10-29',
+      denoms,
+    )
+    expect(result.totals.soldPieces).toBe(6)
+    expect(result.totals.soldCashPieces).toBe(4)
+    expect(result.totals.soldCashEuro).toBe(12)
+    expect(result.totals.soldPinPieces).toBe(2)
+    expect(result.totals.soldPinEuro).toBe(6)
+    expect(result.totals.receivedReceipts).toBe(1)
+    expect(result.totals.receivedEuro).toBe(4.5)
+    expect(result.totals.receivedBlack).toBe(1)
+    expect(result.totals.receivedWhite).toBe(3)
+    expect(result.totals.receivedPieces).toBe(4)
+  })
+
+  it('houdt een bon na middernacht op de open shift', () => {
+    const result = summarizeJetonOverview(
+      [
+        {
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: 'JETON',
+          order_type: 'DINE_IN',
+          total: 3,
+          created_at: '2026-10-29T23:10:00.000Z',
+          items: [],
+        },
+      ],
+      '2026-10-29',
+      '2026-10-29',
+      denoms,
+      [],
+      [{ reportDate: '2026-10-29', closedAt: null }],
+    )
+    expect(result.totals.receivedReceipts).toBe(1)
+    expect(result.totals.receivedBlack).toBe(1)
+    const next = summarizeJetonOverview(
+      [
+        {
+          status: 'confirmed',
+          payment_status: 'paid',
+          payment_method: 'JETON',
+          order_type: 'DINE_IN',
+          total: 3,
+          created_at: '2026-10-29T23:10:00.000Z',
+          items: [],
+        },
+      ],
+      '2026-10-30',
+      '2026-10-30',
+      denoms,
+      [],
+      [{ reportDate: '2026-10-29', closedAt: null }],
+    )
+    expect(next.totals.receivedReceipts).toBe(0)
+  })
+
+  it('staat alleen in het rapportenmenu van The Lagoon', () => {
+    expect(jetonOverviewSubmenuVisible('demo-frituur', { rapporten: true })).toBe(false)
+    expect(jetonOverviewSubmenuVisible('thelagoon', { rapporten: true })).toBe(true)
+    expect(jetonOverviewSubmenuVisible('the-lagoon', { sm_rpt_jetons: false, rapporten: true })).toBe(false)
+    const lagoon = buildHamburgerModules('/shop/thelagoon/admin', 'thelagoon')
+    const other = buildHamburgerModules('/shop/demo-frituur/admin', 'demo-frituur')
+    const ids = (mods: ReturnType<typeof buildHamburgerModules>) =>
+      mods.flatMap((m) => m.items.map((item) => item.id))
+    expect(ids(lagoon)).toContain('sm_rpt_jetons')
+    expect(ids(other)).not.toContain('sm_rpt_jetons')
+    const href = lagoon.flatMap((m) => m.items).find((item) => item.id === 'sm_rpt_jetons')?.href
+    expect(href).toBe('/shop/thelagoon/admin/rapporten/jetons')
+  })
+})
