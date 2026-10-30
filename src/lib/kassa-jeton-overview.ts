@@ -244,6 +244,11 @@ export function jetonDaySaleTotalEuro(sale: Pick<JetonDaySale, 'cashEuro' | 'pin
   return money(Math.max(0, sale.cashEuro) + Math.max(0, sale.pinEuro))
 }
 
+/** Cash + pin min de jetons die de kassa al telde. Jetons zelf blijven onaangeroerd. */
+export function jetonKassaWaardeEuro(cashEuro: number, pinEuro: number, jetonEuro: number): number {
+  return money(cashEuro + pinEuro - jetonEuro)
+}
+
 export function sumJetonDaySales(sales: JetonDaySale[]): JetonDaySale & { totalEuro: number } {
   const acc = sales.reduce(
     (sum, sale) => {

@@ -11,6 +11,7 @@ import { addDaysToBelgiumYMD, belgiumLocalToUtcIso, getBelgiumDateString } from 
 import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
   emptyJetonDaySale,
+  jetonKassaWaardeEuro,
   parseJetonDayAmount,
   sumJetonDaySales,
   summarizeJetonOverview,
@@ -238,6 +239,11 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
   const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
   const jetonEuro = whiteJetonEuro + blackJetonEuro
+  const kassaWaarde = jetonKassaWaardeEuro(
+    parseJetonDayAmount(draftCash),
+    parseJetonDayAmount(draftPin),
+    jetonEuro,
+  )
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -370,6 +376,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                     className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg text-gray-900"
                   />
                 </label>
+                <div className="mt-3 text-sm text-[#d0d0d0]">
+                  Kassa waarde
+                  <div className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg font-semibold text-gray-900">
+                    {fmtEuro(kassaWaarde)}
+                  </div>
+                </div>
                 {saveError ? <p className="mt-3 text-sm text-red-600">{saveError}</p> : null}
                 <div className="mt-5 flex gap-2">
                   <button

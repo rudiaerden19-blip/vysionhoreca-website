@@ -2,6 +2,7 @@ import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
   isJetonSaleItemName,
   jetonDaySaleTotalEuro,
+  jetonKassaWaardeEuro,
   jetonOverviewSubmenuVisible,
   parseJetonDayAmount,
   sumJetonDaySales,
@@ -143,5 +144,10 @@ describe('jeton overview', () => {
         { jetonsSold: 10, cashEuro: 30, pinEuro: 0 },
       ]),
     ).toEqual({ jetonsSold: 110, cashEuro: 130, pinEuro: 200, totalEuro: 330 })
+  })
+
+  it('kassa waarde is cash plus pin min de jetons', () => {
+    expect(jetonKassaWaardeEuro(100, 100, 12)).toBe(188)
+    expect(jetonKassaWaardeEuro(100, 100, 0)).toBe(200)
   })
 })
