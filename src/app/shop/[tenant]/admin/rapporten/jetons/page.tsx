@@ -328,6 +328,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                   <th className="px-4 py-3 font-medium">Jetons</th>
                   <th className="px-4 py-3 font-medium">Cash</th>
                   <th className="px-4 py-3 font-medium">Pin</th>
+                  <th className="px-4 py-3 font-medium">Kassa waarde</th>
                   <th className="px-4 py-3 font-medium w-14" />
                 </tr>
               </thead>
@@ -443,6 +444,9 @@ function DayRow({
       </td>
       <td className="px-4 py-3">{fmtEuro(sale.cashEuro)}</td>
       <td className="px-4 py-3">{fmtEuro(sale.pinEuro)}</td>
+      <td className="px-4 py-3 font-semibold">
+        {fmtEuro(jetonKassaWaardeEuro(sale.cashEuro, sale.pinEuro, row.receivedEuro))}
+      </td>
       <td className="px-2 py-3">
         <button
           type="button"
