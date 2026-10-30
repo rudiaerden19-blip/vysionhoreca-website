@@ -13,7 +13,6 @@ import {
   emptyJetonDaySale,
   jetonDaySaleTotalEuro,
   parseJetonDayAmount,
-  parseJetonDayCount,
   sumJetonDaySales,
   summarizeJetonOverview,
   type JetonDayRow,
@@ -76,7 +75,6 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const [overview, setOverview] = useState<JetonOverview | null>(null)
   const [salesByDate, setSalesByDate] = useState<Record<string, JetonDaySale>>({})
   const [editDate, setEditDate] = useState<string | null>(null)
-  const [draftCount, setDraftCount] = useState('')
   const [draftCash, setDraftCash] = useState('')
   const [draftPin, setDraftPin] = useState('')
   const [saving, setSaving] = useState(false)
@@ -176,7 +174,6 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const openEdit = (date: string) => {
     const sale = salesByDate[date] ?? emptyJetonDaySale()
     setEditDate(date)
-    setDraftCount(sale.jetonsSold ? String(sale.jetonsSold) : '')
     setDraftCash(sale.cashEuro ? String(sale.cashEuro) : '')
     setDraftPin(sale.pinEuro ? String(sale.pinEuro) : '')
     setSaveError('')
@@ -185,7 +182,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const saveEdit = async () => {
     if (!editDate) return
     const sale: JetonDaySale = {
-      jetonsSold: parseJetonDayCount(draftCount),
+      jetonsSold: salesByDate[editDate]?.jetonsSold ?? 0,
       cashEuro: parseJetonDayAmount(draftCash),
       pinEuro: parseJetonDayAmount(draftPin),
     }
@@ -196,7 +193,6 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
       {
         tenant_slug: tenant,
         report_date: editDate,
-        jetons_sold: sale.jetonsSold,
         cash_euro: sale.cashEuro,
         pin_euro: sale.pinEuro,
         updated_at: new Date().toISOString(),
@@ -340,19 +336,8 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
               <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
                 <h2 className="text-lg font-bold text-gray-900">{fmtDay(editDate)}</h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  {parseJetonDayCount(draftCount)} jetons verkocht · {fmtEuro(draftTotal)}
-                </p>
+                <p className="mt-1 text-sm text-gray-500">{fmtEuro(draftTotal)}</p>
                 <label className="mt-4 block text-sm text-gray-600">
-                  Jetons verkocht
-                  <input
-                    inputMode="numeric"
-                    value={draftCount}
-                    onChange={(e) => setDraftCount(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-3 text-lg"
-                  />
-                </label>
-                <label className="mt-3 block text-sm text-gray-600">
                   Cash
                   <input
                     inputMode="decimal"
@@ -417,19 +402,11 @@ function DayRow({
   sale: JetonDaySale
   onEdit: () => void
 }) {
-  const filled = sale.jetonsSold > 0 || sale.cashEuro > 0 || sale.pinEuro > 0
+  const filled = sale.cashEuro > 0 || sale.pinEuro > 0
   const empty = row.receivedReceipts === 0 && row.receivedEuro === 0 && !filled
-  const soldEuro = jetonDaySaleTotalEuro(sale)
   return (
     <tr className={`border-b border-gray-50 ${empty ? 'text-gray-300' : 'text-gray-900'}`}>
-      <td className="px-4 py-3">
-        {fmtDay(row.date)}
-        {filled ? (
-          <div className="text-xs text-gray-500">
-            {sale.jetonsSold} verkocht · {fmtEuro(soldEuro)}
-          </div>
-        ) : null}
-      </td>
+      <td className="px-4 py-3">{fmtDay(row.date)}</td>
       <td className="px-4 py-3">
         {row.receivedPieces} stuks
         <span className="text-gray-400">
