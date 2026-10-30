@@ -34,8 +34,14 @@ function fmtEuro(n: number): string {
   return `€${n.toFixed(2)}`
 }
 
+function fmtJetonAantal(count: number, zwart: boolean): string {
+  const one = count === 1
+  const naam = zwart ? (one ? 'zwarte jeton' : 'zwarte jetons') : one ? 'witte jeton' : 'witte jetons'
+  return `${count} ${naam}`
+}
+
 function fmtSom(som: { euro: number; black: number; white: number }): string {
-  return `${som.black} zwart · ${som.white} wit · ${fmtEuro(som.euro)}`
+  return `${fmtJetonAantal(som.black, true)} · ${fmtJetonAantal(som.white, false)} · ${fmtEuro(som.euro)}`
 }
 
 function fmtDay(ymd: string): string {
@@ -325,7 +331,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             <Stat
               title="Jetons"
               value={String(totals?.receivedPieces ?? 0)}
-              sub={`${fmtEuro(totals?.receivedEuro ?? 0)} · ${totals?.receivedBlack ?? 0} zwart · ${totals?.receivedWhite ?? 0} wit`}
+              sub={`${fmtJetonAantal(totals?.receivedBlack ?? 0, true)} · ${fmtJetonAantal(totals?.receivedWhite ?? 0, false)} · ${fmtEuro(totals?.receivedEuro ?? 0)}`}
             />
             <Stat title="Cash" value={fmtEuro(manualTotals.cashEuro)} sub="" />
             <Stat title="Pin" value={fmtEuro(manualTotals.pinEuro)} sub="" />
@@ -362,10 +368,10 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
               <div className="w-full max-w-md rounded-2xl bg-[#4a4a4a] p-5 shadow-xl">
                 <h2 className="text-lg font-bold text-white">{fmtDay(editDate)}</h2>
                 <p className="mt-2 text-base font-semibold text-white">
-                  {editRow?.receivedBlack ?? 0} zwarte jetons ontvangen
+                  {fmtJetonAantal(editRow?.receivedBlack ?? 0, true)} ontvangen
                 </p>
                 <p className="text-base font-semibold text-white">
-                  {editRow?.receivedWhite ?? 0} witte jetons ontvangen
+                  {fmtJetonAantal(editRow?.receivedWhite ?? 0, false)} ontvangen
                 </p>
                 <p className="mt-3 text-sm text-[#d0d0d0]">
                   Witte jetons {fmtEuro(whiteJetonEuro)}
@@ -458,10 +464,10 @@ function DayRow({
     <tr className={`border-b border-gray-50 ${empty ? 'text-gray-300' : 'text-gray-900'}`}>
       <td className="px-4 py-3">{fmtDay(row.date)}</td>
       <td className="px-4 py-3">
-        {row.receivedPieces} stuks
+        {fmtJetonAantal(row.receivedBlack, true)}
         <span className="text-gray-400">
           {' '}
-          · {fmtEuro(row.receivedEuro)} · {row.receivedBlack} zwart · {row.receivedWhite} wit
+          · {fmtJetonAantal(row.receivedWhite, false)} · {fmtEuro(row.receivedEuro)}
         </span>
       </td>
       <td className="px-4 py-3">{fmtEuro(sale.cashEuro)}</td>
