@@ -69,8 +69,8 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const tenant = params.tenant
   const allowed = isTheLagoonTenant(tenant)
   const today = getBelgiumDateString()
-  const [preset, setPreset] = useState<Preset>('yesterday')
-  const initial = rangeForPreset('yesterday', today)
+  const [preset, setPreset] = useState<Preset>('today')
+  const initial = rangeForPreset('today', today)
   const [from, setFrom] = useState(initial.from)
   const [to, setTo] = useState(initial.to)
   const [loading, setLoading] = useState(allowed)
