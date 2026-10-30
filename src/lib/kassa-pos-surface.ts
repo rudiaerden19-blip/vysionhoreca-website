@@ -30,7 +30,7 @@ export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
 /** Tegel-scroll — effen #2f2f2f. */
 export const KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS = 'bg-[#2f2f2f] kassa-speels-menu-scroll'
 
-/** Mand-layout — geen eigen achtergrond; korrel + grijs alleen op regels. */
+/** Mandvak — dezelfde donkergrijze korrel als het kader; grijs alleen op regels. */
 export const KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS = 'kassa-speels-sidebar-cart-vak rounded-xl'
 
 /** Terras-plattegrond canvas — gedempt groen + korrel. */
@@ -381,7 +381,7 @@ export const KASSA_POS_CART_ROW = [
   'p-2 flex items-center gap-2',
 ].join(' ')
 
-/** Mode Dark — productbalk in de mand (#2f2f2f); mand zelf blijft zwart. */
+/** Mode Dark — productbalk in de mand blijft effen #2f2f2f op het korrelvak. */
 export const KASSA_SPEELS_CART_ROW = [
   KASSA_POS_BTN_SHAPE,
   'kassa-speels-cart-line-bar',
