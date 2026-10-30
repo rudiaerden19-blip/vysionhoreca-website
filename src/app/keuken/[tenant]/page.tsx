@@ -555,7 +555,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <p className="mt-2 text-lg">{tx('ordersAppearHere')}</p>
           </div>
         ) : (
-          <div className="flex h-full">
+          <div className="flex h-full gap-4 px-3 py-3">
             {kdsPageOrders.map((order) => (
               <KitchenKdsColumn
                 key={order.id}

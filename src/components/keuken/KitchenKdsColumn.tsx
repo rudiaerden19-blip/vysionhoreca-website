@@ -98,9 +98,10 @@ export function KitchenKdsColumn({
 
   return (
     <article
-      className={`flex h-full w-[248px] shrink-0 flex-col border-r border-black/60 bg-transparent ${
+      className={`flex h-full w-[248px] shrink-0 flex-col border bg-transparent ${
         isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
+      style={{ borderColor: KDS_HEADER_BLUE }}
     >
       <header className="shrink-0 px-2.5 py-2 text-white" style={{ backgroundColor: KDS_HEADER_BLUE }}>
         <div className="flex items-start justify-between gap-2">
