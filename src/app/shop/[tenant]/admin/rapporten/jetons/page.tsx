@@ -11,7 +11,6 @@ import { addDaysToBelgiumYMD, belgiumLocalToUtcIso, getBelgiumDateString } from 
 import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
   emptyJetonDaySale,
-  jetonDaySaleTotalEuro,
   parseJetonDayAmount,
   sumJetonDaySales,
   summarizeJetonOverview,
@@ -83,6 +82,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const [draftPin, setDraftPin] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [denoms, setDenoms] = useState(() => normalizeKassaJetonDenominations(300, 50))
 
   const load = useCallback(async () => {
     if (!allowed) return
@@ -144,9 +144,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
         created_at: String(row.created_at || ''),
         items: parseItems(row.items),
       }))
-      const denoms = normalizeKassaJetonDenominations(
+      const nextDenoms = normalizeKassaJetonDenominations(
         settings?.kassa_jeton_black_cents,
         settings?.kassa_jeton_white_cents,
+      )
+      setDenoms(nextDenoms)
+      const denoms = nextDenoms
       )
       setOverview(
         summarizeJetonOverview(orders, start, end, denoms, (hours || []) as TenantHourRow[], shifts),
@@ -233,11 +236,10 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const manualTotals = sumJetonDaySales(
     days.map((row) => salesByDate[row.date] ?? emptyJetonDaySale()),
   )
-  const draftTotal = jetonDaySaleTotalEuro({
-    cashEuro: parseJetonDayAmount(draftCash),
-    pinEuro: parseJetonDayAmount(draftPin),
-  })
   const editRow = days.find((row) => row.date === editDate)
+  const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
+  const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
+  const jetonEuro = whiteJetonEuro + blackJetonEuro
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -347,7 +349,11 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                 <p className="text-base font-semibold text-white">
                   {editRow?.receivedWhite ?? 0} witte jetons ontvangen
                 </p>
-                <p className="mt-1 text-sm text-[#c8c8c8]">{fmtEuro(draftTotal)}</p>
+                <p className="mt-3 text-sm text-[#d0d0d0]">
+                  Witte jetons {fmtEuro(whiteJetonEuro)}
+                </p>
+                <p className="text-sm text-[#d0d0d0]">Zwarte jetons {fmtEuro(blackJetonEuro)}</p>
+                <p className="mt-1 text-lg font-bold text-white">{fmtEuro(jetonEuro)}</p>
                 <label className="mt-4 block text-sm text-[#d0d0d0]">
                   Cash
                   <input
