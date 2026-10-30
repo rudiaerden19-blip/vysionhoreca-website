@@ -94,6 +94,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const { dark: kassaKitchenDark } = useKassaUiDarkSync(params.tenant)
   const ui = useMemo(() => getShopDisplaySurface(kassaKitchenDark), [kassaKitchenDark])
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
+  const [startedOrderIds, setStartedOrderIds] = useState<Set<string>>(new Set())
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -104,6 +105,47 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [kdsPage, setKdsPage] = useState(0)
   const kdsChromeBtn = `${kassaSpeelsGrayChromeButtonClass()} px-3 py-2 text-sm`
   const kdsChromeOn = `${kassaSpeelsBlueGlossButtonClass(true)} px-3 py-2 text-sm`
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(`kds-started:${params.tenant}`)
+      const ids = raw ? JSON.parse(raw) : []
+      if (Array.isArray(ids)) {
+        setStartedOrderIds(new Set(ids.filter((id) => typeof id === 'string')))
+      }
+    } catch {
+      setStartedOrderIds(new Set())
+    }
+  }, [params.tenant])
+
+  useEffect(() => {
+    if (!initialLoadDone) return
+    const live = new Set(orders.map((o) => o.id))
+    setStartedOrderIds((prev) => {
+      const next = new Set([...prev].filter((id) => live.has(id)))
+      if (next.size === prev.size) return prev
+      try {
+        localStorage.setItem(`kds-started:${params.tenant}`, JSON.stringify([...next]))
+      } catch {
+        /* scherm blijft rood in dit tabblad */
+      }
+      return next
+    })
+  }, [orders, initialLoadDone, params.tenant])
+
+  function markOrderStarted(orderId: string) {
+    setStartedOrderIds((prev) => {
+      if (prev.has(orderId)) return prev
+      const next = new Set(prev)
+      next.add(orderId)
+      try {
+        localStorage.setItem(`kds-started:${params.tenant}`, JSON.stringify([...next]))
+      } catch {
+        /* scherm blijft rood in dit tabblad */
+      }
+      return next
+    })
+  }
 
   // Update time every second
   useEffect(() => {
@@ -569,6 +611,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 orderTypeLabelShort={orderTypeLabelShort}
                 printLabel={tx('print')}
                 readyLabel={tx('ready')}
+                startLabel={tx('start')}
+                started={startedOrderIds.has(order.id)}
                 t={t}
                 onOpen={() => {
                   setSelectedOrder(order)
@@ -585,6 +629,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 onReady={(e) => {
                   e.stopPropagation()
                   handleReady(order)
+                }}
+                onStart={(e) => {
+                  e.stopPropagation()
+                  markOrderStarted(order.id)
                 }}
               />
             ))}

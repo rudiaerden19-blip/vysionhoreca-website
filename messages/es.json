@@ -2922,6 +2922,7 @@
     "delivery": "ENTREGA",
     "pickup": "RECOGER",
     "print": "Imprimir",
+    "start": "Empezar",
     "ready": "Listo",
     "customer": "Cliente",
     "phone": "Teléfono",

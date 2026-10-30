@@ -15,6 +15,7 @@ import {
 } from '@/lib/kassa-pos-surface'
 
 const KDS_HEADER_BLUE = '#163a66'
+const KDS_HEADER_RED = '#9b1c1c'
 
 type Props = {
   order: KitchenStyleOrder
@@ -27,10 +28,13 @@ type Props = {
   orderTypeLabelShort: (order: Pick<KitchenStyleOrder, 'order_type'>) => string
   printLabel: string
   readyLabel: string
+  startLabel: string
+  started?: boolean
   t: (key: string) => string
   onOpen: () => void
   onPrint: (e: React.MouseEvent) => void
   onReady: (e: React.MouseEvent) => void
+  onStart: (e: React.MouseEvent) => void
 }
 
 function formatElapsed(createdAt: string, now: Date): string {
@@ -71,10 +75,13 @@ export function KitchenKdsColumn({
   orderTypeLabelShort,
   printLabel,
   readyLabel,
+  startLabel,
+  started = false,
   t,
   onOpen,
   onPrint,
   onReady,
+  onStart,
 }: Props) {
   const elapsed = formatElapsed(order.created_at, now)
   const dineInSeat = adminDineInSeatAuditLine(order, t)
@@ -88,6 +95,13 @@ export function KitchenKdsColumn({
     ? `${onlineOrderLabel} · ${orderTypeLabel(order.order_type)}`
     : orderTypeLabelShort(order).trim()
 
+  const tableNr =
+    (order.order_type || '').toString().toUpperCase() === 'DINE_IN' &&
+    order.table_number != null &&
+    String(order.table_number).trim() !== ''
+      ? String(order.table_number).trim()
+      : null
+  const headerColor = started ? KDS_HEADER_RED : KDS_HEADER_BLUE
   const groups: { title: string; items: unknown[] }[] = []
   for (const item of order.items ?? []) {
     const title = itemCategory(item)
@@ -101,9 +115,9 @@ export function KitchenKdsColumn({
       className={`flex h-full w-[248px] shrink-0 flex-col border bg-transparent ${
         isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
-      style={{ borderColor: KDS_HEADER_BLUE }}
+      style={{ borderColor: headerColor }}
     >
-      <header className="shrink-0 px-2.5 py-2 text-white" style={{ backgroundColor: KDS_HEADER_BLUE }}>
+      <header className="shrink-0 px-2.5 py-2 text-white" style={{ backgroundColor: headerColor }}>
         <div className="flex items-start justify-between gap-2">
           <button
             type="button"
@@ -113,6 +127,11 @@ export function KitchenKdsColumn({
             <span className="block text-2xl font-black leading-none tabular-nums">
               {order.order_number}
             </span>
+            {tableNr ? (
+              <span className="mt-1 block text-lg font-black leading-none">
+                {t('kassaApp.tableWord')} {tableNr}
+              </span>
+            ) : null}
             <span className="mt-1 block truncate text-[11px] font-semibold uppercase tracking-wide text-white/90">
               {headerStatus}
             </span>
@@ -173,7 +192,16 @@ export function KitchenKdsColumn({
         ) : null}
       </div>
 
-      <footer className="flex shrink-0 gap-1.5 border-t border-black/40 bg-transparent p-2">
+      <footer className="flex shrink-0 flex-col gap-1.5 border-t border-black/40 bg-transparent p-2">
+        <button
+          type="button"
+          disabled={started}
+          onClick={onStart}
+          className={`${kassaSpeelsGrayChromeButtonClass()} w-full py-2 text-sm disabled:opacity-60`}
+        >
+          <span>{startLabel}</span>
+        </button>
+        <div className="flex gap-1.5">
         <button
           type="button"
           onClick={onPrint}
@@ -188,6 +216,7 @@ export function KitchenKdsColumn({
         >
           {readyLabel}
         </button>
+        </div>
       </footer>
     </article>
   )
