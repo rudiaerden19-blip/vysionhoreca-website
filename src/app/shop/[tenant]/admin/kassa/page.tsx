@@ -6497,13 +6497,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* ── Rechts: numpad / cart ── */}
         <div
+          data-kassa-sidebar="1"
           className={`${
             kassaWide15Chrome
               ? 'w-[268px] max-w-[30vw]'
               : kassaCompactChrome
                 ? 'w-[332px] max-w-[38vw]'
                 : 'w-80 sm:w-96 lg:w-[380px]'
-          } data-kassa-sidebar="1"
           } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
