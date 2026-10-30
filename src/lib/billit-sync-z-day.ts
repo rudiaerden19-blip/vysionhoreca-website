@@ -24,72 +24,30 @@ export type ZReportRowForBillit = {
   closed_at: string | null
 }
 
-type OrderRow = {
-  id: string
-  total: number | null
-  payment_method: string | null
-  created_at: string | null
-}
-
 function num(v: unknown): number {
   const n = typeof v === 'number' ? v : Number(v)
   return Number.isFinite(n) ? n : 0
 }
 
+function money(v: number): string {
+  return v.toFixed(2)
+}
+
+/**
+ * Eén factuurregel = de dagomzet incl. BTW.
+ * Billit telt OrderLines op. BTW, contant/kaart/online en losse bonnen
+ * zijn dezelfde omzet en mogen dus geen extra regels zijn.
+ */
 export function buildBillitOrderPayload(
   tenantSlug: string,
   report: ZReportRowForBillit,
-  orders: OrderRow[],
 ): Record<string, unknown> {
   const reportDate = String(report.report_date)
   const extId = billitExternalProviderId(tenantSlug, reportDate)
+  const dayTotal = num(report.total)
   const taxTotal = num(report.tax_low) + num(report.tax_mid) + num(report.tax_high)
+  const excl = num(report.subtotal)
   const closedAt = report.closed_at || `${reportDate}T23:59:59`
-
-  const summaryLines: Record<string, unknown>[] = [
-    {
-      Description: `Dagomzet totaal (incl. BTW) — ${reportDate}`,
-      Quantity: 1,
-      TotalIncl: num(report.total),
-      UnitPriceIncl: num(report.total),
-    },
-    {
-      Description: `BTW totaal`,
-      Quantity: 1,
-      TotalIncl: taxTotal,
-      UnitPriceIncl: taxTotal,
-    },
-    {
-      Description: `Contant`,
-      Quantity: 1,
-      TotalIncl: num(report.cash_payments),
-      UnitPriceIncl: num(report.cash_payments),
-    },
-    {
-      Description: `Kaart`,
-      Quantity: 1,
-      TotalIncl: num(report.card_payments),
-      UnitPriceIncl: num(report.card_payments),
-    },
-    {
-      Description: `Online`,
-      Quantity: 1,
-      TotalIncl: num(report.online_payments),
-      UnitPriceIncl: num(report.online_payments),
-    },
-  ]
-
-  const bonLines: Record<string, unknown>[] = orders.map((o, idx) => {
-    const totalIncl = num(o.total)
-    const when = o.created_at ? String(o.created_at).slice(0, 19).replace('T', ' ') : ''
-    return {
-      Description: `Bon ${o.id.slice(0, 8)}… ${when} (${o.payment_method || '?'})`,
-      Reference: o.id,
-      Quantity: 1,
-      TotalIncl: totalIncl,
-      UnitPriceIncl: totalIncl,
-    }
-  })
 
   const orderDate = closedAt
   const expiryDate = new Date(closedAt)
@@ -109,11 +67,25 @@ export function buildBillitOrderPayload(
     ExternalProvider: 'Vysion',
     ExternalProviderID: extId,
     Currency: 'EUR',
-    TotalIncl: num(report.total),
-    TotalExcl: num(report.subtotal),
+    TotalIncl: dayTotal,
+    TotalExcl: excl,
     TotalVAT: taxTotal,
-    Comments: `Tenant ${tenantSlug}; ${report.order_count} bonnen; gesloten ${closedAt}`,
-    OrderLines: [...summaryLines, ...bonLines],
+    Comments: [
+      `Tenant ${tenantSlug}; ${report.order_count} bonnen; gesloten ${closedAt}.`,
+      `Dagomzet incl. BTW ${money(dayTotal)}.`,
+      `BTW ${money(taxTotal)} zit in dat bedrag.`,
+      `Contant ${money(num(report.cash_payments))}; kaart ${money(num(report.card_payments))}; online ${money(num(report.online_payments))}.`,
+    ].join(' '),
+    OrderLines: [
+      {
+        Description: `Dagomzet ${reportDate} (incl. BTW, ${report.order_count} bonnen)`,
+        Quantity: 1,
+        TotalIncl: dayTotal,
+        UnitPriceIncl: dayTotal,
+        TotalExcl: excl,
+        TotalVAT: taxTotal,
+      },
+    ],
   }
 }
 
@@ -143,7 +115,7 @@ export async function syncBillitLagoonZDay(
     .eq('report_date', reportDate)
     .maybeSingle()
 
-  if (existingLog?.status === 'ok' && existingLog.billit_order_id) {
+  if (existingLog?.status === 'ok') {
     return { ok: true, skipped: true, reason: 'already_synced' }
   }
 
@@ -162,19 +134,7 @@ export async function syncBillitLagoonZDay(
     return { ok: false, error: 'Dag is nog niet afgesloten' }
   }
 
-  const orderIds = Array.isArray(report.order_ids) ? (report.order_ids as string[]) : []
-  let orders: OrderRow[] = []
-  if (orderIds.length > 0) {
-    const { data: orderRows, error: ordErr } = await client
-      .from('orders')
-      .select('id, total, payment_method, created_at')
-      .eq('tenant_slug', tenantSlug)
-      .in('id', orderIds.slice(0, 500))
-    if (ordErr) return { ok: false, error: ordErr.message }
-    orders = (orderRows ?? []) as OrderRow[]
-  }
-
-  const payload = buildBillitOrderPayload(tenantSlug, report as ZReportRowForBillit, orders)
+  const payload = buildBillitOrderPayload(tenantSlug, report as ZReportRowForBillit)
 
   await client.from('billit_sync_log').upsert(
     {

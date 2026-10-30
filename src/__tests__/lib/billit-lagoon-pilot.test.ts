@@ -43,35 +43,32 @@ describe('billit-lagoon-pilot', () => {
 })
 
 describe('buildBillitOrderPayload', () => {
-  it('includes totals, BTW, payments and bon lines', () => {
-    const payload = buildBillitOrderPayload(
-      'thelagoon',
-      {
-        report_date: '2026-10-28',
-        order_count: 2,
-        subtotal: 80,
-        tax_low: 1,
-        tax_mid: 2,
-        tax_high: 3,
-        total: 86,
-        cash_payments: 50,
-        card_payments: 36,
-        online_payments: 0,
-        order_ids: ['a', 'b'],
-        is_closed: true,
-        closed_at: '2026-10-28T22:00:00.000Z',
-      },
-      [
-        { id: 'order-1', total: 50, payment_method: 'cash', created_at: '2026-10-28T20:00:00Z' },
-        { id: 'order-2', total: 36, payment_method: 'card', created_at: '2026-10-28T21:00:00Z' },
-      ],
-    )
+  it('stuurt de dagomzet één keer, zonder bonnen of betaalwijze als extra regels', () => {
+    const payload = buildBillitOrderPayload('thelagoon', {
+      report_date: '2026-10-28',
+      order_count: 2,
+      subtotal: 80,
+      tax_low: 1,
+      tax_mid: 2,
+      tax_high: 3,
+      total: 86,
+      cash_payments: 50,
+      card_payments: 36,
+      online_payments: 0,
+      order_ids: ['a', 'b'],
+      is_closed: true,
+      closed_at: '2026-10-28T22:00:00.000Z',
+    })
 
     expect(payload.Reference).toBe('vysion-thelagoon-2026-10-28')
     expect(payload.TotalIncl).toBe(86)
     expect(payload.TotalVAT).toBe(6)
     const lines = payload.OrderLines as Record<string, unknown>[]
-    expect(lines.length).toBeGreaterThanOrEqual(7)
-    expect(lines.some((l) => l.Reference === 'order-1')).toBe(true)
+    expect(lines).toHaveLength(1)
+    expect(lines[0]?.TotalIncl).toBe(86)
+    const summed = lines.reduce((sum, line) => sum + Number(line.TotalIncl), 0)
+    expect(summed).toBe(86)
+    expect(String(payload.Comments)).toContain('Contant 50.00')
+    expect(String(payload.Comments)).toContain('2 bonnen')
   })
 })
