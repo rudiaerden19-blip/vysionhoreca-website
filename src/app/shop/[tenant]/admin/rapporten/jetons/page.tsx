@@ -233,6 +233,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
     cashEuro: parseJetonDayAmount(draftCash),
     pinEuro: parseJetonDayAmount(draftPin),
   })
+  const editRow = days.find((row) => row.date === editDate)
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -336,6 +337,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
               <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
                 <h2 className="text-lg font-bold text-gray-900">{fmtDay(editDate)}</h2>
+                <p className="mt-2 text-base font-semibold text-gray-900">
+                  {editRow?.receivedBlack ?? 0} zwarte jetons ontvangen
+                </p>
+                <p className="text-base font-semibold text-gray-900">
+                  {editRow?.receivedWhite ?? 0} witte jetons ontvangen
+                </p>
                 <p className="mt-1 text-sm text-gray-500">{fmtEuro(draftTotal)}</p>
                 <label className="mt-4 block text-sm text-gray-600">
                   Cash
