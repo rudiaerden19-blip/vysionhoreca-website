@@ -149,10 +149,8 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
         settings?.kassa_jeton_white_cents,
       )
       setDenoms(nextDenoms)
-      const denoms = nextDenoms
-      )
       setOverview(
-        summarizeJetonOverview(orders, start, end, denoms, (hours || []) as TenantHourRow[], shifts),
+        summarizeJetonOverview(orders, start, end, nextDenoms, (hours || []) as TenantHourRow[], shifts),
       )
       const nextSales: Record<string, JetonDaySale> = {}
       if (saleResult.ok && Array.isArray(saleResult.data)) {
