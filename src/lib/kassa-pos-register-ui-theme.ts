@@ -14,6 +14,8 @@ import {
   KASSA_SPEELS_PRICE_ACCENT_CLASS,
   KASSA_POS_CART_ROW,
   KASSA_POS_CART_THUMB_SHELL,
+  KASSA_SPEELS_CART_ROW,
+  KASSA_SPEELS_CART_THUMB_SHELL,
   KASSA_POS_MENU_TRANSPARENT_CLASS,
 } from '@/lib/kassa-pos-surface'
 import type { KassaUiLayoutId } from '@/lib/kassa-ui-layout'
@@ -87,6 +89,8 @@ export function createKassaSpeelsRegisterUiTheme(): KassaRegisterUiTheme {
     printFallbackGhost: `mt-3 w-full py-3 px-4 text-sm font-semibold ${kassaSpeelsChromeButtonClass(false)}`,
     printFallbackPanel: `w-full max-w-md ${KASSA_POS_BTN_SHAPE} border border-[#0c1c18] bg-[#1a332c] p-5 shadow-lg sm:p-6`,
     priceAccentClass: KASSA_SPEELS_PRICE_ACCENT_CLASS,
+    cartRowBg: KASSA_SPEELS_CART_ROW,
+    cartThumbPlaceholder: KASSA_SPEELS_CART_THUMB_SHELL,
   }
 }
 

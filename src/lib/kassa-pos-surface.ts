@@ -381,6 +381,16 @@ export const KASSA_POS_CART_ROW = [
   'p-2 flex items-center gap-2',
 ].join(' ')
 
+/** Mode Dark — productbalk in de mand (#2f2f2f); mand zelf blijft zwart. */
+export const KASSA_SPEELS_CART_ROW = [
+  KASSA_POS_BTN_SHAPE,
+  'kassa-speels-cart-line-bar',
+  'p-2 flex items-center gap-2',
+].join(' ')
+
+export const KASSA_SPEELS_CART_THUMB_SHELL =
+  'rounded-lg border border-[#454545] bg-[#3a3a3a] overflow-hidden shrink-0'
+
 export const KASSA_POS_CART_THUMB_SHELL =
   'rounded-lg border border-[#3d352c] bg-[#2a241c] overflow-hidden shrink-0'
 
