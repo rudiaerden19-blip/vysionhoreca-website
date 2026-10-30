@@ -601,6 +601,17 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       label: 'Rapporten',
       labelKey: rowLabelKey('rapporten'),
       items: [
+        ...(isTheLagoonTenant(shopTenant)
+          ? [
+              {
+                id: 'sm_rpt_jetons',
+                icon: '',
+                label: 'Overzicht jetons',
+                labelKey: itemLabelKey('sm_rpt_jetons'),
+                href: `${baseUrl}/rapporten/jetons`,
+              },
+            ]
+          : []),
         {
           id: 'sm_rpt_overzicht',
           icon: '',
@@ -615,17 +626,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
           labelKey: itemLabelKey('sm_rpt_rapporten'),
           href: `${baseUrl}/rapporten`,
         },
-        ...(isTheLagoonTenant(shopTenant)
-          ? [
-              {
-                id: 'sm_rpt_jetons',
-                icon: '',
-                label: 'Overzicht jetons',
-                labelKey: itemLabelKey('sm_rpt_jetons'),
-                href: `${baseUrl}/rapporten/jetons`,
-              },
-            ]
-          : []),
         {
           id: 'sm_rpt_kasboek',
           icon: '',
@@ -744,6 +744,7 @@ export function buildSubToggleStateFromDb(
     for (const it of m.items) {
       if (subs[it.id] !== undefined) continue
       if (typeof p?.[it.id] === 'boolean') subs[it.id] = p[it.id]
+      else if (it.id === 'sm_rpt_jetons' && isTheLagoonTenant(tenantSlug)) subs[it.id] = true
       else if (explicit) subs[it.id] = false
       else subs[it.id] = !!moduleToggles[m.key]
     }

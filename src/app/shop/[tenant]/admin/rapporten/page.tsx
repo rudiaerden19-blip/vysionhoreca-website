@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { adminDb } from '@/lib/admin-db-client'
 import {
@@ -27,6 +28,7 @@ import {
   type ZReportVatContext,
 } from '@/lib/z-report-vat-context'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 import { authFetch } from '@/lib/auth-headers'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -1075,6 +1077,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Rapportages</h1>
         <div className="flex items-center gap-2 flex-wrap">
+          {isTheLagoonTenant(tenant) ? (
+            <Link
+              href={`/shop/${tenant}/admin/rapporten/jetons`}
+              className="px-4 py-2 rounded-xl font-medium text-sm bg-[#1e293b] text-white"
+            >
+              Jetons
+            </Link>
+          ) : null}
           {tabs.map(t => (
             <button key={t.id} onClick={()=>setTab(t.id)}
               className={`px-4 py-2 rounded-xl font-medium text-sm transition-all ${tab===t.id ? t.activeColor : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
