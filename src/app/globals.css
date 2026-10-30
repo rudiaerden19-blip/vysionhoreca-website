@@ -115,11 +115,11 @@ html.vysion-kassa-root.kassa-dark-appearance body {
 }
 
 /* Mode Dark (speels): donkergrijze korrel op page-chrome — effen #2f2f2f vlakken blijven apart.
-   Kleur #262626; korrel-lagen niet wijzigen. */
+   Kleur #1a1a1a; korrel-lagen niet wijzigen. */
 html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout,
 html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout body {
   --kassa-speels-plate-grain-tile: 144px;
-  background-color: #262626 !important;
+  background-color: #1a1a1a !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
     url('/images/kassa-dark-frame-grain.png') !important;
   background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 256px 256px !important;
@@ -471,13 +471,13 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. Donkergrijs kader (#262626) + dezelfde korrel.
+ * Mode «Dark» (layout speels) — alle tenants. Donkergrijs kader (#1a1a1a) + dezelfde korrel.
  * #2f2f2f vlakken gebruiken deze class niet.
  */
 .kassa-speels-plate-grain,
 .kassa-speels-sidebar-cart-vak {
   --kassa-speels-plate-grain-tile: 144px;
-  background-color: #262626;
+  background-color: #1a1a1a;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
     url('/images/kassa-dark-frame-grain.png');
   background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 256px 256px;
