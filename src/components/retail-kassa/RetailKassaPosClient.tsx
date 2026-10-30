@@ -466,11 +466,13 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
     body.classList.add('vysion-kassa-root')
     if (appearanceDark) html.classList.add('kassa-dark-appearance')
     else html.classList.remove('kassa-dark-appearance')
+    if (kassaLayout === 'speels') html.classList.add('kassa-speels-layout')
+    else html.classList.remove('kassa-speels-layout')
     return () => {
-      html.classList.remove('kassa-dark-appearance', 'vysion-kassa-root')
+      html.classList.remove('kassa-dark-appearance', 'kassa-speels-layout', 'vysion-kassa-root')
       body.classList.remove('vysion-kassa-root')
     }
-  }, [appearanceDark])
+  }, [appearanceDark, kassaLayout])
 
   const focusBarcodeCapture = useCallback(() => {
     if (priceFixNameInputRef.current && document.activeElement === priceFixNameInputRef.current) return

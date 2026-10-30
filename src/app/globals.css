@@ -114,17 +114,18 @@ html.vysion-kassa-root.kassa-dark-appearance body {
   color-scheme: dark;
 }
 
-/* Mode Dark (speels): zwarte korrel op page-chrome — grijs #2f2f2f vlakken blijven apart. */
+/* Mode Dark (speels): donkergrijze korrel op page-chrome — effen #2f2f2f vlakken blijven apart.
+   Basis #3a3a3a (niet #000): overlay op puur zwart veegt de korrel weg. */
 html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout,
 html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout body {
   --kassa-speels-plate-grain-tile: 144px;
-  background-color: #000000 !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.82'/%3E%3C/svg%3E"),
+  background-color: #3a3a3a !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
     url('/images/kassa-dark-frame-grain.png') !important;
   background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 256px 256px !important;
   background-repeat: repeat !important;
-  background-blend-mode: overlay, soft-light;
-  -webkit-background-blend-mode: overlay, soft-light;
+  background-blend-mode: soft-light, soft-light;
+  -webkit-background-blend-mode: soft-light, soft-light;
 }
 
 /* Foto-tegels en thumbnails: scherpere herberekening bij opschalen in Chromium/Edge op klassieke lcd */
@@ -470,18 +471,18 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. Zwart kader + korrel (niet grijs #282828).
- * Dubbele laag: SVG-fractalNoise (zichtbaar op #000 + iOS) + PNG-korrel; #2f2f2f vlakken gebruiken deze class niet.
+ * Mode «Dark» (layout speels) — alle tenants. Donkergrijs kader + korrel (niet #000, niet tegel #282828).
+ * Soft-light op #3a3a3a houdt de korrel zichtbaar; #2f2f2f vlakken gebruiken deze class niet.
  */
 .kassa-speels-plate-grain {
   --kassa-speels-plate-grain-tile: 144px;
-  background-color: #000000;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix type='matrix' values='1.32 0 0 0 -0.12 0 1.32 0 0 -0.12 0 0 1.32 0 -0.12 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.82'/%3E%3C/svg%3E"),
+  background-color: #3a3a3a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
     url('/images/kassa-dark-frame-grain.png');
   background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 256px 256px;
   background-repeat: repeat;
-  background-blend-mode: overlay, soft-light;
-  -webkit-background-blend-mode: overlay, soft-light;
+  background-blend-mode: soft-light, soft-light;
+  -webkit-background-blend-mode: soft-light, soft-light;
 }
 
 /* Tegelgrid — effen donkergrijs vlak (niet korrel). */
