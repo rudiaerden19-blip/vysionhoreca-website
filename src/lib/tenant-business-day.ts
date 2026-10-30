@@ -81,6 +81,33 @@ export function businessDayForOrder(createdAt: string, hours: TenantHourRow[]): 
   return ymd
 }
 
+/** Z-dag die nog open is, of net afgesloten. `closedAt` null = shift loopt nog. */
+export type ShiftReportClose = {
+  reportDate: string
+  closedAt: string | null
+}
+
+/**
+ * Bon na middernacht blijft op de shift tot die Z is afgesloten.
+ * Een klokwissel om 00:00 maakt geen tweede Z.
+ */
+export function orderReportDateForShift(
+  createdAt: string,
+  hours: TenantHourRow[],
+  shifts: ShiftReportClose[],
+): string | null {
+  const clock = businessDayForOrder(createdAt, hours)
+  if (!clock) return null
+  const prevDate = addDaysToBelgiumYMD(clock, -1)
+  const prev = shifts.find((s) => s.reportDate === prevDate)
+  if (!prev) return clock
+  if (prev.closedAt == null) return prevDate
+  const createdMs = new Date(createdAt).getTime()
+  const closedMs = new Date(prev.closedAt).getTime()
+  if (Number.isFinite(createdMs) && Number.isFinite(closedMs) && createdMs < closedMs) return prevDate
+  return clock
+}
+
 export function getCurrentBusinessDay(now = new Date(), hours: TenantHourRow[] = []): string {
   return businessDayForOrder(now.toISOString(), hours) ?? getBelgiumDateString(now)
 }

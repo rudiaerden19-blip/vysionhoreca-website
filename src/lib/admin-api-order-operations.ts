@@ -1,10 +1,12 @@
 import { supabase } from './supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { getBelgiumDateString } from './belgium-date-bounds'
+import { addDaysToBelgiumYMD, getBelgiumDateString } from './belgium-date-bounds'
 import {
   businessDayForOrder,
   fetchOpeningHoursForTenant,
   getTenantBusinessDayBounds,
+  orderReportDateForShift,
+  type ShiftReportClose,
 } from './tenant-business-day'
 import {
   distributeOrderPaymentForZRaport,
@@ -262,25 +264,46 @@ async function generateSimpleHash(input: string): Promise<string> {
 export async function regenerateZReportForDate(
   client: SupabaseClient,
   tenantSlug: string,
-  date: string
+  date: string,
+  opts?: { cascade?: boolean },
 ): Promise<void> {
   console.log(`regenerateZReportForDate: Start voor ${tenantSlug} op ${date}`)
 
   try {
     const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
-    const { startUTC, endUTC } = getTenantBusinessDayBounds(date, hours)
-    console.log(`regenerateZReportForDate: Query van ${startUTC} tot ${endUTC} (openingsuren)`)
+    const bounds = getTenantBusinessDayBounds(date, hours)
+    const prevDate = addDaysToBelgiumYMD(date, -1)
+    const nextDate = addDaysToBelgiumYMD(date, 1)
+
+    const { data: shiftRows } = await client
+      .from('z_reports')
+      .select('report_date, is_closed, closed_at, manual_total, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl, owner_dinein_drinks_incl')
+      .eq('tenant_slug', tenantSlug)
+      .in('report_date', [prevDate, date, nextDate])
+
+    const shifts: ShiftReportClose[] = (shiftRows ?? []).map((row) => ({
+      reportDate: String(row.report_date),
+      closedAt: row.is_closed === true ? (row.closed_at ? String(row.closed_at) : null) : null,
+    }))
+    const selfRow = (shiftRows ?? []).find((row) => String(row.report_date) === date)
+
+    let endUTC = bounds.endUTC
+    const selfShift = shifts.find((s) => s.reportDate === date)
+    const extendUntil = selfShift ? selfShift.closedAt ?? new Date().toISOString() : bounds.endUTC
+    if (new Date(extendUntil).getTime() > new Date(endUTC).getTime()) endUTC = extendUntil
+
+    console.log(`regenerateZReportForDate: Query van ${bounds.startUTC} tot ${endUTC} (shift, niet middernacht)`)
 
     const ordersRaw = await fetchAllOrdersInCreatedAtRange(
       client,
       tenantSlug,
-      startUTC,
+      bounds.startUTC,
       endUTC,
       'id, total, payment_method, payment_split_cash, payment_split_card, order_type, status, payment_status, items, created_at'
     )
 
     const orders = (ordersRaw as unknown as Order[]).filter(
-      (o) => businessDayForOrder(String(o.created_at || ''), hours) === date,
+      (o) => orderReportDateForShift(String(o.created_at || ''), hours, shifts) === date,
     )
 
     console.log(`regenerateZReportForDate: ${ordersRaw?.length || 0} orders in venster`)
@@ -319,6 +342,24 @@ export async function regenerateZReportForDate(
     const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
 
     const amounts = buildZReportDayAmountsFromOrders(orders, btwPercentage, vatContext)
+
+    const manualTotal = Number(selfRow?.manual_total) || 0
+    const ownerFilled =
+      Number(selfRow?.owner_cash) > 0 ||
+      Number(selfRow?.owner_card) > 0 ||
+      Number(selfRow?.owner_takeaway_incl) > 0 ||
+      Number(selfRow?.owner_dinein_incl) > 0 ||
+      Number(selfRow?.owner_dinein_drinks_incl) > 0
+    if (amounts.orderCount === 0 && manualTotal <= 0 && !ownerFilled) {
+      if (selfRow) {
+        await client.from('z_reports').delete().eq('tenant_slug', tenantSlug).eq('report_date', date)
+        console.log(`regenerateZReportForDate: lege Z verwijderd ${tenantSlug} ${date} (hoort bij de open shift)`)
+      }
+      if (opts?.cascade !== false) {
+        await regenerateZReportForDate(client, tenantSlug, prevDate, { cascade: false })
+      }
+      return
+    }
 
     const reportHash = await generateSimpleHash(
       zReportDayHashPayload(tenantSlug, date, amounts),
@@ -372,6 +413,10 @@ export async function regenerateZReportForDate(
     console.log(
       `Z-rapport bijgewerkt voor ${tenantSlug} op ${date}: ${amounts.orderCount} bestellingen, €${amounts.orderTotalIncl.toFixed(2)}`,
     )
+
+    if (opts?.cascade !== false) {
+      await regenerateZReportForDate(client, tenantSlug, nextDate, { cascade: false })
+    }
   } catch (error) {
     console.error('regenerateZReportForDate: Onverwachte fout:', error)
   }

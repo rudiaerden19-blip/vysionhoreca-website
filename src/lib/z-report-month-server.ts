@@ -111,6 +111,17 @@ export async function buildZReportMonthFromSupabase(
     ? await fetchZReportOwnerCloseByDateForMonth(client, tenantSlug, yearMonth)
     : {}
 
+  const { data: shiftRows } = await client
+    .from('z_reports')
+    .select('report_date, is_closed, closed_at')
+    .eq('tenant_slug', tenantSlug)
+    .like('report_date', `${yearMonth}%`)
+
+  const shifts = (shiftRows ?? []).map((row) => ({
+    reportDate: String(row.report_date),
+    closedAt: row.is_closed === true ? (row.closed_at ? String(row.closed_at) : null) : null,
+  }))
+
   const days = buildZReportMonthDayRows(
     ordersRaw as unknown as Order[],
     yearMonth,
@@ -120,6 +131,7 @@ export async function buildZReportMonthFromSupabase(
     manualByDate,
     hours,
     ownerByDate,
+    shifts,
   )
 
   return {

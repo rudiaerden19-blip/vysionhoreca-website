@@ -11,7 +11,13 @@ import {
   fiscalReportDateForOrderCreatedAt,
   getBelgiumDateString,
 } from '@/lib/belgium-date-bounds'
-import { businessDayForOrder, getTenantBusinessDayBounds, type TenantHourRow } from '@/lib/tenant-business-day'
+import {
+  businessDayForOrder,
+  getTenantBusinessDayBounds,
+  orderReportDateForShift,
+  type ShiftReportClose,
+  type TenantHourRow,
+} from '@/lib/tenant-business-day'
 
 export { fiscalReportDateForOrderCreatedAt }
 import type { CategoryVatPercent } from '@/lib/order-vat'
@@ -158,6 +164,7 @@ export function buildZReportMonthDayRows(
   manualByDate?: Record<string, ManualDayExtras>,
   hours: TenantHourRow[] = [],
   ownerByDate?: Record<string, ZReportOwnerCloseInput>,
+  shifts: ShiftReportClose[] = [],
 ): ZReportMonthDayRow[] {
   const counted = orders.filter((o) =>
     orderCountsTowardRevenueAndZReport(
@@ -168,7 +175,9 @@ export function buildZReportMonthDayRows(
   const byDate = new Map<string, Order[]>()
   for (const o of counted) {
     const created = String(o.created_at || '')
-    const fiscal = businessDayForOrder(created, hours)
+    const fiscal = shifts.length
+      ? orderReportDateForShift(created, hours, shifts)
+      : businessDayForOrder(created, hours)
     if (!fiscal || !fiscal.startsWith(yearMonth)) continue
     const list = byDate.get(fiscal) || []
     list.push(o)

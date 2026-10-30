@@ -1,6 +1,7 @@
 import {
   businessDayForOrder,
   getTenantBusinessDayBounds,
+  orderReportDateForShift,
   type TenantHourRow,
 } from '@/lib/tenant-business-day'
 
@@ -26,6 +27,24 @@ describe('tenant business day', () => {
   it('17u–01u: 10u zondag is zondag, niet zaterdag', () => {
     const hours = week('17:00', '01:00')
     expect(businessDayForOrder('2026-09-06T08:00:00.000Z', hours)).toBe('2026-09-06')
+  })
+
+  it('open shift houdt bonnen na middernacht op dezelfde Z', () => {
+    const atMidnight = '2026-10-29T23:10:00.000Z'
+    expect(businessDayForOrder(atMidnight, [])).toBe('2026-10-30')
+    expect(
+      orderReportDateForShift(atMidnight, [], [
+        { reportDate: '2026-10-29', closedAt: null },
+      ]),
+    ).toBe('2026-10-29')
+  })
+
+  it('bon vóór het afsluiten blijft op de shift, daarna begint de nieuwe dag', () => {
+    const beforeClose = '2026-10-29T23:10:00.000Z'
+    const afterClose = '2026-10-30T10:00:00.000Z'
+    const shifts = [{ reportDate: '2026-10-29', closedAt: '2026-10-30T09:16:41.817Z' }]
+    expect(orderReportDateForShift(beforeClose, [], shifts)).toBe('2026-10-29')
+    expect(orderReportDateForShift(afterClose, [], shifts)).toBe('2026-10-30')
   })
 
   it('bounds sluiten de volgende ochtend bij over-middernacht', () => {

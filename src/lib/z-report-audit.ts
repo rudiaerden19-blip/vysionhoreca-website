@@ -9,6 +9,7 @@ import {
   businessDayForOrder,
   fetchOpeningHoursForTenant,
   getTenantBusinessDayBounds,
+  orderReportDateForShift,
 } from '@/lib/tenant-business-day'
 import {
   isKassaPosOrder,
@@ -185,11 +186,21 @@ export async function auditTenantZReports(
       }
     }
 
+    const { data: shiftRows } = await client
+      .from('z_reports')
+      .select('report_date, is_closed, closed_at')
+      .eq('tenant_slug', tenantSlug)
+      .like('report_date', `${ym}%`)
+    const shifts = (shiftRows ?? []).map((row) => ({
+      reportDate: String(row.report_date),
+      closedAt: row.is_closed === true ? (row.closed_at ? String(row.closed_at) : null) : null,
+    }))
+
     const byFiscal = new Map<string, Order[]>()
     for (const o of orders) {
       const created = String(o.created_at || '')
       if (!created) continue
-      const fiscal = businessDayForOrder(created, hours)
+      const fiscal = orderReportDateForShift(created, hours, shifts)
       if (!fiscal || !fiscal.startsWith(ym)) continue
       if (!orderCountsTowardRevenueAndZReport(o)) continue
       const list = byFiscal.get(fiscal) || []
@@ -226,7 +237,7 @@ export async function auditTenantZReports(
       }
     }
 
-    const monthRows = buildZReportMonthDayRows(orders, ym, capYmd, btw, vatContext, undefined, hours)
+    const monthRows = buildZReportMonthDayRows(orders, ym, capYmd, btw, vatContext, undefined, hours, undefined, shifts)
     const monthSum = monthRows.length ? sumZReportMonthAmounts(monthRows) : null
 
     let computedMonthTotal = 0

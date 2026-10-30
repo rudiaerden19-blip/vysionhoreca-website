@@ -20,7 +20,7 @@ import {
   zReportOwnerEveningCloseEnabled,
   type ZReportOwnerCloseInput,
 } from '@/lib/z-report-owner-close'
-import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt } from '@/lib/tenant-business-day'
+import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt, orderReportDateForShift } from '@/lib/tenant-business-day'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import {
   fetchZReportVatContextForTenant,
@@ -63,6 +63,7 @@ interface ZReport {
   generated_at: string
   business_name?: string
   is_closed?: boolean
+  closed_at?: string | null
   owner_cash?: number | null
   owner_card?: number | null
   owner_takeaway_incl?: number | null
@@ -293,7 +294,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     // z_reports gaat via /api/admin/db/read (na Phase 2-lockdown heeft de
     // anon-key geen SELECT meer op die tabel).
     const zSelectBase =
-      'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
+      'id, report_date, order_count, total, cash_payments, card_payments, online_payments, tax_low, tax_mid, tax_high, generated_at, business_name, is_closed, closed_at, owner_cash, owner_card, owner_takeaway_incl, owner_dinein_incl'
     const windowStart = startOfMonth(new Date())
     windowStart.setDate(windowStart.getDate() - 8)
     const windowEnd = new Date()
@@ -446,7 +447,15 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const kassaOrders = useMemo(() => validOrders.filter(isKassaOrder), [validOrders])
   const onlineOrders = useMemo(() => validOrders.filter(isOnlineOrder), [validOrders])
 
-  const orderDay = (o: Order) => businessDayForOrder(o.created_at, openingHours)
+  const orderDay = (o: Order) =>
+    orderReportDateForShift(
+      o.created_at,
+      openingHours,
+      zReports.map((r) => ({
+        reportDate: r.report_date,
+        closedAt: r.is_closed ? r.closed_at ?? null : null,
+      })),
+    ) ?? businessDayForOrder(o.created_at, openingHours)
   const revenueInPeriod = (list: Order[], from: Date) =>
     list.filter(o => new Date(o.created_at) >= from).reduce((s,o)=>s+o.total,0)
   const ordersInPeriod = (list: Order[], from: Date) =>

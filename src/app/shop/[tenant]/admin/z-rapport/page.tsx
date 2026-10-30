@@ -29,10 +29,12 @@ import {
   parseOwnerCloseMoney,
   zReportOwnerEveningCloseEnabled,
 } from '@/lib/z-report-owner-close'
+import { addDaysToBelgiumYMD } from '@/lib/belgium-date-bounds'
 import {
-  businessDayForOrder,
   formatTenantBusinessDayPeriod,
   getTenantBusinessDayBounds,
+  orderReportDateForShift,
+  type ShiftReportClose,
   type TenantHourRow,
 } from '@/lib/tenant-business-day'
 import {
@@ -311,18 +313,39 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     }
 
     const hours = await getOpeningHours(params.tenant)
-    const { startUTC, endUTC } = getTenantBusinessDayBounds(selectedDate, hours)
+    const bounds = getTenantBusinessDayBounds(selectedDate, hours)
+    const prevDate = addDaysToBelgiumYMD(selectedDate, -1)
+    const shiftOf = async (reportDate: string): Promise<ShiftReportClose | null> => {
+      const row = await adminDb.select<{ is_closed?: boolean | null; closed_at?: string | null }>('z_reports', {
+        tenantSlug: params.tenant,
+        select: 'is_closed, closed_at',
+        match: { report_date: reportDate },
+        single: 'maybe',
+      })
+      if (!row.ok || !row.data) return null
+      return {
+        reportDate,
+        closedAt: row.data.is_closed ? row.data.closed_at ?? null : null,
+      }
+    }
+    const shifts = [await shiftOf(prevDate), await shiftOf(selectedDate)].filter(
+      (s): s is ShiftReportClose => s != null,
+    )
+    const selfShift = shifts.find((s) => s.reportDate === selectedDate)
+    let endUTC = bounds.endUTC
+    const extendUntil = selfShift ? selfShift.closedAt ?? new Date().toISOString() : bounds.endUTC
+    if (new Date(extendUntil).getTime() > new Date(endUTC).getTime()) endUTC = extendUntil
 
     const ordersRaw = await fetchAllTenantOrdersInCreatedAtRange(
       params.tenant,
-      startUTC,
+      bounds.startUTC,
       endUTC,
       '*'
     )
 
     const vatContext = await fetchZReportVatContextForTenant(params.tenant)
     const dayOrders = (ordersRaw as unknown as Order[]).filter(
-      (o) => businessDayForOrder(String(o.created_at || ''), hours) === selectedDate,
+      (o) => orderReportDateForShift(String(o.created_at || ''), hours, shifts) === selectedDate,
     )
     const counted = dayOrders.filter((o) =>
       orderCountsTowardRevenueAndZReport(
@@ -460,6 +483,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         buildManualByDateForMonth(yearMonth),
         hours,
         buildOwnerByDateForMonth(yearMonth),
+        savedReports
+          .filter((r) => r.report_date.startsWith(yearMonth))
+          .map((r) => ({
+            reportDate: r.report_date,
+            closedAt: r.is_closed ? r.closed_at ?? null : null,
+          })),
       )
       setMonthDayRows(days)
       setMonthAmounts(days.length ? sumZReportMonthAmounts(days) : null)
@@ -1160,6 +1189,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         buildManualByDateForMonth(yearMonth),
         hours,
         buildOwnerByDateForMonth(yearMonth),
+        savedReports
+          .filter((r) => r.report_date.startsWith(yearMonth))
+          .map((r) => ({
+            reportDate: r.report_date,
+            closedAt: r.is_closed ? r.closed_at ?? null : null,
+          })),
       )
 
       if (days.length === 0) {
