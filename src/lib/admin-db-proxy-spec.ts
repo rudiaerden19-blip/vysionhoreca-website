@@ -284,6 +284,14 @@ export const ADMIN_DB_TABLES: Record<string, AdminDbTableSpec> = {
     maxRows: 500,
   },
 
+  /** The Lagoon: handmatig jetons verkocht per dag (cash/pin). Andere tenants schrijven hier niet naartoe vanuit de UI. */
+  kassa_jeton_day_sales: {
+    tenantSlugColumn: 'tenant_slug',
+    allowedOps: ['insert', 'update', 'upsert', 'delete'],
+    forbiddenColumns: ['id', 'created_at'],
+    maxRows: 40,
+  },
+
   // --- Z-rapport (handmatige correctie alleen) ---
   z_reports: {
     tenantSlugColumn: 'tenant_slug',

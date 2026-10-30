@@ -216,3 +216,48 @@ export function summarizeJetonOverview(
 
   return { days, totals }
 }
+
+/** Handmatig ingevuld per dag: jetons verkocht, cash en pin. */
+export type JetonDaySale = {
+  jetonsSold: number
+  cashEuro: number
+  pinEuro: number
+}
+
+export function emptyJetonDaySale(): JetonDaySale {
+  return { jetonsSold: 0, cashEuro: 0, pinEuro: 0 }
+}
+
+export function parseJetonDayAmount(raw: string): number {
+  const n = Number(String(raw ?? '').trim().replace(',', '.'))
+  if (!Number.isFinite(n) || n < 0) return 0
+  return Math.round(n * 100) / 100
+}
+
+export function parseJetonDayCount(raw: string): number {
+  const n = Math.round(Number(String(raw ?? '').trim().replace(',', '.')))
+  if (!Number.isFinite(n) || n < 0) return 0
+  return n
+}
+
+export function jetonDaySaleTotalEuro(sale: Pick<JetonDaySale, 'cashEuro' | 'pinEuro'>): number {
+  return money(Math.max(0, sale.cashEuro) + Math.max(0, sale.pinEuro))
+}
+
+export function sumJetonDaySales(sales: JetonDaySale[]): JetonDaySale & { totalEuro: number } {
+  const acc = sales.reduce(
+    (sum, sale) => {
+      sum.jetonsSold += Math.max(0, Math.round(sale.jetonsSold))
+      sum.cashEuro += Math.max(0, sale.cashEuro)
+      sum.pinEuro += Math.max(0, sale.pinEuro)
+      return sum
+    },
+    { jetonsSold: 0, cashEuro: 0, pinEuro: 0 },
+  )
+  return {
+    jetonsSold: acc.jetonsSold,
+    cashEuro: money(acc.cashEuro),
+    pinEuro: money(acc.pinEuro),
+    totalEuro: money(acc.cashEuro + acc.pinEuro),
+  }
+}

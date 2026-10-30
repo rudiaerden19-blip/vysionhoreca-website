@@ -1,7 +1,10 @@
 import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
   isJetonSaleItemName,
+  jetonDaySaleTotalEuro,
   jetonOverviewSubmenuVisible,
+  parseJetonDayAmount,
+  sumJetonDaySales,
   summarizeJetonOverview,
 } from '@/lib/kassa-jeton-overview'
 import { buildHamburgerModules } from '@/lib/admin-hamburger-modules'
@@ -129,5 +132,16 @@ describe('jeton overview', () => {
     expect(ids(other)).not.toContain('sm_rpt_jetons')
     const href = lagoon.flatMap((m) => m.items).find((item) => item.id === 'sm_rpt_jetons')?.href
     expect(href).toBe('/shop/thelagoon/admin/rapporten/jetons')
+  })
+
+  it('telt handmatig ingevulde verkoop: cash plus pin', () => {
+    expect(parseJetonDayAmount('100,5')).toBe(100.5)
+    expect(jetonDaySaleTotalEuro({ cashEuro: 100, pinEuro: 200 })).toBe(300)
+    expect(
+      sumJetonDaySales([
+        { jetonsSold: 100, cashEuro: 100, pinEuro: 200 },
+        { jetonsSold: 10, cashEuro: 30, pinEuro: 0 },
+      ]),
+    ).toEqual({ jetonsSold: 110, cashEuro: 130, pinEuro: 200, totalEuro: 330 })
   })
 })
