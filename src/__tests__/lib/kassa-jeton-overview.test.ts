@@ -153,6 +153,11 @@ describe('jeton overview', () => {
     expect(jetonKassaWaardeEuro(100, 100, 0)).toBe(200)
   })
 
+  it('179 euro kassa waarde is 59 zwart en 4 wit', () => {
+    expect(jetonKassaWaardeEuro(100, 100, 21)).toBe(179)
+    expect(jetonSomBreakdown(179, 0, 0, denoms)).toEqual({ euro: 179, black: 59, white: 4 })
+  })
+
   it('trekt de kassa-jetons af van cash en pin', () => {
     expect(jetonStuksNaMindering(67, 0, 7, 0)).toEqual({ black: 60, white: 0, stuks: 60 })
   })
