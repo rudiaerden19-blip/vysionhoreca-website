@@ -8,11 +8,11 @@ import {
   getTenantSettings,
 } from '@/lib/admin-api'
 import { addDaysToBelgiumYMD, belgiumLocalToUtcIso, getBelgiumDateString } from '@/lib/belgium-date-bounds'
-import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
+import { normalizeKassaJetonDenominations, type KassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
   emptyJetonDaySale,
-  jetonDaySaleTotalEuro,
   jetonKassaWaardeEuro,
+  jetonSomBreakdown,
   parseJetonDayAmount,
   sumJetonDaySales,
   summarizeJetonOverview,
@@ -32,6 +32,10 @@ type Preset = 'yesterday' | 'today' | '7' | '30' | 'custom'
 
 function fmtEuro(n: number): string {
   return `€${n.toFixed(2)}`
+}
+
+function fmtSom(som: { euro: number; black: number; white: number }): string {
+  return `${som.black} zwart · ${som.white} wit · ${fmtEuro(som.euro)}`
 }
 
 function fmtDay(ymd: string): string {
@@ -240,10 +244,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
   const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
   const jetonEuro = whiteJetonEuro + blackJetonEuro
-  const cashPinSom = jetonDaySaleTotalEuro({
-    cashEuro: parseJetonDayAmount(draftCash),
-    pinEuro: parseJetonDayAmount(draftPin),
-  })
+  const som = jetonSomBreakdown(
+    editRow?.receivedEuro ?? 0,
+    parseJetonDayAmount(draftCash),
+    parseJetonDayAmount(draftPin),
+    denoms,
+  )
   const kassaWaarde = jetonKassaWaardeEuro(
     parseJetonDayAmount(draftCash),
     parseJetonDayAmount(draftPin),
@@ -344,6 +350,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                     key={row.date}
                     row={row}
                     sale={salesByDate[row.date] ?? emptyJetonDaySale()}
+                    denoms={denoms}
                     onEdit={() => openEdit(row.date)}
                   />
                 ))}
@@ -386,7 +393,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                 <div className="mt-3 text-sm text-[#d0d0d0]">
                   Som
                   <div className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg font-semibold text-gray-900">
-                    {fmtEuro(cashPinSom)}
+                    {fmtSom(som)}
                   </div>
                 </div>
                 <div className="mt-3 text-sm text-[#d0d0d0]">
@@ -436,14 +443,17 @@ function Stat({ title, value, sub }: { title: string; value: string; sub: string
 function DayRow({
   row,
   sale,
+  denoms,
   onEdit,
 }: {
   row: JetonDayRow
   sale: JetonDaySale
+  denoms: KassaJetonDenominations
   onEdit: () => void
 }) {
   const filled = sale.cashEuro > 0 || sale.pinEuro > 0
   const empty = row.receivedReceipts === 0 && row.receivedEuro === 0 && !filled
+  const som = jetonSomBreakdown(row.receivedEuro, sale.cashEuro, sale.pinEuro, denoms)
   return (
     <tr className={`border-b border-gray-50 ${empty ? 'text-gray-300' : 'text-gray-900'}`}>
       <td className="px-4 py-3">{fmtDay(row.date)}</td>
@@ -456,9 +466,7 @@ function DayRow({
       </td>
       <td className="px-4 py-3">{fmtEuro(sale.cashEuro)}</td>
       <td className="px-4 py-3">{fmtEuro(sale.pinEuro)}</td>
-      <td className="px-4 py-3">
-        {fmtEuro(jetonDaySaleTotalEuro({ cashEuro: sale.cashEuro, pinEuro: sale.pinEuro }))}
-      </td>
+      <td className="px-4 py-3">{fmtSom(som)}</td>
       <td className="px-4 py-3 font-semibold">
         {fmtEuro(jetonKassaWaardeEuro(sale.cashEuro, sale.pinEuro, row.receivedEuro))}
       </td>

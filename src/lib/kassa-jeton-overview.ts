@@ -249,6 +249,18 @@ export function jetonKassaWaardeEuro(cashEuro: number, pinEuro: number, jetonEur
   return money(cashEuro + pinEuro - jetonEuro)
 }
 
+/** Jetons van de kassa plus cash plus pin, omgerekend naar zwart en wit. */
+export function jetonSomBreakdown(
+  receivedEuro: number,
+  cashEuro: number,
+  pinEuro: number,
+  denoms: KassaJetonDenominations,
+): { euro: number; black: number; white: number } {
+  const euro = money(Math.max(0, receivedEuro) + Math.max(0, cashEuro) + Math.max(0, pinEuro))
+  const breakdown = kassaJetonBreakdownFromCents(Math.round(euro * 100), denoms)
+  return { euro, black: breakdown?.black ?? 0, white: breakdown?.white ?? 0 }
+}
+
 export function sumJetonDaySales(sales: JetonDaySale[]): JetonDaySale & { totalEuro: number } {
   const acc = sales.reduce(
     (sum, sale) => {
