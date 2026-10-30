@@ -39,8 +39,8 @@ import {
   kassaSpeelsGreenGlossButtonClass,
 } from '@/lib/kassa-pos-surface'
 
-/** Minimale kolombreedte. Minder bonnen op een rij, elk vak duidelijk breder. */
-const KDS_COL_PX = 460
+/** Vaste vakbreedte, breder dan de oude 248 px. Het vak rekt niet over het hele scherm. */
+const KDS_COL_PX = 380
 const KDS_COL_GAP_PX = 16
 const KDS_BOARD_PAD_PX = 24
 
