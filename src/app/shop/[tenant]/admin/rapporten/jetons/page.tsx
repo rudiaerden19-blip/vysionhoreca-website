@@ -13,6 +13,7 @@ import {
   emptyJetonDaySale,
   jetonKassaWaardeEuro,
   jetonSomBreakdown,
+  jetonStuksNaMindering,
   parseJetonDayAmount,
   sumJetonDaySales,
   summarizeJetonOverview,
@@ -247,7 +248,12 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
     days.map((row) => salesByDate[row.date] ?? emptyJetonDaySale()),
   )
   const cashPinJetons = jetonSomBreakdown(0, manualTotals.cashEuro, manualTotals.pinEuro, denoms)
-  const cashPinStuks = cashPinJetons.black + cashPinJetons.white
+  const netJetons = jetonStuksNaMindering(
+    cashPinJetons.black,
+    cashPinJetons.white,
+    totals?.receivedBlack ?? 0,
+    totals?.receivedWhite ?? 0,
+  )
   const editRow = days.find((row) => row.date === editDate)
   const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
   const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
@@ -339,8 +345,8 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             <Stat title="Pin" value={fmtEuro(manualTotals.pinEuro)} sub="" />
             <Stat
               title="Jetons"
-              value={String(cashPinStuks)}
-              sub={`${fmtJetonAantal(cashPinJetons.black, true)} · ${fmtJetonAantal(cashPinJetons.white, false)}`}
+              value={String(netJetons.stuks)}
+              sub={`${fmtJetonAantal(netJetons.black, true)} · ${fmtJetonAantal(netJetons.white, false)}`}
             />
           </div>
 

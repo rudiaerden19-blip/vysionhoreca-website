@@ -249,6 +249,18 @@ export function jetonKassaWaardeEuro(cashEuro: number, pinEuro: number, jetonEur
   return money(cashEuro + pinEuro - jetonEuro)
 }
 
+/** Cash+pin in jetons, min de jetons die de kassa al telde. */
+export function jetonStuksNaMindering(
+  cashPinBlack: number,
+  cashPinWhite: number,
+  kassaBlack: number,
+  kassaWhite: number,
+): { black: number; white: number; stuks: number } {
+  const black = cashPinBlack - kassaBlack
+  const white = cashPinWhite - kassaWhite
+  return { black, white, stuks: black + white }
+}
+
 /** Jetons van de kassa plus cash plus pin, omgerekend naar zwart en wit. */
 export function jetonSomBreakdown(
   receivedEuro: number,

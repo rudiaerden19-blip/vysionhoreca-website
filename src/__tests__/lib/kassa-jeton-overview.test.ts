@@ -4,6 +4,7 @@ import {
   jetonDaySaleTotalEuro,
   jetonKassaWaardeEuro,
   jetonSomBreakdown,
+  jetonStuksNaMindering,
   jetonOverviewSubmenuVisible,
   parseJetonDayAmount,
   sumJetonDaySales,
@@ -150,6 +151,10 @@ describe('jeton overview', () => {
   it('kassa waarde is cash plus pin min de jetons', () => {
     expect(jetonKassaWaardeEuro(100, 100, 12)).toBe(188)
     expect(jetonKassaWaardeEuro(100, 100, 0)).toBe(200)
+  })
+
+  it('trekt de kassa-jetons af van cash en pin', () => {
+    expect(jetonStuksNaMindering(67, 0, 7, 0)).toEqual({ black: 60, white: 0, stuks: 60 })
   })
 
   it('som van alleen cash en pin wordt zwart en wit', () => {
