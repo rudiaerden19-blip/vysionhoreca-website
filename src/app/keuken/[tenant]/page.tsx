@@ -31,8 +31,15 @@ import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 import { KitchenKdsColumn } from '@/components/keuken/KitchenKdsColumn'
+import {
+  KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
+  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
+  kassaSpeelsBlueGlossButtonClass,
+  kassaSpeelsGrayChromeButtonClass,
+  kassaSpeelsGreenGlossButtonClass,
+} from '@/lib/kassa-pos-surface'
 
-const KDS_COLUMN_ACCENTS = ['#e07a2f', '#1d6fdb', '#0f7f8a', '#c45c12', '#2f6fdb']
+const KDS_COL_PX = 248
 
 interface Order {
   id: string
@@ -92,12 +99,35 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
   const [keukenLangOpen, setKeukenLangOpen] = useState(false)
   const keukenLangRef = useRef<HTMLDivElement>(null)
+  const boardRef = useRef<HTMLDivElement>(null)
+  const [colsPerPage, setColsPerPage] = useState(5)
+  const [kdsPage, setKdsPage] = useState(0)
+  const kdsChromeBtn = `${kassaSpeelsGrayChromeButtonClass()} px-3 py-2 text-sm`
+  const kdsChromeOn = `${kassaSpeelsBlueGlossButtonClass(true)} px-3 py-2 text-sm`
 
   // Update time every second
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    const el = boardRef.current
+    if (!el) return
+    const measure = () => {
+      const n = Math.max(1, Math.floor(el.clientWidth / KDS_COL_PX))
+      setColsPerPage(n)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [loading])
+
+  useEffect(() => {
+    const count = Math.max(1, Math.ceil(orders.length / Math.max(1, colsPerPage)))
+    setKdsPage((p) => Math.min(p, count - 1))
+  }, [orders.length, colsPerPage])
 
   useEffect(() => {
     loadData()
@@ -365,10 +395,25 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return ` ${t('shopDisplay.pickup')}`
   }
 
+  const kdsPageCount = Math.max(1, Math.ceil(orders.length / Math.max(1, colsPerPage)))
+  const kdsPageSafe = Math.min(kdsPage, kdsPageCount - 1)
+  const kdsPageOrders = orders.slice(
+    kdsPageSafe * colsPerPage,
+    kdsPageSafe * colsPerPage + colsPerPage,
+  )
+  const kdsPageIndexes = (() => {
+    const maxButtons = 7
+    if (kdsPageCount <= maxButtons) return Array.from({ length: kdsPageCount }, (_, i) => i)
+    let start = Math.max(0, kdsPageSafe - 3)
+    const end = Math.min(kdsPageCount, start + maxButtons)
+    start = Math.max(0, end - maxButtons)
+    return Array.from({ length: end - start }, (_, i) => start + i)
+  })()
+
   if (loading) {
     return (
       <div
-        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${ui.pageShell} flex items-center justify-center`}
+        className={`min-h-[100dvh] w-full min-w-0 max-w-full ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} flex items-center justify-center text-white`}
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -386,7 +431,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   return (
     <div
-      className="flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden bg-[#12161c] text-white"
+      className={`flex min-h-0 h-[100dvh] max-h-[100dvh] w-full min-w-0 max-w-full flex-col overflow-hidden ${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} text-white`}
      
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -397,11 +442,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <OnlineDisplaySoundActivationScreen onActivate={activateSound} />
       )}
 
-      <header className="shrink-0 border-b border-white/10 bg-[#0e1218] px-3 py-2">
+      <header className="shrink-0 border-b border-black/50 bg-transparent px-3 py-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {kassaEntryHref && (
-              <Link href={kassaEntryHref} className={`flex shrink-0 items-center gap-2 px-3 py-2 text-sm ${ui.btnAccent}`}>
+              <Link href={kassaEntryHref} className={`flex shrink-0 items-center gap-2 ${kdsChromeBtn}`}>
                 <span className="text-base leading-none" aria-hidden>
                   
                 </span>
@@ -409,7 +454,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               </Link>
             )}
             {!kassaEntryHref && adminMenuHref && (
-              <Link href={adminMenuHref} className={`flex shrink-0 items-center gap-2 px-3 py-2 text-sm ${ui.adminMenuLink}`}>
+              <Link href={adminMenuHref} className={`flex shrink-0 items-center gap-2 ${kdsChromeBtn}`}>
                 ← {t('adminLayout.menu')}
               </Link>
             )}
@@ -426,20 +471,19 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
-            <span
+            <button
+              type="button"
               onClick={enableSound}
-              className={`flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm ${
-                soundActivated ? ui.soundOn : ui.soundOff
-              }`}
+              className={`flex items-center gap-2 ${soundActivated ? kdsChromeOn : kdsChromeBtn}`}
             >
               {soundActivated ? tx('soundEnabled') : tx('soundOn')}
-            </span>
+            </button>
 
-            <div className={`px-4 py-2 font-bold rounded-lg text-sm ${ui.statBadge}`}>
+            <div className={kdsChromeBtn}>
                {orders.length} {tx('toMake')}
             </div>
 
-            <button type="button" onClick={handleAllReady} className={`px-4 py-2 ${ui.btnAccent}`}>
+            <button type="button" onClick={handleAllReady} className={kdsChromeBtn}>
                Alles klaar
             </button>
 
@@ -457,7 +501,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
 
-            <Link href={displayHref} className={`px-3 py-2 text-sm font-bold ${ui.btnAccent}`}>
+            <Link href={displayHref} className={kdsChromeBtn}>
               {t('adminLayout.onlineDisplay')}
             </Link>
 
@@ -465,7 +509,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               <button
                 type="button"
                 onClick={() => setKeukenLangOpen((o) => !o)}
-                className={ui.langBtn}
+                className={`flex items-center gap-1 ${kdsChromeBtn}`}
                 title={t('languageSwitcher.selectLanguage')}
               >
                 <LocaleFlagEmoji locale={locale} className="text-base" />
@@ -504,21 +548,20 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden">
+      <div ref={boardRef} className="min-h-0 flex-1 overflow-hidden">
         {orders.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-white/50">
             <p className="text-2xl font-semibold text-white/80">{tx('allDone')}</p>
             <p className="mt-2 text-lg">{tx('ordersAppearHere')}</p>
           </div>
         ) : (
-          <div className="flex h-full min-w-full">
-            {orders.map((order, index) => (
+          <div className="flex h-full">
+            {kdsPageOrders.map((order) => (
               <KitchenKdsColumn
                 key={order.id}
                 order={order}
                 locale={locale}
                 now={currentTime}
-                accent={KDS_COLUMN_ACCENTS[index % KDS_COLUMN_ACCENTS.length]!}
                 isNew={newOrderIds.has(order.id)}
                 headerStatus={kitchenHeaderStatus(order.status)}
                 onlineOrderLabel={t('shopDisplay.onlineOrder')}
@@ -548,6 +591,52 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
         )}
       </div>
+
+      <footer className="flex shrink-0 items-center justify-center gap-2 border-t border-black/50 bg-transparent px-3 py-2">
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => setKdsPage(0)}
+          disabled={kdsPageSafe <= 0}
+        >
+          «
+        </button>
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => setKdsPage((p) => Math.max(0, p - 1))}
+          disabled={kdsPageSafe <= 0}
+        >
+          ‹
+        </button>
+        {kdsPageIndexes.map((i) => (
+          <button
+            key={i}
+            type="button"
+            className={`min-w-[2.5rem] ${i === kdsPageSafe ? kdsChromeOn : kdsChromeBtn}`}
+            onClick={() => setKdsPage(i)}
+            aria-current={i === kdsPageSafe ? 'page' : undefined}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => setKdsPage((p) => Math.min(kdsPageCount - 1, p + 1))}
+          disabled={kdsPageSafe >= kdsPageCount - 1}
+        >
+          ›
+        </button>
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => setKdsPage(kdsPageCount - 1)}
+          disabled={kdsPageSafe >= kdsPageCount - 1}
+        >
+          »
+        </button>
+      </footer>
 
       {/* Order Detail Modal */}
       <AnimatePresence>
@@ -596,7 +685,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   <button
                     type="button"
                     onClick={() => setSelectedOrder(null)}
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center text-xl ${ui.btn}`}
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center text-xl ${kdsChromeBtn}`}
                     aria-label={t('shopDisplay.cancel')}
                   >
                     <KassaIconClose className="h-6 w-6" />
@@ -682,7 +771,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     whileTap={{ scale: 0.99 }}
                     type="button"
                     onClick={() => printOrder(selectedOrder)}
-                    className={`py-5 text-lg ${ui.btn}`}
+                    className={`py-5 text-lg ${kdsChromeBtn}`}
                   >
                     {tx('printReceipt')}
                   </motion.button>
@@ -691,7 +780,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     whileTap={{ scale: 0.99 }}
                     type="button"
                     onClick={() => handleReady(selectedOrder)}
-                    className={`py-5 text-lg ${ui.btnAccent}`}
+                    className={`py-5 text-lg ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS}`}
                   >
                     {tx('markReady')}
                   </motion.button>

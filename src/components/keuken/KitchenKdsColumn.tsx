@@ -8,12 +8,18 @@ import {
   orderItemDisplayOptionLines,
 } from '@/lib/order-items-display'
 import type { KitchenStyleOrder } from '@/components/shop-display/KitchenStyleOrderCard'
+import {
+  KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
+  kassaSpeelsGrayChromeButtonClass,
+  kassaSpeelsGreenGlossButtonClass,
+} from '@/lib/kassa-pos-surface'
+
+const KDS_HEADER_BLUE = '#163a66'
 
 type Props = {
   order: KitchenStyleOrder
   locale: string
   now: Date
-  accent: string
   isNew?: boolean
   headerStatus: string
   onlineOrderLabel: string
@@ -58,7 +64,6 @@ export function KitchenKdsColumn({
   order,
   locale,
   now,
-  accent,
   isNew,
   headerStatus,
   onlineOrderLabel,
@@ -93,11 +98,11 @@ export function KitchenKdsColumn({
 
   return (
     <article
-      className={`flex h-full w-[232px] shrink-0 flex-col border-r border-black/50 bg-[#1c232c] sm:w-[248px] ${
-        isNew ? 'ring-2 ring-inset ring-amber-300' : ''
+      className={`flex h-full w-[248px] shrink-0 flex-col border-r border-black/60 bg-transparent ${
+        isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
     >
-      <header className="shrink-0 px-2.5 py-2 text-white" style={{ backgroundColor: accent }}>
+      <header className="shrink-0 px-2.5 py-2 text-white" style={{ backgroundColor: KDS_HEADER_BLUE }}>
         <div className="flex items-start justify-between gap-2">
           <button
             type="button"
@@ -167,18 +172,18 @@ export function KitchenKdsColumn({
         ) : null}
       </div>
 
-      <footer className="flex shrink-0 gap-1.5 border-t border-black/40 bg-[#151a21] p-2">
+      <footer className="flex shrink-0 gap-1.5 border-t border-black/40 bg-transparent p-2">
         <button
           type="button"
           onClick={onPrint}
-          className="rounded-md bg-[#2a3340] px-2 py-2 text-xs font-bold text-white/80"
+          className={`${kassaSpeelsGrayChromeButtonClass()} px-2 py-2 text-xs`}
         >
           {printLabel}
         </button>
         <button
           type="button"
           onClick={onReady}
-          className="min-h-[40px] flex-1 rounded-md bg-[#1f9d55] text-sm font-black uppercase tracking-wide text-white"
+          className={`${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} min-h-[40px] flex-1 text-sm font-black uppercase tracking-wide`}
         >
           {readyLabel}
         </button>
