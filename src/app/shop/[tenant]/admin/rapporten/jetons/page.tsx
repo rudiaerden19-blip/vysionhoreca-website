@@ -228,7 +228,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             <Stat
               title="Jetons"
               value={String(totals?.receivedPieces ?? 0)}
-              sub={`${fmtEuro(totals?.receivedEuro ?? 0)} · ${totals?.receivedBlack ?? 0} zwart · ${totals?.receivedWhite ?? 0} wit · ${totals?.receivedReceipts ?? 0} bonnen`}
+              sub={`${fmtEuro(totals?.receivedEuro ?? 0)} · ${totals?.receivedBlack ?? 0} zwart · ${totals?.receivedWhite ?? 0} wit`}
             />
             <Stat
               title="Cash"
