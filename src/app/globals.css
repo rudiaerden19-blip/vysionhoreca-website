@@ -457,13 +457,11 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. Korrel op kader (#282828); tegel-/mandvlak effen grijs.
+ * Mode «Dark» (layout speels) — alle tenants. Zwart kader + korrel (niet grijs #282828).
  */
 .kassa-speels-plate-grain {
-  background-color: #282828;
-  background-image:
-    linear-gradient(rgba(44, 44, 44, 0.16), rgba(44, 44, 44, 0.16)),
-    url('/images/kassa-dark-frame-grain.png');
+  background-color: #000000;
+  background-image: url('/images/kassa-dark-frame-grain.png');
   background-size: 512px 512px;
   background-repeat: repeat;
   background-blend-mode: overlay;
