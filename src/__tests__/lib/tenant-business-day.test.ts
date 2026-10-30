@@ -29,23 +29,23 @@ describe('tenant business day', () => {
     expect(businessDayForOrder('2026-09-06T08:00:00.000Z', hours)).toBe('2026-09-06')
   })
 
-  it('open shift houdt bonnen na middernacht op dezelfde Z', () => {
-    const atMidnight = '2026-10-29T23:10:00.000Z'
-    expect(businessDayForOrder(atMidnight, [])).toBe('2026-10-30')
-    expect(
-      orderReportDateForShift(atMidnight, [], [
-        { reportDate: '2026-10-29', closedAt: null },
-      ]),
-    ).toBe('2026-10-29')
+  it('shift tot 03:00: na middernacht blijft op dezelfde Z, daarna begint de nieuwe dag', () => {
+    const hours = week('17:00', '03:00')
+    const atTwo = '2026-10-30T01:00:00.000Z'
+    const afterClose = '2026-10-30T03:30:00.000Z'
+    const nextShift = '2026-10-30T17:00:00.000Z'
+    const stillOpen = [{ reportDate: '2026-10-29', closedAt: null }]
+    expect(orderReportDateForShift(atTwo, hours, stillOpen)).toBe('2026-10-29')
+    expect(orderReportDateForShift(afterClose, hours, stillOpen)).toBe('2026-10-30')
+    expect(orderReportDateForShift(nextShift, hours, stillOpen)).toBe('2026-10-30')
   })
 
-  it('vanaf opening telt de nieuwe dag, ook als gisteren nog open is', () => {
+  it('dagdienst telt op vandaag, ook als gisteren nog niet is afgesloten', () => {
     const hours = week('08:30', '17:00')
-    const beforeOpen = '2026-10-29T23:30:00.000Z'
     const duringDay = '2026-10-30T12:00:00.000Z'
-    const openYesterday = [{ reportDate: '2026-10-29', closedAt: null }]
-    expect(orderReportDateForShift(beforeOpen, hours, openYesterday)).toBe('2026-10-29')
-    expect(orderReportDateForShift(duringDay, hours, openYesterday)).toBe('2026-10-30')
+    expect(
+      orderReportDateForShift(duringDay, hours, [{ reportDate: '2026-10-29', closedAt: null }]),
+    ).toBe('2026-10-30')
   })
 
   it('bon vóór het afsluiten blijft op de shift, daarna begint de nieuwe dag', () => {

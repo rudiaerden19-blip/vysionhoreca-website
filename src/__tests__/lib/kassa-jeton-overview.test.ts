@@ -81,7 +81,14 @@ describe('jeton overview', () => {
     expect(result.totals.receivedPieces).toBe(4)
   })
 
-  it('houdt een bon na middernacht op de open shift', () => {
+  it('houdt een bon tot sluiting van de shift op dezelfde Z', () => {
+    const hours = [0, 1, 2, 3, 4, 5, 6].map((day_of_week) => ({
+      day_of_week,
+      is_open: true,
+      open_time: '17:00',
+      close_time: '03:00',
+    }))
+    const atTwo = '2026-10-30T01:00:00.000Z'
     const result = summarizeJetonOverview(
       [
         {
@@ -90,14 +97,14 @@ describe('jeton overview', () => {
           payment_method: 'JETON',
           order_type: 'DINE_IN',
           total: 3,
-          created_at: '2026-10-29T23:10:00.000Z',
+          created_at: atTwo,
           items: [],
         },
       ],
       '2026-10-29',
       '2026-10-29',
       denoms,
-      [],
+      hours,
       [{ reportDate: '2026-10-29', closedAt: null }],
     )
     expect(result.totals.receivedReceipts).toBe(1)
@@ -110,14 +117,14 @@ describe('jeton overview', () => {
           payment_method: 'JETON',
           order_type: 'DINE_IN',
           total: 3,
-          created_at: '2026-10-29T23:10:00.000Z',
+          created_at: atTwo,
           items: [],
         },
       ],
       '2026-10-30',
       '2026-10-30',
       denoms,
-      [],
+      hours,
       [{ reportDate: '2026-10-29', closedAt: null }],
     )
     expect(next.totals.receivedReceipts).toBe(0)

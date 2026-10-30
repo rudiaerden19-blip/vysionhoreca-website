@@ -88,10 +88,10 @@ export type ShiftReportClose = {
 }
 
 /**
- * Een Z loopt van start van de shift tot einde van de shift.
- * Blijft de zaak na middernacht open, dan blijven die bonnen op die shift
- * tot de volgende werkdag opent. Vanaf de opening telt de nieuwe dag zelf,
- * ook als de vorige Z nog niet is afgesloten.
+ * Een Z loopt van begin van de shift tot einde van de shift.
+ * Sluit de zaak om 03:00, dan horen de bonnen na middernacht nog bij die shift.
+ * Middernacht begint geen nieuw rapport. Een open Z van gisteren neemt de
+ * volgende werkdag niet over, zodat vandaag zichtbaar blijft en meetelt.
  */
 export function orderReportDateForShift(
   createdAt: string,
@@ -102,24 +102,11 @@ export function orderReportDateForShift(
   if (!clock) return null
   const prevDate = addDaysToBelgiumYMD(clock, -1)
   const prev = shifts.find((s) => s.reportDate === prevDate)
-  if (!prev) return clock
+  if (!prev || prev.closedAt == null) return clock
   const createdMs = new Date(createdAt).getTime()
-  if (prev.closedAt == null) {
-    const openMs = shiftOpenMs(clock, hours)
-    if (openMs != null && Number.isFinite(createdMs) && createdMs >= openMs) return clock
-    return prevDate
-  }
   const closedMs = new Date(prev.closedAt).getTime()
   if (Number.isFinite(createdMs) && Number.isFinite(closedMs) && createdMs < closedMs) return prevDate
   return clock
-}
-
-function shiftOpenMs(ymd: string, hours: TenantHourRow[]): number | null {
-  if (!hours.length) return null
-  const row = hoursForYmd(ymd, hours)
-  if (!row?.is_open || !row.open_time) return null
-  const ms = new Date(belgiumLocalToUtcIso(ymd, formatTimeShort(row.open_time))).getTime()
-  return Number.isFinite(ms) ? ms : null
 }
 
 export function getCurrentBusinessDay(now = new Date(), hours: TenantHourRow[] = []): string {
