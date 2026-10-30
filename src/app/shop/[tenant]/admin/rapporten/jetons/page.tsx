@@ -248,8 +248,6 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
   )
   const cashPinJetons = jetonSomBreakdown(0, manualTotals.cashEuro, manualTotals.pinEuro, denoms)
   const cashPinStuks = cashPinJetons.black + cashPinJetons.white
-  const kassaStuks = totals?.receivedPieces ?? 0
-  const jetonsNaMindering = cashPinStuks - kassaStuks
   const editRow = days.find((row) => row.date === editDate)
   const whiteJetonEuro = ((editRow?.receivedWhite ?? 0) * denoms.whiteCents) / 100
   const blackJetonEuro = ((editRow?.receivedBlack ?? 0) * denoms.blackCents) / 100
@@ -341,8 +339,8 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
             <Stat title="Pin" value={fmtEuro(manualTotals.pinEuro)} sub="" />
             <Stat
               title="Jetons"
-              value={String(jetonsNaMindering)}
-              sub={`${cashPinStuks} jetons − ${kassaStuks} jetons`}
+              value={String(cashPinStuks)}
+              sub={`${fmtJetonAantal(cashPinJetons.black, true)} · ${fmtJetonAantal(cashPinJetons.white, false)}`}
             />
           </div>
 
