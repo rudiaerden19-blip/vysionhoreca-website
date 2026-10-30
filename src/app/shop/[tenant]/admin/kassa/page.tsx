@@ -5909,7 +5909,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {renderKassaTenantNameButton(
                 kassaWide15Chrome
                   ? 'text-base sm:text-lg'
-                  : 'text-lg sm:text-xl md:text-2xl lg:text-3xl',
+                  : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
                 kassaWide15Chrome
                   ? 'max-w-[min(100%,16rem)]'
                   : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
