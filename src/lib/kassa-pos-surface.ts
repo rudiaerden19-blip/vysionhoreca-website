@@ -22,7 +22,7 @@ export const KASSA_LUXE_CART_GRAIN_CLASS = 'kassa-luxe-cart-grain'
 /** Dark mode (layout speels): `kassa-speels-plate-grain` + `/images/kassa-dark-frame-grain.png`. */
 export const KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS = 'kassa-speels-plate-grain'
 
-/** Titel onder menu-tegel — alle tenants (layout speels/Dark); zelfde PNG-korrel als kader. */
+/** Titel onder menu-tegel — alle tenants, alleen Mode Dark; dezelfde korrel en #1a1a1a als het kader. */
 export const KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS = 'kassa-speels-tile-label-grain'
 
 export const KASSA_SPEELS_MENU_RECESS_TRAY_CLASS = 'kassa-speels-recess-tray'
@@ -530,7 +530,7 @@ export const KASSA_POS_MENU_TILE_LABEL_WRAP =
 export const KASSA_POS_MENU_TILE_LABEL_WRAP_SXGA =
   `pointer-events-none shrink-0 w-full border-t border-[#d4b483] ${KASSA_BTN_FACE} px-2 pb-1.5 pt-0 mt-0 sm:px-3 sm:pb-2 sm:pt-0`
 
-/** Speels: titelstrook — effen #2f2f2f (naam/prijs); overlap foto + afgeronde onderhoek. */
+/** Speels: titelstrook — dezelfde donkergrijze korrel als het kader. */
 export const KASSA_SPEELS_MENU_TILE_LABEL_WRAP =
   `pointer-events-none relative z-[2] -mt-1 box-border w-full max-w-full shrink-0 overflow-hidden rounded-b-xl ${KASSA_SPEELS_TILE_LABEL_GRAIN_CLASS} px-2 pb-2.5 pt-2 sm:px-3`
 

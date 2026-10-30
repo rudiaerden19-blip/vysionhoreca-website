@@ -114,18 +114,18 @@ html.vysion-kassa-root.kassa-dark-appearance body {
   color-scheme: dark;
 }
 
-/* Mode Dark (speels): donkergrijze korrel op page-chrome — effen #2f2f2f vlakken blijven apart.
-   Kleur #1a1a1a; korrel-lagen niet wijzigen. */
+/* Mode Dark (speels): donkergrijze korrel op page-chrome — tegelveld blijft effen #2f2f2f.
+   Kleur #1a1a1a. Lichte spikkels (normal) zodat de korrel op dit donker zichtbaar blijft. */
 html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout,
 html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout body {
-  --kassa-speels-plate-grain-tile: 144px;
+  --kassa-speels-plate-grain-tile: 140px;
   background-color: #1a1a1a !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.9 0 0 0 0 0.9 0 0 0 0 0.9 1.2 1.2 1.2 0 -0.62'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"),
     url('/images/kassa-dark-frame-grain.png') !important;
-  background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 256px 256px !important;
+  background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 180px 180px !important;
   background-repeat: repeat !important;
-  background-blend-mode: soft-light, soft-light;
-  -webkit-background-blend-mode: soft-light, soft-light;
+  background-blend-mode: normal, overlay;
+  -webkit-background-blend-mode: normal, overlay;
 }
 
 /* Foto-tegels en thumbnails: scherpere herberekening bij opschalen in Chromium/Edge op klassieke lcd */
@@ -471,19 +471,20 @@ input[type="number"] {
 }
 
 /*
- * Mode «Dark» (layout speels) — alle tenants. Donkergrijs kader (#1a1a1a) + dezelfde korrel.
- * #2f2f2f vlakken gebruiken deze class niet.
+ * Mode «Dark» (layout speels) — alle tenants. Donkergrijs (#1a1a1a) + zichtbare korrel.
+ * Kader, mandvak en titelstrook onder de tegel. Tegelveld (#2f2f2f) gebruikt deze class niet.
  */
 .kassa-speels-plate-grain,
-.kassa-speels-sidebar-cart-vak {
-  --kassa-speels-plate-grain-tile: 144px;
+.kassa-speels-sidebar-cart-vak,
+.kassa-speels-tile-label-grain {
+  --kassa-speels-plate-grain-tile: 140px;
   background-color: #1a1a1a;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"),
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.9 0 0 0 0 0.9 0 0 0 0 0.9 1.2 1.2 1.2 0 -0.62'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"),
     url('/images/kassa-dark-frame-grain.png');
-  background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 256px 256px;
+  background-size: var(--kassa-speels-plate-grain-tile) var(--kassa-speels-plate-grain-tile), 180px 180px;
   background-repeat: repeat;
-  background-blend-mode: soft-light, soft-light;
-  -webkit-background-blend-mode: soft-light, soft-light;
+  background-blend-mode: normal, overlay;
+  -webkit-background-blend-mode: normal, overlay;
 }
 
 /* Tegelgrid — effen donkergrijs vlak (niet korrel). */
@@ -493,13 +494,10 @@ input[type="number"] {
   background-image: none;
 }
 
-/* Titelstrook (naam + prijs) — effen #2f2f2f, alle tenants Mode Dark. */
+/* Titelstrook (naam + prijs) — dezelfde korrel als het kader. Alleen Mode Dark. */
 .kassa-speels-tile-label-grain {
   box-sizing: border-box;
   width: 100%;
-  background-color: #2f2f2f;
-  background-image: none;
-  box-shadow: inset 0 0 0 1px #252525;
 }
 
 /* Grijs fotovlak op tegel — zwart kader binnen de tegel. */
@@ -507,7 +505,7 @@ input[type="number"] {
   box-sizing: border-box;
   box-shadow:
     inset 0 0 0 2px #000000,
-    inset 0 -4px 0 0 #2f2f2f;
+    inset 0 -4px 0 0 #1a1a1a;
 }
 
 /* Menu-tegels Dark — tegel #282828; schaduw erachter zwart. */
