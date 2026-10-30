@@ -39,7 +39,10 @@ import {
   kassaSpeelsGreenGlossButtonClass,
 } from '@/lib/kassa-pos-surface'
 
-const KDS_COL_PX = 248
+/** Minimale kolombreedte. Minder bonnen op een rij, elk vak duidelijk breder. */
+const KDS_COL_PX = 460
+const KDS_COL_GAP_PX = 16
+const KDS_BOARD_PAD_PX = 24
 
 interface Order {
   id: string
@@ -157,7 +160,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     const el = boardRef.current
     if (!el) return
     const measure = () => {
-      const n = Math.max(1, Math.floor(el.clientWidth / KDS_COL_PX))
+      const inner = Math.max(0, el.clientWidth - KDS_BOARD_PAD_PX)
+      const n = Math.max(1, Math.floor((inner + KDS_COL_GAP_PX) / (KDS_COL_PX + KDS_COL_GAP_PX)))
       setColsPerPage(n)
     }
     measure()

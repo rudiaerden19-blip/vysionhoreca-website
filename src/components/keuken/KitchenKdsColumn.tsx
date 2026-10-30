@@ -112,7 +112,7 @@ export function KitchenKdsColumn({
 
   return (
     <article
-      className={`flex h-full w-[248px] shrink-0 flex-col border bg-transparent ${
+      className={`flex h-full min-w-0 w-0 flex-1 flex-col border bg-transparent ${
         isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
       style={{ borderColor: headerColor }}
