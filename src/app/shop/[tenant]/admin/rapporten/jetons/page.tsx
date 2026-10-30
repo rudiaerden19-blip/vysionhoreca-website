@@ -21,6 +21,10 @@ import {
   type JetonOverviewOrder,
 } from '@/lib/kassa-jeton-overview'
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import {
+  kassaSpeelsGrayChromeButtonClass,
+  kassaSpeelsGreenGlossButtonClass,
+} from '@/lib/kassa-pos-surface'
 import type { ShiftReportClose, TenantHourRow } from '@/lib/tenant-business-day'
 
 type Preset = 'yesterday' | 'today' | '7' | '30' | 'custom'
@@ -335,31 +339,31 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
           </div>
           {editDate ? (
             <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
-              <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
-                <h2 className="text-lg font-bold text-gray-900">{fmtDay(editDate)}</h2>
-                <p className="mt-2 text-base font-semibold text-gray-900">
+              <div className="w-full max-w-md rounded-2xl bg-[#4a4a4a] p-5 shadow-xl">
+                <h2 className="text-lg font-bold text-white">{fmtDay(editDate)}</h2>
+                <p className="mt-2 text-base font-semibold text-white">
                   {editRow?.receivedBlack ?? 0} zwarte jetons ontvangen
                 </p>
-                <p className="text-base font-semibold text-gray-900">
+                <p className="text-base font-semibold text-white">
                   {editRow?.receivedWhite ?? 0} witte jetons ontvangen
                 </p>
-                <p className="mt-1 text-sm text-gray-500">{fmtEuro(draftTotal)}</p>
-                <label className="mt-4 block text-sm text-gray-600">
+                <p className="mt-1 text-sm text-[#c8c8c8]">{fmtEuro(draftTotal)}</p>
+                <label className="mt-4 block text-sm text-[#d0d0d0]">
                   Cash
                   <input
                     inputMode="decimal"
                     value={draftCash}
                     onChange={(e) => setDraftCash(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-3 text-lg"
+                    className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg text-gray-900"
                   />
                 </label>
-                <label className="mt-3 block text-sm text-gray-600">
+                <label className="mt-3 block text-sm text-[#d0d0d0]">
                   Pin
                   <input
                     inputMode="decimal"
                     value={draftPin}
                     onChange={(e) => setDraftPin(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-3 text-lg"
+                    className="mt-1 w-full rounded-xl border border-white/40 bg-white px-3 py-3 text-lg text-gray-900"
                   />
                 </label>
                 {saveError ? <p className="mt-3 text-sm text-red-600">{saveError}</p> : null}
@@ -368,7 +372,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                     type="button"
                     disabled={saving}
                     onClick={() => void saveEdit()}
-                    className="flex-1 rounded-xl bg-[#1e293b] py-3 font-semibold text-white disabled:opacity-50"
+                    className={`flex-1 py-3 text-base disabled:opacity-50 ${kassaSpeelsGreenGlossButtonClass()}`}
                   >
                     {saving ? 'Opslaan...' : 'Opslaan'}
                   </button>
@@ -376,7 +380,7 @@ export default function JetonOverzichtPage({ params }: { params: { tenant: strin
                     type="button"
                     disabled={saving}
                     onClick={() => setEditDate(null)}
-                    className="rounded-xl border border-gray-200 px-4 py-3 font-semibold text-gray-700"
+                    className={`px-4 py-3 text-base disabled:opacity-50 ${kassaSpeelsGrayChromeButtonClass()}`}
                   >
                     Annuleren
                   </button>
