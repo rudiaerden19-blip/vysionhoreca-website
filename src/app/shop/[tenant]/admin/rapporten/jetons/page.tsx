@@ -41,8 +41,8 @@ function fmtJetonAantal(count: number, zwart: boolean): string {
   return `${count} ${naam}`
 }
 
-function fmtSom(som: { euro: number; black: number; white: number }): string {
-  return `${fmtJetonAantal(som.black, true)} · ${fmtJetonAantal(som.white, false)} · ${fmtEuro(som.euro)}`
+function fmtSom(som: { euro: number }): string {
+  return fmtEuro(som.euro)
 }
 
 function fmtDay(ymd: string): string {
