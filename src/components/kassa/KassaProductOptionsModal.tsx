@@ -241,8 +241,8 @@ export function KassaProductOptionsModal({
             onClick={onConfirm}
             className={
               dark
-                ? `flex-[2] py-3.5 text-lg font-bold ${darkActionBtn(false)}`
-                : 'flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors'
+                ? `flex-[2] py-3.5 text-lg font-bold ${darkActionBtn(false)}${model.editingCartKey ? '' : ' kassa-options-add-glow'}`
+                : `flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors${model.editingCartKey ? '' : ' kassa-options-add-glow'}`
             }
           >
             {model.editingCartKey ? t('kassaApp.optionsSave') : t('kassaApp.optionsAdd')}{' '}

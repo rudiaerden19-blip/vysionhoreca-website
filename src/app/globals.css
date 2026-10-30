@@ -499,6 +499,13 @@ input[type="number"] {
   width: 100%;
 }
 
+/* Opties-modal: glow alleen op Toevoegen (alle tenants). */
+.kassa-options-add-glow {
+  filter:
+    drop-shadow(0 0 6px rgba(74, 173, 122, 0.95))
+    drop-shadow(0 0 16px rgba(74, 173, 122, 0.6));
+}
+
 /* Foto zelf: geen schaduw, geen donkere rand. */
 .kassa-speels-menu-tile-photo-well {
   box-sizing: border-box;
