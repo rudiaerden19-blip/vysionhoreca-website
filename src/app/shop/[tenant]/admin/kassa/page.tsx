@@ -1147,8 +1147,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const html = document.documentElement
     if (kassaAppearanceDark) html.classList.add('kassa-dark-appearance')
     else html.classList.remove('kassa-dark-appearance')
-    return () => html.classList.remove('kassa-dark-appearance')
-  }, [kassaAppearanceDark])
+    if (kassaLayout === 'speels') html.classList.add('kassa-speels-layout')
+    else html.classList.remove('kassa-speels-layout')
+    return () => {
+      html.classList.remove('kassa-dark-appearance')
+      html.classList.remove('kassa-speels-layout')
+    }
+  }, [kassaAppearanceDark, kassaLayout])
 
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
@@ -5755,6 +5760,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           : 'h-[100svh] max-h-[100svh] supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]'
       }`}
       data-testid="kassa-app"
+      data-kassa-layout={kassaLayout}
       data-kassa-vp={kassaChromeDensity}
     >
       <LogoutSoftwareConfirmModal
@@ -5775,7 +5781,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         } ${
           kassaPosLuxury
             ? `${kassaWide15Chrome ? 'pb-1.5' : 'pb-3'} ${kassaPlateBgClass}`
-            : 'bg-black'
+            : kassaLayout === 'speels'
+              ? kassaPlateBgClass
+              : 'bg-black'
         }`}
       >
 
@@ -6405,7 +6413,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             data-testid="kassa-quick-menu-panel"
             className={`shrink-0 border-t px-2 py-1.5 ${
               kassaPosLuxury
-                ? KASSA_POS_RULE_BLACK
+                ? `${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
                 : kassaClassicDark
                   ? 'border-zinc-600'
                   : 'border-gray-300'

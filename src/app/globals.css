@@ -114,6 +114,16 @@ html.vysion-kassa-root.kassa-dark-appearance body {
   color-scheme: dark;
 }
 
+/* Mode Dark (speels): zwarte korrel op page-chrome — grijs #2f2f2f vlakken blijven apart. */
+html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout,
+html.vysion-kassa-root.kassa-dark-appearance.kassa-speels-layout body {
+  background-color: #000000 !important;
+  background-image: url('/images/kassa-dark-frame-grain.png');
+  background-size: 512px 512px;
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+}
+
 /* Foto-tegels en thumbnails: scherpere herberekening bij opschalen in Chromium/Edge op klassieke lcd */
 html.vysion-klantscherm-root img,
 html.vysion-klantscherm-root picture img,
