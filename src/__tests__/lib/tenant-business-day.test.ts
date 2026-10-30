@@ -39,6 +39,15 @@ describe('tenant business day', () => {
     ).toBe('2026-10-29')
   })
 
+  it('vanaf opening telt de nieuwe dag, ook als gisteren nog open is', () => {
+    const hours = week('08:30', '17:00')
+    const beforeOpen = '2026-10-29T23:30:00.000Z'
+    const duringDay = '2026-10-30T12:00:00.000Z'
+    const openYesterday = [{ reportDate: '2026-10-29', closedAt: null }]
+    expect(orderReportDateForShift(beforeOpen, hours, openYesterday)).toBe('2026-10-29')
+    expect(orderReportDateForShift(duringDay, hours, openYesterday)).toBe('2026-10-30')
+  })
+
   it('bon vóór het afsluiten blijft op de shift, daarna begint de nieuwe dag', () => {
     const beforeClose = '2026-10-29T23:10:00.000Z'
     const afterClose = '2026-10-30T10:00:00.000Z'
