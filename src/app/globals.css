@@ -469,11 +469,11 @@ input[type="number"] {
   background-blend-mode: overlay;
 }
 
-/* Speels tegelbak — effen zwart achter de tegels (niet de tegel zelf). */
+/* Speels tegelbak — effen donkergrijs achter de tegels. */
 .kassa-speels-menu-scroll,
 .kassa-speels-recess-tray {
-  background-color: #000000 !important;
-  background-image: none !important;
+  background-color: #2f2f2f;
+  background-image: none;
 }
 
 /* Titelstrook (naam + prijs) — effen #2f2f2f, alle tenants Mode Dark. */
@@ -1059,11 +1059,11 @@ html.kassa-luxe-leather body {
   box-shadow: inset 0 0 0 1px #000000;
 }
 
-/* Zijbalk mand — effen zwarte buitenkader (Mode Dark, alle tenants). */
+/* Zijbalk mand — donkergrijs (Mode Dark, alle tenants). */
 .kassa-speels-sidebar-cart-vak {
-  background-color: #000000;
+  background-color: #2f2f2f;
   background-image: none;
-  border: 2px solid #000000 !important;
+  border: 2px solid #252525 !important;
   box-shadow: none;
 }
 

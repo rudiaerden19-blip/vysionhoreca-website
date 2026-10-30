@@ -48,7 +48,7 @@ export function kassaLayoutPlateBgClass(layout: KassaUiLayoutId): string {
   return 'bg-[#0b0f14]'
 }
 
-/** Achtergrond menu-scroll — speels: effen zwart achter tegels (`kassa-speels-menu-scroll`). */
+/** Achtergrond menu-scroll — speels: donkergrijs #2f2f2f (`kassa-speels-menu-scroll`). */
 export function kassaLayoutMenuScrollFlatBgClass(layout: KassaUiLayoutId): string {
   if (layout === 'speels') return KASSA_SPEELS_MENU_SCROLL_FLAT_CLASS
   if (layout === 'dark') return 'bg-[#151a21]'

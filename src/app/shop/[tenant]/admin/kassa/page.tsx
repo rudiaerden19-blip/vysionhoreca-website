@@ -6203,7 +6203,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* ── Midden: categorieën / producten ── */}
         <div
           className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${
-            kassaLayout === 'speels' ? 'bg-black' : kassaPlateBgClass
+            kassaLayout === 'speels' ? 'bg-[#2f2f2f]' : kassaPlateBgClass
           }`}
         >
 
@@ -6679,7 +6679,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart / numpad (toggle via footer) */}
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
-            kassaLayout === 'speels' ? 'bg-black' : ''
+            kassaLayout === 'speels' ? 'bg-[#2f2f2f]' : ''
           } ${
             kassaAppearanceDark
               ? kassaLayout === 'speels'
