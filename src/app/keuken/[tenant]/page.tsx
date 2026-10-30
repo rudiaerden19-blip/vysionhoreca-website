@@ -106,6 +106,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const boardRef = useRef<HTMLDivElement>(null)
   const [colsPerPage, setColsPerPage] = useState(5)
   const [kdsPage, setKdsPage] = useState(0)
+  const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
+  const [ticketScroll, setTicketScroll] = useState({ up: false, down: false })
   const kdsChromeBtn = `${kassaSpeelsGrayChromeButtonClass()} px-3 py-2 text-sm`
   const kdsChromeOn = `${kassaSpeelsBlueGlossButtonClass(true)} px-3 py-2 text-sm`
 
@@ -456,6 +458,47 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return Array.from({ length: end - start }, (_, i) => start + i)
   })()
 
+  const syncTicketScroll = useCallback(() => {
+    let up = false
+    let down = false
+    for (const el of ticketBodyRefs.current.values()) {
+      const max = el.scrollHeight - el.clientHeight
+      if (el.scrollTop > 2) up = true
+      if (max > 2 && el.scrollTop < max - 2) down = true
+    }
+    setTicketScroll((prev) => (prev.up === up && prev.down === down ? prev : { up, down }))
+  }, [])
+
+  const scrollTicketBodies = useCallback((dir: 'up' | 'down' | 'top' | 'bottom') => {
+    let moved = false
+    for (const el of ticketBodyRefs.current.values()) {
+      const max = el.scrollHeight - el.clientHeight
+      if (max <= 2) continue
+      const top = el.scrollTop
+      const step = Math.max(180, Math.round(el.clientHeight * 0.72))
+      if (dir === 'up' && top > 2) {
+        el.scrollBy({ top: -step, behavior: 'smooth' })
+        moved = true
+      } else if (dir === 'down' && top < max - 2) {
+        el.scrollBy({ top: step, behavior: 'smooth' })
+        moved = true
+      } else if (dir === 'top' && top > 2) {
+        el.scrollTo({ top: 0, behavior: 'smooth' })
+        moved = true
+      } else if (dir === 'bottom' && top < max - 2) {
+        el.scrollTo({ top: max, behavior: 'smooth' })
+        moved = true
+      }
+    }
+    window.setTimeout(syncTicketScroll, 350)
+    return moved
+  }, [syncTicketScroll])
+
+  useEffect(() => {
+    const id = window.requestAnimationFrame(syncTicketScroll)
+    return () => window.cancelAnimationFrame(id)
+  }, [kdsPageSafe, orders, syncTicketScroll])
+
   if (loading) {
     return (
       <div
@@ -618,6 +661,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 startLabel={tx('start')}
                 started={startedOrderIds.has(order.id)}
                 t={t}
+                bodyRef={(el) => {
+                  if (el) ticketBodyRefs.current.set(order.id, el)
+                  else ticketBodyRefs.current.delete(order.id)
+                }}
+                onBodyScroll={syncTicketScroll}
                 onOpen={() => {
                   setSelectedOrder(order)
                   setNewOrderIds((prev) => {
@@ -648,16 +696,24 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <button
           type="button"
           className={`${kdsChromeBtn} disabled:opacity-40`}
-          onClick={() => setKdsPage(0)}
-          disabled={kdsPageSafe <= 0}
+          onClick={() => {
+            if (scrollTicketBodies('top')) return
+            setKdsPage(0)
+          }}
+          disabled={!ticketScroll.up && kdsPageSafe <= 0}
+          aria-label="Naar boven"
         >
           «
         </button>
         <button
           type="button"
           className={`${kdsChromeBtn} disabled:opacity-40`}
-          onClick={() => setKdsPage((p) => Math.max(0, p - 1))}
-          disabled={kdsPageSafe <= 0}
+          onClick={() => {
+            if (scrollTicketBodies('up')) return
+            setKdsPage((p) => Math.max(0, p - 1))
+          }}
+          disabled={!ticketScroll.up && kdsPageSafe <= 0}
+          aria-label="Omhoog scrollen"
         >
           ‹
         </button>
@@ -675,16 +731,24 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <button
           type="button"
           className={`${kdsChromeBtn} disabled:opacity-40`}
-          onClick={() => setKdsPage((p) => Math.min(kdsPageCount - 1, p + 1))}
-          disabled={kdsPageSafe >= kdsPageCount - 1}
+          onClick={() => {
+            if (scrollTicketBodies('down')) return
+            setKdsPage((p) => Math.min(kdsPageCount - 1, p + 1))
+          }}
+          disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
+          aria-label="Omlaag scrollen"
         >
           ›
         </button>
         <button
           type="button"
           className={`${kdsChromeBtn} disabled:opacity-40`}
-          onClick={() => setKdsPage(kdsPageCount - 1)}
-          disabled={kdsPageSafe >= kdsPageCount - 1}
+          onClick={() => {
+            if (scrollTicketBodies('bottom')) return
+            setKdsPage(kdsPageCount - 1)
+          }}
+          disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
+          aria-label="Naar beneden"
         >
           »
         </button>

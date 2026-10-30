@@ -35,6 +35,8 @@ type Props = {
   onPrint: (e: React.MouseEvent) => void
   onReady: (e: React.MouseEvent) => void
   onStart: (e: React.MouseEvent) => void
+  bodyRef?: (el: HTMLDivElement | null) => void
+  onBodyScroll?: () => void
 }
 
 function formatElapsed(createdAt: string, now: Date): string {
@@ -82,6 +84,8 @@ export function KitchenKdsColumn({
   onPrint,
   onReady,
   onStart,
+  bodyRef,
+  onBodyScroll,
 }: Props) {
   const elapsed = formatElapsed(order.created_at, now)
   const dineInSeat = adminDineInSeatAuditLine(order, t)
@@ -149,8 +153,10 @@ export function KitchenKdsColumn({
       </header>
 
       <div
-        className="min-h-0 flex-1 cursor-pointer overflow-y-auto overscroll-y-contain px-2 py-2"
+        ref={bodyRef}
+        className="min-h-0 flex-1 cursor-pointer touch-pan-y overflow-y-auto overscroll-y-contain px-2 py-2"
         onClick={onOpen}
+        onScroll={onBodyScroll}
       >
         {groups.map((group, gi) => (
           <div key={`${group.title}-${gi}`} className="mb-2">
