@@ -272,6 +272,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const ordersRef = useRef<Order[]>([])
   const coveredRef = useRef<Array<{ start: number; end: number; items: boolean }>>([])
+  const loadGenRef = useRef(0)
 
   const ensureOrders = useCallback(async (start: Date, end: Date, withItems: boolean) => {
     const startMs = start.getTime()
@@ -292,6 +293,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }, [tenant])
 
   const loadData = useCallback(async () => {
+    const gen = ++loadGenRef.current
     setLoading(true)
     // z_reports gaat via /api/admin/db/read (na Phase 2-lockdown heeft de
     // anon-key geen SELECT meer op die tabel).
@@ -303,70 +305,90 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     windowEnd.setDate(windowEnd.getDate() + 2)
     const itemsStart = startOfDay(new Date())
     itemsStart.setDate(itemsStart.getDate() - 1)
-    const [monthRows, todayRows, zResultRaw, info, hours, vatCtx] = await Promise.all([
-      fetchAllTenantOrdersInCreatedAtRange(tenant, windowStart.toISOString(), windowEnd.toISOString(), RAPPORT_ORDER_COLS),
-      fetchAllTenantOrdersInCreatedAtRange(tenant, itemsStart.toISOString(), windowEnd.toISOString(), `${RAPPORT_ORDER_COLS},items`),
-      adminDb.select<Array<Record<string, unknown>>>('z_reports', {
-        tenantSlug: tenant,
-        select: `${zSelectBase}, owner_dinein_drinks_incl`,
-        order: { column: 'report_date', ascending: false },
-      }),
-      getTenantSettings(tenant),
-      getOpeningHours(tenant),
-      fetchZReportVatContextForTenant(tenant).catch(() => null),
-    ])
-    let zResult = zResultRaw
-    if (
-      !zResult.ok &&
-      /owner_dinein_drinks_incl|column .* does not exist|schema cache/i.test(zResult.error || '')
-    ) {
-      zResult = await adminDb.select<Array<Record<string, unknown>>>('z_reports', {
-        tenantSlug: tenant,
-        select: zSelectBase,
-        order: { column: 'report_date', ascending: false },
-      })
-    }
-    setOpeningHours(hours || [])
-    const zData = zResult.ok && Array.isArray(zResult.data) ? zResult.data : null
-    const loadedOrders = mergeRapportOrders(mapRapportOrders(monthRows), mapRapportOrders(todayRows))
-    ordersRef.current = loadedOrders
-    coveredRef.current = [
-      { start: windowStart.getTime(), end: windowEnd.getTime(), items: false },
-      { start: itemsStart.getTime(), end: windowEnd.getTime(), items: true },
-    ]
-    setOrders(loadedOrders)
-    setZReports((zData || []) as unknown as ZReport[])
-    setTenantInfo(info as TenantInfo)
-    setVatContext(vatCtx)
-
-    const settings = info as TenantSettings | null
-    let opening = Number(settings?.report_register_opening_cash ?? 0)
     try {
-      const lsKey = `rapportages_cash_${tenant}`
-      const lsRaw = localStorage.getItem(lsKey)
-      const lsVal = lsRaw != null ? parseFloat(lsRaw) : NaN
-      // Eenmalige migratie van oude browser-only waarde naar tenant_settings
-      if (opening === 0 && Number.isFinite(lsVal) && lsVal !== 0) {
-        opening = lsVal
-        await saveTenantSettings({ tenant_slug: tenant, report_register_opening_cash: lsVal })
+      const [monthRows, zResultRaw, info, hours, vatCtx] = await Promise.all([
+        fetchAllTenantOrdersInCreatedAtRange(tenant, windowStart.toISOString(), windowEnd.toISOString(), RAPPORT_ORDER_COLS),
+        adminDb.select<Array<Record<string, unknown>>>('z_reports', {
+          tenantSlug: tenant,
+          select: `${zSelectBase}, owner_dinein_drinks_incl`,
+          order: { column: 'report_date', ascending: false },
+        }),
+        getTenantSettings(tenant),
+        getOpeningHours(tenant),
+        fetchZReportVatContextForTenant(tenant).catch(() => null),
+      ])
+      if (gen !== loadGenRef.current) return
+      let zResult = zResultRaw
+      if (
+        !zResult.ok &&
+        /owner_dinein_drinks_incl|column .* does not exist|schema cache/i.test(zResult.error || '')
+      ) {
+        zResult = await adminDb.select<Array<Record<string, unknown>>>('z_reports', {
+          tenantSlug: tenant,
+          select: zSelectBase,
+          order: { column: 'report_date', ascending: false },
+        })
       }
-      localStorage.removeItem(lsKey)
-      localStorage.removeItem(`rapportages_lastZ_${tenant}`)
-    } catch {
-      /* ignore */
-    }
-    setOpeningCash(opening)
+      if (gen !== loadGenRef.current) return
+      setOpeningHours(hours || [])
+      const zData = zResult.ok && Array.isArray(zResult.data) ? zResult.data : null
+      const loadedOrders = mapRapportOrders(monthRows)
+      ordersRef.current = loadedOrders
+      coveredRef.current = [
+        { start: windowStart.getTime(), end: windowEnd.getTime(), items: false },
+      ]
+      setOrders(loadedOrders)
+      setZReports((zData || []) as unknown as ZReport[])
+      setTenantInfo(info as TenantInfo)
+      setVatContext(vatCtx)
 
-    setLoading(false)
-    let lastZ = ''
-    for (const row of zData || []) {
-      const generated = String((row as { generated_at?: string }).generated_at || '')
-      if (generated > lastZ) lastZ = generated
-    }
-    if (lastZ && new Date(lastZ) < windowStart) {
-      const zFrom = new Date(lastZ)
-      zFrom.setDate(zFrom.getDate() - 1)
-      void ensureOrders(zFrom, windowEnd, false)
+      const settings = info as TenantSettings | null
+      let opening = Number(settings?.report_register_opening_cash ?? 0)
+      try {
+        const lsKey = `rapportages_cash_${tenant}`
+        const lsRaw = localStorage.getItem(lsKey)
+        const lsVal = lsRaw != null ? parseFloat(lsRaw) : NaN
+        // Eenmalige migratie van oude browser-only waarde naar tenant_settings
+        if (opening === 0 && Number.isFinite(lsVal) && lsVal !== 0) {
+          opening = lsVal
+          await saveTenantSettings({ tenant_slug: tenant, report_register_opening_cash: lsVal })
+        }
+        localStorage.removeItem(lsKey)
+        localStorage.removeItem(`rapportages_lastZ_${tenant}`)
+      } catch {
+        /* ignore */
+      }
+      if (gen !== loadGenRef.current) return
+      setOpeningCash(opening)
+
+      let lastZ = ''
+      for (const row of zData || []) {
+        const generated = String((row as { generated_at?: string }).generated_at || '')
+        if (generated > lastZ) lastZ = generated
+      }
+      if (lastZ && new Date(lastZ) < windowStart) {
+        const zFrom = new Date(lastZ)
+        zFrom.setDate(zFrom.getDate() - 1)
+        void ensureOrders(zFrom, windowEnd, false)
+      }
+      void fetchAllTenantOrdersInCreatedAtRange(
+        tenant,
+        itemsStart.toISOString(),
+        windowEnd.toISOString(),
+        `${RAPPORT_ORDER_COLS},items`,
+      ).then((todayRows) => {
+        if (gen !== loadGenRef.current) return
+        const merged = mergeRapportOrders(ordersRef.current, mapRapportOrders(todayRows))
+        ordersRef.current = merged
+        coveredRef.current.push({ start: itemsStart.getTime(), end: windowEnd.getTime(), items: true })
+        setOrders(merged)
+      }).catch((err) => {
+        console.error('Rapportages artikelen:', err)
+      })
+    } catch (err) {
+      console.error('Rapportages laden:', err)
+    } finally {
+      if (gen === loadGenRef.current) setLoading(false)
     }
   }, [tenant, ensureOrders])
 
@@ -449,15 +471,17 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const kassaOrders = useMemo(() => validOrders.filter(isKassaOrder), [validOrders])
   const onlineOrders = useMemo(() => validOrders.filter(isOnlineOrder), [validOrders])
 
-  const orderDay = (o: Order) =>
-    orderReportDateForShift(
-      o.created_at,
-      openingHours,
+  const shiftCloses = useMemo(
+    () =>
       zReports.map((r) => ({
         reportDate: r.report_date,
         closedAt: r.is_closed ? r.closed_at ?? null : null,
       })),
-    ) ?? businessDayForOrder(o.created_at, openingHours)
+    [zReports],
+  )
+  const orderDay = (o: Order) =>
+    orderReportDateForShift(o.created_at, openingHours, shiftCloses) ??
+    businessDayForOrder(o.created_at, openingHours)
   const revenueInPeriod = (list: Order[], from: Date) =>
     list.filter(o => new Date(o.created_at) >= from).reduce((s,o)=>s+o.total,0)
   const ordersInPeriod = (list: Order[], from: Date) =>
@@ -504,24 +528,31 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   } = useMemo(() => {
     const weekDays = new Set(listBusinessDaysEndingAt(todayYmd, 7))
     const monthPrefix = todayYmd.slice(0, 7)
+    const revenueByDay = new Map<string, number>()
+    const todayOrdersInner: Order[] = []
+    for (const o of validOrders) {
+      const ymd = orderDay(o)
+      if (!ymd) continue
+      revenueByDay.set(ymd, (revenueByDay.get(ymd) || 0) + o.total)
+      if (ymd === todayYmd) todayOrdersInner.push(o)
+    }
     const revenueForBusinessDay = (ymd: string | null) => {
       if (!ymd) return 0
       const owner = ownerTotalByDate.get(ymd)
       if (owner != null) return owner
-      return validOrders.filter((o) => orderDay(o) === ymd).reduce((s, o) => s + o.total, 0)
+      return revenueByDay.get(ymd) || 0
     }
-    const todayOrdersInner = validOrders.filter((o) => orderDay(o) === todayYmd)
     const todayRevenueInner = revenueForBusinessDay(todayYmd)
     const weekRevenueInner = [...weekDays].reduce((s, d) => s + revenueForBusinessDay(d), 0)
-    const monthRevenueInner = validOrders
-      .map((o) => orderDay(o))
-      .filter((d): d is string => !!d && d.startsWith(monthPrefix))
-      .filter((d, i, arr) => arr.indexOf(d) === i)
-      .concat(
-        [...ownerTotalByDate.keys()].filter((d) => d.startsWith(monthPrefix)),
-      )
-      .filter((d, i, arr) => arr.indexOf(d) === i)
-      .reduce((s, d) => s + revenueForBusinessDay(d), 0)
+    const monthDays = new Set<string>()
+    for (const ymd of revenueByDay.keys()) {
+      if (ymd.startsWith(monthPrefix)) monthDays.add(ymd)
+    }
+    for (const ymd of ownerTotalByDate.keys()) {
+      if (ymd.startsWith(monthPrefix)) monthDays.add(ymd)
+    }
+    let monthRevenueInner = 0
+    for (const d of monthDays) monthRevenueInner += revenueForBusinessDay(d)
     return {
       todayOrders: todayOrdersInner,
       todayRevenue: todayRevenueInner,
@@ -531,7 +562,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       /** Week start (maandag) kan vóór de 1e van deze maand vallen → weekomzet > maandomzet is dan logisch. */
       weekStartsBeforeThisMonth: weekStartMs < monthStartMs,
     }
-  }, [validOrders, ownerTotalByDate, todayYmd, openingHours, weekStartMs, monthStartMs])
+  }, [validOrders, ownerTotalByDate, todayYmd, openingHours, shiftCloses, weekStartMs, monthStartMs])
 
   // ── Last 7 days chart ──
   const last7Days = useMemo(() => {
@@ -654,29 +685,27 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }, [onlineOrders, todayStartMs])
 
   // ── Betalingen tabel ──
-  const paymentsForCalendarDay = (y: number, m: number, dayNum: number) => {
-    const ymd = localYmd(y, m, dayNum)
-    const owner = ownerCloseByDate.get(ymd)
-    if (owner) return ownerClosePaymentRow(owner)
-    const day = new Date(y, m, dayNum)
-    const dayStart = startOfDay(day)
-    const dayEnd = new Date(dayStart)
-    dayEnd.setDate(dayEnd.getDate() + 1)
-    const dayOrders = validOrders.filter((o) => {
-      const t = new Date(o.created_at)
-      return t >= dayStart && t < dayEnd
-    })
-    let cash = 0
-    let card = 0
-    for (const o of dayOrders) {
-      const d = distributeOrderPaymentForZRaport(o)
-      cash += d.cash
-      card += d.card + d.online
-    }
-    return { receipts: dayOrders.length, cash, card, total: cash + card }
-  }
-
   const paymentsData = useMemo(() => {
+    const byYmd = new Map<string, { receipts: number; cash: number; card: number }>()
+    for (const o of validOrders) {
+      const t = new Date(o.created_at)
+      if (Number.isNaN(t.getTime())) continue
+      const ymd = localYmd(t.getFullYear(), t.getMonth(), t.getDate())
+      const split = distributeOrderPaymentForZRaport(o)
+      const cur = byYmd.get(ymd) || { receipts: 0, cash: 0, card: 0 }
+      cur.receipts += 1
+      cur.cash += split.cash
+      cur.card += split.card + split.online
+      byYmd.set(ymd, cur)
+    }
+    const paymentsForCalendarDay = (y: number, m: number, dayNum: number) => {
+      const ymd = localYmd(y, m, dayNum)
+      const owner = ownerCloseByDate.get(ymd)
+      if (owner) return ownerClosePaymentRow(owner)
+      const hit = byYmd.get(ymd)
+      if (!hit) return { receipts: 0, cash: 0, card: 0, total: 0 }
+      return { receipts: hit.receipts, cash: hit.cash, card: hit.card, total: hit.cash + hit.card }
+    }
     if (paymentPeriod === 'month') {
       const y = selectedMonth.getFullYear(), m = selectedMonth.getMonth()
       const days = daysInMonth(y, m)
