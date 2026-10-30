@@ -16,6 +16,13 @@ export interface FloorPlanTable {
 }
 
 /** Posities zijn % van het canvas (ongeveer 1–99). Corrupte waarden buiten 0–100 worden geneutraliseerd. */
+/** Graden 0–359. String-concat («45» + 45) mag de tafel niet laten doordraaien. */
+export function normalizeFloorPlanRotation(v: unknown): number {
+  const n = typeof v === 'number' ? v : parseFloat(String(v ?? ''))
+  if (!Number.isFinite(n)) return 0
+  return ((n % 360) + 360) % 360
+}
+
 export function clampFloorPlanPct(v: unknown, fallback = 50): number {
   const n = typeof v === 'number'? v : parseFloat(String(v))
   if (!Number.isFinite(n)) return fallback
@@ -26,7 +33,12 @@ export function clampFloorPlanPct(v: unknown, fallback = 50): number {
 export function sanitizeFloorPlanTables(list: FloorPlanTable[]): FloorPlanTable[] {
   return list
     .filter((t) => t != null && String(t.number ?? '').trim() !== '')
-    .map((t) => ({ ...t, x: clampFloorPlanPct(t.x), y: clampFloorPlanPct(t.y) }))
+    .map((t) => ({
+      ...t,
+      x: clampFloorPlanPct(t.x),
+      y: clampFloorPlanPct(t.y),
+      rotation: normalizeFloorPlanRotation(t.rotation),
+    }))
 }
 
 /**

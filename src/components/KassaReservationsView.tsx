@@ -2781,7 +2781,8 @@ export default function KassaReservationsView({
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
-                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
+                          transform: `translate(-50%, -50%) rotate(${((Number(table.rotation) || 0) % 360 + 360) % 360}deg)`,
+                          transition: 'none',
                           cursor: tableRes ? 'pointer': 'default',
                           zIndex: isSelected ? 10 : 1,
                         }}
@@ -3201,7 +3202,8 @@ export default function KassaReservationsView({
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
-                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
+                          transform: `translate(-50%, -50%) rotate(${((Number(table.rotation) || 0) % 360 + 360) % 360}deg)`,
+                          transition: 'none',
                           zIndex: isSelected ? 10 : 1,
                           cursor: tablesLocked ? 'default': isDraggingFloor ? 'grabbing': 'grab',
                           touchAction: 'none',
@@ -3413,9 +3415,9 @@ export default function KassaReservationsView({
                       <div className="flex-shrink-0 p-3 sm:p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{rk('rotate')}</p>
                         <div className="flex gap-2">
-                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation - 45 + 360) % 360 } : null) }}
+                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: ((Number(t.rotation) || 0) - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: ((Number(p.rotation) || 0) - 45 + 360) % 360 } : null) }}
                             className="flex-1 min-h-[48px] rounded-xl font-bold text-xl text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>↺</button>
-                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation + 45) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation + 45) % 360 } : null) }}
+                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: ((Number(t.rotation) || 0) + 45) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: ((Number(p.rotation) || 0) + 45) % 360 } : null) }}
                             className="flex-1 min-h-[48px] rounded-xl font-bold text-xl text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>↻</button>
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: 0 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: 0 } : null) }}
                             className="flex-1 min-h-[48px] rounded-xl text-xs font-semibold text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)'}}>{rk('reset')}</button>

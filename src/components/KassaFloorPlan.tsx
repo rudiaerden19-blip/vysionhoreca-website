@@ -747,6 +747,7 @@ export default function KassaFloorPlan({
         return prev
       }
 
+      if (JSON.stringify(prev) === JSON.stringify(incoming)) return prev
       return incoming
     })
   }, [seedSignature, seedTables])
@@ -833,7 +834,7 @@ export default function KassaFloorPlan({
           const parsed = parseFloorPlanTablesJson(newRow.data)
           if (parsed === null) return
           const fixed = sanitizeTables(parsed)
-          setTables(fixed)
+          setTables((prev) => (JSON.stringify(prev) === JSON.stringify(fixed) ? prev : fixed))
         }
       )
       .subscribe()
@@ -879,14 +880,19 @@ export default function KassaFloorPlan({
     }
   }, [selectedDecor])
 
+  const lastPersistedTablesRef = useRef('')
+
   // Veiligheidsnet voor iPad: sla posities op naar Supabase na drag (geen localStorage)
   useEffect(() => {
-    if (tables.length > 0 && !floorPersistPausedRef.current) {
-      persistFloorPlanTablesToBackend(tables)
-    }
+    if (tables.length === 0 || floorPersistPausedRef.current) return
+    const sig = JSON.stringify(tables)
+    if (sig === lastPersistedTablesRef.current) return
+    lastPersistedTablesRef.current = sig
+    persistFloorPlanTablesToBackend(tables)
   }, [tables, persistFloorPlanTablesToBackend])
 
   const save = (updated: KassaTable[]) => {
+    lastPersistedTablesRef.current = JSON.stringify(updated)
     setTables(updated)
     persistFloorPlanTablesToBackend(updated)
   }
@@ -1060,7 +1066,12 @@ export default function KassaFloorPlan({
   }
 
   const rotate = (id: string, delta: number) => {
-    const updated = tables.map(t => t.id === id ? { ...t, rotation: (t.rotation + delta + 360) % 360 } : t)
+    const updated = tables.map(t => {
+      if (t.id !== id) return t
+      const cur = Number(t.rotation)
+      const base = Number.isFinite(cur) ? cur : 0
+      return { ...t, rotation: ((base + delta) % 360 + 360) % 360 }
+    })
     save(updated)
     const sel = updated.find(t => t.id === id)
     if (sel) setSelected(sel)
@@ -1441,7 +1452,8 @@ export default function KassaFloorPlan({
               style={{
                 left: `${px}%`,
                 top: `${py}%`,
-                transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
+                transform: `translate(-50%, -50%) rotate(${((Number(d.rotation) || 0) % 360 + 360) % 360}deg)`,
+                transition: 'none',
                 zIndex: dragPaint?.id === d.id ? 40 : selectedDecor?.id === d.id ? 9 : 0,
                 cursor: 'grab',
                 touchAction: 'none',
@@ -1463,7 +1475,8 @@ export default function KassaFloorPlan({
               style={{
                 left: `${px}%`,
                 top: `${py}%`,
-                transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
+                transform: `translate(-50%, -50%) rotate(${((Number(t.rotation) || 0) % 360 + 360) % 360}deg)`,
+                transition: 'none',
                 zIndex: dragPaint?.id === t.id ? 40 : selected?.id === t.id ? 10 : 1,
                 cursor: 'grab',
                 touchAction: 'none',
