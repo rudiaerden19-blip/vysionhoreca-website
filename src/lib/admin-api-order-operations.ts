@@ -422,6 +422,27 @@ export async function regenerateZReportForDate(
   }
 }
 
+/** Datum van de lopende shift voor een bon. Middernacht knipt die shift niet. */
+export async function resolveShiftReportDate(
+  client: SupabaseClient,
+  tenantSlug: string,
+  createdAt: string,
+): Promise<string> {
+  const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
+  const clock = businessDayForOrder(createdAt, hours) ?? getBelgiumDateString(new Date(createdAt))
+  const prevDate = addDaysToBelgiumYMD(clock, -1)
+  const { data } = await client
+    .from('z_reports')
+    .select('report_date, is_closed, closed_at')
+    .eq('tenant_slug', tenantSlug)
+    .in('report_date', [prevDate, clock])
+  const shifts: ShiftReportClose[] = (data ?? []).map((row) => ({
+    reportDate: String(row.report_date),
+    closedAt: row.is_closed === true ? (row.closed_at ? String(row.closed_at) : null) : null,
+  }))
+  return orderReportDateForShift(createdAt, hours, shifts) ?? clock
+}
+
 function ymdToUtcMs(ymd: string): number {
   const [y, m, d] = ymd.split('-').map(Number)
   return Date.UTC(y, m - 1, d)

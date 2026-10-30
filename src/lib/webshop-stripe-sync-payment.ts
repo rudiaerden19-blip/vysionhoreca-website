@@ -1,8 +1,6 @@
 import Stripe from 'stripe'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { regenerateZReportForDate } from '@/lib/admin-api'
-import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
-import { businessDayForOrder, fetchOpeningHoursForTenant } from '@/lib/tenant-business-day'
+import { regenerateZReportForDate, resolveShiftReportDate } from '@/lib/admin-api'
 import {
   isStripeOnlineCheckoutSecretConfigured,
   stripeCheckoutSessionIsPaid,
@@ -61,9 +59,7 @@ async function markOrderPaid(
     .eq('tenant_slug', tenantSlug)
 
   if (order.created_at) {
-    const hours = await fetchOpeningHoursForTenant(supabase, tenantSlug)
-    const dayYmd =
-      businessDayForOrder(order.created_at, hours) ?? getBelgiumDateString(new Date(order.created_at))
+    const dayYmd = await resolveShiftReportDate(supabase, tenantSlug, order.created_at)
     await regenerateZReportForDate(supabase, tenantSlug, dayYmd)
   }
 }

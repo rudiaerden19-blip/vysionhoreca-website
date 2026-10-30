@@ -133,6 +133,7 @@ export {
   getOrderWithItems,
   updateOrderStatus,
   regenerateZReportForDate,
+  resolveShiftReportDate,
   moveFiscalDaySales,
   syncZReportAfterOrder,
   confirmOrder,

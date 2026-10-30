@@ -214,6 +214,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [dayReceipts, setDayReceipts] = useState<Order[]>([])
   const reconciledTenantRef = useRef(false)
   const ownerFormDateRef = useRef(selectedDate)
+  const openShiftFocusedRef = useRef(false)
 
   useEffect(() => {
     if (reconciledTenantRef.current) return
@@ -244,6 +245,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     loadSavedReports()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, selectedDate, reportViewMode])
+
+  useEffect(() => {
+    if (openShiftFocusedRef.current || savedReports.length === 0) return
+    const today = getLocalDateString()
+    if (selectedDate !== today) {
+      openShiftFocusedRef.current = true
+      return
+    }
+    const prev = addDaysToBelgiumYMD(today, -1)
+    const prevRow = savedReports.find((r) => r.report_date === prev)
+    openShiftFocusedRef.current = true
+    if (prevRow && !prevRow.is_closed) setSelectedDate(prev)
+  }, [savedReports, selectedDate])
 
   useEffect(() => {
     if (reportViewMode === 'month') {

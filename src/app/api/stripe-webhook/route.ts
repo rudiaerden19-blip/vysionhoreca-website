@@ -4,9 +4,7 @@ import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { trackError } from '@/lib/monitoring'
-import { regenerateZReportForDate } from '@/lib/admin-api'
-import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
-import { businessDayForOrder, fetchOpeningHoursForTenant } from '@/lib/tenant-business-day'
+import { regenerateZReportForDate, resolveShiftReportDate } from '@/lib/admin-api'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -131,10 +129,7 @@ export async function POST(request: NextRequest) {
           .maybeSingle()
 
         if (paidOrder?.created_at) {
-          const createdAt = paidOrder.created_at as string
-          const hours = await fetchOpeningHoursForTenant(supabase, tenantSlug)
-          const dayYmd =
-            businessDayForOrder(createdAt, hours) ?? getBelgiumDateString(new Date(createdAt))
+          const dayYmd = await resolveShiftReportDate(supabase, tenantSlug, paidOrder.created_at as string)
           await regenerateZReportForDate(supabase, tenantSlug, dayYmd)
         }
       }

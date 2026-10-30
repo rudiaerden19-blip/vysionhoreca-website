@@ -88,8 +88,9 @@ export type ShiftReportClose = {
 }
 
 /**
- * Bon na middernacht blijft op de shift tot die Z is afgesloten.
- * Een klokwissel om 00:00 maakt geen tweede Z.
+ * Een Z loopt van start van de shift tot einde van de shift.
+ * Blijft de zaak na middernacht open, dan blijven die bonnen op dezelfde shift
+ * tot de Z is afgesloten. 00:00 begint geen nieuw rapport.
  */
 export function orderReportDateForShift(
   createdAt: string,
