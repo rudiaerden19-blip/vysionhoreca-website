@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_POS_MENU_PLATE_SHELL_BG_CLASS,
@@ -28,13 +30,19 @@ export function KassaStaffSalesPickModal({
   hint?: string
 }) {
   const { t } = useLanguage()
-  if (!open) return null
+  const [hostReady, setHostReady] = useState(false)
+
+  useEffect(() => {
+    setHostReady(true)
+  }, [])
+
+  if (!open || !hostReady) return null
 
   const clockedIn = staffList.filter((s) => s.hasOpenSession)
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[700] flex items-center justify-center bg-black/60 p-3 sm:p-4"
+      className="fixed inset-0 z-[800] flex items-center justify-center bg-black/60 p-3 sm:p-4"
       onClick={onClose}
       role="presentation"
     >
@@ -93,6 +101,7 @@ export function KassaStaffSalesPickModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

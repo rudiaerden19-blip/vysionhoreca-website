@@ -2980,6 +2980,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Verhoog bij annuleren/sluiten zodat late API-antwoorden geen state meer zetten (busy blijft niet hangen). */
   const staffClockPinReqGen = useRef(0)
   const lagoonNameGateRef = useRef<() => boolean>(() => false)
+  const lagoonNamePromptedRef = useRef(false)
   const [activeStaffHydrated, setActiveStaffHydrated] = useState(false)
   const [activeKassaStaff, setActiveKassaStaffInner] = useState<{ id: string; name: string } | null>(
     null,
@@ -3037,6 +3038,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     staffClockList,
     activeKassaStaff,
     setActiveKassaStaff,
+  ])
+
+  /** The Lagoon: popup meteen bij openen, niet pas na de eerste producttik. */
+  useEffect(() => {
+    if (!isTheLagoonTenant(tenant) || demoViewOnly || !kassaStaffClockEnabled) return
+    if (!staffClockListHydrated || !activeStaffHydrated || lagoonNamePromptedRef.current) return
+    const clockedInIds = staffClockList.filter((s) => s.hasOpenSession).map((s) => s.id)
+    if (lagoonEveningPickIsCurrent(tenant, activeKassaStaff?.id, clockedInIds)) return
+    lagoonNamePromptedRef.current = true
+    setStaffSalesPickOpen(true)
+  }, [
+    tenant,
+    demoViewOnly,
+    kassaStaffClockEnabled,
+    staffClockListHydrated,
+    activeStaffHydrated,
+    staffClockList,
+    activeKassaStaff,
   ])
 
   // Opties modal (editingCartKey = bestaande winkelmandregel aanpassen)
