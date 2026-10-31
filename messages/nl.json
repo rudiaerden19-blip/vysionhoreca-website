@@ -4453,6 +4453,7 @@
     "clockOutCode": "Uitklokken / code",
     "sales": "Verkoop",
     "salesPickTitle": "Kies medewerker",
+    "lagoonEveningPickHint": "Tik één keer op je naam. Dat blijft de hele avond.",
     "salesPickNoClockedIn": "Niemand is ingeklokt. Laat medewerkers eerst inklokken via het snelmenu.",
     "salesHint": "Geen code: je bent ingeklokt",
     "salesNeedsClock": "Eerst inklokken",

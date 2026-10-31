@@ -3852,6 +3852,7 @@
     "clockOutCode": "خروج / PIN",
     "sales": "مبيعات",
     "salesPickTitle": "اختر موظفاً",
+    "lagoonEveningPickHint": "اضغط اسمك مرة واحدة. يبقى طوال المساء.",
     "salesPickNoClockedIn": "لا أحد مسجّل دخولاً. اطلب تسجيل الدخول من القائمة السريعة أولاً.",
     "salesHint": "بدون PIN: مسجّل دخول",
     "salesNeedsClock": "سجّل الدخول أولاً",

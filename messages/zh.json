@@ -3852,6 +3852,7 @@
     "clockOutCode": "下班 / PIN",
     "sales": "销售",
     "salesPickTitle": "选择员工",
+    "lagoonEveningPickHint": "点一次你的名字。当晚一直有效。",
     "salesPickNoClockedIn": "暂无已上班员工。请先从快捷菜单打卡上班。",
     "salesHint": "无需PIN：已上班",
     "salesNeedsClock": "请先上班打卡",

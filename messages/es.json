@@ -3852,6 +3852,7 @@
     "clockOutCode": "Salida / PIN",
     "sales": "Venta",
     "salesPickTitle": "Elegir empleado",
+    "lagoonEveningPickHint": "Pulse su nombre una vez. Vale para toda la noche.",
     "salesPickNoClockedIn": "Nadie ha fichado entrada. Primero fichar desde el menú rápido.",
     "salesHint": "Sin PIN: estás fichado",
     "salesNeedsClock": "Ficha entrada primero",

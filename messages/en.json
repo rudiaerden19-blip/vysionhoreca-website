@@ -4453,6 +4453,7 @@
     "clockOutCode": "Clock out / PIN",
     "sales": "Sales",
     "salesPickTitle": "Choose team member",
+    "lagoonEveningPickHint": "Tap your name once. It stays for the whole evening.",
     "salesPickNoClockedIn": "No one is clocked in. Ask staff to clock in via the quick menu first.",
     "salesHint": "No PIN: you are clocked in",
     "salesNeedsClock": "Clock in first",

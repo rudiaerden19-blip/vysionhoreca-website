@@ -3352,6 +3352,7 @@
     "clockOutCode": "Ausstempeln / PIN",
     "sales": "Verkauf",
     "salesPickTitle": "Mitarbeiter wählen",
+    "lagoonEveningPickHint": "Tippen Sie einmal auf Ihren Namen. Das gilt den ganzen Abend.",
     "salesPickNoClockedIn": "Niemand ist eingestempelt. Zuerst über das Schnellmenü einstempeln.",
     "salesHint": "Keine PIN: eingestempelt",
     "salesNeedsClock": "Zuerst einstempeln",

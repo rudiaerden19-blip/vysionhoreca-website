@@ -3852,6 +3852,7 @@
     "clockOutCode": "Uscita / PIN",
     "sales": "Vendite",
     "salesPickTitle": "Scegli collaboratore",
+    "lagoonEveningPickHint": "Tocca una volta il tuo nome. Resta per tutta la sera.",
     "salesPickNoClockedIn": "Nessuno in servizio. Prima timbrare dal menu rapido.",
     "salesHint": "Senza PIN: sei in servizio",
     "salesNeedsClock": "Timbra prima l'entrata",

@@ -17,6 +17,7 @@ export function KassaStaffSalesPickModal({
   busy,
   onClose,
   onPickStaff,
+  hint,
 }: {
   open: boolean
   listLoading: boolean
@@ -24,6 +25,7 @@ export function KassaStaffSalesPickModal({
   busy: boolean
   onClose: () => void
   onPickStaff: (row: KassaStaffSalesPickRow) => void
+  hint?: string
 }) {
   const { t } = useLanguage()
   if (!open) return null
@@ -45,9 +47,12 @@ export function KassaStaffSalesPickModal({
         data-testid="kassa-staff-sales-pick"
       >
         <div className="flex items-center justify-between gap-3 border-b border-black/40 px-5 py-4">
-          <h2 id="kassa-staff-sales-pick-title" className="font-bold text-xl text-white">
-            {t('staffClock.salesPickTitle')}
-          </h2>
+          <div className="min-w-0">
+            <h2 id="kassa-staff-sales-pick-title" className="font-bold text-xl text-white">
+              {t('staffClock.salesPickTitle')}
+            </h2>
+            {hint ? <p className="mt-1 text-sm font-medium text-white/80">{hint}</p> : null}
+          </div>
           <button
             type="button"
             onClick={onClose}

@@ -265,6 +265,10 @@ import {
   isTheLagoonTenant,
 } from '@/lib/lagoon-kitchen-screen'
 import {
+  lagoonEveningPickIsCurrent,
+  writeLagoonEveningStaffPick,
+} from '@/lib/kassa-lagoon-staff-name-gate'
+import {
   clearLagoonOwnerPinUnlockIfStrict,
   lagoonKassaMenuPinRequired,
   resolveLagoonPinTenantSlug,
@@ -2016,6 +2020,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const requestCheckout = useCallback(() => {
     if (payInFlightRef.current) return
+    if (lagoonNameGateRef.current()) return
     setTicketDiscountOn(false)
     scheduleKassaTapSound(playCheckout)
     if (checkoutVatMode === 'dine_in') {
@@ -2974,6 +2979,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   } | null>(null)
   /** Verhoog bij annuleren/sluiten zodat late API-antwoorden geen state meer zetten (busy blijft niet hangen). */
   const staffClockPinReqGen = useRef(0)
+  const lagoonNameGateRef = useRef<() => boolean>(() => false)
+  const [activeStaffHydrated, setActiveStaffHydrated] = useState(false)
   const [activeKassaStaff, setActiveKassaStaffInner] = useState<{ id: string; name: string } | null>(
     null,
   )
@@ -2992,8 +2999,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void fetchKassaPosState(tenant).then((state) => {
       hydrateBarBonWatermarksFromStore(tenant, state.bar_bon_watermarks)
     })
+    setActiveStaffHydrated(false)
     void loadKassaActiveStaffFromServer(tenant).then((stored) => {
       if (stored) setActiveKassaStaffInner(stored)
+      setActiveStaffHydrated(true)
     })
   }, [tenant])
 
@@ -3007,6 +3016,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     demoViewOnly,
     kassaStaffClockEnabled,
     staffClockListHydrated,
+    staffClockList,
+    activeKassaStaff,
+    setActiveKassaStaff,
+  ])
+
+  /** The Lagoon: een gekozen naam geldt één avond. De volgende avond moet opnieuw. */
+  useEffect(() => {
+    if (!isTheLagoonTenant(tenant) || demoViewOnly || !kassaStaffClockEnabled) return
+    if (!staffClockListHydrated || !activeStaffHydrated || !activeKassaStaff) return
+    const clockedInIds = staffClockList.filter((s) => s.hasOpenSession).map((s) => s.id)
+    if (lagoonEveningPickIsCurrent(tenant, activeKassaStaff.id, clockedInIds)) return
+    setActiveKassaStaff(null)
+  }, [
+    tenant,
+    demoViewOnly,
+    kassaStaffClockEnabled,
+    staffClockListHydrated,
+    activeStaffHydrated,
     staffClockList,
     activeKassaStaff,
     setActiveKassaStaff,
@@ -3309,6 +3336,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   handleProductClickRef.current = async (product: MenuProduct) => {
+    if (lagoonNameGateRef.current()) return
     if (product.id && productIdsWithOptionsSet.has(product.id)) {
       const pid = product.id!
       const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
@@ -5278,6 +5306,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     void loadStaffClockList({ background: staffClockList.length > 0 })
   }, [loadStaffClockList, staffClockList.length])
 
+  lagoonNameGateRef.current = () => {
+    if (!isTheLagoonTenant(tenant) || demoViewOnly || !kassaStaffClockEnabled) return false
+    const clockedInIds = staffClockList.filter((s) => s.hasOpenSession).map((s) => s.id)
+    if (
+      staffClockListHydrated &&
+      activeStaffHydrated &&
+      lagoonEveningPickIsCurrent(tenant, activeKassaStaff?.id, clockedInIds)
+    ) {
+      return false
+    }
+    openStaffSalesPickModal()
+    return true
+  }
+
   const openStaffClockModal = (quickFocus?: 'in' | 'out') => {
     playClick()
     staffClockPinReqGen.current += 1
@@ -5358,6 +5400,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const startStaffSales = (s: { id: string; name: string }) => {
+    if (isTheLagoonTenant(tenant)) writeLagoonEveningStaffPick(tenant, s.id)
     flushSync(() => {
       staffClockPinReqGen.current += 1
       setStaffClockBusy(false)
@@ -7583,6 +7626,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setKassaZoneTab(null)
         }}
         onPickStaff={(s) => startStaffSales(s)}
+        hint={isTheLagoonTenant(tenant) ? t('staffClock.lagoonEveningPickHint') : undefined}
       />
 
       {kassaNameAccountV2 ? (

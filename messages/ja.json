@@ -3852,6 +3852,7 @@
     "clockOutCode": "退勤 / PIN",
     "sales": "販売",
     "salesPickTitle": "スタッフを選択",
+    "lagoonEveningPickHint": "名前を一度タップしてください。その夜はずっと有効です。",
     "salesPickNoClockedIn": "出勤中のスタッフがいません。クイックメニューから出勤してください。",
     "salesHint": "PIN不要：出勤中",
     "salesNeedsClock": "先に出勤してください",

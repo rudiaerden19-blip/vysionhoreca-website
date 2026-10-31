@@ -3352,6 +3352,7 @@
     "clockOutCode": "Sortie / PIN",
     "sales": "Vente",
     "salesPickTitle": "Choisir un collaborateur",
+    "lagoonEveningPickHint": "Touchez une fois votre nom. Cela reste pour toute la soirée.",
     "salesPickNoClockedIn": "Personne n’est en service. Faites pointer via le menu rapide d’abord.",
     "salesHint": "Sans PIN : vous êtes en service",
     "salesNeedsClock": "Pointez d'abord l'entrée",
