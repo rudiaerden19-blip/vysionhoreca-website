@@ -1834,6 +1834,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [showTablePicker, setShowTablePicker] = useState(false)
   /** Verkoop / Binnen / Terras — los van besteltype (Ter plaatse); accent alleen na tik. */
   const [kassaZoneTab, setKassaZoneTab] = useState<'sales' |  'inside' |  'terrace'| null>(null)
+  /** The Lagoon: zone- en bestelknoppen schuiven over de mand. Standaard dicht, mand begint bovenaan. */
+  const [lagoonSidebarToolsOpen, setLagoonSidebarToolsOpen] = useState(false)
   const [pickerBrowseZone, setPickerBrowseZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [dineInFloorZone, setDineInFloorZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [kassaTablesByZone, setKassaTablesByZone] = useState<Record<FloorPlanZone, FloorPlanTable[]>>({
@@ -6260,6 +6262,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : null}
 
           {isOnline !== null && kassaPosLuxury ? (
+            <div className={isTheLagoonTenant(tenant) ? 'relative shrink-0' : 'contents'}>
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
@@ -6275,6 +6278,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className="truncate">
                 {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
               </span>
+            </div>
+            {isTheLagoonTenant(tenant) ? (
+              <button
+                type="button"
+                aria-expanded={lagoonSidebarToolsOpen}
+                aria-controls="kassa-lagoon-sidebar-tools"
+                title={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
+                aria-label={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
+                onClick={() => {
+                  playClick()
+                  setLagoonSidebarToolsOpen((open) => !open)
+                }}
+                className="absolute left-1/2 top-full z-40 mt-0.5 flex h-7 w-11 -translate-x-1/2 items-center justify-center rounded-b-lg border border-t-0 border-black/70 bg-[#1a1a1a] text-[#e4e4e4] shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className={`h-4 w-4 transition-transform duration-300 ${lagoonSidebarToolsOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.4}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M6 7.5l6 5 6-5" />
+                  <path d="M6 13l6 5 6-5" />
+                </svg>
+              </button>
+            ) : null}
             </div>
           ) : null}
 
@@ -6657,7 +6689,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : kassaCompactChrome
                 ? 'w-[332px] max-w-[38vw]'
                 : 'w-80 sm:w-96 lg:w-[380px]'
-          } flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
+          } relative flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
             kassaPosLuxury
@@ -6666,6 +6698,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
+        <div
+          id="kassa-lagoon-sidebar-tools"
+          className={
+            isTheLagoonTenant(tenant)
+              ? `absolute inset-x-0 top-0 z-20 transition-transform duration-300 ease-out ${kassaPlateBgClass} ${
+                  lagoonSidebarToolsOpen
+                    ? 'translate-y-0 shadow-[0_14px_28px_rgba(0,0,0,0.5)]'
+                    : 'pointer-events-none -translate-y-full'
+                }`
+              : 'contents'
+          }
+        >
         {/* Zone: Verkoop / Binnen / Terras */}
         <div
           className={`shrink-0 ${
@@ -6894,6 +6938,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {t('kassaApp.clearTableBanner')}
             </button>
           ) : null}
+        </div>
         </div>
 
         {/* Cart / numpad (toggle via footer) */}
