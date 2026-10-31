@@ -6232,6 +6232,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             kassaPosLuxury ? 'ml-auto' : ''
           }`}
         >
+          {isTheLagoonTenant(tenant) ? (
+            <button
+              type="button"
+              onClick={clearCart}
+              disabled={billLines.length === 0}
+              title={t('kassaApp.remove')}
+              aria-label={t('kassaApp.remove')}
+              className={
+                posChrome === 'speels'
+                  ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsRedGlossButtonClass(false)} disabled:pointer-events-none disabled:opacity-45`
+                  : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosRemoveButtonClass(posChrome)} disabled:pointer-events-none disabled:opacity-45`
+              }
+            >
+              <span className="truncate">{t('kassaApp.remove')}</span>
+            </button>
+          ) : null}
+
           {isOnline !== null && kassaPosLuxury ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
@@ -7213,7 +7230,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               ) : (
               <span className="min-h-0" aria-hidden />
               )}
-              {showSidebarOpRekeningButton ? (
+              {showSidebarOpRekeningButton || isTheLagoonTenant(tenant) ? (
                 <span className="min-h-0" aria-hidden />
               ) : (
                 <button
@@ -7246,6 +7263,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 >
                   <span className={kassaSidebarPairLabelClass}>{t('kassaOnAccount.title')}</span>
                 </button>
+                {isTheLagoonTenant(tenant) ? (
+                  <span className={`min-w-0 ${KASSA_SIDEBAR_PAIR_BTN_MIN_H}`} aria-hidden />
+                ) : (
                 <button
                   type="button"
                   onClick={clearCart}
@@ -7256,6 +7276,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 >
                   <span className={kassaSidebarPairLabelClass}>{t('kassaApp.remove')}</span>
                 </button>
+                )}
               </div>
             ) : null}
             {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
