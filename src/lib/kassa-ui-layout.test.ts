@@ -124,7 +124,7 @@ describe('Speels bruine knoppen', () => {
   it('maakt geselecteerd besteltype speels donkerblauw; rest grijs chrome', () => {
     expect(kassaSpeelsOrderTypeButtonClass(true)).toContain('kassa-speels-blue-gloss-btn')
     expect(kassaSpeelsOrderTypeButtonClass(true)).not.toContain('kassa-speels-blue-gloss-btn--selected')
-    expect(kassaSpeelsOrderTypeButtonClass(true)).not.toContain('kassa-speels-black-gloss-btn')
+    expect(kassaSpeelsOrderTypeButtonClass(true)).toContain('kassa-speels-order-type-btn--selected')
     expect(kassaSpeelsOrderTypeButtonClass(false)).toContain('kassa-speels-order-type-btn')
   })
 })

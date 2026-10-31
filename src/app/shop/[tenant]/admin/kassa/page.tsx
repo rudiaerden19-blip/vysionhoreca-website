@@ -205,6 +205,7 @@ import {
 } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
+import { readKassaOrderTypeChoice, writeKassaOrderTypeChoice } from '@/lib/kassa-order-type-choice'
 import { KassaTablePickerGrid } from '@/components/kassa/KassaTablePickerGrid'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { LocalePickerPortalMenu } from '@/components/LocalePickerPortalMenu'
@@ -1259,6 +1260,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Tafelregels in sidebar: uit na «Voeg toe aan tafel»; leeg veld voor volgende ronde. */
   const [tableOrderLinesInSidebar, setTableOrderLinesInSidebar] = useState(true)
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
+  const orderTypeTouchedRef = useRef(false)
+  const orderTypeTapAtRef = useRef(0)
+  const commitOrderType = useCallback((type: OrderType) => {
+    orderTypeTouchedRef.current = true
+    writeKassaOrderTypeChoice(tenant, type)
+    setOrderType(type)
+  }, [tenant])
+  useEffect(() => {
+    if (orderTypeTouchedRef.current) return
+    const stored = readKassaOrderTypeChoice(tenant)
+    if (stored) setOrderType(stored)
+  }, [tenant])
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
   /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
@@ -2003,12 +2016,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setTicketDiscountOn(false)
     scheduleKassaTapSound(playCheckout)
     if (checkoutVatMode === 'dine_in') {
-      setOrderType('DINE_IN')
+      commitOrderType('DINE_IN')
       openPaymentFlow()
       return
     }
     if (checkoutVatMode === 'takeaway') {
-      setOrderType('TAKEAWAY')
+      commitOrderType('TAKEAWAY')
       openPaymentFlow()
       return
     }
@@ -2017,7 +2030,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
     openPaymentFlow()
-  }, [checkoutVatMode, checkoutVatRates, playCheckout, openPaymentFlow])
+  }, [checkoutVatMode, checkoutVatRates, playCheckout, openPaymentFlow, commitOrderType])
   const resolveCartLineVat = useCallback(
     (line: CartItem) =>
       resolveVatPercentForCartLine(
@@ -2734,7 +2747,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     setTableNumber(newTbl)
     setDineInFloorZone(zone)
-    setOrderType('DINE_IN')
+    commitOrderType('DINE_IN')
     setShowTablePicker(false)
     setKassaZoneTab(null)
     if (openPaymentAfterFloorPlanSwitchRef.current) {
@@ -4106,10 +4119,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   const selectOrderType = useCallback((type: OrderType) => {
-    playClick()
-    setTicketDiscountOn(false)
-    setOrderType(type)
-  }, [])
+    const now = Date.now()
+    const repeat = now - orderTypeTapAtRef.current < 400
+    orderTypeTapAtRef.current = now
+    if (!repeat) {
+      playClick()
+      setTicketDiscountOn(false)
+    }
+    commitOrderType(type)
+  }, [commitOrderType])
 
   useKassaOfflineFlushBridge(tenant, flushOfflineOrdersRef)
 
@@ -6704,6 +6722,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               aria-pressed={orderType === 'DINE_IN'}
+              onPointerDown={(e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return
+                selectOrderType('DINE_IN')
+              }}
               onClick={() => selectOrderType('DINE_IN')}
               className={kassaPosOrderTypeButtonClass(orderType === 'DINE_IN')}
             >
@@ -6720,6 +6742,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               aria-pressed={orderType === 'TAKEAWAY'}
+              onPointerDown={(e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return
+                selectOrderType('TAKEAWAY')
+              }}
               onClick={() => selectOrderType('TAKEAWAY')}
               className={kassaPosOrderTypeButtonClass(orderType === 'TAKEAWAY')}
             >
@@ -6728,6 +6754,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <button
               type="button"
               aria-pressed={orderType === 'DELIVERY'}
+              onPointerDown={(e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return
+                selectOrderType('DELIVERY')
+              }}
               onClick={() => selectOrderType('DELIVERY')}
               className={kassaPosOrderTypeButtonClass(orderType === 'DELIVERY')}
             >
@@ -7845,12 +7875,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
         onClose={() => setShowCheckoutVatModal(false)}
         onPickDineIn={() => {
-          setOrderType('DINE_IN')
+          commitOrderType('DINE_IN')
           setShowCheckoutVatModal(false)
           openPaymentFlow()
         }}
         onPickTakeaway={() => {
-          setOrderType('TAKEAWAY')
+          commitOrderType('TAKEAWAY')
           setShowCheckoutVatModal(false)
           openPaymentFlow()
         }}
