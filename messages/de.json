@@ -2900,6 +2900,7 @@
     "subtotal": "Zwischensumme",
     "vat": "MwSt. ({rate}%)",
     "total": "GESAMT",
+    "discountLine": "Rabatt {percent}%",
     "paidWith": "Bezahlt mit:",
     "paidSplit": "Geteilt: €{cash} Bar / €{card} Karte",
     "thanks": "Danke für Ihren Besuch!",

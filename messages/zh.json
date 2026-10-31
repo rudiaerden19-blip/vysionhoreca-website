@@ -3400,6 +3400,7 @@
     "subtotal": "小计",
     "vat": "增值税 ({rate}%)",
     "total": "合计",
+    "discountLine": "折扣 {percent}%",
     "paidWith": "支付方式:",
     "paidSplit": "拆分：€{cash} 现金 / €{card} 刷卡",
     "thanks": "感谢光临！",

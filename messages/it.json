@@ -3400,6 +3400,7 @@
     "subtotal": "Subtotale",
     "vat": "IVA ({rate}%)",
     "total": "TOTALE",
+    "discountLine": "Sconto {percent}%",
     "paidWith": "Pagato con:",
     "paidSplit": "Diviso: €{cash} contanti / €{card} carta",
     "thanks": "Grazie per la visita!",

@@ -3993,6 +3993,7 @@
     "subtotal": "Subtotaal",
     "vat": "BTW ({rate}%)",
     "total": "TOTAAL",
+    "discountLine": "Korting {percent}%",
     "paidWith": "Betaald met:",
     "paidSplit": "Gesplitst: €{cash} contant / €{card} kaart",
     "thanks": "Bedankt voor uw bezoek!",

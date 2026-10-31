@@ -3993,6 +3993,7 @@
     "subtotal": "Subtotal",
     "vat": "VAT ({rate}%)",
     "total": "TOTAL",
+    "discountLine": "Discount {percent}%",
     "paidWith": "Paid with:",
     "paidSplit": "Split: €{cash} cash / €{card} card",
     "thanks": "Thank you for your visit!",

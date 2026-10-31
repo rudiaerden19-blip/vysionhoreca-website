@@ -63,6 +63,9 @@ export interface KassaLastOrderReceipt {
   checkoutReference?: string
   items: KassaCartItem[]
   total: number
+  /** Oh Green: korting op de hele rekening, afgetrokken vóór het totaal op de bon. */
+  discountAmount?: number
+  discountPercent?: number
   /** Meerdere tarieven (o.a. categorie-BTW); leeg/ontbreekt = legacy enkelvoudig tarief. */
   vatSplit?: KassaReceiptVatLine[]
   subtotalExclVat?: number

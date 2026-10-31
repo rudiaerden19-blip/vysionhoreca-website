@@ -3400,6 +3400,7 @@
     "subtotal": "小計",
     "vat": "税 ({rate}%)",
     "total": "合計",
+    "discountLine": "割引 {percent}%",
     "paidWith": "支払い:",
     "paidSplit": "分割: €{cash} 現金 / €{card} カード",
     "thanks": "ご来店ありがとうございます",

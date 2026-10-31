@@ -2900,6 +2900,7 @@
     "subtotal": "Sous-total",
     "vat": "TVA ({rate}%)",
     "total": "TOTAL",
+    "discountLine": "Réduction {percent}%",
     "paidWith": "Payé avec :",
     "paidSplit": "Répartition : €{cash} espèces / €{card} carte",
     "thanks": "Merci de votre visite !",

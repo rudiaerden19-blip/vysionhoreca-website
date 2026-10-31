@@ -120,6 +120,12 @@ import {
   KASSA_BLONKYS_KEEP_CHROME_CLASS,
 } from '@/lib/blonkys-flat-kassa-buttons'
 import {
+  isOhGreenKassaTenant,
+  kassaCartLinesPricedToGross,
+  kassaLineGrossEuro,
+  kassaTicketDiscountFromGross,
+} from '@/lib/kassa-oh-green-discount'
+import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
@@ -3492,6 +3498,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }, 0),
     [billLines],
   )
+  const ohGreenKassa = isOhGreenKassaTenant(tenant, tenantInfo?.business_name)
+  const [ticketDiscountOn, setTicketDiscountOn] = useState(false)
+  const ticketDiscountActive = ohGreenKassa && ticketDiscountOn && total > 0
+  const ticketDiscount = useMemo(
+    () => (ticketDiscountActive ? kassaTicketDiscountFromGross(total) : { discount: 0, payable: Math.round(total * 100) / 100 }),
+    [ticketDiscountActive, total],
+  )
+  const payableTotal = ticketDiscount.payable
+  useEffect(() => {
+    if (billLines.length === 0 && ticketDiscountOn) setTicketDiscountOn(false)
+  }, [billLines.length, ticketDiscountOn])
 
   const jetonOrderLines = useMemo(
     () =>
@@ -3710,7 +3727,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
     const fallbackVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
-    const totalInclVat = Math.round(total * 100) / 100
+    const totalInclVat = Math.round(payableTotal * 100) / 100
 
     let msg: KassaCustomerDisplayMessage
     const thankYouActive =
@@ -3802,7 +3819,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     klantschermEnabled,
     billLines,
     billLinesByCategory,
-    total,
+    payableTotal,
     showPaymentModal,
     showSplitModal,
     showTerminalPayModal,
@@ -4160,7 +4177,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (method === 'SPLIT') {
       const sc = splitAmounts?.cash ?? 0
       const sd = splitAmounts?.card ?? 0
-      if (Math.abs(total - sc - sd) > 0.02) {
+      if (Math.abs(payableTotal - sc - sd) > 0.02) {
         releasePayInFlight()
         return
       }
@@ -4177,7 +4194,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const freshVatLookup = categoryVatLookup
     const freshProductCategoryById = productCategoryById
     const freshProds = products
-    const linesForVat = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
+    const linesForVatBase = hydrateKassaCartItemsFromCatalog(billLines, freshProds)
+    const chargeTotal = Math.round(payableTotal * 100) / 100
+    const discountEuro = Math.round((total - chargeTotal) * 100) / 100
+    const linesForVat =
+      discountEuro > 0 ? kassaCartLinesPricedToGross(linesForVatBase, chargeTotal) : linesForVatBase
     const resolveLineVatAtCheckout = (line: (typeof billLines)[number]) =>
       resolveVatPercentForCartLine(
         line.product,
@@ -4189,8 +4210,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         line.choices,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
-    if (Math.abs(vatSplit.grossTotal - total) > 0.03) {
-      console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total })
+    if (Math.abs(vatSplit.grossTotal - chargeTotal) > 0.03) {
+      console.warn('[kassa] btw-split vs mandtotaal mismatched', { split: vatSplit.grossTotal, total: chargeTotal })
     }
     const subtotal = vatSplit.subtotalExcl
     const tax = vatSplit.totalTax
@@ -4217,16 +4238,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       customer_notes: customerTableLabel,
       subtotal: Math.round(subtotal * 100) / 100,
       tax: Math.round(tax * 100) / 100,
-      total: total,
+      total: chargeTotal,
+      ...(discountEuro > 0 ? { discount_amount: discountEuro } : {}),
       kassa_staff_id: activeKassaStaff?.id ?? null,
-      items: billLines.map((i) => ({
-        product_id: i.product.id,
-        name: i.product.name,
-        price: i.product.price,
-        quantity: i.quantity,
-        btw_percentage: resolveLineVatAtCheckout(i),
-        options: (i.choices || []).map((c: any) => ({ name: c.choiceName || c.name || '', price: c.price || 0 })),
-      })),
+      items: billLines.map((i, index) => {
+        const priced = linesForVat[index] ?? i
+        const row: Record<string, unknown> = {
+          product_id: i.product.id,
+          name: i.product.name,
+          price: discountEuro > 0 ? priced.product.price : i.product.price,
+          quantity: i.quantity,
+          btw_percentage: resolveLineVatAtCheckout(i),
+          options: (i.choices || []).map((c: { choiceName?: string; name?: string; price?: number }) => ({
+            name: c.choiceName || c.name || '',
+            price: discountEuro > 0 ? 0 : c.price || 0,
+          })),
+        }
+        if (discountEuro > 0) row.line_total = kassaLineGrossEuro(priced)
+        return row
+      }),
       created_at: createdAt.toISOString(),
     }
 
@@ -4252,7 +4282,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setCustomerDisplayThankYou(null)
     }
 
-    showKlantschermThankYou(total)
+    showKlantschermThankYou(chargeTotal)
 
     const wantJetonQuickSuccessClose = method === 'JETON' && kassaJetonQuickSuccess
     clearLastOrderOnSuccessCloseRef.current = wantJetonQuickSuccessClose
@@ -4267,7 +4297,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         kassaClientUuid: kassa_client_uuid,
         checkoutReference: shortRef,
         items: sortKassaCartLinesByMenuCategory([...billLines], categories),
-        total,
+        total: chargeTotal,
+        discountAmount: discountEuro > 0 ? discountEuro : undefined,
+        discountPercent: discountEuro > 0 ? 20 : undefined,
         vatSplit: vatSplit.byRate.map((l) => ({
           rate: l.rate,
           baseExcl: l.baseExcl,
@@ -4688,6 +4720,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
       }
     }
+    if ((order.discountAmount ?? 0) > 0) {
+      bonLines.push(
+        `${t('kassaReceipt.discountLine').replace('{percent}', String(order.discountPercent ?? 20))}  EUR -${order.discountAmount!.toFixed(2)}`,
+      )
+    }
     bonLines.push('--------------------------------')
     bonLines.push(`${t('kassaReceipt.subtotal')}  EUR ${subtotal.toFixed(2)}`)
     if (receiptVatRows.length >= 1) {
@@ -4741,12 +4778,22 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             orderNumber: order.orderNumber,
             orderType: order.orderType,
             tableNumber: receiptTableNr || null,
-            items: kassaNameAccountReceiptDisplayItems(order).map(i => ({
-              quantity: i.quantity,
-              name: i.product.name,
-              price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-              choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-            })),
+            items: [
+              ...kassaNameAccountReceiptDisplayItems(order).map(i => ({
+                quantity: i.quantity,
+                name: i.product.name,
+                price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+                choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
+              })),
+              ...((order.discountAmount ?? 0) > 0
+                ? [{
+                    quantity: 1,
+                    name: t('kassaReceipt.discountLine').replace('{percent}', String(order.discountPercent ?? 20)),
+                    price: -Math.round(order.discountAmount! * 100) / 100,
+                    choices: [] as { name: string; price: number }[],
+                  }]
+                : []),
+            ],
             subtotal,
             tax,
             total: order.total,
@@ -4800,6 +4847,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
         ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€'+ c.price.toFixed(2) : ''}</span></div>`).join('')}`
       }).join('')}
+      ${(order.discountAmount ?? 0) > 0 ? `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.discountLine').replace('{percent}', String(order.discountPercent ?? 20)))}</span><span>-€${order.discountAmount!.toFixed(2)}</span></div>` : ''}
       <div class="divider-solid"></div>
       <div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.subtotal'))}</span><span>€${subtotal.toFixed(2)}</span></div>
       ${
@@ -5047,11 +5095,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
       }
 
-      const draftSplit = computeInclusiveVatSplitFromCart(draftBonLineItems, resolveCartLineVat)
+      const draftVatLines =
+        ticketDiscount.discount > 0
+          ? kassaCartLinesPricedToGross(draftBonLineItems, payableTotal)
+          : draftBonLineItems
+      const draftSplit = computeInclusiveVatSplitFromCart(draftVatLines, resolveCartLineVat)
       const draftOrder: KassaLastOrderReceipt = {
         orderNumber: 0,
         items: sortKassaCartLinesByMenuCategory(draftBonLineItems, categories),
-        total: draftBonTotal,
+        total: payableTotal,
+        discountAmount: ticketDiscount.discount > 0 ? ticketDiscount.discount : undefined,
+        discountPercent: ticketDiscount.discount > 0 ? 20 : undefined,
         vatSplit: draftSplit.byRate.map((l) => ({
           rate: l.rate,
           baseExcl: l.baseExcl,
@@ -7009,7 +7063,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     kassaCompactChrome || kassaSidebarFooterTier !== 'dense'? 'text-2xl sm:text-[1.65rem]': 'text-xl'
                   }`}
                 >
-                  €{total.toFixed(2)}
+                  €{payableTotal.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -7191,6 +7245,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
               </button>
+              {ohGreenKassa ? (
+                <button
+                  type="button"
+                  data-testid="kassa-ticket-discount"
+                  aria-pressed={ticketDiscountOn}
+                  title="-20%"
+                  disabled={billLines.length === 0 || payInFlight}
+                  onClick={() => {
+                    playClick()
+                    setTicketDiscountOn((on) => !on)
+                  }}
+                  className={`flex w-[4.5rem] shrink-0 items-center justify-center px-1 text-sm font-bold ${kassaPosButtonClass(ticketDiscountOn, posChrome)} ${
+                    kassaWide15Chrome ? 'min-h-[2.75rem] py-2' : kassaCompactChrome ? 'min-h-[4rem] py-3.5' : 'min-h-[3.5rem] py-3'
+                  }`}
+                >
+                  -20%
+                </button>
+              ) : null}
               <button
                 type="button"
                 data-testid="kassa-checkout"
@@ -7250,7 +7322,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 <span className={`truncate text-right text-xl font-bold tabular-nums ${
                   kassaClassicDark ? 'text-red-500' : 'text-black'
                 }`}>
-                  €{total.toFixed(2)}
+                  €{payableTotal.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -7449,6 +7521,30 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 {t('kassaApp.numpadToggle')}
               </button>
+              {ohGreenKassa ? (
+                <button
+                  type="button"
+                  data-testid="kassa-ticket-discount"
+                  aria-pressed={ticketDiscountOn}
+                  title="-20%"
+                  disabled={billLines.length === 0 || payInFlight}
+                  onClick={() => {
+                    playClick()
+                    setTicketDiscountOn((on) => !on)
+                  }}
+                  className={`flex w-[4.5rem] shrink-0 items-center justify-center rounded-xl px-1 text-sm font-bold ${
+                    kassaLight
+                      ? ticketDiscountOn
+                        ? KASSA_LIGHT_BTN_FACE_ON
+                        : KASSA_LIGHT_BTN_FACE
+                      : ticketDiscountOn
+                        ? KASSA_CLASSIC_ACTION_BTN_FACE_ON
+                        : KASSA_CLASSIC_ACTION_BTN_FACE
+                  } ${kassaWide15Chrome ? 'min-h-[2.6rem] py-1.5' : 'min-h-[3.5rem] py-3'}`}
+                >
+                  -20%
+                </button>
+              ) : null}
               <button
                 type="button"
                 data-testid="kassa-checkout"
@@ -7801,7 +7897,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {kassaJetonEnabled ? (
         <KassaJetonPaymentModal
           open={showJetonPaymentModal}
-          totalEuros={total}
+          totalEuros={payableTotal}
           orderLines={jetonOrderLines}
           denoms={kassaJetonDenoms}
           salePoint={kassaJetonSalePoint}
@@ -7840,7 +7936,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {/* ── Betaalmodal / split / succes ── */}
       <KassaPaymentModal
         open={showPaymentModal}
-        total={total}
+        total={payableTotal}
         options={paymentMethodOptions}
         payBusy={payInFlight}
         onOpenJeton={
@@ -7888,8 +7984,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         onOpenSplit={() => {
           if (payInFlightRef.current) return
           setSplitCash(0)
-          setSplitCard(total)
-          if (klantschermEnabled) setCustomerDisplayShowQr(total > 0)
+          setSplitCard(payableTotal)
+          if (klantschermEnabled) setCustomerDisplayShowQr(payableTotal > 0)
           setShowSplitModal(true)
           setShowPaymentModal(false)
         }}
@@ -7899,7 +7995,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <KassaTerminalPayModal
         open={showTerminalPayModal}
         tenantSlug={tenant}
-        total={total}
+        total={payableTotal}
         method={terminalPayMethod}
         terminals={paymentTerminals}
         appearance={kassaAppearanceDark ? 'dark' : 'light'}
@@ -7937,7 +8033,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (!pending || payInFlightRef.current) return
           if (!lockPayInFlight()) return
           const paidTotal =
-            pending.kind === 'split' ? pending.cash + pending.card : total
+            pending.kind === 'split' ? pending.cash + pending.card : payableTotal
           flushSync(() => {
             setKlantschermBankPayPending(null)
             setCustomerDisplayShowQr(false)
@@ -7953,7 +8049,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
       <KassaSplitPaymentModal
         open={showSplitModal}
-        total={total}
+        total={payableTotal}
         splitCash={splitCash}
         splitCard={splitCard}
         setSplitCash={setSplitCash}

@@ -3400,6 +3400,7 @@
     "subtotal": "المجموع الفرعي",
     "vat": "ضريبة ({rate}%)",
     "total": "الإجمالي",
+    "discountLine": "خصم {percent}%",
     "paidWith": "طُبع بـ:",
     "paidSplit": "مقسّم: €{cash} نقداً / €{card} بطاقة",
     "thanks": "شكراً لزيارتك!",
