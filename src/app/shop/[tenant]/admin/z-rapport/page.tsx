@@ -48,6 +48,7 @@ import {
 import { fetchZReportVatContextForTenant } from '@/lib/z-report-vat-context'
 import { buildZReportDayAmountsFromOrders } from '@/lib/z-report-day-builder'
 import { fireBillitLagoonZDaySync } from '@/lib/billit-lagoon-sync-client'
+import { isBillitLagoonPilotTenant } from '@/lib/billit-lagoon-pilot'
 import {
   buildZReportVatRows,
   formatZReportEuro,
@@ -200,6 +201,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [emailAddress, setEmailAddress] = useState('')
   const [sendingEmail, setSendingEmail] = useState(false)
+  const [billitSending, setBillitSending] = useState(false)
+  const [billitNote, setBillitNote] = useState('')
   const [monthAccountantEmail, setMonthAccountantEmail] = useState('')
   const [sendingMonthEmail, setSendingMonthEmail] = useState(false)
   const [selectedMonthForEmail, setSelectedMonthForEmail] = useState(() =>
@@ -1330,6 +1333,33 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     monthDayRows.some((d) => (d.taxByRate[rate] || 0) > 0 || (d.baseByRate[rate] || 0) > 0),
   )
 
+  const resendBillitDay = async () => {
+    if (!isBillitLagoonPilotTenant(params.tenant)) return
+    setBillitSending(true)
+    setBillitNote('')
+    try {
+      const res = await authFetch('/api/integrations/billit/sync-z-day', {
+        method: 'POST',
+        body: JSON.stringify({ tenantSlug: params.tenant, reportDate: selectedDate }),
+      })
+      const json = (await res.json().catch(() => ({}))) as {
+        ok?: boolean
+        skipped?: boolean
+        reason?: string
+      }
+      if (json.skipped && json.reason === 'already_synced') {
+        setBillitNote(t('zReport.billitResendStillThere'))
+      } else if (!res.ok || json.ok === false) {
+        setBillitNote(t('zReport.billitResendFail'))
+      } else {
+        setBillitNote(t('zReport.billitResendOk'))
+      }
+    } catch {
+      setBillitNote(t('zReport.billitResendFail'))
+    }
+    setBillitSending(false)
+  }
+
   const isDayClosed = currentSavedReport?.is_closed === true
   const ownerEveningCloseOn = zReportOwnerEveningCloseEnabled(
     businessInfo?.z_report_owner_evening_close,
@@ -1573,6 +1603,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             <p className="text-green-700 text-sm">
               Afgesloten op {currentSavedReport?.closed_at ? new Date(currentSavedReport.closed_at).toLocaleString('nl-BE') : '—'} · Fiscale registratie immutabel (GKS compliant)
             </p>
+            {isBillitLagoonPilotTenant(params.tenant) && (
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => void resendBillitDay()}
+                  disabled={billitSending}
+                  className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl font-medium disabled:opacity-60"
+                >
+                  {billitSending ? t('zReport.billitResendWorking') : t('zReport.billitResendButton')}
+                </button>
+                <p className="text-sm text-green-900">{billitNote || t('zReport.billitResendHint')}</p>
+              </div>
+            )}
             {archiveMismatch && (
               <p className="text-amber-800 text-sm mt-2 font-medium">
                 {t('zReport.archiveMismatchWarning')

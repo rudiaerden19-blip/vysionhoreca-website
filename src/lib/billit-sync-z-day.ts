@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { billitCreateOrder } from '@/lib/billit-api-client'
+import { billitCreateOrder, billitOrderExists } from '@/lib/billit-api-client'
 import {
   BILLIT_LAGOON_DAILY_CUSTOMER_PARTY_ID,
   BILLIT_LAGOON_SUPPLIER_PARTY_ID,
@@ -154,7 +154,18 @@ export async function syncBillitLagoonZDay(
     .maybeSingle()
 
   if (existingLog?.status === 'ok') {
-    return { ok: true, skipped: true, reason: 'already_synced' }
+    const previousId = String(existingLog.billit_order_id || '').trim()
+    if (previousId) {
+      const stillThere = await billitOrderExists(config, previousId)
+      if (stillThere === true) {
+        return { ok: true, skipped: true, reason: 'already_synced' }
+      }
+      if (stillThere === null) {
+        return { ok: false, error: 'Billit niet bereikbaar' }
+      }
+    } else {
+      return { ok: true, skipped: true, reason: 'already_synced' }
+    }
   }
 
   const { data: report, error: reportErr } = await client

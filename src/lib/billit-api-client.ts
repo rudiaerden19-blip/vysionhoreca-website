@@ -125,6 +125,34 @@ export async function billitCreateOrder(
   return { orderId, raw }
 }
 
+/** true = factuur staat nog in Billit, false = verwijderd, null = Billit niet bereikbaar. */
+export async function billitOrderExists(
+  config: BillitLagoonEnvConfig,
+  orderId: string,
+): Promise<boolean | null> {
+  const id = orderId.trim()
+  if (!id) return false
+  const url = `${config.apiBaseUrl.replace(/\/$/, '')}/v1/orders/${encodeURIComponent(id)}`
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...billitAuthHeaders(config),
+  }
+  if (!config.apiKey?.trim()) {
+    if (!config.clientId?.trim() || !config.clientSecret?.trim()) return null
+    const token = await billitFetchAccessToken({
+      apiBaseUrl: config.apiBaseUrl,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret,
+      grantType: config.grantType || 'client_credentials',
+    })
+    headers.Authorization = `Bearer ${token}`
+  }
+  const res = await fetch(url, { headers })
+  if (res.status === 404) return false
+  if (!res.ok) return null
+  return true
+}
+
 /** Tests / server reset */
 export function resetBillitTokenCacheForTests(): void {
   tokenCache = null
