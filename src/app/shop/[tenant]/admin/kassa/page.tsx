@@ -6233,59 +6233,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
           {isTheLagoonTenant(tenant) ? (
-            <>
-              <button
-                type="button"
-                data-testid="kassa-quick-menu"
-                aria-pressed={kassaQuickMenuVisible}
-                onClick={toggleKassaQuickMenu}
-                title={t('kassaApp.quickMenu')}
-                className={`${kassaDarkHeaderBtnShell} px-3 sm:px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)}`}
-              >
-                <span className="truncate">{t('kassaApp.quickMenu')}</span>
-              </button>
-              {showSidebarOpRekeningButton ? (
-                <button
-                  type="button"
-                  data-testid="kassa-sidebar-op-rekening"
-                  onPointerDown={() => prefetchKassaNameTabs(tenant)}
-                  onClick={openNameAccountModalFromSidebar}
-                  title={t('kassaOnAccount.title')}
-                  aria-label={t('kassaOnAccount.title')}
-                  className={`${kassaDarkHeaderBtnShell} px-3 sm:px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)}`}
-                >
-                  <span className="truncate">{t('kassaOnAccount.title')}</span>
-                </button>
-              ) : null}
-              <button
-                type="button"
-                onClick={clearCart}
-                disabled={billLines.length === 0}
-                title={t('kassaApp.remove')}
-                aria-label={t('kassaApp.remove')}
-                className={
-                  posChrome === 'speels'
-                    ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsRedGlossButtonClass(false)} disabled:pointer-events-none disabled:opacity-45`
-                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosRemoveButtonClass(posChrome)} disabled:pointer-events-none disabled:opacity-45`
-                }
-              >
-                <span className="truncate">{t('kassaApp.remove')}</span>
-              </button>
-              <button
-                type="button"
-                aria-pressed={numpadPanelVisible}
-                data-testid="kassa-numpad-toggle"
-                title={t('kassaApp.numpadToggle')}
-                aria-label={t('kassaApp.numpadToggle')}
-                onClick={() => {
-                  playClick()
-                  setNumpadPanelVisible((v) => !v)
-                }}
-                className={`${kassaDarkHeaderBtnShell} px-3 sm:px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(numpadPanelVisible, posChrome)}`}
-              >
-                <span className="truncate">{t('kassaApp.numpadToggle')}</span>
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={clearCart}
+              disabled={billLines.length === 0}
+              title={t('kassaApp.remove')}
+              aria-label={t('kassaApp.remove')}
+              className={
+                posChrome === 'speels'
+                  ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsRedGlossButtonClass(false)} disabled:pointer-events-none disabled:opacity-45`
+                  : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosRemoveButtonClass(posChrome)} disabled:pointer-events-none disabled:opacity-45`
+              }
+            >
+              <span className="truncate">{t('kassaApp.remove')}</span>
+            </button>
           ) : null}
 
           {isOnline !== null && kassaPosLuxury ? (
@@ -6861,6 +6822,47 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className={kassaSidebarActionLabelClass}>{t('kassaApp.orderTypeDelivery')}</span>
             </button>
           </div>
+          {isTheLagoonTenant(tenant) ? (
+            <div className={`flex ${kassaSidebarRowGapClass}`}>
+              <button
+                type="button"
+                data-testid="kassa-quick-menu"
+                aria-pressed={kassaQuickMenuVisible}
+                onClick={toggleKassaQuickMenu}
+                title={t('kassaApp.quickMenu')}
+                className={kassaPosOrderTypeButtonClass(kassaQuickMenuVisible)}
+              >
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.quickMenu')}</span>
+              </button>
+              {showSidebarOpRekeningButton ? (
+                <button
+                  type="button"
+                  data-testid="kassa-sidebar-op-rekening"
+                  onPointerDown={() => prefetchKassaNameTabs(tenant)}
+                  onClick={openNameAccountModalFromSidebar}
+                  title={t('kassaOnAccount.title')}
+                  aria-label={t('kassaOnAccount.title')}
+                  className={kassaPosOrderTypeButtonClass(false)}
+                >
+                  <span className={kassaSidebarActionLabelClass}>{t('kassaOnAccount.title')}</span>
+                </button>
+              ) : null}
+              <button
+                type="button"
+                aria-pressed={numpadPanelVisible}
+                data-testid="kassa-numpad-toggle"
+                title={t('kassaApp.numpadToggle')}
+                aria-label={t('kassaApp.numpadToggle')}
+                onClick={() => {
+                  playClick()
+                  setNumpadPanelVisible((v) => !v)
+                }}
+                className={kassaPosOrderTypeButtonClass(numpadPanelVisible)}
+              >
+                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
+              </button>
+            </div>
+          ) : null}
           {orderType === 'DINE_IN' && tableNumber ? (
             <button
               type="button"
