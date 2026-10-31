@@ -7162,14 +7162,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {kassaPosLuxury ? (
           <div
             className={`sticky bottom-0 z-10 shrink-0 border-t ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass} ${
-              kassaWide15Chrome ? 'px-2 py-1.5 space-y-1.5' : kassaCompactChrome ? 'px-2.5 py-2 space-y-2': 'px-3 py-2.5 space-y-2.5'
+              isTheLagoonTenant(tenant)
+                ? 'px-2 py-1.5 space-y-1.5'
+                : kassaWide15Chrome ? 'px-2 py-1.5 space-y-1.5' : kassaCompactChrome ? 'px-2.5 py-2 space-y-2': 'px-3 py-2.5 space-y-2.5'
             }`}
           >
             <div
-              className={`flex w-full touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-3'} ${kassaFooterActionTouchMinHClass(
-                kassaChromeDensity,
-                kassaSidebarFooterTier === 'dense',
-              )}`}
+              className={`flex w-full touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-3'} ${
+                isTheLagoonTenant(tenant)
+                  ? 'min-h-[5.25rem]'
+                  : kassaFooterActionTouchMinHClass(kassaChromeDensity, kassaSidebarFooterTier === 'dense')
+              }`}
             >
               {isTheLagoonTenant(tenant) ? null : (
               <button
@@ -7193,7 +7196,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </span>
                 <span
                   className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
-                    kassaCompactChrome || kassaSidebarFooterTier !== 'dense'? 'text-2xl sm:text-[1.65rem]': 'text-xl'
+                    isTheLagoonTenant(tenant)
+                      ? 'text-3xl sm:text-[2.15rem]'
+                      : kassaCompactChrome || kassaSidebarFooterTier !== 'dense'? 'text-2xl sm:text-[1.65rem]': 'text-xl'
                   }`}
                 >
                   €{payableTotal.toFixed(2)}
@@ -7394,7 +7399,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 disabled={billLines.length === 0 || payInFlight}
                 className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosCheckoutButtonClass(posChrome)} ${
                   isTheLagoonTenant(tenant)
-                    ? 'min-h-[8.5rem] py-6 text-3xl font-bold sm:min-h-[10rem] sm:text-4xl'
+                    ? 'min-h-[4.25rem] py-3 text-2xl font-bold'
                     : kassaWide15Chrome ? 'min-h-[2.75rem] py-2 text-sm' : kassaCompactChrome ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
