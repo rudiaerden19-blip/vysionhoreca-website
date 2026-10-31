@@ -6271,6 +6271,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className="truncate">{t('kassaApp.remove')}</span>
               </button>
+              <button
+                type="button"
+                aria-pressed={numpadPanelVisible}
+                data-testid="kassa-numpad-toggle"
+                title={t('kassaApp.numpadToggle')}
+                aria-label={t('kassaApp.numpadToggle')}
+                onClick={() => {
+                  playClick()
+                  setNumpadPanelVisible((v) => !v)
+                }}
+                className={`${kassaDarkHeaderBtnShell} px-3 sm:px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(numpadPanelVisible, posChrome)}`}
+              >
+                <span className="truncate">{t('kassaApp.numpadToggle')}</span>
+              </button>
             </>
           ) : null}
 
@@ -7351,7 +7365,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )}
               </div>
             )}
-            <div className={`flex touch-manipulation select-none ${isTheLagoonTenant(tenant) ? 'items-end' : ''} ${kassaCompactChrome ? 'gap-2': 'gap-2.5'}`}>
+            <div className={`flex touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-2.5'}`}>
+              {isTheLagoonTenant(tenant) ? null : (
               <button
                 type="button"
                 aria-pressed={numpadPanelVisible}
@@ -7368,6 +7383,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
               </button>
+              )}
               <button
                 type="button"
                 data-testid="kassa-checkout"
