@@ -6233,20 +6233,45 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
           {isTheLagoonTenant(tenant) ? (
-            <button
-              type="button"
-              onClick={clearCart}
-              disabled={billLines.length === 0}
-              title={t('kassaApp.remove')}
-              aria-label={t('kassaApp.remove')}
-              className={
-                posChrome === 'speels'
-                  ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsRedGlossButtonClass(false)} disabled:pointer-events-none disabled:opacity-45`
-                  : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosRemoveButtonClass(posChrome)} disabled:pointer-events-none disabled:opacity-45`
-              }
-            >
-              <span className="truncate">{t('kassaApp.remove')}</span>
-            </button>
+            <>
+              <button
+                type="button"
+                data-testid="kassa-quick-menu"
+                aria-pressed={kassaQuickMenuVisible}
+                onClick={toggleKassaQuickMenu}
+                title={t('kassaApp.quickMenu')}
+                className={`${kassaDarkHeaderBtnShell} px-3 sm:px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)}`}
+              >
+                <span className="truncate">{t('kassaApp.quickMenu')}</span>
+              </button>
+              {showSidebarOpRekeningButton ? (
+                <button
+                  type="button"
+                  data-testid="kassa-sidebar-op-rekening"
+                  onPointerDown={() => prefetchKassaNameTabs(tenant)}
+                  onClick={openNameAccountModalFromSidebar}
+                  title={t('kassaOnAccount.title')}
+                  aria-label={t('kassaOnAccount.title')}
+                  className={`${kassaDarkHeaderBtnShell} px-3 sm:px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)}`}
+                >
+                  <span className="truncate">{t('kassaOnAccount.title')}</span>
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={clearCart}
+                disabled={billLines.length === 0}
+                title={t('kassaApp.remove')}
+                aria-label={t('kassaApp.remove')}
+                className={
+                  posChrome === 'speels'
+                    ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsRedGlossButtonClass(false)} disabled:pointer-events-none disabled:opacity-45`
+                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosRemoveButtonClass(posChrome)} disabled:pointer-events-none disabled:opacity-45`
+                }
+              >
+                <span className="truncate">{t('kassaApp.remove')}</span>
+              </button>
+            </>
           ) : null}
 
           {isOnline !== null && kassaPosLuxury ? (
@@ -7132,6 +7157,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaSidebarFooterTier === 'dense',
               )}`}
             >
+              {isTheLagoonTenant(tenant) ? null : (
               <button
                 type="button"
                 data-testid="kassa-quick-menu"
@@ -7142,6 +7168,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className={`leading-tight ${kassaSidebarActionLabelClass}`}>{t('kassaApp.quickMenu')}</span>
               </button>
+              )}
               <div
                 role="status"
                 aria-live="polite"
@@ -7248,7 +7275,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </button>
               )}
             </div>
-            {showSidebarOpRekeningButton ? (
+            {showSidebarOpRekeningButton && !isTheLagoonTenant(tenant) ? (
               <div
                 className={`grid w-full grid-cols-2 touch-manipulation select-none ${kassaCompactChrome ? 'gap-2' : 'gap-3'}`}
               >
@@ -7324,7 +7351,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 )}
               </div>
             )}
-            <div className={`flex touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-2.5'}`}>
+            <div className={`flex touch-manipulation select-none ${isTheLagoonTenant(tenant) ? 'items-end' : ''} ${kassaCompactChrome ? 'gap-2': 'gap-2.5'}`}>
               <button
                 type="button"
                 aria-pressed={numpadPanelVisible}
@@ -7350,7 +7377,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }}
                 disabled={billLines.length === 0 || payInFlight}
                 className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosCheckoutButtonClass(posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[2.75rem] py-2 text-sm' : kassaCompactChrome ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
+                  isTheLagoonTenant(tenant)
+                    ? 'min-h-[8.5rem] py-6 text-3xl font-bold sm:min-h-[10rem] sm:text-4xl'
+                    : kassaWide15Chrome ? 'min-h-[2.75rem] py-2 text-sm' : kassaCompactChrome ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
                 {t('kassaApp.checkout')}
