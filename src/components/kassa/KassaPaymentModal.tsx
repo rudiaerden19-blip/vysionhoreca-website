@@ -24,6 +24,7 @@ export function KassaPaymentModal({
   onOpenJeton,
   jetonLabel,
   appearance = 'light',
+  ticketDiscount,
 }: {
   open: boolean
   total: number
@@ -36,6 +37,8 @@ export function KassaPaymentModal({
   onOpenJeton?: () => void
   jetonLabel?: string
   appearance?: 'light' |  'dark'
+  /** Alleen Oh Green: −20% op de hele rekening, in dit venster. */
+  ticketDiscount?: { active: boolean; onToggle: () => void }
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
@@ -117,6 +120,25 @@ export function KassaPaymentModal({
             >
               <span style={{ color: '#8b5cf6'}}>{t('kassaApp.splitPay')}</span>
             </button>
+            {ticketDiscount ? (
+              <button
+                type="button"
+                data-testid="kassa-ticket-discount"
+                aria-pressed={ticketDiscount.active}
+                disabled={payLocked}
+                onClick={() => {
+                  if (payLocked) return
+                  ticketDiscount.onToggle()
+                }}
+                className={`col-span-2 ${btnTile} disabled:opacity-40 disabled:pointer-events-none disabled:scale-100`}
+                style={{
+                  borderColor: '#22c55e',
+                  background: ticketDiscount.active ? (dark ? '#14532d' : '#dcfce7') : undefined,
+                }}
+              >
+                <span style={{ color: dark ? '#4ade80' : '#15803d' }}>-20%</span>
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

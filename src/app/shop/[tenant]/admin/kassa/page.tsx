@@ -7245,24 +7245,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
               </button>
-              {ohGreenKassa ? (
-                <button
-                  type="button"
-                  data-testid="kassa-ticket-discount"
-                  aria-pressed={ticketDiscountOn}
-                  title="-20%"
-                  disabled={billLines.length === 0 || payInFlight}
-                  onClick={() => {
-                    playClick()
-                    setTicketDiscountOn((on) => !on)
-                  }}
-                  className={`flex w-[4.5rem] shrink-0 items-center justify-center px-1 text-sm font-bold ${kassaPosButtonClass(ticketDiscountOn, posChrome)} ${
-                    kassaWide15Chrome ? 'min-h-[2.75rem] py-2' : kassaCompactChrome ? 'min-h-[4rem] py-3.5' : 'min-h-[3.5rem] py-3'
-                  }`}
-                >
-                  -20%
-                </button>
-              ) : null}
               <button
                 type="button"
                 data-testid="kassa-checkout"
@@ -7521,30 +7503,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               >
                 {t('kassaApp.numpadToggle')}
               </button>
-              {ohGreenKassa ? (
-                <button
-                  type="button"
-                  data-testid="kassa-ticket-discount"
-                  aria-pressed={ticketDiscountOn}
-                  title="-20%"
-                  disabled={billLines.length === 0 || payInFlight}
-                  onClick={() => {
-                    playClick()
-                    setTicketDiscountOn((on) => !on)
-                  }}
-                  className={`flex w-[4.5rem] shrink-0 items-center justify-center rounded-xl px-1 text-sm font-bold ${
-                    kassaLight
-                      ? ticketDiscountOn
-                        ? KASSA_LIGHT_BTN_FACE_ON
-                        : KASSA_LIGHT_BTN_FACE
-                      : ticketDiscountOn
-                        ? KASSA_CLASSIC_ACTION_BTN_FACE_ON
-                        : KASSA_CLASSIC_ACTION_BTN_FACE
-                  } ${kassaWide15Chrome ? 'min-h-[2.6rem] py-1.5' : 'min-h-[3.5rem] py-3'}`}
-                >
-                  -20%
-                </button>
-              ) : null}
               <button
                 type="button"
                 data-testid="kassa-checkout"
@@ -7956,7 +7914,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           if (payInFlight) return
           setCustomerDisplayShowQr(false)
           setShowPaymentModal(false)
+          setTicketDiscountOn(false)
         }}
+        ticketDiscount={
+          ohGreenKassa
+            ? {
+                active: ticketDiscountOn,
+                onToggle: () => {
+                  playClick()
+                  setTicketDiscountOn((on) => !on)
+                },
+              }
+            : undefined
+        }
         onPay={(method) => {
           if (payInFlightRef.current) return
           if (method === 'CASH') {
