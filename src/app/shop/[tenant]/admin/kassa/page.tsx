@@ -201,10 +201,7 @@ import {
   isLikelyOfflineOrNetworkPersistFailure,
 } from '@/lib/kassa-supabase-guards'
 import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-number'
-import {
-  formatKassaHeaderWeekdayClockParts,
-  formatKassaNumpadHeaderDate,
-} from '@/lib/format-kassa-header-date'
+import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
 import { readKassaOrderTypeChoice, writeKassaOrderTypeChoice } from '@/lib/kassa-order-type-choice'
@@ -1303,15 +1300,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const id = window.setInterval(() => setNumpadBarDate(new Date()), 60_000)
     return () => window.clearInterval(id)
   }, [])
-  const [kassaSidebarClock, setKassaSidebarClock] = useState(() => new Date())
-  useEffect(() => {
-    const id = window.setInterval(() => setKassaSidebarClock(new Date()), 1000)
-    return () => window.clearInterval(id)
-  }, [])
-  const kassaHeaderClockParts = useMemo(
-    () => formatKassaHeaderWeekdayClockParts(kassaSidebarClock, locale),
-    [kassaSidebarClock, locale],
-  )
   const numpadHeaderDateLabel = useMemo(
     () => formatKassaNumpadHeaderDate(numpadBarDate, locale),
     [numpadBarDate, locale],
@@ -6244,30 +6232,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             kassaPosLuxury ? 'ml-auto' : ''
           }`}
         >
-          {kassaPosLuxury ? (
-            <time
-              dateTime={kassaSidebarClock.toISOString()}
-              className={`pointer-events-none absolute right-full top-1/2 z-10 flex -translate-x-[3cm] -translate-y-1/2 items-center gap-3 whitespace-nowrap px-1 font-bold tracking-[0.04em] sm:gap-4 sm:px-2 ${
-                posChrome === 'speels'
-                  ? 'text-sm text-[#b0b0b0] sm:text-base'
-                  : 'text-sm text-zinc-100 sm:text-base'
-              }`}
-            >
-              <span>{kassaHeaderClockParts.weekday}</span>
-              <span>{kassaHeaderClockParts.datePart}</span>
-              <span className="inline-flex tabular-nums items-baseline">
-                {kassaHeaderClockParts.hours}
-                <span
-                  className={kassaHeaderClockParts.colonVisible ? 'opacity-100' : 'opacity-0'}
-                  aria-hidden
-                >
-                  :
-                </span>
-                {kassaHeaderClockParts.minutes}
-              </span>
-            </time>
-          ) : null}
-
           {isOnline !== null && kassaPosLuxury ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
