@@ -6117,10 +6117,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               target="_blank"
               rel="noopener noreferrer"
               data-testid="kassa-hotmix-link"
-              title="Hotmix"
-              className={`${headerQuickLinkBtnClass} min-h-[3.15rem] px-4 sm:min-h-[3.45rem] sm:px-5`}
+              title="Hotmix Radio"
+              className={`${headerQuickLinkBtnClass} shrink-0 min-h-[3.15rem] px-4 sm:min-h-[3.45rem] sm:px-5`}
             >
-              <span className="truncate text-base font-bold leading-none sm:text-lg">Hotmix</span>
+              <span className="whitespace-nowrap text-base font-bold leading-none sm:text-lg">Hotmix Radio</span>
             </a>
           ) : null}
 
