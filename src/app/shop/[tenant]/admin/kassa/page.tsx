@@ -6116,9 +6116,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onClick={() => setHotmixOpen(true)}
               data-testid="kassa-hotmix-link"
               title="Hotmix Radio"
-              className={`${headerQuickLinkBtnClass} shrink-0 min-h-[3.15rem] px-4 sm:min-h-[3.45rem] sm:px-5`}
+              className={`${headerQuickLinkBtnClass} gap-0.5 sm:gap-1`}
             >
-              <span className="whitespace-nowrap text-base font-bold leading-none sm:text-lg">Hotmix Radio</span>
+              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>Hotmix Radio</span>
             </button>
           ) : null}
 
