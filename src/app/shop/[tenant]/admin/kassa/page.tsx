@@ -2000,6 +2000,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const requestCheckout = useCallback(() => {
     if (payInFlightRef.current) return
+    setTicketDiscountOn(false)
     scheduleKassaTapSound(playCheckout)
     if (checkoutVatMode === 'dine_in') {
       setOrderType('DINE_IN')
@@ -2701,6 +2702,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
    * - Wissel naar andere tafel met open kar: karronde naar vorige tafel (niet mee naar nieuwe tafel).
    */
   const doSwitchToTable = (newTableNr: string, zone: FloorPlanZone) => {
+    setTicketDiscountOn(false)
     const oldZone = dineInFloorZone
     const oldTbl = kassaTableDisplayNumber(tableNumber)
     const newTbl = kassaTableDisplayNumber(newTableNr)
@@ -4105,6 +4107,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const selectOrderType = useCallback((type: OrderType) => {
     playClick()
+    setTicketDiscountOn(false)
     setOrderType(type)
   }, [])
 
@@ -4187,6 +4190,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       setShowPaymentModal(false)
       setShowJetonPaymentModal(false)
       setShowSplitModal(false)
+      setTicketDiscountOn(false)
       setCustomerDisplayShowQr(false)
       setKlantschermBankPayPending(null)
     })
