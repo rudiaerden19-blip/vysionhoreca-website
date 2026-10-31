@@ -50,27 +50,37 @@ export function isKitchenQueueOrder(o: {
   return false
 }
 
+/** Oude onafgewerkte bonnen mogen nieuwe bonnen niet uit de rij duwen. */
+const KITCHEN_QUEUE_LOOKBACK_MS = 18 * 60 * 60 * 1000
+const KITCHEN_QUEUE_FETCH_LIMIT = 200
+
+export function kitchenQueueConfirmedSince(now: Date = new Date()): string {
+  return new Date(now.getTime() - KITCHEN_QUEUE_LOOKBACK_MS).toISOString()
+}
+
 /** Combineert bevestigde webshop-/POS-betaalde rijen met open tafelmanden (één fetch-set, gesorteerd op tijd). */
 export async function fetchKitchenQueueOrders(
   client: SupabaseClient,
   tenantSlug: string,
 ): Promise<Record<string, unknown>[]> {
+  const confirmedSince = kitchenQueueConfirmedSince()
   const [r1, r2] = await Promise.all([
     client
       .from('orders')
       .select('*')
       .eq('tenant_slug', tenantSlug)
       .in('status', ['confirmed', 'preparing'])
-      .order('created_at', { ascending: true })
-      .limit(50),
+      .gte('created_at', confirmedSince)
+      .order('created_at', { ascending: false })
+      .limit(KITCHEN_QUEUE_FETCH_LIMIT),
     client
       .from('orders')
       .select('*')
       .eq('tenant_slug', tenantSlug)
       .eq('status', 'open')
       .eq('order_type', 'DINE_IN')
-      .order('created_at', { ascending: true })
-      .limit(50),
+      .order('created_at', { ascending: false })
+      .limit(KITCHEN_QUEUE_FETCH_LIMIT),
   ])
   if (r1.error) console.warn('[kitchen-queue] fetch confirmed/preparing:', r1.error.message)
   if (r2.error) console.warn('[kitchen-queue] fetch open DINE_IN:', r2.error.message)
