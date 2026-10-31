@@ -1,6 +1,8 @@
 import {
   isKitchenQueueOrder,
+  isLagoonTodayKitchenOrder,
   kitchenQueueConfirmedSince,
+  kitchenQueueTodaySince,
   parseOrdersItemsJson,
 } from '@/lib/kitchen-queue-orders'
 
@@ -11,6 +13,21 @@ describe('kitchen-queue-orders', () => {
     it('looks back 18 hours so a backlog of old tickets cannot hide new ones', () => {
       const now = new Date('2026-10-31T20:26:00.000Z')
       expect(kitchenQueueConfirmedSince(now)).toBe('2026-10-31T02:26:00.000Z')
+    })
+  })
+
+  describe('lagoon today tickets', () => {
+    it('starts at Belgium midnight', () => {
+      const now = new Date('2026-10-31T20:26:00.000Z')
+      expect(kitchenQueueTodaySince(now)).toBe('2026-10-30T23:00:00.000Z')
+    })
+
+    it('keeps beer and finished tickets from today, drops empty and klaar', () => {
+      expect(isLagoonTodayKitchenOrder({ status: 'completed', items: itemsOne })).toBe(true)
+      expect(isLagoonTodayKitchenOrder({ status: 'confirmed', items: itemsOne })).toBe(true)
+      expect(isLagoonTodayKitchenOrder({ status: 'ready', items: itemsOne })).toBe(false)
+      expect(isLagoonTodayKitchenOrder({ status: 'cancelled', items: itemsOne })).toBe(false)
+      expect(isLagoonTodayKitchenOrder({ status: 'confirmed', items: [] })).toBe(false)
     })
   })
 

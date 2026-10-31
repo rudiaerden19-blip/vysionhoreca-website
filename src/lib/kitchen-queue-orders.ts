@@ -1,10 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { belgiumLocalToUtcIso, getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import { isKassaPosOrder } from '@/lib/admin-api-order-helpers'
-import {
-  filterLagoonKitchenQueueOrder,
-  isLagoonKitchenScreenTenant,
-  loadLagoonKitchenCategoryContext,
-} from '@/lib/lagoon-kitchen-screen'
+import { isLagoonKitchenScreenTenant } from '@/lib/lagoon-kitchen-screen'
 
 export function parseOrdersItemsJson<T extends Record<string, unknown>>(rows: T[]): T[] {
   return rows.map((order) => ({
@@ -53,9 +50,25 @@ export function isKitchenQueueOrder(o: {
 /** Oude onafgewerkte bonnen mogen nieuwe bonnen niet uit de rij duwen. */
 const KITCHEN_QUEUE_LOOKBACK_MS = 18 * 60 * 60 * 1000
 const KITCHEN_QUEUE_FETCH_LIMIT = 200
+const LAGOON_TODAY_FETCH_LIMIT = 400
+
+const LAGOON_TODAY_KITCHEN_STATUSES = ['open', 'confirmed', 'preparing', 'completed'] as const
 
 export function kitchenQueueConfirmedSince(now: Date = new Date()): string {
   return new Date(now.getTime() - KITCHEN_QUEUE_LOOKBACK_MS).toISOString()
+}
+
+/** Bonnen van de Belgische kalenderdag, vanaf middernacht. */
+export function kitchenQueueTodaySince(now: Date = new Date()): string {
+  return belgiumLocalToUtcIso(getBelgiumDateString(now), '00:00')
+}
+
+/** The Lagoon: alle bonnen van vandaag op het scherm, niet alleen cocktail of koffie. */
+export function isLagoonTodayKitchenOrder(order: { status?: string; items?: unknown }): boolean {
+  const items = Array.isArray(order.items) ? order.items : []
+  if (items.length === 0) return false
+  const st = (order.status || '').toLowerCase()
+  return (LAGOON_TODAY_KITCHEN_STATUSES as readonly string[]).includes(st)
 }
 
 /** Combineert bevestigde webshop-/POS-betaalde rijen met open tafelmanden (één fetch-set, gesorteerd op tijd). */
@@ -63,6 +76,25 @@ export async function fetchKitchenQueueOrders(
   client: SupabaseClient,
   tenantSlug: string,
 ): Promise<Record<string, unknown>[]> {
+  if (isLagoonKitchenScreenTenant(tenantSlug)) {
+    const todaySince = kitchenQueueTodaySince()
+    const today = await client
+      .from('orders')
+      .select('*')
+      .eq('tenant_slug', tenantSlug)
+      .in('status', [...LAGOON_TODAY_KITCHEN_STATUSES])
+      .gte('created_at', todaySince)
+      .order('created_at', { ascending: false })
+      .limit(LAGOON_TODAY_FETCH_LIMIT)
+    if (today.error) console.warn('[kitchen-queue] fetch lagoon today:', today.error.message)
+    return parseOrdersItemsJson((today.data ?? []) as Record<string, unknown>[])
+      .filter(isLagoonTodayKitchenOrder)
+      .sort(
+        (a, b) =>
+          new Date(String(a.created_at ?? 0)).getTime() - new Date(String(b.created_at ?? 0)).getTime(),
+      )
+  }
+
   const confirmedSince = kitchenQueueConfirmedSince()
   const [r1, r2] = await Promise.all([
     client
@@ -93,19 +125,8 @@ export async function fetchKitchenQueueOrders(
   }
   const parsed = parseOrdersItemsJson([...byId.values()])
 
-  let lagoonKitchenCtx = null as Awaited<ReturnType<typeof loadLagoonKitchenCategoryContext>> | null
-  if (isLagoonKitchenScreenTenant(tenantSlug)) {
-    try {
-      lagoonKitchenCtx = await loadLagoonKitchenCategoryContext(client, tenantSlug)
-    } catch (e) {
-      console.warn('[kitchen-queue] lagoon category context failed:', e)
-    }
-  }
-
   return parsed
     .filter(isKitchenQueueOrder)
-    .map((order) => filterLagoonKitchenQueueOrder(tenantSlug, order, lagoonKitchenCtx))
-    .filter((order): order is Record<string, unknown> => order != null)
     .sort(
       (a, b) =>
         new Date(String(a.created_at ?? 0)).getTime() - new Date(String(b.created_at ?? 0)).getTime(),
