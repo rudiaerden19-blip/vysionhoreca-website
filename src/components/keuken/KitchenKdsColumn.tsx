@@ -116,7 +116,7 @@ export function KitchenKdsColumn({
 
   return (
     <article
-      className={`flex h-full w-[380px] shrink-0 flex-col border bg-transparent ${
+      className={`flex h-full w-[380px] shrink-0 flex-col border bg-transparent [touch-action:pan-x] ${
         isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
       style={{ borderColor: headerColor }}
@@ -154,7 +154,7 @@ export function KitchenKdsColumn({
 
       <div
         ref={bodyRef}
-        className="min-h-0 flex-1 cursor-pointer touch-pan-y overflow-y-auto overscroll-y-contain px-2 py-2"
+        className="min-h-0 flex-1 cursor-pointer overflow-y-auto overscroll-y-contain px-2 py-2 [touch-action:pan-x_pan-y]"
         onClick={onOpen}
         onScroll={onBodyScroll}
       >

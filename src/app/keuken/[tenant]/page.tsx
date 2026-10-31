@@ -104,6 +104,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [keukenLangOpen, setKeukenLangOpen] = useState(false)
   const keukenLangRef = useRef<HTMLDivElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
+  const boardScrollRef = useRef<HTMLDivElement>(null)
   const [colsPerPage, setColsPerPage] = useState(5)
   const [kdsPage, setKdsPage] = useState(0)
   const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
@@ -445,10 +446,26 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   const kdsPageCount = Math.max(1, Math.ceil(orders.length / Math.max(1, colsPerPage)))
   const kdsPageSafe = Math.min(kdsPage, kdsPageCount - 1)
-  const kdsPageOrders = orders.slice(
-    kdsPageSafe * colsPerPage,
-    kdsPageSafe * colsPerPage + colsPerPage,
+  const kdsPageStride = Math.max(1, colsPerPage) * (KDS_COL_PX + KDS_COL_GAP_PX)
+  const scrollBoardToPage = useCallback(
+    (page: number) => {
+      const el = boardScrollRef.current
+      const next = Math.max(0, Math.min(kdsPageCount - 1, page))
+      if (!el) {
+        setKdsPage(next)
+        return
+      }
+      el.scrollTo({ left: next * kdsPageStride, behavior: 'smooth' })
+      setKdsPage(next)
+    },
+    [kdsPageCount, kdsPageStride],
   )
+  const onBoardScroll = useCallback(() => {
+    const el = boardScrollRef.current
+    if (!el) return
+    const page = Math.max(0, Math.min(kdsPageCount - 1, Math.round(el.scrollLeft / kdsPageStride)))
+    setKdsPage((prev) => (prev === page ? prev : page))
+  }, [kdsPageCount, kdsPageStride])
   const kdsPageIndexes = (() => {
     const maxButtons = 7
     if (kdsPageCount <= maxButtons) return Array.from({ length: kdsPageCount }, (_, i) => i)
@@ -644,8 +661,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <p className="mt-2 text-lg">{tx('ordersAppearHere')}</p>
           </div>
         ) : (
-          <div className="flex h-full gap-4 px-3 py-3">
-            {kdsPageOrders.map((order) => (
+          <div
+            ref={boardScrollRef}
+            onScroll={onBoardScroll}
+            className="flex h-full w-full min-w-0 touch-pan-x gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-3 py-3 [-webkit-overflow-scrolling:touch]"
+          >
+            {orders.map((order) => (
               <KitchenKdsColumn
                 key={order.id}
                 order={order}
@@ -698,7 +719,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           className={`${kdsChromeBtn} disabled:opacity-40`}
           onClick={() => {
             if (scrollTicketBodies('top')) return
-            setKdsPage(0)
+            scrollBoardToPage(0)
           }}
           disabled={!ticketScroll.up && kdsPageSafe <= 0}
           aria-label="Naar boven"
@@ -710,7 +731,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           className={`${kdsChromeBtn} disabled:opacity-40`}
           onClick={() => {
             if (scrollTicketBodies('up')) return
-            setKdsPage((p) => Math.max(0, p - 1))
+            scrollBoardToPage(kdsPageSafe - 1)
           }}
           disabled={!ticketScroll.up && kdsPageSafe <= 0}
           aria-label="Omhoog scrollen"
@@ -722,7 +743,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             key={i}
             type="button"
             className={`min-w-[2.5rem] ${i === kdsPageSafe ? kdsChromeOn : kdsChromeBtn}`}
-            onClick={() => setKdsPage(i)}
+            onClick={() => scrollBoardToPage(i)}
             aria-current={i === kdsPageSafe ? 'page' : undefined}
           >
             {i + 1}
@@ -733,7 +754,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           className={`${kdsChromeBtn} disabled:opacity-40`}
           onClick={() => {
             if (scrollTicketBodies('down')) return
-            setKdsPage((p) => Math.min(kdsPageCount - 1, p + 1))
+            scrollBoardToPage(kdsPageSafe + 1)
           }}
           disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
           aria-label="Omlaag scrollen"
@@ -745,7 +766,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           className={`${kdsChromeBtn} disabled:opacity-40`}
           onClick={() => {
             if (scrollTicketBodies('bottom')) return
-            setKdsPage(kdsPageCount - 1)
+            scrollBoardToPage(kdsPageCount - 1)
           }}
           disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
           aria-label="Naar beneden"
