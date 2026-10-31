@@ -7191,7 +7191,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 aria-live="polite"
                 className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)}`}
               >
-                <span className={`shrink-0 text-base font-bold tracking-[0.04em] sm:text-lg ${ui.numpadMeta}`}>
+                <span className={`shrink-0 font-bold tracking-[0.04em] ${ui.numpadMeta} ${
+                  isTheLagoonTenant(tenant) ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'
+                }`}>
                   {t('kassaApp.cartTotal')}
                 </span>
                 <span
