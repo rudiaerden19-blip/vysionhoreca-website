@@ -3374,7 +3374,14 @@
     "disabledHint": "Attiva sopra «Consenti timbratura in cassa». Senza questa opzione nessuno può timbrare.",
     "clockIntro": "I dipendenti sotto possono timbrare entrata e uscita con il PIN (come in cassa). Gli orari compaiono nella registrazione ore.",
     "goToKassaSales": "Apri cassa per le vendite",
-    "refreshList": "Aggiorna elenco"
+    "refreshList": "Aggiorna elenco",
+    "salesTitle": "Vendite per dipendente",
+    "salesHint": "Scontrini di cassa pagati. Può vedere 30 giorni indietro.",
+    "salesDate": "Giorno",
+    "salesEmpty": "Nessun dipendente.",
+    "salesLoadFail": "Impossibile caricare l'elenco.",
+    "salesUnknownStaff": "Dipendente sconosciuto",
+    "salesDayTotal": "Totale di questo giorno"
   },
   "kassaReceipt": {
     "helpedBy": "Sei stato servito da {name}",

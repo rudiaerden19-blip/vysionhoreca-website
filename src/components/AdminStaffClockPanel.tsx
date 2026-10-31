@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import { authFetch } from '@/lib/auth-headers'
 import { StaffClockPinPortal } from '@/components/staff-clock/StaffClockPinPortal'
+import { StaffSalesDayList } from '@/components/StaffSalesDayList'
 import {
   appLocaleToBcp47,
   printStaffSalesSummaryReceipt,
@@ -47,6 +48,7 @@ export function AdminStaffClockPanel({
   const [pinInput, setPinInput] = useState('')
   const [pinError, setPinError] = useState<string | null>(null)
   const [summary, setSummary] = useState<SummaryState | null>(null)
+  const [salesRefresh, setSalesRefresh] = useState(0)
   /** Laat late fetch-antwoorden state overslaan na annuleren (voorkomt vastlopende busy). */
   const pinReqGen = useRef(0)
 
@@ -334,11 +336,16 @@ export function AdminStaffClockPanel({
 
       <button
         type="button"
-        onClick={() => void loadList()}
+        onClick={() => {
+          void loadList()
+          setSalesRefresh((n) => n + 1)
+        }}
         className="mt-4 w-full rounded-xl border border-gray-200 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
       >
         {t('inklokkenPage.refreshList')}
       </button>
+
+      <StaffSalesDayList tenantSlug={tenantSlug} refreshToken={salesRefresh} />
     </div>
   )
 }

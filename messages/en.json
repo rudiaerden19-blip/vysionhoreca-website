@@ -3973,7 +3973,14 @@
     "disabledHint": "Turn on “Allow clock in/out on POS” above. You can still change the setting here; staff clock in/out needs this to be enabled.",
     "clockIntro": "Staff listed below can clock in and out with their PIN (same as on the POS). Times appear in Time registration.",
     "goToKassaSales": "Open POS for sales",
-    "refreshList": "Refresh list"
+    "refreshList": "Refresh list",
+    "salesTitle": "Sales per staff member",
+    "salesHint": "Paid POS receipts. You can look back 30 days.",
+    "salesDate": "Day",
+    "salesEmpty": "No staff.",
+    "salesLoadFail": "The list could not be loaded.",
+    "salesUnknownStaff": "Unknown staff member",
+    "salesDayTotal": "Total this day"
   },
   "kassaReceipt": {
     "helpedBy": "You were helped by {name}",

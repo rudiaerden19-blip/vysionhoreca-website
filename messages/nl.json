@@ -3973,7 +3973,14 @@
     "disabledHint": "Zet hierboven «In- en uitklokken op de kassa toestaan» aan. Zonder deze optie kan niemand in- of uitklokken.",
     "clockIntro": "Onderstaande medewerkers kunnen met hun PIN in- en uitklokken (zelfde werking als op de kassa). Tijden komen in Urenregistratie.",
     "goToKassaSales": "Naar kassa voor verkoop",
-    "refreshList": "Lijst vernieuwen"
+    "refreshList": "Lijst vernieuwen",
+    "salesTitle": "Verkoop per medewerker",
+    "salesHint": "Betaalde kassabonnen. Je kan 30 dagen terugkijken.",
+    "salesDate": "Dag",
+    "salesEmpty": "Geen medewerkers.",
+    "salesLoadFail": "De lijst kon niet geladen worden.",
+    "salesUnknownStaff": "Onbekende medewerker",
+    "salesDayTotal": "Totaal deze dag"
   },
   "kassaReceipt": {
     "helpedBy": "U bent geholpen door medewerker {name}",

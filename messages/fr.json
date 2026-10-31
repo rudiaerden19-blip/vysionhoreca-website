@@ -2874,7 +2874,14 @@
     "disabledHint": "Activez ci-dessus « Autoriser le pointage entrée/sortie à la caisse ». Sans cette option, personne ne peut pointer.",
     "clockIntro": "Les employés ci-dessous peuvent pointer entrée et sortie avec leur PIN (comme à la caisse). Les heures apparaissent dans la feuille de temps.",
     "goToKassaSales": "Ouvrir la caisse pour la vente",
-    "refreshList": "Actualiser la liste"
+    "refreshList": "Actualiser la liste",
+    "salesTitle": "Ventes par employé",
+    "salesHint": "Tickets de caisse payés. Vous pouvez consulter 30 jours en arrière.",
+    "salesDate": "Jour",
+    "salesEmpty": "Aucun employé.",
+    "salesLoadFail": "La liste n'a pas pu être chargée.",
+    "salesUnknownStaff": "Employé inconnu",
+    "salesDayTotal": "Total de ce jour"
   },
   "kassaReceipt": {
     "helpedBy": "Vous avez été servi par {name}",

@@ -3374,7 +3374,14 @@
     "disabledHint": "上で「レジでの出退勤を許可する」をオンにしてください。この設定がオフのときは打刻できません。",
     "clockIntro": "下のスタッフはPINで出勤・退勤できます（レジと同じ）。記録は勤怠に反映されます。",
     "goToKassaSales": "売上のためレジを開く",
-    "refreshList": "一覧を更新"
+    "refreshList": "一覧を更新",
+    "salesTitle": "スタッフ別売上",
+    "salesHint": "支払済みのレジ伝票です。30日さかのぼれます。",
+    "salesDate": "日",
+    "salesEmpty": "スタッフがいません。",
+    "salesLoadFail": "一覧を読み込めませんでした。",
+    "salesUnknownStaff": "不明なスタッフ",
+    "salesDayTotal": "この日の合計"
   },
   "kassaReceipt": {
     "helpedBy": "担当：{name}",

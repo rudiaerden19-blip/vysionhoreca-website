@@ -2874,7 +2874,14 @@
     "disabledHint": "Aktivieren Sie oben „Ein-/Ausstempeln an der Kasse erlauben“. Ohne diese Option kann niemand ein- oder ausstempeln.",
     "clockIntro": "Die unten aufgeführten Mitarbeiter können sich mit ihrer PIN ein- und ausstempeln (wie an der Kasse). Die Zeiten erscheinen in der Zeiterfassung.",
     "goToKassaSales": "Zur Kasse für Verkauf",
-    "refreshList": "Liste aktualisieren"
+    "refreshList": "Liste aktualisieren",
+    "salesTitle": "Umsatz pro Mitarbeiter",
+    "salesHint": "Bezahlte Kassenbons. Sie können 30 Tage zurückschauen.",
+    "salesDate": "Tag",
+    "salesEmpty": "Keine Mitarbeiter.",
+    "salesLoadFail": "Die Liste konnte nicht geladen werden.",
+    "salesUnknownStaff": "Unbekannter Mitarbeiter",
+    "salesDayTotal": "Summe dieses Tages"
   },
   "kassaReceipt": {
     "helpedBy": "Sie wurden von {name} bedient",

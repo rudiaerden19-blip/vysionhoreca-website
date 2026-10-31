@@ -3374,7 +3374,14 @@
     "disabledHint": "Activa arriba «Permitir fichar en la caja». Sin esta opción nadie puede fichar.",
     "clockIntro": "El personal indicado puede fichar entrada y salida con su PIN (igual que en la TPV). Los tiempos aparecen en el registro horario.",
     "goToKassaSales": "Abrir TPV para ventas",
-    "refreshList": "Actualizar lista"
+    "refreshList": "Actualizar lista",
+    "salesTitle": "Ventas por empleado",
+    "salesHint": "Tickets de caja pagados. Puede consultar 30 días atrás.",
+    "salesDate": "Día",
+    "salesEmpty": "Sin personal.",
+    "salesLoadFail": "No se pudo cargar la lista.",
+    "salesUnknownStaff": "Empleado desconocido",
+    "salesDayTotal": "Total de este día"
   },
   "kassaReceipt": {
     "helpedBy": "Le ha atendido {name}",
