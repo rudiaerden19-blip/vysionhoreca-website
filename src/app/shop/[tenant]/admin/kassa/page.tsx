@@ -109,6 +109,10 @@ import {
   kassaLayoutPosChrome,
 } from '@/lib/kassa-layout-chrome'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
+import {
+  isOntbijthuisjeHotmixTenant,
+  ONTBIJTHUISJE_HOTMIX_URL,
+} from '@/lib/kassa-ontbijthuisje-hotmix'
 import { KassaSoundActivationScreen } from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 import {
@@ -6105,6 +6109,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               rowActiveClassName={ui.langRowActive}
               rowInactiveClassName={ui.langRowInactive}
             />
+          ) : null}
+
+          {isOntbijthuisjeHotmixTenant(tenant) ? (
+            <a
+              href={ONTBIJTHUISJE_HOTMIX_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="kassa-hotmix-link"
+              title="Hotmix"
+              className={`${headerQuickLinkBtnClass} min-h-[3.15rem] px-4 sm:min-h-[3.45rem] sm:px-5`}
+            >
+              <span className="truncate text-base font-bold leading-none sm:text-lg">Hotmix</span>
+            </a>
           ) : null}
 
           <button
