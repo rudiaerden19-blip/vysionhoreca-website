@@ -67,6 +67,14 @@ describe('lagoon-kitchen-screen', () => {
     expect(filterLagoonKitchenQueueOrder('other-tenant', order, ctx)).toEqual(order)
   })
 
+  it('hides lagoon orders when category context ontbreekt (geen cola-flood)', () => {
+    const order = {
+      id: 'y',
+      items: [{ quantity: 1, product_id: 'p-cock', name: 'Mojito' }],
+    }
+    expect(filterLagoonKitchenQueueOrder('thelagoon', order, null)).toBeNull()
+  })
+
   it('filters kassa cart lines with category list', () => {
     const categories = [
       { id: 'c1', name: 'Cocktails' },

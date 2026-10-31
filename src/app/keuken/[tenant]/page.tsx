@@ -101,6 +101,37 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
+
+  const applyKitchenQueueSnapshot = useCallback((parsed: Order[]) => {
+    const liveIds = new Set(parsed.map((o) => o.id))
+
+    setNewOrderIds((prev) => {
+      const next = new Set([...prev].filter((id) => liveIds.has(id)))
+      if (next.size === prev.size && [...next].every((id) => prev.has(id))) return prev
+      return next
+    })
+
+    for (const id of [...knownOrderIdsRef.current]) {
+      if (!liveIds.has(id)) knownOrderIdsRef.current.delete(id)
+    }
+
+    const trulyNewOrders = parsed.filter((o) => !knownOrderIdsRef.current.has(o.id))
+    parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
+
+    if (trulyNewOrders.length > 0) {
+      console.log(` ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
+      setNewOrderIds((prev) => {
+        const next = new Set(prev)
+        trulyNewOrders.forEach((order) => next.add(order.id))
+        return next
+      })
+      if (soundActivated) {
+        playOrderNotification()
+      }
+    }
+
+    setOrders(parsed)
+  }, [soundActivated])
   const [keukenLangOpen, setKeukenLangOpen] = useState(false)
   const keukenLangRef = useRef<HTMLDivElement>(null)
   const boardRef = useRef<HTMLDivElement>(null)
@@ -225,23 +256,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     const pollOrders = async () => {
       try {
         if (!supabase) return
-        const parsed = (await fetchKitchenQueueOrders(supabase, params.tenant)) as unknown as Order[]
-
-        const trulyNewOrders = parsed.filter((o) => !knownOrderIdsRef.current.has(o.id))
-
-        parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
-
-        if (trulyNewOrders.length > 0) {
-          console.log(` ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
-          trulyNewOrders.forEach((order) => {
-            setNewOrderIds((prev) => new Set([...prev, order.id]))
-          })
-          if (soundActivated) {
-            playOrderNotification()
-          }
+        const { orders, queryFailed } = await fetchKitchenQueueOrders(supabase, params.tenant)
+        if (queryFailed) {
+          console.warn('[keuken] poll mislukt — laatste bonnen op scherm houden')
+          return
         }
-
-        setOrders(parsed)
+        applyKitchenQueueSnapshot(orders as unknown as Order[])
       } catch (error) {
         console.error('Polling error:', error)
       }
@@ -253,7 +273,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => {
       clearInterval(pollInterval)
     }
-  }, [params.tenant, initialLoadDone, soundActivated])
+  }, [params.tenant, initialLoadDone, applyKitchenQueueSnapshot])
 
   async function loadData() {
     try {
@@ -274,11 +294,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         return
       }
 
-      const parsed = (await fetchKitchenQueueOrders(supabase, params.tenant)) as unknown as Order[]
-      setOrders(parsed)
-
-      parsed.forEach((o) => knownOrderIdsRef.current.add(o.id))
-      console.log(`Initial load: ${parsed.length} keuken orders`)
+      const { orders, queryFailed } = await fetchKitchenQueueOrders(supabase, params.tenant)
+      if (!queryFailed) {
+        applyKitchenQueueSnapshot(orders as unknown as Order[])
+        console.log(`Initial load: ${orders.length} keuken orders`)
+      } else {
+        console.warn('[keuken] initial fetch mislukt')
+      }
     } catch (error) {
       console.error('Error loading data:', error)
     }

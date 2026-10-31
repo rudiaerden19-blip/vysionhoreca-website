@@ -20,6 +20,12 @@ describe('kitchen-queue-orders', () => {
       const out = parseOrdersItemsJson(rows as Record<string, unknown>[])
       expect(out[0].items).toEqual([{ quantity: 2 }])
     })
+
+    it('invalid items JSON becomes empty array', () => {
+      const rows = [{ id: 'b', items: '{not json' }]
+      const out = parseOrdersItemsJson(rows as Record<string, unknown>[])
+      expect(out[0].items).toEqual([])
+    })
   })
 
   describe('isKitchenQueueOrder', () => {

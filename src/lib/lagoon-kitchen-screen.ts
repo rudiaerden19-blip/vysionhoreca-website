@@ -46,6 +46,9 @@ export async function loadLagoonKitchenCategoryContext(
     client.from('menu_categories').select('id,name').eq('tenant_slug', tenantSlug),
     client.from('menu_products').select('id,category_id').eq('tenant_slug', tenantSlug),
   ])
+  if (catRes.error && prodRes.error) {
+    throw new Error(catRes.error.message || prodRes.error.message || 'lagoon menu load failed')
+  }
   const categoryNameById = new Map<string, string>()
   for (const row of catRes.data ?? []) {
     if (row?.id && row.name) categoryNameById.set(String(row.id), String(row.name))
@@ -102,7 +105,8 @@ export function filterLagoonKitchenQueueOrder(
   order: Record<string, unknown>,
   ctx: LagoonKitchenCategoryContext | null,
 ): Record<string, unknown> | null {
-  if (!isLagoonKitchenScreenTenant(tenantSlug) || !ctx) return order
+  if (!isLagoonKitchenScreenTenant(tenantSlug)) return order
+  if (!ctx) return null
   const items = filterOrderItemsForLagoonKitchen(
     Array.isArray(order.items) ? order.items : [],
     ctx,

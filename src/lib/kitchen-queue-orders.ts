@@ -11,7 +11,14 @@ export function parseOrdersItemsJson<T extends Record<string, unknown>>(rows: T[
     ...order,
     items:
       typeof order.items === 'string'
-        ? JSON.parse(order.items as string)
+        ? (() => {
+            try {
+              return JSON.parse(order.items as string) as unknown[]
+            } catch {
+              console.warn('[kitchen-queue] invalid items JSON for order', order.id)
+              return [] as unknown[]
+            }
+          })()
         : ((order.items as unknown[]) ?? []),
   }))
 }
@@ -54,6 +61,18 @@ export function isKitchenQueueOrder(o: {
 const KITCHEN_QUEUE_LOOKBACK_MS = 18 * 60 * 60 * 1000
 const KITCHEN_QUEUE_FETCH_LIMIT = 200
 
+/** Gecachte Lagoon-categorieën — voorkomt lege keuken bij korte Supabase-hiccups. */
+const lagoonKitchenCtxByTenant = new Map<
+  string,
+  import('@/lib/lagoon-kitchen-screen').LagoonKitchenCategoryContext
+>()
+
+export type KitchenQueueFetchResult = {
+  orders: Record<string, unknown>[]
+  /** Beide order-queries faalden — UI moet vorige rij houden, geen lege mand. */
+  queryFailed: boolean
+}
+
 export function kitchenQueueConfirmedSince(now: Date = new Date()): string {
   return new Date(now.getTime() - KITCHEN_QUEUE_LOOKBACK_MS).toISOString()
 }
@@ -62,7 +81,7 @@ export function kitchenQueueConfirmedSince(now: Date = new Date()): string {
 export async function fetchKitchenQueueOrders(
   client: SupabaseClient,
   tenantSlug: string,
-): Promise<Record<string, unknown>[]> {
+): Promise<KitchenQueueFetchResult> {
   const confirmedSince = kitchenQueueConfirmedSince()
   const [r1, r2] = await Promise.all([
     client
@@ -85,6 +104,11 @@ export async function fetchKitchenQueueOrders(
   if (r1.error) console.warn('[kitchen-queue] fetch confirmed/preparing:', r1.error.message)
   if (r2.error) console.warn('[kitchen-queue] fetch open DINE_IN:', r2.error.message)
 
+  const queryFailed = Boolean(r1.error && r2.error)
+  if (queryFailed) {
+    return { orders: [], queryFailed: true }
+  }
+
   const rows = [...(r1.data ?? []), ...(r2.data ?? [])]
   const byId = new Map<string, Record<string, unknown>>()
   for (const row of rows) {
@@ -95,14 +119,21 @@ export async function fetchKitchenQueueOrders(
 
   let lagoonKitchenCtx = null as Awaited<ReturnType<typeof loadLagoonKitchenCategoryContext>> | null
   if (isLagoonKitchenScreenTenant(tenantSlug)) {
+    lagoonKitchenCtx = lagoonKitchenCtxByTenant.get(tenantSlug) ?? null
     try {
-      lagoonKitchenCtx = await loadLagoonKitchenCategoryContext(client, tenantSlug)
+      const loaded = await loadLagoonKitchenCategoryContext(client, tenantSlug)
+      const hasMenuData =
+        loaded.categoryNameById.size > 0 || loaded.productCategoryByProductId.size > 0
+      if (hasMenuData) {
+        lagoonKitchenCtxByTenant.set(tenantSlug, loaded)
+        lagoonKitchenCtx = loaded
+      }
     } catch (e) {
       console.warn('[kitchen-queue] lagoon category context failed:', e)
     }
   }
 
-  return parsed
+  const orders = parsed
     .filter(isKitchenQueueOrder)
     .map((order) => filterLagoonKitchenQueueOrder(tenantSlug, order, lagoonKitchenCtx))
     .filter((order): order is Record<string, unknown> => order != null)
@@ -110,4 +141,6 @@ export async function fetchKitchenQueueOrders(
       (a, b) =>
         new Date(String(a.created_at ?? 0)).getTime() - new Date(String(b.created_at ?? 0)).getTime(),
     )
+
+  return { orders, queryFailed: false }
 }
