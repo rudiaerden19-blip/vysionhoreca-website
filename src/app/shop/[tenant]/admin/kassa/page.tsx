@@ -109,10 +109,8 @@ import {
   kassaLayoutPosChrome,
 } from '@/lib/kassa-layout-chrome'
 import { KassaModePicker } from '@/components/kassa/KassaModePicker'
-import {
-  isOntbijthuisjeHotmixTenant,
-  ONTBIJTHUISJE_HOTMIX_URL,
-} from '@/lib/kassa-ontbijthuisje-hotmix'
+import { isOntbijthuisjeHotmixTenant } from '@/lib/kassa-ontbijthuisje-hotmix'
+import { KassaHotmixRadioOverlay } from '@/components/kassa/KassaHotmixRadioOverlay'
 import { KassaSoundActivationScreen } from '@/components/kassa/KassaSoundActivationGate'
 import { useKassaHelpVideoSession } from '@/components/kassa/KassaHelpVideoSession'
 import {
@@ -1200,6 +1198,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [baseUrl, tenant, demoViewOnly, moduleFlagsLoading, effectiveAccess, effectiveLabelPrinting, effectiveJson])
 
   const { open: kassaHelpOpen, openHelp: openKassaHelp } = useKassaHelpVideoSession()
+  const [hotmixOpen, setHotmixOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
   const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
@@ -6112,16 +6111,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : null}
 
           {isOntbijthuisjeHotmixTenant(tenant) ? (
-            <a
-              href={ONTBIJTHUISJE_HOTMIX_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => setHotmixOpen(true)}
               data-testid="kassa-hotmix-link"
               title="Hotmix Radio"
               className={`${headerQuickLinkBtnClass} shrink-0 min-h-[3.15rem] px-4 sm:min-h-[3.45rem] sm:px-5`}
             >
               <span className="whitespace-nowrap text-base font-bold leading-none sm:text-lg">Hotmix Radio</span>
-            </a>
+            </button>
           ) : null}
 
           <button
@@ -8297,6 +8295,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
         </div>
       )}
+      {isOntbijthuisjeHotmixTenant(tenant) ? (
+        <KassaHotmixRadioOverlay open={hotmixOpen} onClose={() => setHotmixOpen(false)} />
+      ) : null}
       </div>
     </div>
   )
