@@ -5681,6 +5681,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return kassaLightOrderTypeButtonClass(selected)
   }
 
+  /** Zelfde vaste hoogte als Ter plaatse / Afhalen / Levering (geen extra regel). */
+  const kassaLagoonMatchOrderTypeBtnClass = (selected: boolean) =>
+    `${kassaPosOrderTypeButtonClass(selected)} ${
+      kassaChromeDensity === 'wide15'
+        ? 'max-h-[2.1rem]'
+        : kassaChromeDensity === 'sxga'
+          ? 'max-h-[3.25rem]'
+          : 'max-h-[3rem]'
+    }`
+
   const kassaSidebarZoneLabelClass =
     kassaAppearanceDark && kassaCompactChrome
       ? 'text-xs font-medium tracking-[0.02em]'
@@ -6830,9 +6840,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 aria-pressed={kassaQuickMenuVisible}
                 onClick={toggleKassaQuickMenu}
                 title={t('kassaApp.quickMenu')}
-                className={kassaPosOrderTypeButtonClass(kassaQuickMenuVisible)}
+                className={kassaLagoonMatchOrderTypeBtnClass(kassaQuickMenuVisible)}
               >
-                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.quickMenu')}</span>
+                <span className="max-w-full whitespace-nowrap text-center text-[13px] font-medium leading-none tracking-[0.02em]">
+                  {t('kassaApp.quickMenu')}
+                </span>
               </button>
               {showSidebarOpRekeningButton ? (
                 <button
@@ -6842,9 +6854,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={openNameAccountModalFromSidebar}
                   title={t('kassaOnAccount.title')}
                   aria-label={t('kassaOnAccount.title')}
-                  className={kassaPosOrderTypeButtonClass(false)}
+                  className={kassaLagoonMatchOrderTypeBtnClass(false)}
                 >
-                  <span className={kassaSidebarActionLabelClass}>{t('kassaOnAccount.title')}</span>
+                  <span className="max-w-full whitespace-nowrap text-center text-[13px] font-medium leading-none tracking-[0.02em]">
+                    {t('kassaOnAccount.title')}
+                  </span>
                 </button>
               ) : null}
               <button
@@ -6857,9 +6871,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={kassaPosOrderTypeButtonClass(numpadPanelVisible)}
+                className={kassaLagoonMatchOrderTypeBtnClass(numpadPanelVisible)}
               >
-                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
+                <span className="max-w-full whitespace-nowrap text-center text-[13px] font-medium leading-none tracking-[0.02em]">
+                  {t('kassaApp.numpadToggle')}
+                </span>
               </button>
             </div>
           ) : null}
