@@ -115,7 +115,9 @@ export async function billitCreateOrder(
   }
 
   let orderId: string | null = null
-  if (raw && typeof raw === 'object') {
+  if (typeof raw === 'number' && Number.isFinite(raw)) orderId = String(raw)
+  else if (typeof raw === 'string' && raw.trim()) orderId = raw.trim()
+  else if (raw && typeof raw === 'object') {
     const o = raw as Record<string, unknown>
     if (o.OrderID != null) orderId = String(o.OrderID)
     else if (o.orderID != null) orderId = String(o.orderID)

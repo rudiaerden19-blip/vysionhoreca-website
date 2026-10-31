@@ -33,10 +33,46 @@ function money(v: number): string {
   return v.toFixed(2)
 }
 
+function round2(n: number): number {
+  return Math.round(n * 100) / 100
+}
+
+/** Z-kolommen: tax_low = 6%, tax_mid = 12% (BE; 9% zit in dezelfde kolom), tax_high = 21%. */
+const BILLIT_VAT_BUCKETS = [
+  { rate: 6, field: 'tax_low' },
+  { rate: 12, field: 'tax_mid' },
+  { rate: 21, field: 'tax_high' },
+] as const
+
+export type BillitVatLine = { rate: number; totalIncl: number }
+
 /**
- * Eén factuurregel = de dagomzet incl. BTW.
- * Billit telt OrderLines op. BTW, contant/kaart/online en losse bonnen
- * zijn dezelfde omzet en mogen dus geen extra regels zijn.
+ * Eén regel per btw-tarief dat op het Z-rapport staat.
+ * Billit rekent een regel zonder VATPercentage als 0%. InclLeading + TotalIncl
+ * laat Billit de prijs exclusief uit het bedrag inclusief en het tarief halen.
+ */
+export function billitVatLines(report: ZReportRowForBillit): BillitVatLine[] {
+  const dayTotal = round2(num(report.total))
+  const buckets = BILLIT_VAT_BUCKETS
+    .map((b) => ({ rate: b.rate, vat: round2(num(report[b.field])) }))
+    .filter((b) => b.vat > 0)
+  if (dayTotal <= 0 || buckets.length === 0) return []
+  if (buckets.length === 1) return [{ rate: buckets[0].rate, totalIncl: dayTotal }]
+
+  const raw = buckets.map((b) => ({
+    rate: b.rate,
+    totalIncl: round2((b.vat * (100 + b.rate)) / b.rate),
+  }))
+  const sum = round2(raw.reduce((s, b) => s + b.totalIncl, 0))
+  const diff = round2(dayTotal - sum)
+  const biggest = raw.reduce((a, b) => (b.totalIncl > a.totalIncl ? b : a))
+  biggest.totalIncl = round2(biggest.totalIncl + diff)
+  return raw.filter((b) => b.totalIncl > 0)
+}
+
+/**
+ * Factuurregels = dagomzet incl. BTW, gesplitst per tarief.
+ * Contant/kaart/online en losse bonnen zijn dezelfde omzet en mogen geen extra regels zijn.
  */
 export function buildBillitOrderPayload(
   tenantSlug: string,
@@ -48,6 +84,7 @@ export function buildBillitOrderPayload(
   const taxTotal = num(report.tax_low) + num(report.tax_mid) + num(report.tax_high)
   const excl = num(report.subtotal)
   const closedAt = report.closed_at || `${reportDate}T23:59:59`
+  const vatLines = billitVatLines(report)
 
   const orderDate = closedAt
   const expiryDate = new Date(closedAt)
@@ -76,16 +113,17 @@ export function buildBillitOrderPayload(
       `BTW ${money(taxTotal)} zit in dat bedrag.`,
       `Contant ${money(num(report.cash_payments))}; kaart ${money(num(report.card_payments))}; online ${money(num(report.online_payments))}.`,
     ].join(' '),
-    OrderLines: [
-      {
-        Description: `Dagomzet ${reportDate} (incl. BTW, ${report.order_count} bonnen)`,
-        Quantity: 1,
-        TotalIncl: dayTotal,
-        UnitPriceIncl: dayTotal,
-        TotalExcl: excl,
-        TotalVAT: taxTotal,
-      },
-    ],
+    OrderLines: vatLines.map((line) => ({
+      Description:
+        vatLines.length === 1
+          ? `Dagomzet ${reportDate} (${line.rate}% btw, ${report.order_count} bonnen)`
+          : `Dagomzet ${reportDate} (${line.rate}% btw)`,
+      Quantity: 1,
+      VATPercentage: line.rate,
+      InclLeading: true,
+      TotalIncl: line.totalIncl,
+      UnitPriceIncl: line.totalIncl,
+    })),
   }
 }
 
