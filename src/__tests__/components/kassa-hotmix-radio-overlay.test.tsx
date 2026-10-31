@@ -17,6 +17,8 @@ describe('Hotmix Radio popup', () => {
     expect(frame.getAttribute('src')).toBe(ONTBIJTHUISJE_HOTMIX_URL)
     expect(frame.getAttribute('sandbox') ?? '').not.toContain('allow-top-navigation')
     expect(screen.getByTestId('kassa-hotmix-close').textContent).toBe('Sluiten')
+    expect(screen.getByTestId('kassa-hotmix-panel').className).toContain('max-w-[42rem]')
+    expect(screen.getByTestId('kassa-hotmix-panel').className).toContain('h-[30rem]')
 
     fireEvent.click(screen.getByTestId('kassa-hotmix-close'))
     expect(onClose).toHaveBeenCalledTimes(1)
