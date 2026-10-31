@@ -115,6 +115,11 @@ import {
   kassaUiLayoutUsesPosLuxury,
 } from '@/lib/kassa-ui-layout'
 import {
+  isBlonkysFlatBlackKassaTenant,
+  KASSA_BLONKYS_FLAT_HTML_CLASS,
+  KASSA_BLONKYS_KEEP_CHROME_CLASS,
+} from '@/lib/blonkys-flat-kassa-buttons'
+import {
   KASSA_POS_BTN_SHAPE,
   kassaPosCheckoutButtonClass,
   KASSA_SPEELS_MENU_RECESS_TRAY_CLASS,
@@ -1142,6 +1147,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant, searchParams])
   const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const ui = useMemo(() => createKassaThemeForLayout(kassaLayout), [kassaLayout])
+  const blonkysFlatButtons = isBlonkysFlatBlackKassaTenant(tenant)
 
   useEffect(() => {
     const html = document.documentElement
@@ -1149,11 +1155,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     else html.classList.remove('kassa-dark-appearance')
     if (kassaLayout === 'speels') html.classList.add('kassa-speels-layout')
     else html.classList.remove('kassa-speels-layout')
+    if (blonkysFlatButtons) html.classList.add(KASSA_BLONKYS_FLAT_HTML_CLASS)
+    else html.classList.remove(KASSA_BLONKYS_FLAT_HTML_CLASS)
     return () => {
       html.classList.remove('kassa-dark-appearance')
       html.classList.remove('kassa-speels-layout')
+      html.classList.remove(KASSA_BLONKYS_FLAT_HTML_CLASS)
     }
-  }, [kassaAppearanceDark, kassaLayout])
+  }, [kassaAppearanceDark, kassaLayout, blonkysFlatButtons])
 
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
@@ -5596,10 +5605,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               kassaAppearanceDark
                 ? `touch-manipulation ${
                     item.quantity === 1
-                      ? kassaPosCartTrashButtonClass(cartLineQtyBtnCompact, posChrome)
+                      ? `${kassaPosCartTrashButtonClass(cartLineQtyBtnCompact, posChrome)} ${KASSA_BLONKYS_KEEP_CHROME_CLASS}`
                       : kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)
                   }`
-                : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                : `${KASSA_BLONKYS_KEEP_CHROME_CLASS} touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
                     cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                   }`
             }
@@ -5679,10 +5688,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 kassaAppearanceDark
                   ? `touch-manipulation ${
                       item.quantity === 1
-                        ? kassaPosCartTrashButtonClass(cartLineQtyBtnCompact, posChrome)
+                        ? `${kassaPosCartTrashButtonClass(cartLineQtyBtnCompact, posChrome)} ${KASSA_BLONKYS_KEEP_CHROME_CLASS}`
                         : kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)
                     }`
-                  : `touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
+                  : `${KASSA_BLONKYS_KEEP_CHROME_CLASS} touch-manipulation rounded-lg bg-red-500 text-white font-bold flex items-center justify-center hover:bg-red-600 active:brightness-95 ${
                       cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
                     }`
               }
@@ -6167,12 +6176,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           title={t('kassaApp.logout')}
           className={
             kassaPosLuxury
-              ? `relative z-20 ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${
+              ? `relative z-20 ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaWide15Chrome ? kassaHeaderQuickLinkShell : kassaDarkHeaderBtnShell} ${
                   posChrome === 'speels'
                     ? kassaSpeelsRedGlossButtonClass(false)
                     : `${kassaSpeelsBlackGlossButtonClass(true)} ${kassaSpeelsTopChromeTextClass}`
                 }`
-              : `relative z-20 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${
+              : `relative z-20 ${KASSA_BLONKYS_KEEP_CHROME_CLASS} inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1 text-[11px] font-bold transition-colors sm:gap-1 sm:px-2.5 sm:py-1.5 sm:text-sm ${
                   kassaLight
                     ? KASSA_LIGHT_BTN_FACE
                     : KASSA_CLASSIC_BTN_FACE
@@ -7082,7 +7091,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex items-center justify-center px-1 ${kassaPosRemoveButtonClass(posChrome)} ${kassaFooterActionTouchMinHClass(
+                  className={`flex items-center justify-center px-1 ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosRemoveButtonClass(posChrome)} ${kassaFooterActionTouchMinHClass(
                     kassaChromeDensity,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -7112,7 +7121,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${kassaPosRemoveButtonClass(posChrome)}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosRemoveButtonClass(posChrome)}`}
                   title={t('kassaApp.remove')}
                   aria-label={t('kassaApp.remove')}
                 >
@@ -7190,7 +7199,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   requestCheckout()
                 }}
                 disabled={billLines.length === 0 || payInFlight}
-                className={`flex min-w-0 flex-1 items-center justify-center ${kassaPosCheckoutButtonClass(posChrome)} ${
+                className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosCheckoutButtonClass(posChrome)} ${
                   kassaWide15Chrome ? 'min-h-[2.75rem] py-2 text-sm' : kassaCompactChrome ? 'min-h-[4rem] py-3.5 text-lg': 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
@@ -7329,7 +7338,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
+                  className={`flex flex-col items-center justify-center gap-1 rounded-xl active:brightness-95 ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${KASSA_REMOVE_BTN_FACE} ${kassaFooterActionTouchMinHClass(
                     kassaChromeDensity,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -7357,7 +7366,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl active:brightness-95 ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${KASSA_REMOVE_BTN_FACE}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl active:brightness-95 ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${KASSA_REMOVE_BTN_FACE}`}
                 >
                   <span className={kassaSidebarPairLabelClass}>{t('kassaApp.remove')}</span>
                 </button>
@@ -7448,7 +7457,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   requestCheckout()
                 }}
                 disabled={billLines.length === 0 || payInFlight}
-                className={`flex min-w-0 flex-1 items-center justify-center rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 ${
+                className={`flex min-w-0 flex-1 items-center justify-center rounded-xl ${KASSA_BLONKYS_KEEP_CHROME_CLASS} bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 ${
                   kassaWide15Chrome ? 'min-h-[2.6rem] py-1.5 text-sm' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >

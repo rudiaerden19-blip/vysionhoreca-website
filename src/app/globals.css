@@ -1365,4 +1365,57 @@ html.kassa-luxe-leather body {
   }
 }
 
+/*
+ * Blonkys restaurant + snackbar/eethuis: vlak zwart, witte letters, geen glans.
+ * Online, Uitloggen, Verwijder en Afrekenen hebben .kassa-keep-chrome.
+ * Productfoto-tegels blijven staan.
+ */
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile),
+html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn:not(.kassa-keep-chrome),
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn:not(.kassa-keep-chrome),
+html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn:not(.kassa-keep-chrome),
+html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn:not(.kassa-keep-chrome) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: none !important;
+  background: #000 !important;
+  background-image: none !important;
+  border-color: #2a2a2a !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile) *,
+html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn:not(.kassa-keep-chrome) *,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn:not(.kassa-keep-chrome) *,
+html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn:not(.kassa-keep-chrome) *,
+html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn:not(.kassa-keep-chrome) * {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: none !important;
+}
+
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile)::before,
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile)::after,
+html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn:not(.kassa-keep-chrome)::before,
+html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn:not(.kassa-keep-chrome)::after,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn:not(.kassa-keep-chrome)::before,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn:not(.kassa-keep-chrome)::after,
+html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn:not(.kassa-keep-chrome)::before,
+html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn:not(.kassa-keep-chrome)::after,
+html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn:not(.kassa-keep-chrome)::before,
+html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn:not(.kassa-keep-chrome)::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  animation: none !important;
+}
+
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile).kassa-speels-black-gloss-btn--emphasis,
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile).kassa-speels-blue-gloss-btn--selected,
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile).kassa-speels-order-type-btn--selected,
+html.kassa-blonkys-flat-btns button:not(.kassa-keep-chrome):not(.kassa-speels-menu-tile)[aria-pressed='true'] {
+  box-shadow: inset 0 0 0 2px #fff !important;
+}
+
 
