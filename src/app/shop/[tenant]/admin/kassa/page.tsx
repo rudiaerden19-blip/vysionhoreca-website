@@ -6262,7 +6262,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           ) : null}
 
           {isOnline !== null && kassaPosLuxury ? (
-            <div className={isTheLagoonTenant(tenant) ? 'relative shrink-0' : 'contents'}>
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
@@ -6278,35 +6277,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <span className="truncate">
                 {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
               </span>
-            </div>
-            {isTheLagoonTenant(tenant) ? (
-              <button
-                type="button"
-                aria-expanded={lagoonSidebarToolsOpen}
-                aria-controls="kassa-lagoon-sidebar-tools"
-                title={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
-                aria-label={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
-                onClick={() => {
-                  playClick()
-                  setLagoonSidebarToolsOpen((open) => !open)
-                }}
-                className="absolute left-1/2 top-full z-40 mt-0.5 flex h-7 w-11 -translate-x-1/2 items-center justify-center rounded-b-lg border border-t-0 border-black/70 bg-[#1a1a1a] text-[#e4e4e4] shadow-[0_3px_8px_rgba(0,0,0,0.55)]"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className={`h-4 w-4 transition-transform duration-300 ${lagoonSidebarToolsOpen ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2.4}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M6 7.5l6 5 6-5" />
-                  <path d="M6 13l6 5 6-5" />
-                </svg>
-              </button>
-            ) : null}
             </div>
           ) : null}
 
@@ -6697,6 +6667,35 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : ui.sidebarBg
           }`}
         >
+
+        {isTheLagoonTenant(tenant) ? (
+          <button
+            type="button"
+            aria-expanded={lagoonSidebarToolsOpen}
+            aria-controls="kassa-lagoon-sidebar-tools"
+            title={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
+            aria-label={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
+            onClick={() => {
+              playClick()
+              setLagoonSidebarToolsOpen((open) => !open)
+            }}
+            className="absolute left-0 top-0 z-30 flex h-10 w-14 items-center justify-center rounded-br-xl border border-l-0 border-t-0 border-black/70 bg-[#1a1a1a] text-[#ececec] shadow-[0_4px_10px_rgba(0,0,0,0.55)]"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className={`h-6 w-6 transition-transform duration-300 ${lagoonSidebarToolsOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.6}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M5 7l7 6 7-6" />
+              <path d="M5 14l7 6 7-6" />
+            </svg>
+          </button>
+        ) : null}
 
         <div
           id="kassa-lagoon-sidebar-tools"
