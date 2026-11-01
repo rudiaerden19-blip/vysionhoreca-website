@@ -1,10 +1,11 @@
 import { isBlonkysFlatBlackKassaTenant } from '@/lib/blonkys-flat-kassa-buttons'
 
 describe('isBlonkysFlatBlackKassaTenant', () => {
-  it('geldt voor restaurant en snackbar/eethuis', () => {
+  it('geldt alleen voor restaurant en eethuis slug', () => {
     expect(isBlonkysFlatBlackKassaTenant('blonkys-restaurant')).toBe(true)
+    expect(isBlonkysFlatBlackKassaTenant('blonkysrestaurant')).toBe(true)
     expect(isBlonkysFlatBlackKassaTenant('blonkyseethuis')).toBe(true)
-    expect(isBlonkysFlatBlackKassaTenant('blonkys-snackbar')).toBe(true)
+    expect(isBlonkysFlatBlackKassaTenant('blonkys-snackbar')).toBe(false)
   })
 
   it('geldt niet voor andere zaken', () => {
