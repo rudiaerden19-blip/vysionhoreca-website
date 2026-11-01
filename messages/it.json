@@ -4715,7 +4715,7 @@
     "subtitle": "Riepilogo giornaliero per registratore di cassa (GKS)",
     "reportTitle": "RAPPORTO Z",
     "onlineSales": "VENDITE ONLINE",
-    "fiscalPeriodNote": "Periodo fiscale: 00:00 — giorno successivo 12:00",
+    "fiscalPeriodNote": "Periodo fiscale: secondo gli orari di apertura della sede",
     "history": "Archivio",
     "print": "Stampa",
     "refresh": "Aggiorna",

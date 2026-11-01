@@ -8,7 +8,6 @@ import {
 } from '@/lib/admin-api'
 import {
   addDaysToBelgiumYMD,
-  fiscalReportDateForOrderCreatedAt,
   getBelgiumDateString,
 } from '@/lib/belgium-date-bounds'
 import {
@@ -18,8 +17,6 @@ import {
   type ShiftReportClose,
   type TenantHourRow,
 } from '@/lib/tenant-business-day'
-
-export { fiscalReportDateForOrderCreatedAt }
 import type { CategoryVatPercent } from '@/lib/order-vat'
 import type { ZReportAmounts } from '@/lib/z-report-document'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'

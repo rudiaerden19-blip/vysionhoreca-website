@@ -1,15 +1,12 @@
-import {
-  fiscalReportDateForOrderCreatedAt,
-  getCurrentFiscalReportDate,
-  getZRapportDateBounds,
-} from '@/lib/belgium-date-bounds'
 import type { Order } from '@/lib/admin-api-order-helpers'
 import {
   aggregateRevenueByFiscalDay,
   getDashboardFiscalPeriodStats,
+  getCurrentFiscalReportDate,
   monthBoundsUtcForYearMonth,
 } from '@/lib/revenue-fiscal-stats'
 import { buildZReportMonthDayRows, sumZReportMonthAmounts } from '@/lib/z-report-month'
+import { businessDayForOrder, getTenantBusinessDayBounds } from '@/lib/tenant-business-day'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
 const emptyVatContext: ZReportVatContext = {
@@ -34,28 +31,34 @@ function makeOrder(createdAt: string, total: number, id: string): Order {
 }
 
 describe('revenue-fiscal-stats alignment with Z month', () => {
-  it('dashboard today matches fiscal day Z bounds total', () => {
+  it('dashboard today matches tenant werkdag bounds total', () => {
+    const hours: import('@/lib/tenant-business-day').TenantHourRow[] = []
     const orders = [
       makeOrder('2026-05-24T08:00:00.000Z', 10, 'a'),
       makeOrder('2026-05-24T10:00:00.000Z', 20, 'b'),
     ]
-    const fiscal = fiscalReportDateForOrderCreatedAt('2026-05-24T10:00:00.000Z')
+    const fiscal = businessDayForOrder('2026-05-24T10:00:00.000Z', hours)
     expect(fiscal).toBe('2026-05-24')
 
-    const dayBounds = getZRapportDateBounds(fiscal!)
+    const dayBounds = getTenantBusinessDayBounds(fiscal!, hours)
     const inDay = orders.filter((o) => {
       const t = new Date(o.created_at!)
-      return t >= new Date(dayBounds.startUTC) && t <= new Date(dayBounds.endUTC)
+      return (
+        businessDayForOrder(o.created_at!, hours) === fiscal &&
+        t >= new Date(dayBounds.startUTC) &&
+        t <= new Date(dayBounds.endUTC)
+      )
     })
     const dayTotal = inDay.reduce((s, o) => s + o.total!, 0)
 
-    const stats = getDashboardFiscalPeriodStats(orders, new Date('2026-05-24T14:00:00.000Z'))
+    const stats = getDashboardFiscalPeriodStats(orders, new Date('2026-05-24T14:00:00.000Z'), hours)
     expect(stats.todayFiscalYmd).toBe('2026-05-24')
     expect(stats.todayRevenue).toBe(dayTotal)
     expect(stats.todayOrders).toBe(inDay.length)
   })
 
   it('month dashboard aggregate matches buildZReportMonthDayRows sum', () => {
+    const hours: import('@/lib/tenant-business-day').TenantHourRow[] = []
     const orders = [
       makeOrder('2026-05-23T22:00:00.000Z', 5, '1'),
       makeOrder('2026-05-24T08:00:00.000Z', 8, '2'),
@@ -65,10 +68,18 @@ describe('revenue-fiscal-stats alignment with Z month', () => {
 
     const yearMonth = '2026-05'
     const capYmd = '2026-05-31'
-    const monthRows = buildZReportMonthDayRows(orders, yearMonth, capYmd, 9, emptyVatContext)
+    const monthRows = buildZReportMonthDayRows(
+      orders,
+      yearMonth,
+      capYmd,
+      9,
+      emptyVatContext,
+      undefined,
+      hours,
+    )
     const monthSum = sumZReportMonthAmounts(monthRows)
 
-    const byDay = aggregateRevenueByFiscalDay(orders)
+    const byDay = aggregateRevenueByFiscalDay(orders, undefined, hours)
     let fiscalMonthTotal = 0
     let fiscalMonthOrders = 0
     for (const [ymd, t] of byDay) {
@@ -91,10 +102,11 @@ describe('revenue-fiscal-stats alignment with Z month', () => {
 })
 
 describe('getCurrentFiscalReportDate', () => {
-  it('returns same fiscal label as order at that instant', () => {
+  it('returns same fiscal label as order at that instant (tenant werkdag)', () => {
+    const hours: import('@/lib/tenant-business-day').TenantHourRow[] = []
     const now = new Date('2026-05-24T08:00:00.000Z')
-    expect(getCurrentFiscalReportDate(now)).toBe(
-      fiscalReportDateForOrderCreatedAt(now.toISOString()),
+    expect(getCurrentFiscalReportDate(now, hours)).toBe(
+      businessDayForOrder(now.toISOString(), hours),
     )
   })
 })

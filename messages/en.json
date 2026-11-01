@@ -3408,7 +3408,7 @@
     "subtitle": "Daily overview for cash register (GKS)",
     "reportTitle": "Z-REPORT",
     "onlineSales": "POS & order revenue",
-    "fiscalPeriodNote": "Fiscal period: 00:00 — next day 12:00",
+    "fiscalPeriodNote": "Fiscal period: according to venue opening hours",
     "history": "Archive",
     "print": "Print",
     "refresh": "Refresh",

@@ -4738,7 +4738,7 @@
     "subtitle": "Vue quotidienne pour caisse enregistreuse (GKS)",
     "reportTitle": "RAPPORT Z",
     "onlineSales": "VENTES EN LIGNE",
-    "fiscalPeriodNote": "Période fiscale : 00h00 — lendemain 12h00",
+    "fiscalPeriodNote": "Période fiscale : selon les heures d'ouverture de l'établissement",
     "history": "Archive",
     "print": "Imprimer",
     "refresh": "Actualiser",

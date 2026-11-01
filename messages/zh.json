@@ -4734,7 +4734,7 @@
     "vatBaseCol": "不含税",
     "vatTaxCol": "增值税",
     "vatTotalRow": "合计",
-    "fiscalPeriodNote": "会计期间：00:00 — 次日12:00",
+    "fiscalPeriodNote": "会计期间：按门店营业时间",
     "billitResendButton": "重新发送到 Billit",
     "billitResendWorking": "处理中…",
     "billitResendHint": "请先在 Billit 中删除该发票。然后用此按钮重新生成含增值税的正确日营业额。",

@@ -1,6 +1,6 @@
 /**
- * Belgium calendar bounds and Z-rapport fiscal-day ranges (Europe/Brussels).
- * Lightweight module — routes import this instead of `admin-api`where possible.
+ * Belgium calendar bounds (Europe/Brussels).
+ * Z-rapport werkdag: `tenant-business-day.ts` (openingsuren).
  */
 
 export function getDateBoundsForBelgium(dateStr: string): { startUTC: string; endUTC: string } {
@@ -68,70 +68,4 @@ export function addDaysToBelgiumYMD(ymd: string, days: number): string {
   return dt.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels'})
 }
 
-/**
- * Fiscale dag grenzen voor Z-Rapport (GKS compliant).
- * Werkdag met label D = D 12:00 t/m D+1 12:00 (Europe/Brussels).
- * Bonnen na middernacht vóór 12:00 horen bij werkdag D−1 (niet bij D).
- */
-export function getZRapportDateBounds(dateStr: string): { startUTC: string; endUTC: string } {
-  const [year, month, day] = dateStr.split('-').map(Number)
-
-  const isDST = isBelgiumDST(year, month, day)
-  const belgiumOffsetHours = isDST ? 2 : 1
-
-  const startDate = new Date(Date.UTC(year, month - 1, day, 12 - belgiumOffsetHours, 0, 0))
-  const endDate = new Date(Date.UTC(year, month - 1, day + 1, 12 - belgiumOffsetHours, 0, 0))
-
-  return {
-    startUTC: startDate.toISOString(),
-    endUTC: endDate.toISOString(),
-  }
-}
-
-function brusselsHour(utc: Date): number {
-  return Number(
-    utc.toLocaleString('en-GB', {
-      timeZone: 'Europe/Brussels',
-      hour: 'numeric',
-      hour12: false,
-    }),
-  )
-}
-
-/**
- * Fiscale werkdag voor een order — zelfde venster als `getZRapportDateBounds`.
- * Werkdag D = D 12:00 t/m D+1 12:00 (Europe/Brussels).
- */
-export function fiscalReportDateForOrderCreatedAt(createdAt: string): string | null {
-  const t = new Date(createdAt)
-  if (Number.isNaN(t.getTime())) return null
-
-  const center = getBelgiumDateString(t)
-  const hour = brusselsHour(t)
-  const fiscalYmd = hour < 12 ? addDaysToBelgiumYMD(center, -1) : center
-
-  const { startUTC, endUTC } = getZRapportDateBounds(fiscalYmd)
-  if (t >= new Date(startUTC) && t <= new Date(endUTC)) return fiscalYmd
-
-  for (const ymd of [addDaysToBelgiumYMD(center, -1), center, addDaysToBelgiumYMD(center, 1)]) {
-    const b = getZRapportDateBounds(ymd)
-    if (t >= new Date(b.startUTC) && t <= new Date(b.endUTC)) return ymd
-  }
-
-  return fiscalYmd
-}
-
-/**
- * Laatste **afgesloten** fiscale werkdag (Europe/Brussels).
- * Fiscale dag D sluit om D+1 12:00 — cron/archive moet niet de kalenderdag gebruiken.
- */
-export function lastCompletedFiscalReportDate(now: Date = new Date()): string {
-  const center = getBelgiumDateString(now)
-  const hour = brusselsHour(now)
-  return hour >= 12 ? addDaysToBelgiumYMD(center, -1) : addDaysToBelgiumYMD(center, -2)
-}
-
-/** Fiscale werkdag die `now` bevat — zelfde label als Z-rapport / bonnen. */
-export function getCurrentFiscalReportDate(now: Date = new Date()): string {
-  return fiscalReportDateForOrderCreatedAt(now.toISOString()) ?? getBelgiumDateString(now)
-}
+/** Z-rapport / omzet: werkdag = tenant {@link tenant-business-day} (openingsuren), niet 12:00–12:00. */

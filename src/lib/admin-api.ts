@@ -14,14 +14,12 @@ import {
   addDaysToBelgiumYMD,
   getBelgiumDateString,
   getDateBoundsForBelgium,
-  getZRapportDateBounds,
 } from './belgium-date-bounds'
 
 export {
   addDaysToBelgiumYMD,
   getBelgiumDateString,
   getDateBoundsForBelgium,
-  getZRapportDateBounds,
 }
 
 import {

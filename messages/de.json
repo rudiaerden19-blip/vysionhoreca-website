@@ -4738,7 +4738,7 @@
     "subtitle": "Tagesübersicht für Registrierkasse (GKS)",
     "reportTitle": "Z-BERICHT",
     "onlineSales": "Kassen- & Bestellumsatz",
-    "fiscalPeriodNote": "Fiskalperiode: 00:00 — nächster Tag 12:00",
+    "fiscalPeriodNote": "Fiskalperiode: gemäß Öffnungszeiten des Betriebs",
     "history": "Archiv",
     "print": "Drucken",
     "refresh": "Aktualisieren",
