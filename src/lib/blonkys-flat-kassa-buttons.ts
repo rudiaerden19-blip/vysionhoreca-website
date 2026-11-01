@@ -1,8 +1,8 @@
-/** Vlakke zwarte kassaknoppen — alleen Blonkys restaurant en Blonkys snackbar/eethuis. */
+/** Speels-chrome zonder glans — alleen Blonkys restaurant en snackbar/eethuis. */
 
 export const KASSA_BLONKYS_FLAT_HTML_CLASS = 'kassa-blonkys-flat-btns'
 
-/** Online, Uitloggen, Verwijder en Afrekenen houden hun huidige kleur. */
+/** Legacy hook (vroeger uitzondering op vlak zwart); mag op knoppen blijven staan. */
 export const KASSA_BLONKYS_KEEP_CHROME_CLASS = 'kassa-keep-chrome'
 
 export function isBlonkysFlatBlackKassaTenant(slug: string | null | undefined): boolean {
