@@ -122,6 +122,8 @@ import {
   KASSA_BLONKYS_KEEP_CHROME_CLASS,
   blonkysSpeelsCategoryStripButtonClass,
   blonkysSpeelsQuickMenuPanelButtonClass,
+  KASSA_BLONKYS_FLY_MENU_CLASS,
+  KASSA_BLONKYS_FLY_MENU_HEADER_CLASS,
 } from '@/lib/blonkys-flat-kassa-buttons'
 import {
   isOhGreenKassaTenant,
@@ -5993,10 +5995,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             return (
               <div className="absolute top-full left-0 mt-1 flex z-30">
                 {/* Eerste kolom: modules */}
-                <div className={`${ui.flyMenuPanel} overflow-y-auto`} style={{ width: 240, maxHeight: '85vh'}}>
+                <div
+                  className={`${ui.flyMenuPanel} overflow-y-auto${blonkysFlatButtons ? ` ${KASSA_BLONKYS_FLY_MENU_CLASS}` : ''}`}
+                  style={{ width: 240, maxHeight: '85vh' }}
+                >
                   <div
                     className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${
-                      kassaPosLuxury ? kassaPlateBgClass : 'bg-[#1e293b]'
+                      blonkysFlatButtons
+                        ? KASSA_BLONKYS_FLY_MENU_HEADER_CLASS
+                        : kassaPosLuxury
+                          ? kassaPlateBgClass
+                          : 'bg-[#1e293b]'
                     }`}
                   >
                     {t('adminLayout.menu')}
@@ -6024,10 +6033,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </div>
                 {/* Tweede popup rechts: sub-items */}
                 {hamburgerOpen && hamburgerSubOpen && activeMod && (
-                  <div className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}`} style={{ width: 220, maxHeight: '85vh'}}>
+                  <div
+                    className={`ml-2 overflow-y-auto self-start ${ui.flyMenuPanel}${blonkysFlatButtons ? ` ${KASSA_BLONKYS_FLY_MENU_CLASS}` : ''}`}
+                    style={{ width: 220, maxHeight: '85vh' }}
+                  >
                     <div
                       className={`sticky top-0 rounded-t-2xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white ${
-                        kassaPosLuxury ? kassaPlateBgClass : 'bg-[#1e293b]'
+                        blonkysFlatButtons
+                          ? KASSA_BLONKYS_FLY_MENU_HEADER_CLASS
+                          : kassaPosLuxury
+                            ? kassaPlateBgClass
+                            : 'bg-[#1e293b]'
                       }`}
                     >
                       {activeMod.labelKey ? t(activeMod.labelKey) : activeMod.label}

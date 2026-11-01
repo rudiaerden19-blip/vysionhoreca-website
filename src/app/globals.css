@@ -1426,3 +1426,59 @@ html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn * {
   text-shadow: none !important;
 }
 
+/* Hamburger + submenu — zelfde grijs family als speels-chrome knoppen, lichter dan korrelkader */
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu {
+  background: #3a3a3a !important;
+  background-image: none !important;
+  border-color: #1a1a1a !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu__header {
+  background: #545454 !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu button,
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu a {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu button:hover,
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu a:hover {
+  background: #484848 !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu button.bg-\[\#1c3832\],
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu a.bg-\[\#1c3832\] {
+  background: #5a5a5a !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .border-b {
+  border-color: #2a2a2a !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .bg-gray-50 {
+  background: #545454 !important;
+  color: #fff !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .text-gray-500,
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .text-gray-700 {
+  color: #fff !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .border-gray-200,
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .border-gray-100 {
+  border-color: #2a2a2a !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .hover\:bg-red-50:hover {
+  background: #5c3030 !important;
+}
+

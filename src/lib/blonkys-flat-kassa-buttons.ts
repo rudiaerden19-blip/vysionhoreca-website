@@ -7,6 +7,11 @@ import {
 
 export const KASSA_BLONKYS_FLAT_HTML_CLASS = 'kassa-blonkys-flat-btns'
 
+/** Flyout hamburger + submenu — alleen Blonkys (CSS in globals.css). */
+export const KASSA_BLONKYS_FLY_MENU_CLASS = 'kassa-blonkys-fly-menu'
+
+export const KASSA_BLONKYS_FLY_MENU_HEADER_CLASS = 'kassa-blonkys-fly-menu__header'
+
 /** Legacy hook (vroeger uitzondering op vlak zwart); mag op knoppen blijven staan. */
 export const KASSA_BLONKYS_KEEP_CHROME_CLASS = 'kassa-keep-chrome'
 
