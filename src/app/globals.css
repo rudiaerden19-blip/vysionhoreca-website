@@ -1404,4 +1404,25 @@ html.kassa-blonkys-flat-btns .kassa-speels-green-gloss-btn.kassa-speels-online-s
   animation: none !important;
 }
 
+html.kassa-blonkys-flat-btns button:not(.kassa-speels-menu-tile),
+html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn,
+html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn,
+html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn,
+html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: none !important;
+}
+
+html.kassa-blonkys-flat-btns button:not(.kassa-speels-menu-tile) *,
+html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn *,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn *,
+html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn *,
+html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn *,
+html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn * {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: none !important;
+}
 
