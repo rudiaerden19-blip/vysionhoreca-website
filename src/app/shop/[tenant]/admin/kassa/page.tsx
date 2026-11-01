@@ -7934,7 +7934,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {/* Tafelkiezer: gecentreerd over de kassa (niet in de rechterkolom) */}
       {showTablePicker && (
         <div
-          className="fixed inset-0 z-[210] flex items-center justify-center p-4 sm:p-6"
+          className="kassa-table-picker-modal fixed inset-0 z-[210] flex items-center justify-center p-4 sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-labelledby="kassa-table-picker-title"
@@ -7975,7 +7975,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setShowTablePicker(false)
                   setKassaZoneTab(null)
                 }}
-                className={`shrink-0 rounded-xl px-3 py-2 text-lg font-bold leading-none transition-colors ${ui.categoryStripHover} ${ui.flyMenuText}`}
+                className={`kassa-table-picker__close shrink-0 rounded-xl px-3 py-2 text-lg font-bold leading-none transition-colors ${ui.categoryStripHover} ${ui.flyMenuText}`}
                 aria-label={t('kassaApp.closeAria')}
               >
                 ×
@@ -8012,7 +8012,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     setShowTablePicker(false)
                     setKassaZoneTab(null)
                   }}
-                  className="flex-1 rounded-xl bg-red-50 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100"
+                  className="kassa-table-picker__muted-action flex-1 rounded-xl bg-red-50 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100"
                 >
                    {t('kassaApp.clearTable')}
                 </button>

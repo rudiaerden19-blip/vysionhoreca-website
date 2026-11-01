@@ -1404,7 +1404,10 @@ html.kassa-blonkys-flat-btns .kassa-speels-green-gloss-btn.kassa-speels-online-s
   animation: none !important;
 }
 
-html.kassa-blonkys-flat-btns button:not(.kassa-speels-menu-tile),
+html.kassa-blonkys-flat-btns
+  button:not(.kassa-speels-menu-tile):not(.kassa-mode-picker__option):not(.kassa-table-picker__tile):not(
+    .kassa-table-picker__close
+  ):not(.kassa-table-picker__muted-action),
 html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn,
 html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn,
 html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn,
@@ -1415,7 +1418,11 @@ html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn {
   text-shadow: none !important;
 }
 
-html.kassa-blonkys-flat-btns button:not(.kassa-speels-menu-tile) *,
+html.kassa-blonkys-flat-btns
+  button:not(.kassa-speels-menu-tile):not(.kassa-mode-picker__option):not(.kassa-table-picker__tile):not(
+    .kassa-table-picker__close
+  ):not(.kassa-table-picker__muted-action)
+  *,
 html.kassa-blonkys-flat-btns a.kassa-speels-order-type-btn *,
 html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn *,
 html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn *,
@@ -1480,5 +1487,74 @@ html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .text-red-700 {
 
 html.kassa-blonkys-flat-btns .kassa-blonkys-fly-menu .hover\:bg-red-50:hover {
   background: #5c3030 !important;
+}
+
+/* Mode-dropdown (light panel): geen wit-op-wit — alleen Blonkys html-class hierboven */
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option {
+  -webkit-text-fill-color: currentColor !important;
+  text-shadow: none !important;
+  color: rgb(55 65 81) !important;
+}
+html.kassa-blonkys-flat-btns.kassa-dark-appearance .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option {
+  color: rgb(228 228 231) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option.text-gray-700 {
+  color: rgb(55 65 81) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option.text-blue-600 {
+  color: rgb(37 99 235) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option.text-zinc-200 {
+  color: rgb(228 228 231) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option.text-\[\#58CCFF\] {
+  color: #58ccff !important;
+}
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option.text-\[\#d4b483\] {
+  color: #d4b483 !important;
+}
+html.kassa-blonkys-flat-btns .kassa-mode-picker [role='listbox'] .kassa-mode-picker__option.text-\[\#ff8a5b\] {
+  color: #ff8a5b !important;
+}
+
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__close {
+  -webkit-text-fill-color: currentColor !important;
+  text-shadow: none !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__close.text-zinc-100,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__close.text-zinc-200 {
+  color: rgb(244 244 245) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__close.text-gray-800 {
+  color: rgb(31 41 55) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__close.text-gray-700,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__close.text-gray-900 {
+  color: rgb(55 65 81) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__muted-action {
+  color: rgb(220 38 38) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile * {
+  -webkit-text-fill-color: currentColor !important;
+  text-shadow: none !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-emerald-700,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-emerald-700 * {
+  color: rgb(4 120 87) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-amber-700,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-amber-700 * {
+  color: rgb(180 83 9) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-blue-700,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-blue-700 * {
+  color: rgb(29 78 216) !important;
+}
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-white,
+html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker__tile.text-white * {
+  color: #fff !important;
 }
 

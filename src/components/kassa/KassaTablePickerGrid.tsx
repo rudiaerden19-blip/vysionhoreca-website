@@ -199,7 +199,7 @@ export function KassaTablePickerGrid({
                 data-kassa-table-nr={nr}
                 onClick={() => handleSelectClick(nr)}
                 {...dragPointerProps(nr, canDragTile)}
-                className={tableTileClass(tbl, nr)}
+                className={`kassa-table-picker__tile ${tableTileClass(tbl, nr)}`}
               >
                 <div className="text-lg">{tbl.number}</div>
                 <div className="text-[11px] opacity-70">
@@ -238,7 +238,7 @@ export function KassaTablePickerGrid({
                   data-kassa-table-nr={nr}
                   onClick={() => handleSelectClick(nr)}
                   {...dragPointerProps(nr, canDragTile)}
-                  className={stoolTileClass(nr, openLines > 0)}
+                  className={`kassa-table-picker__tile ${stoolTileClass(nr, openLines > 0)}`}
                 >
                   <div className="text-lg">{s.stoolNumber}</div>
                   <div className="text-[11px] opacity-70">

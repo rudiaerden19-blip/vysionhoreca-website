@@ -41,7 +41,7 @@ export function KassaModePicker({
   }, [open])
 
   return (
-    <div ref={rootRef} className="relative z-[40] shrink-0">
+    <div ref={rootRef} className="kassa-mode-picker relative z-[40] shrink-0">
       <button
         type="button"
         data-testid="kassa-mode-picker"
@@ -78,7 +78,7 @@ export function KassaModePicker({
                 role="option"
                 aria-selected={selected}
                 data-testid={`kassa-mode-${option.id}`}
-                className={`flex w-full items-center px-3 py-2.5 text-left text-sm ${
+                className={`kassa-mode-picker__option flex w-full items-center px-3 py-2.5 text-left text-sm ${
                   selected ? rowActiveClassName : `${rowInactiveClassName} ${rowHoverClassName}`
                 }`}
                 onClick={() => {
