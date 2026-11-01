@@ -120,6 +120,8 @@ import {
   isBlonkysFlatBlackKassaTenant,
   KASSA_BLONKYS_FLAT_HTML_CLASS,
   KASSA_BLONKYS_KEEP_CHROME_CLASS,
+  blonkysSpeelsCategoryStripButtonClass,
+  blonkysSpeelsQuickMenuPanelButtonClass,
 } from '@/lib/blonkys-flat-kassa-buttons'
 import {
   isOhGreenKassaTenant,
@@ -5554,7 +5556,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       [
         'flex w-full min-h-[2.5rem] min-w-0 items-center justify-center overflow-hidden whitespace-normal break-words px-1 py-1 text-center text-[11px] font-medium leading-tight tracking-[0.01em] sm:min-h-[2.65rem] sm:text-xs',
         kassaPosLuxury
-          ? kassaPosQuickMenuPanelButtonClass(posChrome)
+          ? blonkysFlatButtons
+            ? blonkysSpeelsQuickMenuPanelButtonClass()
+            : kassaPosQuickMenuPanelButtonClass(posChrome)
           : kassaClassicDark
             ? `rounded-xl ${KASSA_CLASSIC_ACTION_BTN_FACE} active:brightness-95`
             : `rounded-xl ${KASSA_LIGHT_BTN_FACE} ${KASSA_POS_QUICK_MENU_LIFT_SHADOW} hover:brightness-110 active:brightness-90`,
@@ -5564,7 +5568,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             : 'pointer-events-none opacity-40'
           : '',
       ].join(' '),
-    [kassaPosLuxury, kassaClassicDark, kassaLight, posChrome],
+    [kassaPosLuxury, kassaClassicDark, kassaLight, posChrome, blonkysFlatButtons],
   )
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
@@ -6428,7 +6432,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       } ${
                         kassaPosLuxury
                           ? posChrome === 'speels'
-                            ? kassaSpeelsCategoryStripButtonClass(active)
+                            ? blonkysFlatButtons
+                              ? blonkysSpeelsCategoryStripButtonClass(active)
+                              : kassaSpeelsCategoryStripButtonClass(active)
                             : kassaPosButtonClass(active, posChrome)
                           : kassaClassicDark
                             ? `rounded-lg border-transparent ${active ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`

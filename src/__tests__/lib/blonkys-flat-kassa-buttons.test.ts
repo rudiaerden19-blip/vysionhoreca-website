@@ -1,4 +1,8 @@
-import { isBlonkysFlatBlackKassaTenant } from '@/lib/blonkys-flat-kassa-buttons'
+import {
+  blonkysSpeelsCategoryStripButtonClass,
+  blonkysSpeelsQuickMenuPanelButtonClass,
+  isBlonkysFlatBlackKassaTenant,
+} from '@/lib/blonkys-flat-kassa-buttons'
 
 describe('isBlonkysFlatBlackKassaTenant', () => {
   it('geldt alleen voor restaurant en eethuis slug', () => {
@@ -13,5 +17,12 @@ describe('isBlonkysFlatBlackKassaTenant', () => {
     expect(isBlonkysFlatBlackKassaTenant('the-lagoon')).toBe(false)
     expect(isBlonkysFlatBlackKassaTenant('blonkys')).toBe(false)
     expect(isBlonkysFlatBlackKassaTenant('')).toBe(false)
+  })
+
+  it('gebruikt grijs speels-chrome voor categorie en snelmenu', () => {
+    expect(blonkysSpeelsCategoryStripButtonClass(false)).toContain('kassa-speels-order-type-btn')
+    expect(blonkysSpeelsCategoryStripButtonClass(false)).not.toContain('kassa-speels-blue-gloss-btn')
+    expect(blonkysSpeelsQuickMenuPanelButtonClass()).toContain('kassa-speels-order-type-btn')
+    expect(blonkysSpeelsQuickMenuPanelButtonClass()).not.toContain('kassa-speels-blue-gloss-btn')
   })
 })
