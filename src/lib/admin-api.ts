@@ -240,6 +240,8 @@ export interface TenantSettings {
   kassa_cloud_print_enabled?: boolean
   /** Superadmin: geen thermische bon / print-agent voor deze tenant (default uit) */
   kassa_thermal_print_disabled?: boolean
+  /** Draft/gele bon: geen buddy-keuken in Print Agent (default uit) */
+  kassa_draft_bon_skip_buddy_kitchen?: boolean
   /** true = artikelregels in Z-mail/print/PDF naar boekhouder (standaard true) */
   z_report_send_articles_to_accountant?: boolean
   /** true = zaak vult Z zelf (cash, Bancontact, meenemen 6%, daar eten 21%). Default false. */

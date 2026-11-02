@@ -83,6 +83,7 @@ import {
 } from '@/lib/kassa-lan-print'
 import { kassaShowsDrawerInsteadOfBtwBon } from '@/lib/kassa-footer-drawer'
 import { isKassaThermalPrintDisabled } from '@/lib/kassa-thermal-print-disabled'
+import { shouldSkipBuddyKitchenOnKassaDraftBon } from '@/lib/kassa-draft-bon-skip-buddy-kitchen'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -4826,6 +4827,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
+    /** Tenant-flag: geen auto-keuken na kassaslip (sneller). Keuken blijft via receiptMode keuken / keukenscherm. */
+    const skipBuddyAfterKassaSlip =
+      receiptMode === 'kassa' && shouldSkipBuddyKitchenOnKassaDraftBon(tenantInfo)
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -4833,6 +4837,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       copies: isVatInvoice ? 1 : isDraft ? draftCopies : paidCopies,
       openDrawer: isCash,
       receiptMode,
+      ...(skipBuddyAfterKassaSlip ? { companionKitchen: false } : {}),
       reviewUrl: `https://www.vysion-kassa.com/shop/${tenant}/review`,
       /**
        * BTW-bon: géén orderData — anders bouwt de Print Agent een gewone kassabon
