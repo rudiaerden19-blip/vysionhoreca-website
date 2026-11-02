@@ -83,7 +83,10 @@ import {
 } from '@/lib/kassa-lan-print'
 import { kassaShowsDrawerInsteadOfBtwBon } from '@/lib/kassa-footer-drawer'
 import { isKassaThermalPrintDisabled } from '@/lib/kassa-thermal-print-disabled'
-import { shouldSkipBuddyKitchenOnKassaDraftBon } from '@/lib/kassa-draft-bon-skip-buddy-kitchen'
+import {
+  shouldNonBlockKassaPaidReceiptPrint,
+  shouldSkipBuddyKitchenOnKassaDraftBon,
+} from '@/lib/kassa-draft-bon-skip-buddy-kitchen'
 import {
   offlineDbLoadMenuSnapshot,
   offlineDbSaveMenuSnapshot,
@@ -4827,9 +4830,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     const paidCopies = 2
     const draftCopies = opts?.draftCopies === 2 ? 2 : 1
-    /** Tenant-flag: geen auto-keuken na kassaslip (sneller). Keuken blijft via receiptMode keuken / keukenscherm. */
+    /** Alleen voorlopige kassabon — betaalde bon + buddy-keuken blijven ongewijzigd. */
     const skipBuddyAfterKassaSlip =
-      receiptMode === 'kassa' && shouldSkipBuddyKitchenOnKassaDraftBon(tenantInfo)
+      isDraft &&
+      receiptMode === 'kassa' &&
+      shouldSkipBuddyKitchenOnKassaDraftBon(tenantInfo)
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -8450,6 +8455,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             const orderToPrint = lastOrder
             closeSuccessReceiptModal()
             if (!orderToPrint) return
+            if (shouldNonBlockKassaPaidReceiptPrint(tenantInfo)) {
+              void printReceipt(orderToPrint)
+              return
+            }
             try {
               setSuccessReceiptPrintBusy(true)
               await printReceipt(orderToPrint)

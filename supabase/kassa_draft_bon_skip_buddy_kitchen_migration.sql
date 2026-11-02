@@ -4,7 +4,7 @@ ALTER TABLE tenant_settings
   ADD COLUMN IF NOT EXISTS kassa_draft_bon_skip_buddy_kitchen BOOLEAN NOT NULL DEFAULT false;
 
 COMMENT ON COLUMN tenant_settings.kassa_draft_bon_skip_buddy_kitchen IS
-  'true = kassaslip stuurt companionKitchen false (sneller, geen auto-keuken na bar/kassa). Keuken via receiptMode keuken blijft. Per tenant via SQL/superadmin.';
+  'Pilot (o.a. drnerkebablaakdal): draft zonder buddy-keuken; betaalde bon zelfde prints, UI wacht niet op agent. Default false.';
 
 -- Pilot: Dr. Ner Kebab Laakdal (mand ~4s door sync buddy-keuken).
 UPDATE tenant_settings

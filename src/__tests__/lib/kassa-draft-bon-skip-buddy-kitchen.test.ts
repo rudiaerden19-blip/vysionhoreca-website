@@ -1,4 +1,7 @@
-import { shouldSkipBuddyKitchenOnKassaDraftBon } from '@/lib/kassa-draft-bon-skip-buddy-kitchen'
+import {
+  shouldNonBlockKassaPaidReceiptPrint,
+  shouldSkipBuddyKitchenOnKassaDraftBon,
+} from '@/lib/kassa-draft-bon-skip-buddy-kitchen'
 
 describe('shouldSkipBuddyKitchenOnKassaDraftBon', () => {
   it('default uit voor ontbrekende settings', () => {
@@ -11,6 +14,15 @@ describe('shouldSkipBuddyKitchenOnKassaDraftBon', () => {
 
   it('aan alleen bij expliciet true', () => {
     expect(shouldSkipBuddyKitchenOnKassaDraftBon({ kassa_draft_bon_skip_buddy_kitchen: true })).toBe(
+      true,
+    )
+  })
+})
+
+describe('shouldNonBlockKassaPaidReceiptPrint', () => {
+  it('zelfde pilot-flag als draft buddy skip', () => {
+    expect(shouldNonBlockKassaPaidReceiptPrint(null)).toBe(false)
+    expect(shouldNonBlockKassaPaidReceiptPrint({ kassa_draft_bon_skip_buddy_kitchen: true })).toBe(
       true,
     )
   })
