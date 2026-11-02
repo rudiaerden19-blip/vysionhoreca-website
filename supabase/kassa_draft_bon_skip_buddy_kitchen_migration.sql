@@ -4,9 +4,9 @@ ALTER TABLE tenant_settings
   ADD COLUMN IF NOT EXISTS kassa_draft_bon_skip_buddy_kitchen BOOLEAN NOT NULL DEFAULT false;
 
 COMMENT ON COLUMN tenant_settings.kassa_draft_bon_skip_buddy_kitchen IS
-  'Pilot (o.a. drnerkebablaakdal): draft zonder buddy-keuken; betaalde bon zelfde prints, UI wacht niet op agent. Default false.';
+  'Pilot (o.a. donerkebablaakdal): draft zonder buddy-keuken; betaalde bon zelfde prints, UI wacht niet op agent. Default false.';
 
 -- Pilot: Dr. Ner Kebab Laakdal (mand ~4s door sync buddy-keuken).
 UPDATE tenant_settings
 SET kassa_draft_bon_skip_buddy_kitchen = true
-WHERE tenant_slug = 'drnerkebablaakdal';
+WHERE tenant_slug = 'donerkebablaakdal';

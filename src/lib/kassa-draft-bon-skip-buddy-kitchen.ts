@@ -1,5 +1,5 @@
 /**
- * Pilot per tenant (SQL/superadmin). Alleen `drnerkebablaakdal` standaard via migratie.
+ * Pilot per tenant (SQL/superadmin). Alleen `donerkebablaakdal` standaard via migratie.
  * - Voorlopige bon: geen buddy-keuken na kassaslip (sneller mand).
  * - Betaalde bon: zelfde agent-flow (buddy blijft); UI wacht niet op POST (zie kassa success print).
  */
