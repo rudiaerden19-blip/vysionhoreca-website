@@ -605,16 +605,17 @@ function parseItems(raw: unknown): unknown[] {
   return []
 }
 
+export type OrderVatGrossSlice = { gross: number; rate: CategoryVatPercent }
+
 /**
- * Brutobedrag en btw per officiële tarief voor één order.
- * Tarief op regel: `btw_percentage`indien aanwezig, anders zaak‑default.
- * Verschil `order.total`− som(regels): toegewezen aan defaulttarief (kostenbezorging enz.).
+ * Inclusieve stukjes van één order, zelfde verdeling als het Z-rapport.
+ * Eén stukje per artikelregel, plus het restbedrag tot `order.total` op het defaulttarief.
  */
-export function allocateVatBucketsForSingleOrder(
+export function listOrderVatGrossSlices(
   order: ZReportVatOrderSlice,
   tenantDefaultPct: number,
   ctx?: ZReportVatContext | null,
-): { subtotalExcl: number; buckets: Record<CategoryVatPercent, number>; baseBuckets: Record<CategoryVatPercent, number> } {
+): OrderVatGrossSlice[] {
   const orderType = normalizeOrderTypeForVat(order.order_type)
   const country = ctx?.tenantCountry
   const defaultOrderRate = resolveVatPercentForCategoryAndOrderType(
@@ -624,10 +625,8 @@ export function allocateVatBucketsForSingleOrder(
     country,
   )
   const orderTotal = round2(Number(order.total) || 0)
-  const buckets = emptyVatBuckets()
-  const baseBuckets = emptyVatBuckets()
   const items = parseItems(order.items)
-  const lines: { gross: number; rate: CategoryVatPercent }[] = []
+  const lines: OrderVatGrossSlice[] = []
 
   for (const raw of items) {
     if (!raw || typeof raw !== 'object') continue
@@ -644,19 +643,26 @@ export function allocateVatBucketsForSingleOrder(
     lines.push({ gross: delta, rate: defaultOrderRate })
   }
 
-  let subtotalExcl = 0
-
-  if (lines.length === 0) {
-    if (orderTotal <= 0) {
-      return { subtotalExcl: 0, buckets, baseBuckets }
-    }
-    const r = defaultOrderRate / 100
-    const baseExcl = round2(orderTotal / (1 + r))
-    const tax = round2(orderTotal - baseExcl)
-    buckets[defaultOrderRate] = tax
-    baseBuckets[defaultOrderRate] = baseExcl
-    return { subtotalExcl: baseExcl, buckets, baseBuckets }
+  if (lines.length === 0 && orderTotal > 0) {
+    return [{ gross: orderTotal, rate: defaultOrderRate }]
   }
+  return lines
+}
+
+/**
+ * Brutobedrag en btw per officiële tarief voor één order.
+ * Tarief op regel: `btw_percentage`indien aanwezig, anders zaak‑default.
+ * Verschil `order.total`− som(regels): toegewezen aan defaulttarief (kostenbezorging enz.).
+ */
+export function allocateVatBucketsForSingleOrder(
+  order: ZReportVatOrderSlice,
+  tenantDefaultPct: number,
+  ctx?: ZReportVatContext | null,
+): { subtotalExcl: number; buckets: Record<CategoryVatPercent, number>; baseBuckets: Record<CategoryVatPercent, number> } {
+  const buckets = emptyVatBuckets()
+  const baseBuckets = emptyVatBuckets()
+  const lines = listOrderVatGrossSlices(order, tenantDefaultPct, ctx)
+  let subtotalExcl = 0
 
   for (const { gross, rate } of lines) {
     const r = rate / 100

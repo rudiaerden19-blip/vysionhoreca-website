@@ -7,6 +7,8 @@ import {
   getBillitLagoonEnvConfig,
   isBillitLagoonPilotTenant,
 } from '@/lib/billit-lagoon-pilot'
+import { listOrderVatGrossSlices, type OrderVatGrossSlice } from '@/lib/order-vat'
+import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
 
 export type ZReportRowForBillit = {
   report_date: string
@@ -22,6 +24,7 @@ export type ZReportRowForBillit = {
   order_ids: string[] | null
   is_closed: boolean | null
   closed_at: string | null
+  btw_percentage?: number | null
 }
 
 function num(v: unknown): number {
@@ -37,54 +40,91 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100
 }
 
-/** Z-kolommen: tax_low = 6%, tax_mid = 12% (BE; 9% zit in dezelfde kolom), tax_high = 21%. */
-const BILLIT_VAT_BUCKETS = [
-  { rate: 6, field: 'tax_low' },
-  { rate: 12, field: 'tax_mid' },
-  { rate: 21, field: 'tax_high' },
-] as const
-
 export type BillitVatLine = { rate: number; totalIncl: number }
 
-/**
- * Eén regel per btw-tarief dat op het Z-rapport staat.
- * Billit rekent een regel zonder VATPercentage als 0%. InclLeading + TotalIncl
- * laat Billit de prijs exclusief uit het bedrag inclusief en het tarief halen.
- */
-export function billitVatLines(report: ZReportRowForBillit): BillitVatLine[] {
-  const dayTotal = round2(num(report.total))
-  const buckets = BILLIT_VAT_BUCKETS
-    .map((b) => ({ rate: b.rate, vat: round2(num(report[b.field])) }))
-    .filter((b) => b.vat > 0)
-  if (dayTotal <= 0 || buckets.length === 0) return []
-  if (buckets.length === 1) return [{ rate: buckets[0].rate, totalIncl: dayTotal }]
-
-  const raw = buckets.map((b) => ({
-    rate: b.rate,
-    totalIncl: round2((b.vat * (100 + b.rate)) / b.rate),
-  }))
-  const sum = round2(raw.reduce((s, b) => s + b.totalIncl, 0))
-  const diff = round2(dayTotal - sum)
-  const biggest = raw.reduce((a, b) => (b.totalIncl > a.totalIncl ? b : a))
-  biggest.totalIncl = round2(biggest.totalIncl + diff)
-  return raw.filter((b) => b.totalIncl > 0)
+/** Zelfde afronding als Billit bij InclLeading: excl uit incl, btw = incl − excl. */
+export function billitVatFromInclusive(totalIncl: number, rate: number): { excl: number; vat: number } {
+  const incl = round2(totalIncl)
+  const excl = round2(incl / (1 + rate / 100))
+  return { excl, vat: round2(incl - excl) }
 }
 
 /**
- * Factuurregels = dagomzet incl. BTW, gesplitst per tarief.
- * Contant/kaart/online en losse bonnen zijn dezelfde omzet en mogen geen extra regels zijn.
+ * Billit rekent de btw één keer per tarief op het dagbedrag, niet als som van de bonnen.
+ * Per tarief kiezen we het inclusief bedrag waarvan die formule de btw van de bonnen geeft.
+ * Het verschil met de echte dagomzet gaat op een 0%-regel, zodat totaal incl. en btw
+ * gelijk blijven aan het Z-rapport.
+ */
+export function billitVatLinesFromSlices(slices: readonly OrderVatGrossSlice[]): BillitVatLine[] {
+  const byRate = new Map<number, { gross: number; vat: number }>()
+  for (const slice of slices) {
+    const gross = round2(slice.gross)
+    const rate = slice.rate
+    if (gross <= 0 || !Number.isFinite(rate) || rate <= 0) continue
+    const vat = billitVatFromInclusive(gross, rate).vat
+    const prev = byRate.get(rate)
+    if (prev) {
+      prev.gross = round2(prev.gross + gross)
+      prev.vat = round2(prev.vat + vat)
+    } else {
+      byRate.set(rate, { gross, vat })
+    }
+  }
+
+  const out: BillitVatLine[] = []
+  let placedIncl = 0
+  let dayIncl = 0
+  for (const bucket of byRate.values()) dayIncl = round2(dayIncl + bucket.gross)
+
+  for (const rate of [...byRate.keys()].sort((a, b) => a - b)) {
+    const bucket = byRate.get(rate)!
+    const incl = inclusiveMatchingVat(bucket.gross, rate, bucket.vat)
+    out.push({ rate, totalIncl: incl })
+    placedIncl = round2(placedIncl + incl)
+  }
+
+  const plug = round2(dayIncl - placedIncl)
+  if (plug !== 0) out.push({ rate: 0, totalIncl: plug })
+  return out
+}
+
+function inclusiveMatchingVat(gross: number, rate: number, targetVat: number): number {
+  if (billitVatFromInclusive(gross, rate).vat === round2(targetVat)) return round2(gross)
+  const start = Math.round(round2(gross) * 100)
+  const want = round2(targetVat)
+  for (let delta = 1; delta <= 5000; delta++) {
+    for (const sign of [-1, 1]) {
+      const cents = start + sign * delta
+      if (cents <= 0) continue
+      const incl = cents / 100
+      if (billitVatFromInclusive(incl, rate).vat === want) return incl
+    }
+  }
+  return round2(gross)
+}
+
+export function billitLinesVatTotal(lines: readonly BillitVatLine[]): number {
+  return round2(lines.reduce((sum, line) => sum + billitVatFromInclusive(line.totalIncl, line.rate).vat, 0))
+}
+
+/**
+ * Factuurregels = dagomzet incl. BTW. Billit leidt de btw af uit bedrag + tarief,
+ * dus de regels zijn zo gegroepeerd dat die btw gelijk is aan de som van de bonnen.
+ * Contant/kaart/online zijn dezelfde omzet en mogen geen extra regels zijn.
  */
 export function buildBillitOrderPayload(
   tenantSlug: string,
   report: ZReportRowForBillit,
+  slices: readonly OrderVatGrossSlice[],
 ): Record<string, unknown> {
   const reportDate = String(report.report_date)
   const extId = billitExternalProviderId(tenantSlug, reportDate)
-  const dayTotal = num(report.total)
-  const taxTotal = num(report.tax_low) + num(report.tax_mid) + num(report.tax_high)
-  const excl = num(report.subtotal)
   const closedAt = report.closed_at || `${reportDate}T23:59:59`
-  const vatLines = billitVatLines(report)
+  const vatLines = billitVatLinesFromSlices(slices)
+  const dayTotal = round2(vatLines.reduce((sum, line) => sum + line.totalIncl, 0))
+  const taxTotal = billitLinesVatTotal(vatLines)
+  const excl = round2(dayTotal - taxTotal)
+  const taxableCount = vatLines.filter((line) => line.rate > 0).length
 
   const orderDate = closedAt
   const expiryDate = new Date(closedAt)
@@ -113,18 +153,58 @@ export function buildBillitOrderPayload(
       `BTW ${money(taxTotal)} zit in dat bedrag.`,
       `Contant ${money(num(report.cash_payments))}; kaart ${money(num(report.card_payments))}; online ${money(num(report.online_payments))}.`,
     ].join(' '),
-    OrderLines: vatLines.map((line) => ({
-      Description:
-        vatLines.length === 1
-          ? `Dagomzet ${reportDate} (${line.rate}% btw, ${report.order_count} bonnen)`
-          : `Dagomzet ${reportDate} (${line.rate}% btw)`,
-      Quantity: 1,
-      VATPercentage: line.rate,
-      InclLeading: true,
-      TotalIncl: line.totalIncl,
-      UnitPriceIncl: line.totalIncl,
-    })),
+    OrderLines: vatLines.map((line) => {
+      return {
+        Description:
+          line.rate === 0
+            ? `Afronding btw kassabonnen ${reportDate}`
+            : taxableCount === 1
+              ? `Dagomzet ${reportDate} (${line.rate}% btw, ${report.order_count} bonnen)`
+              : `Dagomzet ${reportDate} (${line.rate}% btw)`,
+        Quantity: 1,
+        VATPercentage: line.rate,
+        InclLeading: true,
+        TotalIncl: line.totalIncl,
+        UnitPriceIncl: line.totalIncl,
+      }
+    }),
   }
+}
+
+async function loadClosedDayVatSlices(
+  client: SupabaseClient,
+  tenantSlug: string,
+  report: ZReportRowForBillit,
+): Promise<{ ok: true; slices: OrderVatGrossSlice[] } | { ok: false; error: string }> {
+  const ids = (report.order_ids ?? []).map((id) => String(id)).filter(Boolean)
+  if (ids.length === 0) return { ok: false, error: 'Z-rapport heeft geen bonnen' }
+
+  const orders: { id: string; total: unknown; items: unknown; order_type: unknown }[] = []
+  for (let i = 0; i < ids.length; i += 100) {
+    const chunk = ids.slice(i, i + 100)
+    const { data, error } = await client
+      .from('orders')
+      .select('id, total, items, order_type')
+      .eq('tenant_slug', tenantSlug)
+      .in('id', chunk)
+    if (error) return { ok: false, error: error.message }
+    orders.push(...((data ?? []) as typeof orders))
+  }
+
+  const byId = new Map(orders.map((order) => [String(order.id), order]))
+  const missing = ids.filter((id) => !byId.has(id))
+  if (missing.length > 0) return { ok: false, error: 'Niet alle bonnen van het Z-rapport zijn gevonden' }
+
+  const ctx = await fetchZReportVatContextFromSupabase(client, tenantSlug)
+  const defaultPct = num(report.btw_percentage) || 21
+  const slices: OrderVatGrossSlice[] = []
+  for (const id of ids) {
+    const order = byId.get(id)
+    if (!order) continue
+    slices.push(...listOrderVatGrossSlices(order, defaultPct, ctx))
+  }
+  if (slices.length === 0) return { ok: false, error: 'Geen btw-regels voor deze dag' }
+  return { ok: true, slices }
 }
 
 export type BillitSyncResult =
@@ -171,7 +251,7 @@ export async function syncBillitLagoonZDay(
   const { data: report, error: reportErr } = await client
     .from('z_reports')
     .select(
-      'report_date, order_count, subtotal, tax_low, tax_mid, tax_high, total, cash_payments, card_payments, online_payments, order_ids, is_closed, closed_at',
+      'report_date, order_count, subtotal, tax_low, tax_mid, tax_high, total, cash_payments, card_payments, online_payments, order_ids, is_closed, closed_at, btw_percentage',
     )
     .eq('tenant_slug', tenantSlug)
     .eq('report_date', reportDate)
@@ -183,7 +263,16 @@ export async function syncBillitLagoonZDay(
     return { ok: false, error: 'Dag is nog niet afgesloten' }
   }
 
-  const payload = buildBillitOrderPayload(tenantSlug, report as ZReportRowForBillit)
+  const row = report as ZReportRowForBillit
+  const slices = await loadClosedDayVatSlices(client, tenantSlug, row)
+  if (!slices.ok) return slices
+  const payload = buildBillitOrderPayload(tenantSlug, row, slices.slices)
+  const payloadVat = num((payload as { TotalVAT?: unknown }).TotalVAT)
+  const reportVat = round2(num(row.tax_low) + num(row.tax_mid) + num(row.tax_high))
+  const payloadIncl = num((payload as { TotalIncl?: unknown }).TotalIncl)
+  if (Math.abs(payloadIncl - round2(num(row.total))) > 0.02 || Math.abs(payloadVat - reportVat) > 0.02) {
+    return { ok: false, error: 'Billit-btw wijkt af van het Z-rapport' }
+  }
 
   await client.from('billit_sync_log').upsert(
     {

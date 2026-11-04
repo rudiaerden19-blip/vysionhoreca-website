@@ -4,7 +4,12 @@ import {
   getBillitLagoonEnvConfig,
   isBillitLagoonPilotTenant,
 } from '@/lib/billit-lagoon-pilot'
-import { billitVatLines, buildBillitOrderPayload } from '@/lib/billit-sync-z-day'
+import {
+  billitLinesVatTotal,
+  billitVatFromInclusive,
+  billitVatLinesFromSlices,
+  buildBillitOrderPayload,
+} from '@/lib/billit-sync-z-day'
 
 describe('billit-lagoon-pilot', () => {
   it('only enables pilot for thelagoon slug', () => {
@@ -55,50 +60,83 @@ describe('buildBillitOrderPayload', () => {
     closed_at: '2026-10-31T01:00:00.000Z',
   }
 
-  it('zet 21% op de regel als de dag alleen hoog tarief heeft', () => {
-    const payload = buildBillitOrderPayload('thelagoon', {
-      ...base,
-      tax_low: 0,
-      tax_mid: 0,
-      tax_high: 471.18,
-      total: 2718.5,
-    })
+  it('houdt de btw van de bonnen aan, ook als één dagregel zou afronden', () => {
+    const slices = [
+      { gross: 10, rate: 21 as const },
+      { gross: 10, rate: 21 as const },
+    ]
+    const packed = billitVatLinesFromSlices(slices)
+    expect(billitLinesVatTotal(packed)).toBe(3.48)
+    expect(packed.reduce((sum, line) => sum + line.totalIncl, 0)).toBe(20)
+    expect(billitVatFromInclusive(20, 21).vat).toBe(3.47)
+    expect(packed.some((line) => line.rate === 0)).toBe(true)
+    expect(packed.some((line) => line.rate === 21)).toBe(true)
 
-    expect(payload.TotalIncl).toBe(2718.5)
-    expect(payload.TotalVAT).toBe(471.18)
+    const payload = buildBillitOrderPayload(
+      'thelagoon',
+      {
+        ...base,
+        tax_low: 0,
+        tax_mid: 0,
+        tax_high: 3.48,
+        total: 20,
+        order_count: 2,
+      },
+      slices,
+    )
+    expect(payload.TotalIncl).toBe(20)
+    expect(payload.TotalVAT).toBe(3.48)
+    expect(payload.TotalExcl).toBe(16.52)
     const lines = payload.OrderLines as Record<string, unknown>[]
-    expect(lines).toHaveLength(1)
-    expect(lines[0]).toMatchObject({
-      Quantity: 1,
-      VATPercentage: 21,
-      InclLeading: true,
-      TotalIncl: 2718.5,
-      UnitPriceIncl: 2718.5,
-    })
-    expect(String(lines[0]?.Description)).toContain('21% btw')
-    expect(String(lines[0]?.Description)).not.toContain('0%')
+    expect(lines.some((line) => line.VATPercentage === 21 && line.InclLeading === true)).toBe(true)
+    expect(String(lines.find((line) => line.VATPercentage === 21)?.Description)).toContain('21% btw')
+    expect(String(lines.find((line) => line.VATPercentage === 0)?.Description)).toContain('Afronding btw')
     expect(String(payload.Comments)).toContain('Contant 100.00')
   })
 
+  it('zet geen afrondingsregel als de dag-btw al klopt', () => {
+    const packed = billitVatLinesFromSlices([
+      { gross: 5, rate: 21 },
+      { gross: 5, rate: 21 },
+    ])
+    expect(packed).toEqual([{ rate: 21, totalIncl: 10 }])
+    expect(billitLinesVatTotal(packed)).toBe(1.74)
+  })
+
   it('splitst 6, 12 en 21 zonder 0%-regel en telt op tot het dagtotaal', () => {
-    const report = {
-      ...base,
-      report_date: '2026-10-28',
-      order_count: 2,
-      subtotal: 80,
-      tax_low: 1,
-      tax_mid: 2,
-      tax_high: 3,
-      total: 86,
-      cash_payments: 50,
-      card_payments: 36,
-    }
-    const lines = billitVatLines(report)
+    const slices = [
+      { gross: 17.67, rate: 6 as const },
+      { gross: 18.67, rate: 12 as const },
+      { gross: 17.43, rate: 21 as const },
+    ]
+    const lines = billitVatLinesFromSlices(slices)
     expect(lines.map((l) => l.rate)).toEqual([6, 12, 21])
     const summed = lines.reduce((sum, line) => sum + line.totalIncl, 0)
-    expect(Math.round(summed * 100) / 100).toBe(86)
+    expect(Math.round(summed * 100) / 100).toBe(
+      Math.round(slices.reduce((sum, slice) => sum + slice.gross, 0) * 100) / 100,
+    )
+    expect(billitLinesVatTotal(lines)).toBe(
+      Math.round(
+        slices.reduce((sum, slice) => sum + billitVatFromInclusive(slice.gross, slice.rate).vat, 0) * 100,
+      ) / 100,
+    )
 
-    const payload = buildBillitOrderPayload('thelagoon', report)
+    const payload = buildBillitOrderPayload(
+      'thelagoon',
+      {
+        ...base,
+        report_date: '2026-10-28',
+        order_count: 2,
+        subtotal: 80,
+        tax_low: 1,
+        tax_mid: 2,
+        tax_high: 3,
+        total: 86,
+        cash_payments: 50,
+        card_payments: 36,
+      },
+      slices,
+    )
     const orderLines = payload.OrderLines as Record<string, unknown>[]
     expect(orderLines.map((l) => l.VATPercentage)).toEqual([6, 12, 21])
     expect(orderLines.every((l) => l.InclLeading === true)).toBe(true)
