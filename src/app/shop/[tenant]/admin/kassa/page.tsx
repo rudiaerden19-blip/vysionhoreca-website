@@ -258,6 +258,7 @@ import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { useKassaOfflineFlushBridge } from '@/lib/use-kassa-offline-flush-bridge'
 import type { KassaPayOption } from '@/components/kassa/KassaPaymentModal'
 import { KassaPaymentModal } from '@/components/kassa/KassaPaymentModal'
+import { isDonerKebabLaakdalCashTenderTenant } from '@/lib/kassa-cash-tender'
 import { KassaJetonPaymentModal } from '@/components/kassa/KassaJetonPaymentModal'
 import { normalizeKassaJetonDenominations } from '@/lib/kassa-jeton-math'
 import {
@@ -8203,6 +8204,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           setShowPaymentModal(false)
         }}
         appearance={kassaAppearanceDark ? 'dark': 'light'}
+        cashTender={isDonerKebabLaakdalCashTenderTenant(tenant)}
       />
 
       <KassaTerminalPayModal

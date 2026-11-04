@@ -3664,6 +3664,8 @@
     "jetonSalePointBar": "舞池 / 吧台",
     "jetonSalePointIjs": "冰淇淋 / 露台",
     "toPay": "应付",
+    "cashReceivedLabel": "顾客现金",
+    "cashChangeLabel": "找零",
     "payCash": "现金",
     "payCard": "刷卡",
     "payIdeal": "iDEAL",

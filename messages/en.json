@@ -4319,6 +4319,8 @@
     "jetonSalePointBar": "Dancing / bar",
     "jetonSalePointIjs": "Ice cream / terrace",
     "toPay": "Amount due",
+    "cashReceivedLabel": "Cash from customer",
+    "cashChangeLabel": "Give back",
     "payCash": "Cash",
     "payCard": "Card",
     "payIdeal": "iDEAL",

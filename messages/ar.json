@@ -3664,6 +3664,8 @@
     "jetonSalePointBar": "الرقص / البار",
     "jetonSalePointIjs": "الآيس كريم / التراس",
     "toPay": "المستحق",
+    "cashReceivedLabel": "نقد من الزبون",
+    "cashChangeLabel": "الباقي",
     "payCash": "نقداً",
     "payCard": "بطاقة",
     "payIdeal": "iDEAL",

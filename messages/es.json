@@ -3664,6 +3664,8 @@
     "jetonSalePointBar": "Discoteca / barra",
     "jetonSalePointIjs": "Heladería / terraza",
     "toPay": "A pagar",
+    "cashReceivedLabel": "Efectivo del cliente",
+    "cashChangeLabel": "A devolver",
     "payCash": "Efectivo",
     "payCard": "Tarjeta",
     "payIdeal": "iDEAL",

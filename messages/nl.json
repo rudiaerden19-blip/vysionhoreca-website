@@ -4319,6 +4319,8 @@
     "jetonSalePointBar": "Dancing / bar",
     "jetonSalePointIjs": "Ijssalon / terras",
     "toPay": "Te betalen",
+    "cashReceivedLabel": "Cash van klant",
+    "cashChangeLabel": "Teruggeven",
     "payCash": "Contant",
     "payCard": "PIN/Kaart",
     "payIdeal": "iDEAL",

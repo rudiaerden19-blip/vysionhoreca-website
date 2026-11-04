@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/i18n'
+import { cashChangeDueEuro, parseCashTenderInput } from '@/lib/kassa-cash-tender'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export type KassaQuickPayMethod = 'CASH' |  'CARD' |  'IDEAL' |  'BANCONTACT'
@@ -25,6 +26,7 @@ export function KassaPaymentModal({
   jetonLabel,
   appearance = 'light',
   ticketDiscount,
+  cashTender = false,
 }: {
   open: boolean
   total: number
@@ -39,14 +41,21 @@ export function KassaPaymentModal({
   appearance?: 'light' |  'dark'
   /** Alleen Oh Green: −20% op de hele rekening, in dit venster. */
   ticketDiscount?: { active: boolean; onToggle: () => void }
+  /** Alleen Doner Kebap Laakdal: cash ontvangen en teruggeven. */
+  cashTender?: boolean
 }) {
   const { t } = useLanguage()
   const dark = appearance === 'dark'
   const [optimisticPayBusy, setOptimisticPayBusy] = useState(false)
+  const [cashReceived, setCashReceived] = useState('')
   const payLocked = payBusy || optimisticPayBusy
+  const changeDue = cashChangeDueEuro(total, parseCashTenderInput(cashReceived))
 
   useEffect(() => {
-    if (!open) setOptimisticPayBusy(false)
+    if (!open) {
+      setOptimisticPayBusy(false)
+      setCashReceived('')
+    }
   }, [open])
 
   if (!open) return null
@@ -77,6 +86,38 @@ export function KassaPaymentModal({
             <p className={toPayMuted}>{t('kassaApp.toPay')}</p>
             <p className={`text-5xl font-bold ${totalAccent}`}>€{total.toFixed(2)}</p>
           </div>
+          {cashTender ? (
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <label className="block">
+                <span className={`block text-sm font-medium mb-1 ${toPayMuted}`}>{t('kassaApp.cashReceivedLabel')}</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={cashReceived}
+                  onChange={(e) => setCashReceived(e.target.value)}
+                  className={
+                    dark
+                      ? 'w-full rounded-xl border-2 border-zinc-500 bg-[#263043] px-3 py-3 text-center text-3xl font-bold text-zinc-50'
+                      : 'w-full rounded-xl border-2 border-gray-300 bg-gray-50 px-3 py-3 text-center text-3xl font-bold text-gray-900'
+                  }
+                  aria-label={t('kassaApp.cashReceivedLabel')}
+                />
+              </label>
+              <div>
+                <span className={`block text-sm font-medium mb-1 ${toPayMuted}`}>{t('kassaApp.cashChangeLabel')}</span>
+                <div
+                  className={
+                    dark
+                      ? 'w-full rounded-xl border-2 border-emerald-500 bg-[#263043] px-3 py-3 text-center text-3xl font-bold text-emerald-300'
+                      : 'w-full rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-3 text-center text-3xl font-bold text-emerald-700'
+                  }
+                  aria-live="polite"
+                >
+                  €{changeDue.toFixed(2)}
+                </div>
+              </div>
+            </div>
+          ) : null}
           <div className="grid grid-cols-2 gap-4">
             {options.map((pm) => (
               <button
