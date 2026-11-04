@@ -1,4 +1,4 @@
-/** Wisselgeld in het betaalvenster — alleen Doner Kebap Laakdal. */
+/** Wisselgeld in het betaalvenster — alleen tenant `dnerkebablaakdal`. */
 
 function compactTenantToken(value: string | null | undefined): string {
   return String(value ?? '')
@@ -8,7 +8,7 @@ function compactTenantToken(value: string | null | undefined): string {
 }
 
 export function isDonerKebabLaakdalCashTenderTenant(slug: string | null | undefined): boolean {
-  return compactTenantToken(slug) === 'donerkebablaakdal'
+  return compactTenantToken(slug) === 'dnerkebablaakdal'
 }
 
 export function parseCashTenderInput(raw: string): number | null {

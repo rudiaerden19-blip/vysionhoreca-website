@@ -7,10 +7,10 @@ import {
 
 describe('kassa cash tender', () => {
   it('staat alleen aan voor donerkebablaakdal', () => {
-    expect(isDonerKebabLaakdalCashTenderTenant('donerkebablaakdal')).toBe(true)
-    expect(isDonerKebabLaakdalCashTenderTenant('DonerKebabLaakdal')).toBe(true)
+    expect(isDonerKebabLaakdalCashTenderTenant('dnerkebablaakdal')).toBe(true)
+    expect(isDonerKebabLaakdalCashTenderTenant('DnerKebabLaakdal')).toBe(true)
     expect(isDonerKebabLaakdalCashTenderTenant('thelagoon')).toBe(false)
-    expect(isDonerKebabLaakdalCashTenderTenant('drnerkebablaakdal')).toBe(false)
+    expect(isDonerKebabLaakdalCashTenderTenant('donerkebablaakdal')).toBe(false)
   })
 
   it('rekent wisselgeld uit het ontvangen cash', () => {
