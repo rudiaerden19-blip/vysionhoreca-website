@@ -4321,6 +4321,7 @@
     "toPay": "Te betalen",
     "cashReceivedLabel": "Cash van klant",
     "cashChangeLabel": "Teruggeven",
+    "cashKeypadDone": "Klaar",
     "payCash": "Contant",
     "payCard": "PIN/Kaart",
     "payIdeal": "iDEAL",

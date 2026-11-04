@@ -3666,6 +3666,7 @@
     "toPay": "应付",
     "cashReceivedLabel": "顾客现金",
     "cashChangeLabel": "找零",
+    "cashKeypadDone": "完成",
     "payCash": "现金",
     "payCard": "刷卡",
     "payIdeal": "iDEAL",

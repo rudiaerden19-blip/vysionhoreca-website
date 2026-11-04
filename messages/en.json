@@ -4321,6 +4321,7 @@
     "toPay": "Amount due",
     "cashReceivedLabel": "Cash from customer",
     "cashChangeLabel": "Give back",
+    "cashKeypadDone": "Done",
     "payCash": "Cash",
     "payCard": "Card",
     "payIdeal": "iDEAL",

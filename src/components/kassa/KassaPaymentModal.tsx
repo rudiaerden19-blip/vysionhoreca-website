@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/i18n'
-import { cashChangeDueEuro, parseCashTenderInput } from '@/lib/kassa-cash-tender'
+import { applyCashTenderKey, cashChangeDueEuro, parseCashTenderInput } from '@/lib/kassa-cash-tender'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 
 export type KassaQuickPayMethod = 'CASH' |  'CARD' |  'IDEAL' |  'BANCONTACT'
@@ -48,6 +48,7 @@ export function KassaPaymentModal({
   const dark = appearance === 'dark'
   const [optimisticPayBusy, setOptimisticPayBusy] = useState(false)
   const [cashReceived, setCashReceived] = useState('')
+  const [cashKeypadOpen, setCashKeypadOpen] = useState(false)
   const payLocked = payBusy || optimisticPayBusy
   const changeDue = cashChangeDueEuro(total, parseCashTenderInput(cashReceived))
 
@@ -55,6 +56,7 @@ export function KassaPaymentModal({
     if (!open) {
       setOptimisticPayBusy(false)
       setCashReceived('')
+      setCashKeypadOpen(false)
     }
   }, [open])
 
@@ -92,13 +94,14 @@ export function KassaPaymentModal({
                 <span className={`block text-sm font-medium mb-1 ${toPayMuted}`}>{t('kassaApp.cashReceivedLabel')}</span>
                 <input
                   type="text"
-                  inputMode="decimal"
+                  readOnly
+                  inputMode="none"
                   value={cashReceived}
-                  onChange={(e) => setCashReceived(e.target.value)}
+                  onClick={() => setCashKeypadOpen(true)}
                   className={
                     dark
-                      ? 'w-full rounded-xl border-2 border-zinc-500 bg-[#263043] px-3 py-3 text-center text-3xl font-bold text-zinc-50'
-                      : 'w-full rounded-xl border-2 border-gray-300 bg-gray-50 px-3 py-3 text-center text-3xl font-bold text-gray-900'
+                      ? 'w-full cursor-pointer rounded-xl border-2 border-zinc-500 bg-[#263043] px-3 py-3 text-center text-3xl font-bold text-zinc-50'
+                      : 'w-full cursor-pointer rounded-xl border-2 border-gray-300 bg-gray-50 px-3 py-3 text-center text-3xl font-bold text-gray-900'
                   }
                   aria-label={t('kassaApp.cashReceivedLabel')}
                 />
@@ -183,6 +186,62 @@ export function KassaPaymentModal({
           </div>
         </div>
       </div>
+      {cashTender && cashKeypadOpen ? (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/75 p-4">
+          <div className={card}>
+            <div className={hdr}>
+              <h3 className={titleCls}>{t('kassaApp.cashReceivedLabel')}</h3>
+              <button
+                type="button"
+                onClick={() => setCashKeypadOpen(false)}
+                className={btnCloseCls}
+                aria-label={t('kassaApp.closeAria')}
+              >
+                <KassaIconClose className="h-7 w-7" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className={`mb-4 text-center text-5xl font-bold ${totalAccent}`}>
+                €{cashReceived || '0'}
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {['7', '8', '9', '4', '5', '6', '1', '2', '3', 'C', '0', ','].map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setCashReceived((prev) => applyCashTenderKey(prev, key))}
+                    className={
+                      dark
+                        ? 'h-16 rounded-xl bg-[#263043] text-2xl font-bold text-zinc-50 touch-manipulation active:brightness-125'
+                        : 'h-16 rounded-xl bg-gray-100 text-2xl font-bold text-gray-900 touch-manipulation active:brightness-95'
+                    }
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setCashReceived((prev) => applyCashTenderKey(prev, '⌫'))}
+                className={
+                  dark
+                    ? 'mt-3 h-14 w-full rounded-xl bg-[#263043] text-2xl font-bold text-zinc-50 touch-manipulation'
+                    : 'mt-3 h-14 w-full rounded-xl bg-gray-100 text-2xl font-bold text-gray-900 touch-manipulation'
+                }
+              >
+                ⌫
+              </button>
+              <button
+                type="button"
+                onClick={() => setCashKeypadOpen(false)}
+                className="mt-3 h-14 w-full rounded-xl bg-emerald-500 text-xl font-bold text-white touch-manipulation"
+              >
+                {t('kassaApp.cashKeypadDone')}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

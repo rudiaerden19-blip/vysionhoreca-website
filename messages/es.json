@@ -3666,6 +3666,7 @@
     "toPay": "A pagar",
     "cashReceivedLabel": "Efectivo del cliente",
     "cashChangeLabel": "A devolver",
+    "cashKeypadDone": "Listo",
     "payCash": "Efectivo",
     "payCard": "Tarjeta",
     "payIdeal": "iDEAL",

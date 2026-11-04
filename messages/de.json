@@ -3166,6 +3166,7 @@
     "toPay": "Zu zahlen",
     "cashReceivedLabel": "Bargeld vom Kunden",
     "cashChangeLabel": "Rückgeld",
+    "cashKeypadDone": "Fertig",
     "payCash": "Bar",
     "payCard": "Karte",
     "payIdeal": "iDEAL",

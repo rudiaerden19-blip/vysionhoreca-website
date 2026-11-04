@@ -3666,6 +3666,7 @@
     "toPay": "お支払い金額",
     "cashReceivedLabel": "お客様の現金",
     "cashChangeLabel": "お釣り",
+    "cashKeypadDone": "完了",
     "payCash": "現金",
     "payCard": "カード",
     "payIdeal": "iDEAL",

@@ -3666,6 +3666,7 @@
     "toPay": "المستحق",
     "cashReceivedLabel": "نقد من الزبون",
     "cashChangeLabel": "الباقي",
+    "cashKeypadDone": "تم",
     "payCash": "نقداً",
     "payCard": "بطاقة",
     "payIdeal": "iDEAL",
