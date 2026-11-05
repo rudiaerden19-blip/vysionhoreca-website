@@ -89,7 +89,7 @@ export function KassaPaymentModal({
             <p className={`text-5xl font-bold ${totalAccent}`}>€{total.toFixed(2)}</p>
           </div>
           {cashTender ? (
-            <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="mb-6 space-y-3">
               <label className="block">
                 <span className={`block text-sm font-medium mb-1 ${toPayMuted}`}>{t('kassaApp.cashReceivedLabel')}</span>
                 <input
@@ -107,12 +107,14 @@ export function KassaPaymentModal({
                 />
               </label>
               <div>
-                <span className={`block text-sm font-medium mb-1 ${toPayMuted}`}>{t('kassaApp.cashChangeLabel')}</span>
+                <span className={`mb-1.5 block text-xl font-bold ${dark ? 'text-red-300' : 'text-red-700'}`}>
+                  {t('kassaApp.cashChangeLabel')}
+                </span>
                 <div
                   className={
                     dark
-                      ? 'w-full rounded-xl border-2 border-emerald-500 bg-[#263043] px-3 py-3 text-center text-3xl font-bold text-emerald-300'
-                      : 'w-full rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-3 text-center text-3xl font-bold text-emerald-700'
+                      ? 'w-full rounded-2xl border-4 border-red-500 bg-red-950/60 px-4 py-5 text-center text-6xl font-black leading-none text-red-400'
+                      : 'w-full rounded-2xl border-4 border-red-600 bg-red-50 px-4 py-5 text-center text-6xl font-black leading-none text-red-600'
                   }
                   aria-live="polite"
                 >
