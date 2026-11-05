@@ -30,7 +30,7 @@ import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { KDS_COLUMN_WIDTH_PX, KitchenKdsColumn } from '@/components/keuken/KitchenKdsColumn'
+import { KDS_COLUMN_WIDTH_PX, KitchenKdsColumn, kitchenItemLineKey } from '@/components/keuken/KitchenKdsColumn'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -140,6 +140,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [kdsPage, setKdsPage] = useState(0)
   const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
   const [ticketScroll, setTicketScroll] = useState({ up: false, down: false })
+  const [madeByOrder, setMadeByOrder] = useState<Record<string, string[]>>({})
   const kdsChromeBtn = `${kassaSpeelsGrayChromeButtonClass()} px-4 py-2.5 text-lg`
   const kdsChromeOn = `${kassaSpeelsBlueGlossButtonClass(true)} px-4 py-2.5 text-lg`
 
@@ -169,6 +170,59 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       return next
     })
   }, [orders, initialLoadDone, params.tenant])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(`kds-item-made:${params.tenant}`)
+      const parsed = raw ? JSON.parse(raw) : {}
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return
+      const next: Record<string, string[]> = {}
+      for (const [orderId, keys] of Object.entries(parsed as Record<string, unknown>)) {
+        if (!Array.isArray(keys)) continue
+        const lineKeys = keys.filter((key) => typeof key === 'string')
+        if (lineKeys.length) next[orderId] = lineKeys
+      }
+      setMadeByOrder(next)
+    } catch {
+      setMadeByOrder({})
+    }
+  }, [params.tenant])
+
+  useEffect(() => {
+    if (!initialLoadDone) return
+    const live = new Set(orders.map((o) => o.id))
+    setMadeByOrder((prev) => {
+      const next: Record<string, string[]> = {}
+      for (const [orderId, keys] of Object.entries(prev)) {
+        if (live.has(orderId) && keys.length) next[orderId] = keys
+      }
+      if (Object.keys(next).length === Object.keys(prev).length) return prev
+      try {
+        localStorage.setItem(`kds-item-made:${params.tenant}`, JSON.stringify(next))
+      } catch {
+        /* vinkjes blijven in dit tabblad */
+      }
+      return next
+    })
+  }, [orders, initialLoadDone, params.tenant])
+
+  function toggleItemMade(orderId: string, lineKey: string) {
+    setMadeByOrder((prev) => {
+      const current = prev[orderId] ?? []
+      const nextKeys = current.includes(lineKey)
+        ? current.filter((key) => key !== lineKey)
+        : [...current, lineKey]
+      const next = { ...prev }
+      if (nextKeys.length) next[orderId] = nextKeys
+      else delete next[orderId]
+      try {
+        localStorage.setItem(`kds-item-made:${params.tenant}`, JSON.stringify(next))
+      } catch {
+        /* vinkjes blijven in dit tabblad */
+      }
+      return next
+    })
+  }
 
   function markOrderStarted(orderId: string) {
     setStartedOrderIds((prev) => {
@@ -703,6 +757,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 readyLabel={tx('ready')}
                 startLabel={tx('start')}
                 started={startedOrderIds.has(order.id)}
+                madeLineKeys={new Set(madeByOrder[order.id] ?? [])}
+                madeLabel={tx('itemMade')}
+                onToggleMade={(lineKey) => toggleItemMade(order.id, lineKey)}
                 t={t}
                 bodyRef={(el) => {
                   if (el) ticketBodyRefs.current.set(order.id, el)
@@ -891,26 +948,35 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       const noteRaw = (item as { notes?: unknown }).notes
                       const noteStr =
                         noteRaw != null && String(noteRaw).trim() !== ''? String(noteRaw) : ''
+                      const lineKey = kitchenItemLineKey(i)
+                      const made = (madeByOrder[selectedOrder.id] ?? []).includes(lineKey)
                       return (
-                      <div key={i} className={`flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0 ${ui.panelDivider}`}>
-                        <span className={`flex h-12 w-12 shrink-0 items-center justify-center text-xl font-bold sm:h-14 sm:w-14 sm:text-2xl ${ui.btn}`}>
+                      <div key={lineKey} className={`flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0 ${ui.panelDivider}`}>
+                        <span className={`flex h-12 w-12 shrink-0 items-center justify-center text-xl font-bold sm:h-14 sm:w-14 sm:text-2xl ${made ? 'bg-red-600 text-white' : ui.btn}`}>
                           {qty}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className={`text-xl font-semibold leading-tight sm:text-2xl ${ui.panelText}`}>
+                          <p className={`text-xl font-semibold leading-tight sm:text-2xl ${made ? 'text-red-600' : ui.panelText}`}>
                             {label}
                           </p>
                           {optLines.map((line, j) => (
-                            <p key={j} className={ui.optionLine}>
+                            <p key={j} className={made ? 'text-lg text-red-500' : ui.optionLine}>
                               + {line}
                             </p>
                           ))}
                           {noteStr ? (
-                            <p className={ui.itemNoteBox}>
+                            <p className={made ? 'mt-1 text-lg text-red-500' : ui.itemNoteBox}>
                               Opmerking: {noteStr}
                             </p>
                           ) : null}
                         </div>
+                        <input
+                          type="checkbox"
+                          checked={made}
+                          onChange={() => toggleItemMade(selectedOrder.id, lineKey)}
+                          className="mt-1 h-9 w-9 shrink-0 cursor-pointer accent-red-500"
+                          aria-label={tx('itemMade')}
+                        />
                       </div>
                       )
                     })}

@@ -20,6 +20,11 @@ const KDS_HEADER_RED = '#9b1c1c'
 /** Zelfde breedte als de paginering op het keukenscherm. */
 export const KDS_COLUMN_WIDTH_PX = 500
 
+/** Regel in de bon: index in `order.items`, zodat twee dezelfde producten apart afgevinkt worden. */
+export function kitchenItemLineKey(index: number): string {
+  return `i:${index}`
+}
+
 type Props = {
   order: KitchenStyleOrder
   locale: string
@@ -38,6 +43,9 @@ type Props = {
   onPrint: (e: React.MouseEvent) => void
   onReady: (e: React.MouseEvent) => void
   onStart: (e: React.MouseEvent) => void
+  madeLineKeys?: ReadonlySet<string>
+  madeLabel?: string
+  onToggleMade?: (lineKey: string) => void
   bodyRef?: (el: HTMLDivElement | null) => void
   onBodyScroll?: () => void
 }
@@ -87,6 +95,9 @@ export function KitchenKdsColumn({
   onPrint,
   onReady,
   onStart,
+  madeLineKeys,
+  madeLabel = '',
+  onToggleMade,
   bodyRef,
   onBodyScroll,
 }: Props) {
@@ -109,12 +120,15 @@ export function KitchenKdsColumn({
       ? String(order.table_number).trim()
       : null
   const headerColor = started ? KDS_HEADER_RED : KDS_HEADER_BLUE
-  const groups: { title: string; items: unknown[] }[] = []
-  for (const item of order.items ?? []) {
+  const groups: { title: string; lines: { item: unknown; lineKey: string }[] }[] = []
+  const items = order.items ?? []
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index]
     const title = itemCategory(item)
+    const line = { item, lineKey: kitchenItemLineKey(index) }
     const last = groups[groups.length - 1]
-    if (last && last.title === title) last.items.push(item)
-    else groups.push({ title, items: [item] })
+    if (last && last.title === title) last.lines.push(line)
+    else groups.push({ title, lines: [line] })
   }
 
   return (
@@ -166,28 +180,41 @@ export function KitchenKdsColumn({
             {group.title ? (
               <p className="mb-1.5 text-lg font-bold uppercase tracking-wide text-sky-300">
                 {group.title}
-                <span className="ml-1 text-white/40">({group.items.length})</span>
+                <span className="ml-1 text-white/40">({group.lines.length})</span>
               </p>
             ) : null}
             <ul className="space-y-1.5">
-              {group.items.map((item, i) => {
+              {group.lines.map(({ item, lineKey }) => {
                 const label = orderItemDisplayName(item)
                 const optLines = orderItemDisplayOptionLines(item)
                 const qty = Number((item as { quantity?: unknown }).quantity) || 1
                 const noteRaw = (item as { notes?: unknown }).notes
                 const noteStr = noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                const made = madeLineKeys?.has(lineKey) === true
                 return (
-                  <li key={i} className="text-2xl leading-snug text-white">
-                    <p className="font-semibold">
-                      <span className="tabular-nums text-white/80">{qty} x </span>
-                      {label}
-                    </p>
+                  <li key={lineKey} className={`text-2xl leading-snug ${made ? 'text-red-500' : 'text-white'}`}>
+                    <div className="flex items-start gap-3">
+                      <p className="min-w-0 flex-1 font-semibold">
+                        <span className={`tabular-nums ${made ? 'text-red-400' : 'text-white/80'}`}>{qty} x </span>
+                        {label}
+                      </p>
+                      <input
+                        type="checkbox"
+                        checked={made}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => onToggleMade?.(lineKey)}
+                        className="mt-1 h-9 w-9 shrink-0 cursor-pointer accent-red-500"
+                        aria-label={madeLabel}
+                      />
+                    </div>
                     {optLines.map((line, j) => (
-                      <p key={j} className="pl-5 text-xl text-white/70">
+                      <p key={j} className={`pl-5 text-xl ${made ? 'text-red-400' : 'text-white/70'}`}>
                         {line}
                       </p>
                     ))}
-                    {noteStr ? <p className="pl-5 text-xl text-amber-200/90">{noteStr}</p> : null}
+                    {noteStr ? (
+                      <p className={`pl-5 text-xl ${made ? 'text-red-300' : 'text-amber-200/90'}`}>{noteStr}</p>
+                    ) : null}
                   </li>
                 )
               })}
