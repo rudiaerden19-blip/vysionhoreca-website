@@ -25,6 +25,40 @@ export function kitchenItemLineKey(index: number): string {
   return `i:${index}`
 }
 
+/** Groot tikvlak. Leeg vierkant, of een V zodra het product gemaakt is. */
+export function KitchenItemMadeMark({
+  made,
+  label,
+  onToggle,
+  onDark = true,
+}: {
+  made: boolean
+  label: string
+  onToggle: () => void
+  onDark?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={made}
+      aria-label={label}
+      onClick={(e) => {
+        e.stopPropagation()
+        onToggle()
+      }}
+      className={`flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-xl border-4 text-5xl font-black leading-none touch-manipulation ${
+        made
+          ? 'border-red-500 bg-red-600 text-white'
+          : onDark
+            ? 'border-white bg-white text-transparent'
+            : 'border-zinc-900 bg-white text-transparent'
+      }`}
+    >
+      V
+    </button>
+  )
+}
+
 type Props = {
   order: KitchenStyleOrder
   locale: string
@@ -198,13 +232,10 @@ export function KitchenKdsColumn({
                         <span className={`tabular-nums ${made ? 'text-red-400' : 'text-white/80'}`}>{qty} x </span>
                         {label}
                       </p>
-                      <input
-                        type="checkbox"
-                        checked={made}
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={() => onToggleMade?.(lineKey)}
-                        className="mt-1 h-9 w-9 shrink-0 cursor-pointer accent-red-500"
-                        aria-label={madeLabel}
+                      <KitchenItemMadeMark
+                        made={made}
+                        label={madeLabel}
+                        onToggle={() => onToggleMade?.(lineKey)}
                       />
                     </div>
                     {optLines.map((line, j) => (

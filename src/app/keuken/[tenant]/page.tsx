@@ -30,7 +30,12 @@ import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { KDS_COLUMN_WIDTH_PX, KitchenKdsColumn, kitchenItemLineKey } from '@/components/keuken/KitchenKdsColumn'
+import {
+  KDS_COLUMN_WIDTH_PX,
+  KitchenItemMadeMark,
+  KitchenKdsColumn,
+  kitchenItemLineKey,
+} from '@/components/keuken/KitchenKdsColumn'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -970,12 +975,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                             </p>
                           ) : null}
                         </div>
-                        <input
-                          type="checkbox"
-                          checked={made}
-                          onChange={() => toggleItemMade(selectedOrder.id, lineKey)}
-                          className="mt-1 h-9 w-9 shrink-0 cursor-pointer accent-red-500"
-                          aria-label={tx('itemMade')}
+                        <KitchenItemMadeMark
+                          made={made}
+                          label={tx('itemMade')}
+                          onDark={kassaKitchenDark}
+                          onToggle={() => toggleItemMade(selectedOrder.id, lineKey)}
                         />
                       </div>
                       )
