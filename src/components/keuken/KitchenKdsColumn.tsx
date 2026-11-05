@@ -46,7 +46,7 @@ export function KitchenItemMadeMark({
         e.stopPropagation()
         onToggle()
       }}
-      className={`flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-xl border-4 text-5xl font-black leading-none touch-manipulation ${
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 text-2xl font-black leading-none touch-manipulation ${
         made
           ? 'border-red-500 bg-red-600 text-white'
           : onDark
