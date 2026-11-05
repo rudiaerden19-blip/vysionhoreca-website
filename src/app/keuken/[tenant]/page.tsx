@@ -30,7 +30,7 @@ import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import { KitchenKdsColumn } from '@/components/keuken/KitchenKdsColumn'
+import { KDS_COLUMN_WIDTH_PX, KitchenKdsColumn } from '@/components/keuken/KitchenKdsColumn'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -39,8 +39,8 @@ import {
   kassaSpeelsGreenGlossButtonClass,
 } from '@/lib/kassa-pos-surface'
 
-/** Vaste vakbreedte, breder dan de oude 248 px. Het vak rekt niet over het hele scherm. */
-const KDS_COL_PX = 380
+/** Zelfde vakbreedte als KitchenKdsColumn. Het vak rekt niet over het hele scherm. */
+const KDS_COL_PX = KDS_COLUMN_WIDTH_PX
 const KDS_COL_GAP_PX = 16
 const KDS_BOARD_PAD_PX = 24
 
@@ -140,8 +140,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [kdsPage, setKdsPage] = useState(0)
   const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
   const [ticketScroll, setTicketScroll] = useState({ up: false, down: false })
-  const kdsChromeBtn = `${kassaSpeelsGrayChromeButtonClass()} px-3 py-2 text-sm`
-  const kdsChromeOn = `${kassaSpeelsBlueGlossButtonClass(true)} px-3 py-2 text-sm`
+  const kdsChromeBtn = `${kassaSpeelsGrayChromeButtonClass()} px-4 py-2.5 text-lg`
+  const kdsChromeOn = `${kassaSpeelsBlueGlossButtonClass(true)} px-4 py-2.5 text-lg`
 
   useEffect(() => {
     try {
@@ -587,14 +587,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               </Link>
             )}
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl"
               style={{ backgroundColor: business?.primary_color }}
             >
               
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold text-white sm:text-xl">{tx('title')}</h1>
-              <p className="truncate text-xs text-white/60 sm:text-sm">{business?.business_name}</p>
+              <h1 className="truncate text-3xl font-bold text-white">{tx('title')}</h1>
+              <p className="truncate text-lg text-white/70">{business?.business_name}</p>
             </div>
           </div>
 
@@ -625,7 +625,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               </motion.div>
             )}
 
-            <div className="font-mono text-2xl font-bold tabular-nums text-white">
+            <div className="font-mono text-4xl font-bold tabular-nums text-white">
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit'})}
             </div>
 

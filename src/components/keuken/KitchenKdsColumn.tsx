@@ -17,6 +17,9 @@ import {
 const KDS_HEADER_BLUE = '#163a66'
 const KDS_HEADER_RED = '#9b1c1c'
 
+/** Zelfde breedte als de paginering op het keukenscherm. */
+export const KDS_COLUMN_WIDTH_PX = 500
+
 type Props = {
   order: KitchenStyleOrder
   locale: string
@@ -116,52 +119,52 @@ export function KitchenKdsColumn({
 
   return (
     <article
-      className={`flex h-full w-[380px] shrink-0 flex-col border bg-transparent [touch-action:pan-x] ${
+      className={`flex h-full shrink-0 flex-col border bg-transparent [touch-action:pan-x] ${
         isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
-      style={{ borderColor: headerColor }}
+      style={{ borderColor: headerColor, width: KDS_COLUMN_WIDTH_PX }}
     >
-      <header className="shrink-0 px-2.5 py-2 text-white" style={{ backgroundColor: headerColor }}>
-        <div className="flex items-start justify-between gap-2">
+      <header className="shrink-0 px-4 py-3 text-white" style={{ backgroundColor: headerColor }}>
+        <div className="flex items-start justify-between gap-3">
           <button
             type="button"
             onClick={onOpen}
             className="min-w-0 text-left"
           >
-            <span className="block text-2xl font-black leading-none tabular-nums">
+            <span className="block text-5xl font-black leading-none tabular-nums">
               {order.order_number}
             </span>
             {tableNr ? (
-              <span className="mt-1 block text-lg font-black leading-none">
+              <span className="mt-2 block text-3xl font-black leading-none">
                 {t('kassaApp.tableWord')} {tableNr}
               </span>
             ) : null}
-            <span className="mt-1 block truncate text-[11px] font-semibold uppercase tracking-wide text-white/90">
+            <span className="mt-2 block truncate text-lg font-bold uppercase tracking-wide text-white/90">
               {headerStatus}
             </span>
           </button>
-          <span className="shrink-0 rounded bg-black/25 px-1.5 py-0.5 font-mono text-sm font-bold tabular-nums">
+          <span className="shrink-0 rounded bg-black/25 px-2.5 py-1 font-mono text-2xl font-bold tabular-nums">
             {elapsed}
           </span>
         </div>
-        <p className="mt-1 truncate text-xs font-medium text-white/95">
+        <p className="mt-2 truncate text-xl font-semibold text-white/95">
           {typeLine}
           {dineInSeat ? ` · ${dineInSeat}` : ''}
         </p>
-        <p className="truncate text-xs text-white/80">{order.customer_name}</p>
-        {schedLine ? <p className="truncate text-[11px] text-white/80">{schedLine}</p> : null}
+        <p className="truncate text-xl font-medium text-white/90">{order.customer_name}</p>
+        {schedLine ? <p className="truncate text-lg text-white/80">{schedLine}</p> : null}
       </header>
 
       <div
         ref={bodyRef}
-        className="min-h-0 flex-1 cursor-pointer overflow-y-auto overscroll-y-contain px-2 py-2 [touch-action:pan-x_pan-y]"
+        className="min-h-0 flex-1 cursor-pointer overflow-y-auto overscroll-y-contain px-4 py-3 [touch-action:pan-x_pan-y]"
         onClick={onOpen}
         onScroll={onBodyScroll}
       >
         {groups.map((group, gi) => (
           <div key={`${group.title}-${gi}`} className="mb-2">
             {group.title ? (
-              <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-sky-300">
+              <p className="mb-1.5 text-lg font-bold uppercase tracking-wide text-sky-300">
                 {group.title}
                 <span className="ml-1 text-white/40">({group.items.length})</span>
               </p>
@@ -174,17 +177,17 @@ export function KitchenKdsColumn({
                 const noteRaw = (item as { notes?: unknown }).notes
                 const noteStr = noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
                 return (
-                  <li key={i} className="text-sm leading-snug text-white">
+                  <li key={i} className="text-2xl leading-snug text-white">
                     <p className="font-semibold">
-                      <span className="tabular-nums text-white/70">{qty} x </span>
+                      <span className="tabular-nums text-white/80">{qty} x </span>
                       {label}
                     </p>
                     {optLines.map((line, j) => (
-                      <p key={j} className="pl-4 text-xs text-white/55">
+                      <p key={j} className="pl-5 text-xl text-white/70">
                         {line}
                       </p>
                     ))}
-                    {noteStr ? <p className="pl-4 text-xs text-amber-200/90">{noteStr}</p> : null}
+                    {noteStr ? <p className="pl-5 text-xl text-amber-200/90">{noteStr}</p> : null}
                   </li>
                 )
               })}
@@ -192,33 +195,33 @@ export function KitchenKdsColumn({
           </div>
         ))}
         {order.customer_notes ? (
-          <p className="mt-2 border-t border-white/10 pt-2 text-xs text-amber-100/90">
+          <p className="mt-3 border-t border-white/10 pt-3 text-xl text-amber-100/90">
             {order.customer_notes}
           </p>
         ) : null}
       </div>
 
-      <footer className="flex shrink-0 flex-col gap-1.5 border-t border-black/40 bg-transparent p-2">
+      <footer className="flex shrink-0 flex-col gap-2 border-t border-black/40 bg-transparent p-3">
         <button
           type="button"
           disabled={started}
           onClick={onStart}
-          className={`${kassaSpeelsGrayChromeButtonClass()} w-full py-2 text-sm disabled:opacity-60`}
+          className={`${kassaSpeelsGrayChromeButtonClass()} w-full py-3.5 text-2xl disabled:opacity-60`}
         >
           <span>{startLabel}</span>
         </button>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2">
         <button
           type="button"
           onClick={onPrint}
-          className={`${kassaSpeelsGrayChromeButtonClass()} px-2 py-2 text-xs`}
+          className={`${kassaSpeelsGrayChromeButtonClass()} px-4 py-3.5 text-xl`}
         >
           {printLabel}
         </button>
         <button
           type="button"
           onClick={onReady}
-          className={`${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} min-h-[40px] flex-1 text-sm font-black uppercase tracking-wide`}
+          className={`${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} min-h-[64px] flex-1 text-2xl font-black uppercase tracking-wide`}
         >
           {readyLabel}
         </button>
