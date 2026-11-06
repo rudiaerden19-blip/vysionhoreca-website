@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
 import {
   buildStaffSalesDayLines,
-  isStaffSalesDateVisible,
+  resolveStaffSalesWindow,
   staffSalesDayTotal,
   staffSalesVisibleRange,
 } from '@/lib/kassa-staff-sales-day'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import { fetchOpeningHoursForTenant } from '@/lib/tenant-business-day'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
@@ -44,7 +45,7 @@ async function fetchPaidStaffOrders(
   return { rows }
 }
 
-/** Verkoop per medewerker voor één kalenderdag, max. 30 dagen terug. Elke tenant. */
+/** Verkoop per medewerker, max. 30 dagen terug. The Lagoon: openingsuren tot na middernacht. Andere tenants: kalenderdag. */
 export async function GET(request: NextRequest) {
   const supabase = getServerSupabaseClient()
   if (!supabase) {
@@ -62,8 +63,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: access.error || 'unauthorized' }, { status: 403 })
   }
 
-  const today = getBelgiumDateString()
-  if (!isStaffSalesDateVisible(date, today)) {
+  const now = new Date()
+  const lagoon = isTheLagoonTenant(tenantSlug)
+  const hours = lagoon ? await fetchOpeningHoursForTenant(supabase, tenantSlug) : []
+  const window = resolveStaffSalesWindow({ requestedYmd: date, now, lagoon, hours })
+  if (!window) {
     return NextResponse.json({ ok: false, error: 'date_out_of_range' }, { status: 400 })
   }
 
@@ -88,7 +92,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'server' }, { status: 500 })
   }
 
-  const { startUTC, endUTC } = getDateBoundsForBelgium(date)
+  const { startUTC, endUTC } = window
   const ordersResult = await fetchPaidStaffOrders(supabase, tenantSlug, startUTC, endUTC)
   if ('error' in ordersResult) {
     console.error('staff-sales orders', ordersResult.error)
@@ -132,11 +136,11 @@ export async function GET(request: NextRequest) {
       total: row.total,
     })),
   )
-  const range = staffSalesVisibleRange(today)
+  const range = staffSalesVisibleRange(window.today)
 
   return NextResponse.json({
     ok: true,
-    date,
+    date: window.date,
     minDate: range.minYmd,
     maxDate: range.maxYmd,
     lines,

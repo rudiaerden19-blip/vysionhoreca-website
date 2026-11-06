@@ -37,6 +37,7 @@ export function StaffSalesDayList({ tenantSlug, refreshToken }: Props) {
         const res = await authFetch(`/api/kassa/staff-sales?${params.toString()}`)
         const data = (await res.json()) as {
           ok?: boolean
+          date?: string
           minDate?: string
           maxDate?: string
           lines?: StaffSalesDayLine[]
@@ -51,6 +52,7 @@ export function StaffSalesDayList({ tenantSlug, refreshToken }: Props) {
         }
         if (data.minDate) setMinDate(data.minDate)
         if (data.maxDate) setMaxDate(data.maxDate)
+        if (data.date && data.date !== date) setDate(data.date)
         setLines(data.lines)
         setDayTotal(Number(data.dayTotal) || 0)
       } catch {

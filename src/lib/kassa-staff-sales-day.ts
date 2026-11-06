@@ -1,4 +1,5 @@
-import { addDaysToBelgiumYMD } from '@/lib/belgium-date-bounds'
+import { addDaysToBelgiumYMD, getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
+import { getCurrentBusinessDay, getTenantBusinessDayBounds, type TenantHourRow } from '@/lib/tenant-business-day'
 
 /** Inclusief vandaag: de eigenaar kan 30 kalenderdagen terugkijken. */
 export const STAFF_SALES_VISIBLE_DAYS = 30
@@ -23,6 +24,29 @@ export function isStaffSalesDateVisible(dateYmd: string, todayYmd: string): bool
   if (!YMD.test(dateYmd) || !YMD.test(todayYmd)) return false
   const { minYmd, maxYmd } = staffSalesVisibleRange(todayYmd)
   return dateYmd >= minYmd && dateYmd <= maxYmd
+}
+
+/**
+ * The Lagoon: dezelfde shift als de openingsuren (tot na middernacht).
+ * Andere tenants: kalenderdag 00:00–23:59, ongewijzigd.
+ * Na middernacht, zolang de shift nog open is, telt een te nieuwe datum nog bij die shift.
+ */
+export function resolveStaffSalesWindow(input: {
+  requestedYmd: string
+  now: Date
+  lagoon: boolean
+  hours: TenantHourRow[]
+}): { date: string; today: string; startUTC: string; endUTC: string } | null {
+  const today = input.lagoon
+    ? getCurrentBusinessDay(input.now, input.hours)
+    : getBelgiumDateString(input.now)
+  let date = input.requestedYmd
+  if (input.lagoon && YMD.test(date) && date > today) date = today
+  if (!isStaffSalesDateVisible(date, today)) return null
+  const bounds = input.lagoon
+    ? getTenantBusinessDayBounds(date, input.hours)
+    : getDateBoundsForBelgium(date)
+  return { date, today, startUTC: bounds.startUTC, endUTC: bounds.endUTC }
 }
 
 /**

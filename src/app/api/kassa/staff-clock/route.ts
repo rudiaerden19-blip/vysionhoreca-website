@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getBelgiumDateString, getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
+import { resolveStaffSalesWindow } from '@/lib/kassa-staff-sales-day'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import { fetchOpeningHoursForTenant } from '@/lib/tenant-business-day'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 export const dynamic = 'force-dynamic'
@@ -245,8 +248,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'server'}, { status: 500 })
   }
 
-  const dayYmd = getBelgiumDateString()
-  const { startUTC, endUTC } = getDateBoundsForBelgium(dayYmd)
+  const now = new Date()
+  const lagoon = isTheLagoonTenant(tenant_slug)
+  const hours = lagoon ? await fetchOpeningHoursForTenant(supabase, tenant_slug) : []
+  const salesWindow = resolveStaffSalesWindow({
+    requestedYmd: getBelgiumDateString(now),
+    now,
+    lagoon,
+    hours,
+  })
+  const { startUTC, endUTC } = salesWindow ?? getDateBoundsForBelgium(getBelgiumDateString(now))
 
   const { data: orderRows, error: ordErr } = await supabase
     .from('orders')

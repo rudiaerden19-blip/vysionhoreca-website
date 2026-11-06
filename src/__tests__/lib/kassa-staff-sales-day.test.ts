@@ -2,9 +2,12 @@ import {
   STAFF_SALES_VISIBLE_DAYS,
   buildStaffSalesDayLines,
   isStaffSalesDateVisible,
+  resolveStaffSalesWindow,
   staffSalesDayTotal,
   staffSalesVisibleRange,
 } from '@/lib/kassa-staff-sales-day'
+import { getDateBoundsForBelgium } from '@/lib/belgium-date-bounds'
+import { getTenantBusinessDayBounds, type TenantHourRow } from '@/lib/tenant-business-day'
 
 describe('verkoop per medewerker', () => {
   it('laat 30 dagen toe, inclusief vandaag', () => {
@@ -42,4 +45,45 @@ describe('verkoop per medewerker', () => {
     ])
     expect(staffSalesDayTotal(lines)).toBe(15.3)
   })
+
+  it('laat andere tenants op de kalenderdag 00:00–23:59', () => {
+    const now = new Date('2026-11-07T00:30:00.000Z')
+    const resolved = resolveStaffSalesWindow({
+      requestedYmd: '2026-11-07',
+      now,
+      lagoon: false,
+      hours: overnightHours(),
+    })
+    expect(resolved).toEqual({
+      date: '2026-11-07',
+      today: '2026-11-07',
+      ...getDateBoundsForBelgium('2026-11-07'),
+    })
+  })
+
+  it('telt The Lagoon na middernacht nog bij de open shift', () => {
+    const hours = overnightHours()
+    const now = new Date('2026-11-07T00:30:00.000Z')
+    const resolved = resolveStaffSalesWindow({
+      requestedYmd: '2026-11-07',
+      now,
+      lagoon: true,
+      hours,
+    })
+    expect(resolved).toEqual({
+      date: '2026-11-06',
+      today: '2026-11-06',
+      ...getTenantBusinessDayBounds('2026-11-06', hours),
+    })
+    expect(resolved!.endUTC > getDateBoundsForBelgium('2026-11-06').endUTC).toBe(true)
+  })
 })
+
+function overnightHours(): TenantHourRow[] {
+  return Array.from({ length: 7 }, (_, day_of_week) => ({
+    day_of_week,
+    is_open: true,
+    open_time: '17:00',
+    close_time: '03:00',
+  }))
+}
