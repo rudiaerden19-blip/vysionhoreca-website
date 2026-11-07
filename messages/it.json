@@ -3668,6 +3668,7 @@
     "cashReceivedLabel": "Contanti dal cliente",
     "cashChangeLabel": "Resto",
     "cashKeypadDone": "Fatto",
+    "hotmixRefreshHint": "Dopo l'accesso, tocca Aggiorna per vedere il tuo account",
     "payCash": "Contanti",
     "payCard": "Carta",
     "payIdeal": "iDEAL",

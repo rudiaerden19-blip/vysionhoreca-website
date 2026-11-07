@@ -3168,6 +3168,7 @@
     "cashReceivedLabel": "Espèces du client",
     "cashChangeLabel": "À rendre",
     "cashKeypadDone": "OK",
+    "hotmixRefreshHint": "Après connexion, appuyez sur Actualiser pour voir votre compte",
     "payCash": "Espèces",
     "payCard": "Carte",
     "payIdeal": "iDEAL",

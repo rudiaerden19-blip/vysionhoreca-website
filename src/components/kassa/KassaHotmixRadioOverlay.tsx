@@ -11,16 +11,15 @@ type Props = {
 }
 
 /**
- * Zelfde kassapagina, venster op de Hotmix-home. Geen nieuwe browserpagina.
- * Popups blijven toe zodat Hotmix-inloggen werkt. Geen top-navigatie: de kassa blijft staan.
+ * Zelfde kassapagina, venster op de Hotmix-home. Geen aparte browsertab.
+ * Geen sandbox: anders blokkeert de browser Hotmix-cookies (inlog blijft op «Inloggen» staan).
+ * Na inloggen even «Vernieuwen» — Hotmix ververst de sessie niet altijd in een iframe.
  */
-const HOTMIX_FRAME_SANDBOX =
-  'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads allow-storage-access-by-user-activation'
-
 export function KassaHotmixRadioOverlay({ open, onClose }: Props) {
   const { t } = useLanguage()
   const [started, setStarted] = useState(false)
   const [hostReady, setHostReady] = useState(false)
+  const [frameGeneration, setFrameGeneration] = useState(0)
 
   useEffect(() => {
     setHostReady(true)
@@ -64,24 +63,36 @@ export function KassaHotmixRadioOverlay({ open, onClose }: Props) {
         }
       >
         {open ? (
-          <div className="flex shrink-0 items-center justify-between gap-3 px-3 py-2">
-            <p className="text-sm font-bold text-white sm:text-base">Hotmix Radio</p>
-            <button
-              type="button"
-              onClick={onClose}
-              data-testid="kassa-hotmix-close"
-              className="min-h-[2.25rem] shrink-0 rounded-lg bg-white px-3 text-sm font-bold text-[#151a21]"
-            >
-              {t('common.close')}
-            </button>
+          <div className="flex shrink-0 items-center justify-between gap-2 px-3 py-2">
+            <p className="min-w-0 truncate text-sm font-bold text-white sm:text-base">Hotmix Radio</p>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                data-testid="kassa-hotmix-refresh"
+                title={t('kassaApp.hotmixRefreshHint')}
+                onClick={() => setFrameGeneration((n) => n + 1)}
+                className="min-h-[2.25rem] rounded-lg border border-white/25 bg-white/10 px-3 text-sm font-semibold text-white hover:bg-white/20"
+              >
+                {t('common.refresh')}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                data-testid="kassa-hotmix-close"
+                className="min-h-[2.25rem] shrink-0 rounded-lg bg-white px-3 text-sm font-bold text-[#151a21]"
+              >
+                {t('common.close')}
+              </button>
+            </div>
           </div>
         ) : null}
         <iframe
+          key={frameGeneration}
           title="Hotmix Radio"
           src={ONTBIJTHUISJE_HOTMIX_URL}
           className={open ? 'min-h-0 w-full flex-1 border-0 bg-white' : 'h-full w-full border-0'}
-          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-          sandbox={HOTMIX_FRAME_SANDBOX}
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture; storage-access *"
+          referrerPolicy="strict-origin-when-cross-origin"
         />
       </div>
     </div>,

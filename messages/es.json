@@ -3668,6 +3668,7 @@
     "cashReceivedLabel": "Efectivo del cliente",
     "cashChangeLabel": "A devolver",
     "cashKeypadDone": "Listo",
+    "hotmixRefreshHint": "Tras iniciar sesión, pulse Actualizar para ver su cuenta",
     "payCash": "Efectivo",
     "payCard": "Tarjeta",
     "payIdeal": "iDEAL",

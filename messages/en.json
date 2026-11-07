@@ -4323,6 +4323,7 @@
     "cashReceivedLabel": "Cash from customer",
     "cashChangeLabel": "Give back",
     "cashKeypadDone": "Done",
+    "hotmixRefreshHint": "After logging in, tap Refresh to update your account",
     "payCash": "Cash",
     "payCard": "Card",
     "payIdeal": "iDEAL",

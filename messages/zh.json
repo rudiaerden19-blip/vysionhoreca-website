@@ -3668,6 +3668,7 @@
     "cashReceivedLabel": "顾客现金",
     "cashChangeLabel": "找零",
     "cashKeypadDone": "完成",
+    "hotmixRefreshHint": "登录后请点“刷新”以显示您的账户",
     "payCash": "现金",
     "payCard": "刷卡",
     "payIdeal": "iDEAL",

@@ -3668,6 +3668,7 @@
     "cashReceivedLabel": "نقد من الزبون",
     "cashChangeLabel": "الباقي",
     "cashKeypadDone": "تم",
+    "hotmixRefreshHint": "بعد تسجيل الدخول اضغط «تحديث» لعرض حسابك",
     "payCash": "نقداً",
     "payCard": "بطاقة",
     "payIdeal": "iDEAL",
