@@ -16,7 +16,7 @@ describe('Hotmix Radio popup', () => {
     const frame = screen.getByTitle('Hotmix Radio') as HTMLIFrameElement
     expect(frame.getAttribute('src')).toBe(ONTBIJTHUISJE_HOTMIX_URL)
     expect(frame.getAttribute('sandbox') ?? '').not.toContain('allow-top-navigation')
-    expect(frame.getAttribute('sandbox') ?? '').not.toContain('allow-popups')
+    expect(frame.getAttribute('sandbox') ?? '').toContain('allow-popups')
     expect(screen.getByTestId('kassa-hotmix-close').textContent).toBe('Sluiten')
     expect(screen.getByTestId('kassa-hotmix-panel').className).toContain('h-full')
     expect(screen.getByTestId('kassa-hotmix-panel').className).not.toContain('max-w-[42rem]')

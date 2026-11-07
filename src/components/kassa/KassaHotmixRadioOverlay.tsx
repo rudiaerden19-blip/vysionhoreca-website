@@ -12,10 +12,10 @@ type Props = {
 
 /**
  * Zelfde kassapagina, venster op de Hotmix-home. Geen nieuwe browserpagina.
- * sandbox zonder top-navigatie en zonder popups: de site kan de kassa niet vervangen.
+ * Popups blijven toe zodat Hotmix-inloggen werkt. Geen top-navigatie: de kassa blijft staan.
  */
 const HOTMIX_FRAME_SANDBOX =
-  'allow-scripts allow-same-origin allow-forms allow-presentation allow-downloads allow-storage-access-by-user-activation'
+  'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads allow-storage-access-by-user-activation'
 
 export function KassaHotmixRadioOverlay({ open, onClose }: Props) {
   const { t } = useLanguage()
