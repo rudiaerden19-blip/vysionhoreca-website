@@ -52,30 +52,39 @@ export function KassaHotmixRadioOverlay({ open, onClose }: Props) {
       aria-hidden={open ? undefined : true}
       className={
         open
-          ? 'fixed inset-0 z-[800] flex flex-col bg-[#0c1016]/80 p-3 sm:p-4'
+          ? 'fixed inset-0 z-[800] flex items-center justify-center bg-black/40 p-4'
           : 'pointer-events-none fixed -left-[9999px] top-0 -z-10 h-[480px] w-[640px] overflow-hidden opacity-0'
       }
     >
-      {open ? (
-        <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
-          <p className="text-lg font-bold text-white sm:text-2xl">Hotmix Radio</p>
-          <button
-            type="button"
-            onClick={onClose}
-            data-testid="kassa-hotmix-close"
-            className="min-h-[3.15rem] shrink-0 rounded-xl bg-white px-6 text-lg font-bold text-[#151a21] shadow-lg sm:min-h-[3.45rem] sm:px-8 sm:text-xl"
-          >
-            {t('common.close')}
-          </button>
-        </div>
-      ) : null}
-      <iframe
-        title="Hotmix Radio"
-        src={ONTBIJTHUISJE_HOTMIX_URL}
-        className={open ? 'min-h-0 w-full flex-1 rounded-xl border-0 bg-white' : 'h-full w-full border-0'}
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-        sandbox={HOTMIX_FRAME_SANDBOX}
-      />
+      <div
+        data-testid="kassa-hotmix-panel"
+        className={
+          open
+            ? 'flex h-[30rem] max-h-[calc(100vh-2rem)] w-full max-w-[42rem] flex-col overflow-hidden rounded-2xl bg-[#151a21] shadow-2xl'
+            : 'h-full w-full'
+        }
+      >
+        {open ? (
+          <div className="flex shrink-0 items-center justify-between gap-3 px-3 py-2">
+            <p className="text-sm font-bold text-white sm:text-base">Hotmix Radio</p>
+            <button
+              type="button"
+              onClick={onClose}
+              data-testid="kassa-hotmix-close"
+              className="min-h-[2.25rem] shrink-0 rounded-lg bg-white px-3 text-sm font-bold text-[#151a21]"
+            >
+              {t('common.close')}
+            </button>
+          </div>
+        ) : null}
+        <iframe
+          title="Hotmix Radio"
+          src={ONTBIJTHUISJE_HOTMIX_URL}
+          className={open ? 'min-h-0 w-full flex-1 border-0 bg-white' : 'h-full w-full border-0'}
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          sandbox={HOTMIX_FRAME_SANDBOX}
+        />
+      </div>
     </div>,
     document.body,
   )
