@@ -13,6 +13,6 @@ describe('ontbijthuisje hotmix', () => {
   })
 
   it('opent de hotmix-site', () => {
-    expect(ONTBIJTHUISJE_HOTMIX_URL).toBe('https://hotmixradio.com/nl')
+    expect(ONTBIJTHUISJE_HOTMIX_URL).toBe('https://www.hotmixradio.com')
   })
 })

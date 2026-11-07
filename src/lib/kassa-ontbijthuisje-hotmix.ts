@@ -1,7 +1,6 @@
-/** Hotmix over de kassa — alleen tenant t ontbijthuisje (iframe + minimaliseren). */
+/** Hotmix-knop in de kassa — alleen tenant t ontbijthuisje. */
 
-/** Canoniek domein + NL (geen www-hop): cookies en sessie blijven in het iframe. */
-export const ONTBIJTHUISJE_HOTMIX_URL = 'https://hotmixradio.com/nl'
+export const ONTBIJTHUISJE_HOTMIX_URL = 'https://www.hotmixradio.com'
 
 function compactTenantSlug(value: string | null | undefined): string {
   return String(value ?? '')

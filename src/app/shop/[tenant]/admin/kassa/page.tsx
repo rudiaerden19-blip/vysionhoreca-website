@@ -1208,7 +1208,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [baseUrl, tenant, demoViewOnly, moduleFlagsLoading, effectiveAccess, effectiveLabelPrinting, effectiveJson])
 
   const { open: kassaHelpOpen, openHelp: openKassaHelp } = useKassaHelpVideoSession()
-  const [hotmixExpanded, setHotmixExpanded] = useState(false)
+  const [hotmixOpen, setHotmixOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
   const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
@@ -6206,7 +6206,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isOntbijthuisjeHotmixTenant(tenant) ? (
             <button
               type="button"
-              onClick={() => setHotmixExpanded(true)}
+              onClick={() => setHotmixOpen(true)}
               data-testid="kassa-hotmix-link"
               title="Hotmix Radio"
               className={`${headerQuickLinkBtnClass} gap-0.5 sm:gap-1`}
@@ -8496,11 +8496,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
       {isOntbijthuisjeHotmixTenant(tenant) ? (
-        <KassaHotmixRadioOverlay
-          expanded={hotmixExpanded}
-          onRequestExpand={() => setHotmixExpanded(true)}
-          onMinimize={() => setHotmixExpanded(false)}
-        />
+        <KassaHotmixRadioOverlay open={hotmixOpen} onClose={() => setHotmixOpen(false)} />
       ) : null}
       </div>
     </div>
