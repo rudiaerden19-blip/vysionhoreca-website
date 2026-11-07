@@ -19,17 +19,13 @@ export function isSxga17PhysicalPair(a: number, b: number): boolean {
 
 /**
  * 15–16″ landschap: 1366×768, 1440×900, 15″ Mac (1440×932 / 1710×1107).
- * Ook 1366×768 op 150% (~910×512). Geen 17″ 4∶3 en geen volle 1920×1080 / 21″.
+ * Geen 17″ 4∶3 en geen volle 1920×1080 / 21″.
  */
 export function isWide15CssViewport(wCss: number, hCss: number): boolean {
   if (!(wCss > 0 && hCss > 0) || wCss <= hCss) return false
   if (isSxga17CssViewport(wCss, hCss)) return false
   if (wCss >= 1800 && hCss >= 1000) return false
   if (wCss >= 1640 && wCss <= 1720 && hCss >= 1020 && hCss <= 1080) return false
-  if (hCss >= 460 && hCss < 600 && wCss >= 860 && wCss <= 1400) {
-    const shortRatio = wCss / hCss
-    if (shortRatio >= 1.45 && shortRatio <= 1.95) return true
-  }
   if (hCss < 600 || hCss > 1140) return false
   if (wCss < 980 || wCss > 1760) return false
   const r = wCss / hCss
@@ -175,10 +171,11 @@ export function readKassaViewportProfileFromWindow(): KassaViewportProfile {
   })
 }
 
-/** Zelfde drempels als het wide15-raster in de kassa: 3 kolommen tot xl, daarna 5. */
 export function kassaMenuGridColumnCountWide15(vpWcss: number): number {
   if (!Number.isFinite(vpWcss) || vpWcss <= 0) return 2
   if (vpWcss >= 1280) return 5
+  if (vpWcss >= 1024) return 4
+  if (vpWcss >= 768) return 4
   if (vpWcss >= 640) return 3
   return 2
 }

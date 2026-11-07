@@ -369,7 +369,6 @@ import {
 import {
   kassaDefaultMenuClassicGridCols,
   kassaDefaultMenuGridTailwindCols,
-  kassaMenuGridColumnCountWide15,
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
@@ -430,12 +429,6 @@ type KassaChromeDensity = 'wide15' | 'sxga' | 'default'
 /**
  * SXGA (~17″): rij gelijk aan **vierkante foto** (celbreedte) + lichte gap + titel — overige schermen ongemoeid.
  */
-function readKassaCssViewportWidth(): number {
-  if (typeof window === 'undefined') return 1366
-  const w = window.visualViewport?.width
-  return Math.max(1, Math.floor(w != null && w > 0 ? w : window.innerWidth))
-}
-
 function applyKassaMenuSquareMonitorTileRowCap(
   rowH: number,
   gridInnerWidthPx: number,
@@ -443,33 +436,21 @@ function applyKassaMenuSquareMonitorTileRowCap(
   _unusedMaxTileHToCellWLegacy: number,
   viewportCssWidth: number,
 ): number {
-  if (shouldApplyKassaCompactSquareMonitorTileCap()) {
-    const cols = kassaMenuGridColumnCountSxgaViewport(viewportCssWidth)
-    const cellW =
-      cols > 0
-        ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
-        : gridInnerWidthPx
+  if (!shouldApplyKassaCompactSquareMonitorTileCap()) return rowH
+  const cols = kassaMenuGridColumnCountSxgaViewport(viewportCssWidth)
+  const cellW =
+    cols > 0
+      ? (gridInnerWidthPx - (cols - 1) * menuGridGapPx) / cols
+      : gridInnerWidthPx
 
-    const cw = Math.max(1, cellW)
-    const imgBandPx = cw * KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC
-    const idealSxgaRowPx = Math.ceil(
-      imgBandPx + KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX,
-    )
-    void _unusedMaxTileHToCellWLegacy
+  const cw = Math.max(1, cellW)
+  const imgBandPx = cw * KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC
+  const idealSxgaRowPx = Math.ceil(
+    imgBandPx + KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX + KASSA_SXGA_LABEL_STRIP_RESERVED_PX,
+  )
+  void _unusedMaxTileHToCellWLegacy
 
-    return Math.max(118, Math.min(rowH, idealSxgaRowPx))
-  }
-  if (shouldApplyKassaWide15Chrome()) {
-    const cols = kassaMenuGridColumnCountWide15(viewportCssWidth)
-    const wide15GapPx = 12
-    const cellW =
-      cols > 0
-        ? (gridInnerWidthPx - (cols - 1) * wide15GapPx) / cols
-        : gridInnerWidthPx
-    const cap = Math.ceil(Math.max(1, cellW) * 1.12)
-    return Math.max(96, Math.min(rowH, cap))
-  }
-  return rowH
+  return Math.max(118, Math.min(rowH, idealSxgaRowPx))
 }
 
 const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '×', 'C', '0', '.', '='] as const
@@ -539,13 +520,8 @@ function kassaFooterActionTouchMinHClass(density: KassaChromeDensity, denseBill:
   return 'min-h-[4.25rem] py-2.5'
 }
 
-/** Op rekening + Verwijder: volle breedte, tekst mag wrappen. 17″/21″ ongewijzigd. */
+/** Op rekening + Verwijder: volle breedte, tekst mag wrappen. */
 const KASSA_SIDEBAR_PAIR_BTN_MIN_H = 'min-h-[3.75rem] py-2.5 sm:min-h-[4rem]'
-
-function kassaSidebarPairBtnMinHClass(density: KassaChromeDensity): string {
-  if (density === 'wide15') return 'min-h-[2.45rem] py-1.5'
-  return KASSA_SIDEBAR_PAIR_BTN_MIN_H
-}
 
 function stoolsFromFloorDecorPayload(data: unknown): { stoolNumber: string; segmentId: string }[] {
   const rawItems = Array.isArray(data)
@@ -5661,12 +5637,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       : ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
-  const kassaMenuClassicGridCols = kassaWide15Chrome
-    ? kassaMenuGridColumnCountWide15(readKassaCssViewportWidth())
-    : kassaDefaultMenuClassicGridCols({
-        compactChrome: kassaCompactChrome,
-        ipadClient: kassaIpadMenuGridCap,
-      })
+  const kassaMenuClassicGridCols = kassaDefaultMenuClassicGridCols({
+    compactChrome: kassaCompactChrome,
+    ipadClient: kassaIpadMenuGridCap,
+  })
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
   const kassaChromeDensity: KassaChromeDensity = kassaWide15Chrome
     ? 'wide15'
@@ -6541,7 +6515,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     kassaSxgaDenseTiles
                       ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                       : kassaWide15Chrome
-                        ? 'gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5'
+                        ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5'
                         : kassaDefaultMenuGridColsClass
                   } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                   style={
@@ -6589,7 +6563,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       kassaSxgaDenseTiles
                         ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                         : kassaWide15Chrome
-                          ? 'gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5'
+                          ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5'
                           : kassaDefaultMenuGridColsClass
                     } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                     style={
@@ -6718,12 +6692,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : kassaCompactChrome
                 ? 'w-[332px] max-w-[38vw]'
                 : 'w-80 sm:w-96 lg:w-[380px]'
-          } relative flex min-h-0 min-w-0 flex-shrink-0 flex-col ${
-            kassaWide15Chrome
-              ? 'overflow-y-auto overflow-x-hidden'
-              : kassaSxgaDenseTiles
-                ? 'overflow-y-hidden overflow-x-visible'
-                : 'overflow-y-hidden overflow-hidden'
+          } relative flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
+            kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${
             kassaPosLuxury
               ? `border-l ${KASSA_POS_RULE_BLACK} ${kassaPlateBgClass}`
@@ -7430,20 +7400,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   data-testid="kassa-sidebar-op-rekening"
                   onPointerDown={() => prefetchKassaNameTabs(tenant)}
                   onClick={openNameAccountModalFromSidebar}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden ${kassaSidebarPairBtnMinHClass(kassaChromeDensity)} ${kassaPosButtonClass(false, posChrome)}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${kassaPosButtonClass(false, posChrome)}`}
                   title={t('kassaOnAccount.title')}
                   aria-label={t('kassaOnAccount.title')}
                 >
                   <span className={kassaSidebarPairLabelClass}>{t('kassaOnAccount.title')}</span>
                 </button>
                 {isTheLagoonTenant(tenant) ? (
-                  <span className={`min-w-0 ${kassaSidebarPairBtnMinHClass(kassaChromeDensity)}`} aria-hidden />
+                  <span className={`min-w-0 ${KASSA_SIDEBAR_PAIR_BTN_MIN_H}`} aria-hidden />
                 ) : (
                 <button
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden ${kassaSidebarPairBtnMinHClass(kassaChromeDensity)} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosRemoveButtonClass(posChrome)}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosRemoveButtonClass(posChrome)}`}
                   title={t('kassaApp.remove')}
                   aria-label={t('kassaApp.remove')}
                 >
@@ -7461,7 +7431,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   title={t('kassaApp.parkTableAdd')}
                   aria-label={t('kassaApp.parkTableAdd')}
                   className={`w-full font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
-                    kassaWide15Chrome ? 'min-h-[2.35rem]' : kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
+                    kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
                   {t('kassaApp.parkTableAdd')}
@@ -7474,7 +7444,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   title={t('kassaApp.parkTableKitchenBonAria')}
                   aria-label={t('kassaApp.parkTableKitchenBonAria')}
                   className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
-                    kassaWide15Chrome ? 'min-h-[2.35rem]' : kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
+                    kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
                   {t('kassaApp.parkTableAdd')}
@@ -7485,7 +7455,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   title={t('kassaApp.parkTableKassaBonAria')}
                   aria-label={t('kassaApp.parkTableKassaBonAria')}
                   className={`min-w-0 flex-1 font-semibold flex flex-col items-center justify-center gap-0.5 text-center px-2 py-2 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
-                    kassaWide15Chrome ? 'min-h-[2.35rem]' : kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
+                    kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
                   <span>{t('kassaApp.parkTableAdd')}</span>
@@ -7683,7 +7653,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={openNameAccountModalFromSidebar}
                   className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl active:brightness-95 ${
                     kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_ACTION_BTN_FACE
-                  } disabled:pointer-events-none disabled:opacity-45 ${kassaSidebarPairBtnMinHClass(kassaChromeDensity)}`}
+                  } disabled:pointer-events-none disabled:opacity-45 ${KASSA_SIDEBAR_PAIR_BTN_MIN_H}`}
                   title={t('kassaOnAccount.title')}
                   aria-label={t('kassaOnAccount.title')}
                 >
@@ -7693,7 +7663,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl active:brightness-95 ${kassaSidebarPairBtnMinHClass(kassaChromeDensity)} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${KASSA_REMOVE_BTN_FACE}`}
+                  className={`flex min-w-0 items-center justify-center overflow-hidden rounded-xl active:brightness-95 ${KASSA_SIDEBAR_PAIR_BTN_MIN_H} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${KASSA_REMOVE_BTN_FACE}`}
                 >
                   <span className={kassaSidebarPairLabelClass}>{t('kassaApp.remove')}</span>
                 </button>

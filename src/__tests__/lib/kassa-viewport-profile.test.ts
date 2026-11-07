@@ -5,7 +5,6 @@ import {
   isWide15CssViewport,
   kassaDefaultMenuClassicGridCols,
   kassaDefaultMenuGridTailwindCols,
-  kassaMenuGridColumnCountWide15,
   resolveKassaViewportProfile,
 } from '@/lib/kassa-viewport-profile'
 
@@ -89,15 +88,6 @@ describe('kassa-viewport-profile', () => {
     expect(resolveKassaViewportProfile({ cssW: 1680, cssH: 1050 })).toBe('default')
     expect(resolveKassaViewportProfile({ cssW: 1920, cssH: 1200 })).toBe('default')
     expect(isWide15CssViewport(1920, 1080)).toBe(false)
-  })
-
-  it('zet een geschaalde 15″ onder 600px hoog op wide15', () => {
-    expect(isWide15CssViewport(910, 512)).toBe(true)
-    expect(resolveKassaViewportProfile({ cssW: 910, cssH: 512 })).toBe('wide15')
-    expect(resolveKassaViewportProfile({ cssW: 1093, cssH: 614 })).toBe('wide15')
-    expect(kassaMenuGridColumnCountWide15(1024)).toBe(3)
-    expect(kassaMenuGridColumnCountWide15(1366)).toBe(5)
-    expect(kassaMenuGridColumnCountWide15(1920)).toBe(5)
   })
 
   it('17″ SXGA wint van 15″ als het paneel 1280×1024 is', () => {
