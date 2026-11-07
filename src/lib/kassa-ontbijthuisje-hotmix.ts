@@ -1,4 +1,4 @@
-/** Hotmix-knop in de kassa — alleen tenant t ontbijthuisje. */
+/** Hotmix-link in de kassa-header — alleen t ontbijthuisje; opent los van de kassa. */
 
 export const ONTBIJTHUISJE_HOTMIX_URL = 'https://www.hotmixradio.com'
 
