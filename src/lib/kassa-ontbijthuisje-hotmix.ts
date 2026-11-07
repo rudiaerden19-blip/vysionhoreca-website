@@ -2,6 +2,18 @@
 
 export const ONTBIJTHUISJE_HOTMIX_URL = 'https://www.hotmixradio.com'
 
+/** Benoemd venster: een tweede tik focust hetzelfde venster, geen extra popup. */
+export const ONTBIJTHUISJE_HOTMIX_WINDOW = 'vysion-hotmix-tontbijthuisje'
+
+/** Gewoon browservenster. Geen afmetingen: anders maakt de browser er een popup van. */
+export function openOntbijthuisjeHotmixWindow(
+  openImpl: typeof window.open = window.open.bind(window),
+): Window | null {
+  const opened = openImpl(ONTBIJTHUISJE_HOTMIX_URL, ONTBIJTHUISJE_HOTMIX_WINDOW)
+  opened?.focus()
+  return opened
+}
+
 function compactTenantSlug(value: string | null | undefined): string {
   return String(value ?? '')
     .trim()
