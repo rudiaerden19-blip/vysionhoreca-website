@@ -52,30 +52,45 @@ export function kassaAzertyKeyDisplay(key: string, shift: boolean): string {
   return key.length === 1 ? key.toUpperCase() : key
 }
 
+/** @ toets — apart van letters/cijfers. */
+export const KASSA_AZERTY_AT_CHAR = '@' as const
+
+const OSK_SKIP_INPUT_TYPES = new Set([
+  'hidden',
+  'checkbox',
+  'radio',
+  'file',
+  'button',
+  'submit',
+  'reset',
+  'range',
+  'color',
+  'image',
+])
+
+function isOskIgnoredHiddenCapture(el: HTMLElement): boolean {
+  if (el.getAttribute('data-osk-ignore') !== 'true') return false
+  if (el.getAttribute('aria-hidden') === 'true') return true
+  return el.tabIndex < 0 && el.classList.contains('pointer-events-none')
+}
+
+/**
+ * Elk echt admin-tekstveld (tekst, e-mail, tel, prijs, …) — geen checkbox/hidden/barcode-vangst.
+ */
 export function isKassaAzertyOskTextTarget(
   target: EventTarget | null,
 ): target is HTMLInputElement | HTMLTextAreaElement {
   if (!target || !(target instanceof HTMLElement)) return false
   if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return false
+  if (isOskIgnoredHiddenCapture(target)) return false
   if (target.getAttribute('data-kassa-osk-skip') === 'true') return false
-  if (target.getAttribute('data-osk-ignore') === 'true') return false
   if (target.getAttribute('aria-hidden') === 'true') return false
+  if (target.disabled) return false
   if (target instanceof HTMLInputElement) {
     const type = (target.type || 'text').toLowerCase()
-    if (
-      type === 'hidden' ||
-      type === 'checkbox' ||
-      type === 'radio' ||
-      type === 'button' ||
-      type === 'submit' ||
-      type === 'email' ||
-      type === 'url'
-    ) {
-      return false
-    }
+    if (OSK_SKIP_INPUT_TYPES.has(type)) return false
     if (target.readOnly && target.getAttribute('data-kassa-osk-force') !== 'true') return false
   }
-  if (target.disabled) return false
   return true
 }
 

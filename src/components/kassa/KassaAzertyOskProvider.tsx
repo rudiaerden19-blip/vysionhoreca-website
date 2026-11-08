@@ -5,6 +5,7 @@ import { useParams, usePathname } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_AZERTY_LETTER_ROWS,
+  KASSA_AZERTY_AT_CHAR,
   KASSA_AZERTY_NUMBER_ROW,
   applyKassaAzertyOskEdit,
   armKassaOskInput,
@@ -20,7 +21,7 @@ import {
 } from '@/lib/scroll-input-above-keyboard'
 
 /** Ruimte onderaan pagina zodat invoervelden niet achter het toetsenbord verdwijnen. */
-const OSK_HEIGHT_PX = 336
+const OSK_HEIGHT_PX = 352
 
 export function KassaAzertyOskProvider({ children }: { children: React.ReactNode }) {
   const params = useParams()
@@ -125,7 +126,7 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
   return (
     <>
       {children}
-      {enabled && visible && !suppressedRef.current ? (
+      {enabled && visible ? (
         <div
           className="fixed bottom-0 left-0 right-0 z-[500] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
           role="region"
@@ -180,7 +181,7 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
                 ))}
               </div>
             ))}
-            <div className="grid grid-cols-[auto,1fr,auto,auto] gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-1.5 sm:gap-2">
               <button
                 type="button"
                 className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift ? 'border-cyan-500 bg-cyan-900' : ''}`}
@@ -188,6 +189,15 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
                 onClick={() => setShift((s) => !s)}
               >
                 ⇧
+              </button>
+              <button
+                type="button"
+                className={`${keyBtnClass} min-w-[3.25rem] px-2 sm:min-w-[3.5rem]`}
+                onPointerDown={onKeyPointerDown}
+                onClick={() => sendEdit({ char: KASSA_AZERTY_AT_CHAR })}
+                data-testid="kassa-azerty-osk-at"
+              >
+                @
               </button>
               <button
                 type="button"

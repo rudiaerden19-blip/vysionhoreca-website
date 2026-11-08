@@ -22,10 +22,13 @@ describe('kassa-azerty-osk', () => {
     expect(isTenantAzertyOskRoute('/', 'lomichillplay')).toBe(false)
   })
 
-  it('geen os k voor e-mailvelden (geen @-toets)', () => {
-    const input = document.createElement('input')
-    input.type = 'email'
-    expect(isKassaAzertyOskTextTarget(input)).toBe(false)
+  it('e-mail en tel openen os k', () => {
+    const email = document.createElement('input')
+    email.type = 'email'
+    expect(isKassaAzertyOskTextTarget(email)).toBe(true)
+    const tel = document.createElement('input')
+    tel.type = 'tel'
+    expect(isKassaAzertyOskTextTarget(tel)).toBe(true)
   })
 
   it('pilot alleen tenant lomichillplay', () => {
@@ -47,11 +50,24 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskTextTarget(input)).toBe(false)
   })
 
-  it('respecteert data-osk-ignore uit admin-catalogus', () => {
+  it('data-osk-ignore alleen op verborgen barcode-vangst', () => {
+    const hidden = document.createElement('input')
+    hidden.type = 'text'
+    hidden.setAttribute('data-osk-ignore', 'true')
+    hidden.setAttribute('aria-hidden', 'true')
+    expect(isKassaAzertyOskTextTarget(hidden)).toBe(false)
+    const visible = document.createElement('input')
+    visible.type = 'text'
+    visible.setAttribute('data-osk-ignore', 'true')
+    expect(isKassaAzertyOskTextTarget(visible)).toBe(true)
+  })
+
+  it('voegt @ toe via apply edit', () => {
     const input = document.createElement('input')
-    input.type = 'text'
-    input.setAttribute('data-osk-ignore', 'true')
-    expect(isKassaAzertyOskTextTarget(input)).toBe(false)
+    document.body.appendChild(input)
+    applyKassaAzertyOskEdit(input, { char: '@' })
+    expect(input.value).toBe('@')
+    document.body.removeChild(input)
   })
 
   it('past maxLength toe via input event', () => {
