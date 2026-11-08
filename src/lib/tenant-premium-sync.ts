@@ -58,5 +58,38 @@ export async function syncTenantPremiumSubscription(
 
   if (tenantErr) return { ok: false, error: tenantErr.message }
 
+  await setLicensePagePremiumFlag(supabase, slug, true)
+
   return { ok: true }
+}
+
+/** Vaste Premium-kader op tenant-licentiepagina (geen checkout-flow). */
+export async function setLicensePagePremiumFlag(
+  supabase: Db,
+  tenantSlug: string,
+  enabled: boolean,
+): Promise<void> {
+  const slug = tenantSlug.trim().toLowerCase()
+  if (!slug) return
+
+  const { error } = await supabase
+    .from('tenant_settings')
+    .update({ license_page_premium: enabled })
+    .eq('tenant_slug', slug)
+
+  if (error) {
+    if (
+      error.message.includes('license_page_premium') ||
+      error.message.includes('schema cache')
+    ) {
+      return
+    }
+    const { error: insertErr } = await supabase.from('tenant_settings').insert({
+      tenant_slug: slug,
+      license_page_premium: enabled,
+    })
+    if (insertErr && !insertErr.message.includes('duplicate')) {
+      console.warn('[license_page_premium]', slug, insertErr.message)
+    }
+  }
 }

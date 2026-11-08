@@ -29,7 +29,7 @@ export async function GET(
     return NextResponse.json({ error: 'Database niet beschikbaar' }, { status: 503 })
   }
 
-  const [subRes, tenantRes, invRes] = await Promise.all([
+  const [subRes, tenantRes, invRes, settingsRes] = await Promise.all([
     supabase.from('subscriptions').select('*').eq('tenant_slug', tenantSlug).maybeSingle(),
     supabase
       .from('tenants')
@@ -41,6 +41,11 @@ export async function GET(
       .select('*')
       .eq('tenant_slug', tenantSlug)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('tenant_settings')
+      .select('license_page_premium')
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle(),
   ])
 
   if (subRes.error) {
@@ -54,12 +59,14 @@ export async function GET(
   }
 
   const invoices = invRes.data ?? []
-  const effectivePlan = resolveTenantCurrentPlan({
+  const licensePagePremium = settingsRes.data?.license_page_premium === true
+  let effectivePlan = resolveTenantCurrentPlan({
     tenantSlug,
     subscription: subRes.data,
     tenant: tenantRes.data,
     licenseInvoices: invoices,
   })
+  if (licensePagePremium) effectivePlan = 'pro'
 
   const subscription = subRes.data
     ? {
@@ -88,5 +95,6 @@ export async function GET(
     tenant,
     invoices,
     effectivePlan,
+    licensePagePremium,
   })
 }

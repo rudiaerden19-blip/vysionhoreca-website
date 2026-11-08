@@ -2853,7 +2853,8 @@
       "upgradePremiumSubtitle": "Tutte le funzioni per 99 €/mese",
       "upgradePremiumButton": "Passa a Premium",
       "premiumActiveTitle": "Vysion Premium",
-      "premiumActiveSubtitle": "Hai Premium"
+      "premiumActiveSubtitle": "Hai Premium",
+      "licensePremiumStaticNote": "La licenza è gestita da Vysion. Nessun acquisto o pagamento online in questa schermata — solo panoramica."
     }
   },
   "shopDisplay": {

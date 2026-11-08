@@ -16,7 +16,11 @@ import {
   resolveTenantCurrentPlan,
   tenantPlanMonthlyEuros,
 } from '@/lib/tenant-subscription-display'
-import { formatLicenseInvoiceAmounts } from '@/lib/tenant-license-invoice'
+import {
+  formatLicenseInvoiceAmounts,
+  licenseInvoiceInclFromExcl,
+  LICENSE_INVOICE_VAT_RATE,
+} from '@/lib/tenant-license-invoice'
 
 interface Subscription {
   id: string
@@ -514,6 +518,7 @@ export default function AbonnementPage() {
   const [showCancelled, setShowCancelled] = useState(false)
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
   const [successType, setSuccessType] = useState<'subscription' |  'invoice'>('subscription')
+  const [licensePagePremium, setLicensePagePremium] = useState(false)
 
   // Check URL parameters for payment result
   useEffect(() => {
@@ -575,17 +580,20 @@ export default function AbonnementPage() {
         setSubscription(json.subscription ?? null)
         setTenant(json.tenant ?? null)
         setInvoices(Array.isArray(json.invoices) ? json.invoices : [])
+        setLicensePagePremium(json.licensePagePremium === true)
       } else {
         console.warn('[abonnement] license-overview', res.status, json?.error)
         setSubscription(null)
         setTenant(null)
         setInvoices([])
+        setLicensePagePremium(false)
       }
     } catch (e) {
       console.warn('[abonnement] license-overview failed', e)
       setSubscription(null)
       setTenant(null)
       setInvoices([])
+      setLicensePagePremium(false)
     }
 
     const settingsData = await getTenantSettings(tenantSlug)
@@ -680,16 +688,20 @@ export default function AbonnementPage() {
     })
   }
 
-  const currentPlan = resolveTenantCurrentPlan({
+  const resolvedPlan = resolveTenantCurrentPlan({
     tenantSlug,
     subscription,
     tenant,
     licenseInvoices: invoices,
   })
+  const currentPlan = licensePagePremium ? 'pro' : resolvedPlan
+  const showSimplePremium =
+    licensePagePremium || isPremiumPlan(resolvedPlan) || isPremiumPlan(currentPlan)
   const currentPlanMonthlyEuros = tenantPlanMonthlyEuros(currentPlan, {
     ...subscription,
     plan: currentPlan,
   })
+  const premiumInclMonthly = licenseInvoiceInclFromExcl(MONTHLY_PRICE_WITH_HARDWARE)
   const isActive = status === 'active' || status === 'ACTIVE'
   const isTrial = status === 'trial' || status === 'TRIAL'
   const isExpired = status === 'expired' || status === 'EXPIRED'
@@ -759,11 +771,27 @@ export default function AbonnementPage() {
               </div>
             </div>
           </div>
-          {/* Upgrade knop voor starter plan */}
-          {!isPremiumPlan(currentPlan) && (
+          {showSimplePremium ? (
+            <div className="flex-shrink-0 w-full md:max-w-sm">
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 border-2 border-purple-300 rounded-2xl p-6 text-center">
+                <h3 className="font-bold text-purple-900 text-lg">{t('premiumActiveTitle')}</h3>
+                <p className="text-green-700 font-semibold mt-1">{t('premiumActiveSubtitle')}</p>
+                <p className="text-purple-900 text-sm mt-3 font-medium">
+                  €{MONTHLY_PRICE_WITH_HARDWARE} excl. BTW
+                  <span className="text-purple-700">
+                    {' '}
+                    · €{premiumInclMonthly.toFixed(2)} incl. {Math.round(LICENSE_INVOICE_VAT_RATE * 100)}% BTW
+                    {t('perMonth')}
+                  </span>
+                </p>
+                <p className="text-gray-600 text-xs mt-3 leading-relaxed">
+                  {globalT('adminPages.subscription.licensePremiumStaticNote')}
+                </p>
+              </div>
+            </div>
+          ) : !isPremiumPlan(currentPlan) ? (
             <div className="flex-shrink-0">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-5 text-center max-w-xs">
-                <span className="text-3xl"></span>
                 <h3 className="font-bold text-purple-900 mt-2 mb-1">{t('upgradePremiumTitle')}</h3>
                 <p className="text-purple-700 text-sm mb-4">{t('upgradePremiumSubtitle')}</p>
                 <button
@@ -775,11 +803,9 @@ export default function AbonnementPage() {
                 </button>
               </div>
             </div>
-          )}
-          {isPremiumPlan(currentPlan) && (
+          ) : (
             <div className="flex-shrink-0">
               <div className="bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-300 rounded-2xl p-5 text-center max-w-xs">
-                <span className="text-3xl"></span>
                 <h3 className="font-bold text-purple-900 mt-2 mb-1">{t('premiumActiveTitle')}</h3>
                 <p className="text-green-700 font-semibold text-sm">{t('premiumActiveSubtitle')}</p>
               </div>
@@ -790,7 +816,7 @@ export default function AbonnementPage() {
 
       {/* Upgrade Banner - wordt getoond wanneer tenant een Pro feature probeert te openen */}
       <AnimatePresence>
-        {showUpgradeBanner && (
+        {!showSimplePremium && showUpgradeBanner && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -895,7 +921,7 @@ export default function AbonnementPage() {
       </AnimatePresence>
 
       {/* Warning Banner for Overdue */}
-      {hasOverdue && (
+      {!showSimplePremium && hasOverdue && (
         <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -920,7 +946,7 @@ export default function AbonnementPage() {
       )}
 
       {/* Warning Banner voor bijna verlopend abonnement */}
-      {expiringDays !== null && !hasOverdue && (
+      {!showSimplePremium && expiringDays !== null && !hasOverdue && (
         <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -964,8 +990,20 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="text-3xl font-bold text-gray-900">
-            €{currentPlanMonthlyEuros}
-            <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
+            {showSimplePremium ? (
+              <>
+                €{MONTHLY_PRICE_WITH_HARDWARE}
+                <span className="text-base font-normal text-gray-500"> excl. BTW{t('perMonth')}</span>
+                <p className="text-sm font-normal text-gray-500 mt-1">
+                  €{premiumInclMonthly.toFixed(2)} incl. BTW
+                </p>
+              </>
+            ) : (
+              <>
+                €{currentPlanMonthlyEuros}
+                <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -1030,7 +1068,8 @@ export default function AbonnementPage() {
         </div>
       </div>
 
-      {/* Abonnement Kopen - ALTIJD ZICHTBAAR */}
+      {!showSimplePremium ? (
+      <>
       {/* Billing Toggle */}
       <div className="flex flex-col items-center mb-6">
         <div className="bg-gray-100 p-1 rounded-full inline-flex items-center">
@@ -1175,6 +1214,8 @@ export default function AbonnementPage() {
           </button>
         </div>
       </div>
+      </>
+      ) : null}
 
       {/* Invoices Table */}
       <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden">
@@ -1243,7 +1284,8 @@ export default function AbonnementPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      {(invoice.status === 'pending' || invoice.status === 'overdue') ? (
+                      {!showSimplePremium &&
+                      (invoice.status === 'pending' || invoice.status === 'overdue') ? (
                         <button
                           onClick={() => handlePayInvoice(invoice)}
                           disabled={processing === invoice.id}

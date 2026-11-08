@@ -3191,7 +3191,8 @@
       "upgradePremiumSubtitle": "Alle features voor €99/maand",
       "upgradePremiumButton": "Upgrade naar Premium",
       "premiumActiveTitle": "Vysion Premium",
-      "premiumActiveSubtitle": "U heeft Premium"
+      "premiumActiveSubtitle": "U heeft Premium",
+      "licensePremiumStaticNote": "Uw licentie wordt door Vysion beheerd. Op dit scherm geen online aankoop of betalen — alleen overzicht."
     }
   },
   "shopDisplay": {

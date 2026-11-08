@@ -2853,7 +2853,8 @@
       "upgradePremiumSubtitle": "Todas las funciones por 99 €/mes",
       "upgradePremiumButton": "Actualizar a Premium",
       "premiumActiveTitle": "Vysion Premium",
-      "premiumActiveSubtitle": "Tienes Premium"
+      "premiumActiveSubtitle": "Tienes Premium",
+      "licensePremiumStaticNote": "Tu licencia la gestiona Vysion. Sin compra ni pago en línea en esta pantalla — solo resumen."
     }
   },
   "shopDisplay": {

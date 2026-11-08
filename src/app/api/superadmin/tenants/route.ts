@@ -43,7 +43,10 @@ import {
   tenantHasPaidPremiumLicense,
   isPremiumPlan,
 } from '@/lib/tenant-subscription-display'
-import { syncTenantPremiumSubscription } from '@/lib/tenant-premium-sync'
+import {
+  setLicensePagePremiumFlag,
+  syncTenantPremiumSubscription,
+} from '@/lib/tenant-premium-sync'
 
 const CreateSchema = z.object({
   action: z.literal('create'),
@@ -169,6 +172,12 @@ const DeleteLicenseInvoiceSchema = z.object({
   invoiceId: z.string().uuid(),
 })
 
+const SetLicensePagePremiumSchema = z.object({
+  action: z.literal('set_license_page_premium'),
+  slug: z.string().min(1),
+  enabled: z.boolean(),
+})
+
 const BodySchema = z.discriminatedUnion('action', [
   CreateSchema,
   DeleteSchema,
@@ -188,6 +197,7 @@ const BodySchema = z.discriminatedUnion('action', [
   ListLicenseInvoicesSchema,
   SaveLicenseInvoiceSchema,
   DeleteLicenseInvoiceSchema,
+  SetLicensePagePremiumSchema,
 ])
 
 type SupabaseService = NonNullable<ReturnType<typeof getServerSupabaseClient>>
@@ -875,6 +885,29 @@ export async function POST(req: NextRequest) {
         requestId,
       })
       return NextResponse.json({ ok: true, id: inserted?.id })
+    }
+
+    if (body.action === 'set_license_page_premium') {
+      const slug = body.slug.trim().toLowerCase()
+      await setLicensePagePremiumFlag(supabase, slug, body.enabled)
+      if (body.enabled) {
+        await syncTenantPremiumSubscription(supabase, slug)
+      }
+      await recordAudit(supabase, {
+        tenantSlug: slug,
+        actorType: 'superadmin',
+        actorId,
+        actorEmail,
+        action: 'set_license_page_premium',
+        resourceType: 'tenant_settings',
+        resourceId: slug,
+        before: null,
+        after: { license_page_premium: body.enabled },
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+        requestId,
+      })
+      return NextResponse.json({ ok: true })
     }
 
     if (body.action === 'delete_license_invoice') {

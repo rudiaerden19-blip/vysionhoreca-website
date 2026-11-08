@@ -2853,7 +2853,8 @@
       "upgradePremiumSubtitle": "جميع الميزات مقابل 99 يورو/شهر",
       "upgradePremiumButton": "الترقية إلى Premium",
       "premiumActiveTitle": "Vysion Premium",
-      "premiumActiveSubtitle": "لديك Premium"
+      "premiumActiveSubtitle": "لديك Premium",
+      "licensePremiumStaticNote": "تُدار رخصتك عبر Vysion. لا شراء أو دفع عبر الإنترنت في هذه الشاشة — عرض فقط."
     }
   },
   "shopDisplay": {

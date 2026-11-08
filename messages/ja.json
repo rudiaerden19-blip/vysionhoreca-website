@@ -2853,7 +2853,8 @@
       "upgradePremiumSubtitle": "月額99ユーロで全機能",
       "upgradePremiumButton": "プレミアムにアップグレード",
       "premiumActiveTitle": "Vysion Premium",
-      "premiumActiveSubtitle": "プレミアム契約中"
+      "premiumActiveSubtitle": "プレミアム契約中",
+      "licensePremiumStaticNote": "ライセンスは Vysion が管理します。この画面でのオンライン購入・支払いはありません — 概要のみです。"
     }
   },
   "shopDisplay": {

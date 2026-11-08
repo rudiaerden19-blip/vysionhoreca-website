@@ -30,6 +30,7 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
+  const [activatingPremium, setActivatingPremium] = useState(false)
 
   const loadInvoices = useCallback(async () => {
     setLoading(true)
@@ -117,6 +118,32 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
     })
   }
 
+  async function handleActivateLicensePremiumView() {
+    if (
+      !confirm(
+        'Licentiepagina van deze zaak: alleen kader «U heeft Premium», geen Stripe/checkout. Doorgaan?',
+      )
+    ) {
+      return
+    }
+    setActivatingPremium(true)
+    const res = await authFetch('/api/superadmin/tenants', {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'set_license_page_premium',
+        slug: tenantSlug,
+        enabled: true,
+      }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      alert(`Mislukt: ${json?.error || res.status}`)
+    } else {
+      alert('Premium-weergave staat aan voor deze tenant (refresh licentiepagina).')
+    }
+    setActivatingPremium(false)
+  }
+
   async function handleDelete(id: string) {
     if (!confirm('Deze licentiefactuur verwijderen?')) return
     const res = await authFetch('/api/superadmin/tenants', {
@@ -148,6 +175,14 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
         <p className="text-slate-400 text-sm">
           Verschijnt in tenant → <strong className="text-slate-200">Licentie / Betalingsoverzicht</strong>
         </p>
+        <button
+          type="button"
+          onClick={() => void handleActivateLicensePremiumView()}
+          disabled={activatingPremium}
+          className="text-sm font-semibold text-orange-400 hover:text-orange-300 disabled:opacity-50"
+        >
+          {activatingPremium ? 'Bezig…' : 'Licentiepagina: U heeft Premium (geen checkout)'}
+        </button>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-3 mb-6 text-sm">

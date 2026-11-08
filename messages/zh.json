@@ -2853,7 +2853,8 @@
       "upgradePremiumSubtitle": "每月 99 欧元，全部功能",
       "upgradePremiumButton": "升级到高级版",
       "premiumActiveTitle": "Vysion Premium",
-      "premiumActiveSubtitle": "您已拥有 Premium"
+      "premiumActiveSubtitle": "您已拥有 Premium",
+      "licensePremiumStaticNote": "许可证由 Vysion 管理。此页不支持在线购买或付款 — 仅作概览。"
     }
   },
   "shopDisplay": {
