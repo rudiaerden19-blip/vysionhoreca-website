@@ -39,8 +39,7 @@ import {
 } from '@/components/kassa/KassaHelpVideoSession'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
-import { isAzertyOskActiveForSession } from '@/lib/kassa-azerty-osk'
-import { getCurrentTenantSlug } from '@/lib/tenant-url'
+import { OskLegacyFieldCleanup } from '@/components/admin/OskLegacyFieldCleanup'
 import {
   buildShopInternalReturnPath,
   clearTenantOwnerSession,
@@ -93,15 +92,6 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   const kassaHelpSession = useKassaHelpVideoSessionOptional()
   const kassaHelpOpen = kassaHelpSession?.open === true
   const pathname = usePathname()
-  const [hostTenantSlug, setHostTenantSlug] = useState<string | null>(null)
-  useEffect(() => {
-    setHostTenantSlug(getCurrentTenantSlug())
-  }, [pathname])
-  const azertyOskActive = isAzertyOskActiveForSession({
-    pathname: pathname ?? '',
-    routeParamTenant: params.tenant,
-    hostTenantSlug,
-  })
   const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
   const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
   const isRetailKassaPos = isShopAdminRetailKassaPosPath(adminPath, params.tenant)
@@ -657,7 +647,8 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         </div>
       </div>
 
-      {!azertyOskActive ? <AdminWindowsOskSupport /> : null}
+      <OskLegacyFieldCleanup />
+      <AdminWindowsOskSupport />
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main
         data-vysion-admin-scroll

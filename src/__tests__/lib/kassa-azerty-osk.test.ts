@@ -18,24 +18,18 @@ describe('kassa-azerty-osk', () => {
     expect(isTenantAzertyOskRoute('/', 'lomichillplay')).toBe(false)
   })
 
-  it('active sessie via host, next of route-param', () => {
+  it('active sessie uit zolang pilot LIVE uit staat', () => {
     expect(
       isAzertyOskActiveForSession({
         pathname: '/login',
       }),
-    ).toBe(true)
+    ).toBe(false)
     expect(
       isAzertyOskActiveForSession({
-        pathname: '/login',
-        searchNext: '/shop/lomichillplay/admin/kassa',
+        pathname: '/shop/lomichillplay/admin/kassa',
+        routeParamTenant: 'lomichillplay',
       }),
-    ).toBe(true)
-    expect(
-      isAzertyOskActiveForSession({
-        pathname: '/login',
-        hostTenantSlug: 'lomichillplay',
-      }),
-    ).toBe(true)
+    ).toBe(false)
     expect(
       isAzertyOskActiveForSession({
         pathname: '/shop/other/admin',
@@ -59,9 +53,9 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskTextTarget(tel)).toBe(true)
   })
 
-  it('pilot alleen tenant lomichillplay', () => {
-    expect(isKassaAzertyOskEnabled('lomichillplay')).toBe(true)
-    expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(true)
+  it('pilot tenant-slug check (LIVE momenteel uit)', () => {
+    expect(isKassaAzertyOskEnabled('lomichillplay')).toBe(false)
+    expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(false)
     expect(isKassaAzertyOskEnabled('vysion')).toBe(false)
     expect(isKassaAzertyOskEnabled('demo-frituur')).toBe(false)
   })

@@ -5,7 +5,13 @@
 
 const KASSA_AZERTY_OSK_PILOT_SLUG = 'lomichillplay'
 
+/**
+ * Pilot tijdelijk uit tot stabiele UX — zet op true om Lomichillplay-toetsenbord te heractiveren.
+ */
+export const KASSA_AZERTY_OSK_LIVE = false
+
 export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
+  if (!KASSA_AZERTY_OSK_LIVE) return false
   return tenantSlug.trim().toLowerCase() === KASSA_AZERTY_OSK_PILOT_SLUG
 }
 
@@ -75,6 +81,7 @@ export function isAzertyOskActiveForSession(input: {
   searchNext?: string | null
   hostTenantSlug?: string | null
 }): boolean {
+  if (!KASSA_AZERTY_OSK_LIVE) return false
   if (
     isAzertyOskPilotOwnerLoginPath(input.pathname) &&
     isKassaAzertyOskEnabled(KASSA_AZERTY_OSK_PILOT_SLUG)
@@ -230,8 +237,11 @@ export function disarmAllKassaOskInputs(root: ParentNode = document): void {
 export function releaseLegacyOskInputGuards(root: ParentNode = document): void {
   root.querySelectorAll('input, textarea').forEach((node) => {
     if (!(node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement)) return
-    if (node.getAttribute('inputMode') === 'none' && !node.readOnly) {
+    if (node.getAttribute('inputMode') === 'none') {
       node.removeAttribute('inputMode')
+    }
+    if (node.getAttribute('data-kassa-osk-armed') === 'true') {
+      disarmKassaOskInput(node)
     }
   })
 }

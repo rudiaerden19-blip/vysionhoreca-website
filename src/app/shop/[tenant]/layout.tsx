@@ -4,8 +4,6 @@ import { TENANT_APP_SHELL_THEME_COLOR } from '@/lib/theme-color'
 import { InstallPWABanner } from '@/components/InstallPWABanner'
 import { TenantWebSessionOrchestrator } from '@/components/TenantWebSessionOrchestrator'
 import { TenantBlockedGate } from '@/components/TenantBlockedGate'
-import { ShopAzertyOskShell } from './ShopAzertyOskShell'
-
 export async function generateViewport(): Promise<Viewport> {
   return {
     width: 'device-width',
@@ -26,9 +24,7 @@ export default function ShopTenantLayout({
     <>
       <TenantWebSessionOrchestrator tenantSlug={params.tenant} />
       <InstallPWABanner />
-      <TenantBlockedGate tenantSlug={params.tenant}>
-        <ShopAzertyOskShell>{children}</ShopAzertyOskShell>
-      </TenantBlockedGate>
+      <TenantBlockedGate tenantSlug={params.tenant}>{children}</TenantBlockedGate>
     </>
   )
 }
