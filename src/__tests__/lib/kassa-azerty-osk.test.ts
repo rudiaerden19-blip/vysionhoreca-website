@@ -7,12 +7,22 @@ import {
 } from '@/lib/kassa-azerty-osk'
 
 describe('kassa-azerty-osk', () => {
-  it('azerty route op hele tenant-admin', () => {
-    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/producten', 'lomichillplay')).toBe(
-      true,
-    )
+  it('azerty route alleen horeca-kassa, niet catalogus of account', () => {
     expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/kassa', 'lomichillplay')).toBe(true)
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/producten', 'lomichillplay')).toBe(
+      false,
+    )
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/reserveringen', 'lomichillplay')).toBe(
+      false,
+    )
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/account/login', 'lomichillplay')).toBe(false)
     expect(isTenantAzertyOskRoute('/shop/other/admin/kassa', 'lomichillplay')).toBe(false)
+  })
+
+  it('geen os k voor e-mailvelden (geen @-toets)', () => {
+    const input = document.createElement('input')
+    input.type = 'email'
+    expect(isKassaAzertyOskTextTarget(input)).toBe(false)
   })
 
   it('pilot alleen tenant lomichillplay', () => {

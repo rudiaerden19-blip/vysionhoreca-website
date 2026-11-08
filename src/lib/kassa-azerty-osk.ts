@@ -9,12 +9,15 @@ export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
   return tenantSlug.trim().toLowerCase() === KASSA_AZERTY_OSK_PILOT_SLUG
 }
 
-/** AZERTY-OSK actief op alle tenant-adminmodules (kassa, producten, team, …). */
+/**
+ * Alleen horeca-kassa-POS — geen producten/categorieën/reserveringen, geen account/website.
+ */
 export function isTenantAzertyOskRoute(pathname: string, tenantSlug: string): boolean {
-  const path = (pathname || '').toLowerCase()
+  const path = (pathname || '').split('?')[0].replace(/\/+$/, '').toLowerCase()
   const slug = tenantSlug.trim().toLowerCase()
   if (!slug) return false
-  return path.includes(`/shop/${slug}/admin`)
+  if (path.includes('/account/')) return false
+  return path === `/shop/${slug}/admin/kassa`
 }
 
 export const KASSA_AZERTY_NUMBER_ROW = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'] as const
@@ -59,7 +62,15 @@ export function isKassaAzertyOskTextTarget(
   if (target.getAttribute('aria-hidden') === 'true') return false
   if (target instanceof HTMLInputElement) {
     const type = (target.type || 'text').toLowerCase()
-    if (type === 'hidden' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit') {
+    if (
+      type === 'hidden' ||
+      type === 'checkbox' ||
+      type === 'radio' ||
+      type === 'button' ||
+      type === 'submit' ||
+      type === 'email' ||
+      type === 'url'
+    ) {
       return false
     }
     if (target.readOnly && target.getAttribute('data-kassa-osk-force') !== 'true') return false

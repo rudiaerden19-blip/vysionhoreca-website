@@ -39,7 +39,6 @@ import {
 } from '@/components/kassa/KassaHelpVideoSession'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
-import { KassaAzertyOskProvider } from '@/components/kassa/KassaAzertyOskProvider'
 import { isKassaAzertyOskEnabled } from '@/lib/kassa-azerty-osk'
 import {
   buildShopInternalReturnPath,
@@ -83,9 +82,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   return (
     <TenantModuleFlagsProvider tenantSlug={params.tenant}>
       <KassaHelpVideoProvider tenantSlug={params.tenant}>
-        <KassaAzertyOskProvider>
-          <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
-        </KassaAzertyOskProvider>
+        <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
       </KassaHelpVideoProvider>
     </TenantModuleFlagsProvider>
   )
@@ -650,7 +647,12 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         </div>
       </div>
 
-      {!isKassaAzertyOskEnabled(params.tenant) ? <AdminWindowsOskSupport /> : null}
+      {!(
+        isKassaAzertyOskEnabled(params.tenant) &&
+        isShopAdminKassaPosPath(adminPath, params.tenant)
+      ) ? (
+        <AdminWindowsOskSupport />
+      ) : null}
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main
         data-vysion-admin-scroll
