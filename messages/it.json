@@ -3637,6 +3637,8 @@
     "cartLineNoteLabel": "Nota",
     "cartLineNotePlaceholder": "Nome, istruzione, …",
     "numpadLineNotePlaceholder": "Nota (facoltativa)",
+    "azertyOskTitle": "Tastiera AZERTY",
+    "azertyOskClose": "Chiudi tastiera",
     "cartLineNoteAsReceiptName": "Nome in grande sullo scontrino (sotto tipo ordine)",
     "ariaEditLine": "Modifica riga",
     "closeAria": "Chiudi",

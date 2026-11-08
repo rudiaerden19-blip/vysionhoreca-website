@@ -3637,6 +3637,8 @@
     "cartLineNoteLabel": "Nota",
     "cartLineNotePlaceholder": "Nombre, instrucción, …",
     "numpadLineNotePlaceholder": "Nota (opcional)",
+    "azertyOskTitle": "Teclado AZERTY",
+    "azertyOskClose": "Cerrar teclado",
     "cartLineNoteAsReceiptName": "Nombre grande en ticket (bajo tipo de pedido)",
     "ariaEditLine": "Editar línea",
     "closeAria": "Cerrar",
