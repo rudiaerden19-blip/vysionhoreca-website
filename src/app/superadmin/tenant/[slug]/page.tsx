@@ -18,6 +18,11 @@ import {
 import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-column'
 import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { SuperadminTenantLicenseInvoices } from '@/components/superadmin/SuperadminTenantLicenseInvoices'
+import {
+  MONTHLY_PRICE_WITHOUT_HARDWARE,
+  MONTHLY_PRICE_WITH_HARDWARE,
+} from '@/lib/pricing-hardware'
 
 interface TenantDetails {
   id: string
@@ -278,10 +283,13 @@ export default function TenantDetailPage() {
 
   function getPlanPrice(plan: string): number {
     switch (plan) {
-      case 'starter': return 59
-      case 'standaard': return 99
-      case 'pro': return 129
-      default: return 69
+      case 'pro':
+      case 'premium':
+        return MONTHLY_PRICE_WITH_HARDWARE
+      case 'starter':
+        return MONTHLY_PRICE_WITHOUT_HARDWARE
+      default:
+        return MONTHLY_PRICE_WITHOUT_HARDWARE
     }
   }
 
@@ -602,6 +610,17 @@ export default function TenantDetailPage() {
             )}
           </motion.div>
         </div>
+
+        {!isAdminTenant(slug) ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mt-8"
+          >
+            <SuperadminTenantLicenseInvoices tenantSlug={slug} />
+          </motion.div>
+        ) : null}
       </div>
 
       {/* Subscription Modal */}
@@ -622,8 +641,8 @@ export default function TenantDetailPage() {
                   onChange={(e) => setSubForm({ ...subForm, plan: e.target.value, price_monthly: getPlanPrice(e.target.value) })}
                   className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
                 >
-                  <option value="starter">Starter - €59/maand</option>
-                  <option value="pro">Premium - €99/maand</option>
+                  <option value="starter">Starter - €{MONTHLY_PRICE_WITHOUT_HARDWARE}/maand</option>
+                  <option value="pro">Premium - €{MONTHLY_PRICE_WITH_HARDWARE}/maand</option>
                 </select>
               </div>
 

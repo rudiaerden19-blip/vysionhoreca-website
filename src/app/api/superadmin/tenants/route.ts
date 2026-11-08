@@ -29,6 +29,11 @@ import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
+import { buildLicenseInvoiceDbPayload } from '@/lib/tenant-license-invoice'
+import {
+  MONTHLY_PRICE_WITHOUT_HARDWARE,
+  MONTHLY_PRICE_WITH_HARDWARE,
+} from '@/lib/pricing-hardware'
 
 const CreateSchema = z.object({
   action: z.literal('create'),
@@ -128,6 +133,32 @@ const UpdateKassaJetonQuickSuccessSchema = z.object({
   kassaJetonQuickSuccessFlow: z.boolean(),
 })
 
+const ListLicenseInvoicesSchema = z.object({
+  action: z.literal('list_license_invoices'),
+  slug: z.string().min(1),
+})
+
+const SaveLicenseInvoiceSchema = z.object({
+  action: z.literal('save_license_invoice'),
+  slug: z.string().min(1),
+  invoice: z.object({
+    id: z.string().uuid().optional(),
+    invoice_number: z.string().min(1).max(120),
+    amount: z.number().positive(),
+    status: z.enum(['paid', 'pending', 'overdue']),
+    description: z.string().max(500).optional(),
+    invoice_date: z.string().optional(),
+    due_date: z.string().optional(),
+    paid_at: z.string().nullable().optional(),
+  }),
+})
+
+const DeleteLicenseInvoiceSchema = z.object({
+  action: z.literal('delete_license_invoice'),
+  slug: z.string().min(1),
+  invoiceId: z.string().uuid(),
+})
+
 const BodySchema = z.discriminatedUnion('action', [
   CreateSchema,
   DeleteSchema,
@@ -144,6 +175,9 @@ const BodySchema = z.discriminatedUnion('action', [
   UpdateKassaCloudPrintEnabledSchema,
   UpdateKassaThermalPrintDisabledSchema,
   UpdateKassaJetonQuickSuccessSchema,
+  ListLicenseInvoicesSchema,
+  SaveLicenseInvoiceSchema,
+  DeleteLicenseInvoiceSchema,
 ])
 
 const CASCADE_DELETE_TABLES = [
@@ -458,7 +492,7 @@ export async function POST(req: NextRequest) {
         const { error } = await supabase.from('subscriptions').insert({
           tenant_slug: body.slug,
           plan: 'starter',
-          price_monthly: 59,
+          price_monthly: MONTHLY_PRICE_WITHOUT_HARDWARE,
           ...updates,
         })
         if (error) return NextResponse.json({ error: error.message }, { status: 400 })
@@ -694,6 +728,93 @@ export async function POST(req: NextRequest) {
         resourceId: body.slug,
         before: null,
         after: updates,
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+        requestId,
+      })
+      return NextResponse.json({ ok: true })
+    }
+
+  // ── LICENTIEFACTUREN (tenant /admin/abonnement) ───────────────────────────
+    if (body.action === 'list_license_invoices') {
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('tenant_slug', body.slug.trim().toLowerCase())
+        .order('created_at', { ascending: false })
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json({ ok: true, invoices: data ?? [] })
+    }
+
+    if (body.action === 'save_license_invoice') {
+      const slug = body.slug.trim().toLowerCase()
+      const row = buildLicenseInvoiceDbPayload(slug, body.invoice)
+      if (body.invoice.id) {
+        delete row.created_at
+        delete row.tenant_slug
+        const { error } = await supabase
+          .from('invoices')
+          .update(row)
+          .eq('id', body.invoice.id)
+          .eq('tenant_slug', slug)
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+        await recordAudit(supabase, {
+          tenantSlug: slug,
+          actorType: 'superadmin',
+          actorId,
+          actorEmail,
+          action: 'save_license_invoice',
+          resourceType: 'invoices',
+          resourceId: body.invoice.id,
+          before: null,
+          after: row,
+          ip: meta.ip,
+          userAgent: meta.userAgent,
+          requestId,
+        })
+        return NextResponse.json({ ok: true, id: body.invoice.id })
+      }
+      const { data: inserted, error } = await supabase
+        .from('invoices')
+        .insert(row)
+        .select('id')
+        .single()
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      await recordAudit(supabase, {
+        tenantSlug: slug,
+        actorType: 'superadmin',
+        actorId,
+        actorEmail,
+        action: 'save_license_invoice',
+        resourceType: 'invoices',
+        resourceId: inserted?.id ?? null,
+        before: null,
+        after: row,
+        ip: meta.ip,
+        userAgent: meta.userAgent,
+        requestId,
+      })
+      return NextResponse.json({ ok: true, id: inserted?.id })
+    }
+
+    if (body.action === 'delete_license_invoice') {
+      const slug = body.slug.trim().toLowerCase()
+      const { error } = await supabase
+        .from('invoices')
+        .delete()
+        .eq('id', body.invoiceId)
+        .eq('tenant_slug', slug)
+      if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      await recordAudit(supabase, {
+        tenantSlug: slug,
+        actorType: 'superadmin',
+        actorId,
+        actorEmail,
+        action: 'delete_license_invoice',
+        resourceType: 'invoices',
+        resourceId: body.invoiceId,
+        before: null,
+        after: null,
         ip: meta.ip,
         userAgent: meta.userAgent,
         requestId,

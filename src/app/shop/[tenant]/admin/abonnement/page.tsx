@@ -1212,7 +1212,11 @@ export default function AbonnementPage() {
                   <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-mono text-sm">{invoice.invoice_number}</td>
                     <td className="px-6 py-4 text-gray-600">
-                      {new Date(invoice.created_at).toLocaleDateString(locale === 'nl'? 'nl-BE': locale)}
+                      {new Date(
+                        invoice.status === 'paid' && invoice.paid_at
+                          ? invoice.paid_at
+                          : invoice.created_at,
+                      ).toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale)}
                     </td>
                     <td className="px-6 py-4 text-gray-900">{invoice.description || '-'}</td>
                     <td className="px-6 py-4 font-semibold">€{Number(invoice.amount).toFixed(2)}</td>
