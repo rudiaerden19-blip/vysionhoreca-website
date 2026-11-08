@@ -30,6 +30,9 @@ export function buildKassaCartLineKey(
 }
 
 /** Order-/keuken-JSON gebruikt `notes`, mand gebruikt `lineNote`. */
-export function kassaCartLineOrderNotes(line: { lineNote?: string | null }): string | undefined {
-  return normalizeKassaLineNote(line.lineNote)
+export function kassaCartLineOrderNotes(line: {
+  lineNote?: string | null
+  notes?: string | null
+}): string | undefined {
+  return normalizeKassaLineNote(line.lineNote) ?? normalizeKassaLineNote(line.notes)
 }

@@ -1,5 +1,6 @@
 import {
   buildKassaCartLineKey,
+  kassaCartLineOrderNotes,
   normalizeKassaLineNote,
 } from '@/lib/kassa-cart-line-key'
 
@@ -22,5 +23,10 @@ describe('kassa-cart-line-key', () => {
   it('normalizes line note', () => {
     expect(normalizeKassaLineNote('  foo  ')).toBe('foo')
     expect(normalizeKassaLineNote('')).toBeUndefined()
+  })
+
+  it('reads notes from persisted order items', () => {
+    expect(kassaCartLineOrderNotes({ notes: ' keuken ' })).toBe('keuken')
+    expect(kassaCartLineOrderNotes({ lineNote: 'mand', notes: 'db' })).toBe('mand')
   })
 })

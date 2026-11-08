@@ -4906,12 +4906,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             orderType: order.orderType,
             tableNumber: receiptTableNr || null,
             items: [
-              ...kassaNameAccountReceiptDisplayItems(order).map(i => ({
-                quantity: i.quantity,
-                name: i.product.name,
-                price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-                choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-              })),
+              ...kassaNameAccountReceiptDisplayItems(order).map(i => {
+                const lineNote = kassaCartLineOrderNotes(i)
+                const choiceLines = (i.choices || []).map(c => ({ name: c.choiceName, price: c.price }))
+                if (lineNote) {
+                  choiceLines.push({ name: `! ${lineNote}`, price: 0 })
+                }
+                return {
+                  quantity: i.quantity,
+                  name: i.product.name,
+                  price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+                  choices: choiceLines,
+                }
+              }),
               ...((order.discountAmount ?? 0) > 0
                 ? [{
                     quantity: 1,
