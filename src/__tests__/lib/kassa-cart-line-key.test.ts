@@ -1,5 +1,6 @@
 import {
   buildKassaCartLineKey,
+  kassaCartLineNoteOnProductReceipt,
   kassaCartLineOrderNotes,
   kassaDistinctCartLineNotesForReceipt,
   normalizeKassaLineNote,
@@ -31,13 +32,20 @@ describe('kassa-cart-line-key', () => {
     expect(kassaCartLineOrderNotes({ lineNote: 'mand', notes: 'db' })).toBe('mand')
   })
 
-  it('dedupes receipt heading notes case-insensitively', () => {
+  it('only puts flagged names in receipt heading', () => {
     expect(
       kassaDistinctCartLineNotesForReceipt([
-        { lineNote: 'Theo' },
-        { lineNote: 'theo' },
-        { lineNote: 'Sara' },
+        { lineNote: 'Theo', lineNoteAsReceiptName: true },
+        { lineNote: 'Zonder boter' },
+        { lineNote: 'theo', lineNoteAsReceiptName: true },
       ]),
-    ).toEqual(['Theo', 'Sara'])
+    ).toEqual(['Theo'])
+    expect(kassaCartLineNoteOnProductReceipt({ lineNote: 'Zonder boter' })).toBe('Zonder boter')
+    expect(
+      kassaCartLineNoteOnProductReceipt({
+        lineNote: 'Theo',
+        lineNoteAsReceiptName: true,
+      }),
+    ).toBeUndefined()
   })
 })

@@ -3137,6 +3137,7 @@
     "cartLineNoteLabel": "Anmerkung",
     "cartLineNotePlaceholder": "Name, Anweisung, …",
     "numpadLineNotePlaceholder": "Anmerkung (optional)",
+    "cartLineNoteAsReceiptName": "Name groß auf Bon (unter Bestellart)",
     "ariaEditLine": "Position bearbeiten",
     "closeAria": "Schließen",
     "reservationsOneWaiting": "1 Reservierung wartet auf Freigabe",

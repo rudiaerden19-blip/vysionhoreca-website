@@ -3637,6 +3637,7 @@
     "cartLineNoteLabel": "メモ",
     "cartLineNotePlaceholder": "名前、指示など",
     "numpadLineNotePlaceholder": "メモ（任意）",
+    "cartLineNoteAsReceiptName": "レシート上部に名前を大きく表示",
     "ariaEditLine": "行を編集",
     "closeAria": "閉じる",
     "reservationsOneWaiting": "承認待ちの予約が1件",

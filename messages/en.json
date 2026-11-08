@@ -4292,6 +4292,7 @@
     "cartLineNoteLabel": "Note",
     "cartLineNotePlaceholder": "Name, instruction, …",
     "numpadLineNotePlaceholder": "Note (optional)",
+    "cartLineNoteAsReceiptName": "Name large on receipt (under order type)",
     "ariaEditLine": "Edit line",
     "closeAria": "Close",
     "reservationsOneWaiting": "1 reservation awaiting approval",

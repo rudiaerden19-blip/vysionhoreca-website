@@ -3637,6 +3637,7 @@
     "cartLineNoteLabel": "Nota",
     "cartLineNotePlaceholder": "Nombre, instrucción, …",
     "numpadLineNotePlaceholder": "Nota (opcional)",
+    "cartLineNoteAsReceiptName": "Nombre grande en ticket (bajo tipo de pedido)",
     "ariaEditLine": "Editar línea",
     "closeAria": "Cerrar",
     "reservationsOneWaiting": "1 reserva pendiente de aprobación",

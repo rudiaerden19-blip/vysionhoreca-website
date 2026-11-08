@@ -4292,6 +4292,7 @@
     "cartLineNoteLabel": "Opmerking",
     "cartLineNotePlaceholder": "Naam, instructie, …",
     "numpadLineNotePlaceholder": "Opmerking (optioneel)",
+    "cartLineNoteAsReceiptName": "Naam groot op bon (onder afhalen/ter plaatse)",
     "ariaEditLine": "Regel aanpassen",
     "closeAria": "Sluiten",
     "reservationsOneWaiting": "1 reservatie wacht op goedkeuring",

@@ -4,7 +4,10 @@ import type { TenantSettings } from '@/lib/admin-api'
 import type { KassaLastOrderReceipt } from '@/lib/kassa-cart-types'
 import { kassaNameAccountReceiptDisplayItems } from '@/lib/kassa-name-account-receipt'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
-import { kassaDistinctCartLineNotesForReceipt } from '@/lib/kassa-cart-line-key'
+import {
+  kassaCartLineNoteOnProductReceipt,
+  kassaDistinctCartLineNotesForReceipt,
+} from '@/lib/kassa-cart-line-key'
 import { useLanguage } from '@/i18n'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 import { formatEan13Display } from '@/lib/retail-kassa/receipt-ticket-barcode'
@@ -225,6 +228,7 @@ export function KassaSuccessReceiptModal({
               {kassaNameAccountReceiptDisplayItems(order).map((item, idx) => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 const lineTotal = (item.product.price + choicesTotal) * item.quantity
+                const productNote = kassaCartLineNoteOnProductReceipt(item)
                 return (
                   <div key={idx}>
                     <div className="flex justify-between">
@@ -243,6 +247,9 @@ export function KassaSuccessReceiptModal({
                         ))}
                       </div>
                     )}
+                    {productNote ? (
+                      <div className="ml-4 text-xs font-semibold text-gray-800">! {productNote}</div>
+                    ) : null}
                   </div>
                 )
               })}

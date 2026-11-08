@@ -231,6 +231,7 @@ import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import {
   buildKassaCartLineKey,
   kassaCartLineOrderNotes,
+  kassaCartLineNoteOnProductReceipt,
   kassaDistinctCartLineNotesForReceipt,
   normalizeKassaLineNote,
 } from '@/lib/kassa-cart-line-key'
@@ -1296,6 +1297,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
   const [numpadLineNote, setNumpadLineNote] = useState('')
+  const [numpadLineNoteAsReceiptName, setNumpadLineNoteAsReceiptName] = useState(false)
   /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   /** Snelmenu-balk: standaard dicht; alleen open via knop «Snel menu» (niet na refresh). */
@@ -3073,6 +3075,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     selected: SelectedChoice[]
     editingCartKey?: string
     lineNote?: string
+    lineNoteAsReceiptName?: boolean
   } | null>(null)
 
   // Blokkeer body scroll (iPad Safari fix)
@@ -3350,11 +3353,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     product: MenuProduct,
     choices: SelectedChoice[] = [],
     lineNote?: string,
+    lineNoteAsReceiptName?: boolean,
   ) => {
     scheduleAddToCartSound()
     const pid = product.id!
     const note = normalizeKassaLineNote(lineNote)
     const cartKey = buildKassaCartLineKey(pid, choices, note)
+    const asName = note && lineNoteAsReceiptName === true
     setCart(prev => {
       const existing = prev.find(i => i.cartKey === cartKey)
       const updated = existing
@@ -3367,6 +3372,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               choices,
               cartKey,
               ...(note ? { lineNote: note } : {}),
+              ...(asName ? { lineNoteAsReceiptName: true } : {}),
             },
           ]
       if (tableNumber) {
@@ -3382,11 +3388,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const pid = product.id!
       const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
       if (!shouldFetchProductOptionsFallback(cached, pid, productIdsWithOptionsSet)) {
-        setOptionsModal({ product, options: cached ?? [], selected: [], lineNote: '' })
+        setOptionsModal({
+          product,
+          options: cached ?? [],
+          selected: [],
+          lineNote: '',
+          lineNoteAsReceiptName: false,
+        })
         return
       }
       const opts = await resolveKassaProductOptions(pid)
-      setOptionsModal({ product, options: opts, selected: [], lineNote: '' })
+      setOptionsModal({
+        product,
+        options: opts,
+        selected: [],
+        lineNote: '',
+        lineNoteAsReceiptName: false,
+      })
     } else {
       addToCart(product)
     }
@@ -3430,11 +3448,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       selected: item.choices?.length ? [...item.choices] : [],
       editingCartKey: item.cartKey,
       lineNote: item.lineNote ?? '',
+      lineNoteAsReceiptName: item.lineNoteAsReceiptName === true,
     })
   }
 
   const setOptionsModalLineNote = useCallback((lineNote: string) => {
-    setOptionsModal((prev) => (prev ? { ...prev, lineNote } : prev))
+    setOptionsModal((prev) => {
+      if (!prev) return prev
+      const trimmed = lineNote.trim()
+      return {
+        ...prev,
+        lineNote,
+        lineNoteAsReceiptName: trimmed ? prev.lineNoteAsReceiptName : false,
+      }
+    })
+  }, [])
+
+  const setOptionsModalLineNoteAsReceiptName = useCallback((lineNoteAsReceiptName: boolean) => {
+    setOptionsModal((prev) => (prev ? { ...prev, lineNoteAsReceiptName } : prev))
   }, [])
 
   const toggleChoice = (option: ProductOption, choice: ProductOptionChoice) => {
@@ -3469,8 +3500,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
 
-    const { product, selected, editingCartKey, lineNote } = optionsModal
+    const { product, selected, editingCartKey, lineNote, lineNoteAsReceiptName } = optionsModal
     const note = normalizeKassaLineNote(lineNote)
+    const asName = note && lineNoteAsReceiptName === true
 
     if (editingCartKey) {
       scheduleAddToCartSound()
@@ -3486,6 +3518,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           choices: selected,
           cartKey,
           ...(note ? { lineNote: note } : {}),
+          ...(asName ? { lineNoteAsReceiptName: true } : {}),
         }
         let updated: CartItem[]
         if (existing) {
@@ -3501,7 +3534,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return updated
       })
     } else {
-      addToCart(product, selected, note)
+      addToCart(product, selected, note, asName ? true : false)
     }
     setOptionsModal(null)
   }
@@ -4180,6 +4213,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const amount = parseFloat(numpadValue)
     if (amount > 0) {
       const note = normalizeKassaLineNote(numpadLineNote)
+      const asName = note && numpadLineNoteAsReceiptName
       const custom: MenuProduct = {
         id: `custom-${Date.now()}`,
         tenant_slug: tenant,
@@ -4202,6 +4236,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             quantity: 1,
             cartKey,
             ...(note ? { lineNote: note } : {}),
+            ...(asName ? { lineNoteAsReceiptName: true } : {}),
           },
         ]
         if (tableNumber) {
@@ -4211,6 +4246,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       setNumpadValue('')
       setNumpadLineNote('')
+      setNumpadLineNoteAsReceiptName(false)
     }
   }
 
@@ -4374,6 +4410,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
         const lineNotes = kassaCartLineOrderNotes(i)
         if (lineNotes) row.notes = lineNotes
+        if (i.lineNoteAsReceiptName === true) row.receipt_heading_name = true
         if (discountEuro > 0) row.line_total = kassaLineGrossEuro(priced)
         return row
       }),
@@ -4847,6 +4884,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       if (receiptMode === 'keuken') {
         const lineNote = kassaCartLineOrderNotes(i)
         if (lineNote) bonLines.push(` ! ${lineNote}`)
+      } else {
+        const lineNote = kassaCartLineNoteOnProductReceipt(i)
+        if (lineNote) bonLines.push(` ! ${lineNote}`)
       }
     }
     if ((order.discountAmount ?? 0) > 0) {
@@ -4988,7 +5028,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ${sortKassaCartLinesByMenuCategory(order.items, categories).map(i => {
         const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
         const lineTotal = (i.product.price + choicesTotal) * i.quantity
-        const lineNote = receiptMode === 'keuken' ? kassaCartLineOrderNotes(i) : undefined
+        const lineNote =
+          receiptMode === 'keuken'
+            ? kassaCartLineOrderNotes(i)
+            : kassaCartLineNoteOnProductReceipt(i)
         return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
         ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€'+ c.price.toFixed(2) : ''}</span></div>`).join('')}
         ${lineNote ? `<div class="row small" style="margin-left:15px;font-weight:bold;">! ${escapeReceiptHtml(lineNote)}</div>` : ''}`
@@ -7190,7 +7233,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     data-testid="kassa-numpad-line-note"
                     value={numpadLineNote}
                     maxLength={120}
-                    onChange={(e) => setNumpadLineNote(e.target.value)}
+                    onChange={(e) => {
+                      setNumpadLineNote(e.target.value)
+                      if (!e.target.value.trim()) setNumpadLineNoteAsReceiptName(false)
+                    }}
                     placeholder={t('kassaApp.numpadLineNotePlaceholder')}
                     className={
                       kassaAppearanceDark
@@ -7198,6 +7244,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         : 'mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]'
                     }
                   />
+                  {numpadLineNote.trim() ? (
+                    <label
+                      className={`mt-2 flex cursor-pointer items-start gap-2 text-left text-sm ${
+                        kassaAppearanceDark ? 'text-zinc-200' : 'text-gray-700'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={numpadLineNoteAsReceiptName}
+                        onChange={(e) => setNumpadLineNoteAsReceiptName(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded"
+                      />
+                      <span>{t('kassaApp.cartLineNoteAsReceiptName')}</span>
+                    </label>
+                  ) : null}
                   <button
                     type="button"
                     data-testid="kassa-add-custom-amount"
@@ -7328,10 +7389,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     data-testid="kassa-numpad-line-note"
                     value={numpadLineNote}
                     maxLength={120}
-                    onChange={(e) => setNumpadLineNote(e.target.value)}
+                    onChange={(e) => {
+                      setNumpadLineNote(e.target.value)
+                      if (!e.target.value.trim()) setNumpadLineNoteAsReceiptName(false)
+                    }}
                     placeholder={t('kassaApp.numpadLineNotePlaceholder')}
                     className="mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]"
                   />
+                  {numpadLineNote.trim() ? (
+                    <label className="mt-2 flex cursor-pointer items-start gap-2 text-left text-sm text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={numpadLineNoteAsReceiptName}
+                        onChange={(e) => setNumpadLineNoteAsReceiptName(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded"
+                      />
+                      <span>{t('kassaApp.cartLineNoteAsReceiptName')}</span>
+                    </label>
+                  ) : null}
                   <button
                     type="button"
                     data-testid="kassa-add-custom-amount"
@@ -7980,6 +8055,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onClose={() => setOptionsModal(null)}
           onToggleChoice={toggleChoice}
           onLineNoteChange={setOptionsModalLineNote}
+          onLineNoteAsReceiptNameChange={setOptionsModalLineNoteAsReceiptName}
           onConfirm={confirmOptions}
           appearance={kassaAppearanceDark ? 'dark' : 'light'}
           posChrome={kassaPosLuxury ? posChrome : null}

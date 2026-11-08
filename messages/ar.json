@@ -3637,6 +3637,7 @@
     "cartLineNoteLabel": "ملاحظة",
     "cartLineNotePlaceholder": "الاسم، تعليمات، …",
     "numpadLineNotePlaceholder": "ملاحظة (اختياري)",
+    "cartLineNoteAsReceiptName": "اسم كبير على الإيصال (تحت نوع الطلب)",
     "ariaEditLine": "تعديل السطر",
     "closeAria": "إغلاق",
     "reservationsOneWaiting": "حجز واحد بانتظار الموافقة",

@@ -37,13 +37,24 @@ export function kassaCartLineOrderNotes(line: {
   return normalizeKassaLineNote(line.lineNote) ?? normalizeKassaLineNote(line.notes)
 }
 
-type CartLineNotesSource = { lineNote?: string | null; notes?: string | null }
+export type KassaCartLineReceiptNoteSource = {
+  lineNote?: string | null
+  notes?: string | null
+  lineNoteAsReceiptName?: boolean | null
+  /** Opgeslagen in order.items JSON na afrekenen. */
+  receipt_heading_name?: boolean | null
+}
 
-/** Unieke opmerkingen/namen voor bovenaan de kassabon (niet per productregel). */
-export function kassaDistinctCartLineNotesForReceipt(items: CartLineNotesSource[]): string[] {
+function kassaCartLineIsReceiptHeadingName(item: KassaCartLineReceiptNoteSource): boolean {
+  return item.lineNoteAsReceiptName === true || item.receipt_heading_name === true
+}
+
+/** Alleen regels met vinkje «naam op bon» — niet gewone keukenopmerkingen. */
+export function kassaDistinctCartLineNotesForReceipt(items: KassaCartLineReceiptNoteSource[]): string[] {
   const seen = new Set<string>()
   const out: string[] = []
   for (const item of items) {
+    if (!kassaCartLineIsReceiptHeadingName(item)) continue
     const note = kassaCartLineOrderNotes(item)
     if (!note) continue
     const key = note.toLowerCase()
@@ -52,4 +63,12 @@ export function kassaDistinctCartLineNotesForReceipt(items: CartLineNotesSource[
     out.push(note)
   }
   return out
+}
+
+/** Opmerking onder productregel op kassabon (niet als bon-header). */
+export function kassaCartLineNoteOnProductReceipt(
+  line: KassaCartLineReceiptNoteSource,
+): string | undefined {
+  if (kassaCartLineIsReceiptHeadingName(line)) return undefined
+  return kassaCartLineOrderNotes(line)
 }

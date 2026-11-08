@@ -22,6 +22,7 @@ export interface KassaProductOptionsModalModel {
   selected: KassaSelectedChoice[]
   editingCartKey?: string
   lineNote?: string
+  lineNoteAsReceiptName?: boolean
 }
 
 export function KassaProductOptionsModal({
@@ -29,6 +30,7 @@ export function KassaProductOptionsModal({
   onClose,
   onToggleChoice,
   onLineNoteChange,
+  onLineNoteAsReceiptNameChange,
   onConfirm,
   appearance = 'light',
   posChrome,
@@ -37,6 +39,7 @@ export function KassaProductOptionsModal({
   onClose: () => void
   onToggleChoice: (option: ProductOption, choice: ProductOptionChoice) => void
   onLineNoteChange: (note: string) => void
+  onLineNoteAsReceiptNameChange: (checked: boolean) => void
   onConfirm: () => void
   appearance?: 'light' | 'dark'
   /** Speels POS: grijs glanzend chrome + groene prijzen (zoals kassa-sidebar). */
@@ -144,6 +147,24 @@ export function KassaProductOptionsModal({
                   : 'w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-base text-gray-900 outline-none focus:border-[#3C4D6B] focus:ring-1 focus:ring-[#3C4D6B]'
               }
             />
+            {(model.lineNote ?? '').trim().length > 0 ? (
+              <label
+                className={`mt-3 flex cursor-pointer items-start gap-2.5 ${
+                  dark ? 'text-zinc-200' : 'text-gray-700'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  data-testid="kassa-line-note-receipt-name"
+                  checked={model.lineNoteAsReceiptName === true}
+                  onChange={(e) => onLineNoteAsReceiptNameChange(e.target.checked)}
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-gray-300"
+                />
+                <span className="text-sm font-medium leading-snug">
+                  {t('kassaApp.cartLineNoteAsReceiptName')}
+                </span>
+              </label>
+            ) : null}
           </div>
           {model.options.map((option) => (
             <div key={option.id}>

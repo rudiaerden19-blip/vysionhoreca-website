@@ -3637,6 +3637,7 @@
     "cartLineNoteLabel": "备注",
     "cartLineNotePlaceholder": "姓名、说明等",
     "numpadLineNotePlaceholder": "备注（可选）",
+    "cartLineNoteAsReceiptName": "在收据上大字显示姓名（订单类型下方）",
     "ariaEditLine": "编辑行",
     "closeAria": "关闭",
     "reservationsOneWaiting": "1 条预订待审批",

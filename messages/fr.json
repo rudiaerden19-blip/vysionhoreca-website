@@ -3137,6 +3137,7 @@
     "cartLineNoteLabel": "Remarque",
     "cartLineNotePlaceholder": "Nom, consigne, …",
     "numpadLineNotePlaceholder": "Remarque (facultatif)",
+    "cartLineNoteAsReceiptName": "Nom en grand sur le ticket (sous le type)",
     "ariaEditLine": "Modifier la ligne",
     "closeAria": "Fermer",
     "reservationsOneWaiting": "1 réservation en attente d’approbation",
