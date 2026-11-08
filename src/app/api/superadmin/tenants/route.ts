@@ -29,7 +29,12 @@ import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
-import { buildLicenseInvoiceDbPayload } from '@/lib/tenant-license-invoice'
+import {
+  buildLicenseInvoiceDbPayload,
+  invoicePayloadInsertMinimum,
+  parseMissingInvoicesColumn,
+  shrinkInvoicePayloadForMissingColumn,
+} from '@/lib/tenant-license-invoice'
 import {
   MONTHLY_PRICE_WITHOUT_HARDWARE,
   MONTHLY_PRICE_WITH_HARDWARE,
@@ -179,6 +184,47 @@ const BodySchema = z.discriminatedUnion('action', [
   SaveLicenseInvoiceSchema,
   DeleteLicenseInvoiceSchema,
 ])
+
+type SupabaseService = NonNullable<ReturnType<typeof getServerSupabaseClient>>
+
+async function persistLicenseInvoiceRow(
+  supabase: SupabaseService,
+  mode: 'insert' | 'update',
+  row: Record<string, unknown>,
+  match?: { id: string; tenant_slug: string },
+): Promise<{ data?: { id?: string } | null; error?: { message: string } | null }> {
+  let payload: Record<string, unknown> = { ...row }
+  for (let attempt = 0; attempt < 10; attempt++) {
+    if (mode === 'update' && match) {
+      const { error } = await supabase
+        .from('invoices')
+        .update(payload)
+        .eq('id', match.id)
+        .eq('tenant_slug', match.tenant_slug)
+      if (!error) return { data: { id: match.id }, error: null }
+      const missing = parseMissingInvoicesColumn(error.message)
+      if (missing) {
+        payload = shrinkInvoicePayloadForMissingColumn(payload, missing)
+        continue
+      }
+      return { error }
+    }
+
+    const { data, error } = await supabase.from('invoices').insert(payload).select('id').single()
+    if (!error) return { data, error: null }
+    const missing = parseMissingInvoicesColumn(error.message)
+    if (missing) {
+      payload = shrinkInvoicePayloadForMissingColumn(payload, missing)
+      continue
+    }
+    if (attempt === 0) {
+      payload = invoicePayloadInsertMinimum(payload)
+      continue
+    }
+    return { error }
+  }
+  return { error: { message: 'Invoices-tabel mist verplichte kolommen — zie migratie invoices_license_columns' } }
+}
 
 const CASCADE_DELETE_TABLES = [
   'order_items',
@@ -750,13 +796,13 @@ export async function POST(req: NextRequest) {
       const slug = body.slug.trim().toLowerCase()
       const row = buildLicenseInvoiceDbPayload(slug, body.invoice)
       if (body.invoice.id) {
-        delete row.created_at
-        delete row.tenant_slug
-        const { error } = await supabase
-          .from('invoices')
-          .update(row)
-          .eq('id', body.invoice.id)
-          .eq('tenant_slug', slug)
+        const updateRow = { ...row }
+        delete updateRow.created_at
+        delete updateRow.tenant_slug
+        const { error } = await persistLicenseInvoiceRow(supabase, 'update', updateRow, {
+          id: body.invoice.id,
+          tenant_slug: slug,
+        })
         if (error) return NextResponse.json({ error: error.message }, { status: 400 })
         await recordAudit(supabase, {
           tenantSlug: slug,
@@ -767,18 +813,14 @@ export async function POST(req: NextRequest) {
           resourceType: 'invoices',
           resourceId: body.invoice.id,
           before: null,
-          after: row,
+          after: updateRow,
           ip: meta.ip,
           userAgent: meta.userAgent,
           requestId,
         })
         return NextResponse.json({ ok: true, id: body.invoice.id })
       }
-      const { data: inserted, error } = await supabase
-        .from('invoices')
-        .insert(row)
-        .select('id')
-        .single()
+      const { data: inserted, error } = await persistLicenseInvoiceRow(supabase, 'insert', row)
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
       await recordAudit(supabase, {
         tenantSlug: slug,

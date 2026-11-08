@@ -1,5 +1,7 @@
 import {
   buildLicenseInvoiceDbPayload,
+  parseMissingInvoicesColumn,
+  shrinkInvoicePayloadForMissingColumn,
   suggestNextLicenseInvoiceNumber,
 } from '@/lib/tenant-license-invoice'
 
@@ -16,6 +18,16 @@ describe('tenant-license-invoice', () => {
     expect(row.amount).toBe(99)
     expect(row.status).toBe('paid')
     expect(String(row.paid_at)).toContain('2026-11-05')
+  })
+
+  it('parseMissingInvoicesColumn uit PostgREST fout', () => {
+    expect(
+      parseMissingInvoicesColumn(
+        "Could not find the 'description' column of 'invoices' in the schema cache",
+      ),
+    ).toBe('description')
+    const row = { amount: 99, description: 'x' }
+    expect(shrinkInvoicePayloadForMissingColumn(row, 'description')).toEqual({ amount: 99 })
   })
 
   it('suggestNextLicenseInvoiceNumber verhoogt teller', () => {

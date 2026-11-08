@@ -65,6 +65,44 @@ export function buildLicenseInvoiceDbPayload(
   }
 }
 
+const OPTIONAL_INVOICE_DB_COLUMNS = [
+  'description',
+  'due_date',
+  'paid_at',
+  'updated_at',
+  'stripe_payment_intent_id',
+] as const
+
+export function parseMissingInvoicesColumn(errorMessage: string): string | null {
+  const m = errorMessage.match(/Could not find the '([^']+)' column of 'invoices'/)
+  return m?.[1] ?? null
+}
+
+/** PostgREST schema-cache: kolom ontbreekt op oude DB → strip en opnieuw proberen. */
+export function shrinkInvoicePayloadForMissingColumn(
+  row: Record<string, unknown>,
+  missingColumn: string,
+): Record<string, unknown> {
+  const next = { ...row }
+  delete next[missingColumn]
+  return next
+}
+
+export function invoicePayloadInsertMinimum(row: Record<string, unknown>): Record<string, unknown> {
+  const keep = ['tenant_slug', 'invoice_number', 'amount', 'status', 'created_at', 'paid_at'] as const
+  const out: Record<string, unknown> = {}
+  for (const k of keep) {
+    if (row[k] !== undefined) out[k] = row[k]
+  }
+  return out
+}
+
+export function isInvoiceSchemaColumnError(message: string): boolean {
+  return message.includes("column of 'invoices'") || message.includes('schema cache')
+}
+
+export { OPTIONAL_INVOICE_DB_COLUMNS }
+
 export function suggestNextLicenseInvoiceNumber(
   tenantSlug: string,
   existing: { invoice_number: string }[],
