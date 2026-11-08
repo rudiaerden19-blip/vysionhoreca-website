@@ -2,24 +2,47 @@ import {
   applyKassaAzertyOskEdit,
   isKassaAzertyOskEnabled,
   isKassaAzertyOskTextTarget,
+  isAzertyOskActiveForSession,
   isTenantAzertyOskRoute,
   kassaAzertyKeyDisplay,
+  resolveAzertyOskTenantSlug,
 } from '@/lib/kassa-azerty-osk'
 
 describe('kassa-azerty-osk', () => {
-  it('azerty route op admin-modules, niet account of website', () => {
-    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/kassa', 'lomichillplay')).toBe(true)
+  it('azerty route op admin, zaak-login en account-login', () => {
     expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/producten', 'lomichillplay')).toBe(
       true,
     )
-    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/categorieen', 'lomichillplay')).toBe(
-      true,
-    )
-    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/reserveringen', 'lomichillplay')).toBe(
-      true,
-    )
-    expect(isTenantAzertyOskRoute('/shop/lomichillplay/account/login', 'lomichillplay')).toBe(false)
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/account/login', 'lomichillplay')).toBe(true)
+    expect(isTenantAzertyOskRoute('/login', 'lomichillplay')).toBe(true)
     expect(isTenantAzertyOskRoute('/', 'lomichillplay')).toBe(false)
+  })
+
+  it('active sessie via host, next of route-param', () => {
+    expect(
+      isAzertyOskActiveForSession({
+        pathname: '/login',
+        searchNext: '/shop/lomichillplay/admin/kassa',
+      }),
+    ).toBe(true)
+    expect(
+      isAzertyOskActiveForSession({
+        pathname: '/login',
+        hostTenantSlug: 'lomichillplay',
+      }),
+    ).toBe(true)
+    expect(
+      isAzertyOskActiveForSession({
+        pathname: '/login',
+        searchNext: '/shop/other/admin',
+      }),
+    ).toBe(false)
+    expect(
+      resolveAzertyOskTenantSlug({
+        pathname: '/shop/lomichillplay/admin',
+        routeParamTenant: 'lomichillplay',
+      }),
+    ).toBe('lomichillplay')
   })
 
   it('e-mail en tel openen os k', () => {

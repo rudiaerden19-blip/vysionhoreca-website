@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams, usePathname } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_AZERTY_LETTER_ROWS,
@@ -10,9 +11,8 @@ import {
   applyKassaAzertyOskEdit,
   armKassaOskInput,
   disarmKassaOskInput,
-  isKassaAzertyOskEnabled,
+  isAzertyOskActiveForSession,
   isKassaAzertyOskTextTarget,
-  isTenantAzertyOskRoute,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
 import {
@@ -23,13 +23,24 @@ import {
 /** Ruimte onderaan pagina zodat invoervelden niet achter het toetsenbord verdwijnen. */
 const OSK_HEIGHT_PX = 352
 
-export function KassaAzertyOskProvider({ children }: { children: React.ReactNode }) {
+function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }) {
   const params = useParams()
   const pathname = usePathname() ?? ''
+  const searchParams = useSearchParams()
   const { t } = useLanguage()
-  const tenantSlug = typeof params?.tenant === 'string' ? params.tenant : ''
-  const enabled =
-    isKassaAzertyOskEnabled(tenantSlug) && isTenantAzertyOskRoute(pathname, tenantSlug)
+  const routeParamTenant = typeof params?.tenant === 'string' ? params.tenant : undefined
+  const [hostTenantSlug, setHostTenantSlug] = useState<string | null>(null)
+
+  useEffect(() => {
+    setHostTenantSlug(getCurrentTenantSlug())
+  }, [pathname])
+
+  const enabled = isAzertyOskActiveForSession({
+    pathname,
+    routeParamTenant,
+    searchNext: searchParams?.get('next') ?? null,
+    hostTenantSlug,
+  })
 
   const [visible, setVisible] = useState(false)
   const [shift, setShift] = useState(false)
@@ -220,5 +231,13 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
         </div>
       ) : null}
     </>
+  )
+}
+
+export function KassaAzertyOskProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={children}>
+      <KassaAzertyOskProviderInner>{children}</KassaAzertyOskProviderInner>
+    </Suspense>
   )
 }

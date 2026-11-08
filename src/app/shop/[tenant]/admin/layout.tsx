@@ -39,8 +39,8 @@ import {
 } from '@/components/kassa/KassaHelpVideoSession'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
-import { KassaAzertyOskProvider } from '@/components/kassa/KassaAzertyOskProvider'
-import { isKassaAzertyOskEnabled, isTenantAzertyOskRoute } from '@/lib/kassa-azerty-osk'
+import { isAzertyOskActiveForSession } from '@/lib/kassa-azerty-osk'
+import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import {
   buildShopInternalReturnPath,
   clearTenantOwnerSession,
@@ -83,9 +83,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   return (
     <TenantModuleFlagsProvider tenantSlug={params.tenant}>
       <KassaHelpVideoProvider tenantSlug={params.tenant}>
-        <KassaAzertyOskProvider>
-          <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
-        </KassaAzertyOskProvider>
+        <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
       </KassaHelpVideoProvider>
     </TenantModuleFlagsProvider>
   )
@@ -95,6 +93,15 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
   const kassaHelpSession = useKassaHelpVideoSessionOptional()
   const kassaHelpOpen = kassaHelpSession?.open === true
   const pathname = usePathname()
+  const [hostTenantSlug, setHostTenantSlug] = useState<string | null>(null)
+  useEffect(() => {
+    setHostTenantSlug(getCurrentTenantSlug())
+  }, [pathname])
+  const azertyOskActive = isAzertyOskActiveForSession({
+    pathname: pathname ?? '',
+    routeParamTenant: params.tenant,
+    hostTenantSlug,
+  })
   const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
   const isHorecaKassaPos = isShopAdminKassaPosPath(adminPath, params.tenant)
   const isRetailKassaPos = isShopAdminRetailKassaPosPath(adminPath, params.tenant)
@@ -650,12 +657,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         </div>
       </div>
 
-      {!(
-        isKassaAzertyOskEnabled(params.tenant) &&
-        isTenantAzertyOskRoute(pathname ?? '', params.tenant)
-      ) ? (
-        <AdminWindowsOskSupport />
-      ) : null}
+      {!azertyOskActive ? <AdminWindowsOskSupport /> : null}
       {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main
         data-vysion-admin-scroll

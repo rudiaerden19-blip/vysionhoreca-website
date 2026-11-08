@@ -9,15 +9,69 @@ export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
   return tenantSlug.trim().toLowerCase() === KASSA_AZERTY_OSK_PILOT_SLUG
 }
 
+export function parseTenantSlugFromShopPath(pathOrNext: string): string | null {
+  const raw = pathOrNext.trim()
+  if (!raw) return null
+  const m = raw.match(/^\/shop\/([^/?#]+)/i)
+  return m?.[1]?.toLowerCase() ?? null
+}
+
+export function resolveAzertyOskTenantSlug(input: {
+  pathname: string
+  routeParamTenant?: string
+  searchNext?: string | null
+  hostTenantSlug?: string | null
+}): string | null {
+  const route = (input.routeParamTenant || '').trim().toLowerCase()
+  if (route) return route
+
+  const path = (input.pathname || '').split('?')[0].replace(/\/+$/, '')
+  const fromPath = parseTenantSlugFromShopPath(path)
+  if (fromPath) return fromPath
+
+  if (input.searchNext) {
+    try {
+      const dec = decodeURIComponent(input.searchNext.trim())
+      const fromNext = parseTenantSlugFromShopPath(dec)
+      if (fromNext) return fromNext
+    } catch {
+      /* ignore bad next */
+    }
+  }
+
+  const host = (input.hostTenantSlug || '').trim().toLowerCase()
+  return host || null
+}
+
+const OWNER_LOGIN_PATHS = new Set([
+  '/login',
+  '/login/forgot-password',
+  '/login/reset-password',
+  '/login/troubleshooting',
+])
+
 /**
- * Alle tenant-adminmodules (producten, categorieën, kassa, reserveringen, …).
- * Geen account-login of publieke website — die routes zitten buiten `/admin`.
+ * Admin, zaak-login (/login?next=…), account-login — geen marketing-home.
  */
 export function isTenantAzertyOskRoute(pathname: string, tenantSlug: string): boolean {
   const path = (pathname || '').split('?')[0].replace(/\/+$/, '').toLowerCase()
   const slug = tenantSlug.trim().toLowerCase()
   if (!slug) return false
-  return path.startsWith(`/shop/${slug}/admin`)
+  if (path.startsWith(`/shop/${slug}/admin`)) return true
+  if (path === `/shop/${slug}/account/login`) return true
+  if (OWNER_LOGIN_PATHS.has(path)) return true
+  return false
+}
+
+export function isAzertyOskActiveForSession(input: {
+  pathname: string
+  routeParamTenant?: string
+  searchNext?: string | null
+  hostTenantSlug?: string | null
+}): boolean {
+  const tenant = resolveAzertyOskTenantSlug(input)
+  if (!tenant || !isKassaAzertyOskEnabled(tenant)) return false
+  return isTenantAzertyOskRoute(input.pathname, tenant)
 }
 
 export const KASSA_AZERTY_NUMBER_ROW = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'] as const
