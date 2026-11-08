@@ -39,7 +39,8 @@ import {
 } from '@/components/kassa/KassaHelpVideoSession'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
-import { isKassaAzertyOskEnabled } from '@/lib/kassa-azerty-osk'
+import { KassaAzertyOskProvider } from '@/components/kassa/KassaAzertyOskProvider'
+import { isKassaAzertyOskEnabled, isTenantAzertyOskRoute } from '@/lib/kassa-azerty-osk'
 import {
   buildShopInternalReturnPath,
   clearTenantOwnerSession,
@@ -82,7 +83,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   return (
     <TenantModuleFlagsProvider tenantSlug={params.tenant}>
       <KassaHelpVideoProvider tenantSlug={params.tenant}>
-        <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
+        <KassaAzertyOskProvider>
+          <AdminLayoutBody params={params}>{children}</AdminLayoutBody>
+        </KassaAzertyOskProvider>
       </KassaHelpVideoProvider>
     </TenantModuleFlagsProvider>
   )
@@ -649,7 +652,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
 
       {!(
         isKassaAzertyOskEnabled(params.tenant) &&
-        isShopAdminKassaPosPath(adminPath, params.tenant)
+        isTenantAzertyOskRoute(pathname ?? '', params.tenant)
       ) ? (
         <AdminWindowsOskSupport />
       ) : null}

@@ -7,16 +7,19 @@ import {
 } from '@/lib/kassa-azerty-osk'
 
 describe('kassa-azerty-osk', () => {
-  it('azerty route alleen horeca-kassa, niet catalogus of account', () => {
+  it('azerty route op admin-modules, niet account of website', () => {
     expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/kassa', 'lomichillplay')).toBe(true)
     expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/producten', 'lomichillplay')).toBe(
-      false,
+      true,
+    )
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/categorieen', 'lomichillplay')).toBe(
+      true,
     )
     expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/reserveringen', 'lomichillplay')).toBe(
-      false,
+      true,
     )
     expect(isTenantAzertyOskRoute('/shop/lomichillplay/account/login', 'lomichillplay')).toBe(false)
-    expect(isTenantAzertyOskRoute('/shop/other/admin/kassa', 'lomichillplay')).toBe(false)
+    expect(isTenantAzertyOskRoute('/', 'lomichillplay')).toBe(false)
   })
 
   it('geen os k voor e-mailvelden (geen @-toets)', () => {

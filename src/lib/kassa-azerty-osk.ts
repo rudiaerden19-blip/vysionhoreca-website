@@ -10,14 +10,14 @@ export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
 }
 
 /**
- * Alleen horeca-kassa-POS — geen producten/categorieën/reserveringen, geen account/website.
+ * Alle tenant-adminmodules (producten, categorieën, kassa, reserveringen, …).
+ * Geen account-login of publieke website — die routes zitten buiten `/admin`.
  */
 export function isTenantAzertyOskRoute(pathname: string, tenantSlug: string): boolean {
   const path = (pathname || '').split('?')[0].replace(/\/+$/, '').toLowerCase()
   const slug = tenantSlug.trim().toLowerCase()
   if (!slug) return false
-  if (path.includes('/account/')) return false
-  return path === `/shop/${slug}/admin/kassa`
+  return path.startsWith(`/shop/${slug}/admin`)
 }
 
 export const KASSA_AZERTY_NUMBER_ROW = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'] as const
