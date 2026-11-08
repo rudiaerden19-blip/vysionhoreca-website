@@ -16,6 +16,7 @@ import {
   resolveTenantCurrentPlan,
   tenantPlanMonthlyEuros,
 } from '@/lib/tenant-subscription-display'
+import { formatLicenseInvoiceAmounts } from '@/lib/tenant-license-invoice'
 
 interface Subscription {
   id: string
@@ -652,7 +653,10 @@ export default function AbonnementPage() {
   const paidInvoices = invoices.filter(i => i.status === 'paid')
   const pendingInvoices = invoices.filter(i => i.status === 'pending')
   const overdueInvoices = invoices.filter(i => i.status === 'overdue')
-  const totalPaid = paidInvoices.reduce((sum, i) => sum + Number(i.amount), 0)
+  const totalPaid = paidInvoices.reduce(
+    (sum, i) => sum + formatLicenseInvoiceAmounts(i).incl,
+    0,
+  )
   const totalOverdue = overdueInvoices.reduce((sum, i) => sum + Number(i.amount), 0)
 
   // Calculate trial info
@@ -1207,7 +1211,20 @@ export default function AbonnementPage() {
                       ).toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale)}
                     </td>
                     <td className="px-6 py-4 text-gray-900">{invoice.description || '-'}</td>
-                    <td className="px-6 py-4 font-semibold">€{Number(invoice.amount).toFixed(2)}</td>
+                    <td className="px-6 py-4">
+                      {(() => {
+                        const a = formatLicenseInvoiceAmounts(invoice)
+                        return (
+                          <div>
+                            <p className="font-semibold">€{a.incl.toFixed(2)} incl. BTW</p>
+                            <p className="text-xs text-gray-500">
+                              €{a.excl.toFixed(2)} excl. + {Math.round(a.vatRate * 100)}% BTW (€
+                              {a.vat.toFixed(2)})
+                            </p>
+                          </div>
+                        )
+                      })()}
+                    </td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                         invoice.status === 'paid'? 'bg-green-100 text-green-700':

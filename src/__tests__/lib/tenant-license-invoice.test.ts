@@ -15,7 +15,8 @@ describe('tenant-license-invoice', () => {
       paid_at: '2026-11-05',
     })
     expect(row.tenant_slug).toBe('lomichillplay')
-    expect(row.amount).toBe(99)
+    expect(row.amount_excl_vat).toBe(99)
+    expect(row.amount).toBe(119.79)
     expect(row.status).toBe('paid')
     expect(String(row.paid_at)).toContain('2026-11-05')
   })

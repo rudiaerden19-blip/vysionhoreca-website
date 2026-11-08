@@ -9,6 +9,8 @@ ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TE
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS tenant_slug TEXT;
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS invoice_number TEXT;
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS amount NUMERIC(12, 2);
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS amount_excl_vat NUMERIC(12, 2);
+ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS vat_rate NUMERIC(5, 4) DEFAULT 0.21;
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS status TEXT;
 ALTER TABLE public.invoices ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
 

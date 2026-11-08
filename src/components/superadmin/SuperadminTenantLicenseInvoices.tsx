@@ -4,6 +4,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { authFetch } from '@/lib/auth-headers'
 import {
   defaultLicenseInvoiceDescription,
+  formatLicenseInvoiceAmounts,
+  licenseInvoiceExclForForm,
+  licenseInvoiceInclFromExcl,
+  licenseInvoiceVatFromExcl,
+  LICENSE_INVOICE_VAT_RATE,
   suggestNextLicenseInvoiceNumber,
   type TenantLicenseInvoiceRow,
   type TenantLicenseInvoiceStatus,
@@ -103,7 +108,7 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
     setEditingId(row.id)
     setForm({
       invoice_number: row.invoice_number,
-      amount: String(row.amount),
+      amount: String(licenseInvoiceExclForForm(row)),
       status: row.status as TenantLicenseInvoiceStatus,
       description: row.description || '',
       invoice_date: row.created_at.slice(0, 10),
@@ -129,7 +134,12 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
 
   const paidTotal = invoices
     .filter((i) => i.status === 'paid')
-    .reduce((s, i) => s + Number(i.amount), 0)
+    .reduce((s, i) => s + formatLicenseInvoiceAmounts(i).incl, 0)
+
+  const formExcl = Number(String(form.amount).replace(',', '.'))
+  const formExclValid = Number.isFinite(formExcl) && formExcl > 0
+  const formVat = formExclValid ? licenseInvoiceVatFromExcl(formExcl) : 0
+  const formIncl = formExclValid ? licenseInvoiceInclFromExcl(formExcl) : 0
 
   return (
     <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
@@ -174,7 +184,7 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
             />
           </label>
           <label className="block text-xs text-slate-400">
-            Bedrag (€)
+            Bedrag excl. {Math.round(LICENSE_INVOICE_VAT_RATE * 100)}% BTW (€)
             <input
               required
               inputMode="decimal"
@@ -182,6 +192,11 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
               onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
               className="mt-1 w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white text-sm"
             />
+            {formExclValid ? (
+              <span className="mt-1 block text-emerald-300 text-xs">
+                BTW €{formVat.toFixed(2)} → <strong>€{formIncl.toFixed(2)} incl. BTW</strong>
+              </span>
+            ) : null}
           </label>
           <label className="block text-xs text-slate-400">
             Status
@@ -281,7 +296,19 @@ export function SuperadminTenantLicenseInvoices({ tenantSlug }: { tenantSlug: st
                       row.status === 'paid' && row.paid_at ? row.paid_at : row.created_at,
                     ).toLocaleDateString('nl-BE')}
                   </td>
-                  <td className="px-3 py-2">€{Number(row.amount).toFixed(2)}</td>
+                  <td className="px-3 py-2">
+                    {(() => {
+                      const a = formatLicenseInvoiceAmounts(row)
+                      return (
+                        <span>
+                          €{a.incl.toFixed(2)} incl.
+                          <span className="block text-xs text-slate-400">
+                            excl. €{a.excl.toFixed(2)} + BTW €{a.vat.toFixed(2)}
+                          </span>
+                        </span>
+                      )
+                    })()}
+                  </td>
                   <td className="px-3 py-2 capitalize">{row.status}</td>
                   <td className="px-3 py-2 flex gap-1">
                     <button

@@ -1,8 +1,11 @@
+export const LICENSE_INVOICE_VAT_RATE = 0.21
+
 export type TenantLicenseInvoiceStatus = 'paid' | 'pending' | 'overdue'
 
 export type TenantLicenseInvoiceInput = {
   id?: string
   invoice_number: string
+  /** Bedrag exclusief 21% BTW (Belgische licentiefactuur). */
   amount: number
   status: TenantLicenseInvoiceStatus
   description?: string
@@ -17,12 +20,59 @@ export type TenantLicenseInvoiceRow = {
   tenant_slug: string
   invoice_number: string
   amount: number
+  amount_excl_vat?: number | null
+  vat_rate?: number | null
   status: string
   description: string | null
   due_date: string | null
   paid_at: string | null
   created_at: string
   updated_at?: string | null
+}
+
+export function roundLicenseEuro(amount: number): number {
+  return Math.round(amount * 100) / 100
+}
+
+export function licenseInvoiceInclFromExcl(
+  amountExcl: number,
+  vatRate = LICENSE_INVOICE_VAT_RATE,
+): number {
+  return roundLicenseEuro(amountExcl * (1 + vatRate))
+}
+
+export function licenseInvoiceVatFromExcl(
+  amountExcl: number,
+  vatRate = LICENSE_INVOICE_VAT_RATE,
+): number {
+  return roundLicenseEuro(amountExcl * vatRate)
+}
+
+export function formatLicenseInvoiceAmounts(row: {
+  amount: number
+  amount_excl_vat?: number | null
+  vat_rate?: number | null
+}): { excl: number; vat: number; incl: number; vatRate: number } {
+  const vatRate =
+    row.vat_rate != null && Number(row.vat_rate) >= 0
+      ? Number(row.vat_rate)
+      : LICENSE_INVOICE_VAT_RATE
+  const exclStored = Number(row.amount_excl_vat)
+  if (Number.isFinite(exclStored) && exclStored > 0) {
+    const incl = roundLicenseEuro(Number(row.amount))
+    const vat = roundLicenseEuro(incl - exclStored)
+    return { excl: exclStored, vat, incl, vatRate }
+  }
+  const excl = roundLicenseEuro(Number(row.amount))
+  const incl = licenseInvoiceInclFromExcl(excl, vatRate)
+  const vat = licenseInvoiceVatFromExcl(excl, vatRate)
+  return { excl, vat, incl, vatRate }
+}
+
+export function licenseInvoiceExclForForm(row: TenantLicenseInvoiceRow): number {
+  const exclStored = Number(row.amount_excl_vat)
+  if (Number.isFinite(exclStored) && exclStored > 0) return exclStored
+  return roundLicenseEuro(Number(row.amount))
 }
 
 export function defaultLicenseInvoiceDescription(planLabel?: string): string {
@@ -52,10 +102,15 @@ export function buildLicenseInvoiceDbPayload(
         : invoiceDate
   }
 
+  const amountExcl = roundLicenseEuro(Number(input.amount))
+  const amountIncl = licenseInvoiceInclFromExcl(amountExcl)
+
   return {
     tenant_slug: slug,
     invoice_number: input.invoice_number.trim(),
-    amount: Math.round(Number(input.amount) * 100) / 100,
+    amount: amountIncl,
+    amount_excl_vat: amountExcl,
+    vat_rate: LICENSE_INVOICE_VAT_RATE,
     status,
     description: (input.description || defaultLicenseInvoiceDescription()).trim(),
     due_date: due,
@@ -71,6 +126,8 @@ const OPTIONAL_INVOICE_DB_COLUMNS = [
   'paid_at',
   'updated_at',
   'stripe_payment_intent_id',
+  'amount_excl_vat',
+  'vat_rate',
 ] as const
 
 export function parseMissingInvoicesColumn(errorMessage: string): string | null {
