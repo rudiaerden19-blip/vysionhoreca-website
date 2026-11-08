@@ -13,6 +13,8 @@ export interface KassaCartItem {
   product: MenuProduct
   quantity: number
   choices?: KassaSelectedChoice[]
+  /** Vrije opmerking (naam, keukeninstructie, …) — geen invloed op prijs/BTW. */
+  lineNote?: string
   cartKey: string
 }
 

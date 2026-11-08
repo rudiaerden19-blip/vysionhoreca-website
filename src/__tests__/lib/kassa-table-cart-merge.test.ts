@@ -38,4 +38,12 @@ describe('mergeCartLinesForTable', () => {
     expect(merged).toHaveLength(1)
     expect(merged[0].quantity).toBe(2)
   })
+
+  it('keeps separate lines when lineNote differs', () => {
+    const a = { ...line('brood', 1, 'brood-n-one'), lineNote: 'Ahmed' }
+    const b = { ...line('brood', 1, 'brood-n-two'), lineNote: 'Sara' }
+    const merged = mergeCartLinesForTable([a], [b])
+    expect(merged).toHaveLength(2)
+    expect(merged.find((l) => l.lineNote === 'Ahmed')?.quantity).toBe(1)
+  })
 })

@@ -97,18 +97,22 @@ export async function insertKassaOrderForNameAccountPayment(params: {
     tax: Math.round(vatSplit.totalTax * 100) / 100,
     total,
     kassa_staff_id: staffId ?? null,
-    items: hydrated.map((i) => ({
-      product_id: i.product.id,
-      name: i.product.name,
-      price: i.product.price,
-      quantity: i.quantity,
-      btw_percentage: resolveLineVat(i),
-      options: (i.choices || []).map((c) => ({
-        name: c.choiceName || c.optionName || '',
-        price: c.price || 0,
-      })),
-      total_price: undefined,
-    })),
+    items: hydrated.map((i) => {
+      const notes = (i.lineNote ?? '').trim()
+      return {
+        product_id: i.product.id,
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        btw_percentage: resolveLineVat(i),
+        options: (i.choices || []).map((c) => ({
+          name: c.choiceName || c.optionName || '',
+          price: c.price || 0,
+        })),
+        ...(notes ? { notes } : {}),
+        total_price: undefined,
+      }
+    }),
     created_at: createdAt.toISOString(),
   }
 

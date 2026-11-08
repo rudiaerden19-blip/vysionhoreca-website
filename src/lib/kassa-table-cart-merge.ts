@@ -5,6 +5,7 @@ function cloneCartLine(line: KassaCartItem): KassaCartItem {
     ...line,
     product: { ...line.product },
     choices: line.choices?.map((c) => ({ ...c })),
+    lineNote: line.lineNote,
   }
 }
 

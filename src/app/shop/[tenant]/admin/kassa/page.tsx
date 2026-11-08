@@ -228,6 +228,11 @@ import type {
 } from '@/lib/kassa-cart-types'
 import { kassaReceiptTableNumber } from '@/lib/kassa-cart-types'
 import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
+import {
+  buildKassaCartLineKey,
+  kassaCartLineOrderNotes,
+  normalizeKassaLineNote,
+} from '@/lib/kassa-cart-line-key'
 import { transferParkedTableOrder } from '@/lib/kassa-table-order-transfer'
 import {
   kassaSidebarShowsOrderLinePanel,
@@ -686,8 +691,9 @@ function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayL
     const unit = i.product.price + choicesTotal
     const choiceNames = (i.choices || []).map((c) => c.choiceName).filter(Boolean)
     const choicePart = choiceNames.length > 0 ? `(${choiceNames.join(', ')})`: ''
+    const notePart = i.lineNote?.trim() ? ` — ${i.lineNote.trim()}` : ''
     return {
-      label: `${i.product.name}${choicePart}`,
+      label: `${i.product.name}${choicePart}${notePart}`,
       qty: i.quantity,
       lineTotal: Math.round(unit * i.quantity * 100) / 100,
     }
@@ -1288,6 +1294,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant])
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
+  const [numpadLineNote, setNumpadLineNote] = useState('')
   /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   /** Snelmenu-balk: standaard dicht; alleen open via knop «Snel menu» (niet na refresh). */
@@ -3064,6 +3071,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     options: ProductOption[]
     selected: SelectedChoice[]
     editingCartKey?: string
+    lineNote?: string
   } | null>(null)
 
   // Blokkeer body scroll (iPad Safari fix)
@@ -3337,16 +3345,29 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [productIdsWithOptionsSet],
   )
 
-  const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
+  const addToCart = (
+    product: MenuProduct,
+    choices: SelectedChoice[] = [],
+    lineNote?: string,
+  ) => {
     scheduleAddToCartSound()
-    const cartKey = choices.length > 0
-      ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
-      : product.id!
+    const pid = product.id!
+    const note = normalizeKassaLineNote(lineNote)
+    const cartKey = buildKassaCartLineKey(pid, choices, note)
     setCart(prev => {
       const existing = prev.find(i => i.cartKey === cartKey)
       const updated = existing
         ? prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
-        : [...prev, { product, quantity: 1, choices, cartKey }]
+        : [
+            ...prev,
+            {
+              product,
+              quantity: 1,
+              choices,
+              cartKey,
+              ...(note ? { lineNote: note } : {}),
+            },
+          ]
       if (tableNumber) {
         updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
       }
@@ -3360,11 +3381,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       const pid = product.id!
       const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
       if (!shouldFetchProductOptionsFallback(cached, pid, productIdsWithOptionsSet)) {
-        setOptionsModal({ product, options: cached ?? [], selected: [] })
+        setOptionsModal({ product, options: cached ?? [], selected: [], lineNote: '' })
         return
       }
       const opts = await resolveKassaProductOptions(pid)
-      setOptionsModal({ product, options: opts, selected: [] })
+      setOptionsModal({ product, options: opts, selected: [], lineNote: '' })
     } else {
       addToCart(product)
     }
@@ -3387,25 +3408,33 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setKassaQuickMenuVisible((open) => !open)
   }, [])
 
-  /** Open opties-modal om toppings/sauzen van een mandregel te wijzigen (alle tenants). */
+  /** Open opties-modal om toppings/sauzen en opmerking van een mandregel te wijzigen (alle tenants). */
   const openEditCartItem = async (item: CartItem) => {
     if (demoViewOnly) return
     const pid = item.product.id
-    if (!pid || String(pid).startsWith('custom-')) return
-    if (!productIdsWithOptionsSet.has(pid)) return
-    const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
-    const opts =
-      !shouldFetchProductOptionsFallback(cached, pid, productIdsWithOptionsSet)
-        ? (cached ?? [])
-        : await resolveKassaProductOptions(pid)
+    if (!pid) return
+    const isCustomAmount = String(pid).startsWith('custom-')
+    let opts: ProductOption[] = []
+    if (!isCustomAmount && productIdsWithOptionsSet.has(pid)) {
+      const cached = readCachedProductOptions(pid, optionsByProductIdRef.current)
+      opts =
+        !shouldFetchProductOptionsFallback(cached, pid, productIdsWithOptionsSet)
+          ? (cached ?? [])
+          : await resolveKassaProductOptions(pid)
+    }
     playClick()
     setOptionsModal({
       product: item.product,
       options: opts,
       selected: item.choices?.length ? [...item.choices] : [],
       editingCartKey: item.cartKey,
+      lineNote: item.lineNote ?? '',
     })
   }
+
+  const setOptionsModalLineNote = useCallback((lineNote: string) => {
+    setOptionsModal((prev) => (prev ? { ...prev, lineNote } : prev))
+  }, [])
 
   const toggleChoice = (option: ProductOption, choice: ProductOptionChoice) => {
     setOptionsModal(prev => {
@@ -3439,26 +3468,31 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
 
-    const { product, selected, editingCartKey } = optionsModal
+    const { product, selected, editingCartKey, lineNote } = optionsModal
+    const note = normalizeKassaLineNote(lineNote)
 
     if (editingCartKey) {
       scheduleAddToCartSound()
       const oldQty = cart.find(i => i.cartKey === editingCartKey)?.quantity ?? 1
-      const cartKey =
-        selected.length > 0
-          ? `${product.id}-${selected.map(c => c.choiceId).sort().join('-')}`
-          : product.id!
+      const cartKey = buildKassaCartLineKey(product.id!, selected, note)
 
       setCart(prev => {
         const without = prev.filter(i => i.cartKey !== editingCartKey)
         const existing = without.find(i => i.cartKey === cartKey)
+        const nextLine: CartItem = {
+          product,
+          quantity: oldQty,
+          choices: selected,
+          cartKey,
+          ...(note ? { lineNote: note } : {}),
+        }
         let updated: CartItem[]
         if (existing) {
           updated = without.map(i =>
             i.cartKey === cartKey ? { ...i, quantity: i.quantity + oldQty } : i
           )
         } else {
-          updated = [...without, { product, quantity: oldQty, choices: selected, cartKey }]
+          updated = [...without, nextLine]
         }
         if (tableNumber) {
           updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
@@ -3466,7 +3500,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return updated
       })
     } else {
-      addToCart(product, selected)
+      addToCart(product, selected, note)
     }
     setOptionsModal(null)
   }
@@ -4144,6 +4178,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const addCustomAmount = () => {
     const amount = parseFloat(numpadValue)
     if (amount > 0) {
+      const note = normalizeKassaLineNote(numpadLineNote)
       const custom: MenuProduct = {
         id: `custom-${Date.now()}`,
         tenant_slug: tenant,
@@ -4157,14 +4192,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         sort_order: 0,
         allergens: [],
       }
+      const cartKey = buildKassaCartLineKey(custom.id!, [], note)
       setCart((prev) => {
-        const updated = [...prev, { product: custom, quantity: 1, cartKey: custom.id! }]
+        const updated = [
+          ...prev,
+          {
+            product: custom,
+            quantity: 1,
+            cartKey,
+            ...(note ? { lineNote: note } : {}),
+          },
+        ]
         if (tableNumber) {
           updateTableStatus(tableNumber, tableHasOpenOrder(dineInFloorZone, tableNumber, updated), dineInFloorZone)
         }
         return updated
       })
       setNumpadValue('')
+      setNumpadLineNote('')
     }
   }
 
@@ -4326,6 +4371,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             price: discountEuro > 0 ? 0 : c.price || 0,
           })),
         }
+        const lineNotes = kassaCartLineOrderNotes(i)
+        if (lineNotes) row.notes = lineNotes
         if (discountEuro > 0) row.line_total = kassaLineGrossEuro(priced)
         return row
       }),
@@ -4791,6 +4838,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       for (const c of i.choices || []) {
         bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
       }
+      const lineNote = kassaCartLineOrderNotes(i)
+      if (lineNote) bonLines.push(` ! ${lineNote}`)
     }
     if ((order.discountAmount ?? 0) > 0) {
       bonLines.push(
@@ -4922,8 +4971,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ${sortKassaCartLinesByMenuCategory(order.items, categories).map(i => {
         const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
         const lineTotal = (i.product.price + choicesTotal) * i.quantity
+        const lineNote = kassaCartLineOrderNotes(i)
         return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
-        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€'+ c.price.toFixed(2) : ''}</span></div>`).join('')}`
+        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€'+ c.price.toFixed(2) : ''}</span></div>`).join('')}
+        ${lineNote ? `<div class="row small" style="margin-left:15px;font-weight:bold;">! ${escapeReceiptHtml(lineNote)}</div>` : ''}`
       }).join('')}
       ${(order.discountAmount ?? 0) > 0 ? `<div class="row"><span>${escapeReceiptHtml(t('kassaReceipt.discountLine').replace('{percent}', String(order.discountPercent ?? 20)))}</span><span>-€${order.discountAmount!.toFixed(2)}</span></div>` : ''}
       <div class="divider-solid"></div>
@@ -5750,6 +5801,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {item.choices && item.choices.length > 0 ? (
             <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
           ) : null}
+          {item.lineNote?.trim() ? (
+            <p className={`truncate text-xs italic ${ui.cartChoices}`}>{item.lineNote.trim()}</p>
+          ) : null}
           <p
             className={`font-bold ${kassaAppearanceDark ? `text-xs ${ui.priceAccentClass}`: 'text-sm text-emerald-600'}`}
           >
@@ -5781,10 +5835,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               '−'
             )}
           </button>
-          {!demoViewOnly &&
-            item.product.id &&
-            !String(item.product.id).startsWith('custom-') &&
-            productIdsWithOptionsSet.has(item.product.id) && (
+          {!demoViewOnly && item.product.id && (
               <button
                 type="button"
                 onClick={() => void openEditCartItem(item)}
@@ -5795,8 +5846,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         cartLineQtyBtnCompact ? 'h-8 w-8 text-sm': 'h-9 w-9 text-sm'
                       }`
                 }
-                title={t('kassaApp.ariaEditOptions')}
-                aria-label={t('kassaApp.ariaEditOptions')}
+                title={t('kassaApp.ariaEditLine')}
+                aria-label={t('kassaApp.ariaEditLine')}
               >
                 <KassaCartIconPencil className="h-4 w-4" />
               </button>
@@ -5833,6 +5884,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <p className={`truncate text-sm font-semibold ${ui.cartTitle}`}>{item.product.name}</p>
           {item.choices && item.choices.length > 0 ? (
             <p className={`truncate text-xs ${ui.cartChoices}`}>{item.choices.map((c) => c.choiceName).join(', ')}</p>
+          ) : null}
+          {item.lineNote?.trim() ? (
+            <p className={`truncate text-xs italic ${ui.cartChoices}`}>{item.lineNote.trim()}</p>
           ) : null}
           <p className={`text-xs font-bold ${ui.priceAccentClass}`}>
             {item.quantity}× · €{lineTotal}
@@ -7113,23 +7167,38 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ))}
               </div>
               {numpadValue && parseFloat(numpadValue) > 0 && (
-                <button
-                  type="button"
-                  data-testid="kassa-add-custom-amount"
-                  onClick={addCustomAmount}
-                  className={
-                    kassaAppearanceDark
-                      ? kassaClassicDark
-                        ? `mt-3 shrink-0 touch-manipulation rounded-xl py-4 text-base font-bold ${KASSA_CLASSIC_ACTION_BTN_FACE_ON}`
-                        : `mt-3 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosLuxury ? kassaPosButtonClass(false, posChrome) : kassaPosButtonClass(true, posChrome)}`
-                      : 'mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
-                  }
-                >
-                  {t('kassaApp.addAmount').replace(
-                    '{amount}',
-                    parseFloat(numpadValue || '0').toFixed(2),
-                  )}
-                </button>
+                <>
+                  <input
+                    type="text"
+                    data-testid="kassa-numpad-line-note"
+                    value={numpadLineNote}
+                    maxLength={120}
+                    onChange={(e) => setNumpadLineNote(e.target.value)}
+                    placeholder={t('kassaApp.numpadLineNotePlaceholder')}
+                    className={
+                      kassaAppearanceDark
+                        ? `mt-3 w-full shrink-0 rounded-xl border border-[#3d3d3d] bg-[#121212] px-3 py-2 text-sm text-zinc-50 outline-none ${KASSA_POS_BTN_SHAPE}`
+                        : 'mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]'
+                    }
+                  />
+                  <button
+                    type="button"
+                    data-testid="kassa-add-custom-amount"
+                    onClick={addCustomAmount}
+                    className={
+                      kassaAppearanceDark
+                        ? kassaClassicDark
+                          ? `mt-2 shrink-0 touch-manipulation rounded-xl py-4 text-base font-bold ${KASSA_CLASSIC_ACTION_BTN_FACE_ON}`
+                          : `mt-2 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosLuxury ? kassaPosButtonClass(false, posChrome) : kassaPosButtonClass(true, posChrome)}`
+                        : 'mt-2 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
+                    }
+                  >
+                    {t('kassaApp.addAmount').replace(
+                      '{amount}',
+                      parseFloat(numpadValue || '0').toFixed(2),
+                    )}
+                  </button>
+                </>
               )}
               </div>
               </div>
@@ -7236,17 +7305,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 ))}
               </div>
               {numpadValue && parseFloat(numpadValue) > 0 && (
-                <button
-                  type="button"
-                  data-testid="kassa-add-custom-amount"
-                  onClick={addCustomAmount}
-                  className="mt-3 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95"
-                >
-                  {t('kassaApp.addAmount').replace(
-                    '{amount}',
-                    parseFloat(numpadValue || '0').toFixed(2),
-                  )}
-                </button>
+                <>
+                  <input
+                    type="text"
+                    data-testid="kassa-numpad-line-note"
+                    value={numpadLineNote}
+                    maxLength={120}
+                    onChange={(e) => setNumpadLineNote(e.target.value)}
+                    placeholder={t('kassaApp.numpadLineNotePlaceholder')}
+                    className="mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]"
+                  />
+                  <button
+                    type="button"
+                    data-testid="kassa-add-custom-amount"
+                    onClick={addCustomAmount}
+                    className="mt-2 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95"
+                  >
+                    {t('kassaApp.addAmount').replace(
+                      '{amount}',
+                      parseFloat(numpadValue || '0').toFixed(2),
+                    )}
+                  </button>
+                </>
               )}
               </div>
               ) : null}
@@ -7882,6 +7962,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           model={optionsModal}
           onClose={() => setOptionsModal(null)}
           onToggleChoice={toggleChoice}
+          onLineNoteChange={setOptionsModalLineNote}
           onConfirm={confirmOptions}
           appearance={kassaAppearanceDark ? 'dark' : 'light'}
           posChrome={kassaPosLuxury ? posChrome : null}

@@ -21,12 +21,14 @@ export interface KassaProductOptionsModalModel {
   options: ProductOption[]
   selected: KassaSelectedChoice[]
   editingCartKey?: string
+  lineNote?: string
 }
 
 export function KassaProductOptionsModal({
   model,
   onClose,
   onToggleChoice,
+  onLineNoteChange,
   onConfirm,
   appearance = 'light',
   posChrome,
@@ -34,6 +36,7 @@ export function KassaProductOptionsModal({
   model: KassaProductOptionsModalModel
   onClose: () => void
   onToggleChoice: (option: ProductOption, choice: ProductOptionChoice) => void
+  onLineNoteChange: (note: string) => void
   onConfirm: () => void
   appearance?: 'light' | 'dark'
   /** Speels POS: grijs glanzend chrome + groene prijzen (zoals kassa-sidebar). */
@@ -114,6 +117,34 @@ export function KassaProductOptionsModal({
         <div
           className={`flex-1 overflow-y-auto p-4 space-y-5 ${dark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : ''}`}
         >
+          <div>
+            <label
+              htmlFor="kassa-line-note"
+              className={
+                speelsDark
+                  ? `mb-2 block text-sm font-semibold ${KASSA_SPEELS_PRICE_ACCENT_CLASS}`
+                  : dark
+                    ? 'mb-2 block text-sm font-semibold text-zinc-200'
+                    : 'mb-2 block text-sm font-semibold text-gray-700'
+              }
+            >
+              {t('kassaApp.cartLineNoteLabel')}
+            </label>
+            <input
+              id="kassa-line-note"
+              type="text"
+              data-testid="kassa-line-note-input"
+              value={model.lineNote ?? ''}
+              maxLength={120}
+              onChange={(e) => onLineNoteChange(e.target.value)}
+              placeholder={t('kassaApp.cartLineNotePlaceholder')}
+              className={
+                dark
+                  ? `w-full rounded-xl border border-[#3d3d3d] bg-[#121212] px-3 py-2.5 text-base text-zinc-50 outline-none focus:border-[#6dd5ff] ${KASSA_POS_BTN_SHAPE}`
+                  : 'w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-base text-gray-900 outline-none focus:border-[#3C4D6B] focus:ring-1 focus:ring-[#3C4D6B]'
+              }
+            />
+          </div>
           {model.options.map((option) => (
             <div key={option.id}>
               <div className="flex items-center gap-2 mb-3">
