@@ -23,6 +23,10 @@ import {
   MONTHLY_PRICE_WITHOUT_HARDWARE,
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
+import {
+  isPremiumPlan,
+  subscriptionMonthlyEurosFromPlan,
+} from '@/lib/tenant-subscription-display'
 
 interface TenantDetails {
   id: string
@@ -92,7 +96,7 @@ export default function TenantDetailPage() {
     tenant_slug: slug,
     plan: 'starter',
     status: 'trial',
-    price_monthly: 59,
+    price_monthly: MONTHLY_PRICE_WITHOUT_HARDWARE,
     billing_email: '',
     billing_name: '',
     billing_address: '',
@@ -174,8 +178,18 @@ export default function TenantDetailPage() {
       .single()
 
     if (subData) {
-      setSubscription(subData)
-      setSubForm(subData)
+      const price_monthly = subscriptionMonthlyEurosFromPlan(subData.plan, subData.price_monthly)
+      const plan =
+        coreRow && isPremiumPlan(coreRow.plan) && !isPremiumPlan(subData.plan)
+          ? 'pro'
+          : subData.plan
+      const normalized = {
+        ...subData,
+        plan,
+        price_monthly: subscriptionMonthlyEurosFromPlan(plan, price_monthly),
+      }
+      setSubscription(normalized)
+      setSubForm(normalized)
     }
 
     setLoading(false)
@@ -191,7 +205,10 @@ export default function TenantDetailPage() {
         subscriptionId: subscription?.id,
         data: {
           ...subForm,
-          price_monthly: getPlanPrice(subForm.plan),
+          price_monthly: subscriptionMonthlyEurosFromPlan(
+            subForm.plan,
+            subForm.price_monthly ?? getPlanPrice(subForm.plan),
+          ),
         },
         tenantPlan: subForm.plan,
       }),
@@ -547,7 +564,9 @@ export default function TenantDetailPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-slate-400 text-sm">Plan</p>
-                    <p className="text-2xl font-bold text-white capitalize">{subscription.plan}</p>
+                    <p className="text-2xl font-bold text-white">
+                      {isPremiumPlan(subscription.plan) ? 'Premium' : 'Starter'}
+                    </p>
                   </div>
                   <span className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(subscription.status)}`}>
                     {subscription.status}
@@ -556,7 +575,14 @@ export default function TenantDetailPage() {
 
                 <div>
                   <p className="text-slate-400 text-sm">Maandelijks bedrag</p>
-                  <p className="text-3xl font-bold text-orange-400">€{subscription.price_monthly}/maand</p>
+                  <p className="text-3xl font-bold text-orange-400">
+                    €
+                    {subscriptionMonthlyEurosFromPlan(
+                      subscription.plan,
+                      subscription.price_monthly,
+                    )}
+                    /maand
+                  </p>
                 </div>
 
                 {subscription.status === 'trial' && subscription.trial_ends_at && (
@@ -638,12 +664,38 @@ export default function TenantDetailPage() {
                 <label className="block text-sm font-medium text-slate-300 mb-2">Plan</label>
                 <select
                   value={subForm.plan}
-                  onChange={(e) => setSubForm({ ...subForm, plan: e.target.value, price_monthly: getPlanPrice(e.target.value) })}
+                  onChange={(e) =>
+                    setSubForm({
+                      ...subForm,
+                      plan: e.target.value,
+                      price_monthly: getPlanPrice(e.target.value),
+                    })
+                  }
                   className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
                 >
                   <option value="starter">Starter - €{MONTHLY_PRICE_WITHOUT_HARDWARE}/maand</option>
                   <option value="pro">Premium - €{MONTHLY_PRICE_WITH_HARDWARE}/maand</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Maandprijs (€)</label>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={subForm.price_monthly}
+                  onChange={(e) =>
+                    setSubForm({
+                      ...subForm,
+                      price_monthly: Number(e.target.value) || getPlanPrice(subForm.plan),
+                    })
+                  }
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+                />
+                <p className="mt-1 text-xs text-slate-400">
+                  Premium = €{MONTHLY_PRICE_WITH_HARDWARE}, Starter = €{MONTHLY_PRICE_WITHOUT_HARDWARE}
+                </p>
               </div>
 
               <div>

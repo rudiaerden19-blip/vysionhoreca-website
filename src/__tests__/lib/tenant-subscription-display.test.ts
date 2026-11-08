@@ -2,6 +2,7 @@ import {
   isPremiumPlan,
   normalizeSubscriptionPlan,
   resolveTenantCurrentPlan,
+  subscriptionMonthlyEurosFromPlan,
   tenantPlanMonthlyEuros,
 } from '@/lib/tenant-subscription-display'
 
@@ -20,6 +21,11 @@ describe('tenant-subscription-display', () => {
         tenant: { plan: 'starter', subscription_status: 'active' },
       }),
     ).toBe('pro')
+  })
+
+  it('legacy 59 en pro met 59 worden 69/99', () => {
+    expect(subscriptionMonthlyEurosFromPlan('starter', 59)).toBe(69)
+    expect(subscriptionMonthlyEurosFromPlan('pro', 59)).toBe(99)
   })
 
   it('premium toont 99 p/m standaard', () => {

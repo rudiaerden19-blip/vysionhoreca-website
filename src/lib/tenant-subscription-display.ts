@@ -67,6 +67,20 @@ export function resolveTenantCurrentPlan(input: {
   return tenantPlan
 }
 
+/** Legacy 59 → 69; pro in DB met te lage price_monthly → 99 (superadmin + tenant UI). */
+export function subscriptionMonthlyEurosFromPlan(
+  plan: string | null | undefined,
+  priceMonthly?: number | null,
+): number {
+  const premium = isPremiumPlan(plan)
+  const listPrice = premium ? MONTHLY_PRICE_WITH_HARDWARE : MONTHLY_PRICE_WITHOUT_HARDWARE
+  const stored = Number(priceMonthly)
+  if (!Number.isFinite(stored) || stored <= 0) return listPrice
+  if (premium && stored < MONTHLY_PRICE_WITH_HARDWARE) return MONTHLY_PRICE_WITH_HARDWARE
+  if (!premium && stored === 59) return MONTHLY_PRICE_WITHOUT_HARDWARE
+  return stored
+}
+
 export function tenantPlanMonthlyEuros(
   plan: TenantPlanTier,
   subscription: { price_monthly?: number | null } | null,
