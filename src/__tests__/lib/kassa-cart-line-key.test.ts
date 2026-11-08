@@ -3,6 +3,8 @@ import {
   kassaCartLineNoteOnProductReceipt,
   kassaCartLineOrderNotes,
   kassaDistinctCartLineNotesForReceipt,
+  kassaOrderItemHeadingNames,
+  kassaOrderItemKitchenLineNote,
   normalizeKassaLineNote,
 } from '@/lib/kassa-cart-line-key'
 
@@ -30,6 +32,24 @@ describe('kassa-cart-line-key', () => {
   it('reads notes from persisted order items', () => {
     expect(kassaCartLineOrderNotes({ notes: ' keuken ' })).toBe('keuken')
     expect(kassaCartLineOrderNotes({ lineNote: 'mand', notes: 'db' })).toBe('mand')
+  })
+
+  it('maps persisted order items for kitchen display', () => {
+    expect(
+      kassaOrderItemKitchenLineNote({ notes: 'Zonder boter' }),
+    ).toBe('Zonder boter')
+    expect(
+      kassaOrderItemKitchenLineNote({
+        notes: 'Theo',
+        receipt_heading_name: true,
+      }),
+    ).toBeUndefined()
+    expect(
+      kassaOrderItemHeadingNames([
+        { notes: 'Theo', receipt_heading_name: true },
+        { notes: 'extra saus' },
+      ]),
+    ).toEqual(['Theo'])
   })
 
   it('only puts flagged names in receipt heading', () => {

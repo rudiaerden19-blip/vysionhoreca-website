@@ -7,6 +7,10 @@ import {
   orderItemDisplayName,
   orderItemDisplayOptionLines,
 } from '@/lib/order-items-display'
+import {
+  kassaOrderItemHeadingNames,
+  kassaOrderItemKitchenLineNote,
+} from '@/lib/kassa-cart-line-key'
 import type { KitchenStyleOrder } from '@/components/shop-display/KitchenStyleOrderCard'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
@@ -154,6 +158,7 @@ export function KitchenKdsColumn({
       ? String(order.table_number).trim()
       : null
   const headerColor = started ? KDS_HEADER_RED : KDS_HEADER_BLUE
+  const headingNames = kassaOrderItemHeadingNames(order.items)
   const groups: { title: string; lines: { item: unknown; lineKey: string }[] }[] = []
   const items = order.items ?? []
   for (let index = 0; index < items.length; index++) {
@@ -199,6 +204,11 @@ export function KitchenKdsColumn({
           {typeLine}
           {dineInSeat ? ` · ${dineInSeat}` : ''}
         </p>
+        {headingNames.map((name) => (
+          <p key={name} className="mt-2 text-4xl font-black leading-tight text-white">
+            {name}
+          </p>
+        ))}
         <p className="truncate text-xl font-medium text-white/90">{order.customer_name}</p>
         {schedLine ? <p className="truncate text-lg text-white/80">{schedLine}</p> : null}
       </header>
@@ -222,8 +232,7 @@ export function KitchenKdsColumn({
                 const label = orderItemDisplayName(item)
                 const optLines = orderItemDisplayOptionLines(item)
                 const qty = Number((item as { quantity?: unknown }).quantity) || 1
-                const noteRaw = (item as { notes?: unknown }).notes
-                const noteStr = noteRaw != null && String(noteRaw).trim() !== '' ? String(noteRaw) : ''
+                const noteStr = kassaOrderItemKitchenLineNote(item) ?? ''
                 const made = madeLineKeys?.has(lineKey) === true
                 return (
                   <li key={lineKey} className={`text-2xl leading-snug ${made ? 'text-red-500' : 'text-white'}`}>

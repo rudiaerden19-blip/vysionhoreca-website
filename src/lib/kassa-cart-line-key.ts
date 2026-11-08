@@ -72,3 +72,35 @@ export function kassaCartLineNoteOnProductReceipt(
   if (kassaCartLineIsReceiptHeadingName(line)) return undefined
   return kassaCartLineOrderNotes(line)
 }
+
+function orderItemToReceiptNoteSource(item: unknown): KassaCartLineReceiptNoteSource | null {
+  if (!item || typeof item !== 'object') return null
+  const o = item as Record<string, unknown>
+  const notes =
+    o.notes != null && String(o.notes).trim() !== '' ? String(o.notes) : undefined
+  const lineNote =
+    typeof o.lineNote === 'string' && o.lineNote.trim() ? o.lineNote : undefined
+  return {
+    lineNote,
+    notes,
+    lineNoteAsReceiptName: o.lineNoteAsReceiptName === true,
+    receipt_heading_name: o.receipt_heading_name === true,
+  }
+}
+
+/** Keuken/KDS: opmerking bij product (niet bon-header / klantnaam). */
+export function kassaOrderItemKitchenLineNote(item: unknown): string | undefined {
+  const src = orderItemToReceiptNoteSource(item)
+  return src ? kassaCartLineNoteOnProductReceipt(src) : undefined
+}
+
+/** Keuken/KDS: klantnamen groot in blauwe header. */
+export function kassaOrderItemHeadingNames(items: unknown[] | null | undefined): string[] {
+  if (!items?.length) return []
+  const mapped: KassaCartLineReceiptNoteSource[] = []
+  for (const item of items) {
+    const src = orderItemToReceiptNoteSource(item)
+    if (src) mapped.push(src)
+  }
+  return kassaDistinctCartLineNotesForReceipt(mapped)
+}

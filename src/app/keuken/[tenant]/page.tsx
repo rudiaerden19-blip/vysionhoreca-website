@@ -26,6 +26,10 @@ import {
   orderItemDisplayOptionLines,
   orderItemLineTotalEur,
 } from '@/lib/order-items-display'
+import {
+  kassaOrderItemHeadingNames,
+  kassaOrderItemKitchenLineNote,
+} from '@/lib/kassa-cart-line-key'
 import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
@@ -435,14 +439,16 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         : order.floor_plan_zone?.trim()
           ? `${order.table_number} (${order.floor_plan_zone.trim()})`
           : order.table_number
+    const headingNames = kassaOrderItemHeadingNames(order.items)
     const items = (order.items || []).map((item: unknown) => {
       const optLines = orderItemDisplayOptionLines(item)
+      const kitchenNote = kassaOrderItemKitchenLineNote(item)
       return {
         quantity: Number((item as { quantity?: unknown }).quantity) || 1,
         name: orderItemDisplayName(item) || 'Item',
         price: orderItemLineTotalEur(item),
         choices: optLines.map((name) => ({ name, price: 0 })),
-        notes: (item as { notes?: unknown }).notes ? String((item as { notes?: unknown }).notes) : undefined,
+        notes: kitchenNote,
       }
     })
     const requestedDateTime = order.scheduled_date
@@ -452,6 +458,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       '*** KEUKEN BON ***',
       `#${order.order_number}`,
       ...(tableNumber != null ? [`Tafel ${tableNumber}`] : []),
+      ...headingNames,
       ...items.flatMap((item) => [
         `${item.quantity}x ${item.name}`,
         ...(item.choices || []).map((c) => ` + ${c.name}`),
@@ -902,6 +909,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                         </p>
                       )
                     })()}
+                    {kassaOrderItemHeadingNames(selectedOrder.items).map((name) => (
+                      <p
+                        key={name}
+                        className={`mt-3 text-4xl font-black leading-tight ${ui.panelText}`}
+                      >
+                        {name}
+                      </p>
+                    ))}
                   </div>
                   <button
                     type="button"
@@ -950,9 +965,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       const label = orderItemDisplayName(item)
                       const optLines = orderItemDisplayOptionLines(item)
                       const qty = Number((item as { quantity?: unknown }).quantity) || 1
-                      const noteRaw = (item as { notes?: unknown }).notes
-                      const noteStr =
-                        noteRaw != null && String(noteRaw).trim() !== ''? String(noteRaw) : ''
+                      const noteStr = kassaOrderItemKitchenLineNote(item) ?? ''
                       const lineKey = kitchenItemLineKey(i)
                       const made = (madeByOrder[selectedOrder.id] ?? []).includes(lineKey)
                       return (
