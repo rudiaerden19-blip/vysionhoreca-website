@@ -48,6 +48,56 @@ export function licenseInvoiceVatFromExcl(
   return roundLicenseEuro(amountExcl * vatRate)
 }
 
+/** Standaard licentie-prijzen excl. BTW (legacy 59 + huidige pakketten). */
+const LICENSE_LIST_EXCL_EUROS = [59, 69, 99] as const
+
+export function licenseInvoiceAmountLooksStoredIncl(
+  amount: number,
+  vatRate = LICENSE_INVOICE_VAT_RATE,
+): boolean {
+  const raw = roundLicenseEuro(amount)
+  if (!Number.isFinite(raw) || raw <= 0) return false
+  const exclBack = roundLicenseEuro(raw / (1 + vatRate))
+  const inclBack = licenseInvoiceInclFromExcl(exclBack, vatRate)
+  return Math.abs(inclBack - raw) <= 0.02
+}
+
+/**
+ * Bepaalt excl. BTW uit DB: expliciete kolom, of «amount» = excl. óf incl. totaal (119,79 = 99+21%).
+ */
+export function resolveLicenseInvoiceExcl(row: {
+  amount: number
+  amount_excl_vat?: number | null
+  vat_rate?: number | null
+}): number {
+  const vatRate =
+    row.vat_rate != null && Number(row.vat_rate) >= 0
+      ? Number(row.vat_rate)
+      : LICENSE_INVOICE_VAT_RATE
+  const exclStored = Number(row.amount_excl_vat)
+  if (Number.isFinite(exclStored) && exclStored > 0) return exclStored
+
+  let raw = roundLicenseEuro(Number(row.amount))
+  if (!Number.isFinite(raw) || raw <= 0) return 0
+
+  const isKnownExcl = (n: number) =>
+    LICENSE_LIST_EXCL_EUROS.some((p) => Math.abs(p - n) < 0.02)
+
+  if (isKnownExcl(raw)) return raw
+
+  for (let step = 0; step < 3 && licenseInvoiceAmountLooksStoredIncl(raw, vatRate); step++) {
+    const excl = roundLicenseEuro(raw / (1 + vatRate))
+    if (isKnownExcl(excl)) return excl
+    raw = excl
+  }
+
+  if (licenseInvoiceAmountLooksStoredIncl(raw, vatRate)) {
+    return roundLicenseEuro(raw / (1 + vatRate))
+  }
+
+  return raw
+}
+
 export function formatLicenseInvoiceAmounts(row: {
   amount: number
   amount_excl_vat?: number | null
@@ -57,22 +107,14 @@ export function formatLicenseInvoiceAmounts(row: {
     row.vat_rate != null && Number(row.vat_rate) >= 0
       ? Number(row.vat_rate)
       : LICENSE_INVOICE_VAT_RATE
-  const exclStored = Number(row.amount_excl_vat)
-  if (Number.isFinite(exclStored) && exclStored > 0) {
-    const incl = roundLicenseEuro(Number(row.amount))
-    const vat = roundLicenseEuro(incl - exclStored)
-    return { excl: exclStored, vat, incl, vatRate }
-  }
-  const excl = roundLicenseEuro(Number(row.amount))
+  const excl = resolveLicenseInvoiceExcl(row)
   const incl = licenseInvoiceInclFromExcl(excl, vatRate)
   const vat = licenseInvoiceVatFromExcl(excl, vatRate)
   return { excl, vat, incl, vatRate }
 }
 
 export function licenseInvoiceExclForForm(row: TenantLicenseInvoiceRow): number {
-  const exclStored = Number(row.amount_excl_vat)
-  if (Number.isFinite(exclStored) && exclStored > 0) return exclStored
-  return roundLicenseEuro(Number(row.amount))
+  return resolveLicenseInvoiceExcl(row)
 }
 
 export function defaultLicenseInvoiceDescription(planLabel?: string): string {
@@ -142,6 +184,21 @@ export function shrinkInvoicePayloadForMissingColumn(
 ): Record<string, unknown> {
   const next = { ...row }
   delete next[missingColumn]
+  if (
+    missingColumn === 'amount_excl_vat' ||
+    missingColumn === 'vat_rate'
+  ) {
+    const excl =
+      row.amount_excl_vat != null
+        ? roundLicenseEuro(Number(row.amount_excl_vat))
+        : resolveLicenseInvoiceExcl({
+            amount: Number(row.amount),
+            amount_excl_vat: null,
+            vat_rate:
+              row.vat_rate != null ? Number(row.vat_rate) : null,
+          })
+    if (excl > 0) next.amount = excl
+  }
   return next
 }
 
@@ -151,6 +208,16 @@ export function invoicePayloadInsertMinimum(row: Record<string, unknown>): Recor
   for (const k of keep) {
     if (row[k] !== undefined) out[k] = row[k]
   }
+  const exclFromRow =
+    row.amount_excl_vat != null
+      ? roundLicenseEuro(Number(row.amount_excl_vat))
+      : resolveLicenseInvoiceExcl({
+          amount: Number(row.amount),
+          amount_excl_vat: null,
+          vat_rate:
+            row.vat_rate != null ? Number(row.vat_rate) : null,
+        })
+  if (exclFromRow > 0) out.amount = exclFromRow
   return out
 }
 
