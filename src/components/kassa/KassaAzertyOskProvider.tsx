@@ -181,26 +181,26 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   }
 
   const keyBtnClass =
-    'min-h-[3.25rem] touch-manipulation select-none rounded-xl border border-slate-500 bg-slate-800 px-0.5 text-center text-xl font-bold text-white active:bg-slate-600 sm:min-h-[3.5rem] sm:text-2xl'
+    'min-h-[3.25rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-xl font-bold text-white active:bg-neutral-500 sm:min-h-[3.5rem] sm:text-2xl'
 
   return (
     <KassaAzertyOskContext.Provider value={chromeValue}>
       {children}
       {enabled && visible && !suppressedRef.current ? (
         <div
-          className="fixed bottom-0 left-0 right-0 z-[480] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
+          className="fixed bottom-0 left-0 right-0 z-[480] border-t border-neutral-600 bg-neutral-800 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.4)]"
           role="region"
           aria-label={t('kassaApp.azertyOskTitle')}
           style={{ minHeight: KASSA_AZERTY_OSK_HEIGHT_PX, maxHeight: 'min(44vh, 380px)' }}
           data-testid="kassa-azerty-osk"
         >
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 sm:text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-neutral-300 sm:text-sm">
               {t('kassaApp.azertyOskTitle')}
             </span>
             <button
               type="button"
-              className="touch-manipulation min-h-[2.75rem] min-w-[2.75rem] rounded-xl border border-slate-500 bg-slate-800 px-4 text-lg font-bold text-slate-100 active:bg-slate-600"
+              className="touch-manipulation min-h-[2.75rem] min-w-[2.75rem] rounded-xl border border-neutral-500 bg-neutral-600 px-4 text-lg font-bold text-white active:bg-neutral-500"
               aria-label={t('kassaApp.azertyOskClose')}
               data-testid="kassa-azerty-osk-close"
               onClick={() => dismissAzertyOsk()}
@@ -244,7 +244,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             <div className="grid grid-cols-[auto,auto,1fr,auto] gap-1.5 sm:gap-2">
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift ? 'border-cyan-500 bg-cyan-900' : ''}`}
+                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift ? 'border-neutral-300 bg-neutral-500' : ''}`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => setShift((s) => !s)}
               >
