@@ -15,10 +15,7 @@ import {
   isKassaAzertyOskTextTarget,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
-import {
-  releaseAllOskScrollPadding,
-  scheduleScrollInputAboveKeyboard,
-} from '@/lib/scroll-input-above-keyboard'
+import { releaseAllOskScrollPadding } from '@/lib/scroll-input-above-keyboard'
 
 /** Ruimte onderaan pagina zodat invoervelden niet achter het toetsenbord verdwijnen. */
 const OSK_HEIGHT_PX = 352
@@ -70,8 +67,6 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!enabled) return
 
-    let scrollCancel: (() => void) | undefined
-
     const onFocusIn = (e: FocusEvent) => {
       if (!isKassaAzertyOskTextTarget(e.target)) return
       const el = e.target
@@ -83,30 +78,39 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       activeRef.current = el
       armKassaOskInput(el)
       setVisible(true)
-      scrollCancel?.()
-      scrollCancel = scheduleScrollInputAboveKeyboard(el)
       window.requestAnimationFrame(() => {
+        if (!el.isConnected) return
         try {
-          el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+          el.scrollIntoView({ block: 'nearest', behavior: 'auto' })
         } catch {
           /* ignore */
         }
       })
     }
 
-    const onFocusOut = () => {
+    const onFocusOut = (e: FocusEvent) => {
+      const related = e.relatedTarget
+      if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk"]')) {
+        return
+      }
       window.setTimeout(() => {
         const active = document.activeElement
-        if (isKassaAzertyOskTextTarget(active) && active === activeRef.current) return
+        if (isKassaAzertyOskTextTarget(active)) {
+          if (active !== activeRef.current) {
+            activeRef.current = active
+            armKassaOskInput(active)
+          }
+          setVisible(true)
+          return
+        }
         hideKeyboard(true)
         suppressedRef.current = false
-      }, 120)
+      }, 280)
     }
 
     document.addEventListener('focusin', onFocusIn, true)
     document.addEventListener('focusout', onFocusOut, true)
     return () => {
-      scrollCancel?.()
       document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('focusout', onFocusOut, true)
       hideKeyboard(true)

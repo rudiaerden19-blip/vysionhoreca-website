@@ -196,13 +196,14 @@ export function applyKassaAzertyOskEdit(
 }
 
 export function armKassaOskInput(el: HTMLInputElement | HTMLTextAreaElement): void {
-  el.readOnly = true
+  /** Geen readOnly — op touch verliest dat anders meteen focus (potlood/notitie). */
   el.inputMode = 'none'
   el.setAttribute('autocomplete', 'off')
   el.setAttribute('enterkeyhint', 'done')
+  el.setAttribute('data-kassa-osk-armed', 'true')
 }
 
 export function disarmKassaOskInput(el: HTMLInputElement | HTMLTextAreaElement): void {
-  el.readOnly = false
   el.removeAttribute('inputMode')
+  el.removeAttribute('data-kassa-osk-armed')
 }
