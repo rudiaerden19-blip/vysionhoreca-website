@@ -2848,7 +2848,12 @@
       "loading": "加载中...",
       "noOutstanding": "您没有待付发票",
       "overdueWarning": "逾期付款",
-      "overdueDesc": "您有 {count} 张未付发票，价值 €{amount}。请尽快付款。"
+      "overdueDesc": "您有 {count} 张未付发票，价值 €{amount}。请尽快付款。",
+      "upgradePremiumTitle": "升级到高级版",
+      "upgradePremiumSubtitle": "每月 99 欧元，全部功能",
+      "upgradePremiumButton": "升级到高级版",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "您已拥有 Premium"
     }
   },
   "shopDisplay": {

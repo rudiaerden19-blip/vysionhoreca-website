@@ -3186,7 +3186,12 @@
       "loading": "Loading...",
       "noOutstanding": "You have no outstanding invoices",
       "overdueWarning": "Overdue payment",
-      "overdueDesc": "You have {count} unpaid invoice(s) worth €{amount}. Please pay as soon as possible to keep your account active."
+      "overdueDesc": "You have {count} unpaid invoice(s) worth €{amount}. Please pay as soon as possible to keep your account active.",
+      "upgradePremiumTitle": "Upgrade to Premium",
+      "upgradePremiumSubtitle": "All features for €99/month",
+      "upgradePremiumButton": "Upgrade to Premium",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "You have Premium"
     }
   },
   "shopDisplay": {

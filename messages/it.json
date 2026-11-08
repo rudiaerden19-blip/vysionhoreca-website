@@ -2848,7 +2848,12 @@
       "loading": "Caricamento...",
       "noOutstanding": "Non hai fatture in sospeso",
       "overdueWarning": "Pagamento scaduto",
-      "overdueDesc": "Hai {count} fattura/e non pagata/e per un valore di €{amount}. Paga il prima possibile."
+      "overdueDesc": "Hai {count} fattura/e non pagata/e per un valore di €{amount}. Paga il prima possibile.",
+      "upgradePremiumTitle": "Passa a Premium",
+      "upgradePremiumSubtitle": "Tutte le funzioni per 99 €/mese",
+      "upgradePremiumButton": "Passa a Premium",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "Hai Premium"
     }
   },
   "shopDisplay": {

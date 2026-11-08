@@ -2848,7 +2848,12 @@
       "loading": "جاري التحميل...",
       "noOutstanding": "ليس لديك فواتير معلقة",
       "overdueWarning": "دفعة متأخرة",
-      "overdueDesc": "لديك {count} فاتورة غير مدفوعة بقيمة €{amount}. يرجى الدفع في أقرب وقت ممكن."
+      "overdueDesc": "لديك {count} فاتورة غير مدفوعة بقيمة €{amount}. يرجى الدفع في أقرب وقت ممكن.",
+      "upgradePremiumTitle": "الترقية إلى Premium",
+      "upgradePremiumSubtitle": "جميع الميزات مقابل 99 يورو/شهر",
+      "upgradePremiumButton": "الترقية إلى Premium",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "لديك Premium"
     }
   },
   "shopDisplay": {

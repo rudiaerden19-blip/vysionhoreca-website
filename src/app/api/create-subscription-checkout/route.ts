@@ -10,7 +10,7 @@ import {
 
 // Plan pricing in cents (monthly)
 const planPrices: Record<string, number> = {
-  starter: 5900, // €59/maand
+  starter: MONTHLY_PRICE_WITHOUT_HARDWARE * 100,
   pro: MONTHLY_PRICE_WITH_HARDWARE * 100, // €99/maand met hardware (default)
 }
 

@@ -2348,7 +2348,12 @@
       "loading": "Chargement...",
       "noOutstanding": "Vous n'avez aucune facture en attente",
       "overdueWarning": "Paiement en retard",
-      "overdueDesc": "Vous avez {count} facture(s) impayée(s) d'une valeur de €{amount}. Veuillez payer dès que possible."
+      "overdueDesc": "Vous avez {count} facture(s) impayée(s) d'une valeur de €{amount}. Veuillez payer dès que possible.",
+      "upgradePremiumTitle": "Passer à Premium",
+      "upgradePremiumSubtitle": "Toutes les fonctionnalités pour 99 €/mois",
+      "upgradePremiumButton": "Passer à Premium",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "Vous avez Premium"
     }
   },
   "shopDisplay": {

@@ -3186,7 +3186,12 @@
       "loading": "Laden...",
       "noOutstanding": "Je hebt geen openstaande facturen",
       "overdueWarning": "Achterstallige betaling",
-      "overdueDesc": "Je hebt {count} onbetaalde factuur(en) ter waarde van €{amount}. Betaal zo snel mogelijk om je account actief te houden."
+      "overdueDesc": "Je hebt {count} onbetaalde factuur(en) ter waarde van €{amount}. Betaal zo snel mogelijk om je account actief te houden.",
+      "upgradePremiumTitle": "Upgrade naar Premium",
+      "upgradePremiumSubtitle": "Alle features voor €99/maand",
+      "upgradePremiumButton": "Upgrade naar Premium",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "U heeft Premium"
     }
   },
   "shopDisplay": {

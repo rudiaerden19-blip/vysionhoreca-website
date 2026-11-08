@@ -10,6 +10,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PinGate from '@/components/PinGate'
 import { getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { isAdminTenant } from '@/lib/protected-tenants'
+import {
+  isPremiumPlan,
+  MONTHLY_PRICE_WITHOUT_HARDWARE,
+  MONTHLY_PRICE_WITH_HARDWARE,
+  resolveTenantCurrentPlan,
+  tenantPlanMonthlyEuros,
+} from '@/lib/tenant-subscription-display'
 
 interface Subscription {
   id: string
@@ -681,11 +688,12 @@ export default function AbonnementPage() {
     })
   }
 
-  const currentPlan = isAdminTenant(tenantSlug)
-    ? 'pro'
-    : (status === 'trial' || status === 'TRIAL')
-      ? 'pro'
-      : (subscription?.plan || tenant?.plan || 'starter')
+  const currentPlan = resolveTenantCurrentPlan({
+    tenantSlug,
+    subscription,
+    tenant,
+  })
+  const currentPlanMonthlyEuros = tenantPlanMonthlyEuros(currentPlan, subscription)
   const isActive = status === 'active' || status === 'ACTIVE'
   const isTrial = status === 'trial' || status === 'TRIAL'
   const isExpired = status === 'expired' || status === 'EXPIRED'
@@ -756,29 +764,28 @@ export default function AbonnementPage() {
             </div>
           </div>
           {/* Upgrade knop voor starter plan */}
-          {(currentPlan === 'starter' || currentPlan === 'STARTER') && (
+          {!isPremiumPlan(currentPlan) && (
             <div className="flex-shrink-0">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-5 text-center max-w-xs">
                 <span className="text-3xl"></span>
-                <h3 className="font-bold text-purple-900 mt-2 mb-1">Upgrade naar Premium</h3>
-                <p className="text-purple-700 text-sm mb-4">Alle features voor €99/maand</p>
+                <h3 className="font-bold text-purple-900 mt-2 mb-1">{t('upgradePremiumTitle')}</h3>
+                <p className="text-purple-700 text-sm mb-4">{t('upgradePremiumSubtitle')}</p>
                 <button
                   onClick={() => handleSubscribe('pro', 'monthly')}
                   disabled={processing !== null}
                   className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 px-6 rounded-xl font-bold text-sm transition-colors disabled:opacity-50"
                 >
-                  {processing === 'pro'? 'Laden...': 'Upgrade naar Premium'}
+                  {processing === 'pro' ? t('loading') : t('upgradePremiumButton')}
                 </button>
               </div>
             </div>
           )}
-          {/* Huidig plan is Premium */}
-          {(currentPlan === 'pro' || currentPlan === 'PRO') && (isActive || isTrial) && (
+          {isPremiumPlan(currentPlan) && (
             <div className="flex-shrink-0">
               <div className="bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-300 rounded-2xl p-5 text-center max-w-xs">
                 <span className="text-3xl"></span>
-                <h3 className="font-bold text-purple-900 mt-2 mb-1">Vysion Premium</h3>
-                <p className="text-green-700 font-semibold text-sm"> Uw huidig plan is Premium</p>
+                <h3 className="font-bold text-purple-900 mt-2 mb-1">{t('premiumActiveTitle')}</h3>
+                <p className="text-green-700 font-semibold text-sm">{t('premiumActiveSubtitle')}</p>
               </div>
             </div>
           )}
@@ -946,20 +953,22 @@ export default function AbonnementPage() {
         {/* Plan Card */}
         <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-              currentPlan === 'pro' || currentPlan === 'PRO'? 'bg-purple-100': 'bg-yellow-100'
-            }`}>
-              <span className="text-2xl">{currentPlan === 'pro' || currentPlan === 'PRO'? '' : ''}</span>
+            <div
+              className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                isPremiumPlan(currentPlan) ? 'bg-purple-100' : 'bg-yellow-100'
+              }`}
+            >
+              <span className="text-2xl"></span>
             </div>
             <div>
               <p className="text-sm text-gray-500">{t('currentPlan')}</p>
-              <p className="text-xl font-bold text-gray-900 capitalize">
-                Vysion {currentPlan}
+              <p className="text-xl font-bold text-gray-900">
+                {isPremiumPlan(currentPlan) ? t('pro') : t('starter')}
               </p>
             </div>
           </div>
           <div className="text-3xl font-bold text-gray-900">
-            €{currentPlan === 'pro' || currentPlan === 'PRO'? '99': '59'}
+            €{currentPlanMonthlyEuros}
             <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
           </div>
         </div>
@@ -1075,13 +1084,17 @@ export default function AbonnementPage() {
           <div className="mb-6">
             {billingYearly ? (
               <>
-                <span className="text-4xl font-bold text-yellow-400">€{Math.round(59 * 12 * 0.9)}</span>
+                <span className="text-4xl font-bold text-yellow-400">
+                  €{Math.round(MONTHLY_PRICE_WITHOUT_HARDWARE * 12 * 0.9)}
+                </span>
                 <span className="text-gray-300 ml-2">/jaar</span>
-                <p className="text-green-300 text-sm mt-1">= €{Math.round(59 * 0.9)}/maand</p>
+                <p className="text-green-300 text-sm mt-1">
+                  = €{Math.round(MONTHLY_PRICE_WITHOUT_HARDWARE * 0.9)}/maand
+                </p>
               </>
             ) : (
               <>
-                <span className="text-4xl font-bold text-yellow-400">€59</span>
+                <span className="text-4xl font-bold text-yellow-400">€{MONTHLY_PRICE_WITHOUT_HARDWARE}</span>
                 <span className="text-gray-300 ml-2">{t('perMonth')}</span>
               </>
             )}
@@ -1114,13 +1127,17 @@ export default function AbonnementPage() {
           <div className="mb-6">
             {billingYearly ? (
               <>
-                <span className="text-4xl font-bold text-purple-300">€{Math.round(99 * 12 * 0.9)}</span>
+                <span className="text-4xl font-bold text-purple-300">
+                  €{Math.round(MONTHLY_PRICE_WITH_HARDWARE * 12 * 0.9)}
+                </span>
                 <span className="text-gray-300 ml-2">/jaar</span>
-                <p className="text-purple-200 text-sm mt-1">= €{Math.round(99 * 0.9)}/maand</p>
+                <p className="text-purple-200 text-sm mt-1">
+                  = €{Math.round(MONTHLY_PRICE_WITH_HARDWARE * 0.9)}/maand
+                </p>
               </>
             ) : (
               <>
-                <span className="text-4xl font-bold text-purple-300">€99</span>
+                <span className="text-4xl font-bold text-purple-300">€{MONTHLY_PRICE_WITH_HARDWARE}</span>
                 <span className="text-gray-300 ml-2">{t('perMonth')}</span>
               </>
             )}

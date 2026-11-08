@@ -2348,7 +2348,12 @@
       "loading": "Laden...",
       "noOutstanding": "Sie haben keine offenen Rechnungen",
       "overdueWarning": "Überfällige Zahlung",
-      "overdueDesc": "Sie haben {count} unbezahlte Rechnung(en) im Wert von €{amount}. Bitte zahlen Sie so schnell wie möglich."
+      "overdueDesc": "Sie haben {count} unbezahlte Rechnung(en) im Wert von €{amount}. Bitte zahlen Sie so schnell wie möglich.",
+      "upgradePremiumTitle": "Auf Premium upgraden",
+      "upgradePremiumSubtitle": "Alle Funktionen für €99/Monat",
+      "upgradePremiumButton": "Auf Premium upgraden",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "Sie haben Premium"
     }
   },
   "shopDisplay": {

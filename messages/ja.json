@@ -2848,7 +2848,12 @@
       "loading": "読み込み中...",
       "noOutstanding": "未払いの請求書はありません",
       "overdueWarning": "延滞支払い",
-      "overdueDesc": "€{amount}相当の未払い請求書が{count}件あります。できるだけ早くお支払いください。"
+      "overdueDesc": "€{amount}相当の未払い請求書が{count}件あります。できるだけ早くお支払いください。",
+      "upgradePremiumTitle": "プレミアムにアップグレード",
+      "upgradePremiumSubtitle": "月額99ユーロで全機能",
+      "upgradePremiumButton": "プレミアムにアップグレード",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "プレミアム契約中"
     }
   },
   "shopDisplay": {

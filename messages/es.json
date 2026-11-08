@@ -2848,7 +2848,12 @@
       "loading": "Cargando...",
       "noOutstanding": "No tienes facturas pendientes",
       "overdueWarning": "Pago vencido",
-      "overdueDesc": "Tienes {count} factura(s) impagada(s) por valor de €{amount}. Por favor paga lo antes posible."
+      "overdueDesc": "Tienes {count} factura(s) impagada(s) por valor de €{amount}. Por favor paga lo antes posible.",
+      "upgradePremiumTitle": "Actualizar a Premium",
+      "upgradePremiumSubtitle": "Todas las funciones por 99 €/mes",
+      "upgradePremiumButton": "Actualizar a Premium",
+      "premiumActiveTitle": "Vysion Premium",
+      "premiumActiveSubtitle": "Tienes Premium"
     }
   },
   "shopDisplay": {
