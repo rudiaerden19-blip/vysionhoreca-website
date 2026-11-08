@@ -207,15 +207,31 @@ export function applyKassaAzertyOskEdit(
   writeNativeValue(el, value)
 }
 
+/** Alleen markeer — geen inputMode/readOnly (blokkeerde typen overal). */
 export function armKassaOskInput(el: HTMLInputElement | HTMLTextAreaElement): void {
-  /** Geen readOnly — op touch verliest dat anders meteen focus (potlood/notitie). */
-  el.inputMode = 'none'
-  el.setAttribute('autocomplete', 'off')
-  el.setAttribute('enterkeyhint', 'done')
   el.setAttribute('data-kassa-osk-armed', 'true')
 }
 
 export function disarmKassaOskInput(el: HTMLInputElement | HTMLTextAreaElement): void {
-  el.removeAttribute('inputMode')
   el.removeAttribute('data-kassa-osk-armed')
+  el.removeAttribute('inputMode')
+  el.readOnly = false
+}
+
+export function disarmAllKassaOskInputs(root: ParentNode = document): void {
+  root.querySelectorAll('[data-kassa-osk-armed="true"]').forEach((node) => {
+    if (node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement) {
+      disarmKassaOskInput(node)
+    }
+  })
+}
+
+/** Opruimen restanten inputMode=none van eerdere OSK-builds in de pagina. */
+export function releaseLegacyOskInputGuards(root: ParentNode = document): void {
+  root.querySelectorAll('input, textarea').forEach((node) => {
+    if (!(node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement)) return
+    if (node.getAttribute('inputMode') === 'none' && !node.readOnly) {
+      node.removeAttribute('inputMode')
+    }
+  })
 }

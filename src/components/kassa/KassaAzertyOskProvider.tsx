@@ -10,8 +10,10 @@ import {
   KASSA_AZERTY_NUMBER_ROW,
   applyKassaAzertyOskEdit,
   armKassaOskInput,
+  disarmAllKassaOskInputs,
   disarmKassaOskInput,
   isAzertyOskActiveForSession,
+  releaseLegacyOskInputGuards,
   isKassaAzertyOskTextTarget,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
@@ -27,16 +29,21 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const searchParams = useSearchParams()
   const { t } = useLanguage()
   const routeParamTenant = typeof params?.tenant === 'string' ? params.tenant : undefined
-  const [hostTenantSlug, setHostTenantSlug] = useState<string | null>(null)
+  const [hostTenantSlug, setHostTenantSlug] = useState<string | null>(() =>
+    typeof window !== 'undefined' ? getCurrentTenantSlug() : null,
+  )
 
   useEffect(() => {
     setHostTenantSlug(getCurrentTenantSlug())
+    releaseLegacyOskInputGuards()
+    disarmAllKassaOskInputs()
   }, [pathname])
 
   const [visible, setVisible] = useState(false)
   const [shift, setShift] = useState(false)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
+  const focusOutTimerRef = useRef<number | undefined>(undefined)
 
   const enabled = isAzertyOskActiveForSession({
     pathname,
@@ -45,28 +52,42 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     hostTenantSlug,
   })
 
-  /** Veld al gefocust vóór host/?next= klaar was — alsnog OSK tonen. */
-  useEffect(() => {
-    if (!enabled) return
-    const active = document.activeElement
-    if (!isKassaAzertyOskTextTarget(active)) return
-    if (activeRef.current === active) return
-    activeRef.current = active
-    armKassaOskInput(active)
-    setVisible(true)
-  }, [enabled, hostTenantSlug, pathname])
-
   const hideKeyboard = useCallback((disarm: boolean) => {
-    const prev = activeRef.current
-    if (disarm && prev) disarmKassaOskInput(prev)
+    if (disarm) {
+      if (activeRef.current) disarmKassaOskInput(activeRef.current)
+      disarmAllKassaOskInputs()
+      releaseLegacyOskInputGuards()
+    }
     activeRef.current = null
     setVisible(false)
     setShift(false)
     releaseAllOskScrollPadding()
   }, [])
 
+  const attachField = useCallback((el: HTMLInputElement | HTMLTextAreaElement) => {
+    const prev = activeRef.current
+    if (prev && prev !== el) disarmKassaOskInput(prev)
+    suppressedRef.current = false
+    activeRef.current = el
+    armKassaOskInput(el)
+    setVisible(true)
+  }, [])
+
   useEffect(() => {
-    if (!enabled || !visible || suppressedRef.current) {
+    if (enabled) return
+    hideKeyboard(true)
+  }, [enabled, hideKeyboard])
+
+  useEffect(() => {
+    if (!enabled) return
+    const active = document.activeElement
+    if (!isKassaAzertyOskTextTarget(active)) return
+    if (activeRef.current === active && visible) return
+    attachField(active)
+  }, [enabled, hostTenantSlug, pathname, attachField, visible])
+
+  useEffect(() => {
+    if (!enabled || !visible) {
       document.documentElement.style.paddingBottom = ''
       return
     }
@@ -79,25 +100,18 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!enabled) return
 
+    const clearFocusOutTimer = () => {
+      if (focusOutTimerRef.current !== undefined) {
+        window.clearTimeout(focusOutTimerRef.current)
+        focusOutTimerRef.current = undefined
+      }
+    }
+
     const onFocusIn = (e: FocusEvent) => {
       if (!isKassaAzertyOskTextTarget(e.target)) return
-      const el = e.target
-      const prev = activeRef.current
-      if (prev && prev !== el) {
-        disarmKassaOskInput(prev)
-      }
-      suppressedRef.current = false
-      activeRef.current = el
-      armKassaOskInput(el)
-      setVisible(true)
-      window.requestAnimationFrame(() => {
-        if (!el.isConnected) return
-        try {
-          el.scrollIntoView({ block: 'nearest', behavior: 'auto' })
-        } catch {
-          /* ignore */
-        }
-      })
+      if (suppressedRef.current) return
+      clearFocusOutTimer()
+      attachField(e.target)
     }
 
     const onFocusOut = (e: FocusEvent) => {
@@ -105,29 +119,40 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk"]')) {
         return
       }
-      window.setTimeout(() => {
+      if (!(e.target instanceof HTMLElement) || !isKassaAzertyOskTextTarget(e.target)) {
+        return
+      }
+      clearFocusOutTimer()
+      focusOutTimerRef.current = window.setTimeout(() => {
+        focusOutTimerRef.current = undefined
         const active = document.activeElement
         if (isKassaAzertyOskTextTarget(active)) {
-          if (active !== activeRef.current) {
-            activeRef.current = active
-            armKassaOskInput(active)
-          }
+          activeRef.current = active
+          setVisible(true)
+          return
+        }
+        const tracked = activeRef.current
+        if (
+          tracked?.isConnected &&
+          !suppressedRef.current &&
+          (active === document.body || active === document.documentElement)
+        ) {
           setVisible(true)
           return
         }
         hideKeyboard(true)
-        suppressedRef.current = false
-      }, 280)
+      }, 300)
     }
 
     document.addEventListener('focusin', onFocusIn, true)
     document.addEventListener('focusout', onFocusOut, true)
     return () => {
+      clearFocusOutTimer()
       document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('focusout', onFocusOut, true)
-      hideKeyboard(true)
+      disarmAllKassaOskInputs()
     }
-  }, [enabled, hideKeyboard])
+  }, [enabled, attachField, hideKeyboard])
 
   const dismissAzertyOsk = useCallback(() => {
     suppressedRef.current = true
@@ -135,10 +160,6 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     const active = document.activeElement
     if (active instanceof HTMLElement) active.blur()
   }, [hideKeyboard])
-
-  const onClose = () => {
-    dismissAzertyOsk()
-  }
 
   const chromeValue = useMemo(
     () => ({
@@ -151,7 +172,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   const sendEdit = (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
     const el = activeRef.current
-    if (!el) return
+    if (!el?.isConnected) return
     applyKassaAzertyOskEdit(el, edit)
   }
 
@@ -165,7 +186,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   return (
     <KassaAzertyOskContext.Provider value={chromeValue}>
       {children}
-      {enabled && visible ? (
+      {enabled && visible && !suppressedRef.current ? (
         <div
           className="fixed bottom-0 left-0 right-0 z-[480] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
           role="region"
@@ -182,7 +203,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               className="touch-manipulation min-h-[2.75rem] min-w-[2.75rem] rounded-xl border border-slate-500 bg-slate-800 px-4 text-lg font-bold text-slate-100 active:bg-slate-600"
               aria-label={t('kassaApp.azertyOskClose')}
               data-testid="kassa-azerty-osk-close"
-              onClick={onClose}
+              onClick={() => dismissAzertyOsk()}
             >
               ✕
             </button>
