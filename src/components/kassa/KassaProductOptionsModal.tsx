@@ -2,6 +2,7 @@
 
 import type { MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 import type { KassaSelectedChoice } from '@/lib/kassa-cart-types'
+import { kassaLineNoteTreatAsReceiptName } from '@/lib/kassa-cart-line-key'
 import { useLanguage } from '@/i18n'
 import { kassaProductImageRetryOnError } from '@/lib/kassa-img-retry'
 import {
@@ -22,6 +23,7 @@ export interface KassaProductOptionsModalModel {
   selected: KassaSelectedChoice[]
   editingCartKey?: string
   lineNote?: string
+  /** undefined = auto (naam vs instructie); anders expliciet vinkje. */
   lineNoteAsReceiptName?: boolean
 }
 
@@ -156,7 +158,10 @@ export function KassaProductOptionsModal({
                 <input
                   type="checkbox"
                   data-testid="kassa-line-note-receipt-name"
-                  checked={model.lineNoteAsReceiptName === true}
+                  checked={kassaLineNoteTreatAsReceiptName(
+                    model.lineNote ?? '',
+                    model.lineNoteAsReceiptName,
+                  )}
                   onChange={(e) => onLineNoteAsReceiptNameChange(e.target.checked)}
                   className="mt-1 h-4 w-4 shrink-0 rounded border-gray-300"
                 />

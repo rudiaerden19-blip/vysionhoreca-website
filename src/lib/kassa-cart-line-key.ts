@@ -45,8 +45,36 @@ export type KassaCartLineReceiptNoteSource = {
   receipt_heading_name?: boolean | null
 }
 
+const KASSA_LINE_NOTE_INSTRUCTION_PREFIX =
+  /^(zonder|geen|extra|met|niet|apart|allergie)\b/i
+
+/** Korte naam (Rudi) vs keukeninstructie (zonder boter). */
+export function kassaLineNoteLooksLikeCustomerName(note: string): boolean {
+  const t = note.trim()
+  if (!t || t.length > 48) return false
+  if (KASSA_LINE_NOTE_INSTRUCTION_PREFIX.test(t)) return false
+  if (/^!/.test(t)) return false
+  return true
+}
+
+/** Vinkje = expliciet; anders automatisch naam vs instructie. */
+export function kassaLineNoteTreatAsReceiptName(
+  note: string | null | undefined,
+  explicit?: boolean | null,
+): boolean {
+  const n = normalizeKassaLineNote(note)
+  if (!n) return false
+  if (explicit === true) return true
+  if (explicit === false) return false
+  return kassaLineNoteLooksLikeCustomerName(n)
+}
+
 function kassaCartLineIsReceiptHeadingName(item: KassaCartLineReceiptNoteSource): boolean {
-  return item.lineNoteAsReceiptName === true || item.receipt_heading_name === true
+  if (item.lineNoteAsReceiptName === true || item.receipt_heading_name === true) return true
+  if (item.lineNoteAsReceiptName === false) return false
+  const note = kassaCartLineOrderNotes(item)
+  if (!note) return false
+  return kassaLineNoteLooksLikeCustomerName(note)
 }
 
 /** Alleen regels met vinkje «naam op bon» — niet gewone keukenopmerkingen. */
@@ -83,7 +111,12 @@ function orderItemToReceiptNoteSource(item: unknown): KassaCartLineReceiptNoteSo
   return {
     lineNote,
     notes,
-    lineNoteAsReceiptName: o.lineNoteAsReceiptName === true,
+    lineNoteAsReceiptName:
+      o.lineNoteAsReceiptName === true
+        ? true
+        : o.lineNoteAsReceiptName === false
+          ? false
+          : undefined,
     receipt_heading_name: o.receipt_heading_name === true,
   }
 }

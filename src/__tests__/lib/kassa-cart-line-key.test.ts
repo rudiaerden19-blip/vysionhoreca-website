@@ -4,6 +4,8 @@ import {
   kassaCartLineOrderNotes,
   kassaDistinctCartLineNotesForReceipt,
   kassaOrderItemHeadingNames,
+  kassaLineNoteLooksLikeCustomerName,
+  kassaLineNoteTreatAsReceiptName,
   kassaOrderItemKitchenLineNote,
   normalizeKassaLineNote,
 } from '@/lib/kassa-cart-line-key'
@@ -52,20 +54,19 @@ describe('kassa-cart-line-key', () => {
     ).toEqual(['Theo'])
   })
 
-  it('only puts flagged names in receipt heading', () => {
-    expect(
-      kassaDistinctCartLineNotesForReceipt([
-        { lineNote: 'Theo', lineNoteAsReceiptName: true },
-        { lineNote: 'Zonder boter' },
-        { lineNote: 'theo', lineNoteAsReceiptName: true },
-      ]),
-    ).toEqual(['Theo'])
+  it('auto-detects naam vs keukeninstructie voor bon-header', () => {
+    expect(kassaLineNoteLooksLikeCustomerName('Rudi')).toBe(true)
+    expect(kassaLineNoteLooksLikeCustomerName('Zonder boter')).toBe(false)
+    expect(kassaLineNoteTreatAsReceiptName('Rudi', undefined)).toBe(true)
+    expect(kassaLineNoteTreatAsReceiptName('Zonder boter', undefined)).toBe(false)
+    expect(kassaDistinctCartLineNotesForReceipt([{ lineNote: 'Rudi' }])).toEqual(['Rudi'])
     expect(kassaCartLineNoteOnProductReceipt({ lineNote: 'Zonder boter' })).toBe('Zonder boter')
+    expect(kassaCartLineNoteOnProductReceipt({ lineNote: 'Rudi' })).toBeUndefined()
     expect(
       kassaCartLineNoteOnProductReceipt({
-        lineNote: 'Theo',
-        lineNoteAsReceiptName: true,
+        lineNote: 'Rudi',
+        lineNoteAsReceiptName: false,
       }),
-    ).toBeUndefined()
+    ).toBe('Rudi')
   })
 })

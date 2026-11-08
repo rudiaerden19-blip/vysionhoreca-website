@@ -15,7 +15,7 @@ export interface KassaCartItem {
   choices?: KassaSelectedChoice[]
   /** Vrije opmerking (naam, keukeninstructie, …) — geen invloed op prijs/BTW. */
   lineNote?: string
-  /** true = opmerking als klantnaam groot onder besteltype op kassabon (niet bij product). */
+  /** true = naam bovenaan bon/keuken; false = expliciet instructie bij product. */
   lineNoteAsReceiptName?: boolean
   cartKey: string
 }
