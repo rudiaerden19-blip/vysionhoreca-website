@@ -39,6 +39,11 @@ import {
   MONTHLY_PRICE_WITHOUT_HARDWARE,
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
+import {
+  tenantHasPaidPremiumLicense,
+  isPremiumPlan,
+} from '@/lib/tenant-subscription-display'
+import { syncTenantPremiumSubscription } from '@/lib/tenant-premium-sync'
 
 const CreateSchema = z.object({
   action: z.literal('create'),
@@ -504,8 +509,19 @@ export async function POST(req: NextRequest) {
         const { error } = await supabase.from('subscriptions').insert(data)
         if (error) return NextResponse.json({ error: error.message }, { status: 400 })
       }
-      if (body.tenantPlan) {
-        await supabase.from('tenants').update({ plan: body.tenantPlan }).eq('slug', body.slug)
+      const tenantPlan = body.tenantPlan || body.data.plan
+      const subStatus =
+        typeof body.data.status === 'string' && body.data.status.trim()
+          ? body.data.status.trim().toLowerCase()
+          : 'active'
+      if (tenantPlan) {
+        await supabase
+          .from('tenants')
+          .update({ plan: tenantPlan, subscription_status: subStatus })
+          .eq('slug', body.slug.trim().toLowerCase())
+      }
+      if (isPremiumPlan(tenantPlan)) {
+        await syncTenantPremiumSubscription(supabase, body.slug)
       }
       await recordAudit(supabase, {
         tenantSlug: body.slug,
@@ -804,6 +820,17 @@ export async function POST(req: NextRequest) {
           tenant_slug: slug,
         })
         if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+        if (body.invoice.status === 'paid') {
+          const hint = {
+            status: 'paid',
+            amount: updateRow.amount as number,
+            amount_excl_vat: updateRow.amount_excl_vat as number | undefined,
+            description: (updateRow.description as string) || body.invoice.description,
+          }
+          if (tenantHasPaidPremiumLicense([hint])) {
+            await syncTenantPremiumSubscription(supabase, slug)
+          }
+        }
         await recordAudit(supabase, {
           tenantSlug: slug,
           actorType: 'superadmin',
@@ -822,6 +849,17 @@ export async function POST(req: NextRequest) {
       }
       const { data: inserted, error } = await persistLicenseInvoiceRow(supabase, 'insert', row)
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+      if (body.invoice.status === 'paid') {
+        const hint = {
+          status: 'paid',
+          amount: row.amount as number,
+          amount_excl_vat: row.amount_excl_vat as number | undefined,
+          description: (row.description as string) || body.invoice.description,
+        }
+        if (tenantHasPaidPremiumLicense([hint])) {
+          await syncTenantPremiumSubscription(supabase, slug)
+        }
+      }
       await recordAudit(supabase, {
         tenantSlug: slug,
         actorType: 'superadmin',

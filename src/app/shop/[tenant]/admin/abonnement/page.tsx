@@ -684,8 +684,12 @@ export default function AbonnementPage() {
     tenantSlug,
     subscription,
     tenant,
+    licenseInvoices: invoices,
   })
-  const currentPlanMonthlyEuros = tenantPlanMonthlyEuros(currentPlan, subscription)
+  const currentPlanMonthlyEuros = tenantPlanMonthlyEuros(currentPlan, {
+    ...subscription,
+    plan: currentPlan,
+  })
   const isActive = status === 'active' || status === 'ACTIVE'
   const isTrial = status === 'trial' || status === 'TRIAL'
   const isExpired = status === 'expired' || status === 'EXPIRED'

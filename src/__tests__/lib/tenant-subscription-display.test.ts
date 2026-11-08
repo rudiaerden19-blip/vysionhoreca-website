@@ -3,6 +3,7 @@ import {
   normalizeSubscriptionPlan,
   resolveTenantCurrentPlan,
   subscriptionMonthlyEurosFromPlan,
+  tenantHasPaidPremiumLicense,
   tenantPlanMonthlyEuros,
 } from '@/lib/tenant-subscription-display'
 
@@ -43,6 +44,32 @@ describe('tenant-subscription-display', () => {
         tenant: { plan: 'starter', subscription_status: 'active' },
       }),
     ).toBe('pro')
+  })
+
+  it('betaalde premium-licentiefactuur telt als pro', () => {
+    expect(
+      resolveTenantCurrentPlan({
+        tenantSlug: 'donerkebablaakdal',
+        subscription: { plan: 'starter', status: 'active', price_monthly: 59 },
+        tenant: { plan: 'starter', subscription_status: 'active' },
+        licenseInvoices: [
+          {
+            status: 'paid',
+            amount: 119.79,
+            amount_excl_vat: 99,
+            description: 'Vysion licentie — Premium',
+          },
+        ],
+      }),
+    ).toBe('pro')
+    expect(tenantHasPaidPremiumLicense([{ status: 'paid', amount_excl_vat: 99, amount: 119.79 }])).toBe(
+      true,
+    )
+  })
+
+  it('legacy 59 op actief abonnement wordt 69 bij weergave starter', () => {
+    expect(tenantPlanMonthlyEuros('starter', { price_monthly: 59, plan: 'starter' })).toBe(69)
+    expect(tenantPlanMonthlyEuros('pro', { price_monthly: 59, plan: 'pro' })).toBe(99)
   })
 
   it('starter blijft starter', () => {

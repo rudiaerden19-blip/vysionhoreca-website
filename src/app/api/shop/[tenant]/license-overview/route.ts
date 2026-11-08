@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import {
+  resolveTenantCurrentPlan,
+  subscriptionMonthlyEurosFromPlan,
+} from '@/lib/tenant-subscription-display'
 
 /**
  * Licentiepagina: subscriptions + tenants.plan + invoices (service role).
@@ -49,9 +53,40 @@ export async function GET(
     return NextResponse.json({ error: invRes.error.message }, { status: 500 })
   }
 
-  return NextResponse.json({
+  const invoices = invRes.data ?? []
+  const effectivePlan = resolveTenantCurrentPlan({
+    tenantSlug,
     subscription: subRes.data,
     tenant: tenantRes.data,
-    invoices: invRes.data ?? [],
+    licenseInvoices: invoices,
+  })
+
+  const subscription = subRes.data
+    ? {
+        ...subRes.data,
+        plan: effectivePlan,
+        price_monthly: subscriptionMonthlyEurosFromPlan(
+          effectivePlan,
+          subRes.data.price_monthly,
+        ),
+      }
+    : null
+
+  const tenant = tenantRes.data
+    ? {
+        ...tenantRes.data,
+        plan: effectivePlan,
+        subscription_status:
+          tenantRes.data.subscription_status ||
+          subscription?.status ||
+          'active',
+      }
+    : null
+
+  return NextResponse.json({
+    subscription,
+    tenant,
+    invoices,
+    effectivePlan,
   })
 }

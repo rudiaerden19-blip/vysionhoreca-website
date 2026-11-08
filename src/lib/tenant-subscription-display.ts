@@ -3,6 +3,7 @@ import {
   MONTHLY_PRICE_WITHOUT_HARDWARE,
   MONTHLY_PRICE_WITH_HARDWARE,
 } from '@/lib/pricing-hardware'
+import { formatLicenseInvoiceAmounts } from '@/lib/tenant-license-invoice'
 
 export type TenantPlanTier = 'pro' | 'starter'
 
@@ -19,6 +20,29 @@ export function isPremiumPlan(plan: string | null | undefined): boolean {
 /**
  * Effectief plan voor UI (abonnement-pagina): subscription + tenants + trial.
  */
+export type LicenseInvoicePlanHint = {
+  status?: string | null
+  amount?: number | null
+  amount_excl_vat?: number | null
+  description?: string | null
+}
+
+export function tenantHasPaidPremiumLicense(
+  invoices: LicenseInvoicePlanHint[] | null | undefined,
+): boolean {
+  if (!invoices?.length) return false
+  return invoices.some((inv) => {
+    if ((inv.status || '').toLowerCase() !== 'paid') return false
+    const { excl } = formatLicenseInvoiceAmounts({
+      amount: Number(inv.amount) || 0,
+      amount_excl_vat: inv.amount_excl_vat,
+    })
+    if (excl >= MONTHLY_PRICE_WITH_HARDWARE) return true
+    const desc = (inv.description || '').toLowerCase()
+    return desc.includes('premium') || desc.includes('pro licentie') || desc.includes('vysion licentie')
+  })
+}
+
 export function resolveTenantCurrentPlan(input: {
   tenantSlug: string
   subscription: {
@@ -27,6 +51,7 @@ export function resolveTenantCurrentPlan(input: {
     price_monthly?: number | null
   } | null
   tenant: { plan?: string | null; subscription_status?: string | null } | null
+  licenseInvoices?: LicenseInvoicePlanHint[] | null
 }): TenantPlanTier {
   if (isAdminTenant(input.tenantSlug)) return 'pro'
 
@@ -54,6 +79,8 @@ export function resolveTenantCurrentPlan(input: {
 
   if (subPlan === 'pro') return 'pro'
   if (tenantPlan === 'pro') return 'pro'
+
+  if (tenantHasPaidPremiumLicense(input.licenseInvoices)) return 'pro'
 
   const monthly = Number(input.subscription?.price_monthly)
   if (
@@ -83,11 +110,9 @@ export function subscriptionMonthlyEurosFromPlan(
 
 export function tenantPlanMonthlyEuros(
   plan: TenantPlanTier,
-  subscription: { price_monthly?: number | null } | null,
+  subscription: { price_monthly?: number | null; plan?: string | null } | null,
 ): number {
-  const stored = Number(subscription?.price_monthly)
-  if (Number.isFinite(stored) && stored > 0) return stored
-  return isPremiumPlan(plan) ? MONTHLY_PRICE_WITH_HARDWARE : MONTHLY_PRICE_WITHOUT_HARDWARE
+  return subscriptionMonthlyEurosFromPlan(plan, subscription?.price_monthly)
 }
 
 export { MONTHLY_PRICE_WITHOUT_HARDWARE, MONTHLY_PRICE_WITH_HARDWARE }
