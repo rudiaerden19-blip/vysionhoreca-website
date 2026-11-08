@@ -16,6 +16,7 @@ import {
   type KassaPosChromeLook,
 } from '@/lib/kassa-pos-surface'
 import { KassaIconCheck, KassaIconClose } from '@/lib/kassa-ui-icons'
+import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
 
 export interface KassaProductOptionsModalModel {
   product: MenuProduct
@@ -48,6 +49,9 @@ export function KassaProductOptionsModal({
   posChrome?: KassaPosChromeLook | null
 }) {
   const { t } = useLanguage()
+  const azertyOsk = useKassaAzertyOskChrome()
+  const oskBottomPad =
+    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 12 : 0
   const dark = appearance === 'dark'
   const speelsDark = dark && posChrome === 'speels'
 
@@ -58,6 +62,16 @@ export function KassaProductOptionsModal({
 
   const speelsChromeBtn = (selected: boolean, extraClass = '') =>
     `${KASSA_POS_BTN_SHAPE} ${kassaSpeelsChromeButtonClass(selected)} ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} ${extraClass}`
+
+  const closeWithOsk = () => {
+    azertyOsk?.dismiss()
+    onClose()
+  }
+
+  const confirmWithOsk = () => {
+    azertyOsk?.dismiss()
+    onConfirm()
+  }
 
   const speelsOptionBadgeClass = [
     KASSA_POS_BTN_SHAPE,
@@ -74,13 +88,14 @@ export function KassaProductOptionsModal({
   return (
     <div
       data-testid="kassa-options-modal"
-      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[600] flex items-center justify-center bg-black/60 p-4"
+      style={{ paddingBottom: oskBottomPad > 0 ? `${oskBottomPad}px` : undefined }}
     >
       <div
         className={
           dark
-            ? `${KASSA_POS_BTN_SHAPE} w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden border border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
-            : 'bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden'
+            ? `${KASSA_POS_BTN_SHAPE} flex max-h-[min(80vh,calc(100%-5rem))] w-full max-w-lg flex-col overflow-hidden border border-[#1a1a1a] shadow-2xl ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+            : 'flex max-h-[min(80vh,calc(100%-5rem))] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl'
         }
       >
         <div
@@ -105,7 +120,7 @@ export function KassaProductOptionsModal({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={closeWithOsk}
             className={
               dark
                 ? speelsDark
@@ -283,7 +298,7 @@ export function KassaProductOptionsModal({
           <button
             type="button"
             data-testid="kassa-options-cancel"
-            onClick={onClose}
+            onClick={closeWithOsk}
             className={
               dark
                 ? `flex-1 py-3 font-semibold ${darkActionBtn(false)}`
@@ -295,7 +310,7 @@ export function KassaProductOptionsModal({
           <button
             type="button"
             data-testid="kassa-options-confirm"
-            onClick={onConfirm}
+            onClick={confirmWithOsk}
             className={
               dark
                 ? `flex-[2] py-3.5 text-lg font-bold ${darkActionBtn(false)}${model.editingCartKey ? '' : ' kassa-options-add-glow'}`

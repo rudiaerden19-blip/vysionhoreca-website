@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
@@ -16,9 +16,10 @@ import {
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
 import { releaseAllOskScrollPadding } from '@/lib/scroll-input-above-keyboard'
-
-/** Ruimte onderaan pagina zodat invoervelden niet achter het toetsenbord verdwijnen. */
-const OSK_HEIGHT_PX = 352
+import {
+  KASSA_AZERTY_OSK_HEIGHT_PX,
+  KassaAzertyOskContext,
+} from '@/lib/kassa-azerty-osk-context'
 
 function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }) {
   const params = useParams()
@@ -69,7 +70,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       document.documentElement.style.paddingBottom = ''
       return
     }
-    document.documentElement.style.paddingBottom = `${OSK_HEIGHT_PX}px`
+    document.documentElement.style.paddingBottom = `${KASSA_AZERTY_OSK_HEIGHT_PX}px`
     return () => {
       document.documentElement.style.paddingBottom = ''
     }
@@ -128,13 +129,25 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     }
   }, [enabled, hideKeyboard])
 
-  const onClose = () => {
+  const dismissAzertyOsk = useCallback(() => {
     suppressedRef.current = true
-    setVisible(false)
-    setShift(false)
-    const el = activeRef.current
-    if (el) disarmKassaOskInput(el)
+    hideKeyboard(true)
+    const active = document.activeElement
+    if (active instanceof HTMLElement) active.blur()
+  }, [hideKeyboard])
+
+  const onClose = () => {
+    dismissAzertyOsk()
   }
+
+  const chromeValue = useMemo(
+    () => ({
+      visible: enabled && visible,
+      heightPx: KASSA_AZERTY_OSK_HEIGHT_PX,
+      dismiss: dismissAzertyOsk,
+    }),
+    [dismissAzertyOsk, enabled, visible],
+  )
 
   const sendEdit = (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
     const el = activeRef.current
@@ -150,14 +163,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     'min-h-[3.25rem] touch-manipulation select-none rounded-xl border border-slate-500 bg-slate-800 px-0.5 text-center text-xl font-bold text-white active:bg-slate-600 sm:min-h-[3.5rem] sm:text-2xl'
 
   return (
-    <>
+    <KassaAzertyOskContext.Provider value={chromeValue}>
       {children}
       {enabled && visible ? (
         <div
-          className="fixed bottom-0 left-0 right-0 z-[500] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
+          className="fixed bottom-0 left-0 right-0 z-[480] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
           role="region"
           aria-label={t('kassaApp.azertyOskTitle')}
-          style={{ minHeight: OSK_HEIGHT_PX, maxHeight: 'min(44vh, 380px)' }}
+          style={{ minHeight: KASSA_AZERTY_OSK_HEIGHT_PX, maxHeight: 'min(44vh, 380px)' }}
           data-testid="kassa-azerty-osk"
         >
           <div className="mb-2 flex items-center justify-between gap-2">
@@ -245,7 +258,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
           </div>
         </div>
       ) : null}
-    </>
+    </KassaAzertyOskContext.Provider>
   )
 }
 
