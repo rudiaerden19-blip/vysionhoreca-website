@@ -55,6 +55,15 @@ export function resolveTenantCurrentPlan(input: {
   if (subPlan === 'pro') return 'pro'
   if (tenantPlan === 'pro') return 'pro'
 
+  const monthly = Number(input.subscription?.price_monthly)
+  if (
+    (status === 'active' || status === 'past_due') &&
+    Number.isFinite(monthly) &&
+    monthly >= MONTHLY_PRICE_WITH_HARDWARE
+  ) {
+    return 'pro'
+  }
+
   return tenantPlan
 }
 

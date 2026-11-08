@@ -2,7 +2,6 @@
 
 import { VYSION_INFO_EMAIL } from '@/lib/vysion-contact'
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -497,13 +496,6 @@ const legacyTranslations: Record<string, Record<string, string>> = {
   },
 }
 
-const getSupabase = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !supabaseKey) return null
-  return createClient(supabaseUrl, supabaseKey)
-}
-
 export default function AbonnementPage() {
   const params = useParams()
   const searchParams = useSearchParams()
@@ -572,35 +564,31 @@ export default function AbonnementPage() {
   }
 
   async function loadData() {
-    const supabase = getSupabase()
-    if (!supabase) {
-      setLoading(false)
-      return
+    try {
+      const res = await fetch(`/api/shop/${encodeURIComponent(tenantSlug)}/license-overview`, {
+        headers: { ...getAuthHeaders() },
+        cache: 'no-store',
+      })
+      const json = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setSubscription(json.subscription ?? null)
+        setTenant(json.tenant ?? null)
+        setInvoices(Array.isArray(json.invoices) ? json.invoices : [])
+      } else {
+        console.warn('[abonnement] license-overview', res.status, json?.error)
+        setSubscription(null)
+        setTenant(null)
+        setInvoices([])
+      }
+    } catch (e) {
+      console.warn('[abonnement] license-overview failed', e)
+      setSubscription(null)
+      setTenant(null)
+      setInvoices([])
     }
-
-    const { data: subData } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('tenant_slug', tenantSlug)
-      .single()
-    setSubscription(subData)
-
-    const { data: tenantData } = await supabase
-      .from('tenants')
-      .select('*')
-      .eq('slug', tenantSlug)
-      .single()
-    setTenant(tenantData)
 
     const settingsData = await getTenantSettings(tenantSlug)
     setTenantInfo(settingsData)
-
-    const { data: invoiceData } = await supabase
-      .from('invoices')
-      .select('*')
-      .eq('tenant_slug', tenantSlug)
-      .order('created_at', { ascending: false })
-    setInvoices(invoiceData || [])
 
     setLoading(false)
   }

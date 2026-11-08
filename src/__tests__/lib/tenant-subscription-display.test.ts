@@ -29,6 +29,16 @@ describe('tenant-subscription-display', () => {
     expect(tenantPlanMonthlyEuros('starter', null)).toBe(69)
   })
 
+  it('active met price 99 telt als premium ook bij plan starter', () => {
+    expect(
+      resolveTenantCurrentPlan({
+        tenantSlug: 'klant-x',
+        subscription: { plan: 'starter', status: 'active', price_monthly: 99 },
+        tenant: { plan: 'starter', subscription_status: 'active' },
+      }),
+    ).toBe('pro')
+  })
+
   it('starter blijft starter', () => {
     expect(
       resolveTenantCurrentPlan({
