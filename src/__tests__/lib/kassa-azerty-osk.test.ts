@@ -22,6 +22,11 @@ describe('kassa-azerty-osk', () => {
     expect(
       isAzertyOskActiveForSession({
         pathname: '/login',
+      }),
+    ).toBe(true)
+    expect(
+      isAzertyOskActiveForSession({
+        pathname: '/login',
         searchNext: '/shop/lomichillplay/admin/kassa',
       }),
     ).toBe(true)
@@ -33,8 +38,8 @@ describe('kassa-azerty-osk', () => {
     ).toBe(true)
     expect(
       isAzertyOskActiveForSession({
-        pathname: '/login',
-        searchNext: '/shop/other/admin',
+        pathname: '/shop/other/admin',
+        routeParamTenant: 'other',
       }),
     ).toBe(false)
     expect(

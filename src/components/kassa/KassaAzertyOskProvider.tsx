@@ -32,6 +32,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     setHostTenantSlug(getCurrentTenantSlug())
   }, [pathname])
 
+  const [visible, setVisible] = useState(false)
+  const [shift, setShift] = useState(false)
+  const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
+  const suppressedRef = useRef(false)
+
   const enabled = isAzertyOskActiveForSession({
     pathname,
     routeParamTenant,
@@ -39,10 +44,16 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     hostTenantSlug,
   })
 
-  const [visible, setVisible] = useState(false)
-  const [shift, setShift] = useState(false)
-  const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
-  const suppressedRef = useRef(false)
+  /** Veld al gefocust vóór host/?next= klaar was — alsnog OSK tonen. */
+  useEffect(() => {
+    if (!enabled) return
+    const active = document.activeElement
+    if (!isKassaAzertyOskTextTarget(active)) return
+    if (activeRef.current === active) return
+    activeRef.current = active
+    armKassaOskInput(active)
+    setVisible(true)
+  }, [enabled, hostTenantSlug, pathname])
 
   const hideKeyboard = useCallback((disarm: boolean) => {
     const prev = activeRef.current
