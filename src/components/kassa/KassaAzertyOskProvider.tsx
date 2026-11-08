@@ -12,6 +12,7 @@ import {
   armKassaOskInput,
   disarmAllKassaOskInputs,
   disarmKassaOskInput,
+  healOskBlockedTextField,
   isAzertyOskActiveForSession,
   releaseLegacyOskInputGuards,
   isKassaAzertyOskTextTarget,
@@ -68,6 +69,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     const prev = activeRef.current
     if (prev && prev !== el) disarmKassaOskInput(prev)
     suppressedRef.current = false
+    healOskBlockedTextField(el)
     activeRef.current = el
     armKassaOskInput(el)
     setVisible(true)
@@ -109,7 +111,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
     const onFocusIn = (e: FocusEvent) => {
       if (!isKassaAzertyOskTextTarget(e.target)) return
-      if (suppressedRef.current) return
+      /** Na Toevoegen/Annuleren in opties-modal: opnieuw typen moet OSK weer openen. */
+      suppressedRef.current = false
       clearFocusOutTimer()
       attachField(e.target)
     }
@@ -157,8 +160,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const dismissAzertyOsk = useCallback(() => {
     suppressedRef.current = true
     hideKeyboard(true)
-    const active = document.activeElement
-    if (active instanceof HTMLElement) active.blur()
+    /** Kort onderdrukken na modal-sluit — geen vaste blur (blokkeerde 2e keer typen). */
+    window.setTimeout(() => {
+      suppressedRef.current = false
+    }, 400)
   }, [hideKeyboard])
 
   const chromeValue = useMemo(

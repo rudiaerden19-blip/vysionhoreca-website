@@ -8,7 +8,7 @@ const KASSA_AZERTY_OSK_PILOT_SLUG = 'lomichillplay'
 /**
  * Pilot tijdelijk uit tot stabiele UX — zet op true om Lomichillplay-toetsenbord te heractiveren.
  */
-export const KASSA_AZERTY_OSK_LIVE = false
+export const KASSA_AZERTY_OSK_LIVE = true
 
 export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
   if (!KASSA_AZERTY_OSK_LIVE) return false
@@ -237,11 +237,22 @@ export function disarmAllKassaOskInputs(root: ParentNode = document): void {
 export function releaseLegacyOskInputGuards(root: ParentNode = document): void {
   root.querySelectorAll('input, textarea').forEach((node) => {
     if (!(node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement)) return
-    if (node.getAttribute('inputMode') === 'none') {
-      node.removeAttribute('inputMode')
-    }
-    if (node.getAttribute('data-kassa-osk-armed') === 'true') {
-      disarmKassaOskInput(node)
-    }
+    healOskBlockedTextField(node)
   })
+}
+
+/**
+ * Eén veld na OSK/modal-wissel (product A → product B): geen blijvend inputMode=none.
+ * Verborgen barcode-vangst en `data-keep-input-mode` blijven met rust.
+ */
+export function healOskBlockedTextField(el: HTMLInputElement | HTMLTextAreaElement): void {
+  if (el.getAttribute('data-keep-input-mode') === 'none') return
+  if (el.getAttribute('aria-hidden') === 'true' && el.tabIndex < 0) return
+  if (el.getAttribute('data-kassa-osk-armed') === 'true') {
+    disarmKassaOskInput(el)
+    return
+  }
+  if (el.getAttribute('inputMode') === 'none' && isKassaAzertyOskTextTarget(el)) {
+    el.removeAttribute('inputMode')
+  }
 }

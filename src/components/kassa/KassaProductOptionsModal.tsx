@@ -16,7 +16,12 @@ import {
   type KassaPosChromeLook,
 } from '@/lib/kassa-pos-surface'
 import { KassaIconCheck, KassaIconClose } from '@/lib/kassa-ui-icons'
+import {
+  disarmAllKassaOskInputs,
+  releaseLegacyOskInputGuards,
+} from '@/lib/kassa-azerty-osk'
 import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { useEffect } from 'react'
 
 export interface KassaProductOptionsModalModel {
   product: MenuProduct
@@ -52,6 +57,17 @@ export function KassaProductOptionsModal({
   const azertyOsk = useKassaAzertyOskChrome()
   const oskBottomPad =
     azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 12 : 0
+
+  const optionsSessionKey = `${model.product.id ?? ''}:${model.editingCartKey ?? ''}`
+
+  useEffect(() => {
+    releaseLegacyOskInputGuards()
+    disarmAllKassaOskInputs()
+    return () => {
+      releaseLegacyOskInputGuards()
+      disarmAllKassaOskInputs()
+    }
+  }, [optionsSessionKey])
   const dark = appearance === 'dark'
   const speelsDark = dark && posChrome === 'speels'
 
@@ -69,8 +85,8 @@ export function KassaProductOptionsModal({
   }
 
   const confirmWithOsk = () => {
-    azertyOsk?.dismiss()
     onConfirm()
+    azertyOsk?.dismiss()
   }
 
   const speelsOptionBadgeClass = [
@@ -151,6 +167,7 @@ export function KassaProductOptionsModal({
               {t('kassaApp.cartLineNoteLabel')}
             </label>
             <input
+              key={optionsSessionKey}
               id="kassa-line-note"
               type="text"
               data-testid="kassa-line-note-input"

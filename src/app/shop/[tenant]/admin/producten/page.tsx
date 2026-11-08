@@ -974,6 +974,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             }}
           >
             <motion.div
+              key={editingProduct?.id ?? (showAddModal ? 'new-product' : 'product-modal')}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

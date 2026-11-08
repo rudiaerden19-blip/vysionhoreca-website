@@ -1,5 +1,6 @@
 import {
   applyKassaAzertyOskEdit,
+  healOskBlockedTextField,
   isKassaAzertyOskEnabled,
   isKassaAzertyOskTextTarget,
   isAzertyOskActiveForSession,
@@ -18,18 +19,18 @@ describe('kassa-azerty-osk', () => {
     expect(isTenantAzertyOskRoute('/', 'lomichillplay')).toBe(false)
   })
 
-  it('active sessie uit zolang pilot LIVE uit staat', () => {
+  it('active sessie via host, next of route-param', () => {
     expect(
       isAzertyOskActiveForSession({
         pathname: '/login',
       }),
-    ).toBe(false)
+    ).toBe(true)
     expect(
       isAzertyOskActiveForSession({
-        pathname: '/shop/lomichillplay/admin/kassa',
+        pathname: '/shop/lomichillplay/admin/producten',
         routeParamTenant: 'lomichillplay',
       }),
-    ).toBe(false)
+    ).toBe(true)
     expect(
       isAzertyOskActiveForSession({
         pathname: '/shop/other/admin',
@@ -53,9 +54,17 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskTextTarget(tel)).toBe(true)
   })
 
-  it('pilot tenant-slug check (LIVE momenteel uit)', () => {
-    expect(isKassaAzertyOskEnabled('lomichillplay')).toBe(false)
-    expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(false)
+  it('healOskBlockedTextField verwijdert inputMode=none na pilot-resten', () => {
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.setAttribute('inputMode', 'none')
+    healOskBlockedTextField(input)
+    expect(input.getAttribute('inputMode')).toBeNull()
+  })
+
+  it('pilot alleen tenant lomichillplay', () => {
+    expect(isKassaAzertyOskEnabled('lomichillplay')).toBe(true)
+    expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(true)
     expect(isKassaAzertyOskEnabled('vysion')).toBe(false)
     expect(isKassaAzertyOskEnabled('demo-frituur')).toBe(false)
   })
