@@ -2,10 +2,19 @@ import {
   applyKassaAzertyOskEdit,
   isKassaAzertyOskEnabled,
   isKassaAzertyOskTextTarget,
+  isTenantAzertyOskRoute,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
 
 describe('kassa-azerty-osk', () => {
+  it('azerty route op hele tenant-admin', () => {
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/producten', 'lomichillplay')).toBe(
+      true,
+    )
+    expect(isTenantAzertyOskRoute('/shop/lomichillplay/admin/kassa', 'lomichillplay')).toBe(true)
+    expect(isTenantAzertyOskRoute('/shop/other/admin/kassa', 'lomichillplay')).toBe(false)
+  })
+
   it('pilot alleen tenant lomichillplay', () => {
     expect(isKassaAzertyOskEnabled('lomichillplay')).toBe(true)
     expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(true)
@@ -22,6 +31,13 @@ describe('kassa-azerty-osk', () => {
     const input = document.createElement('input')
     input.type = 'text'
     input.readOnly = true
+    expect(isKassaAzertyOskTextTarget(input)).toBe(false)
+  })
+
+  it('respecteert data-osk-ignore uit admin-catalogus', () => {
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.setAttribute('data-osk-ignore', 'true')
     expect(isKassaAzertyOskTextTarget(input)).toBe(false)
   })
 

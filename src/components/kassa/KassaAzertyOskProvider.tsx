@@ -11,8 +11,13 @@ import {
   disarmKassaOskInput,
   isKassaAzertyOskEnabled,
   isKassaAzertyOskTextTarget,
+  isTenantAzertyOskRoute,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
+import {
+  releaseAllOskScrollPadding,
+  scheduleScrollInputAboveKeyboard,
+} from '@/lib/scroll-input-above-keyboard'
 
 /** Ruimte onderaan pagina zodat invoervelden niet achter het toetsenbord verdwijnen. */
 const OSK_HEIGHT_PX = 336
@@ -22,7 +27,8 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
   const pathname = usePathname() ?? ''
   const { t } = useLanguage()
   const tenantSlug = typeof params?.tenant === 'string' ? params.tenant : ''
-  const enabled = isKassaAzertyOskEnabled(tenantSlug) && pathname.includes('/admin/kassa')
+  const enabled =
+    isKassaAzertyOskEnabled(tenantSlug) && isTenantAzertyOskRoute(pathname, tenantSlug)
 
   const [visible, setVisible] = useState(false)
   const [shift, setShift] = useState(false)
@@ -35,6 +41,7 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
     activeRef.current = null
     setVisible(false)
     setShift(false)
+    releaseAllOskScrollPadding()
   }, [])
 
   useEffect(() => {
@@ -51,6 +58,8 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     if (!enabled) return
 
+    let scrollCancel: (() => void) | undefined
+
     const onFocusIn = (e: FocusEvent) => {
       if (!isKassaAzertyOskTextTarget(e.target)) return
       const el = e.target
@@ -62,6 +71,8 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
       activeRef.current = el
       armKassaOskInput(el)
       setVisible(true)
+      scrollCancel?.()
+      scrollCancel = scheduleScrollInputAboveKeyboard(el)
       window.requestAnimationFrame(() => {
         try {
           el.scrollIntoView({ block: 'center', behavior: 'smooth' })
@@ -83,6 +94,7 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
     document.addEventListener('focusin', onFocusIn, true)
     document.addEventListener('focusout', onFocusOut, true)
     return () => {
+      scrollCancel?.()
       document.removeEventListener('focusin', onFocusIn, true)
       document.removeEventListener('focusout', onFocusOut, true)
       hideKeyboard(true)
@@ -115,7 +127,7 @@ export function KassaAzertyOskProvider({ children }: { children: React.ReactNode
       {children}
       {enabled && visible && !suppressedRef.current ? (
         <div
-          className="fixed bottom-0 left-0 right-0 z-[320] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
+          className="fixed bottom-0 left-0 right-0 z-[500] border-t border-slate-600 bg-slate-900/98 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.45)]"
           role="region"
           aria-label={t('kassaApp.azertyOskTitle')}
           style={{ minHeight: OSK_HEIGHT_PX, maxHeight: 'min(44vh, 380px)' }}

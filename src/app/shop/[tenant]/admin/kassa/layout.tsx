@@ -3,7 +3,6 @@
  * oude HTML tonen terwijl andere werkstations al de nieuwe bundle hebben.
  */
 import type { Viewport } from 'next'
-import { KassaAzertyOskLayoutClient } from './KassaAzertyOskLayoutClient'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -17,5 +16,5 @@ export const viewport: Viewport = {
 }
 
 export default function AdminKassaLayout({ children }: { children: React.ReactNode }) {
-  return <KassaAzertyOskLayoutClient>{children}</KassaAzertyOskLayoutClient>
+  return children
 }

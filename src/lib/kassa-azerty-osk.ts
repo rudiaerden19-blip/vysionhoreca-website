@@ -9,6 +9,14 @@ export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
   return tenantSlug.trim().toLowerCase() === KASSA_AZERTY_OSK_PILOT_SLUG
 }
 
+/** AZERTY-OSK actief op alle tenant-adminmodules (kassa, producten, team, …). */
+export function isTenantAzertyOskRoute(pathname: string, tenantSlug: string): boolean {
+  const path = (pathname || '').toLowerCase()
+  const slug = tenantSlug.trim().toLowerCase()
+  if (!slug) return false
+  return path.includes(`/shop/${slug}/admin`)
+}
+
 export const KASSA_AZERTY_NUMBER_ROW = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'] as const
 
 /** Belgisch AZERTY (kleine letters) — rijen 2–4. */
@@ -47,6 +55,8 @@ export function isKassaAzertyOskTextTarget(
   if (!target || !(target instanceof HTMLElement)) return false
   if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return false
   if (target.getAttribute('data-kassa-osk-skip') === 'true') return false
+  if (target.getAttribute('data-osk-ignore') === 'true') return false
+  if (target.getAttribute('aria-hidden') === 'true') return false
   if (target instanceof HTMLInputElement) {
     const type = (target.type || 'text').toLowerCase()
     if (type === 'hidden' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit') {
