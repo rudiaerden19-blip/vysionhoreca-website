@@ -36,3 +36,20 @@ export function kassaCartLineOrderNotes(line: {
 }): string | undefined {
   return normalizeKassaLineNote(line.lineNote) ?? normalizeKassaLineNote(line.notes)
 }
+
+type CartLineNotesSource = { lineNote?: string | null; notes?: string | null }
+
+/** Unieke opmerkingen/namen voor bovenaan de kassabon (niet per productregel). */
+export function kassaDistinctCartLineNotesForReceipt(items: CartLineNotesSource[]): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const item of items) {
+    const note = kassaCartLineOrderNotes(item)
+    if (!note) continue
+    const key = note.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(note)
+  }
+  return out
+}

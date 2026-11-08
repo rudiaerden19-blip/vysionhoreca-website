@@ -1,6 +1,7 @@
 import {
   buildKassaCartLineKey,
   kassaCartLineOrderNotes,
+  kassaDistinctCartLineNotesForReceipt,
   normalizeKassaLineNote,
 } from '@/lib/kassa-cart-line-key'
 
@@ -28,5 +29,15 @@ describe('kassa-cart-line-key', () => {
   it('reads notes from persisted order items', () => {
     expect(kassaCartLineOrderNotes({ notes: ' keuken ' })).toBe('keuken')
     expect(kassaCartLineOrderNotes({ lineNote: 'mand', notes: 'db' })).toBe('mand')
+  })
+
+  it('dedupes receipt heading notes case-insensitively', () => {
+    expect(
+      kassaDistinctCartLineNotesForReceipt([
+        { lineNote: 'Theo' },
+        { lineNote: 'theo' },
+        { lineNote: 'Sara' },
+      ]),
+    ).toEqual(['Theo', 'Sara'])
   })
 })

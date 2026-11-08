@@ -231,6 +231,7 @@ import { mergeCartLinesForTable } from '@/lib/kassa-table-cart-merge'
 import {
   buildKassaCartLineKey,
   kassaCartLineOrderNotes,
+  kassaDistinctCartLineNotesForReceipt,
   normalizeKassaLineNote,
 } from '@/lib/kassa-cart-line-key'
 import { transferParkedTableOrder } from '@/lib/kassa-table-order-transfer'
@@ -4825,6 +4826,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     if (order.onAccountCustomerName) {
       bonLines.push(t('kassaNameAccount.receiptCustomer').replace('{name}', order.onAccountCustomerName))
     }
+    if (receiptMode === 'kassa') {
+      for (const headingNote of kassaDistinctCartLineNotesForReceipt(receiptLines)) {
+        bonLines.push(headingNote)
+      }
+    }
     bonLines.push(`${t('kassaReceipt.receiptNo')}${receiptRefDisplay}  ${dateStr}`)
     bonLines.push('--------------------------------')
     if (order.onAccountReceiptShowProducts === false) {
@@ -4838,8 +4844,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       for (const c of i.choices || []) {
         bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}`: ''}`)
       }
-      const lineNote = kassaCartLineOrderNotes(i)
-      if (lineNote) bonLines.push(` ! ${lineNote}`)
+      if (receiptMode === 'keuken') {
+        const lineNote = kassaCartLineOrderNotes(i)
+        if (lineNote) bonLines.push(` ! ${lineNote}`)
+      }
     }
     if ((order.discountAmount ?? 0) > 0) {
       bonLines.push(
@@ -4906,19 +4914,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             orderType: order.orderType,
             tableNumber: receiptTableNr || null,
             items: [
-              ...kassaNameAccountReceiptDisplayItems(order).map(i => {
-                const lineNote = kassaCartLineOrderNotes(i)
-                const choiceLines = (i.choices || []).map(c => ({ name: c.choiceName, price: c.price }))
-                if (lineNote) {
-                  choiceLines.push({ name: `! ${lineNote}`, price: 0 })
-                }
-                return {
-                  quantity: i.quantity,
-                  name: i.product.name,
-                  price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-                  choices: choiceLines,
-                }
-              }),
+              ...kassaNameAccountReceiptDisplayItems(order).map(i => ({
+                quantity: i.quantity,
+                name: i.product.name,
+                price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+                choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
+              })),
               ...((order.discountAmount ?? 0) > 0
                 ? [{
                     quantity: 1,
@@ -4970,6 +4971,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       <div class="divider"></div>
       ${isDraft ? `<div class="center bold">${escapeReceiptHtml(barKitchenDelta ? t('kassaReceipt.barToogBanner') : t('kassaReceipt.draftBanner'))}</div>${barKitchenDelta ? `<div class="center small">${escapeReceiptHtml(t('kassaReceipt.barToogHint'))}</div>`: ''}<div class="divider-solid"></div>`: ''}
       <div class="center order-type">${escapeReceiptHtml(orderTypeLabel)}${receiptTableNr ? `<br/>${escapeReceiptHtml(t('kassaReceipt.tablePrefix'))} ${escapeReceiptHtml(receiptTableNr)}${escapeReceiptHtml(terraceSuffix)}`: ''}</div>
+      ${
+        receiptMode === 'kassa'
+          ? kassaDistinctCartLineNotesForReceipt(
+              sortKassaCartLinesByMenuCategory(order.items, categories),
+            )
+              .map((n) => `<div class="center bold big" style="margin-top:8px;">${escapeReceiptHtml(n)}</div>`)
+              .join('')
+          : ''
+      }
       <div class="row small">
         <span>${escapeReceiptHtml(t('kassaReceipt.receiptNo'))}${escapeReceiptHtml(receiptRefDisplay)}</span>
         <span>${escapeReceiptHtml(dateStr)}</span>
@@ -4978,7 +4988,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ${sortKassaCartLinesByMenuCategory(order.items, categories).map(i => {
         const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
         const lineTotal = (i.product.price + choicesTotal) * i.quantity
-        const lineNote = kassaCartLineOrderNotes(i)
+        const lineNote = receiptMode === 'keuken' ? kassaCartLineOrderNotes(i) : undefined
         return `<div class="row"><span>${i.quantity}x ${escapeReceiptHtml(i.product.name)}</span><span>€${lineTotal.toFixed(2)}</span></div>
         ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${escapeReceiptHtml(c.choiceName)}</span><span>${c.price > 0 ? '€'+ c.price.toFixed(2) : ''}</span></div>`).join('')}
         ${lineNote ? `<div class="row small" style="margin-left:15px;font-weight:bold;">! ${escapeReceiptHtml(lineNote)}</div>` : ''}`
