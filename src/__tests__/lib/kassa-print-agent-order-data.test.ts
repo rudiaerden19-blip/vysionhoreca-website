@@ -25,15 +25,14 @@ function cartLine(overrides: Partial<KassaCartItem> & Pick<KassaCartItem, 'cartK
 }
 
 describe('kassa-print-agent-order-data', () => {
-  it('puts instructie onder regel, naam in header-lijst', () => {
+  it('kassa: alle opmerkingen op productregel in print-payload', () => {
     const lines = [
       cartLine({ cartKey: 'a', lineNote: 'Zonder ui' }),
-      cartLine({ cartKey: 'b', lineNote: 'Ahmed' }),
+      cartLine({ cartKey: 'b', lineNote: 'Ananas' }),
     ]
-    const item = buildKassaPrintAgentOrderItem(lines[0], 'kassa')
-    expect(item.notes).toBe('Zonder ui')
-    expect(buildKassaPrintAgentOrderItem(lines[1], 'kassa').notes).toBeUndefined()
-    expect(buildKassaPrintAgentReceiptHeadingNames(lines, 'kassa')).toEqual(['Ahmed'])
+    expect(buildKassaPrintAgentOrderItem(lines[0], 'kassa').notes).toBe('Zonder ui')
+    expect(buildKassaPrintAgentOrderItem(lines[1], 'kassa').notes).toBe('Ananas')
+    expect(buildKassaPrintAgentReceiptHeadingNames(lines, 'kassa')).toBeUndefined()
   })
 
   it('keuken: alle opmerkingen op item', () => {

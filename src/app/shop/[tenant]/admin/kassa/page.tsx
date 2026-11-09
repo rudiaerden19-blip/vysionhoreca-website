@@ -3365,13 +3365,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     product: MenuProduct,
     choices: SelectedChoice[] = [],
     lineNote?: string,
-    lineNoteAsReceiptName?: boolean | null,
   ) => {
     scheduleAddToCartSound()
     const pid = product.id!
     const note = normalizeKassaLineNote(lineNote)
     const cartKey = buildKassaCartLineKey(pid, choices, note)
-    const asName = note && kassaLineNoteTreatAsReceiptName(note, lineNoteAsReceiptName)
     setCart(prev => {
       const existing = prev.find(i => i.cartKey === cartKey)
       const updated = existing
@@ -3384,11 +3382,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               choices,
               cartKey,
               ...(note ? { lineNote: note } : {}),
-              ...(lineNoteAsReceiptName === false
-                ? { lineNoteAsReceiptName: false as const }
-                : asName
-                  ? { lineNoteAsReceiptName: true as const }
-                  : {}),
             },
           ]
       if (tableNumber) {
@@ -3462,24 +3455,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       selected: item.choices?.length ? [...item.choices] : [],
       editingCartKey: item.cartKey,
       lineNote: item.lineNote ?? '',
-      lineNoteAsReceiptName: item.lineNoteAsReceiptName,
     })
   }
 
   const setOptionsModalLineNote = useCallback((lineNote: string) => {
-    setOptionsModal((prev) => {
-      if (!prev) return prev
-      const trimmed = lineNote.trim()
-      return {
-        ...prev,
-        lineNote,
-        lineNoteAsReceiptName: trimmed ? prev.lineNoteAsReceiptName : undefined,
-      }
-    })
-  }, [])
-
-  const setOptionsModalLineNoteAsReceiptName = useCallback((lineNoteAsReceiptName: boolean) => {
-    setOptionsModal((prev) => (prev ? { ...prev, lineNoteAsReceiptName } : prev))
+    setOptionsModal((prev) => (prev ? { ...prev, lineNote } : prev))
   }, [])
 
   const toggleChoice = (option: ProductOption, choice: ProductOptionChoice) => {
@@ -3514,9 +3494,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       return
     }
 
-    const { product, selected, editingCartKey, lineNote, lineNoteAsReceiptName } = optionsModal
+    const { product, selected, editingCartKey, lineNote } = optionsModal
     const note = normalizeKassaLineNote(lineNote)
-    const asName = note && kassaLineNoteTreatAsReceiptName(note, lineNoteAsReceiptName)
 
     if (editingCartKey) {
       scheduleAddToCartSound()
@@ -3532,11 +3511,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           choices: selected,
           cartKey,
           ...(note ? { lineNote: note } : {}),
-          ...(lineNoteAsReceiptName === false
-            ? { lineNoteAsReceiptName: false as const }
-            : asName
-              ? { lineNoteAsReceiptName: true as const }
-              : {}),
         }
         let updated: CartItem[]
         if (existing) {
@@ -3552,7 +3526,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         return updated
       })
     } else {
-      addToCart(product, selected, note, lineNoteAsReceiptName)
+      addToCart(product, selected, note)
     }
     setOptionsModal(null)
   }
@@ -4253,7 +4227,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             product: custom,
             quantity: 1,
             cartKey,
-            ...(note ? { lineNote: note, lineNoteAsReceiptName: false as const } : {}),
+            ...(note ? { lineNote: note } : {}),
           },
         ]
         if (tableNumber) {
@@ -8058,7 +8032,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           onClose={() => setOptionsModal(null)}
           onToggleChoice={toggleChoice}
           onLineNoteChange={setOptionsModalLineNote}
-          onLineNoteAsReceiptNameChange={setOptionsModalLineNoteAsReceiptName}
           onConfirm={confirmOptions}
           appearance={kassaAppearanceDark ? 'dark' : 'light'}
           posChrome={kassaPosLuxury ? posChrome : null}

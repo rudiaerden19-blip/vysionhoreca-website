@@ -57,24 +57,17 @@ export function kassaLineNoteLooksLikeCustomerName(note: string): boolean {
   return true
 }
 
-/** Vinkje = expliciet; anders automatisch naam vs instructie. */
+/** Alleen expliciet `lineNoteAsReceiptName === true` — geen auto-naam in bon-header. */
 export function kassaLineNoteTreatAsReceiptName(
   note: string | null | undefined,
   explicit?: boolean | null,
 ): boolean {
-  const n = normalizeKassaLineNote(note)
-  if (!n) return false
-  if (explicit === true) return true
-  if (explicit === false) return false
-  return kassaLineNoteLooksLikeCustomerName(n)
+  if (!normalizeKassaLineNote(note)) return false
+  return explicit === true
 }
 
 function kassaCartLineIsReceiptHeadingName(item: KassaCartLineReceiptNoteSource): boolean {
-  if (item.lineNoteAsReceiptName === true || item.receipt_heading_name === true) return true
-  if (item.lineNoteAsReceiptName === false) return false
-  const note = kassaCartLineOrderNotes(item)
-  if (!note) return false
-  return kassaLineNoteLooksLikeCustomerName(note)
+  return item.lineNoteAsReceiptName === true || item.receipt_heading_name === true
 }
 
 /** Alleen regels met vinkje «naam op bon» — niet gewone keukenopmerkingen. */
