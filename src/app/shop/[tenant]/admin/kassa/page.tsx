@@ -80,6 +80,11 @@ import {
   buildKassaPrintAgentReceiptHeadingNames,
 } from '@/lib/kassa-print-agent-order-data'
 import {
+  kassaNumpadCustomLineCanAdd,
+  kassaNumpadShowsCustomLinePanel,
+  parseKassaNumpadAmount,
+} from '@/lib/kassa-numpad-custom-amount'
+import {
   isValidLanPrintHost,
   probeLocalVysionPrintAgent,
   readLanPrintHostForTenant,
@@ -4226,9 +4231,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [])
 
   const addCustomAmount = () => {
-    const amount = parseFloat(numpadValue)
-    if (amount > 0) {
-      const note = normalizeKassaLineNote(numpadLineNote)
+    const amount = parseKassaNumpadAmount(numpadValue)
+    const note = normalizeKassaLineNote(numpadLineNote)
+    if (!kassaNumpadCustomLineCanAdd(amount, note)) return
+    if (amount !== null) {
       const asName = note && kassaLineNoteTreatAsReceiptName(note, numpadLineNoteAsReceiptName)
       const custom: MenuProduct = {
         id: `custom-${Date.now()}`,
@@ -7253,7 +7259,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ))}
               </div>
-              {numpadValue && parseFloat(numpadValue) > 0 && (
+              {kassaNumpadShowsCustomLinePanel(numpadValue) && (
                 <>
                   <input
                     type="text"
@@ -7290,17 +7296,23 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     type="button"
                     data-testid="kassa-add-custom-amount"
                     onClick={addCustomAmount}
+                    disabled={
+                      !kassaNumpadCustomLineCanAdd(
+                        parseKassaNumpadAmount(numpadValue),
+                        numpadLineNote,
+                      )
+                    }
                     className={
                       kassaAppearanceDark
                         ? kassaClassicDark
-                          ? `mt-2 shrink-0 touch-manipulation rounded-xl py-4 text-base font-bold ${KASSA_CLASSIC_ACTION_BTN_FACE_ON}`
-                          : `mt-2 shrink-0 touch-manipulation py-4 font-bold text-base ${kassaPosLuxury ? kassaPosButtonClass(false, posChrome) : kassaPosButtonClass(true, posChrome)}`
-                        : 'mt-2 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95'
+                          ? `mt-2 shrink-0 touch-manipulation rounded-xl py-4 text-base font-bold disabled:opacity-40 ${KASSA_CLASSIC_ACTION_BTN_FACE_ON}`
+                          : `mt-2 shrink-0 touch-manipulation py-4 font-bold text-base disabled:opacity-40 ${kassaPosLuxury ? kassaPosButtonClass(false, posChrome) : kassaPosButtonClass(true, posChrome)}`
+                        : 'mt-2 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95 disabled:opacity-40'
                     }
                   >
                     {t('kassaApp.addAmount').replace(
                       '{amount}',
-                      parseFloat(numpadValue || '0').toFixed(2),
+                      (parseKassaNumpadAmount(numpadValue) ?? 0).toFixed(2),
                     )}
                   </button>
                 </>
@@ -7409,7 +7421,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ))}
               </div>
-              {numpadValue && parseFloat(numpadValue) > 0 && (
+              {kassaNumpadShowsCustomLinePanel(numpadValue) && (
                 <>
                   <input
                     type="text"
@@ -7438,11 +7450,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     type="button"
                     data-testid="kassa-add-custom-amount"
                     onClick={addCustomAmount}
-                    className="mt-2 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95"
+                    disabled={
+                      !kassaNumpadCustomLineCanAdd(
+                        parseKassaNumpadAmount(numpadValue),
+                        numpadLineNote,
+                      )
+                    }
+                    className="mt-2 shrink-0 touch-manipulation py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg active:brightness-95 disabled:opacity-40"
                   >
                     {t('kassaApp.addAmount').replace(
                       '{amount}',
-                      parseFloat(numpadValue || '0').toFixed(2),
+                      (parseKassaNumpadAmount(numpadValue) ?? 0).toFixed(2),
                     )}
                   </button>
                 </>
