@@ -4235,7 +4235,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const note = normalizeKassaLineNote(numpadLineNote)
     if (!kassaNumpadCustomLineCanAdd(amount, note)) return
     if (amount !== null) {
-      const asName = note && kassaLineNoteTreatAsReceiptName(note, numpadLineNoteAsReceiptName)
       const custom: MenuProduct = {
         id: `custom-${Date.now()}`,
         tenant_slug: tenant,
@@ -4258,11 +4257,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             quantity: 1,
             cartKey,
             ...(note ? { lineNote: note } : {}),
-            ...(numpadLineNoteAsReceiptName === false
-              ? { lineNoteAsReceiptName: false as const }
-              : asName
-                ? { lineNoteAsReceiptName: true as const }
-                : {}),
+            /** Numpad: opmerking standaard bij de regel — alleen vinkje = groot onder afhalen/ter plaatse. */
+            ...(note
+              ? {
+                  lineNoteAsReceiptName:
+                    numpadLineNoteAsReceiptName === true ? (true as const) : (false as const),
+                }
+              : {}),
           },
         ]
         if (tableNumber) {

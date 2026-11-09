@@ -1,4 +1,8 @@
 import {
+  kassaCartLineNoteOnProductReceipt,
+  kassaDistinctCartLineNotesForReceipt,
+} from '@/lib/kassa-cart-line-key'
+import {
   kassaNumpadCustomLineCanAdd,
   kassaNumpadShowsCustomLinePanel,
   parseKassaNumpadAmount,
@@ -20,5 +24,11 @@ describe('kassa-numpad-custom-amount', () => {
   it('shows panel for zero amount', () => {
     expect(kassaNumpadShowsCustomLinePanel('0')).toBe(true)
     expect(kassaNumpadShowsCustomLinePanel('')).toBe(false)
+  })
+
+  it('numpad note with lineNoteAsReceiptName false prints on product line', () => {
+    const line = { lineNote: 'Test vis', lineNoteAsReceiptName: false as const }
+    expect(kassaCartLineNoteOnProductReceipt(line)).toBe('Test vis')
+    expect(kassaDistinctCartLineNotesForReceipt([line])).toEqual([])
   })
 })
