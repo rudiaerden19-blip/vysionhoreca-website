@@ -4,14 +4,6 @@ import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import type { MenuCategory } from '@/lib/admin-api'
 import { kassaReceiptVatFromPersistedOrder } from '@/lib/kassa-receipt-vat'
 import { normalizeCategoryVatPercent } from '@/lib/order-vat'
-import {
-  kassaCartLineNoteOnProductReceipt,
-  kassaDistinctCartLineNotesForReceipt,
-} from '@/lib/kassa-cart-line-key'
-import {
-  buildKassaPrintAgentOrderItem,
-  kassaReceiptOmitPrintAgentOrderData,
-} from '@/lib/kassa-print-agent-order-data'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 
@@ -108,13 +100,6 @@ export async function printNameAccountPaymentReceipt(opts: {
   if (order.onAccountCustomerName) {
     bonLines.push(labels.receiptCustomer(order.onAccountCustomerName))
   }
-  const receiptLines = sortKassaCartLinesByMenuCategory(
-    kassaNameAccountReceiptDisplayItems(order),
-    categories,
-  )
-  for (const headingNote of kassaDistinctCartLineNotesForReceipt(receiptLines)) {
-    bonLines.push(headingNote)
-  }
   bonLines.push(`${labels.receiptNo}${receiptRefDisplay}  ${dateStr}`)
   bonLines.push('--------------------------------')
 
@@ -123,15 +108,13 @@ export async function printNameAccountPaymentReceipt(opts: {
     bonLines.push('--------------------------------')
   }
 
-  for (const i of receiptLines) {
+  for (const i of sortKassaCartLinesByMenuCategory(kassaNameAccountReceiptDisplayItems(order), categories)) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     const lineTotal = (i.product.price + choicesTotal) * i.quantity
     bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
     for (const c of i.choices || []) {
       bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}` : ''}`)
     }
-    const lineNote = kassaCartLineNoteOnProductReceipt(i)
-    if (lineNote) bonLines.push(` ! ${lineNote}`)
   }
 
   bonLines.push('--------------------------------')
@@ -153,7 +136,6 @@ export async function printNameAccountPaymentReceipt(opts: {
 
   const isCash = ['CASH', 'cash', 'CONTANT', 'contant'].includes(String(order.paymentMethod || ''))
 
-  const omitRichPrintOrderData = kassaReceiptOmitPrintAgentOrderData('kassa', receiptLines)
   const printResult = await sendToVysionPrintAgent({
     winkelnaam: tenantInfo?.business_name || labels.defaultBusinessName,
     bonInhoud: bonLines.join('\n'),
@@ -161,22 +143,25 @@ export async function printNameAccountPaymentReceipt(opts: {
     openDrawer: isCash,
     receiptMode: 'kassa',
     reviewUrl: `https://www.vysion-kassa.com/shop/${tenantSlug}/review`,
-    orderData: omitRichPrintOrderData
-      ? undefined
-      : {
-          orderNumber: order.orderNumber,
-          orderType: order.orderType,
-          tableNumber: null,
-          items: receiptLines.map((i) => buildKassaPrintAgentOrderItem(i, 'kassa')),
-          subtotal,
-          tax,
-          total: order.total,
-          paymentMethod: order.paymentMethod,
-          ...(order.onAccountCustomerName ? { customerName: order.onAccountCustomerName } : {}),
-          ...(receiptVatRows.length > 0
-            ? { vatLines: receiptVatRows.map((row) => ({ rate: row.rate, tax: row.tax })) }
-            : {}),
-        },
+    orderData: {
+      orderNumber: order.orderNumber,
+      orderType: order.orderType,
+      tableNumber: null,
+      items: kassaNameAccountReceiptDisplayItems(order).map((i) => ({
+        quantity: i.quantity,
+        name: i.product.name,
+        price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
+        choices: (i.choices || []).map((c) => ({ name: c.choiceName, price: c.price })),
+      })),
+      subtotal,
+      tax,
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+      ...(order.onAccountCustomerName ? { customerName: order.onAccountCustomerName } : {}),
+      ...(receiptVatRows.length > 0
+        ? { vatLines: receiptVatRows.map((row) => ({ rate: row.rate, tax: row.tax })) }
+        : {}),
+    },
     businessInfo: {
       name: tenantInfo?.business_name,
       address: tenantInfo?.address ?? undefined,
