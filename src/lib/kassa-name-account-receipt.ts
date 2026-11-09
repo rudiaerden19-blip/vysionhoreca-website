@@ -4,6 +4,14 @@ import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import type { MenuCategory } from '@/lib/admin-api'
 import { kassaReceiptVatFromPersistedOrder } from '@/lib/kassa-receipt-vat'
 import { normalizeCategoryVatPercent } from '@/lib/order-vat'
+import {
+  kassaCartLineNoteOnProductReceipt,
+  kassaDistinctCartLineNotesForReceipt,
+} from '@/lib/kassa-cart-line-key'
+import {
+  buildKassaPrintAgentOrderItem,
+  buildKassaPrintAgentReceiptHeadingNames,
+} from '@/lib/kassa-print-agent-order-data'
 import { sendToVysionPrintAgent } from '@/lib/vysion-print-agent-client'
 import { appLocaleToBcp47 } from '@/lib/print-receipt-html'
 
@@ -100,6 +108,13 @@ export async function printNameAccountPaymentReceipt(opts: {
   if (order.onAccountCustomerName) {
     bonLines.push(labels.receiptCustomer(order.onAccountCustomerName))
   }
+  const receiptLines = sortKassaCartLinesByMenuCategory(
+    kassaNameAccountReceiptDisplayItems(order),
+    categories,
+  )
+  for (const headingNote of kassaDistinctCartLineNotesForReceipt(receiptLines)) {
+    bonLines.push(headingNote)
+  }
   bonLines.push(`${labels.receiptNo}${receiptRefDisplay}  ${dateStr}`)
   bonLines.push('--------------------------------')
 
@@ -108,13 +123,15 @@ export async function printNameAccountPaymentReceipt(opts: {
     bonLines.push('--------------------------------')
   }
 
-  for (const i of sortKassaCartLinesByMenuCategory(kassaNameAccountReceiptDisplayItems(order), categories)) {
+  for (const i of receiptLines) {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     const lineTotal = (i.product.price + choicesTotal) * i.quantity
     bonLines.push(`${i.quantity}x ${i.product.name}  EUR ${lineTotal.toFixed(2)}`)
     for (const c of i.choices || []) {
       bonLines.push(` + ${c.choiceName}${c.price > 0 ? ` EUR ${c.price.toFixed(2)}` : ''}`)
     }
+    const lineNote = kassaCartLineNoteOnProductReceipt(i)
+    if (lineNote) bonLines.push(` ! ${lineNote}`)
   }
 
   bonLines.push('--------------------------------')
@@ -147,12 +164,10 @@ export async function printNameAccountPaymentReceipt(opts: {
       orderNumber: order.orderNumber,
       orderType: order.orderType,
       tableNumber: null,
-      items: kassaNameAccountReceiptDisplayItems(order).map((i) => ({
-        quantity: i.quantity,
-        name: i.product.name,
-        price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-        choices: (i.choices || []).map((c) => ({ name: c.choiceName, price: c.price })),
-      })),
+      items: receiptLines.map((i) => buildKassaPrintAgentOrderItem(i, 'kassa')),
+      ...(buildKassaPrintAgentReceiptHeadingNames(receiptLines, 'kassa')
+        ? { receiptHeadingNames: buildKassaPrintAgentReceiptHeadingNames(receiptLines, 'kassa') }
+        : {}),
       subtotal,
       tax,
       total: order.total,

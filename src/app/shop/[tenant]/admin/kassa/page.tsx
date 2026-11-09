@@ -76,6 +76,10 @@ import {
   type VysionPrintAgentSendContext,
 } from '@/lib/vysion-print-agent-client'
 import {
+  buildKassaPrintAgentOrderItem,
+  buildKassaPrintAgentReceiptHeadingNames,
+} from '@/lib/kassa-print-agent-order-data'
+import {
   isValidLanPrintHost,
   probeLocalVysionPrintAgent,
   readLanPrintHostForTenant,
@@ -4957,6 +4961,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       isDraft &&
       receiptMode === 'kassa' &&
       shouldSkipBuddyKitchenOnKassaDraftBon(tenantInfo)
+    const printReceiptHeadingNames = buildKassaPrintAgentReceiptHeadingNames(
+      receiptLines,
+      receiptMode,
+    )
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -4977,12 +4985,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             orderType: order.orderType,
             tableNumber: receiptTableNr || null,
             items: [
-              ...kassaNameAccountReceiptDisplayItems(order).map(i => ({
-                quantity: i.quantity,
-                name: i.product.name,
-                price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-                choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-              })),
+              ...receiptLines.map((i) => buildKassaPrintAgentOrderItem(i, receiptMode)),
               ...((order.discountAmount ?? 0) > 0
                 ? [{
                     quantity: 1,
@@ -4992,6 +4995,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   }]
                 : []),
             ],
+            ...(printReceiptHeadingNames ? { receiptHeadingNames: printReceiptHeadingNames } : {}),
             subtotal,
             tax,
             total: order.total,

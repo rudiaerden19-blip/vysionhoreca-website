@@ -219,6 +219,16 @@ function buildRichReceipt(body) {
   else if (orderType === 'TAKEAWAY' || orderType === 'PICKUP') typeLabel = '>> AFHALEN'
   c.push(enc(typeLabel))
   if (orderData?.tableNumber) c.push(enc(`Tafel ${orderData.tableNumber}`))
+  const headingNames = Array.isArray(orderData?.receiptHeadingNames) ? orderData.receiptHeadingNames : []
+  for (const rawName of headingNames) {
+    const hn = String(rawName || '').trim()
+    if (!hn) continue
+    c.push(ALIGN_CENTER)
+    c.push(DOUBLE_HEIGHT)
+    c.push(enc(hn))
+    c.push(NORMAL_SIZE)
+    c.push(ALIGN_LEFT)
+  }
   c.push(NORMAL_SIZE)
 
   c.push(Buffer.from('\n', 'latin1'))
@@ -293,6 +303,13 @@ function buildRichReceipt(body) {
       } else {
         c.push(enc(`   + ${cn}`))
       }
+    }
+
+    const lineNote = String(item.notes || '').trim()
+    if (lineNote) {
+      c.push(DOUBLE_HEIGHT)
+      c.push(enc(`   ! ${lineNote}`))
+      c.push(NORMAL_SIZE)
     }
 
     c.push(Buffer.from('\n', 'latin1'))
