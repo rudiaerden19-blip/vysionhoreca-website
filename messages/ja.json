@@ -3418,7 +3418,6 @@
     "paidWith": "支払い:",
     "paidSplit": "分割: €{cash} 現金 / €{card} カード",
     "thanks": "ご来店ありがとうございます",
-    "reviewQrCaption": "ご意見をお聞かせください",
     "orderTypeDineIn": "店内",
     "orderTypeTakeaway": "テイクアウト",
     "orderTypeDelivery": "配達",

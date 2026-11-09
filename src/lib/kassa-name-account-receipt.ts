@@ -30,7 +30,6 @@ export type KassaNameAccountPrintLabels = {
   telPrefix: string
   receiptCustomer: (name: string) => string
   receiptPartialPaymentHint: string
-  reviewQrCaption: string
 }
 
 export type PrintNameAccountReceiptResult =
@@ -59,7 +58,6 @@ export function nameAccountPrintLabelsFromT(t: (key: string) => string): KassaNa
     telPrefix: t('kassaReceipt.telPrefix'),
     receiptCustomer: (name) => t('kassaNameAccount.receiptCustomer').replace('{name}', name),
     receiptPartialPaymentHint: t('kassaNameAccount.receiptPartialPaymentHint'),
-    reviewQrCaption: t('kassaReceipt.reviewQrCaption'),
   }
 }
 
@@ -163,7 +161,6 @@ export async function printNameAccountPaymentReceipt(opts: {
     openDrawer: isCash,
     receiptMode: 'kassa',
     reviewUrl: `https://www.vysion-kassa.com/shop/${tenantSlug}/review`,
-    reviewQrCaption: labels.reviewQrCaption,
     orderData: omitRichPrintOrderData
       ? undefined
       : {

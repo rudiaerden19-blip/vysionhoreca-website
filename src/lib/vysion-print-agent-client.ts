@@ -97,8 +97,6 @@ export type VysionPrintAgentBody = {
   receiptMode?: 'kassa' |  'keuken'
   /** Alleen TD80-agent gebruikt dit (review-QR). Epson/Star negeren het veld. */
   reviewUrl?: string
-  /** Tekst onder review-QR op kassabon (TD80 / cloud). */
-  reviewQrCaption?: string
   /** false = geen auto-keukenbon na kassabon (Print Agent companionKitchen). */
   companionKitchen?: boolean
 }
@@ -116,7 +114,6 @@ function buildAgentRequestPayload(body: VysionPrintAgentBody) {
     openDrawer: body.openDrawer === true,
     receiptMode: body.receiptMode || 'kassa',
     reviewUrl: body.reviewUrl,
-    reviewQrCaption: body.reviewQrCaption,
     ...(body.companionKitchen === false ? { companionKitchen: false } : {}),
   }
 }
