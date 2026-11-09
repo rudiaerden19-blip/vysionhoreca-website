@@ -1310,9 +1310,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
   const [numpadLineNote, setNumpadLineNote] = useState('')
-  const [numpadLineNoteAsReceiptName, setNumpadLineNoteAsReceiptName] = useState<
-    boolean | undefined
-  >(undefined)
   /** Alleen zichtbaar na druk op Num pad; bij opstart/login uit. */
   const [numpadPanelVisible, setNumpadPanelVisible] = useState(false)
   /** Snelmenu-balk: standaard dicht; alleen open via knop «Snel menu» (niet na refresh). */
@@ -4256,14 +4253,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             product: custom,
             quantity: 1,
             cartKey,
-            ...(note ? { lineNote: note } : {}),
-            /** Numpad: opmerking standaard bij de regel — alleen vinkje = groot onder afhalen/ter plaatse. */
-            ...(note
-              ? {
-                  lineNoteAsReceiptName:
-                    numpadLineNoteAsReceiptName === true ? (true as const) : (false as const),
-                }
-              : {}),
+            ...(note ? { lineNote: note, lineNoteAsReceiptName: false as const } : {}),
           },
         ]
         if (tableNumber) {
@@ -4273,7 +4263,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       })
       setNumpadValue('')
       setNumpadLineNote('')
-      setNumpadLineNoteAsReceiptName(undefined)
     }
   }
 
@@ -7267,10 +7256,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     data-testid="kassa-numpad-line-note"
                     value={numpadLineNote}
                     maxLength={120}
-                    onChange={(e) => {
-                      setNumpadLineNote(e.target.value)
-                      if (!e.target.value.trim()) setNumpadLineNoteAsReceiptName(undefined)
-                    }}
+                    onChange={(e) => setNumpadLineNote(e.target.value)}
                     placeholder={t('kassaApp.numpadLineNotePlaceholder')}
                     className={
                       kassaAppearanceDark
@@ -7278,21 +7264,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         : 'mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]'
                     }
                   />
-                  {numpadLineNote.trim() ? (
-                    <label
-                      className={`mt-2 flex cursor-pointer items-start gap-2 text-left text-sm ${
-                        kassaAppearanceDark ? 'text-zinc-200' : 'text-gray-700'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={numpadLineNoteAsReceiptName}
-                        onChange={(e) => setNumpadLineNoteAsReceiptName(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 shrink-0 rounded"
-                      />
-                      <span>{t('kassaApp.cartLineNoteAsReceiptName')}</span>
-                    </label>
-                  ) : null}
                   <button
                     type="button"
                     data-testid="kassa-add-custom-amount"
@@ -7429,24 +7400,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     data-testid="kassa-numpad-line-note"
                     value={numpadLineNote}
                     maxLength={120}
-                    onChange={(e) => {
-                      setNumpadLineNote(e.target.value)
-                      if (!e.target.value.trim()) setNumpadLineNoteAsReceiptName(undefined)
-                    }}
+                    onChange={(e) => setNumpadLineNote(e.target.value)}
                     placeholder={t('kassaApp.numpadLineNotePlaceholder')}
                     className="mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]"
                   />
-                  {numpadLineNote.trim() ? (
-                    <label className="mt-2 flex cursor-pointer items-start gap-2 text-left text-sm text-gray-700">
-                      <input
-                        type="checkbox"
-                        checked={numpadLineNoteAsReceiptName}
-                        onChange={(e) => setNumpadLineNoteAsReceiptName(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 shrink-0 rounded"
-                      />
-                      <span>{t('kassaApp.cartLineNoteAsReceiptName')}</span>
-                    </label>
-                  ) : null}
                   <button
                     type="button"
                     data-testid="kassa-add-custom-amount"
