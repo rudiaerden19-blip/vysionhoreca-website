@@ -517,6 +517,8 @@ function reviewUrlFromKassaUrl(kassaUrl) {
   return `https://www.vysion-kassa.com/shop/${slug}/review`
 }
 
+const KASSA_REVIEW_QR_CAPTION_DEFAULT = 'UW MENING IS BELANGRIJK'
+
 function resolveKassabonReviewUrl(body, opts) {
   const a = String(opts && opts.reviewUrl || '').trim()
   if (a) return a
@@ -525,8 +527,17 @@ function resolveKassabonReviewUrl(body, opts) {
   return reviewUrlFromKassaUrl(opts && opts.kassaUrl)
 }
 
-function buildKassabonReviewQr(reviewUrl) {
+function resolveReviewQrCaption(body, opts) {
+  const a = String(opts && opts.reviewQrCaption || '').trim()
+  if (a) return a
+  const b = String(body && body.reviewQrCaption || '').trim()
+  if (b) return b
+  return KASSA_REVIEW_QR_CAPTION_DEFAULT
+}
+
+function buildKassabonReviewQr(reviewUrl, caption) {
   const url = String(reviewUrl || '').trim()
+  const label = String(caption || KASSA_REVIEW_QR_CAPTION_DEFAULT).trim()
   const parts = [
     Buffer.from('\n', 'latin1'),
     ALIGN_CENTER,
@@ -541,7 +552,7 @@ function buildKassabonReviewQr(reviewUrl) {
     }
   }
   parts.push(Buffer.from('\n', 'latin1'))
-  parts.push(enc('geef review'))
+  parts.push(enc(label))
   parts.push(Buffer.from('\n', 'latin1'))
   return Buffer.concat(parts)
 }
@@ -557,8 +568,8 @@ function indexBeforeTrailingFeedAndCut(buf) {
 }
 
 /** Zelfde QR als 123/TD80. Bonregels blijven gelijk; QR alleen onderaan kassabon. */
-function appendKassabonReviewQr(buf, reviewUrl) {
-  const qr = buildKassabonReviewQr(reviewUrl)
+function appendKassabonReviewQr(buf, reviewUrl, caption) {
+  const qr = buildKassabonReviewQr(reviewUrl, caption)
   if (!qr.length) return buf
   const idx = indexBeforeTrailingFeedAndCut(buf)
   return Buffer.concat([buf.subarray(0, idx), qr, buf.subarray(idx)])
@@ -569,7 +580,7 @@ function buildEscPosPayload(body, opts) {
   if (body && body.receiptMode === 'keuken') return core
   const url = resolveKassabonReviewUrl(body, opts)
   if (!url) return core
-  return appendKassabonReviewQr(core, url)
+  return appendKassabonReviewQr(core, url, resolveReviewQrCaption(body, opts))
 }
 
 function buildEscPosPayloadCore(body) {

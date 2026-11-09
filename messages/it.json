@@ -3418,6 +3418,7 @@
     "paidWith": "Pagato con:",
     "paidSplit": "Diviso: €{cash} contanti / €{card} carta",
     "thanks": "Grazie per la visita!",
+    "reviewQrCaption": "LA SUA OPINIONE È IMPORTANTE",
     "orderTypeDineIn": "Al tavolo",
     "orderTypeTakeaway": "Asporto",
     "orderTypeDelivery": "Consegna",

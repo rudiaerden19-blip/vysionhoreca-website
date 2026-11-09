@@ -3418,6 +3418,7 @@
     "paidWith": "支付方式:",
     "paidSplit": "拆分：€{cash} 现金 / €{card} 刷卡",
     "thanks": "感谢光临！",
+    "reviewQrCaption": "您的意见很重要",
     "orderTypeDineIn": "堂食",
     "orderTypeTakeaway": "外带",
     "orderTypeDelivery": "配送",

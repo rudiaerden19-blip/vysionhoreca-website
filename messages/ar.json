@@ -3418,6 +3418,7 @@
     "paidWith": "طُبع بـ:",
     "paidSplit": "مقسّم: €{cash} نقداً / €{card} بطاقة",
     "thanks": "شكراً لزيارتك!",
+    "reviewQrCaption": "رأيك مهم",
     "orderTypeDineIn": "داخل المطعم",
     "orderTypeTakeaway": "سفري",
     "orderTypeDelivery": "توصيل",

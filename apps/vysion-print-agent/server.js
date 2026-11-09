@@ -97,6 +97,8 @@ function reviewUrlFromKassaUrl(kassaUrl) {
   return `https://www.vysion-kassa.com/shop/${slug}/review`
 }
 
+const KASSA_REVIEW_QR_CAPTION_DEFAULT = 'UW MENING IS BELANGRIJK'
+
 function resolveTd80ReviewUrl(body, opts) {
   const a = String(opts && opts.reviewUrl || '').trim()
   if (a) return a
@@ -105,8 +107,17 @@ function resolveTd80ReviewUrl(body, opts) {
   return ''
 }
 
-function buildTd80ReviewQr(reviewUrl) {
+function resolveReviewQrCaption(body, opts) {
+  const a = String(opts && opts.reviewQrCaption || '').trim()
+  if (a) return a
+  const b = String(body && body.reviewQrCaption || '').trim()
+  if (b) return b
+  return KASSA_REVIEW_QR_CAPTION_DEFAULT
+}
+
+function buildTd80ReviewQr(reviewUrl, caption) {
   const url = String(reviewUrl || '').trim()
+  const label = String(caption || KASSA_REVIEW_QR_CAPTION_DEFAULT).trim()
   const parts = [
     Buffer.from('\n', 'latin1'),
     ALIGN_CENTER,
@@ -121,7 +132,7 @@ function buildTd80ReviewQr(reviewUrl) {
     }
   }
   parts.push(Buffer.from('\n', 'latin1'))
-  parts.push(enc('geef review'))
+  parts.push(enc(label))
   parts.push(Buffer.from('\n', 'latin1'))
   return Buffer.concat(parts)
 }
@@ -137,8 +148,8 @@ function indexBeforeTrailingFeedAndCut(buf) {
   return idx
 }
 
-function appendTd80ReviewQr(buf, reviewUrl) {
-  const qr = buildTd80ReviewQr(reviewUrl)
+function appendTd80ReviewQr(buf, body, opts) {
+  const qr = buildTd80ReviewQr(resolveTd80ReviewUrl(body, opts), resolveReviewQrCaption(body, opts))
   if (!qr.length) return buf
   const idx = indexBeforeTrailingFeedAndCut(buf)
   return Buffer.concat([buf.subarray(0, idx), qr, buf.subarray(idx)])
@@ -707,7 +718,7 @@ function buildEscPosPayload(body, opts) {
   if (!isTd80Profile(opts && opts.printerProfile)) return unchanged
   const spaced = applyTd80Spacing(unchanged)
   if (body && body.receiptMode === 'keuken') return spaced
-  return appendTd80ReviewQr(spaced, resolveTd80ReviewUrl(body, opts))
+  return appendTd80ReviewQr(spaced, body, opts)
 }
 
 /**
@@ -808,15 +819,24 @@ function encWithEuro(line) {
   const starWithReview = buildEscPosPayload(richBody, { printerProfile: 'star', reviewUrl: review })
   assert(starWithReview.equals(unchanged), 'Star negeert review-QR')
   const td80Qr = buildEscPosPayload(richBody, { printerProfile: 'td80', reviewUrl: review })
-  assert(td80Qr.includes(Buffer.from('geef review', 'latin1')), 'TD80 kassabon: geef review')
+  assert(
+    td80Qr.includes(Buffer.from(KASSA_REVIEW_QR_CAPTION_DEFAULT, 'latin1')),
+    'TD80 kassabon: review QR-tekst',
+  )
   assert(td80Qr.includes(Buffer.from([0x1b, 0x2a, 0x21])), 'TD80 kassabon: ESC* QR onderaan')
   const cut = Buffer.from([0x1d, 0x56, 0x01])
-  assert(td80Qr.lastIndexOf(Buffer.from('geef review', 'latin1')) < td80Qr.lastIndexOf(cut), 'QR-tekst vóór cutter')
+  assert(
+    td80Qr.lastIndexOf(Buffer.from(KASSA_REVIEW_QR_CAPTION_DEFAULT, 'latin1')) < td80Qr.lastIndexOf(cut),
+    'QR-tekst vóór cutter',
+  )
   const td80Kitchen = buildEscPosPayload({ ...richBody, receiptMode: 'keuken' }, {
     printerProfile: 'td80',
     reviewUrl: review,
   })
-  assert(!td80Kitchen.includes(Buffer.from('geef review', 'latin1')), 'TD80 keukenbon: geen QR')
+  assert(
+    !td80Kitchen.includes(Buffer.from(KASSA_REVIEW_QR_CAPTION_DEFAULT, 'latin1')),
+    'TD80 keukenbon: geen QR',
+  )
   // eslint-disable-next-line no-console -- bewust bij selftest
   console.log('[print-agent] encWithEuro regression smoke: OK')
 })()

@@ -4972,6 +4972,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       receiptMode,
       ...(skipBuddyAfterKassaSlip ? { companionKitchen: false } : {}),
       reviewUrl: `https://www.vysion-kassa.com/shop/${tenant}/review`,
+      reviewQrCaption: t('kassaReceipt.reviewQrCaption'),
       /**
        * BTW-bon: géén orderData — anders bouwt de Print Agent een gewone kassabon
        * en verdwijnt de factuurtekst. Alleen bonInhoud (zelfde regels als de preview).
