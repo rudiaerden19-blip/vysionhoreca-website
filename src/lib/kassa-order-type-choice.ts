@@ -2,7 +2,14 @@
 
 export type KassaOrderTypeChoice = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
+/** Standaard bij openen kassa — alle tenants; sessie onthoudt expliciete keuze. */
+export const KASSA_DEFAULT_ORDER_TYPE: KassaOrderTypeChoice = 'TAKEAWAY'
+
 const STORAGE_PREFIX = 'vysion-kassa-order-type:'
+
+export function resolveKassaOrderTypeOnLoad(tenantSlug: string): KassaOrderTypeChoice {
+  return readKassaOrderTypeChoice(tenantSlug) ?? KASSA_DEFAULT_ORDER_TYPE
+}
 
 export function readKassaOrderTypeChoice(tenantSlug: string): KassaOrderTypeChoice | null {
   if (typeof sessionStorage === 'undefined') return null

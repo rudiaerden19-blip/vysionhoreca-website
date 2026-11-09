@@ -214,7 +214,11 @@ import { fetchOrderNumberByKassaClientUuid } from '@/lib/kassa-fetch-order-numbe
 import { formatKassaNumpadHeaderDate } from '@/lib/format-kassa-header-date'
 import { appendKassaCloseTipToAbsoluteLoginUrl } from '@/lib/shop-login-kassa-tip'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
-import { readKassaOrderTypeChoice, writeKassaOrderTypeChoice } from '@/lib/kassa-order-type-choice'
+import {
+  KASSA_DEFAULT_ORDER_TYPE,
+  resolveKassaOrderTypeOnLoad,
+  writeKassaOrderTypeChoice,
+} from '@/lib/kassa-order-type-choice'
 import { KassaTablePickerGrid } from '@/components/kassa/KassaTablePickerGrid'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { LocalePickerPortalMenu } from '@/components/LocalePickerPortalMenu'
@@ -1282,7 +1286,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [cart])
   /** Tafelregels in sidebar: uit na «Voeg toe aan tafel»; leeg veld voor volgende ronde. */
   const [tableOrderLinesInSidebar, setTableOrderLinesInSidebar] = useState(true)
-  const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
+  const [orderType, setOrderType] = useState<OrderType>(KASSA_DEFAULT_ORDER_TYPE)
   const orderTypeTouchedRef = useRef(false)
   const orderTypeTapAtRef = useRef(0)
   const commitOrderType = useCallback((type: OrderType) => {
@@ -1292,8 +1296,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [tenant])
   useEffect(() => {
     if (orderTypeTouchedRef.current) return
-    const stored = readKassaOrderTypeChoice(tenant)
-    if (stored) setOrderType(stored)
+    setOrderType(resolveKassaOrderTypeOnLoad(tenant))
   }, [tenant])
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')

@@ -1,4 +1,9 @@
-import { readKassaOrderTypeChoice, writeKassaOrderTypeChoice } from '@/lib/kassa-order-type-choice'
+import {
+  KASSA_DEFAULT_ORDER_TYPE,
+  readKassaOrderTypeChoice,
+  resolveKassaOrderTypeOnLoad,
+  writeKassaOrderTypeChoice,
+} from '@/lib/kassa-order-type-choice'
 
 describe('kassa order type choice', () => {
   beforeEach(() => {
@@ -16,5 +21,12 @@ describe('kassa order type choice', () => {
   it('negeert een onbekende waarde', () => {
     sessionStorage.setItem('vysion-kassa-order-type:ohgreen', 'foo')
     expect(readKassaOrderTypeChoice('ohgreen')).toBeNull()
+  })
+
+  it('standaard bij openen is afhalen voor elke tenant', () => {
+    expect(KASSA_DEFAULT_ORDER_TYPE).toBe('TAKEAWAY')
+    expect(resolveKassaOrderTypeOnLoad('nieuwe-zaak')).toBe('TAKEAWAY')
+    writeKassaOrderTypeChoice('ohgreen', 'DINE_IN')
+    expect(resolveKassaOrderTypeOnLoad('ohgreen')).toBe('DINE_IN')
   })
 })
