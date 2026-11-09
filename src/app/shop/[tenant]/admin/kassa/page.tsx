@@ -76,6 +76,10 @@ import {
   type VysionPrintAgentSendContext,
 } from '@/lib/vysion-print-agent-client'
 import {
+  buildKassaPrintAgentOrderItem,
+  kassaReceiptOmitPrintAgentOrderData,
+} from '@/lib/kassa-print-agent-order-data'
+import {
   isValidLanPrintHost,
   probeLocalVysionPrintAgent,
   readLanPrintHostForTenant,
@@ -4957,6 +4961,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       isDraft &&
       receiptMode === 'kassa' &&
       shouldSkipBuddyKitchenOnKassaDraftBon(tenantInfo)
+    const omitRichPrintOrderData =
+      !isVatInvoice && kassaReceiptOmitPrintAgentOrderData(receiptMode, receiptLines)
     const printResult = await sendToVysionPrintAgent({
       winkelnaam: tenantInfo?.business_name || t('kassaApp.defaultBusinessName'),
       bonInhoud: bonLines.join('\n'),
@@ -4969,43 +4975,45 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       /**
        * BTW-bon: géén orderData — anders bouwt de Print Agent een gewone kassabon
        * en verdwijnt de factuurtekst. Alleen bonInhoud (zelfde regels als de preview).
+       * Kassabon met regelopmerkingen: ook alleen bonInhoud (agent negeert anders notes in orderData).
        */
-      orderData: isVatInvoice
-        ? undefined
-        : {
-            orderNumber: order.orderNumber,
-            orderType: order.orderType,
-            tableNumber: receiptTableNr || null,
-            items: [
-              ...kassaNameAccountReceiptDisplayItems(order).map(i => ({
-                quantity: i.quantity,
-                name: i.product.name,
-                price: (i.product.price + (i.choices || []).reduce((s, c) => s + c.price, 0)) * i.quantity,
-                choices: (i.choices || []).map(c => ({ name: c.choiceName, price: c.price })),
-              })),
-              ...((order.discountAmount ?? 0) > 0
-                ? [{
-                    quantity: 1,
-                    name: t('kassaReceipt.discountLine').replace('{percent}', String(order.discountPercent ?? 20)),
-                    price: -Math.round(order.discountAmount! * 100) / 100,
-                    choices: [] as { name: string; price: number }[],
-                  }]
-                : []),
-            ],
-            subtotal,
-            tax,
-            total: order.total,
-            paymentMethod: order.paymentMethod,
-            ...(order.onAccountCustomerName ? { customerName: order.onAccountCustomerName } : {}),
-            ...(receiptVatRows.length > 0
-              ? {
-                  vatLines: receiptVatRows.map((row) => ({
-                    rate: row.rate,
-                    tax: row.tax,
-                  })),
-                }
-              : {}),
-          },
+      orderData:
+        isVatInvoice || omitRichPrintOrderData
+          ? undefined
+          : {
+              orderNumber: order.orderNumber,
+              orderType: order.orderType,
+              tableNumber: receiptTableNr || null,
+              items: [
+                ...receiptLines.map((i) => buildKassaPrintAgentOrderItem(i, receiptMode)),
+                ...((order.discountAmount ?? 0) > 0
+                  ? [
+                      {
+                        quantity: 1,
+                        name: t('kassaReceipt.discountLine').replace(
+                          '{percent}',
+                          String(order.discountPercent ?? 20),
+                        ),
+                        price: -Math.round(order.discountAmount! * 100) / 100,
+                        choices: [] as { name: string; price: number }[],
+                      },
+                    ]
+                  : []),
+              ],
+              subtotal,
+              tax,
+              total: order.total,
+              paymentMethod: order.paymentMethod,
+              ...(order.onAccountCustomerName ? { customerName: order.onAccountCustomerName } : {}),
+              ...(receiptVatRows.length > 0
+                ? {
+                    vatLines: receiptVatRows.map((row) => ({
+                      rate: row.rate,
+                      tax: row.tax,
+                    })),
+                  }
+                : {}),
+            },
       businessInfo: {
         name: tenantInfo?.business_name,
         address: tenantInfo?.address ?? undefined,

@@ -50,6 +50,8 @@ export type VysionPrintAgentItem = {
   name: string
   price: number
   choices?: { name: string; price: number }[]
+  /** Keuken / nieuwere kassabon-layout in Print Agent. */
+  notes?: string
 }
 
 export type VysionPrintAgentVatLine = {
