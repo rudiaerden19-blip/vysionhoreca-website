@@ -24,7 +24,8 @@ import {
 import { releaseAllOskScrollPadding } from '@/lib/scroll-input-above-keyboard'
 import {
   KASSA_AZERTY_OSK_HEIGHT_PX,
-  KASSA_AZERTY_OSK_MAX_WIDTH_PX,
+  KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
+  KASSA_AZERTY_OSK_PANEL_WIDTH,
   KassaAzertyOskContext,
 } from '@/lib/kassa-azerty-osk-context'
 
@@ -258,15 +259,20 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div
-          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480] max-w-[min(92vw,760px)]"
+          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480]"
           role="presentation"
+          style={{ width: KASSA_AZERTY_OSK_PANEL_WIDTH, maxWidth: KASSA_AZERTY_OSK_PANEL_WIDTH }}
         >
           <div
-            className="pointer-events-auto w-[min(92vw,760px)] min-w-[min(88vw,520px)] rounded-2xl border border-neutral-600 bg-neutral-800/95 px-3.5 pb-2.5 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
+            className="pointer-events-auto rounded-2xl border border-neutral-600 bg-neutral-800/95 px-3.5 pb-2.5 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
-            style={{ maxWidth: KASSA_AZERTY_OSK_MAX_WIDTH_PX }}
+            style={{
+              width: KASSA_AZERTY_OSK_PANEL_WIDTH,
+              minWidth: KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
+              maxWidth: KASSA_AZERTY_OSK_PANEL_WIDTH,
+            }}
           >
           <div className="mb-1.5 flex items-center justify-between gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-neutral-300">
