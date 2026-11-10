@@ -20,6 +20,7 @@ import {
   releaseLegacyOskInputGuards,
 } from '@/lib/kassa-azerty-osk'
 import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
 import { useEffect } from 'react'
 
 export interface KassaProductOptionsModalModel {
@@ -50,8 +51,11 @@ export function KassaProductOptionsModal({
 }) {
   const { t } = useLanguage()
   const azertyOsk = useKassaAzertyOskChrome()
-  const oskBottomPad =
-    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 12 : 0
+  const oskOpen = Boolean(azertyOsk?.visible && azertyOsk.heightPx > 0)
+  const oskBottomPad = oskOpen ? azertyOsk!.heightPx + 16 : 0
+  const oskModalMaxHeight = oskOpen
+    ? `calc(100vh - ${oskBottomPad + 24}px)`
+    : 'min(80vh, calc(100% - 5rem))'
 
   const optionsSessionKey = `${model.product.id ?? ''}:${model.editingCartKey ?? ''}`
 
@@ -63,6 +67,15 @@ export function KassaProductOptionsModal({
       disarmAllKassaOskInputs()
     }
   }, [optionsSessionKey])
+
+  useEffect(() => {
+    if (!oskOpen) return
+    const active = document.activeElement
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      scheduleScrollInputAboveKeyboard(active)
+    }
+  }, [oskOpen, optionsSessionKey])
+
   const dark = appearance === 'dark'
   const speelsDark = dark && posChrome === 'speels'
 
@@ -80,8 +93,8 @@ export function KassaProductOptionsModal({
   }
 
   const confirmWithOsk = () => {
-    onConfirm()
     azertyOsk?.dismiss()
+    onConfirm()
   }
 
   const speelsOptionBadgeClass = [
@@ -99,18 +112,25 @@ export function KassaProductOptionsModal({
   return (
     <div
       data-testid="kassa-options-modal"
-      className="fixed inset-0 z-[600] flex items-center justify-center bg-black/60 p-4"
-      style={{ paddingBottom: oskBottomPad > 0 ? `${oskBottomPad}px` : undefined }}
+      data-osk-scroll
+      data-osk-next="true"
+      className={`fixed inset-0 z-[600] flex bg-black/60 p-4 ${
+        oskOpen
+          ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-4'
+          : 'items-center justify-center'
+      }`}
+      style={{ paddingBottom: oskOpen ? `${oskBottomPad}px` : undefined }}
     >
       <div
         className={
           dark
-            ? `${KASSA_POS_BTN_SHAPE} flex max-h-[min(80vh,calc(100%-5rem))] w-full max-w-lg flex-col overflow-hidden border border-[#1a1a1a] shadow-2xl ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
-            : 'flex max-h-[min(80vh,calc(100%-5rem))] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl'
+            ? `${KASSA_POS_BTN_SHAPE} flex w-full max-w-lg min-h-0 flex-col overflow-hidden border border-[#1a1a1a] shadow-2xl ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+            : 'flex w-full max-w-lg min-h-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl'
         }
+        style={{ maxHeight: oskModalMaxHeight }}
       >
         <div
-          className={`flex items-center gap-3 p-4 border-b ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : ''}`}
+          className={`flex shrink-0 items-center gap-3 border-b p-4 ${dark ? `border-[#1a1a1a] ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}` : ''}`}
         >
           {model.product.image_url && (
             <img
@@ -146,7 +166,7 @@ export function KassaProductOptionsModal({
         </div>
 
         <div
-          className={`flex-1 overflow-y-auto p-4 space-y-5 ${dark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : ''}`}
+          className={`min-h-0 flex-1 overflow-y-auto touch-pan-y p-4 space-y-5 ${dark ? KASSA_POS_MENU_PLATE_SHELL_BG_CLASS : ''}`}
         >
           <div>
             <label
@@ -288,8 +308,8 @@ export function KassaProductOptionsModal({
         <div
           className={
             dark
-              ? `flex gap-3 border-t border-[#1a1a1a] p-4 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
-              : 'p-4 border-t flex gap-3 bg-gray-50'
+              ? `flex shrink-0 gap-3 border-t border-[#1a1a1a] p-4 ${KASSA_POS_MENU_PLATE_SHELL_BG_CLASS}`
+              : 'flex shrink-0 gap-3 border-t bg-gray-50 p-4'
           }
         >
           <button
