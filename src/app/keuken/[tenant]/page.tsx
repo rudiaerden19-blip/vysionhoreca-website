@@ -651,24 +651,34 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-nowrap items-center justify-end gap-1.5 overflow-x-auto sm:gap-2">
-            <div className={`shrink-0 whitespace-nowrap ${kdsChromeBtn}`}>
-              {orders.length} {tx('toMake')}
+          <div
+            className={`flex shrink-0 flex-nowrap items-center justify-end overflow-x-auto ${
+              kdsDensity === 'wide15' ? 'gap-0' : 'gap-2'
+            }`}
+          >
+            <div
+              className={`flex shrink-0 flex-nowrap items-center gap-1.5 sm:gap-2 ${
+                kdsDensity === 'wide15' ? 'mr-[1cm]' : ''
+              }`}
+            >
+              <div className={`shrink-0 whitespace-nowrap ${kdsChromeBtn}`}>
+                {orders.length} {tx('toMake')}
+              </div>
+
+              <button type="button" onClick={handleAllReady} className={`shrink-0 whitespace-nowrap ${kdsChromeBtn}`}>
+                Alles klaar
+              </button>
+
+              {newOrderIds.size > 0 && (
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 0.5 }}
+                  className={`shrink-0 ${ui.newOrderBanner}`}
+                >
+                  {newOrderIds.size} {tx('newOrder')}
+                </motion.div>
+              )}
             </div>
-
-            <button type="button" onClick={handleAllReady} className={`shrink-0 whitespace-nowrap ${kdsChromeBtn}`}>
-              Alles klaar
-            </button>
-
-            {newOrderIds.size > 0 && (
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ repeat: Infinity, duration: 0.5 }}
-                className={`shrink-0 ${ui.newOrderBanner}`}
-              >
-                {newOrderIds.size} {tx('newOrder')}
-              </motion.div>
-            )}
 
             <div className="shrink-0 whitespace-nowrap font-mono text-2xl font-bold tabular-nums text-white sm:text-4xl">
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
