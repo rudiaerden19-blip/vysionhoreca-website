@@ -85,6 +85,7 @@ import {
   parseKassaNumpadAmount,
 } from '@/lib/kassa-numpad-custom-amount'
 import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
+import { seedKassaOskControlledFieldEditState } from '@/lib/kassa-azerty-osk'
 import {
   isValidLanPrintHost,
   probeLocalVysionPrintAgent,
@@ -745,6 +746,13 @@ function KassaNumpadOskLineNoteInput({
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
+  useLayoutEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    const caret = Math.min(el.selectionStart ?? value.length, value.length)
+    seedKassaOskControlledFieldEditState(el, value, caret)
+  }, [value])
+
   useEffect(() => {
     const el = inputRef.current
     if (!el) return
@@ -753,6 +761,7 @@ function KassaNumpadOskLineNoteInput({
       const next = detail?.value
       if (typeof next !== 'string') return
       flushSync(() => onValueChange(next))
+      seedKassaOskControlledFieldEditState(el, next, next.length)
     }
     el.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
     return () => el.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
@@ -766,7 +775,16 @@ function KassaNumpadOskLineNoteInput({
       data-kassa-osk-line-note="true"
       value={value}
       maxLength={maxLength}
-      onChange={(e) => onValueChange(e.target.value)}
+      onChange={(e) => {
+        const next = e.target.value
+        onValueChange(next)
+        seedKassaOskControlledFieldEditState(e.target, next, e.target.selectionStart ?? next.length)
+      }}
+      onFocus={(e) => {
+        const el = e.currentTarget
+        const caret = Math.min(el.selectionStart ?? value.length, value.length)
+        seedKassaOskControlledFieldEditState(el, value, caret)
+      }}
       placeholder={placeholder}
       className={className}
     />
@@ -7438,7 +7456,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ))}
               </div>
-              {kassaNumpadShowsCustomLinePanel(numpadValue) && (
+              {numpadPanelVisible && kassaNumpadShowsCustomLinePanel(numpadValue) && (
                 <>
                   <KassaNumpadOskLineNoteInput
                     value={numpadLineNote}
@@ -7579,7 +7597,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   </button>
                 ))}
               </div>
-              {kassaNumpadShowsCustomLinePanel(numpadValue) && (
+              {numpadPanelVisible && kassaNumpadShowsCustomLinePanel(numpadValue) && (
                 <>
                   <KassaNumpadOskLineNoteInput
                     value={numpadLineNote}

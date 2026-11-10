@@ -18,10 +18,23 @@ export function isKassaOskLineNoteField(target: EventTarget | null): boolean {
 
 function isOskLineNoteElementVisible(el: HTMLInputElement | HTMLTextAreaElement): boolean {
   if (!el.isConnected) return false
+  let node: HTMLElement | null = el
+  while (node) {
+    if (node.getAttribute('aria-hidden') === 'true') return false
+    node = node.parentElement
+  }
   const style = getComputedStyle(el)
   if (style.display === 'none' || style.visibility === 'hidden') return false
+  if (parseFloat(style.opacity) < 0.2) return false
   const rect = el.getBoundingClientRect()
-  return rect.width > 0 && rect.height > 0
+  const hasLayout = rect.width > 0 && rect.height > 0
+  if (!hasLayout) return true
+  if (typeof window !== 'undefined') {
+    const vh = window.innerHeight || 0
+    const vw = window.innerWidth || 0
+    if (vw > 0 && vh > 0 && (rect.bottom < 4 || rect.top > vh - 4)) return false
+  }
+  return true
 }
 
 /**
@@ -43,6 +56,13 @@ export function findKassaOskLineNoteInput(
     const inModal = optionsModal.querySelector(`[${KASSA_OSK_LINE_NOTE_ATTR}="true"]`)
     if (inModal instanceof HTMLInputElement || inModal instanceof HTMLTextAreaElement) {
       return inModal
+    }
+  }
+
+  const active = document.activeElement
+  if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+    if (isKassaOskLineNoteField(active) && isOskLineNoteElementVisible(active)) {
+      return active
     }
   }
 

@@ -52,6 +52,25 @@ describe('kassa-osk-line-shortcuts', () => {
     expect(shouldOpenAzertyOskForFieldFocus(true, true, plain)).toBe(true)
   })
 
+  it('findKassaOskLineNoteInput: slaat numpad-opmerking over in aria-hidden paneel', () => {
+    const panel = document.createElement('div')
+    panel.setAttribute('data-testid', 'kassa-numpad-panel')
+    panel.setAttribute('aria-hidden', 'true')
+    const hidden = document.createElement('input')
+    hidden.setAttribute('data-kassa-osk-line-note', 'true')
+    panel.appendChild(hidden)
+    document.body.appendChild(panel)
+
+    const visible = document.createElement('input')
+    visible.setAttribute('data-kassa-osk-line-note', 'true')
+    document.body.appendChild(visible)
+
+    expect(findKassaOskLineNoteInput(null)).toBe(visible)
+
+    document.body.removeChild(panel)
+    document.body.removeChild(visible)
+  })
+
   it('findKassaOskLineNoteInput: opties-modal vóór numpad in DOM-volgorde', () => {
     const numpad = document.createElement('input')
     numpad.setAttribute('data-kassa-osk-line-note', 'true')
