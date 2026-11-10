@@ -358,10 +358,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     setInitialLoadDone(true)
   }
 
-  function enableSound() {
-    activateSound()
-  }
-
   async function handleAllReady() {
     await Promise.all(
       orders.map((o) => {
@@ -644,14 +640,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
 
           <div className="flex shrink-0 flex-nowrap items-center justify-end gap-1.5 overflow-x-auto sm:gap-2">
-            <button
-              type="button"
-              onClick={enableSound}
-              className={`shrink-0 whitespace-nowrap ${soundActivated ? kdsChromeOn : kdsChromeBtn}`}
-            >
-              {soundActivated ? tx('soundEnabled') : tx('soundOn')}
-            </button>
-
             <div className={`shrink-0 whitespace-nowrap ${kdsChromeBtn}`}>
               {orders.length} {tx('toMake')}
             </div>
@@ -673,66 +661,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <div className="shrink-0 whitespace-nowrap font-mono text-2xl font-bold tabular-nums text-white sm:text-4xl">
               {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
             </div>
-
-            <button
-              type="button"
-              className={`${kdsChromeBtn} shrink-0 disabled:opacity-40`}
-              onClick={() => {
-                if (scrollTicketBodies('top')) return
-                scrollBoardToPage(0)
-              }}
-              disabled={!ticketScroll.up && kdsPageSafe <= 0}
-              aria-label="Naar boven"
-            >
-              «
-            </button>
-            <button
-              type="button"
-              className={`${kdsChromeBtn} shrink-0 disabled:opacity-40`}
-              onClick={() => {
-                if (scrollTicketBodies('up')) return
-                scrollBoardToPage(kdsPageSafe - 1)
-              }}
-              disabled={!ticketScroll.up && kdsPageSafe <= 0}
-              aria-label="Omhoog scrollen"
-            >
-              ‹
-            </button>
-            {kdsPageIndexes.map((i) => (
-              <button
-                key={i}
-                type="button"
-                className={`min-w-[2.5rem] shrink-0 ${i === kdsPageSafe ? kdsChromeOn : kdsChromeBtn}`}
-                onClick={() => scrollBoardToPage(i)}
-                aria-current={i === kdsPageSafe ? 'page' : undefined}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              type="button"
-              className={`${kdsChromeBtn} shrink-0 disabled:opacity-40`}
-              onClick={() => {
-                if (scrollTicketBodies('down')) return
-                scrollBoardToPage(kdsPageSafe + 1)
-              }}
-              disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
-              aria-label="Omlaag scrollen"
-            >
-              ›
-            </button>
-            <button
-              type="button"
-              className={`${kdsChromeBtn} shrink-0 disabled:opacity-40`}
-              onClick={() => {
-                if (scrollTicketBodies('bottom')) return
-                scrollBoardToPage(kdsPageCount - 1)
-              }}
-              disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
-              aria-label="Naar beneden"
-            >
-              »
-            </button>
           </div>
         </div>
       </header>
@@ -798,6 +726,68 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
         )}
       </div>
+
+      <footer className="flex shrink-0 items-center justify-center gap-2 border-t border-black/50 bg-transparent px-3 py-2">
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => {
+            if (scrollTicketBodies('top')) return
+            scrollBoardToPage(0)
+          }}
+          disabled={!ticketScroll.up && kdsPageSafe <= 0}
+          aria-label="Naar boven"
+        >
+          «
+        </button>
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => {
+            if (scrollTicketBodies('up')) return
+            scrollBoardToPage(kdsPageSafe - 1)
+          }}
+          disabled={!ticketScroll.up && kdsPageSafe <= 0}
+          aria-label="Omhoog scrollen"
+        >
+          ‹
+        </button>
+        {kdsPageIndexes.map((i) => (
+          <button
+            key={i}
+            type="button"
+            className={`min-w-[2.5rem] ${i === kdsPageSafe ? kdsChromeOn : kdsChromeBtn}`}
+            onClick={() => scrollBoardToPage(i)}
+            aria-current={i === kdsPageSafe ? 'page' : undefined}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => {
+            if (scrollTicketBodies('down')) return
+            scrollBoardToPage(kdsPageSafe + 1)
+          }}
+          disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
+          aria-label="Omlaag scrollen"
+        >
+          ›
+        </button>
+        <button
+          type="button"
+          className={`${kdsChromeBtn} disabled:opacity-40`}
+          onClick={() => {
+            if (scrollTicketBodies('bottom')) return
+            scrollBoardToPage(kdsPageCount - 1)
+          }}
+          disabled={!ticketScroll.down && kdsPageSafe >= kdsPageCount - 1}
+          aria-label="Naar beneden"
+        >
+          »
+        </button>
+      </footer>
 
       {/* Order Detail Modal */}
       <AnimatePresence>

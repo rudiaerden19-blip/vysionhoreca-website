@@ -22,7 +22,7 @@ const KDS_HEADER_BLUE = '#163a66'
 const KDS_HEADER_RED = '#9b1c1c'
 
 /** Zelfde breedte als de paginering op het keukenscherm. */
-export const KDS_COLUMN_WIDTH_PX = 500
+export const KDS_COLUMN_WIDTH_PX = 400
 
 /** Regel in de bon: index in `order.items`, zodat twee dezelfde producten apart afgevinkt worden. */
 export function kitchenItemLineKey(index: number): string {
