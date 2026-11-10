@@ -1247,6 +1247,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const effectiveLabelPrinting = demoViewOnly ? true : featureLabelPrinting
   const effectiveJson = demoViewOnly ? null : enabledModulesJson
 
+  /** Zelfde slider als admin-menu (`sm_reserveringen`), niet alleen module-flag `reservaties`. */
+  const kassaReservationsNavEnabled = useMemo(
+    () => isAdminSubmenuEnabled('sm_reserveringen', tenant, effectiveAccess, effectiveJson),
+    [tenant, effectiveAccess, effectiveJson],
+  )
+
   const filteredHamburgerModules = useMemo(() => {
     const all = buildHamburgerModules(baseUrl, tenant)
     if (!demoViewOnly && moduleFlagsLoading) return []
@@ -1581,7 +1587,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useEffect(() => {
     if (demoViewOnly || moduleFlagsLoading) return
     const pollOrders = tenantShouldPollWebshopNewOrders(effectiveAccess)
-    const pollReserv = tenantShouldPollReservations(effectiveAccess)
+    const pollReserv =
+      tenantShouldPollReservations(effectiveAccess) && kassaReservationsNavEnabled
     if (!pollOrders && !pollReserv) {
       setPendingReservCount(0)
       previousOrderIdsRef.current = []
@@ -1807,6 +1814,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     demoViewOnly,
     moduleFlagsLoading,
     effectiveAccess,
+    kassaReservationsNavEnabled,
     t,
   ])
 
@@ -6371,7 +6379,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }`}
           >
 
-          {effectiveAccess.reservaties && (
+          {kassaReservationsNavEnabled && (
             <button
               type="button"
               onClick={() => {
@@ -8246,7 +8254,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       )}
 
       {/* Reservatie-actie: blijft tot geen PENDING/WAITLIST meer (zelfde teller als badge) */}
-      {effectiveAccess.reservaties && (pendingReservCount > 0 || onlineReservNavBlink) && !showReservations && (
+      {kassaReservationsNavEnabled && (pendingReservCount > 0 || onlineReservNavBlink) && !showReservations && (
         <div
           className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex max-w-[95vw] items-center gap-4 bg-amber-500 text-white px-8 py-5 rounded-2xl shadow-2xl cursor-pointer border-4 border-amber-700"
           onClick={() => {
@@ -8266,7 +8274,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         </div>
       )}
 
-      {showReservations && effectiveAccess.reservaties && (
+      {showReservations && kassaReservationsNavEnabled && (
         <KassaReservationsView
           tenant={tenant}
           kassaTables={kassaTablesByZone.inside}
