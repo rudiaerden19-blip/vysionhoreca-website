@@ -1943,6 +1943,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [kassaZoneTab, setKassaZoneTab] = useState<'sales' |  'inside' |  'terrace'| null>(null)
   /** The Lagoon: zone- en bestelknoppen schuiven over de mand. Standaard dicht, mand begint bovenaan. */
   const [lagoonSidebarToolsOpen, setLagoonSidebarToolsOpen] = useState(false)
+  /** 15″ breedbeeld: zelfde slide als The Lagoon — meer mandruimte, standaard dicht. */
+  const [kassaWide15SidebarToolsOpen, setKassaWide15SidebarToolsOpen] = useState(false)
   const [pickerBrowseZone, setPickerBrowseZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [dineInFloorZone, setDineInFloorZone] = useState<FloorPlanZone>(FLOOR_PLAN_ZONE_INSIDE)
   const [kassaTablesByZone, setKassaTablesByZone] = useState<Record<FloorPlanZone, FloorPlanTable[]>>({
@@ -6101,6 +6103,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }`
     : 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
 
+  const kassaSidebarToolsSlidePanel = isTheLagoonTenant(tenant) || kassaWide15Chrome
+  const kassaSidebarToolsOpen = isTheLagoonTenant(tenant)
+    ? lagoonSidebarToolsOpen
+    : kassaWide15SidebarToolsOpen
+  const toggleKassaSidebarToolsOpen = () => {
+    playClick()
+    if (isTheLagoonTenant(tenant)) {
+      setLagoonSidebarToolsOpen((open) => !open)
+    } else {
+      setKassaWide15SidebarToolsOpen((open) => !open)
+    }
+  }
+
   const kassaTenantDisplayName =
     tenantInfo?.business_name ||
     tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -6946,22 +6961,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           }`}
         >
 
-        {isTheLagoonTenant(tenant) ? (
+        {kassaSidebarToolsSlidePanel ? (
           <button
             type="button"
-            aria-expanded={lagoonSidebarToolsOpen}
-            aria-controls="kassa-lagoon-sidebar-tools"
-            title={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
-            aria-label={lagoonSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
-            onClick={() => {
-              playClick()
-              setLagoonSidebarToolsOpen((open) => !open)
-            }}
+            data-testid="kassa-sidebar-tools-toggle"
+            aria-expanded={kassaSidebarToolsOpen}
+            aria-controls="kassa-sidebar-tools-panel"
+            title={kassaSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
+            aria-label={kassaSidebarToolsOpen ? 'Knoppen sluiten' : 'Knoppen openen'}
+            onClick={toggleKassaSidebarToolsOpen}
             className="absolute left-0 top-0 z-30 flex h-10 w-14 items-center justify-center rounded-br-xl border border-l-0 border-t-0 border-black/70 bg-[#1a1a1a] text-[#ececec] shadow-[0_4px_10px_rgba(0,0,0,0.55)]"
           >
             <svg
               viewBox="0 0 24 24"
-              className={`h-6 w-6 transition-transform duration-300 ${lagoonSidebarToolsOpen ? 'rotate-180' : ''}`}
+              className={`h-6 w-6 transition-transform duration-300 ${kassaSidebarToolsOpen ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               strokeWidth={2.6}
@@ -6976,11 +6989,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) : null}
 
         <div
-          id="kassa-lagoon-sidebar-tools"
+          id="kassa-sidebar-tools-panel"
           className={
-            isTheLagoonTenant(tenant)
+            kassaSidebarToolsSlidePanel
               ? `absolute inset-x-0 top-0 z-20 transition-transform duration-300 ease-out ${kassaPlateBgClass} ${
-                  lagoonSidebarToolsOpen
+                  kassaSidebarToolsOpen
                     ? 'translate-y-0 shadow-[0_14px_28px_rgba(0,0,0,0.5)]'
                     : 'pointer-events-none -translate-y-full'
                 }`
@@ -7221,11 +7234,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart / numpad (toggle via footer) */}
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
-            kassaAppearanceDark
-              ? kassaLayout === 'speels'
-                ? 'px-2 pt-1 pb-1'
-                : 'px-3 pt-1'
-              : 'px-2.5 pt-1.5'
+            kassaSidebarToolsSlidePanel && !kassaSidebarToolsOpen
+              ? `pt-10 ${
+                  kassaAppearanceDark
+                    ? kassaLayout === 'speels'
+                      ? 'px-2 pb-1'
+                      : 'px-3'
+                    : 'px-2.5'
+                }`
+              : kassaAppearanceDark
+                ? kassaLayout === 'speels'
+                  ? 'px-2 pt-1 pb-1'
+                  : 'px-3 pt-1'
+                : 'px-2.5 pt-1.5'
           }`}
         >
             <div
