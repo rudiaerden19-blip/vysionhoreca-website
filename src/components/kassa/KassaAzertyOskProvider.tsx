@@ -78,6 +78,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const lineShortcutsLoadedRef = useRef(false)
   const lineShortcutsSaveTimerRef = useRef<number | undefined>(undefined)
   const lineShortcutsLastSavedRef = useRef('')
+  const prevKeyboardPinnedRef = useRef(false)
+  const [optionsModalOpen, setOptionsModalOpen] = useState(false)
 
   const enabled = isAzertyOskActiveForSession({
     pathname,
@@ -106,6 +108,17 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     enabled && visible && (!manualOpen || keyboardPinned || lineNoteFieldActive)
   const showLineShortcutsColumn =
     lineShortcutsOnKassaPos && showKeyboardPanel && !suppressedRef.current
+
+  useEffect(() => {
+    if (!lineShortcutsOnKassaPos || typeof document === 'undefined') return
+    const syncOptionsModal = () => {
+      setOptionsModalOpen(!!document.querySelector('[data-testid="kassa-options-modal"]'))
+    }
+    syncOptionsModal()
+    const mo = new MutationObserver(syncOptionsModal)
+    mo.observe(document.body, { childList: true, subtree: true })
+    return () => mo.disconnect()
+  }, [lineShortcutsOnKassaPos, showKeyboardPanel])
 
   useEffect(() => {
     setHostTenantSlug(getCurrentTenantSlug())
@@ -334,9 +347,30 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     setKeyboardPinned(true)
     setVisible(true)
     const active = document.activeElement
-    if (isKassaAzertyOskTextTarget(active)) {
+    const optionsOpen = !!document.querySelector('[data-testid="kassa-options-modal"]')
+    if (
+      optionsOpen &&
+      active instanceof HTMLInputElement &&
+      isKassaOskLineNoteField(active)
+    ) {
       attachField(active)
+      return
     }
+    setLineNoteFieldActive(false)
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      if (isKassaOskShortcutSlotField(active)) {
+        attachField(active)
+        return
+      }
+      if (isKassaAzertyOskTextTarget(active) && !isKassaOskLineNoteField(active)) {
+        attachField(active)
+        return
+      }
+    }
+    window.requestAnimationFrame(() => {
+      const first = document.querySelector('[data-kassa-osk-shortcut-slot="true"]')
+      if (first instanceof HTMLInputElement) attachField(first)
+    })
   }, [attachField, hideKeyboard, keyboardPinned])
 
   const chromeValue = useMemo(
@@ -357,10 +391,23 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     ],
   )
 
-  const shortcutSlotsEditable = keyboardPinned && !lineNoteFieldActive
+  /** Potlood/productmodal: invul-knoppen. Blauw Toetsenbord vast + géén modal: tekstvelden bewerken. */
+  const shortcutSlotsEditable = keyboardPinned && !optionsModalOpen
 
-  const preferOskLineNoteTarget =
-    lineNoteFieldActive || (lineShortcutsOnKassaPos && !shortcutSlotsEditable)
+  const preferOskLineNoteTarget = lineShortcutsOnKassaPos && !shortcutSlotsEditable
+
+  useEffect(() => {
+    const justPinned = keyboardPinned && !prevKeyboardPinnedRef.current
+    prevKeyboardPinnedRef.current = keyboardPinned
+    if (!justPinned || optionsModalOpen || !showLineShortcutsColumn) return
+    const id = window.requestAnimationFrame(() => {
+      const active = document.activeElement
+      if (isKassaOskShortcutSlotField(active)) return
+      const first = document.querySelector('[data-kassa-osk-shortcut-slot="true"]')
+      if (first instanceof HTMLInputElement) attachField(first)
+    })
+    return () => window.cancelAnimationFrame(id)
+  }, [attachField, keyboardPinned, optionsModalOpen, showLineShortcutsColumn])
 
   const pickOskEditTarget = useCallback(
     (candidate: HTMLInputElement | HTMLTextAreaElement | null | undefined) => {
