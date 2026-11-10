@@ -1,18 +1,14 @@
 /**
- * Horeca-kassa: vast AZERTY-schermtoetsenbord (pilot tenant lomichillplay).
- * Uitbreiding naar alle tenants: hier of tenant_settings vlag koppelen.
+ * Horeca-kassa: vast AZERTY-schermtoetsenbord (alle tenants).
  */
 
-export const KASSA_AZERTY_OSK_PILOT_SLUG = 'lomichillplay'
-
 /**
- * Pilot tijdelijk uit tot stabiele UX — zet op true om Lomichillplay-toetsenbord te heractiveren.
+ * Zet op false om AZERTY OSK platformbreed uit te schakelen.
  */
 export const KASSA_AZERTY_OSK_LIVE = true
 
 /**
- * Toetsenbord alleen na tik op de bovenste «Toetsenbord»-knop (geen auto-open bij focus).
- * Later voor alle tenants; nu gekoppeld aan dezelfde pilot als `isKassaAzertyOskEnabled`.
+ * Toetsenbord alleen na tik op «Toetsenbord» (opmerking-velden mogen OSK nog wel focussen).
  */
 export const KASSA_AZERTY_OSK_MANUAL_OPEN = true
 
@@ -27,7 +23,7 @@ export function isKassaAzertyOskManualOpenEnabled(tenantSlug: string): boolean {
 
 export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
   if (!KASSA_AZERTY_OSK_LIVE) return false
-  return tenantSlug.trim().toLowerCase() === KASSA_AZERTY_OSK_PILOT_SLUG
+  return tenantSlug.trim().length > 0
 }
 
 export function parseTenantSlugFromShopPath(pathOrNext: string): string | null {
@@ -97,10 +93,7 @@ export function isAzertyOskActiveForSession(input: {
   hostTenantSlug?: string | null
 }): boolean {
   if (!KASSA_AZERTY_OSK_LIVE) return false
-  if (
-    isAzertyOskPilotOwnerLoginPath(input.pathname) &&
-    isKassaAzertyOskEnabled(KASSA_AZERTY_OSK_PILOT_SLUG)
-  ) {
+  if (isAzertyOskPilotOwnerLoginPath(input.pathname)) {
     return true
   }
   const tenant = resolveAzertyOskTenantSlug(input)

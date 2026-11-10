@@ -37,7 +37,7 @@ describe('kassa-azerty-osk', () => {
         pathname: '/shop/other/admin',
         routeParamTenant: 'other',
       }),
-    ).toBe(false)
+    ).toBe(true)
     expect(
       resolveAzertyOskTenantSlug({
         pathname: '/shop/lomichillplay/admin',
@@ -63,16 +63,16 @@ describe('kassa-azerty-osk', () => {
     expect(input.getAttribute('inputMode')).toBeNull()
   })
 
-  it('pilot alleen tenant lomichillplay', () => {
+  it('azerty OSK voor elke tenant slug', () => {
     expect(isKassaAzertyOskEnabled('lomichillplay')).toBe(true)
-    expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(true)
-    expect(isKassaAzertyOskEnabled('vysion')).toBe(false)
-    expect(isKassaAzertyOskEnabled('demo-frituur')).toBe(false)
+    expect(isKassaAzertyOskEnabled('demo-frituur')).toBe(true)
+    expect(isKassaAzertyOskEnabled(' ')).toBe(false)
   })
 
-  it('handmatig openen alleen pilot-lomichillplay', () => {
+  it('handmatig openen volgt tenant enable', () => {
     expect(isKassaAzertyOskManualOpenEnabled('lomichillplay')).toBe(true)
-    expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(false)
+    expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(true)
+    expect(isKassaAzertyOskManualOpenEnabled('')).toBe(false)
   })
 
   it('shift voor letters en leestekens', () => {

@@ -25,7 +25,6 @@ import {
   healOskBlockedTextField,
   isAzertyOskActiveForSession,
   isKassaAzertyOskManualOpenEnabled,
-  KASSA_AZERTY_OSK_PILOT_SLUG,
   releaseLegacyOskInputGuards,
   resolveAzertyOskTenantSlug,
   isKassaAzertyOskTextTarget,
@@ -85,7 +84,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         routeParamTenant,
         searchNext: searchParams?.get('next') ?? null,
         hostTenantSlug,
-      }) ?? KASSA_AZERTY_OSK_PILOT_SLUG,
+      }) ?? '',
     [hostTenantSlug, pathname, routeParamTenant, searchParams],
   )
 
