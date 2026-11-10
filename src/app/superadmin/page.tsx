@@ -511,6 +511,12 @@ export default function SuperAdminDashboard() {
             >
                Analytics
             </Link>
+            <Link
+              href="/superadmin/kassa-layout-lab"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition-colors"
+            >
+               Kassa layout-lab
+            </Link>
             <button
               onClick={handleCleanupExpired}
               className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors border border-red-500/30"

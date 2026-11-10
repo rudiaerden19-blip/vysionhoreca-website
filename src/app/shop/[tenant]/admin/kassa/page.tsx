@@ -397,6 +397,7 @@ import {
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
+import { resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -425,14 +426,30 @@ const KASSA_SXGA_TILE_IMAGE_HEIGHT_FRAC = 1
 /** Zelfde als `mt-1.5`tussen foto-strook en naam */
 const KASSA_SXGA_IMAGE_TO_TITLE_GAP_PX = 6
 
+function readKassaChromeFlagsFromWindow(): {
+  sxgaDense: boolean
+  wide15: boolean
+  ipadClient: boolean
+} {
+  if (typeof window !== 'undefined') {
+    const preview = resolveKassaLayoutPreviewChrome(new URLSearchParams(window.location.search))
+    if (preview) return preview
+  }
+  return {
+    sxgaDense: readKassaViewportProfileFromWindow() === 'sxga17',
+    wide15: readKassaViewportProfileFromWindow() === 'wide15',
+    ipadClient: readKassaIpadClientFromWindow(),
+  }
+}
+
 /** Alleen **≈1280×1024 / 17″**. 15″ breedbeeld gebruikt `shouldApplyKassaWide15Chrome`. */
 function shouldApplyKassaCompactSquareMonitorTileCap(): boolean {
-  return readKassaViewportProfileFromWindow() === 'sxga17'
+  return readKassaChromeFlagsFromWindow().sxgaDense
 }
 
 /** 15–16″ landschap: compacte chrome, géén SXGA-tegelgeometrie. */
 function shouldApplyKassaWide15Chrome(): boolean {
-  return readKassaViewportProfileFromWindow() === 'wide15'
+  return readKassaChromeFlagsFromWindow().wide15
 }
 
 /** Standaard numpadbalk (`w-80`/ `sm:w-96`/ `lg:w-[380px]`). */
@@ -1811,7 +1828,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [kassaSxgaDenseTiles, setKassaSxgaDenseTiles] = useState(shouldApplyKassaCompactSquareMonitorTileCap)
   const [kassaWide15Chrome, setKassaWide15Chrome] = useState(shouldApplyKassaWide15Chrome)
   /** iPad: max 4 tegels/rij (desktop 21″ blijft 6 op xl). */
-  const [kassaIpadMenuGridCap, setKassaIpadMenuGridCap] = useState(readKassaIpadClientFromWindow)
+  const [kassaIpadMenuGridCap, setKassaIpadMenuGridCap] = useState(
+    () => readKassaChromeFlagsFromWindow().ipadClient,
+  )
 
   /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
   useLayoutEffect(() => {
@@ -2172,12 +2191,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
     /** Moet synchroon: geen `rAF`— anders eerste categorie-frame nog “niet‑SXGA” (te groot). */
     function syncSxgaDenseFromViewport() {
-      const sxgaDense = shouldApplyKassaCompactSquareMonitorTileCap()
-      const wide15 = shouldApplyKassaWide15Chrome()
-      const ipadGridCap = readKassaIpadClientFromWindow()
-      setKassaSxgaDenseTiles((prev) => (prev === sxgaDense ? prev : sxgaDense))
-      setKassaWide15Chrome((prev) => (prev === wide15 ? prev : wide15))
-      setKassaIpadMenuGridCap((prev) => (prev === ipadGridCap ? prev : ipadGridCap))
+      const flags = readKassaChromeFlagsFromWindow()
+      setKassaSxgaDenseTiles((prev) => (prev === flags.sxgaDense ? prev : flags.sxgaDense))
+      setKassaWide15Chrome((prev) => (prev === flags.wide15 ? prev : flags.wide15))
+      setKassaIpadMenuGridCap((prev) => (prev === flags.ipadClient ? prev : flags.ipadClient))
     }
 
     const measure = () => {
