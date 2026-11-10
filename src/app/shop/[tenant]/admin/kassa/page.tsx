@@ -7599,10 +7599,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div
                 role="status"
                 aria-live="polite"
-                className={`flex min-w-0 flex-1 justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
-                  kassaWide15Chrome
-                    ? 'min-h-[4.25rem] items-start pt-1.5 pb-2'
-                    : 'items-center'
+                className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
+                  kassaWide15Chrome ? 'min-h-[4.25rem] py-2' : ''
                 }`}
               >
                 <span
@@ -7610,7 +7608,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   isTheLagoonTenant(tenant)
                     ? 'text-xl sm:text-2xl'
                     : kassaWide15Chrome
-                      ? 'text-lg leading-none'
+                      ? 'text-xl leading-tight'
                       : 'text-base sm:text-lg'
                 }`}
                 >
@@ -7618,8 +7616,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 </span>
                 <span
                   className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
-                    kassaWide15Chrome ? 'self-center' : ''
-                  } ${
                     isTheLagoonTenant(tenant)
                       ? 'text-3xl sm:text-[2.15rem]'
                       : kassaWide15Chrome
