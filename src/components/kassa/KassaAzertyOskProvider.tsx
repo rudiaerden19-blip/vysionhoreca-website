@@ -251,18 +251,18 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   }
 
   const keyBtnClass =
-    'min-h-[2.65rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:min-h-[2.85rem] sm:text-lg'
+    'min-h-[3rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-lg font-bold text-white active:bg-neutral-500 sm:min-h-[3.15rem] sm:text-xl'
 
   return (
     <KassaAzertyOskContext.Provider value={chromeValue}>
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div
-          className="pointer-events-none fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[480] flex justify-center px-3"
+          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480] max-w-[min(92vw,760px)]"
           role="presentation"
         >
           <div
-            className="pointer-events-auto w-full min-w-0 rounded-2xl border border-neutral-600 bg-neutral-800/95 px-3 pb-2 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
+            className="pointer-events-auto w-[min(92vw,760px)] min-w-[min(88vw,520px)] rounded-2xl border border-neutral-600 bg-neutral-800/95 px-3.5 pb-2.5 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
@@ -282,8 +282,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               ✕
             </button>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <div className="grid grid-cols-10 gap-1.5">
+          <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-10 gap-2">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
                 <button
                   key={`n-${key}`}
@@ -299,7 +299,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             {KASSA_AZERTY_LETTER_ROWS.map((row, ri) => (
               <div
                 key={`r-${ri}`}
-                className="grid gap-1.5"
+                className="grid gap-2"
                 style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))` }}
               >
                 {row.map((key) => (
@@ -315,10 +315,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 ))}
               </div>
             ))}
-            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-1.5">
+            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-2">
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[2.75rem] px-2.5 sm:min-w-[3rem] ${shift ? 'border-neutral-300 bg-neutral-500' : ''}`}
+                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift ? 'border-neutral-300 bg-neutral-500' : ''}`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => setShift((s) => !s)}
               >
@@ -326,7 +326,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[2.75rem] px-2 sm:min-w-[3rem]`}
+                className={`${keyBtnClass} min-w-[3.25rem] px-2.5 sm:min-w-[3.5rem]`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => sendEdit({ char: KASSA_AZERTY_AT_CHAR })}
                 data-testid="kassa-azerty-osk-at"
@@ -343,7 +343,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[2.75rem] px-2.5 sm:min-w-[3rem]`}
+                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem]`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => sendEdit('backspace')}
               >
