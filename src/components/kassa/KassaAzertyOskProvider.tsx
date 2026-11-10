@@ -419,10 +419,12 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   const insertLineShortcut = useCallback(
     (label: string) => {
+      const trimmed = label.trim()
+      if (!trimmed) return
       const el = findKassaOskLineNoteInput(activeRef.current)
       if (!el?.isConnected || !isKassaOskLineNoteField(el)) return
       focusInputForProgrammaticEdit(el)
-      applyKassaOskLineShortcut(el, label)
+      applyKassaOskLineShortcut(el, trimmed)
       attachField(el)
     },
     [attachField],

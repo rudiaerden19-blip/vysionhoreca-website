@@ -41,6 +41,9 @@ function setValueViaNativePrototype(el: HTMLInputElement | HTMLTextAreaElement, 
   }
 }
 
+/** Bubbelt na programmatische wijziging — controlled React-velden (kassa-opmerking). */
+export const KASSA_OSK_PROGRAMMATIC_INPUT_EVENT = 'kassa-osk-programmatic-input'
+
 /**
  * Zet de DOM-waarde en vuurt één bubbling `input`(klassiek Event — React verwacht deze keten).
  */
@@ -63,7 +66,22 @@ export function setNativeInputValue(el: HTMLInputElement | HTMLTextAreaElement, 
   }
 
   try {
-    el.dispatchEvent(new Event('input', { bubbles: true }))
+    if (typeof InputEvent !== 'undefined') {
+      el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }))
+    } else {
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+  } catch {
+    /* noop */
+  }
+
+  try {
+    el.dispatchEvent(
+      new CustomEvent(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, {
+        bubbles: true,
+        detail: { value },
+      }),
+    )
   } catch {
     /* noop */
   }

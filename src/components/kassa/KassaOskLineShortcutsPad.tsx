@@ -126,14 +126,14 @@ export function KassaOskLineShortcutsPad({
               />
               <button
                 type="button"
-                disabled={!trimmed}
                 title={t('kassaApp.azertyOskShortcutInsertHint')}
                 aria-label={t('kassaApp.azertyOskShortcutInsertHint')}
-                className={`${insertBtnClass} disabled:pointer-events-none disabled:opacity-25`}
-                onPointerDown={(e) => e.preventDefault()}
-                onPointerUp={(e) => {
-                  e.preventDefault()
+                aria-disabled={!trimmed}
+                className={`${insertBtnClass} ${!trimmed ? 'pointer-events-none opacity-25' : ''}`}
+                onPointerDown={(e) => {
                   if (e.button !== 0) return
+                  e.preventDefault()
+                  e.stopPropagation()
                   const row = e.currentTarget.parentElement
                   const input = row?.querySelector('input[data-kassa-osk-shortcut-slot="true"]')
                   if (!(input instanceof HTMLInputElement)) return

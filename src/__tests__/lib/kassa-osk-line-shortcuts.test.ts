@@ -63,6 +63,22 @@ describe('kassa-osk-line-shortcuts', () => {
     document.body.removeChild(numpad)
   })
 
+  it('applyKassaOskLineShortcut vuurt programmatic sync-event', () => {
+    const input = document.createElement('input')
+    input.setAttribute('data-kassa-osk-line-note', 'true')
+    document.body.appendChild(input)
+    let synced = ''
+    const onSync = (e: Event) => {
+      synced = (e as CustomEvent<{ value: string }>).detail.value
+    }
+    input.addEventListener('kassa-osk-programmatic-input', onSync)
+    applyKassaOskLineShortcut(input, 'Zonder sla')
+    expect(input.value).toBe('Zonder sla')
+    expect(synced).toBe('Zonder sla')
+    input.removeEventListener('kassa-osk-programmatic-input', onSync)
+    document.body.removeChild(input)
+  })
+
   it('voegt sneltekst toe met spatie', () => {
     const input = document.createElement('input')
     input.value = 'Test'

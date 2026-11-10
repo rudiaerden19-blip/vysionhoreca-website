@@ -20,8 +20,9 @@ import {
   releaseLegacyOskInputGuards,
 } from '@/lib/kassa-azerty-osk'
 import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export interface KassaProductOptionsModalModel {
   product: MenuProduct
@@ -58,6 +59,19 @@ export function KassaProductOptionsModal({
     : 'min(80vh, calc(100% - 5rem))'
 
   const optionsSessionKey = `${model.product.id ?? ''}:${model.editingCartKey ?? ''}`
+  const lineNoteInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const el = lineNoteInputRef.current
+    if (!el) return
+    const onProgrammaticInput = (e: Event) => {
+      const detail = (e as CustomEvent<{ value?: string }>).detail
+      if (typeof detail?.value !== 'string') return
+      onLineNoteChange(detail.value)
+    }
+    el.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
+    return () => el.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
+  }, [onLineNoteChange, optionsSessionKey])
 
   useEffect(() => {
     releaseLegacyOskInputGuards()
@@ -183,6 +197,7 @@ export function KassaProductOptionsModal({
             </label>
             <input
               key={optionsSessionKey}
+              ref={lineNoteInputRef}
               id="kassa-line-note"
               type="text"
               data-testid="kassa-line-note-input"
