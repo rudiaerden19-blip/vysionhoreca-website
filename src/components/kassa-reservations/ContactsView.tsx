@@ -106,13 +106,20 @@ export function ContactsView({
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           type="text"
+          inputMode="search"
+          autoComplete="off"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value)
             setPage(0)
           }}
+          onPointerDown={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) {
+              e.currentTarget.focus()
+            }
+          }}
           placeholder={rk('contactsSearchPlaceholder')}
-          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-[#075985]"
+          className="min-h-[44px] w-full touch-manipulation rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-[#075985]"
         />
       </div>
 

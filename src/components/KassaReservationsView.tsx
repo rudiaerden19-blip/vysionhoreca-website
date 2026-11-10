@@ -113,6 +113,7 @@ import {
   KassaSoundActivationScreen,
   useKassaSoundActivationGate,
 } from '@/components/kassa/KassaSoundActivationGate'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 
 // ---- Props ----
@@ -477,6 +478,26 @@ export default function KassaReservationsView({
   const [contactPromoMessage, setContactPromoMessage] = useState('')
   const [contactPromoSending, setContactPromoSending] = useState(false)
   const [contactPromoSelectionReset, setContactPromoSelectionReset] = useState(0)
+
+  const { oskContentPad, oskModalMaxHeight, dismissOsk } = useAdminAzertyOskPageChrome({
+    scrollDeps: [
+      showNewReservationModal,
+      showWalkInModal,
+      showWaitlistModal,
+      showSearchPopup,
+      showResSearch,
+      viewMode,
+      contactPromoRecipients.length,
+      showOnlineReservationsModal,
+      editReservation?.id,
+    ],
+    defaultPaddingBottom: '0px',
+  })
+
+  const oskModalOverlayClass =
+    oskContentPad > 0
+      ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+      : 'items-center justify-center'
 
   /** Tijdlijn: rechts slepen om duur (duration_minutes) te wijzigen */
   const timelineDurDragRef = useRef<{
@@ -2403,7 +2424,12 @@ export default function KassaReservationsView({
 
   // ---- Main render ----
   return (
-    <div className={shellFixed}>
+    <div
+      className={shellFixed}
+      data-osk-scroll
+      data-osk-next="true"
+      data-testid="admin-osk-reservations"
+    >
       {isAdminPagePresentation && !soundActivated && (
         <KassaSoundActivationScreen ui={adminSoundUi} onActivate={activateSound} />
       )}
@@ -2561,10 +2587,17 @@ export default function KassaReservationsView({
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
+                inputMode="text"
+                autoComplete="off"
                 placeholder={rk('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none"
+                onPointerDown={(e) => {
+                  if (e.currentTarget instanceof HTMLInputElement) {
+                    e.currentTarget.focus()
+                  }
+                }}
+                className={`w-full rounded-xl border border-gray-200 bg-gray-100 py-2 pl-10 pr-4 outline-none focus:border-black ${KASSA_FLOOR_MODAL_TOUCH}`}
               />
             </div>
           )}
@@ -2578,10 +2611,13 @@ export default function KassaReservationsView({
         } ${
           viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'floorplan'
             ? 'flex flex-col overflow-hidden'
-            : 'overflow-y-auto'
+            : 'overflow-y-auto touch-pan-y'
         }`}
         key={viewMode}
         data-vysion-locale={locale}
+        style={{
+          paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+        }}
       >
         {loading && (
           <div className="flex items-center justify-center py-12">
@@ -4208,9 +4244,21 @@ export default function KassaReservationsView({
               {/* Zoekbalk */}
               {showResSearch && (
                 <div className="px-4 py-2 border-b border-gray-200 flex-shrink-0 bg-gray-50">
-                  <input autoFocus type="text" placeholder={rk('searchPopupPlaceholder')}
-                    value={resSearch} onChange={e => setResSearch(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:border-[#6b7d9e] focus:ring-2 focus:ring-[#e8eef6]"/>
+                  <input
+                    autoFocus
+                    type="text"
+                    inputMode="search"
+                    autoComplete="off"
+                    placeholder={rk('searchPopupPlaceholder')}
+                    value={resSearch}
+                    onChange={(e) => setResSearch(e.target.value)}
+                    onPointerDown={(e) => {
+                      if (e.currentTarget instanceof HTMLInputElement) {
+                        e.currentTarget.focus()
+                      }
+                    }}
+                    className={`w-full rounded-xl border border-gray-300 px-4 py-2 text-sm outline-none focus:border-[#6b7d9e] focus:ring-2 focus:ring-[#e8eef6] ${KASSA_FLOOR_MODAL_TOUCH}`}
+                  />
                 </div>
               )}
 
@@ -4482,7 +4530,11 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'settings' && (
-          <div className="max-w-2xl overflow-y-auto h-full pb-8">
+          <div
+            className="max-w-2xl h-full overflow-y-auto touch-pan-y pb-8"
+            data-osk-scroll
+            data-osk-next="true"
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">{rk('reservationSettingsTitle')}</h3>
               <button
@@ -4902,13 +4954,23 @@ export default function KassaReservationsView({
         typeof document !== 'undefined' &&
         createPortal(
         <div
-          className="fixed inset-0 z-[72] flex items-center justify-center bg-black/50 p-4 pointer-events-auto"
+          className={`fixed inset-0 z-[72] pointer-events-auto flex bg-black/50 p-4 ${oskModalOverlayClass}`}
           data-vysion-modal-overlay
-          onClick={() => !contactPromoSending && setContactPromoRecipients([])}
+          onClick={() => {
+            if (contactPromoSending) return
+            dismissOsk()
+            setContactPromoRecipients([])
+          }}
         >
           <div
-            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl [color-scheme:light]"
+            className="w-full max-w-lg touch-pan-y overflow-y-auto rounded-2xl bg-white p-6 shadow-xl [color-scheme:light]"
             data-vysion-light-form
+            data-osk-scroll
+            data-osk-next="true"
+            style={{
+              maxHeight: oskModalMaxHeight,
+              paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+            }}
             onClick={e => e.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-2">
@@ -5007,7 +5069,12 @@ export default function KassaReservationsView({
       {/* New Reservation Modal */}
       {showNewReservationModal && (
         <NewReservationModal
-          onClose={() => setShowNewReservationModal(false)}
+          onClose={() => {
+            dismissOsk()
+            setShowNewReservationModal(false)
+          }}
+          oskContentPad={oskContentPad}
+          oskModalMaxHeight={oskModalMaxHeight}
           onSave={handleAddReservation}
           rk={rk}
           tables={
@@ -5200,21 +5267,44 @@ export default function KassaReservationsView({
         const sortedDates = Object.keys(grouped).sort()
 
         return (
-          <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4"
-            style={{ background: 'rgba(0,0,0,0.4)'}}
-            onClick={() => setShowSearchPopup(false)}>
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden"
-              style={{ maxHeight: '75vh'}}
-              onClick={e => e.stopPropagation()}>
+          <div
+            className={`fixed inset-0 z-50 flex px-4 ${oskModalOverlayClass}`}
+            style={{ background: 'rgba(0,0,0,0.4)' }}
+            onClick={() => {
+              dismissOsk()
+              setShowSearchPopup(false)
+            }}
+          >
+            <div
+              className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl touch-pan-y overflow-y-auto"
+              data-osk-scroll
+              data-osk-next="true"
+              style={{
+                maxHeight: oskModalMaxHeight ?? '75vh',
+                paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Zoekbalk */}
               <div className="px-4 pt-4 pb-3 border-b border-gray-100">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">{rk('searchLabel')}</p>
                 <div className="flex items-center gap-3 bg-gray-100 rounded-xl px-4 py-2">
                   <Search size={20} className="text-gray-400 flex-shrink-0"/>
-                  <input autoFocus type="text" value={searchPopupQuery}
-                    onChange={e => setSearchPopupQuery(e.target.value)}
+                  <input
+                    autoFocus
+                    type="text"
+                    inputMode="search"
+                    autoComplete="off"
+                    value={searchPopupQuery}
+                    onChange={(e) => setSearchPopupQuery(e.target.value)}
+                    onPointerDown={(e) => {
+                      if (e.currentTarget instanceof HTMLInputElement) {
+                        e.currentTarget.focus()
+                      }
+                    }}
                     placeholder={rk('searchPopupPlaceholder')}
-                    className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder-gray-400"/>
+                    className={`flex-1 bg-transparent text-base text-gray-800 outline-none placeholder-gray-400 ${KASSA_FLOOR_MODAL_TOUCH}`}
+                  />
                   {searchPopupQuery && (
                     <button onClick={() => setSearchPopupQuery('')} className="text-gray-400 hover:text-gray-600">
                       <X size={16}/>
@@ -5282,7 +5372,12 @@ export default function KassaReservationsView({
           reservations={reservations}
           shifts={reservationSettings.shifts || []}
           bufferMinutes={reservationSettings.bufferMinutes || 0}
-          onClose={() => setEditReservation(null)}
+          onClose={() => {
+            dismissOsk()
+            setEditReservation(null)
+          }}
+          oskContentPad={oskContentPad}
+          oskModalMaxHeight={oskModalMaxHeight}
           onSave={async (updated) => {
             const r = await adminDb.update(
               'reservations',
@@ -5336,9 +5431,26 @@ interface EditReservationModalProps {
   onClose: () => void
   onSave: (updated: Reservation) => Promise<void>
   onCancel: () => Promise<void>
+  oskContentPad?: number
+  oskModalMaxHeight?: string
 }
 
-function EditReservationModal({ reservation, tables, reservations, shifts, bufferMinutes, onClose, onSave, onCancel }: EditReservationModalProps) {
+function EditReservationModal({
+  reservation,
+  tables,
+  reservations,
+  shifts,
+  bufferMinutes,
+  onClose,
+  onSave,
+  onCancel,
+  oskContentPad = 0,
+  oskModalMaxHeight,
+}: EditReservationModalProps) {
+  const oskModalOverlayClass =
+    oskContentPad > 0
+      ? 'items-start overflow-y-auto overscroll-y-contain pt-14 pb-2'
+      : 'items-center justify-center'
   const { t } = useLanguage()
   const rk = useMemo(() => makeReservationKassaRk(t), [t])
   const [form, setForm] = useState({
@@ -5412,11 +5524,21 @@ function EditReservationModal({ reservation, tables, reservations, shifts, buffe
   const inputCls = 'w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-black outline-none text-base'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background:'rgba(0,0,0,0.5)'}}
-      onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden"
-        style={{ maxHeight:'92vh'}}
-        onClick={e => e.stopPropagation()}>
+    <div
+      className={`fixed inset-0 z-50 flex px-4 ${oskModalOverlayClass}`}
+      style={{ background: 'rgba(0,0,0,0.5)' }}
+      onClick={onClose}
+    >
+      <div
+        className="flex w-full max-w-lg flex-col overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl touch-pan-y"
+        data-osk-scroll
+        data-osk-next="true"
+        style={{
+          maxHeight: oskModalMaxHeight ?? '92vh',
+          paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
 
         {/* Header */}
         <div className="flex items-start justify-between gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50 flex-shrink-0">
@@ -6153,9 +6275,27 @@ interface NewReservationModalProps {
   shifts: Shift[]
   bufferMinutes: number
   rk: (key: string, rep?: Record<string, string>) => string
+  oskContentPad?: number
+  oskModalMaxHeight?: string
 }
 
-function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations, shifts, bufferMinutes, rk }: NewReservationModalProps) {
+function NewReservationModal({
+  onClose,
+  onSave,
+  tables,
+  defaultDurationMinutes,
+  maxPartySize,
+  reservations,
+  shifts,
+  bufferMinutes,
+  rk,
+  oskContentPad = 0,
+  oskModalMaxHeight,
+}: NewReservationModalProps) {
+  const oskModalOverlayClass =
+    oskContentPad > 0
+      ? 'items-start overflow-y-auto overscroll-y-contain pt-14 pb-2'
+      : 'items-center justify-center'
   const [formData, setFormData] = useState({
     guest_first_name: '',
     guest_last_name: '',
@@ -6278,8 +6418,16 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     `w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors[field] ? 'border-red-500': 'border-gray-200'} focus:border-green-500 outline-none`
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+    <div className={`fixed inset-0 z-[60] flex bg-black/50 p-4 ${oskModalOverlayClass}`}>
+      <div
+        className="w-full max-w-xl touch-pan-y overflow-y-auto rounded-2xl bg-white max-h-[90vh]"
+        data-osk-scroll
+        data-osk-next="true"
+        style={{
+          paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+          maxHeight: oskModalMaxHeight,
+        }}
+      >
         {/* Header */}
         <div className="sticky top-0 bg-white p-6 pb-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
