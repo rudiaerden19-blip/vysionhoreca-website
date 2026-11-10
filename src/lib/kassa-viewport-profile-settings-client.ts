@@ -6,6 +6,8 @@ import type { KassaViewportChromeTokens } from '@/lib/kassa-viewport-chrome-toke
 
 const SESSION_KEY = 'vysion-kassa-vp-settings-v1'
 
+const EMPTY_SETTINGS = { version: '0', map: {} as KassaViewportProfileSettingsMap }
+
 export function readCachedKassaViewportProfileSettings(): {
   version: string
   map: KassaViewportProfileSettingsMap
@@ -38,25 +40,34 @@ export async function fetchKassaViewportProfileSettingsMap(): Promise<{
   version: string
   map: KassaViewportProfileSettingsMap
 }> {
-  const res = await fetch('/api/kassa/viewport-profile-settings', {
-    credentials: 'same-origin',
-    cache: 'no-store',
-  })
-  if (!res.ok) {
+  try {
+    const res = await fetch('/api/kassa/viewport-profile-settings', {
+      credentials: 'same-origin',
+      cache: 'no-store',
+    })
+    if (!res.ok) {
+      const cached = readCachedKassaViewportProfileSettings()
+      return cached ?? EMPTY_SETTINGS
+    }
+    const body = (await res.json()) as { version?: string; map?: KassaViewportProfileSettingsMap }
+    const version = body.version ?? '0'
+    const map = body.map ?? {}
+    writeCachedKassaViewportProfileSettings(version, map)
+    return { version, map }
+  } catch {
     const cached = readCachedKassaViewportProfileSettings()
-    return cached ?? { version: '0', map: {} }
+    return cached ?? EMPTY_SETTINGS
   }
-  const body = (await res.json()) as { version?: string; map?: KassaViewportProfileSettingsMap }
-  const version = body.version ?? '0'
-  const map = body.map ?? {}
-  writeCachedKassaViewportProfileSettings(version, map)
-  return { version, map }
 }
 
 export function resolveKassaChromeTokensForProfile(
   profileId: KassaViewportProfileId,
   map: KassaViewportProfileSettingsMap,
 ): KassaViewportChromeTokens {
-  const patch = map[profileId] ?? {}
-  return applyProfileSettingsToChromeTokens(profileId, patch)
+  try {
+    const patch = map[profileId] ?? {}
+    return applyProfileSettingsToChromeTokens(profileId, patch)
+  } catch {
+    return applyProfileSettingsToChromeTokens(profileId, {})
+  }
 }

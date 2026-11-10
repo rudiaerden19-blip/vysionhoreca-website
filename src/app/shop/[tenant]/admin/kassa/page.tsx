@@ -1317,15 +1317,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     let cancelled = false
-    void (async () => {
-      const { map } = await fetchKassaViewportProfileSettingsMap()
-      if (!cancelled) setKassaViewportSettingsMap(map)
-    })()
-    const poll = window.setInterval(() => {
-      void fetchKassaViewportProfileSettingsMap().then(({ map }) => {
+    const load = async () => {
+      try {
+        const { map } = await fetchKassaViewportProfileSettingsMap()
         if (!cancelled) setKassaViewportSettingsMap(map)
-      })
-    }, 60_000)
+      } catch {
+        /* defaults — geen Sentry-reject */
+      }
+    }
+    void load()
+    const poll = window.setInterval(() => void load(), 60_000)
     return () => {
       cancelled = true
       clearInterval(poll)
@@ -1333,7 +1334,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [])
 
   useEffect(() => {
-    const sync = () => setKassaViewportProfileId(readKassaViewportProfileIdFromWindow())
+    const sync = () => {
+      try {
+        setKassaViewportProfileId(readKassaViewportProfileIdFromWindow())
+      } catch {
+        setKassaViewportProfileId('default')
+      }
+    }
     sync()
     window.addEventListener('resize', sync)
     window.visualViewport?.addEventListener?.('resize', sync)

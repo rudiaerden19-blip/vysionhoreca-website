@@ -4,8 +4,11 @@
  */
 
 import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
-import { KASSA_LAYOUT_LAB_FRAMES } from '@/lib/kassa-layout-preview'
-import { readKassaViewportProfileIdFromBrowser } from '@/lib/kassa-viewport-profile-id-helpers'
+import { KASSA_LAYOUT_LAB_FRAMES, resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
+import {
+  readKassaIpadClientFromWindow,
+  readKassaViewportProfileFromWindow,
+} from '@/lib/kassa-viewport-profile'
 
 export const KASSA_VIEWPORT_PROFILE_IDS = [
   'wide15',
@@ -49,6 +52,23 @@ export function isKassaViewportProfileId(raw: string | null | undefined): raw is
   return (KASSA_VIEWPORT_PROFILE_IDS as readonly string[]).includes(raw.trim())
 }
 
+function readKassaChromeFlagsForProfileId(): {
+  wide15: boolean
+  sxgaDense: boolean
+  ipadClient: boolean
+} {
+  if (typeof window !== 'undefined') {
+    const preview = resolveKassaLayoutPreviewChrome(new URLSearchParams(window.location.search))
+    if (preview) return preview
+  }
+  const vp = readKassaViewportProfileFromWindow()
+  return {
+    sxgaDense: vp === 'sxga17',
+    wide15: vp === 'wide15',
+    ipadClient: readKassaIpadClientFromWindow(),
+  }
+}
+
 /** iPad landschap: logische viewport → ipad-profiel (anders desktop-profielen). */
 export function resolveKassaViewportProfileIdFromWindow(input: {
   wide15: boolean
@@ -74,8 +94,26 @@ export function resolveKassaViewportProfileIdFromWindow(input: {
 
 export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
   if (typeof window === 'undefined') return 'default'
-  const sp = new URLSearchParams(window.location.search)
-  const forced = sp.get('kvp')
-  if (isKassaViewportProfileId(forced)) return forced
-  return readKassaViewportProfileIdFromBrowser()
+  try {
+    const sp = new URLSearchParams(window.location.search)
+    const forced = sp.get('kvp')
+    if (isKassaViewportProfileId(forced)) return forced
+    const flags = readKassaChromeFlagsForProfileId()
+    const vv = window.visualViewport
+    const cssW = Math.max(
+      1,
+      Math.floor(vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth),
+    )
+    const cssH = Math.max(
+      1,
+      Math.floor(vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight),
+    )
+    return resolveKassaViewportProfileIdFromWindow({
+      ...flags,
+      cssW,
+      cssH,
+    })
+  } catch {
+    return 'default'
+  }
 }

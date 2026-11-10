@@ -6,13 +6,24 @@ export const revalidate = 0
 
 /** Platform chrome voor alle tenants — read-only, geen secrets. */
 export async function GET() {
-  const { map, version } = await loadKassaViewportProfileSettingsMap()
-  return NextResponse.json(
-    { version, map },
-    {
-      headers: {
-        'Cache-Control': 'private, max-age=15, stale-while-revalidate=30',
+  try {
+    const { map, version } = await loadKassaViewportProfileSettingsMap()
+    return NextResponse.json(
+      { version, map },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=15, stale-while-revalidate=30',
+        },
       },
-    },
-  )
+    )
+  } catch {
+    return NextResponse.json(
+      { version: '0', map: {} },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=5',
+        },
+      },
+    )
+  }
 }
