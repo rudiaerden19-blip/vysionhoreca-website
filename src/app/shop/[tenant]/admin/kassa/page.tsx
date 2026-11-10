@@ -470,7 +470,7 @@ function readKassaViewportChromeProfileFromWindow(): KassaViewportProfileId {
   return readKassaViewportProfileIdFromWindow()
 }
 const KASSA_SIDEBAR_FOOTER_LEFT_COL_WIDE15 =
-  'w-[5.75rem] min-w-[5.75rem] max-w-[5.75rem] shrink-0'
+  'w-[7.5rem] min-w-[7.5rem] max-w-[7.5rem] shrink-0'
 /** Snel menu + Totaal-balk op 15″ — iets hoger dan overige footerknoppen. */
 const KASSA_WIDE15_FOOTER_TOTAL_ROW_MIN_H = 'min-h-[4.25rem]'
 
@@ -564,7 +564,7 @@ function kassaOrderTypeButtonTouchClass(density: KassaChromeDensity): string {
 
 /** Sidebar-footer: touch-vriendelijke hoogte (BTW-bon / Bon / Verwijder). */
 function kassaFooterActionTouchMinHClass(density: KassaChromeDensity, denseBill: boolean): string {
-  if (density === 'wide15') return 'min-h-[3.5rem]'
+  if (density === 'wide15') return 'min-h-[3.5rem] py-2'
   if (density === 'sxga') return 'min-h-[4.75rem] py-2.5'
   if (denseBill) return 'min-h-[4rem] py-2'
   return 'min-h-[4.25rem] py-2.5'
@@ -5868,19 +5868,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       : 'gap-4'
     : 'gap-1.5'
 
-  /** 15″: label in bovenste glansband (niet verticaal midden — oogt te laag op gloss-knop). */
-  const kassaSidebarFooterBtnFlexClass = kassaWide15Chrome
-    ? 'flex items-start justify-center pt-2 pb-2.5'
-    : 'flex items-center justify-center'
+  const kassaSidebarFooterBtnFlexClass = 'flex items-center justify-center'
 
   const kassaSidebarActionLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
-      ? 'text-center text-base font-semibold leading-tight tracking-[0.02em]'
+      ? 'text-center text-[15px] font-semibold leading-none tracking-[0.02em]'
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
       : kassaAppearanceDark
         ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
         : 'text-center text-xs font-bold leading-tight sm:text-sm'
+
+  /** Snel menu + Num pad op 15″ — één regel. */
+  const kassaSidebarFooterLeftLabelClass = kassaWide15Chrome
+    ? `${kassaSidebarActionLabelClass} whitespace-nowrap`
+    : kassaSidebarActionLabelClass
 
   /** Zelfde typografie als Num pad / BTW-bon; Op rekening mag wrappen. */
   const kassaSidebarPairLabelClass = `max-w-full whitespace-normal break-words px-2 ${kassaSidebarActionLabelClass}`
@@ -7606,14 +7608,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`}
                 title={t('kassaApp.quickMenu')}
               >
-                <span className={`leading-tight ${kassaSidebarActionLabelClass}`}>{t('kassaApp.quickMenu')}</span>
+                <span className={kassaSidebarFooterLeftLabelClass}>{t('kassaApp.quickMenu')}</span>
               </button>
               )}
               <div
                 role="status"
                 aria-live="polite"
-                className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[4.25rem] py-1.5' : ''
+                className={`flex min-w-0 flex-1 items-center justify-between gap-1.5 px-2 ${kassaPosRaisedStripClass(posChrome)} ${
+                  kassaWide15Chrome ? 'min-h-[4.25rem]' : ''
                 }`}
               >
                 <span
@@ -7621,7 +7623,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   isTheLagoonTenant(tenant)
                     ? 'text-xl sm:text-2xl'
                     : kassaWide15Chrome
-                      ? 'text-xl leading-tight'
+                      ? 'text-lg leading-none'
                       : 'text-base sm:text-lg'
                 }`}
                 >
@@ -7632,7 +7634,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     isTheLagoonTenant(tenant)
                       ? 'text-3xl sm:text-[2.15rem]'
                       : kassaWide15Chrome
-                        ? 'text-[1.75rem]'
+                        ? 'text-[1.55rem] leading-none'
                         : kassaCompactChrome || kassaSidebarFooterTier !== 'dense'
                           ? 'text-2xl sm:text-[1.65rem]'
                           : 'text-xl'
@@ -7819,11 +7821,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`${kassaSidebarFooterBtnFlexClass} px-3 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[3.5rem]' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
+                className={`${kassaSidebarFooterBtnFlexClass} px-2 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
+                  kassaWide15Chrome ? 'min-h-[3.5rem] py-2' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
                 }`}
               >
-                <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
+                <span className={kassaSidebarFooterLeftLabelClass}>{t('kassaApp.numpadToggle')}</span>
               </button>
               )}
               <button
@@ -7838,7 +7840,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   isTheLagoonTenant(tenant)
                     ? 'min-h-[4.25rem] py-3 text-2xl font-bold'
                     : kassaWide15Chrome
-                      ? 'min-h-[3.6rem] text-lg font-bold'
+                      ? 'min-h-[3.6rem] py-2 text-lg font-bold'
                       : kassaCompactChrome
                         ? 'min-h-[4rem] py-3.5 text-lg'
                         : 'min-h-[3.5rem] py-3 text-lg'
