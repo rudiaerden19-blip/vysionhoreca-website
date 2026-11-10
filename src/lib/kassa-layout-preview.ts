@@ -2,6 +2,8 @@ import type { KassaViewportProfile } from '@/lib/kassa-viewport-profile'
 
 /** Alleen superadmin layout-lab; geen productie-feature voor zaken. */
 export const KASSA_LAYOUT_PREVIEW_QUERY = 'kassa_layout_preview'
+export const KASSA_LAYOUT_PREVIEW_LAB_W = 'lab_w'
+export const KASSA_LAYOUT_PREVIEW_LAB_H = 'lab_h'
 
 export type KassaLayoutLabFrame = {
   id: string
@@ -61,6 +63,54 @@ export function resolveKassaLayoutPreviewChrome(
   }
 }
 
+/** Vaste lab-logische pixels — iframe mag niet `device-width` van ultrawide desktop zijn. */
+export function resolveKassaLayoutPreviewViewportPixels(
+  sp: URLSearchParams,
+): { w: number; h: number } | null {
+  if (!isKassaLayoutPreviewSearchParams(sp)) return null
+  const w = Number.parseInt(sp.get(KASSA_LAYOUT_PREVIEW_LAB_W) ?? '', 10)
+  const h = Number.parseInt(sp.get(KASSA_LAYOUT_PREVIEW_LAB_H) ?? '', 10)
+  if (Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0) {
+    return { w, h }
+  }
+  const vp = parseViewportOverride(sp.get('vp'))
+  if (!vp) return null
+  const frame = KASSA_LAYOUT_LAB_FRAMES.find(
+    (f) => f.vp === vp && (f.id === '15' || f.id === '17' || f.id === '21'),
+  )
+  return frame ? { w: frame.cssW, h: frame.cssH } : null
+}
+
+/** Zet viewport-meta voor layout-lab; cleanup bij unmount. */
+export function applyKassaLayoutPreviewViewportFromSearchParams(
+  sp: URLSearchParams,
+): (() => void) | undefined {
+  const dims = resolveKassaLayoutPreviewViewportPixels(sp)
+  if (!dims) return undefined
+  if (typeof document === 'undefined') return undefined
+
+  let meta = document.querySelector('meta[name="viewport"]') as HTMLMetaElement | null
+  const created = !meta
+  if (!meta) {
+    meta = document.createElement('meta')
+    meta.setAttribute('name', 'viewport')
+    document.head.appendChild(meta)
+  }
+  const previous = meta.getAttribute('content') ?? ''
+  meta.setAttribute(
+    'content',
+    `width=${dims.w}, height=${dims.h}, initial-scale=1, maximum-scale=1, user-scalable=no`,
+  )
+
+  return () => {
+    if (created) {
+      meta?.remove()
+      return
+    }
+    if (previous) meta?.setAttribute('content', previous)
+  }
+}
+
 export function buildKassaLayoutPreviewKassaUrl(
   tenantSlug: string,
   frame: KassaLayoutLabFrame,
@@ -71,6 +121,8 @@ export function buildKassaLayoutPreviewKassaUrl(
     [KASSA_LAYOUT_PREVIEW_QUERY]: '1',
     vp: frame.vp,
     ipad: frame.ipadClient ? '1' : '0',
+    [KASSA_LAYOUT_PREVIEW_LAB_W]: String(frame.cssW),
+    [KASSA_LAYOUT_PREVIEW_LAB_H]: String(frame.cssH),
   })
   return `${origin.replace(/\/$/, '')}/shop/${encodeURIComponent(slug)}/admin/kassa?${q.toString()}`
 }

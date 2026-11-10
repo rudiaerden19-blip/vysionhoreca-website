@@ -397,7 +397,10 @@ import {
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
-import { resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
+import {
+  applyKassaLayoutPreviewViewportFromSearchParams,
+  resolveKassaLayoutPreviewChrome,
+} from '@/lib/kassa-layout-preview'
 import {
   estimateKassaSidebarWidthPxForInnerWidth,
   getKassaViewportChromeTokens,
@@ -1291,6 +1294,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       html.classList.remove('vysion-kassa-root')
       body.classList.remove('vysion-kassa-root')
     }
+  }, [])
+
+  /** Layout-lab iframe: viewport = lab_w×lab_h, niet device-width van desktop. */
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+    return applyKassaLayoutPreviewViewportFromSearchParams(
+      new URLSearchParams(window.location.search),
+    )
   }, [])
 
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */

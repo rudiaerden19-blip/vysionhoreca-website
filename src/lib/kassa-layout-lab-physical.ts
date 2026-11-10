@@ -21,7 +21,13 @@ export function kassaLabPhysicalBoxCm(
   return { widthCm: 34.5, heightCm: 19.4 }
 }
 
-export function labIframeScaleForPhysicalBox(boxWidthPx: number, cssW: number): number {
-  if (!(boxWidthPx > 0 && cssW > 0)) return 1
-  return boxWidthPx / cssW
+/** Uniforme schaal zodat 1366×768 / 1280×1024 / 1920×1080 het cm-kader vult zonder rechterstrook. */
+export function labIframeScaleForPhysicalBox(
+  boxWidthPx: number,
+  boxHeightPx: number,
+  cssW: number,
+  cssH: number,
+): number {
+  if (!(boxWidthPx > 0 && boxHeightPx > 0 && cssW > 0 && cssH > 0)) return 1
+  return Math.min(boxWidthPx / cssW, boxHeightPx / cssH)
 }

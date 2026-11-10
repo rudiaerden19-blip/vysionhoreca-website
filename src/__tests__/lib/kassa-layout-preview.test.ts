@@ -2,6 +2,7 @@ import {
   buildKassaLayoutPreviewKassaUrl,
   KASSA_LAYOUT_LAB_FRAMES,
   resolveKassaLayoutPreviewChrome,
+  resolveKassaLayoutPreviewViewportPixels,
 } from '@/lib/kassa-layout-preview'
 
 describe('kassa-layout-preview', () => {
@@ -29,5 +30,14 @@ describe('kassa-layout-preview', () => {
     expect(url).toContain('/shop/oh-green/admin/kassa')
     expect(url).toContain('kassa_layout_preview=1')
     expect(url).toContain('vp=default')
+    expect(url).toContain('lab_w=1920')
+    expect(url).toContain('lab_h=1080')
+  })
+
+  it('preview viewport uit lab_w/lab_h', () => {
+    const sp = new URLSearchParams(
+      'kassa_layout_preview=1&vp=wide15&lab_w=1366&lab_h=768',
+    )
+    expect(resolveKassaLayoutPreviewViewportPixels(sp)).toEqual({ w: 1366, h: 768 })
   })
 })

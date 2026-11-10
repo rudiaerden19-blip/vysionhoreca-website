@@ -1,4 +1,8 @@
-import { KASSA_LAB_FIXED_BOX_CM, kassaLabPhysicalBoxCm } from '@/lib/kassa-layout-lab-physical'
+import {
+  KASSA_LAB_FIXED_BOX_CM,
+  kassaLabPhysicalBoxCm,
+  labIframeScaleForPhysicalBox,
+} from '@/lib/kassa-layout-lab-physical'
 import { KASSA_LAYOUT_LAB_FRAMES } from '@/lib/kassa-layout-preview'
 
 describe('kassa-layout-lab-physical', () => {
@@ -13,5 +17,12 @@ describe('kassa-layout-lab-physical', () => {
       const frame = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === id)!
       expect(kassaLabPhysicalBoxCm(frame)).toEqual(KASSA_LAB_FIXED_BOX_CM[id])
     }
+  })
+
+  it('iframe schaal vult kader uniform', () => {
+    const s = labIframeScaleForPhysicalBox(1000, 800, 1920, 1080)
+    expect(s).toBeCloseTo(1000 / 1920, 5)
+    expect(1920 * s).toBeCloseTo(1000, 2)
+    expect(1080 * s).toBeLessThanOrEqual(800 + 0.01)
   })
 })

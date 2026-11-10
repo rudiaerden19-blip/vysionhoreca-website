@@ -50,7 +50,7 @@ function Preview({
     const measure = () => {
       const r = el.getBoundingClientRect()
       if (r.width > 0 && r.height > 0) {
-        setScale(labIframeScaleForPhysicalBox(r.width, frame.cssW))
+        setScale(labIframeScaleForPhysicalBox(r.width, r.height, frame.cssW, frame.cssH))
       }
     }
     measure()
@@ -67,7 +67,7 @@ function Preview({
       </p>
       <div
         ref={boxRef}
-        className="relative overflow-hidden border-[3px] border-amber-500 bg-[#0b0f14]"
+        className="relative box-border overflow-hidden border-[3px] border-amber-500 bg-[#0b0f14]"
         style={{
           width: `${physical.widthCm}cm`,
           height: `${physical.heightCm}cm`,
@@ -77,7 +77,7 @@ function Preview({
           key={`${frame.id}-${iframeKey}`}
           title={`${label} — ${tenantSlug}`}
           src={src}
-          className="absolute left-0 top-0 m-0 block border-0"
+          className="kassa-layout-lab-embed absolute left-0 top-0 m-0 block border-0"
           style={{
             width: frame.cssW,
             height: frame.cssH,

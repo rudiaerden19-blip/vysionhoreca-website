@@ -426,6 +426,12 @@ img, video, iframe, embed, object {
   height: auto;
 }
 
+/* Superadmin kassa layout-lab: vaste logische px — geen max-width/height:auto van globals op iframe. */
+iframe.kassa-layout-lab-embed {
+  max-width: none !important;
+  max-height: none !important;
+}
+
 /* Prevent iOS zoom on input focus */
 @media (max-width: 768px) {
   input, select, textarea {
