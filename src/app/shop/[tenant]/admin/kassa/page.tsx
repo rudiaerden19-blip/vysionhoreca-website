@@ -392,7 +392,6 @@ import {
   formatKassaVatInvoiceNumber,
 } from '@/lib/kassa-vat-invoice-layout'
 import {
-  kassaDefaultMenuClassicGridCols,
   kassaDefaultMenuGridTailwindCols,
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
