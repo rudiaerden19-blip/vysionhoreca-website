@@ -71,6 +71,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     normalizeKassaOskLineShortcuts([]),
   )
   const [shift, setShift] = useState(false)
+  const shiftRef = useRef(false)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
   const focusOutTimerRef = useRef<number | undefined>(undefined)
@@ -156,6 +157,17 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     }
   }, [lineShortcutDraft, lineShortcutsOnKassaPos, tenantSlugForOsk])
 
+  useEffect(() => {
+    shiftRef.current = shift
+  }, [shift])
+
+  const clearFocusOutTimer = useCallback(() => {
+    if (focusOutTimerRef.current !== undefined) {
+      window.clearTimeout(focusOutTimerRef.current)
+      focusOutTimerRef.current = undefined
+    }
+  }, [])
+
   const hideKeyboard = useCallback((disarm: boolean) => {
     if (disarm) {
       if (activeRef.current) disarmKassaOskInput(activeRef.current)
@@ -230,13 +242,6 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!enabled) return
 
-    const clearFocusOutTimer = () => {
-      if (focusOutTimerRef.current !== undefined) {
-        window.clearTimeout(focusOutTimerRef.current)
-        focusOutTimerRef.current = undefined
-      }
-    }
-
     const onFocusIn = (e: FocusEvent) => {
       if (!isKassaAzertyOskTextTarget(e.target)) return
       /** Na Toevoegen/Annuleren in opties-modal: opnieuw typen moet OSK weer openen. */
@@ -303,7 +308,15 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       document.removeEventListener('focusout', onFocusOut, true)
       disarmAllKassaOskInputs()
     }
-  }, [attachField, enabled, hideKeyboard, keyboardPinned, lineNoteFieldActive, manualOpen])
+  }, [
+    attachField,
+    clearFocusOutTimer,
+    enabled,
+    hideKeyboard,
+    keyboardPinned,
+    lineNoteFieldActive,
+    manualOpen,
+  ])
 
   const dismissAzertyOsk = useCallback(() => {
     suppressedRef.current = true
@@ -344,29 +357,64 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     ],
   )
 
-  const sendEdit = (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
-    let el = activeRef.current
-    if (!el?.isConnected) {
-      const active = document.activeElement
-      if (isKassaAzertyOskTextTarget(active)) {
-        el = active
-        activeRef.current = active
-      }
+  const resolveOskEditTarget = useCallback((): HTMLInputElement | HTMLTextAreaElement | null => {
+    const tracked = activeRef.current
+    if (tracked?.isConnected && isKassaAzertyOskTextTarget(tracked)) {
+      return tracked
     }
-    if (!el?.isConnected) return
-    focusInputForProgrammaticEdit(el)
-    applyKassaAzertyOskEdit(el, edit)
-  }
+    const active = document.activeElement
+    if (isKassaAzertyOskTextTarget(active)) {
+      activeRef.current = active
+      return active
+    }
+    const armed = document.querySelector('[data-kassa-osk-armed="true"]')
+    if (
+      (armed instanceof HTMLInputElement || armed instanceof HTMLTextAreaElement) &&
+      armed.isConnected
+    ) {
+      activeRef.current = armed
+      return armed
+    }
+    return null
+  }, [])
 
-  const onOskKeyPointerUp =
+  const sendEdit = useCallback(
+    (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
+      const el = resolveOskEditTarget()
+      if (!el?.isConnected) return
+      focusInputForProgrammaticEdit(el)
+      applyKassaAzertyOskEdit(el, edit)
+      activeRef.current = el
+    },
+    [resolveOskEditTarget],
+  )
+
+  const onOskKeyPointerDown =
     (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => (e: React.PointerEvent) => {
-      e.preventDefault()
       if (e.button !== 0) return
+      e.preventDefault()
+      e.stopPropagation()
+      clearFocusOutTimer()
       sendEdit(edit)
     }
 
-  const onKeyPointerDown = (e: React.PointerEvent) => {
+  const onOskLetterKeyPointerDown = useCallback(
+    (key: string) => (e: React.PointerEvent) => {
+      if (e.button !== 0) return
+      e.preventDefault()
+      e.stopPropagation()
+      clearFocusOutTimer()
+      sendEdit({ char: kassaAzertyKeyDisplay(key, shiftRef.current) })
+    },
+    [clearFocusOutTimer, sendEdit],
+  )
+
+  const onShiftPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0) return
     e.preventDefault()
+    e.stopPropagation()
+    clearFocusOutTimer()
+    setShift((s) => !s)
   }
 
   const insertLineShortcut = useCallback(
@@ -447,8 +495,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                   key={`n-${key}`}
                   type="button"
                   className={keyBtnClass}
-                  onPointerDown={onKeyPointerDown}
-                  onPointerUp={onOskKeyPointerUp({ char: kassaAzertyKeyDisplay(key, shift) })}
+                  onPointerDown={onOskLetterKeyPointerDown(key)}
                 >
                   {kassaAzertyKeyDisplay(key, shift)}
                 </button>
@@ -465,8 +512,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                     key={key}
                     type="button"
                     className={keyBtnClass}
-                    onPointerDown={onKeyPointerDown}
-                    onPointerUp={onOskKeyPointerUp({ char: kassaAzertyKeyDisplay(key, shift) })}
+                    onPointerDown={onOskLetterKeyPointerDown(key)}
                   >
                     {kassaAzertyKeyDisplay(key, shift)}
                   </button>
@@ -477,16 +523,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               <button
                 type="button"
                 className={`${keyBtnClass} min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
-                onPointerDown={onKeyPointerDown}
-                onClick={() => setShift((s) => !s)}
+                onPointerDown={onShiftPointerDown}
               >
                 ⇧
               </button>
               <button
                 type="button"
                 className={`${keyBtnClass} min-w-[2.85rem] px-2 sm:min-w-[3rem]`}
-                onPointerDown={onKeyPointerDown}
-                onPointerUp={onOskKeyPointerUp({ char: KASSA_AZERTY_AT_CHAR })}
+                onPointerDown={onOskKeyPointerDown({ char: KASSA_AZERTY_AT_CHAR })}
                 data-testid="kassa-azerty-osk-at"
               >
                 @
@@ -494,8 +538,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               <button
                 type="button"
                 className={`${keyBtnClass} text-base tracking-widest text-neutral-300`}
-                onPointerDown={onKeyPointerDown}
-                onPointerUp={onOskKeyPointerUp('space')}
+                onPointerDown={onOskKeyPointerDown('space')}
                 data-testid="kassa-azerty-osk-space"
                 aria-label={t('kassaApp.azertyOskSpace')}
               >
@@ -504,8 +547,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               <button
                 type="button"
                 className={`${keyBtnClass} min-w-[2.85rem] px-2.5 sm:min-w-[3rem]`}
-                onPointerDown={onKeyPointerDown}
-                onPointerUp={onOskKeyPointerUp('backspace')}
+                onPointerDown={onOskKeyPointerDown('backspace')}
               >
                 ⌫
               </button>
