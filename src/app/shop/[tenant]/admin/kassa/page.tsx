@@ -509,6 +509,8 @@ const KASSA_NUMPAD_KEYS = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3'
 
 /** Scroll vs tik op embedded touch/WebView (o.a. Elo): kleine beweging telt nog als tik */
 const KASSA_TILE_TAP_SLOP_PX = 18
+/** Categoriebalk boven producten — reserve bij rijhoogte op categorie-overzicht zodat tegels gelijk blijven. */
+const KASSA_CATEGORY_STRIP_LAYOUT_RESERVE_PX_FALLBACK = 49
 /** Horizontale categoriebalk: ruimere slop + scroll-as detectie (17″/21″/iPad). */
 const KASSA_STRIP_TAP_SLOP_PX = 24
 const KASSA_STRIP_SCROLL_AXIS_MIN_PX = 8
@@ -1945,6 +1947,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaProductGridRef = useRef<HTMLDivElement>(null)
   const kassaCategoryGridRef = useRef<HTMLDivElement>(null)
   const kassaCategoryStripRef = useRef<HTMLDivElement>(null)
+  const kassaCategoryStripBarRef = useRef<HTMLDivElement>(null)
+  const kassaCategoryStripReservePxRef = useRef(KASSA_CATEGORY_STRIP_LAYOUT_RESERVE_PX_FALLBACK)
   /** Vorige gekozen categorie-id; null = nog nooit naar producten geweest. */
   const kassaPrevSelectedCategoryIdRef = useRef<string | null>(null)
 
@@ -2337,6 +2341,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         const pl = parseFloat(st.paddingLeft) || 0
         const pr = parseFloat(st.paddingRight) || 0
         const innerH = el.clientHeight - pt - pb
+        const stripBar = kassaCategoryStripBarRef.current
+        if (stripBar && stripBar.offsetHeight > 0) {
+          kassaCategoryStripReservePxRef.current = stripBar.offsetHeight
+        }
+        const categoryStripReservePx =
+          categories.length > 0 && !selectedCategory
+            ? kassaCategoryStripReservePxRef.current
+            : 0
+        const menuScrollInnerH = Math.max(0, innerH - categoryStripReservePx)
+        const menuGridGapPxForRow =
+          kassaWide15Chrome && !kassaSxgaDenseTiles ? 8 : KASSA_MENU_GRID_GAP_PX
         const gridInnerW = Math.max(0, el.clientWidth - pl - pr)
         const vpWsrc =
           window.visualViewport?.width != null && window.visualViewport.width > 0
@@ -2344,18 +2359,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             : window.innerWidth
         const viewportW = Math.max(1, Math.floor(vpWsrc))
         const fallback = computeInitialKassaMenuRowPx()
-        if (innerH <= 0) {
+        if (menuScrollInnerH <= 0) {
           setKassaMenuRowPx((prev) => (prev === fallback ? prev : fallback))
           return
         }
         let rowH =
-          ((innerH - (KASSA_MENU_VISIBLE_ROWS - 1) * KASSA_MENU_GRID_GAP_PX) / KASSA_MENU_VISIBLE_ROWS) *
+          ((menuScrollInnerH - (KASSA_MENU_VISIBLE_ROWS - 1) * menuGridGapPxForRow) / KASSA_MENU_VISIBLE_ROWS) *
           KASSA_MENU_TILE_HEIGHT_BOOST
         rowH = Math.max(108, Math.floor(rowH))
         const next = applyKassaMenuSquareMonitorTileRowCap(
           rowH,
           gridInnerW,
-          KASSA_MENU_GRID_GAP_PX,
+          menuGridGapPxForRow,
           KASSA_MENU_SQUARE_MONITOR_MAX_TILE_H_TO_CELL_W,
           viewportW,
         )
@@ -2380,6 +2395,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [
     selectedCategory,
+    categories.length,
     menuLoading,
     kassaSxgaDenseTiles,
     kassaWide15Chrome,
@@ -6734,6 +6750,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {/* Categoriebalk boven producten: alle tenant-categorieën, horizontaal scrollbaar */}
           {selectedCategory && categories.length > 0 && (
             <div
+              ref={kassaCategoryStripBarRef}
               className={`flex shrink-0 items-stretch border-b ${ui.categoryStripBorder} ${ui.categoryStripBg} ${
                 kassaAppearanceDark ? 'pl-2': ''
               }`}
