@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -12,9 +12,16 @@ import { KASSA_LAYOUT_REGRESSION_FRAME_IDS } from '@/lib/kassa-viewport-chrome-t
 
 /** Passend in beeld; 1 = echte pixelgrootte (scroll). */
 const DEFAULT_FIT_SCALE = 0.88
-const REGRESSION_FIT_SCALE = 0.36
 
 type LabViewMode = 'single' | 'regression'
+
+/** Volledige breedte in lab — geen afgeknipte mand door te smalle grid-kolom. */
+function labFitScale(cssW: number, viewportInnerWidth: number): number {
+  if (!Number.isFinite(cssW) || cssW <= 0) return DEFAULT_FIT_SCALE
+  const budget = Math.max(320, Math.min(1680, viewportInnerWidth - 56))
+  const fit = budget / cssW
+  return Math.min(1, Math.max(0.32, Math.round(fit * 100) / 100))
+}
 
 function KassaLayoutPreviewFrame({
   frame,
@@ -45,12 +52,12 @@ function KassaLayoutPreviewFrame({
   }
 
   return (
-    <section className="flex min-w-0 flex-col gap-1.5">
+    <section className="flex w-full max-w-full flex-col gap-1.5">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-sm font-bold text-zinc-200">{frame.label}</h2>
         <span className="text-xs text-zinc-500">
           {frame.cssW}×{frame.cssH} · vp={frame.vp}
-          {frame.ipadClient ? ' · iPad' : ''}
+          {frame.ipadClient ? ' · iPad' : ''} · zoom {Math.round(scale * 100)}%
         </span>
         <button
           type="button"
@@ -60,8 +67,9 @@ function KassaLayoutPreviewFrame({
           Volle grootte
         </button>
       </div>
+      <div className="max-w-full overflow-x-auto overflow-y-hidden pb-1">
       <div
-        className="overflow-hidden rounded-lg border-2 border-zinc-600 bg-black shadow-xl"
+        className="inline-block overflow-hidden rounded-lg border-2 border-zinc-600 bg-black shadow-xl"
         style={{ width: scaledW, height: scaledH }}
       >
         <div className="relative overflow-hidden" style={{ width: scaledW, height: scaledH }}>
@@ -82,6 +90,7 @@ function KassaLayoutPreviewFrame({
           />
         </div>
       </div>
+      </div>
     </section>
   )
 }
@@ -94,6 +103,16 @@ export default function SuperadminKassaLayoutLabPage() {
   const [scale, setScale] = useState(DEFAULT_FIT_SCALE)
   const [activeId, setActiveId] = useState<KassaLayoutLabFrame['id']>('15')
   const [iframeKey, setIframeKey] = useState(0)
+  const [viewportW, setViewportW] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1440,
+  )
+
+  useEffect(() => {
+    const onResize = () => setViewportW(window.innerWidth)
+    onResize()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
@@ -110,7 +129,14 @@ export default function SuperadminKassaLayoutLabPage() {
     [],
   )
 
-  const effectiveScale = viewMode === 'regression' ? REGRESSION_FIT_SCALE : scale
+  const effectiveScale = scale
+  const regressionScales = useMemo(
+    () =>
+      Object.fromEntries(
+        regressionFrames.map((f) => [f.id, labFitScale(f.cssW, viewportW)] as const),
+      ) as Record<string, number>,
+    [regressionFrames, viewportW],
+  )
 
   const kassaSrc = useMemo(() => {
     if (!tenantSlug || !activeFrame) return ''
@@ -231,8 +257,8 @@ export default function SuperadminKassaLayoutLabPage() {
             </label>
           ) : (
             <p className="ml-auto max-w-md text-right text-xs text-zinc-500">
-              Zelfde tenant als in de zaak — controleren of 21″/15″/17″ na een wijziging nog klopt.
-              Eerst «Kassa openen (login)» voor iframe-sessie.
+              Volledige kassa-breedte (geen 3 kolommen die afknippen). Eerst «Kassa openen (login)».
+              Grote zwarte rand rechts = preview te smal — scroll of «Volle grootte».
             </p>
           )}
         </div>
@@ -263,14 +289,14 @@ export default function SuperadminKassaLayoutLabPage() {
         {!tenantSlug ? (
           <p className="text-zinc-400">Vul een tenant slug in (bv. oh-green).</p>
         ) : viewMode === 'regression' ? (
-          <div className="mx-auto grid max-w-[1800px] grid-cols-1 gap-6 xl:grid-cols-3">
+          <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-10">
             {regressionFrames.map((frame) => (
               <KassaLayoutPreviewFrame
                 key={frame.id}
                 frame={frame}
                 tenantSlug={tenantSlug}
                 origin={origin}
-                scale={effectiveScale}
+                scale={regressionScales[frame.id] ?? labFitScale(frame.cssW, viewportW)}
                 iframeKey={iframeKey}
               />
             ))}
