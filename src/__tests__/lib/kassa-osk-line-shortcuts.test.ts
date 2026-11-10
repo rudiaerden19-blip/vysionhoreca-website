@@ -4,11 +4,18 @@ import {
   normalizeKassaOskLineShortcuts,
   sanitizeKassaOskLineShortcutLabel,
   isAdminOskNextFormField,
+  isKassaOskLineShortcutsEnabled,
   isKassaOskShortcutSlotField,
   shouldOpenAzertyOskForFieldFocus,
 } from '@/lib/kassa-osk-line-shortcuts'
 
 describe('kassa-osk-line-shortcuts', () => {
+  it('snelteksten OSK: zelfde enable voor elke tenant-slug (geen whitelist)', () => {
+    expect(isKassaOskLineShortcutsEnabled('lomichillplay')).toBe(true)
+    expect(isKassaOskLineShortcutsEnabled('nieuwe-zaak-2026')).toBe(true)
+    expect(isKassaOskLineShortcutsEnabled(' ')).toBe(false)
+  })
+
   it('normaliseert naar 10 slots', () => {
     expect(normalizeKassaOskLineShortcuts(['Jan', 'zonder ui'])).toHaveLength(10)
     expect(normalizeKassaOskLineShortcuts(['Jan', 'zonder ui'])[0]).toBe('Jan')

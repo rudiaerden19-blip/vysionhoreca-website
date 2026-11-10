@@ -6,8 +6,9 @@ export const KASSA_OSK_LINE_SHORTCUT_MAX_LEN = 15
 export const KASSA_OSK_LINE_NOTE_ATTR = 'data-kassa-osk-line-note'
 export const KASSA_OSK_SHORTCUT_SLOT_ATTR = 'data-kassa-osk-shortcut-slot'
 
+/** Geen tenant-whitelist — elke geldige slug op horeca-kassa. */
 export function isKassaOskLineShortcutsEnabled(tenantSlug: string): boolean {
-  return isKassaAzertyOskManualOpenEnabled(tenantSlug)
+  return isKassaAzertyOskManualOpenEnabled(tenantSlug.trim())
 }
 
 export function isKassaOskLineNoteField(target: EventTarget | null): boolean {

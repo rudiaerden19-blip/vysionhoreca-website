@@ -433,31 +433,51 @@ export async function saveTenantKassaLanPrintEnabled(
   return { ok: true }
 }
 
-/** Horeca-kassa: 10 snelteksten naast toetsenbord (regel-opmerking). */
+/** Horeca-kassa: 10 snelteksten naast toetsenbord (regel-opmerking). Alle tenants zelfde pad; upsert bij ontbrekende rij. */
 export async function saveKassaOskLineShortcuts(
   tenantSlug: string,
   shortcuts: string[],
 ): Promise<{ ok: boolean; error?: string }> {
+  const slug = tenantSlug.trim().toLowerCase()
+  if (!slug) return { ok: false, error: 'tenant_slug ontbreekt' }
+
   const { normalizeKassaOskLineShortcuts } = await import('@/lib/kassa-osk-line-shortcuts')
   const payload = normalizeKassaOskLineShortcuts(shortcuts)
+
   const { data, error } = await supabase
     .from('tenant_settings')
     .update({ kassa_osk_line_shortcuts: payload })
-    .eq('tenant_slug', tenantSlug)
+    .eq('tenant_slug', slug)
     .select('tenant_slug')
 
   if (error) {
+    if (/kassa_osk_line_shortcuts|column .* does not exist|schema cache/i.test(error.message)) {
+      return {
+        ok: false,
+        error:
+          'Kolom kassa_osk_line_shortcuts ontbreekt. Voer supabase/tenant_settings_kassa_osk_line_shortcuts.sql uit (alle tenants).',
+      }
+    }
     console.error('saveKassaOskLineShortcuts:', error.message)
     return { ok: false, error: error.message }
   }
-  if (!data || data.length === 0) {
-    return {
-      ok: false,
-      error:
-        'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_osk_line_shortcuts.sql uit.',
-    }
+
+  if (data && data.length > 0) {
+    cache.invalidate(cacheKey('tenant_settings', slug))
+    return { ok: true }
   }
-  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+
+  const upsert = await adminDb.upsert(
+    'tenant_settings',
+    { tenant_slug: slug, kassa_osk_line_shortcuts: payload },
+    { onConflict: 'tenant_slug', tenantSlug: slug },
+  )
+  if (!upsert.ok) {
+    console.error('saveKassaOskLineShortcuts upsert:', upsert.error)
+    return { ok: false, error: upsert.error || 'Opslaan mislukt' }
+  }
+
+  cache.invalidate(cacheKey('tenant_settings', slug))
   return { ok: true }
 }
 

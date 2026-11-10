@@ -19,7 +19,7 @@ De **horeca-kassa** (`src/app/shop/[tenant]/admin/kassa/`) **nooit aanraken**
  `npm test -- --testPathPatterns=kassa-table-park-flow` en `npm test -- --testPathPatterns=controlled-number-input`.
 - Vóór wijzigingen aan **op rekening v2** (zie `.cursor/rules/kassa-name-account-v2-sacred.mdc`):
   `npm test -- --testPathPatterns=kassa-name-account` en `npm test -- --testPathPatterns=kassa-name-tabs-cache` en `npm test -- --testPathPatterns=kassa-name-account-modal-ui`.
-- **AZERTY + snelteksten + numpad-opmerking** niet aanraken zonder expliciete opdracht (zie `.cursor/rules/kassa-osk-snelteksten-sacred.mdc`). Verplichte tests bij wél wijzigen:
+- **AZERTY-toetsenbord + snelteksten + numpad-opmerking (nov 2026 werkend): NOOIT AANRAKEN** zonder ontgrendeling in de opdracht («JE MAG HET TOETSENBORD / OSK / SNELTEKSTEN WIJZIGEN»). Zie `.cursor/rules/kassa-osk-snelteksten-sacred.mdc`. Zelfde OSK-code voor **alle** tenants. Verplichte tests bij wél wijzigen:
   `npm test -- --testPathPatterns=kassa-osk-line-shortcuts`, `kassa-azerty-osk`, `kassa-numpad-custom-amount`, `kassa-cart-line-key`.
 - **Vysion Music playback/flow niet aanraken** (zie `.cursor/rules/vysion-music-playback-sacred.mdc`) — alleen Soundtrack-lijsten/sync/API zonder `VysionMusicClient` transport.
 

@@ -5,16 +5,39 @@ alwaysApply: true
 
 # Kassa — AZERTY OSK, snelteksten & numpad-opmerking (HEILIG)
 
-**Eigenaar:** (1) potlood → opmerking productmodal; (2) blauw **Toetsenbord** → snelknoppen bewerken; (3) **numpad** vrije bedrag + opmerking → mand. Meerdere keren kapot door AI. **Geen agent wijzigt dit** tenzij de gebruiker in **dezelfde opdracht** expliciet schrijft dat **snelteksten / OSK / numpad-opmerkingen** **mag** worden aangepast.
+**Status (eigenaar, nov 2026):** toetsenbord + sneltekst bewerken (blauw Toetsenbord) + snel typen → **werkt**. **NOOIT MEER AANRAKEN** zonder expliciete ontgrendeling.
 
-## Beschermde paden (geen writes zonder expliciete opdracht)
+**Eigenaar:** (1) potlood → opmerking productmodal; (2) blauw **Toetsenbord** → snelknoppen bewerken; (3) **numpad** vrije bedrag + opmerking → mand. Meerdere keren kapot door AI.
 
-**OSK & snelteksten**
+## Ontgrendeling (verplicht in dezelfde gebruikersopdracht)
+
+Alleen wijzigen als de gebruiker letterlijk schrijft dat het **mag**, bv.:
+
+- **«JE MAG HET TOETSENBORD / OSK / SNELTEKSTEN WIJZIGEN»**
+- of expliciet: **snelteksten / OSK / numpad-opmerkingen mag worden aangepast**
+
+Zonder die zin: **geen writes, geen refactor, geen “kleine fix”** — ook niet na een bugmelding in een andere module.
+
+## Multi-tenant (niet onderhandelbaar)
+
+- **Één** production-deploy = **zelfde** toetsenbord-code voor **alle** tenants.
+- **Verboden:** `if (tenantSlug === '…')`, `if (slug === 'demo-frituur')`, aparte OSK-paden per zaak.
+- `tenant_slug` alleen voor **data** (laden/opslaan `kassa_osk_line_shortcuts`), nooit voor andere UI of toetsen.
+
+## Beschermde paden (geen writes zonder ontgrendeling)
+
+**OSK & snelteksten (volledig)**
 
 - `src/components/kassa/KassaAzertyOskProvider.tsx`
 - `src/components/kassa/KassaOskLineShortcutsPad.tsx`
 - `src/lib/kassa-osk-line-shortcuts.ts`
-- `src/lib/dom-input-value.ts` (`KASSA_OSK_PROGRAMMATIC_INPUT_EVENT`, `setNativeInputValue`)
+- `src/lib/kassa-azerty-osk.ts`
+- `src/lib/kassa-azerty-osk-context.ts`
+- `src/lib/dom-input-value.ts` (OSK sync: `KASSA_OSK_PROGRAMMATIC_INPUT_EVENT`, controlled buffer, `setNativeInputValue`)
+- `src/hooks/useKassaSpeelsDarkOskChrome.ts`
+- `src/app/shop/[tenant]/ShopAzertyOskShell.tsx`
+- `src/lib/admin-api.ts` — alleen `saveKassaOskLineShortcuts` (+ tenant slug, geen andere tenant-branches)
+- `src/components/GlobalAutoCapitalize.tsx` — alleen `data-kassa-osk-*` / `data-no-capitalize` skip
 - `src/components/kassa/KassaProductOptionsModal.tsx` — alleen als diff **line note / OSK-sync** raakt
 - `src/__tests__/lib/kassa-osk-line-shortcuts.test.ts`
 - `src/__tests__/lib/kassa-azerty-osk.test.ts`
@@ -77,8 +100,16 @@ Faalt een test → **geen** commit.
 ## Gemeenschappelijk
 
 - Sneltekst draft: `clampKassaOskLineShortcutDraft`; trim bij insert via `sanitizeKassaOskLineShortcutLabel`.
-- Multi-tenant shortcuts: `saveKassaOskLineShortcuts`.
-- Alle tenants.
+- Multi-tenant shortcuts: `saveKassaOskLineShortcuts` (upsert als `tenant_settings` rij ontbreekt).
+- Alle tenants, zelfde gedrag.
+
+## Vastgelegd werkend — niet “verbeteren”
+
+1. **Snel typen:** `lineShortcutDraftRef` + `flushSync` + caret-ref; controlled buffer (`seedKassaOskControlledFieldEditState`) voor opmerking.
+2. **Save/load:** geen `setLineShortcutDraft` na succesvolle save; `saveSeq` tegen stale HTTP; load niet over `dirty`/`keyboardPinned`.
+3. **Toetsen:** `pointerdown` + `click` met dedupe (zelfde toets), geen globale 120ms-blokkade op herhaalde letters.
+4. **Blauw Toetsenbord:** `shortcutSlotsEditable`; resolve armed sneltekst-slot; **geen** `readOnly`/`inputMode=none` op slots die typen blokkeren.
+5. **Autocapitalize:** geen `input`-hook op `data-kassa-osk-shortcut-slot` / `data-kassa-osk-line-note`.
 
 ## Verboden
 
@@ -97,6 +128,10 @@ buildKassaCartLineKey(pid, choices) // opmerking weglaten terwijl UI wel note to
 
 // NOOIT — kiosk-only pointerup
 onPointerUp only voor toetsen of ›
+
+// NOOIT — per-tenant OSK
+if (tenantSlug === 'cafemarquise') { ... }
+if (isOhGreenKassaTenant(...)) { ... } // in OSK-paden (korting elsewhere OK)
 ```
 
 ## Scope
