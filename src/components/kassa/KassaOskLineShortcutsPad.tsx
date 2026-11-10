@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef } from 'react'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
@@ -23,6 +22,7 @@ type Props = {
   slotsEditable?: boolean
   onClose?: () => void
   onDraftChange: (next: string[]) => void
+  onSlotFocus?: (input: HTMLInputElement) => void
   onInsert: (label: string) => void
 }
 
@@ -39,9 +39,18 @@ export function KassaOskLineShortcutsPad({
   kassaNumpad = false,
   slotsEditable = false,
   onClose,
+  onDraftChange,
+  onSlotFocus,
   onInsert,
 }: Props) {
   const { t } = useLanguage()
+
+  const setSlot = (index: number, value: string) => {
+    const next = [...draft]
+    next[index] = value.slice(0, KASSA_OSK_LINE_SHORTCUT_MAX_LEN)
+    onDraftChange(next)
+  }
+
   const fieldClass = speelsDark
     ? `kassa-osk-shortcut-field ${OSK_SHORTCUT_FIELD_HEIGHT} w-full rounded-xl pl-1 pr-8 text-center text-xs font-bold outline-none sm:text-sm`
     : `${OSK_SHORTCUT_FIELD_HEIGHT} w-full rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-8 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:text-sm`
@@ -110,20 +119,21 @@ export function KassaOskLineShortcutsPad({
                     type="text"
                     maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
                     value={label}
-                    readOnly
                     autoComplete="off"
                     autoCapitalize="off"
                     autoCorrect="off"
                     spellCheck={false}
-                    inputMode="none"
+                    inputMode="text"
                     data-no-capitalize="true"
                     data-kassa-osk-force="true"
                     data-kassa-osk-shortcut-slot="true"
                     data-kassa-osk-shortcut-index={String(index)}
+                    onChange={(e) => setSlot(index, e.target.value)}
                     onPointerDown={(e) => {
-                      if (e.currentTarget instanceof HTMLInputElement) {
-                        e.currentTarget.focus()
-                      }
+                      const input = e.currentTarget
+                      if (!(input instanceof HTMLInputElement)) return
+                      input.focus()
+                      onSlotFocus?.(input)
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
