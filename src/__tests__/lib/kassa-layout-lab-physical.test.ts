@@ -1,8 +1,7 @@
 import {
-  KASSA_LAB_PANEL_DIAGONAL_CM,
-  kassaLabDefaultPanelWidthCmForFrame,
+  KASSA_LAB_FIXED_BOX_CM,
+  KASSA_LAB_FIXED_DIAGONAL_CM,
   kassaLabPhysicalBoxCm,
-  kassaLabViewableWidthCmFromDiagonal,
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
 import { KASSA_LAYOUT_LAB_FRAMES } from '@/lib/kassa-layout-preview'
@@ -12,38 +11,26 @@ describe('kassa-layout-lab-physical', () => {
   const frame17 = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === '17')!
   const frame21 = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === '21')!
 
-  it('diagonalen 39 / 43 / 54,6 cm (zaak)', () => {
-    expect(KASSA_LAB_PANEL_DIAGONAL_CM['15']).toBe(39)
-    expect(KASSA_LAB_PANEL_DIAGONAL_CM['17']).toBe(43)
-    expect(KASSA_LAB_PANEL_DIAGONAL_CM['21']).toBe(54.6)
+  it('vaste diagonalen 21/15/17', () => {
+    expect(KASSA_LAB_FIXED_DIAGONAL_CM).toEqual({ '21': 54.6, '15': 39, '17': 43 })
   })
 
-  it('15″ breedte uit 39 cm diagonaal (1366×768)', () => {
-    const w = kassaLabViewableWidthCmFromDiagonal(39, 1366, 768)
-    expect(w).toBeCloseTo(34, 0)
-    const box = kassaLabPhysicalBoxCm(frame15)
-    expect(box.widthCm).toBeCloseTo(34, 0)
+  it('vaste box 15″ ≈ 34 cm breed', () => {
+    expect(KASSA_LAB_FIXED_BOX_CM['15'].widthCm).toBeCloseTo(34, 0)
+    expect(kassaLabPhysicalBoxCm(frame15)).toEqual(KASSA_LAB_FIXED_BOX_CM['15'])
   })
 
-  it('17″ vierkant breedte uit 43 cm diagonaal', () => {
-    const box = kassaLabPhysicalBoxCm(frame17)
-    expect(box.widthCm).toBeCloseTo(33.6, 1)
-    expect(box.heightCm).toBeCloseTo(33.6 * (1024 / 1280), 1)
+  it('vaste box 17″ vierkant', () => {
+    expect(KASSA_LAB_FIXED_BOX_CM['17'].widthCm).toBeCloseTo(33.6, 1)
+    expect(kassaLabPhysicalBoxCm(frame17)).toEqual(KASSA_LAB_FIXED_BOX_CM['17'])
   })
 
-  it('21″ breedte uit 54,6 cm diagonaal (1920×1080)', () => {
-    const box = kassaLabPhysicalBoxCm(frame21)
-    expect(box.widthCm).toBeCloseTo(47.5, 0)
-    expect(kassaLabDefaultPanelWidthCmForFrame(frame21)).toBeCloseTo(47.5, 0)
+  it('vaste box 21″', () => {
+    expect(KASSA_LAB_FIXED_BOX_CM['21'].widthCm).toBeCloseTo(47.5, 0)
+    expect(kassaLabPhysicalBoxCm(frame21)).toEqual(KASSA_LAB_FIXED_BOX_CM['21'])
   })
 
   it('schaal = doosbreedte / cssW', () => {
-    const px = 345
-    expect(labIframeScaleForPhysicalBox(px, 1366)).toBeCloseTo(px / 1366, 5)
-  })
-
-  it('override cm per frame', () => {
-    const box = kassaLabPhysicalBoxCm(frame15, { '15': 34.5 })
-    expect(box.widthCm).toBe(34.5)
+    expect(labIframeScaleForPhysicalBox(345, 1366)).toBeCloseTo(345 / 1366, 5)
   })
 })

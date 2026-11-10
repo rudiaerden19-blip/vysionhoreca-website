@@ -9,14 +9,18 @@ import {
   type KassaLayoutLabFrame,
 } from '@/lib/kassa-layout-preview'
 import {
-  KASSA_LAB_PANEL_DIAGONAL_CM,
-  kassaLabDefaultPanelWidthCmForFrame,
+  KASSA_LAB_FIXED_BOX_CM,
   kassaLabPhysicalBoxCm,
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
 import { KASSA_LAYOUT_REGRESSION_FRAME_IDS } from '@/lib/kassa-viewport-chrome-tokens'
 
-const CM_OVERRIDES_STORAGE = 'kassa-layout-lab-cm-overrides-v1'
+const VASTE_PANELEN_TEKST = (['21', '15', '17'] as const)
+  .map((id) => {
+    const b = KASSA_LAB_FIXED_BOX_CM[id]
+    return `${id}″ ${b.widthCm}×${b.heightCm} cm`
+  })
+  .join(' · ')
 
 /** Passend in beeld (niet lineaal). */
 const DEFAULT_FIT_SCALE = 0.88
@@ -31,25 +35,12 @@ function labFitScale(cssW: number, viewportInnerWidth: number): number {
   return Math.min(1, Math.max(0.32, Math.round(fit * 100) / 100))
 }
 
-function readCmOverrides(): Record<string, number> {
-  if (typeof window === 'undefined') return {}
-  try {
-    const raw = window.localStorage.getItem(CM_OVERRIDES_STORAGE)
-    if (!raw) return {}
-    const parsed = JSON.parse(raw) as Record<string, number>
-    return typeof parsed === 'object' && parsed ? parsed : {}
-  } catch {
-    return {}
-  }
-}
-
 function KassaLayoutPreviewFrame({
   frame,
   tenantSlug,
   origin,
   sizeMode,
   fitScale,
-  cmOverrides,
   iframeKey,
 }: {
   frame: KassaLayoutLabFrame
@@ -57,15 +48,11 @@ function KassaLayoutPreviewFrame({
   origin: string
   sizeMode: LabSizeMode
   fitScale: number
-  cmOverrides: Record<string, number>
   iframeKey: number
 }) {
   const boxRef = useRef<HTMLDivElement>(null)
   const [physicalScale, setPhysicalScale] = useState(0.25)
-  const physical = useMemo(
-    () => kassaLabPhysicalBoxCm(frame, cmOverrides),
-    [cmOverrides, frame],
-  )
+  const physical = useMemo(() => kassaLabPhysicalBoxCm(frame), [frame])
 
   const src = useMemo(
     () => buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost'),
@@ -191,28 +178,6 @@ export default function SuperadminKassaLayoutLabPage() {
   const [viewportW, setViewportW] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1440,
   )
-  const [cmOverrides, setCmOverrides] = useState<Record<string, number>>({})
-
-  useEffect(() => {
-    setCmOverrides(readCmOverrides())
-  }, [])
-
-  const persistCm = useCallback((next: Record<string, number>) => {
-    setCmOverrides(next)
-    try {
-      window.localStorage.setItem(CM_OVERRIDES_STORAGE, JSON.stringify(next))
-    } catch {
-      /* ignore */
-    }
-  }, [])
-
-  const setFrameCm = useCallback(
-    (id: string, cm: number) => {
-      if (!(cm > 0)) return
-      persistCm({ ...cmOverrides, [id]: cm })
-    },
-    [cmOverrides, persistCm],
-  )
 
   useEffect(() => {
     const onResize = () => setViewportW(window.innerWidth)
@@ -272,26 +237,6 @@ export default function SuperadminKassaLayoutLabPage() {
       )
     }
   }, [origin, regressionFrames, tenantSlug])
-
-  function CmCalibrationStrip() {
-    return (
-      <div className="mb-4 flex flex-wrap items-center gap-4 rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-xs">
-        <span className="font-semibold text-amber-100">Kalibratie lineaal:</span>
-        <div className="flex items-center gap-2">
-          <div
-            className="h-3 shrink-0 rounded-sm bg-amber-400"
-            style={{ width: '10cm' }}
-            title="10 cm"
-          />
-          <span className="text-amber-100/90">= 10 cm</span>
-        </div>
-        <span className="text-zinc-400">
-          Klopt 10 cm niet op jouw scherm? Pas paneelbreedte hieronder aan tot de preview overeenkomt
-          met de kassa-PC in de zaak.
-        </span>
-      </div>
-    )
-  }
 
   return (
     <div className="flex min-h-screen flex-col bg-[#0f1419] text-zinc-100">
@@ -413,40 +358,9 @@ export default function SuperadminKassaLayoutLabPage() {
           )}
         </div>
         <p className="mx-auto mt-2 max-w-[1800px] text-xs text-zinc-500">
-          Dit lab wijzigt <strong className="text-zinc-300">geen</strong> kassa bij klanten — alleen
-          vooraf kijken. Wat zij op de toog zien = echte PC → «Open 3 vensters» of kassa in de zaak.
+          Lab raakt klanten niet. Vaste panelen (lineaal):{' '}
+          <span className="text-amber-200/90">{VASTE_PANELEN_TEKST}</span>
         </p>
-        {sizeMode === 'physical' ? (
-          <div className="mx-auto mt-2 flex max-w-[1800px] flex-wrap items-center gap-3 text-xs text-zinc-400">
-            <span className="font-semibold text-amber-200/90">Beeldbreedte (cm) 21·15·17:</span>
-            {KASSA_LAYOUT_REGRESSION_FRAME_IDS.map((id) => {
-              const frame = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === id)!
-              const def = kassaLabDefaultPanelWidthCmForFrame(frame)
-              const diag = KASSA_LAB_PANEL_DIAGONAL_CM[id]
-              const val = cmOverrides[id] ?? def
-              return (
-                <label key={id} className="flex items-center gap-1">
-                  {id}″
-                  {diag ? (
-                    <span className="text-zinc-500" title="Diagonaal paneel">
-                      ({diag} cm diag)
-                    </span>
-                  ) : null}
-                  <input
-                    type="number"
-                    min={20}
-                    max={80}
-                    step={0.1}
-                    value={val}
-                    onChange={(e) => setFrameCm(id, Number(e.target.value))}
-                    className="w-16 rounded border border-zinc-600 bg-zinc-900 px-1 py-0.5 text-zinc-100"
-                  />
-                  cm
-                </label>
-              )
-            })}
-          </div>
-        ) : null}
         {viewMode === 'single' ? (
           <div className="mx-auto mt-2 flex max-w-[1800px] flex-wrap gap-1.5">
             {KASSA_LAYOUT_LAB_FRAMES.map((frame) => (
@@ -475,7 +389,6 @@ export default function SuperadminKassaLayoutLabPage() {
           <p className="text-zinc-400">Vul een tenant slug in (bv. oh-green).</p>
         ) : viewMode === 'regression' ? (
           <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-10">
-            {sizeMode === 'physical' ? <CmCalibrationStrip /> : null}
             {regressionFrames.map((frame) => (
               <KassaLayoutPreviewFrame
                 key={frame.id}
@@ -484,24 +397,19 @@ export default function SuperadminKassaLayoutLabPage() {
                 origin={origin}
                 sizeMode={sizeMode}
                 fitScale={fitScaleForFrame(frame)}
-                cmOverrides={cmOverrides}
                 iframeKey={iframeKey}
               />
             ))}
           </div>
         ) : (
-          <>
-            {sizeMode === 'physical' ? <CmCalibrationStrip /> : null}
           <KassaLayoutPreviewFrame
             frame={activeFrame}
             tenantSlug={tenantSlug}
             origin={origin}
             sizeMode={sizeMode === 'fit' ? 'fit' : sizeMode}
             fitScale={sizeMode === 'fit' ? scale : fitScaleForFrame(activeFrame)}
-            cmOverrides={cmOverrides}
             iframeKey={iframeKey}
           />
-          </>
         )}
       </main>
     </div>
