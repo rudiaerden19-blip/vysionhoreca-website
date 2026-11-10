@@ -17,6 +17,7 @@ type Props = {
   speelsDark?: boolean
   /** Kassa-POS: vaste 3 cm knoppen, geen rek over mand. */
   kassaNumpad?: boolean
+  onClose?: () => void
   onDraftChange: (next: string[]) => void
   onInsert: (label: string) => void
 }
@@ -32,6 +33,7 @@ export function KassaOskLineShortcutsPad({
   draft,
   speelsDark = false,
   kassaNumpad = false,
+  onClose,
   onDraftChange,
   onInsert,
 }: Props) {
@@ -59,6 +61,23 @@ export function KassaOskLineShortcutsPad({
       data-testid="kassa-azerty-osk-shortcuts"
       aria-label={numpadTitle}
     >
+      {onClose ? (
+        <div className="mb-1 flex h-7 shrink-0 items-center justify-end">
+          <button
+            type="button"
+            className={
+              speelsDark
+                ? 'flex h-7 w-7 touch-manipulation items-center justify-center text-lg font-bold leading-none text-[#b0b0b0] active:opacity-80'
+                : 'flex h-7 w-7 touch-manipulation items-center justify-center text-lg font-bold leading-none text-neutral-300 active:text-white'
+            }
+            aria-label={t('kassaApp.azertyOskClose')}
+            data-testid="kassa-azerty-osk-close"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        </div>
+      ) : null}
       <div
         className="grid gap-2"
         style={{ gridTemplateColumns: `repeat(2, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})` }}

@@ -387,19 +387,21 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                   }
             }
           >
-            <button
-              type="button"
-              className={
-                speelsDarkOsk
-                  ? `absolute right-1.5 top-1.5 z-20 flex h-8 w-8 touch-manipulation items-center justify-center rounded-md text-xl font-bold leading-none text-[#b0b0b0] active:opacity-80`
-                  : 'absolute right-1.5 top-1.5 z-20 flex h-8 w-8 touch-manipulation items-center justify-center rounded-md text-xl font-bold leading-none text-neutral-300 active:text-white'
-              }
-              aria-label={t('kassaApp.azertyOskClose')}
-              data-testid="kassa-azerty-osk-close"
-              onClick={() => hideKeyboard(true)}
-            >
-              ✕
-            </button>
+            {!showLineShortcutsColumn ? (
+              <button
+                type="button"
+                className={
+                  speelsDarkOsk
+                    ? 'absolute right-1.5 top-1.5 z-20 flex h-8 w-8 touch-manipulation items-center justify-center text-xl font-bold leading-none text-[#b0b0b0] active:opacity-80'
+                    : 'absolute right-1.5 top-1.5 z-20 flex h-8 w-8 touch-manipulation items-center justify-center text-xl font-bold leading-none text-neutral-300 active:text-white'
+                }
+                aria-label={t('kassaApp.azertyOskClose')}
+                data-testid="kassa-azerty-osk-close"
+                onClick={() => hideKeyboard(true)}
+              >
+                ✕
+              </button>
+            ) : null}
           <div className="relative flex w-full items-start gap-0">
             <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="grid grid-cols-10 gap-2">
@@ -475,6 +477,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               draft={lineShortcutDraft}
               speelsDark={speelsDarkOsk}
               kassaNumpad={oskStretchToCart}
+              onClose={() => hideKeyboard(true)}
               onDraftChange={setLineShortcutDraft}
               onInsert={insertLineShortcut}
             />
