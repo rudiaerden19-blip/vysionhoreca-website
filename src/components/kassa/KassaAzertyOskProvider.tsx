@@ -357,26 +357,51 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     ],
   )
 
+  const shortcutSlotsEditable = keyboardPinned && !lineNoteFieldActive
+
+  const preferOskLineNoteTarget =
+    lineNoteFieldActive || (lineShortcutsOnKassaPos && !shortcutSlotsEditable)
+
+  const pickOskEditTarget = useCallback(
+    (candidate: HTMLInputElement | HTMLTextAreaElement | null | undefined) => {
+      if (!candidate?.isConnected || !isKassaAzertyOskTextTarget(candidate)) return null
+      if (preferOskLineNoteTarget && isKassaOskShortcutSlotField(candidate)) return null
+      return candidate
+    },
+    [preferOskLineNoteTarget],
+  )
+
   const resolveOskEditTarget = useCallback((): HTMLInputElement | HTMLTextAreaElement | null => {
-    const tracked = activeRef.current
-    if (tracked?.isConnected && isKassaAzertyOskTextTarget(tracked)) {
-      return tracked
+    const tracked = pickOskEditTarget(activeRef.current)
+    if (tracked) return tracked
+
+    if (preferOskLineNoteTarget) {
+      const line = findKassaOskLineNoteInput(null)
+      if (line) {
+        activeRef.current = line
+        return line
+      }
     }
+
     const active = document.activeElement
-    if (isKassaAzertyOskTextTarget(active)) {
-      activeRef.current = active
-      return active
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      const picked = pickOskEditTarget(active)
+      if (picked) {
+        activeRef.current = picked
+        return picked
+      }
     }
+
     const armed = document.querySelector('[data-kassa-osk-armed="true"]')
-    if (
-      (armed instanceof HTMLInputElement || armed instanceof HTMLTextAreaElement) &&
-      armed.isConnected
-    ) {
-      activeRef.current = armed
-      return armed
+    if (armed instanceof HTMLInputElement || armed instanceof HTMLTextAreaElement) {
+      const picked = pickOskEditTarget(armed)
+      if (picked) {
+        activeRef.current = picked
+        return picked
+      }
     }
     return null
-  }, [])
+  }, [pickOskEditTarget, preferOskLineNoteTarget])
 
   const sendEdit = useCallback(
     (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
@@ -560,6 +585,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               draft={lineShortcutDraft}
               speelsDark={speelsDarkOsk}
               kassaNumpad={oskStretchToCart}
+              slotsEditable={shortcutSlotsEditable}
               onClose={() => hideKeyboard(true)}
               onDraftChange={setLineShortcutDraft}
               onInsert={insertLineShortcut}

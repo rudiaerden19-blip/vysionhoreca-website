@@ -19,6 +19,8 @@ type Props = {
   speelsDark?: boolean
   /** Kassa-POS: vaste 3 cm knoppen, geen rek over mand. */
   kassaNumpad?: boolean
+  /** Alleen bij vast «Toetsenbord» bovenaan; anders tik = naar opmerking. */
+  slotsEditable?: boolean
   onClose?: () => void
   onDraftChange: (next: string[]) => void
   onInsert: (label: string) => void
@@ -35,6 +37,7 @@ export function KassaOskLineShortcutsPad({
   draft,
   speelsDark = false,
   kassaNumpad = false,
+  slotsEditable = false,
   onClose,
   onDraftChange,
   onInsert,
@@ -59,6 +62,15 @@ export function KassaOskLineShortcutsPad({
 
   const readSlotInsertLabel = (input: HTMLInputElement): string =>
     sanitizeKassaOskLineShortcutLabel(readKassaOskFieldValue(input))
+
+  const insertShortcutLabel = (rawLabel: string) => {
+    const insertLabel = sanitizeKassaOskLineShortcutLabel(rawLabel)
+    if (insertLabel) onInsert(insertLabel)
+  }
+
+  const insertSlotBtnClass = speelsDark
+    ? `kassa-osk-shortcut-field relative ${OSK_SHORTCUT_FIELD_HEIGHT} w-full touch-manipulation rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-7 text-center text-xs font-bold text-white active:border-[#58CCFF] sm:text-sm`
+    : `relative ${OSK_SHORTCUT_FIELD_HEIGHT} w-full touch-manipulation rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-7 text-center text-xs font-bold text-white active:border-[#58CCFF] sm:text-sm`
 
   const stripWidth = kassaNumpad ? KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH : KASSA_AZERTY_OSK_NUMPAD_WIDTH
   const numpadTitle = t('kassaApp.azertyOskShortcutsNumpadTitle')
@@ -100,49 +112,71 @@ export function KassaOskLineShortcutsPad({
               className="relative w-full min-w-0"
               style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}
             >
-              <input
-                type="text"
-                maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
-                value={label}
-                autoComplete="off"
-                inputMode="text"
-                data-kassa-osk-shortcut-slot="true"
-                onChange={(e) => setSlot(index, e.target.value)}
-                onPointerDown={(e) => {
-                  if (e.currentTarget instanceof HTMLInputElement) {
-                    e.currentTarget.focus()
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+              {slotsEditable ? (
+                <>
+                  <input
+                    type="text"
+                    maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
+                    value={label}
+                    autoComplete="off"
+                    inputMode="text"
+                    data-kassa-osk-shortcut-slot="true"
+                    onChange={(e) => setSlot(index, e.target.value)}
+                    onPointerDown={(e) => {
+                      if (e.currentTarget instanceof HTMLInputElement) {
+                        e.currentTarget.focus()
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        const insertLabel = readSlotInsertLabel(e.currentTarget)
+                        if (insertLabel) onInsert(insertLabel)
+                      }
+                    }}
+                    placeholder={`${index + 1}`}
+                    title={t('kassaApp.azertyOskShortcutEditHint')}
+                    className={fieldClass}
+                  />
+                  <button
+                    type="button"
+                    title={t('kassaApp.azertyOskShortcutInsertHint')}
+                    aria-label={t('kassaApp.azertyOskShortcutInsertHint')}
+                    aria-disabled={!trimmed}
+                    className={`${insertBtnClass} ${!trimmed ? 'pointer-events-none opacity-25' : ''}`}
+                    onPointerDown={(e) => {
+                      if (e.button !== 0) return
+                      e.preventDefault()
+                      e.stopPropagation()
+                      const row = e.currentTarget.parentElement
+                      const input = row?.querySelector('input[data-kassa-osk-shortcut-slot="true"]')
+                      if (!(input instanceof HTMLInputElement)) return
+                      const insertLabel = readSlotInsertLabel(input)
+                      if (insertLabel) onInsert(insertLabel)
+                    }}
+                  >
+                    ›
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  disabled={!trimmed}
+                  title={t('kassaApp.azertyOskShortcutInsertHint')}
+                  aria-label={t('kassaApp.azertyOskShortcutInsertHint')}
+                  data-testid={`kassa-osk-shortcut-insert-${index}`}
+                  className={`${insertSlotBtnClass} disabled:opacity-25`}
+                  onPointerDown={(e) => {
+                    if (e.button !== 0) return
                     e.preventDefault()
-                    const insertLabel = readSlotInsertLabel(e.currentTarget)
-                    if (insertLabel) onInsert(insertLabel)
-                  }
-                }}
-                placeholder={`${index + 1}`}
-                title={t('kassaApp.azertyOskShortcutEditHint')}
-                className={fieldClass}
-              />
-              <button
-                type="button"
-                title={t('kassaApp.azertyOskShortcutInsertHint')}
-                aria-label={t('kassaApp.azertyOskShortcutInsertHint')}
-                aria-disabled={!trimmed}
-                className={`${insertBtnClass} ${!trimmed ? 'pointer-events-none opacity-25' : ''}`}
-                onPointerDown={(e) => {
-                  if (e.button !== 0) return
-                  e.preventDefault()
-                  e.stopPropagation()
-                  const row = e.currentTarget.parentElement
-                  const input = row?.querySelector('input[data-kassa-osk-shortcut-slot="true"]')
-                  if (!(input instanceof HTMLInputElement)) return
-                  const insertLabel = readSlotInsertLabel(input)
-                  if (insertLabel) onInsert(insertLabel)
-                }}
-              >
-                ›
-              </button>
+                    e.stopPropagation()
+                    insertShortcutLabel(label)
+                  }}
+                >
+                  <span className="block truncate px-0.5">{trimmed || `${index + 1}`}</span>
+                  <span className={`${insertBtnClass} pointer-events-none`}>›</span>
+                </button>
+              )}
             </div>
           )
         })}
