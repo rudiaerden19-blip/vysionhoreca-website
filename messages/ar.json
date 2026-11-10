@@ -3646,6 +3646,7 @@
     "azertyOskTitle": "لوحة مفاتيح AZERTY",
     "azertyOskShow": "لوحة المفاتيح",
     "azertyOskHide": "إخفاء لوحة المفاتيح",
+    "azertyOskShortcutsNumpadTitle": "خيارات",
     "azertyOskShortcutsTitle": "نصوص سريعة للملاحظة",
     "azertyOskShortcutsHint": "14 حقلًا، 15 حرفًا لكل منها — لملاحظة المنتج أو لوحة الأرقام.",
     "azertyOskShortcutInsertHint": "نقر مزدوج أو Enter = في الملاحظة",

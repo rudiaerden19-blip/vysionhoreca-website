@@ -4301,6 +4301,7 @@
     "azertyOskTitle": "AZERTY keyboard",
     "azertyOskShow": "Keyboard",
     "azertyOskHide": "Hide keyboard",
+    "azertyOskShortcutsNumpadTitle": "Options",
     "azertyOskShortcutsTitle": "Note quick texts",
     "azertyOskShortcutsHint": "14 fields, 15 characters each — product or numpad notes.",
     "azertyOskShortcutInsertHint": "Double-click or Enter = insert into note",

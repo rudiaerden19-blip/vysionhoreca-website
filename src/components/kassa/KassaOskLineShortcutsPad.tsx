@@ -3,14 +3,11 @@
 import { useLanguage } from '@/i18n'
 import { KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS } from '@/lib/kassa-azerty-osk'
 import {
-  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
-  KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
-} from '@/lib/kassa-pos-surface'
-import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
   sanitizeKassaOskLineShortcutLabel,
 } from '@/lib/kassa-osk-line-shortcuts'
+import { KASSA_AZERTY_OSK_NUMPAD_WIDTH } from '@/lib/kassa-azerty-osk-context'
 
 type Props = {
   draft: string[]
@@ -21,6 +18,9 @@ type Props = {
   onSave: () => void
 }
 
+/**
+ * Numpad-zone rechts van AZERTY — zelfde behuizing, verticale scheiding (zoals fysiek toetsenbord).
+ */
 export function KassaOskLineShortcutsPad({
   draft,
   saving,
@@ -41,54 +41,58 @@ export function KassaOskLineShortcutsPad({
     e.preventDefault()
   }
 
-  const shellClass = speelsDark
-    ? `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS} rounded-r-2xl border border-l border-[#252525] shadow-[0_12px_40px_rgba(0,0,0,0.55)]`
-    : 'rounded-r-2xl border border-l-0 border-neutral-600 bg-neutral-800/95 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md'
-
   const fieldClass = speelsDark
-    ? 'kassa-osk-shortcut-field min-h-[2.65rem] w-full rounded-xl px-2 text-center text-sm font-bold outline-none sm:min-h-[2.85rem] sm:text-base'
-    : 'min-h-[2.65rem] w-full rounded-xl border border-neutral-500 bg-neutral-900 px-2 text-center text-sm font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[2.85rem] sm:text-base'
+    ? 'kassa-osk-shortcut-field min-h-[2.85rem] w-full min-w-0 rounded-xl px-1.5 text-center text-xs font-bold outline-none sm:min-h-[3rem] sm:text-sm'
+    : 'min-h-[2.85rem] w-full min-w-0 rounded-xl border border-neutral-500 bg-neutral-900 px-1.5 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[3rem] sm:text-sm'
+
+  const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
 
   return (
     <div
-      className={`flex w-[min(11rem,28vw)] min-w-[9.5rem] shrink-0 flex-col gap-1.5 p-2 ${shellClass}`}
+      className={`flex shrink-0 flex-col self-stretch border-l pl-2.5 ${dividerClass}`}
+      style={{ width: KASSA_AZERTY_OSK_NUMPAD_WIDTH }}
       data-testid="kassa-azerty-osk-shortcuts"
     >
-      {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
-        const label = draft[index] ?? ''
-        return (
-          <input
-            key={`slot-${index}`}
-            type="text"
-            maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
-            value={label}
-            onChange={(e) => setSlot(index, e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
+      <div className="mb-1.5 shrink-0 pt-0.5 text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:text-xs">
+        {t('kassaApp.azertyOskShortcutsNumpadTitle')}
+      </div>
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-1.5 content-start">
+        {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
+          const label = draft[index] ?? ''
+          return (
+            <input
+              key={`slot-${index}`}
+              type="text"
+              maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
+              value={label}
+              onChange={(e) => setSlot(index, e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const trimmed = label.trim()
+                  if (trimmed) onInsert(trimmed)
+                }
+              }}
+              onDoubleClick={() => {
                 const trimmed = label.trim()
                 if (trimmed) onInsert(trimmed)
-              }
-            }}
-            onDoubleClick={() => {
-              const trimmed = label.trim()
-              if (trimmed) onInsert(trimmed)
-            }}
-            placeholder={`${index + 1}`}
-            title={t('kassaApp.azertyOskShortcutInsertHint')}
-            className={fieldClass}
-          />
-        )
-      })}
-      <button
-        type="button"
-        disabled={saving}
-        className={`${KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS} min-h-[2.85rem] w-full sm:min-h-[3rem]`}
-        onPointerDown={onKeyPointerDown}
-        onClick={onSave}
-      >
-        {saving ? t('adminLayout.loading') : t('kassaApp.azertyOskShortcutsSave')}
-      </button>
+              }}
+              placeholder={`${index + 1}`}
+              title={t('kassaApp.azertyOskShortcutInsertHint')}
+              className={fieldClass}
+            />
+          )
+        })}
+        <button
+          type="button"
+          disabled={saving}
+          className={`${KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS} col-span-2 min-h-[3rem] w-full text-sm font-bold sm:min-h-[3.15rem] sm:text-base`}
+          onPointerDown={onKeyPointerDown}
+          onClick={onSave}
+        >
+          {saving ? t('adminLayout.loading') : t('kassaApp.azertyOskShortcutsSave')}
+        </button>
+      </div>
     </div>
   )
 }

@@ -42,6 +42,7 @@ import {
   KASSA_AZERTY_OSK_HEIGHT_PX,
   KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
   KASSA_AZERTY_OSK_PANEL_WIDTH,
+  KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH,
   KassaAzertyOskContext,
 } from '@/lib/kassa-azerty-osk-context'
 
@@ -341,27 +342,25 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div
-          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480] flex max-w-[96vw] items-stretch"
+          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480] max-w-[96vw]"
           role="presentation"
         >
           <div
-            className={`pointer-events-auto shrink-0 px-3.5 pb-2.5 pt-2 ${oskPanelShell} ${
-              showLineShortcutsColumn
-                ? speelsDarkOsk
-                  ? 'rounded-l-2xl rounded-r-none border-r border-[#252525]'
-                  : 'rounded-l-2xl rounded-r-none border-r-0'
-                : 'rounded-2xl'
-            }`}
+            className={`pointer-events-auto flex flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
             style={{
-              width: KASSA_AZERTY_OSK_PANEL_WIDTH,
+              width: showLineShortcutsColumn
+                ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
+                : KASSA_AZERTY_OSK_PANEL_WIDTH,
               minWidth: KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
-              maxWidth: KASSA_AZERTY_OSK_PANEL_WIDTH,
+              maxWidth: showLineShortcutsColumn
+                ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
+                : KASSA_AZERTY_OSK_PANEL_WIDTH,
             }}
           >
-          <div className="mb-1.5 flex items-center justify-between gap-2">
+          <div className="mb-1.5 flex shrink-0 items-center justify-between gap-2">
             <span
               className={
                 speelsDarkOsk
@@ -385,7 +384,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               ✕
             </button>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex min-h-0 items-stretch gap-0">
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="grid grid-cols-10 gap-2">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
                 <button
@@ -454,7 +454,6 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
             </div>
           </div>
-          </div>
           {showLineShortcutsColumn ? (
             <KassaOskLineShortcutsPad
               draft={lineShortcutDraft}
@@ -465,6 +464,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               onSave={() => void saveLineShortcuts()}
             />
           ) : null}
+          </div>
         </div>
       ) : null}
     </KassaAzertyOskContext.Provider>
