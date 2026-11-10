@@ -2,6 +2,7 @@ import {
   applyKassaAzertyOskEdit,
   healOskBlockedTextField,
   isKassaAzertyOskEnabled,
+  isKassaAzertyOskManualOpenEnabled,
   isKassaAzertyOskTextTarget,
   isAzertyOskActiveForSession,
   isTenantAzertyOskRoute,
@@ -67,6 +68,11 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskEnabled('Lomichillplay')).toBe(true)
     expect(isKassaAzertyOskEnabled('vysion')).toBe(false)
     expect(isKassaAzertyOskEnabled('demo-frituur')).toBe(false)
+  })
+
+  it('handmatig openen alleen pilot-lomichillplay', () => {
+    expect(isKassaAzertyOskManualOpenEnabled('lomichillplay')).toBe(true)
+    expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(false)
   })
 
   it('shift voor letters en leestekens', () => {

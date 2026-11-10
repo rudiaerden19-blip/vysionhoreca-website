@@ -3644,6 +3644,8 @@
     "cartLineNotePlaceholder": "名前、指示など",
     "numpadLineNotePlaceholder": "メモ（任意）",
     "azertyOskTitle": "AZERTYキーボード",
+    "azertyOskShow": "キーボード",
+    "azertyOskHide": "キーボードを隠す",
     "azertyOskClose": "キーボードを閉じる",
     "cartLineNoteAsReceiptName": "レシート上部に名前を大きく表示",
     "ariaEditLine": "行を編集",

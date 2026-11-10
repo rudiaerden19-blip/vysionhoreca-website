@@ -14,7 +14,10 @@ import {
   disarmKassaOskInput,
   healOskBlockedTextField,
   isAzertyOskActiveForSession,
+  isKassaAzertyOskManualOpenEnabled,
+  KASSA_AZERTY_OSK_PILOT_SLUG,
   releaseLegacyOskInputGuards,
+  resolveAzertyOskTenantSlug,
   isKassaAzertyOskTextTarget,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
@@ -38,9 +41,12 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     setHostTenantSlug(getCurrentTenantSlug())
     releaseLegacyOskInputGuards()
     disarmAllKassaOskInputs()
+    setKeyboardPinned(false)
+    setVisible(false)
   }, [pathname])
 
   const [visible, setVisible] = useState(false)
+  const [keyboardPinned, setKeyboardPinned] = useState(false)
   const [shift, setShift] = useState(false)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
@@ -53,6 +59,21 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     hostTenantSlug,
   })
 
+  const tenantSlugForOsk = useMemo(
+    () =>
+      resolveAzertyOskTenantSlug({
+        pathname,
+        routeParamTenant,
+        searchNext: searchParams?.get('next') ?? null,
+        hostTenantSlug,
+      }) ?? KASSA_AZERTY_OSK_PILOT_SLUG,
+    [hostTenantSlug, pathname, routeParamTenant, searchParams],
+  )
+
+  const manualOpen = enabled && isKassaAzertyOskManualOpenEnabled(tenantSlugForOsk)
+
+  const showKeyboardPanel = enabled && visible && (!manualOpen || keyboardPinned)
+
   const hideKeyboard = useCallback((disarm: boolean) => {
     if (disarm) {
       if (activeRef.current) disarmKassaOskInput(activeRef.current)
@@ -61,19 +82,25 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     }
     activeRef.current = null
     setVisible(false)
+    setKeyboardPinned(false)
     setShift(false)
     releaseAllOskScrollPadding()
   }, [])
 
-  const attachField = useCallback((el: HTMLInputElement | HTMLTextAreaElement) => {
-    const prev = activeRef.current
-    if (prev && prev !== el) disarmKassaOskInput(prev)
-    suppressedRef.current = false
-    healOskBlockedTextField(el)
-    activeRef.current = el
-    armKassaOskInput(el)
-    setVisible(true)
-  }, [])
+  const attachField = useCallback(
+    (el: HTMLInputElement | HTMLTextAreaElement) => {
+      const prev = activeRef.current
+      if (prev && prev !== el) disarmKassaOskInput(prev)
+      suppressedRef.current = false
+      healOskBlockedTextField(el)
+      activeRef.current = el
+      armKassaOskInput(el)
+      if (!manualOpen || keyboardPinned) {
+        setVisible(true)
+      }
+    },
+    [keyboardPinned, manualOpen],
+  )
 
   useEffect(() => {
     if (enabled) return
@@ -81,15 +108,15 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   }, [enabled, hideKeyboard])
 
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || manualOpen) return
     const active = document.activeElement
     if (!isKassaAzertyOskTextTarget(active)) return
     if (activeRef.current === active && visible) return
     attachField(active)
-  }, [enabled, hostTenantSlug, pathname, attachField, visible])
+  }, [enabled, hostTenantSlug, manualOpen, pathname, attachField, visible])
 
   useEffect(() => {
-    if (!enabled || !visible) {
+    if (!showKeyboardPanel) {
       document.documentElement.style.paddingBottom = ''
       return
     }
@@ -97,7 +124,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     return () => {
       document.documentElement.style.paddingBottom = ''
     }
-  }, [enabled, visible])
+  }, [showKeyboardPanel])
 
   useEffect(() => {
     if (!enabled) return
@@ -122,6 +149,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk"]')) {
         return
       }
+      if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk-toggle-bar"]')) {
+        return
+      }
       if (!(e.target instanceof HTMLElement) || !isKassaAzertyOskTextTarget(e.target)) {
         return
       }
@@ -131,7 +161,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         const active = document.activeElement
         if (isKassaAzertyOskTextTarget(active)) {
           activeRef.current = active
-          setVisible(true)
+          if (!manualOpen || keyboardPinned) setVisible(true)
+          return
+        }
+        if (manualOpen && keyboardPinned) {
           return
         }
         const tracked = activeRef.current
@@ -155,24 +188,50 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       document.removeEventListener('focusout', onFocusOut, true)
       disarmAllKassaOskInputs()
     }
-  }, [enabled, attachField, hideKeyboard])
+  }, [attachField, enabled, hideKeyboard, keyboardPinned, manualOpen])
 
   const dismissAzertyOsk = useCallback(() => {
     suppressedRef.current = true
-    hideKeyboard(true)
+    setVisible(false)
+    releaseAllOskScrollPadding()
+    if (!manualOpen) {
+      hideKeyboard(true)
+      window.setTimeout(() => {
+        suppressedRef.current = false
+      }, 400)
+      return
+    }
     /** Kort onderdrukken na modal-sluit — geen vaste blur (blokkeerde 2e keer typen). */
     window.setTimeout(() => {
       suppressedRef.current = false
+      if (keyboardPinned) setVisible(true)
     }, 400)
-  }, [hideKeyboard])
+  }, [hideKeyboard, keyboardPinned, manualOpen])
+
+  const onToggleKeyboardPinned = useCallback(() => {
+    if (keyboardPinned) {
+      hideKeyboard(true)
+      return
+    }
+    setKeyboardPinned(true)
+    setVisible(true)
+    const active = document.activeElement
+    if (isKassaAzertyOskTextTarget(active)) {
+      attachField(active)
+    }
+  }, [attachField, hideKeyboard, keyboardPinned])
+
+  const toggleBarTopClass = pathname.includes('/admin/')
+    ? 'top-14'
+    : 'top-0 pt-[max(env(safe-area-inset-top),0px)]'
 
   const chromeValue = useMemo(
     () => ({
-      visible: enabled && visible,
+      visible: showKeyboardPanel && !suppressedRef.current,
       heightPx: KASSA_AZERTY_OSK_HEIGHT_PX,
       dismiss: dismissAzertyOsk,
     }),
-    [dismissAzertyOsk, enabled, visible],
+    [dismissAzertyOsk, showKeyboardPanel],
   )
 
   const sendEdit = (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
@@ -190,8 +249,28 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   return (
     <KassaAzertyOskContext.Provider value={chromeValue}>
+      {enabled && manualOpen ? (
+        <div
+          className={`fixed left-0 right-0 z-[105] flex justify-center border-b border-neutral-600 bg-neutral-900/95 px-3 py-1.5 backdrop-blur-sm ${toggleBarTopClass}`}
+          data-testid="kassa-azerty-osk-toggle-bar"
+        >
+          <button
+            type="button"
+            className={`touch-manipulation min-h-[2.75rem] w-full max-w-lg rounded-xl border px-4 text-base font-bold sm:text-lg ${
+              keyboardPinned
+                ? 'border-neutral-300 bg-neutral-600 text-white'
+                : 'border-neutral-500 bg-neutral-700 text-white active:bg-neutral-600'
+            }`}
+            aria-pressed={keyboardPinned}
+            data-testid="kassa-azerty-osk-toggle"
+            onClick={onToggleKeyboardPinned}
+          >
+            {keyboardPinned ? t('kassaApp.azertyOskHide') : t('kassaApp.azertyOskShow')}
+          </button>
+        </div>
+      ) : null}
       {children}
-      {enabled && visible && !suppressedRef.current ? (
+      {showKeyboardPanel && !suppressedRef.current ? (
         <div
           className="fixed bottom-0 left-0 right-0 z-[480] border-t border-neutral-600 bg-neutral-800 px-3 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.4)]"
           role="region"
@@ -208,7 +287,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               className="touch-manipulation min-h-[2.75rem] min-w-[2.75rem] rounded-xl border border-neutral-500 bg-neutral-600 px-4 text-lg font-bold text-white active:bg-neutral-500"
               aria-label={t('kassaApp.azertyOskClose')}
               data-testid="kassa-azerty-osk-close"
-              onClick={() => dismissAzertyOsk()}
+              onClick={() => hideKeyboard(true)}
             >
               ✕
             </button>

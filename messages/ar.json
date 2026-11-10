@@ -3644,6 +3644,8 @@
     "cartLineNotePlaceholder": "الاسم، تعليمات، …",
     "numpadLineNotePlaceholder": "ملاحظة (اختياري)",
     "azertyOskTitle": "لوحة مفاتيح AZERTY",
+    "azertyOskShow": "لوحة المفاتيح",
+    "azertyOskHide": "إخفاء لوحة المفاتيح",
     "azertyOskClose": "إغلاق لوحة المفاتيح",
     "cartLineNoteAsReceiptName": "اسم كبير على الإيصال (تحت نوع الطلب)",
     "ariaEditLine": "تعديل السطر",

@@ -4299,6 +4299,8 @@
     "cartLineNotePlaceholder": "Naam, instructie, …",
     "numpadLineNotePlaceholder": "Opmerking (optioneel)",
     "azertyOskTitle": "AZERTY-toetsenbord",
+    "azertyOskShow": "Toetsenbord",
+    "azertyOskHide": "Toetsenbord verbergen",
     "azertyOskClose": "Sluit toetsenbord",
     "cartLineNoteAsReceiptName": "Naam groot op bon (onder afhalen/ter plaatse)",
     "ariaEditLine": "Regel aanpassen",

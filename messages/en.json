@@ -4299,6 +4299,8 @@
     "cartLineNotePlaceholder": "Name, instruction, …",
     "numpadLineNotePlaceholder": "Note (optional)",
     "azertyOskTitle": "AZERTY keyboard",
+    "azertyOskShow": "Keyboard",
+    "azertyOskHide": "Hide keyboard",
     "azertyOskClose": "Close keyboard",
     "cartLineNoteAsReceiptName": "Name large on receipt (under order type)",
     "ariaEditLine": "Edit line",

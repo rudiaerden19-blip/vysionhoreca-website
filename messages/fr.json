@@ -3144,6 +3144,8 @@
     "cartLineNotePlaceholder": "Nom, consigne, …",
     "numpadLineNotePlaceholder": "Remarque (facultatif)",
     "azertyOskTitle": "Clavier AZERTY",
+    "azertyOskShow": "Clavier",
+    "azertyOskHide": "Masquer le clavier",
     "azertyOskClose": "Fermer le clavier",
     "cartLineNoteAsReceiptName": "Nom en grand sur le ticket (sous le type)",
     "ariaEditLine": "Modifier la ligne",

@@ -3644,6 +3644,8 @@
     "cartLineNotePlaceholder": "姓名、说明等",
     "numpadLineNotePlaceholder": "备注（可选）",
     "azertyOskTitle": "AZERTY 键盘",
+    "azertyOskShow": "键盘",
+    "azertyOskHide": "隐藏键盘",
     "azertyOskClose": "关闭键盘",
     "cartLineNoteAsReceiptName": "在收据上大字显示姓名（订单类型下方）",
     "ariaEditLine": "编辑行",

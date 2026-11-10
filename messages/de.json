@@ -3144,6 +3144,8 @@
     "cartLineNotePlaceholder": "Name, Anweisung, …",
     "numpadLineNotePlaceholder": "Anmerkung (optional)",
     "azertyOskTitle": "AZERTY-Tastatur",
+    "azertyOskShow": "Tastatur",
+    "azertyOskHide": "Tastatur ausblenden",
     "azertyOskClose": "Tastatur schließen",
     "cartLineNoteAsReceiptName": "Name groß auf Bon (unter Bestellart)",
     "ariaEditLine": "Position bearbeiten",

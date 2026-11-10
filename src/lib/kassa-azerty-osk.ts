@@ -3,12 +3,26 @@
  * Uitbreiding naar alle tenants: hier of tenant_settings vlag koppelen.
  */
 
-const KASSA_AZERTY_OSK_PILOT_SLUG = 'lomichillplay'
+export const KASSA_AZERTY_OSK_PILOT_SLUG = 'lomichillplay'
 
 /**
  * Pilot tijdelijk uit tot stabiele UX — zet op true om Lomichillplay-toetsenbord te heractiveren.
  */
 export const KASSA_AZERTY_OSK_LIVE = true
+
+/**
+ * Toetsenbord alleen na tik op de bovenste «Toetsenbord»-knop (geen auto-open bij focus).
+ * Later voor alle tenants; nu gekoppeld aan dezelfde pilot als `isKassaAzertyOskEnabled`.
+ */
+export const KASSA_AZERTY_OSK_MANUAL_OPEN = true
+
+/** Vaste hoogte balk met «Toetsenbord»-knop (admin-layout reserveert dit). */
+export const KASSA_AZERTY_OSK_TOGGLE_BAR_PX = 46
+
+export function isKassaAzertyOskManualOpenEnabled(tenantSlug: string): boolean {
+  if (!KASSA_AZERTY_OSK_LIVE || !KASSA_AZERTY_OSK_MANUAL_OPEN) return false
+  return isKassaAzertyOskEnabled(tenantSlug)
+}
 
 export function isKassaAzertyOskEnabled(tenantSlug: string): boolean {
   if (!KASSA_AZERTY_OSK_LIVE) return false
