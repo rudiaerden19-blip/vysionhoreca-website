@@ -15,6 +15,53 @@ export function isKassaOskLineNoteField(target: EventTarget | null): boolean {
   return target.getAttribute(KASSA_OSK_LINE_NOTE_ATTR) === 'true'
 }
 
+function isOskLineNoteElementVisible(el: HTMLInputElement | HTMLTextAreaElement): boolean {
+  if (!el.isConnected) return false
+  const style = getComputedStyle(el)
+  if (style.display === 'none' || style.visibility === 'hidden') return false
+  const rect = el.getBoundingClientRect()
+  return rect.width > 0 && rect.height > 0
+}
+
+/**
+ * Doel voor sneltekst › — productopties-modal wint vóór verborgen numpad-opmerking in de zijbalk.
+ */
+export function findKassaOskLineNoteInput(
+  preferred?: HTMLInputElement | HTMLTextAreaElement | null,
+): HTMLInputElement | HTMLTextAreaElement | null {
+  if (
+    preferred?.isConnected &&
+    isKassaOskLineNoteField(preferred) &&
+    isOskLineNoteElementVisible(preferred)
+  ) {
+    return preferred
+  }
+
+  const optionsModal = document.querySelector('[data-testid="kassa-options-modal"]')
+  if (optionsModal instanceof HTMLElement) {
+    const inModal = optionsModal.querySelector(`[${KASSA_OSK_LINE_NOTE_ATTR}="true"]`)
+    if (inModal instanceof HTMLInputElement || inModal instanceof HTMLTextAreaElement) {
+      return inModal
+    }
+  }
+
+  const candidates = document.querySelectorAll(`[${KASSA_OSK_LINE_NOTE_ATTR}="true"]`)
+  for (const node of candidates) {
+    if (!(node instanceof HTMLInputElement || node instanceof HTMLTextAreaElement)) continue
+    if (isOskLineNoteElementVisible(node)) return node
+  }
+
+  if (preferred?.isConnected && isKassaOskLineNoteField(preferred)) {
+    return preferred
+  }
+
+  const first = candidates[0]
+  if (first instanceof HTMLInputElement || first instanceof HTMLTextAreaElement) {
+    return first
+  }
+  return null
+}
+
 export function isKassaOskShortcutSlotField(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   return target.getAttribute(KASSA_OSK_SHORTCUT_SLOT_ATTR) === 'true'

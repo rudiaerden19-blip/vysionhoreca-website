@@ -5,7 +5,9 @@ import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
   clampKassaOskLineShortcutDraft,
+  sanitizeKassaOskLineShortcutLabel,
 } from '@/lib/kassa-osk-line-shortcuts'
+import { readKassaOskFieldValue } from '@/lib/kassa-azerty-osk'
 import {
   KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH,
   KASSA_AZERTY_OSK_NUMPAD_WIDTH,
@@ -54,6 +56,9 @@ export function KassaOskLineShortcutsPad({
     : 'absolute right-0.5 top-1/2 flex h-7 w-7 -translate-y-1/2 touch-manipulation items-center justify-center rounded-md border border-neutral-600 bg-neutral-700 text-base font-bold text-[#58CCFF] active:bg-neutral-600'
 
   const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
+
+  const readSlotInsertLabel = (input: HTMLInputElement): string =>
+    sanitizeKassaOskLineShortcutLabel(readKassaOskFieldValue(input))
 
   const stripWidth = kassaNumpad ? KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH : KASSA_AZERTY_OSK_NUMPAD_WIDTH
   const numpadTitle = t('kassaApp.azertyOskShortcutsNumpadTitle')
@@ -111,7 +116,8 @@ export function KassaOskLineShortcutsPad({
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    if (trimmed) onInsert(trimmed)
+                    const insertLabel = readSlotInsertLabel(e.currentTarget)
+                    if (insertLabel) onInsert(insertLabel)
                   }
                 }}
                 placeholder={`${index + 1}`}
@@ -125,8 +131,14 @@ export function KassaOskLineShortcutsPad({
                 aria-label={t('kassaApp.azertyOskShortcutInsertHint')}
                 className={`${insertBtnClass} disabled:pointer-events-none disabled:opacity-25`}
                 onPointerDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  if (trimmed) onInsert(trimmed)
+                onPointerUp={(e) => {
+                  e.preventDefault()
+                  if (e.button !== 0) return
+                  const row = e.currentTarget.parentElement
+                  const input = row?.querySelector('input[data-kassa-osk-shortcut-slot="true"]')
+                  if (!(input instanceof HTMLInputElement)) return
+                  const insertLabel = readSlotInsertLabel(input)
+                  if (insertLabel) onInsert(insertLabel)
                 }}
               >
                 ›

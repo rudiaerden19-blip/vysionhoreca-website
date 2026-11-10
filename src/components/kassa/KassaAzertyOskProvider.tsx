@@ -9,6 +9,7 @@ import { useLanguage } from '@/i18n'
 import { KassaOskLineShortcutsPad } from '@/components/kassa/KassaOskLineShortcutsPad'
 import {
   applyKassaOskLineShortcut,
+  findKassaOskLineNoteInput,
   isKassaHorecaPosPath,
   isAdminOskNextFormField,
   isKassaOskLineNoteField,
@@ -370,17 +371,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   const insertLineShortcut = useCallback(
     (label: string) => {
-      let el = activeRef.current
-      if (!el?.isConnected || !isKassaOskLineNoteField(el)) {
-        const found = document.querySelector(
-          `[${'data-kassa-osk-line-note'}="true"]`,
-        )
-        if (found instanceof HTMLInputElement || found instanceof HTMLTextAreaElement) {
-          el = found
-          attachField(el)
-        }
-      }
+      const el = findKassaOskLineNoteInput(activeRef.current)
       if (!el?.isConnected || !isKassaOskLineNoteField(el)) return
+      focusInputForProgrammaticEdit(el)
       applyKassaOskLineShortcut(el, label)
       attachField(el)
     },

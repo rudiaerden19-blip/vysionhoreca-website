@@ -1,5 +1,6 @@
 import {
   applyKassaOskLineShortcut,
+  findKassaOskLineNoteInput,
   normalizeKassaOskLineShortcuts,
   sanitizeKassaOskLineShortcutLabel,
   isAdminOskNextFormField,
@@ -42,6 +43,24 @@ describe('kassa-osk-line-shortcuts', () => {
     const plain = document.createElement('input')
     expect(shouldOpenAzertyOskForFieldFocus(true, false, plain)).toBe(false)
     expect(shouldOpenAzertyOskForFieldFocus(true, true, plain)).toBe(true)
+  })
+
+  it('findKassaOskLineNoteInput: opties-modal vóór numpad in DOM-volgorde', () => {
+    const numpad = document.createElement('input')
+    numpad.setAttribute('data-kassa-osk-line-note', 'true')
+    document.body.appendChild(numpad)
+
+    const modalRoot = document.createElement('div')
+    modalRoot.setAttribute('data-testid', 'kassa-options-modal')
+    const modalNote = document.createElement('input')
+    modalNote.setAttribute('data-kassa-osk-line-note', 'true')
+    modalRoot.appendChild(modalNote)
+    document.body.appendChild(modalRoot)
+
+    expect(findKassaOskLineNoteInput(null)).toBe(modalNote)
+
+    document.body.removeChild(modalRoot)
+    document.body.removeChild(numpad)
   })
 
   it('voegt sneltekst toe met spatie', () => {
