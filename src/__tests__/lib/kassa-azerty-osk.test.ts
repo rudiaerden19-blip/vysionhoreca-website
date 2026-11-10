@@ -2,6 +2,8 @@ import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import {
   applyKassaAzertyOskEdit,
   nextKassaAzertyOskEditValue,
+  readKassaOskControlledFieldEditState,
+  seedKassaOskControlledFieldEditState,
   healOskBlockedTextField,
   isKassaAzertyOskEnabled,
   isKassaAzertyOskManualOpenEnabled,
@@ -144,7 +146,7 @@ describe('kassa-azerty-osk', () => {
     document.body.removeChild(input)
   })
 
-  it('controlled opmerking: sync via programmatic event (geen DOM-flits)', () => {
+  it('controlled opmerking: snelle opeenvolgende toetsen zonder verlies', () => {
     const input = document.createElement('input')
     input.setAttribute('data-kassa-osk-line-note', 'true')
     document.body.appendChild(input)
@@ -152,11 +154,18 @@ describe('kassa-azerty-osk', () => {
     input.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, (e) => {
       model = (e as CustomEvent<{ value: string }>).detail.value
       input.value = model
+      seedKassaOskControlledFieldEditState(input, model, model.length)
     })
-    applyKassaAzertyOskEdit(input, { char: 'Z' })
-    applyKassaAzertyOskEdit(input, { char: 'o' })
-    expect(model).toBe('Zo')
-    expect(input.value).toBe('Zo')
+    seedKassaOskControlledFieldEditState(input, '', 0)
+    for (const ch of 'Zonder zout') {
+      if (ch === ' ') {
+        applyKassaAzertyOskEdit(input, 'space')
+      } else {
+        applyKassaAzertyOskEdit(input, { char: ch })
+      }
+    }
+    expect(model).toBe('Zonder zout')
+    expect(readKassaOskControlledFieldEditState(input).value).toBe('Zonder zout')
     document.body.removeChild(input)
   })
 

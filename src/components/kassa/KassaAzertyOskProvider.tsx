@@ -25,8 +25,8 @@ import {
   KASSA_AZERTY_AT_CHAR,
   KASSA_AZERTY_NUMBER_ROW,
   applyKassaAzertyOskEdit,
-  kassaOskSelectionRange,
   nextKassaAzertyOskEditValue,
+  seedKassaOskControlledFieldEditState,
   armKassaOskInput,
   disarmAllKassaOskInputs,
   disarmKassaOskInput,
@@ -78,7 +78,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const shiftRef = useRef(false)
   const oskEditPointerRef = useRef<{ token: string; at: number } | null>(null)
   const lineShortcutDraftRef = useRef(lineShortcutDraft)
-  lineShortcutDraftRef.current = lineShortcutDraft
+  const oskShortcutCaretRef = useRef<{ idx: number; caret: number } | null>(null)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
   const focusOutTimerRef = useRef<number | undefined>(undefined)
@@ -149,6 +149,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       const normalized = normalizeKassaOskLineShortcuts(settings?.kassa_osk_line_shortcuts)
       lineShortcutsLoadedRef.current = true
       if (lineShortcutsDirtyRef.current || keyboardPinnedRef.current) return
+      lineShortcutDraftRef.current = normalized
       setLineShortcutDraft(normalized)
       lineShortcutsLastSavedRef.current = JSON.stringify(normalized)
     })
@@ -216,6 +217,17 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       healOskBlockedTextField(el)
       activeRef.current = el
       armKassaOskInput(el)
+      if (isKassaOskShortcutSlotField(el)) {
+        const slotIdx = Number(el.getAttribute('data-kassa-osk-shortcut-index'))
+        if (Number.isFinite(slotIdx) && slotIdx >= 0) {
+          const slotValue = lineShortcutDraftRef.current[slotIdx] ?? ''
+          const caret = Math.min(el.selectionStart ?? slotValue.length, slotValue.length)
+          oskShortcutCaretRef.current = { idx: slotIdx, caret }
+          seedKassaOskControlledFieldEditState(el, slotValue, caret)
+        }
+      } else {
+        seedKassaOskControlledFieldEditState(el)
+      }
       setLineNoteFieldActive(
         isKassaOskLineNoteField(el) ||
           isAdminOskNextFormField(el) ||
@@ -476,34 +488,34 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       ) {
         const idx = Number(el.getAttribute('data-kassa-osk-shortcut-index'))
         if (!Number.isFinite(idx) || idx < 0) return
-        const value = lineShortcutDraftRef.current[idx] ?? ''
+        const draft = lineShortcutDraftRef.current
+        const value = draft[idx] ?? ''
+        const caretStart =
+          oskShortcutCaretRef.current?.idx === idx
+            ? oskShortcutCaretRef.current.caret
+            : Math.min(el.selectionStart ?? value.length, value.length)
         const max = el.maxLength > 0 ? el.maxLength : undefined
         const result = nextKassaAzertyOskEditValue(
           value,
-          kassaOskSelectionRange(el, value),
+          { start: caretStart, end: caretStart },
           edit,
           max,
         )
         if (!result) return
         const clamped = clampKassaOskLineShortcutDraft(result.next)
         const caret = Math.min(result.caret, clamped.length)
+        const nextDraft = [...draft]
+        nextDraft[idx] = clamped
+        lineShortcutDraftRef.current = nextDraft
+        oskShortcutCaretRef.current = { idx, caret }
+        seedKassaOskControlledFieldEditState(el, clamped, caret)
         lineShortcutsDirtyRef.current = true
-        flushSync(() => {
-          setLineShortcutDraft((prev) => {
-            if (prev[idx] === clamped) return prev
-            const next = [...prev]
-            next[idx] = clamped
-            lineShortcutDraftRef.current = next
-            return next
-          })
-        })
-        requestAnimationFrame(() => {
-          try {
-            el.setSelectionRange(caret, caret)
-          } catch {
-            /* noop */
-          }
-        })
+        flushSync(() => setLineShortcutDraft(nextDraft))
+        try {
+          el.setSelectionRange(caret, caret)
+        } catch {
+          /* noop */
+        }
       } else {
         applyKassaAzertyOskEdit(el, edit)
       }

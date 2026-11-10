@@ -185,6 +185,56 @@ export function readKassaOskFieldValue(el: HTMLInputElement | HTMLTextAreaElemen
   return el.value
 }
 
+type OskControlledFieldEdit = { value: string; caret: number }
+
+const oskControlledFieldEdit = new WeakMap<
+  HTMLInputElement | HTMLTextAreaElement,
+  OskControlledFieldEdit
+>()
+
+/** Snel OSK-typetempo: DOM/React lopen achter — buffer per veld. */
+export function seedKassaOskControlledFieldEditState(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value?: string,
+  caret?: number,
+): void {
+  const v = value ?? readKassaOskFieldValue(el)
+  const c = caret ?? el.selectionStart ?? v.length
+  oskControlledFieldEdit.set(el, {
+    value: v,
+    caret: Math.max(0, Math.min(c, v.length)),
+  })
+}
+
+export function clearKassaOskControlledFieldEditState(
+  el: HTMLInputElement | HTMLTextAreaElement,
+): void {
+  oskControlledFieldEdit.delete(el)
+}
+
+export function readKassaOskControlledFieldEditState(
+  el: HTMLInputElement | HTMLTextAreaElement,
+): OskControlledFieldEdit {
+  const tracked = oskControlledFieldEdit.get(el)
+  const value = tracked?.value ?? readKassaOskFieldValue(el)
+  const rawCaret = tracked?.caret ?? el.selectionStart ?? value.length
+  return {
+    value,
+    caret: Math.max(0, Math.min(rawCaret, value.length)),
+  }
+}
+
+function writeKassaOskControlledFieldEditState(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+  caret: number,
+): void {
+  oskControlledFieldEdit.set(el, {
+    value,
+    caret: Math.max(0, Math.min(caret, value.length)),
+  })
+}
+
 export type KassaAzertyOskEdit = 'backspace' | 'space' | { char: string }
 
 export function kassaOskSelectionRange(
@@ -241,20 +291,32 @@ export function applyKassaAzertyOskEdit(
   edit: KassaAzertyOskEdit,
 ): void {
   const max = el.maxLength > 0 ? el.maxLength : undefined
-  const value = readKassaOskFieldValue(el)
-  const result = nextKassaAzertyOskEditValue(value, kassaOskSelectionRange(el, value), edit, max)
+  const useControlledBuffer = isKassaOskReactControlledSyncField(el)
+  const { value, caret: caretStart } = useControlledBuffer
+    ? readKassaOskControlledFieldEditState(el)
+    : (() => {
+        const v = readKassaOskFieldValue(el)
+        const sel = kassaOskSelectionRange(el, v)
+        return { value: v, caret: sel.start }
+      })()
+
+  const selection = { start: caretStart, end: caretStart }
+  const result = nextKassaAzertyOskEditValue(
+    value,
+    useControlledBuffer ? selection : kassaOskSelectionRange(el, value),
+    edit,
+    max,
+  )
   if (!result) return
 
-  if (isKassaOskReactControlledSyncField(el)) {
+  if (useControlledBuffer) {
+    writeKassaOskControlledFieldEditState(el, result.next, result.caret)
     dispatchKassaOskProgrammaticValue(el, result.next)
-    const caret = result.caret
-    requestAnimationFrame(() => {
-      try {
-        el.setSelectionRange(caret, caret)
-      } catch {
-        /* date/time, etc. */
-      }
-    })
+    try {
+      el.setSelectionRange(result.caret, result.caret)
+    } catch {
+      /* date/time, etc. */
+    }
     return
   }
 
@@ -272,6 +334,7 @@ export function armKassaOskInput(el: HTMLInputElement | HTMLTextAreaElement): vo
 }
 
 export function disarmKassaOskInput(el: HTMLInputElement | HTMLTextAreaElement): void {
+  clearKassaOskControlledFieldEditState(el)
   el.removeAttribute('data-kassa-osk-armed')
   el.removeAttribute('inputMode')
   el.readOnly = false
