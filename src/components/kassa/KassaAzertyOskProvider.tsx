@@ -30,6 +30,13 @@ import {
   isKassaAzertyOskTextTarget,
   kassaAzertyKeyDisplay,
 } from '@/lib/kassa-azerty-osk'
+import { useKassaSpeelsDarkOskChrome } from '@/hooks/useKassaSpeelsDarkOskChrome'
+import {
+  KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
+  kassaSpeelsGrayChromeButtonClass,
+} from '@/lib/kassa-pos-surface'
 import { releaseAllOskScrollPadding } from '@/lib/scroll-input-above-keyboard'
 import {
   KASSA_AZERTY_OSK_HEIGHT_PX,
@@ -81,6 +88,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const manualOpen = enabled && isKassaAzertyOskManualOpenEnabled(tenantSlugForOsk)
   const lineShortcutsPilot =
     isKassaOskLineShortcutsEnabled(tenantSlugForOsk) && isKassaHorecaPosPath(pathname)
+  const speelsDarkOsk = useKassaSpeelsDarkOskChrome(pathname)
 
   const showKeyboardPanel = enabled && visible && (!manualOpen || keyboardPinned)
   const showLineShortcutsColumn =
@@ -319,8 +327,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     }
   }, [lineShortcutDraft, tenantSlugForOsk])
 
-  const keyBtnClass =
-    'min-h-[3rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-lg font-bold text-white active:bg-neutral-500 sm:min-h-[3.15rem] sm:text-xl'
+  const keyBtnClass = speelsDarkOsk
+    ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[3rem] px-0.5 text-center text-lg font-bold sm:min-h-[3.15rem] sm:text-xl`
+    : 'kassa-azerty-osk-key min-h-[3rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-lg font-bold text-white active:bg-neutral-500 sm:min-h-[3.15rem] sm:text-xl'
+
+  const oskShellSpeels = `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS}`
+  const oskPanelShell = speelsDarkOsk
+    ? `${oskShellSpeels} shadow-[0_12px_40px_rgba(0,0,0,0.55)]`
+    : 'border border-neutral-600 bg-neutral-800/95 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md'
 
   return (
     <KassaAzertyOskContext.Provider value={chromeValue}>
@@ -331,8 +345,12 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
           role="presentation"
         >
           <div
-            className={`pointer-events-auto shrink-0 border border-neutral-600 bg-neutral-800/95 px-3.5 pb-2.5 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md ${
-              showLineShortcutsColumn ? 'rounded-l-2xl rounded-r-none border-r-0' : 'rounded-2xl'
+            className={`pointer-events-auto shrink-0 px-3.5 pb-2.5 pt-2 ${oskPanelShell} ${
+              showLineShortcutsColumn
+                ? speelsDarkOsk
+                  ? 'rounded-l-2xl rounded-r-none border-r border-[#252525]'
+                  : 'rounded-l-2xl rounded-r-none border-r-0'
+                : 'rounded-2xl'
             }`}
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
@@ -344,12 +362,22 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             }}
           >
           <div className="mb-1.5 flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-neutral-300">
+            <span
+              className={
+                speelsDarkOsk
+                  ? `text-xs font-semibold uppercase tracking-wide ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS}`
+                  : 'text-xs font-semibold uppercase tracking-wide text-neutral-300'
+              }
+            >
               {t('kassaApp.azertyOskTitle')}
             </span>
             <button
               type="button"
-              className="touch-manipulation min-h-[2.25rem] min-w-[2.25rem] rounded-lg border border-neutral-500 bg-neutral-600 px-2.5 text-base font-bold text-white active:bg-neutral-500"
+              className={
+                speelsDarkOsk
+                  ? `${kassaSpeelsGrayChromeButtonClass()} min-h-[2.25rem] min-w-[2.25rem] px-2.5 text-base font-bold`
+                  : 'touch-manipulation min-h-[2.25rem] min-w-[2.25rem] rounded-lg border border-neutral-500 bg-neutral-600 px-2.5 text-base font-bold text-white active:bg-neutral-500'
+              }
               aria-label={t('kassaApp.azertyOskClose')}
               data-testid="kassa-azerty-osk-close"
               onClick={() => hideKeyboard(true)}
@@ -393,7 +421,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             <div className="grid grid-cols-[auto,auto,1fr,auto] gap-2">
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift ? 'border-neutral-300 bg-neutral-500' : ''}`}
+                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => setShift((s) => !s)}
               >
@@ -431,6 +459,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             <KassaOskLineShortcutsPad
               draft={lineShortcutDraft}
               saving={shortcutsSaving}
+              speelsDark={speelsDarkOsk}
               onDraftChange={setLineShortcutDraft}
               onInsert={insertLineShortcut}
               onSave={() => void saveLineShortcuts()}

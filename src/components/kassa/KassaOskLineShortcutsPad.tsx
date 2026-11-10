@@ -3,6 +3,10 @@
 import { useLanguage } from '@/i18n'
 import { KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS } from '@/lib/kassa-azerty-osk'
 import {
+  KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
+  KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
+} from '@/lib/kassa-pos-surface'
+import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
   sanitizeKassaOskLineShortcutLabel,
@@ -11,6 +15,7 @@ import {
 type Props = {
   draft: string[]
   saving: boolean
+  speelsDark?: boolean
   onDraftChange: (next: string[]) => void
   onInsert: (label: string) => void
   onSave: () => void
@@ -19,6 +24,7 @@ type Props = {
 export function KassaOskLineShortcutsPad({
   draft,
   saving,
+  speelsDark = false,
   onDraftChange,
   onInsert,
   onSave,
@@ -35,9 +41,17 @@ export function KassaOskLineShortcutsPad({
     e.preventDefault()
   }
 
+  const shellClass = speelsDark
+    ? `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS} rounded-r-2xl border border-l border-[#252525] shadow-[0_12px_40px_rgba(0,0,0,0.55)]`
+    : 'rounded-r-2xl border border-l-0 border-neutral-600 bg-neutral-800/95 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md'
+
+  const fieldClass = speelsDark
+    ? 'kassa-osk-shortcut-field min-h-[2.65rem] w-full rounded-xl px-2 text-center text-sm font-bold outline-none sm:min-h-[2.85rem] sm:text-base'
+    : 'min-h-[2.65rem] w-full rounded-xl border border-neutral-500 bg-neutral-900 px-2 text-center text-sm font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[2.85rem] sm:text-base'
+
   return (
     <div
-      className="flex w-[min(11rem,28vw)] min-w-[9.5rem] shrink-0 flex-col gap-1.5 rounded-r-2xl border border-l-0 border-neutral-600 bg-neutral-800/95 p-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
+      className={`flex w-[min(11rem,28vw)] min-w-[9.5rem] shrink-0 flex-col gap-1.5 p-2 ${shellClass}`}
       data-testid="kassa-azerty-osk-shortcuts"
     >
       {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
@@ -62,7 +76,7 @@ export function KassaOskLineShortcutsPad({
             }}
             placeholder={`${index + 1}`}
             title={t('kassaApp.azertyOskShortcutInsertHint')}
-            className="min-h-[2.65rem] w-full rounded-xl border border-neutral-500 bg-neutral-900 px-2 text-center text-sm font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[2.85rem] sm:text-base"
+            className={fieldClass}
           />
         )
       })}

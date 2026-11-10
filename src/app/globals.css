@@ -1142,6 +1142,42 @@ html.kassa-luxe-leather body {
   box-shadow: none;
 }
 
+/* AZERTY-snelvelden (kassa dark) — zelfde gloss als Snel menu. */
+html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field {
+  color: #b0b0b0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
+  background: linear-gradient(
+    180deg,
+    #686868 0%,
+    #545454 5%,
+    #3a3a3a 18%,
+    #2c2c2c 40%,
+    #222222 62%,
+    #1a1a1a 100%
+  );
+  border: 1px solid #0a0a0a;
+  border-top-color: #323232;
+  border-bottom-color: #050505;
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
+}
+
+html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field:focus {
+  outline: none;
+  border-top-color: #3d8fd4;
+  box-shadow:
+    0 3px 7px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.42),
+    0 0 0 2px rgba(88, 204, 255, 0.45);
+}
+
+html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field::placeholder {
+  color: #858585;
+}
+
 /* ===========================================
    SCROLLBAR HIDE
    =========================================== */
