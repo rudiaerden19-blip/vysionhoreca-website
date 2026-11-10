@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getReviews, replyToReview, toggleReviewVisible, deleteReview, Review } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 export default function ReviewsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -13,6 +14,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
+  const { pageRootProps } = useAdminAzertyOskPageChrome({ scrollDeps: [replyingTo] })
   const [replyText, setReplyText] = useState('')
   const [savingReply, setSavingReply] = useState(false)
   const [filter, setFilter] = useState<'all' |  'visible' |  'hidden'>('all')
@@ -113,7 +115,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto" {...pageRootProps}>
       <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>

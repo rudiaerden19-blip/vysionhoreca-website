@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 const colorPresets = [
   // Rij 1 - Warm
@@ -36,6 +37,7 @@ const colorPresets = [
 
 export default function DesignPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { pageRootProps, saveFabBottom } = useAdminAzertyOskPageChrome()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -108,14 +110,15 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-24">
+    <div className="max-w-4xl mx-auto" {...pageRootProps}>
       {/* Floating Save Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleSave}
         disabled={saving}
-        className={`vysion-admin-save-fab fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
+        style={{ bottom: `${saveFabBottom}px` }}
+        className={`vysion-admin-save-fab fixed right-6 z-50 flex items-center gap-2 rounded-2xl px-6 py-4 font-medium shadow-2xl ${
           saved ? 'bg-green-500 text-white': 'bg-gray-900 hover:bg-black text-white'
         }`}
       >

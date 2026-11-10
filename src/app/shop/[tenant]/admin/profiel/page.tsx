@@ -8,8 +8,7 @@ import MediaPicker from '@/components/MediaPicker'
 import ImageZoomPicker, { parseImageZoomSettings, stringifyImageZoomSettings } from '@/components/ImageZoomPicker'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
-import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
-import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 function detectSmtp(email: string): { host: string; port: number } | null {
   const domain = email.split('@')[1]?.toLowerCase()
@@ -27,10 +26,7 @@ function detectSmtp(email: string): { host: string; port: number } | null {
 
 export default function ProfielPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
-  const azertyOsk = useKassaAzertyOskChrome()
-  const oskContentPad =
-    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 16 : 0
-  const saveFabBottom = oskContentPad > 0 ? oskContentPad + 16 : 24
+  const { pageRootProps, saveFabBottom } = useAdminAzertyOskPageChrome()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -125,14 +121,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     loadSmtp()
   }, [params.tenant])
 
-  useEffect(() => {
-    if (oskContentPad <= 0) return
-    const active = document.activeElement
-    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
-      scheduleScrollInputAboveKeyboard(active)
-    }
-  }, [oskContentPad])
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
       ...prev,
@@ -197,15 +185,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
-    <div
-      className="max-w-4xl mx-auto overflow-x-hidden"
-      data-osk-scroll
-      data-osk-next="true"
-      data-testid="admin-osk-form-modal"
-      style={{
-        paddingBottom: oskContentPad > 0 ? `${Math.max(96, oskContentPad + 16)}px` : '6rem',
-      }}
-    >
+    <div className="max-w-4xl mx-auto overflow-x-hidden" {...pageRootProps}>
       {/* Floating Save Button - Fixed Bottom Right */}
       <motion.button
         whileHover={{ scale: 1.05 }}

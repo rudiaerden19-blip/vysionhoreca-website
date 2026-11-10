@@ -8,6 +8,7 @@ import { getTeamMembers, saveTeamMember, deleteTeamMember, TeamMember } from '@/
 import MediaPicker from '@/components/MediaPicker'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { AdminIconPencil, AdminIconTrash } from '@/lib/admin-action-icons'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 export default function TeamPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -23,6 +24,15 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
     role: '',
     photo_url: '',
   })
+  const { pageRootProps, oskContentPad, oskModalMaxHeight, dismissOsk } = useAdminAzertyOskPageChrome({
+    scrollDeps: [showModal],
+  })
+
+  const closeTeamModal = () => {
+    dismissOsk()
+    setShowModal(false)
+    setEditingMember(null)
+  }
 
   useEffect(() => {
     loadMembers()
@@ -83,7 +93,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
     const saved = await saveTeamMember(memberData)
     
     if (saved) {
-      setShowModal(false)
+      closeTeamModal()
       loadMembers()
     } else {
       alert(t('websiteTeam.saveFailed'))
@@ -105,7 +115,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto" {...pageRootProps}>
       <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -216,17 +226,25 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowModal(false)}
+            className={`fixed inset-0 z-[130] flex bg-black/50 p-4 ${
+              oskContentPad > 0
+                ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+                : 'items-center justify-center'
+            }`}
+            onClick={closeTeamModal}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-md touch-pan-y overflow-y-auto rounded-2xl bg-white p-6 max-h-[90vh]"
               data-osk-scroll
               data-osk-next="true"
+              style={{
+                paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+                maxHeight: oskModalMaxHeight,
+              }}
             >
               <h2 className="text-xl font-bold text-gray-900 mb-6">
                 {editingMember ? t('websiteTeam.editMember') : t('websiteTeam.newMember')}
@@ -277,7 +295,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
               {/* Actions */}
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={closeTeamModal}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   {t('adminPages.common.cancel')}

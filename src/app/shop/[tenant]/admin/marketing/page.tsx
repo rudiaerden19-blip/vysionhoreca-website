@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { adminDb } from '@/lib/admin-db-client'
 import { getTenantSettings } from '@/lib/admin-api'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 interface Customer {
   id: string
@@ -34,6 +35,14 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [showComposer, setShowComposer] = useState(false)
+  const { pageRootProps, oskContentPad, oskModalMaxHeight, dismissOsk } = useAdminAzertyOskPageChrome({
+    scrollDeps: [showComposer],
+  })
+
+  const closeComposer = () => {
+    dismissOsk()
+    setShowComposer(false)
+  }
   const [businessInfo, setBusinessInfo] = useState<any>(null)
   const [campaigns, setCampaigns] = useState<CampaignHistory[]>([])
   const [sendSuccess, setSendSuccess] = useState(false)
@@ -147,7 +156,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
 
       if (result.success) {
         setSendSuccess(true)
-        setShowComposer(false)
+        closeComposer()
         setSelectedCustomers(new Set())
         loadData() // Reload campaign history
         setTimeout(() => setSendSuccess(false), 5000)
@@ -185,7 +194,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" {...pageRootProps}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -345,13 +354,23 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
 
       {/* Email Composer Modal */}
       {showComposer && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
+        <div
+          className={`fixed inset-0 z-[130] flex bg-black/50 p-4 ${
+            oskContentPad > 0
+              ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+              : 'items-center justify-center'
+          }`}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-2xl touch-pan-y overflow-y-auto rounded-xl bg-white shadow-xl max-h-[90vh]"
             data-osk-scroll
             data-osk-next="true"
+            style={{
+              paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+              maxHeight: oskModalMaxHeight,
+            }}
           >
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
@@ -438,7 +457,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
 
             <div className="p-6 border-t flex gap-3 justify-end">
               <button
-                onClick={() => setShowComposer(false)}
+                onClick={closeComposer}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
               >
                 {t('adminPages.common.cancel')}

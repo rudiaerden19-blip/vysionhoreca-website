@@ -8,6 +8,7 @@ import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { AdminIconPrint, AdminIconTrash } from '@/lib/admin-action-icons'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 const getQrTypes = (t: (key: string) => string) => [
   { id: 'menu', name: t('marketingQr.types.menu'), icon: '', description: t('marketingQr.types.menuDesc') },
@@ -29,6 +30,14 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
     type: 'menu'as 'menu' |  'table' |  'promo' |  'review',
     table_number: '',
   })
+  const { pageRootProps, oskContentPad, oskModalMaxHeight, dismissOsk } = useAdminAzertyOskPageChrome({
+    scrollDeps: [showModal],
+  })
+
+  const closeQrModal = () => {
+    dismissOsk()
+    setShowModal(false)
+  }
 
   useEffect(() => {
     loadQrCodes()
@@ -81,7 +90,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
     const result = await saveQrCode(newQr)
     if (result.ok) {
       setQrCodes((prev) => [result.data, ...prev])
-      setShowModal(false)
+      closeQrModal()
       setSelectedType(null)
       setFormData({ name: '', type: 'menu', table_number: '' })
     } else {
@@ -186,7 +195,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
 
   return (
     <PinGate tenant={params.tenant}>
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto" {...pageRootProps}>
       <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -318,17 +327,25 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowModal(false)}
+            className={`fixed inset-0 z-[130] flex bg-black/50 p-4 ${
+              oskContentPad > 0
+                ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+                : 'items-center justify-center'
+            }`}
+            onClick={closeQrModal}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-md touch-pan-y overflow-y-auto overflow-hidden rounded-2xl bg-white shadow-2xl max-h-[90vh]"
               data-osk-scroll
               data-osk-next="true"
+              style={{
+                paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+                maxHeight: oskModalMaxHeight,
+              }}
             >
               <div className="p-6 border-b flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -339,7 +356,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                   </div>
                 </div>
                 <button 
-                  onClick={() => setShowModal(false)}
+                  onClick={closeQrModal}
                   className="text-gray-400 hover:text-gray-600 text-2xl"
                 >
                   ×
@@ -392,7 +409,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
 
               <div className="p-6 border-t bg-gray-50 flex gap-3">
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={closeQrModal}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >
                   {t('adminPages.common.cancel')}

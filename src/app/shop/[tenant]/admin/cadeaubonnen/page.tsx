@@ -7,9 +7,11 @@ import { motion } from 'framer-motion'
 import { getGiftCards, GiftCard, getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 export default function CadeaubonnenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { pageRootProps, saveFabBottom } = useAdminAzertyOskPageChrome()
   const { ask, ConfirmModal } = useAdminConfirm(t)
   const [giftCards, setGiftCards] = useState<GiftCard[]>([])
   const [settings, setSettings] = useState<TenantSettings | null>(null)
@@ -107,7 +109,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-24">
+    <div className="max-w-4xl mx-auto" {...pageRootProps}>
       <ConfirmModal />
       {/* Floating Save Button */}
       {activeTab === 'instellingen' && (
@@ -117,7 +119,8 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           whileTap={{ scale: 0.95 }}
           onClick={handleSave}
           disabled={saving}
-          className={`vysion-admin-save-fab fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
+          style={{ bottom: `${saveFabBottom}px` }}
+          className={`vysion-admin-save-fab fixed right-6 z-50 flex items-center gap-2 rounded-2xl px-6 py-4 font-medium shadow-2xl ${
             saved ? 'bg-green-500 text-white': 'bg-black hover:bg-neutral-900 text-white'
           }`}
         >

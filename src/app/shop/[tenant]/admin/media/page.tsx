@@ -9,6 +9,7 @@ import { adminDb } from '@/lib/admin-db-client'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { AdminIconCheck, AdminIconClose, AdminIconList, AdminIconTrash } from '@/lib/admin-action-icons'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 // =====================================================
 // AUTOMATISCHE IMAGE RESIZE FUNCTIE
@@ -102,6 +103,10 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [showNewCategory, setShowNewCategory] = useState(false)
+  const { pageRootProps } = useAdminAzertyOskPageChrome({
+    scrollDeps: [showNewCategory],
+    defaultPaddingBottom: '2rem',
+  })
   const [newCategoryName, setNewCategoryName] = useState('')
   const [uploadCategory, setUploadCategory] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -332,7 +337,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     : media.filter(m => m.category === selectedCategory)
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto" {...pageRootProps}>
       <ConfirmModal />
       {/* Header */}
       <div className="flex items-center justify-between mb-8">

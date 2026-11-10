@@ -14,6 +14,7 @@ import {
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { AdminIconCopy } from '@/lib/admin-action-icons'
+import { useAdminAzertyOskPageChrome } from '@/hooks/useAdminAzertyOskPageChrome'
 
 // ── Tijdinvoer helper ─────────────────────────────────────────────
 function formatTimeInput(raw: string): string {
@@ -101,6 +102,7 @@ function getBelgianHolidays(year: number): { key: string; label: string; date: s
 
 export default function OpeningstijdenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const { pageRootProps, saveFabBottom } = useAdminAzertyOskPageChrome()
   
   const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const
 
@@ -375,7 +377,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
 
   return (
       <PinGate tenant={params.tenant}>
-      <div className="max-w-4xl mx-auto pb-24">
+      <div className="max-w-4xl mx-auto" {...pageRootProps}>
       {/* Floating Save Button - Fixed Bottom Right */}
       <motion.button
         type="button"
@@ -383,7 +385,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         whileTap={{ scale: 0.95 }}
         onClick={handleSave}
         disabled={saving}
-        className={`vysion-admin-save-fab fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
+        style={{ bottom: `${saveFabBottom}px` }}
+        className={`vysion-admin-save-fab fixed right-6 z-50 flex items-center gap-2 rounded-2xl px-6 py-4 font-medium shadow-2xl ${
           saved 
             ? 'bg-green-500 text-white' 
             : 'bg-black hover:bg-neutral-900 text-white'
