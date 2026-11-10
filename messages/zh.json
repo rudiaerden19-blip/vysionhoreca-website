@@ -3648,7 +3648,7 @@
     "azertyOskHide": "隐藏键盘",
     "azertyOskShortcutsNumpadTitle": "选项",
     "azertyOskShortcutsTitle": "备注快捷文本",
-    "azertyOskShortcutsHint": "14个字段，每个15字符 — 用于商品或数字键盘备注。",
+    "azertyOskShortcutsHint": "10个字段，每个15字符 — 用于商品或数字键盘备注。自动保存。",
     "azertyOskShortcutInsertHint": "双击或回车插入到备注",
     "azertyOskShortcutPlaceholder": "例如 张三 或 不要洋葱",
     "azertyOskShortcutsSave": "保存",

@@ -1,6 +1,6 @@
 import { isKassaAzertyOskManualOpenEnabled, readKassaOskFieldValue } from '@/lib/kassa-azerty-osk'
 
-export const KASSA_OSK_LINE_SHORTCUT_SLOTS = 14
+export const KASSA_OSK_LINE_SHORTCUT_SLOTS = 10
 export const KASSA_OSK_LINE_SHORTCUT_MAX_LEN = 15
 export const KASSA_OSK_LINE_NOTE_ATTR = 'data-kassa-osk-line-note'
 

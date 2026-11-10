@@ -4303,7 +4303,7 @@
     "azertyOskHide": "Toetsenbord verbergen",
     "azertyOskShortcutsNumpadTitle": "Opties",
     "azertyOskShortcutsTitle": "Snelteksten opmerking",
-    "azertyOskShortcutsHint": "14 velden, elk 15 tekens — opmerking bij product of numpad.",
+    "azertyOskShortcutsHint": "10 velden, elk 15 tekens — opmerking bij product of numpad. Automatisch opgeslagen.",
     "azertyOskShortcutInsertHint": "Dubbelklik of Enter = in opmerking",
     "azertyOskShortcutPlaceholder": "bv. Jan of zonder ui",
     "azertyOskShortcutsSave": "Opslaan",

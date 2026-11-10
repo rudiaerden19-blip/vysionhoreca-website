@@ -5,8 +5,8 @@ import {
 } from '@/lib/kassa-osk-line-shortcuts'
 
 describe('kassa-osk-line-shortcuts', () => {
-  it('normaliseert naar 14 slots', () => {
-    expect(normalizeKassaOskLineShortcuts(['Jan', 'zonder ui'])).toHaveLength(14)
+  it('normaliseert naar 10 slots', () => {
+    expect(normalizeKassaOskLineShortcuts(['Jan', 'zonder ui'])).toHaveLength(10)
     expect(normalizeKassaOskLineShortcuts(['Jan', 'zonder ui'])[0]).toBe('Jan')
     expect(normalizeKassaOskLineShortcuts(['Jan', 'zonder ui'])[1]).toBe('zonder ui')
   })

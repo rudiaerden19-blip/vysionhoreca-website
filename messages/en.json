@@ -4303,7 +4303,7 @@
     "azertyOskHide": "Hide keyboard",
     "azertyOskShortcutsNumpadTitle": "Options",
     "azertyOskShortcutsTitle": "Note quick texts",
-    "azertyOskShortcutsHint": "14 fields, 15 characters each — product or numpad notes.",
+    "azertyOskShortcutsHint": "10 fields, 15 characters each — product or numpad notes. Saved automatically.",
     "azertyOskShortcutInsertHint": "Double-click or Enter = insert into note",
     "azertyOskShortcutPlaceholder": "e.g. John or no onion",
     "azertyOskShortcutsSave": "Save",

@@ -1178,6 +1178,18 @@ html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field::placeh
   color: #858585;
 }
 
+/* AZERTY OSK op kassa: breedte tot start mand (sidebar). */
+.kassa-azerty-osk-kassa-anchor {
+  right: max(0.5rem, calc(20rem + 0.35rem));
+  max-width: none;
+}
+
+@media (min-width: 640px) {
+  .kassa-azerty-osk-kassa-anchor {
+    right: max(0.5rem, calc(24rem + 0.35rem));
+  }
+}
+
 /* ===========================================
    SCROLLBAR HIDE
    =========================================== */

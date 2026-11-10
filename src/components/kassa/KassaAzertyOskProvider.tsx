@@ -62,11 +62,13 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const [lineShortcutDraft, setLineShortcutDraft] = useState<string[]>(() =>
     normalizeKassaOskLineShortcuts([]),
   )
-  const [shortcutsSaving, setShortcutsSaving] = useState(false)
   const [shift, setShift] = useState(false)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
   const focusOutTimerRef = useRef<number | undefined>(undefined)
+  const lineShortcutsLoadedRef = useRef(false)
+  const lineShortcutsSaveTimerRef = useRef<number | undefined>(undefined)
+  const lineShortcutsLastSavedRef = useRef('')
 
   const enabled = isAzertyOskActiveForSession({
     pathname,
@@ -107,14 +109,43 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!lineShortcutsPilot) return
     let cancelled = false
+    lineShortcutsLoadedRef.current = false
     void getTenantSettings(tenantSlugForOsk).then((settings) => {
       if (cancelled) return
-      setLineShortcutDraft(normalizeKassaOskLineShortcuts(settings?.kassa_osk_line_shortcuts))
+      const normalized = normalizeKassaOskLineShortcuts(settings?.kassa_osk_line_shortcuts)
+      setLineShortcutDraft(normalized)
+      lineShortcutsLastSavedRef.current = JSON.stringify(normalized)
+      lineShortcutsLoadedRef.current = true
     })
     return () => {
       cancelled = true
     }
   }, [lineShortcutsPilot, tenantSlugForOsk])
+
+  useEffect(() => {
+    if (!lineShortcutsPilot || !lineShortcutsLoadedRef.current) return
+    const normalized = normalizeKassaOskLineShortcuts(lineShortcutDraft)
+    const payloadKey = JSON.stringify(normalized)
+    if (payloadKey === lineShortcutsLastSavedRef.current) return
+
+    if (lineShortcutsSaveTimerRef.current !== undefined) {
+      window.clearTimeout(lineShortcutsSaveTimerRef.current)
+    }
+    lineShortcutsSaveTimerRef.current = window.setTimeout(() => {
+      void saveKassaOskLineShortcuts(tenantSlugForOsk, normalized).then((result) => {
+        if (result.ok) {
+          lineShortcutsLastSavedRef.current = payloadKey
+          setLineShortcutDraft(normalized)
+        }
+      })
+    }, 700)
+
+    return () => {
+      if (lineShortcutsSaveTimerRef.current !== undefined) {
+        window.clearTimeout(lineShortcutsSaveTimerRef.current)
+      }
+    }
+  }, [lineShortcutDraft, lineShortcutsPilot, tenantSlugForOsk])
 
   const hideKeyboard = useCallback((disarm: boolean) => {
     if (disarm) {
@@ -318,15 +349,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     [attachField],
   )
 
-  const saveLineShortcuts = useCallback(async () => {
-    setShortcutsSaving(true)
-    const normalized = normalizeKassaOskLineShortcuts(lineShortcutDraft)
-    const result = await saveKassaOskLineShortcuts(tenantSlugForOsk, normalized)
-    setShortcutsSaving(false)
-    if (result.ok) {
-      setLineShortcutDraft(normalized)
-    }
-  }, [lineShortcutDraft, tenantSlugForOsk])
+  const oskStretchToCart =
+    lineShortcutsPilot && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
   const keyBtnClass = speelsDarkOsk
     ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[3rem] px-0.5 text-center text-lg font-bold sm:min-h-[3.15rem] sm:text-xl`
@@ -342,23 +366,29 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div
-          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480] max-w-[96vw]"
+          className={`pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[480] left-[max(0.75rem,env(safe-area-inset-left))] ${
+            oskStretchToCart ? 'kassa-azerty-osk-kassa-anchor' : 'max-w-[96vw]'
+          }`}
           role="presentation"
         >
           <div
-            className={`pointer-events-auto flex flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
+            className={`pointer-events-auto flex w-full flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
-            style={{
-              width: showLineShortcutsColumn
-                ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
-                : KASSA_AZERTY_OSK_PANEL_WIDTH,
-              minWidth: KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
-              maxWidth: showLineShortcutsColumn
-                ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
-                : KASSA_AZERTY_OSK_PANEL_WIDTH,
-            }}
+            style={
+              oskStretchToCart
+                ? { minWidth: KASSA_AZERTY_OSK_PANEL_MIN_WIDTH }
+                : {
+                    width: showLineShortcutsColumn
+                      ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
+                      : KASSA_AZERTY_OSK_PANEL_WIDTH,
+                    minWidth: KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
+                    maxWidth: showLineShortcutsColumn
+                      ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
+                      : KASSA_AZERTY_OSK_PANEL_WIDTH,
+                  }
+            }
           >
           <div className="mb-1.5 flex shrink-0 items-center justify-between gap-2">
             <span
@@ -384,7 +414,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               ✕
             </button>
           </div>
-          <div className="flex min-h-0 items-stretch gap-0">
+          <div className="flex items-start gap-0">
             <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="grid grid-cols-10 gap-2">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
@@ -457,11 +487,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
           {showLineShortcutsColumn ? (
             <KassaOskLineShortcutsPad
               draft={lineShortcutDraft}
-              saving={shortcutsSaving}
               speelsDark={speelsDarkOsk}
               onDraftChange={setLineShortcutDraft}
               onInsert={insertLineShortcut}
-              onSave={() => void saveLineShortcuts()}
             />
           ) : null}
           </div>

@@ -3148,7 +3148,7 @@
     "azertyOskHide": "Masquer le clavier",
     "azertyOskShortcutsNumpadTitle": "Options",
     "azertyOskShortcutsTitle": "Textes rapides remarque",
-    "azertyOskShortcutsHint": "14 champs, 15 caractères — note produit ou pavé numérique.",
+    "azertyOskShortcutsHint": "10 champs, 15 caractères — note produit ou pavé numérique. Enregistrement automatique.",
     "azertyOskShortcutInsertHint": "Double-clic ou Entrée = dans la note",
     "azertyOskShortcutPlaceholder": "ex. Jean ou sans oignon",
     "azertyOskShortcutsSave": "Enregistrer",

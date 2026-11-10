@@ -3648,7 +3648,7 @@
     "azertyOskHide": "キーボードを隠す",
     "azertyOskShortcutsNumpadTitle": "オプション",
     "azertyOskShortcutsTitle": "備考クイック入力",
-    "azertyOskShortcutsHint": "14フィールド、各15文字 — 商品またはテンキーの備考用。",
+    "azertyOskShortcutsHint": "10フィールド、各15文字 — 商品またはテンキーの備考用。自動保存。",
     "azertyOskShortcutInsertHint": "ダブルクリックまたはEnterで備考に挿入",
     "azertyOskShortcutPlaceholder": "例: 田中、玉ねぎなし",
     "azertyOskShortcutsSave": "保存",

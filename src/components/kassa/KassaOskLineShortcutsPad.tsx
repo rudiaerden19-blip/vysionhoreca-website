@@ -1,7 +1,6 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
-import { KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS } from '@/lib/kassa-azerty-osk'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
@@ -11,11 +10,9 @@ import { KASSA_AZERTY_OSK_NUMPAD_WIDTH } from '@/lib/kassa-azerty-osk-context'
 
 type Props = {
   draft: string[]
-  saving: boolean
   speelsDark?: boolean
   onDraftChange: (next: string[]) => void
   onInsert: (label: string) => void
-  onSave: () => void
 }
 
 /**
@@ -23,11 +20,9 @@ type Props = {
  */
 export function KassaOskLineShortcutsPad({
   draft,
-  saving,
   speelsDark = false,
   onDraftChange,
   onInsert,
-  onSave,
 }: Props) {
   const { t } = useLanguage()
 
@@ -37,26 +32,22 @@ export function KassaOskLineShortcutsPad({
     onDraftChange(next)
   }
 
-  const onKeyPointerDown = (e: React.PointerEvent) => {
-    e.preventDefault()
-  }
-
   const fieldClass = speelsDark
-    ? 'kassa-osk-shortcut-field min-h-[2.85rem] w-full min-w-0 rounded-xl px-1.5 text-center text-xs font-bold outline-none sm:min-h-[3rem] sm:text-sm'
-    : 'min-h-[2.85rem] w-full min-w-0 rounded-xl border border-neutral-500 bg-neutral-900 px-1.5 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[3rem] sm:text-sm'
+    ? 'kassa-osk-shortcut-field min-h-[2.75rem] w-full min-w-0 rounded-xl px-1.5 text-center text-xs font-bold outline-none sm:min-h-[3rem] sm:text-sm'
+    : 'min-h-[2.75rem] w-full min-w-0 rounded-xl border border-neutral-500 bg-neutral-900 px-1.5 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[3rem] sm:text-sm'
 
   const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
 
   return (
     <div
-      className={`flex shrink-0 flex-col self-stretch border-l pl-2.5 ${dividerClass}`}
+      className={`flex shrink-0 flex-col self-start border-l pl-2.5 ${dividerClass}`}
       style={{ width: KASSA_AZERTY_OSK_NUMPAD_WIDTH }}
       data-testid="kassa-azerty-osk-shortcuts"
     >
-      <div className="mb-1.5 shrink-0 pt-0.5 text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:text-xs">
+      <div className="mb-1 shrink-0 pt-0.5 text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:text-xs">
         {t('kassaApp.azertyOskShortcutsNumpadTitle')}
       </div>
-      <div className="grid min-h-0 flex-1 grid-cols-2 gap-1.5 content-start">
+      <div className="grid grid-cols-2 gap-1.5">
         {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
           const label = draft[index] ?? ''
           return (
@@ -83,15 +74,6 @@ export function KassaOskLineShortcutsPad({
             />
           )
         })}
-        <button
-          type="button"
-          disabled={saving}
-          className={`${KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS} col-span-2 min-h-[3rem] w-full text-sm font-bold sm:min-h-[3.15rem] sm:text-base`}
-          onPointerDown={onKeyPointerDown}
-          onClick={onSave}
-        >
-          {saving ? t('adminLayout.loading') : t('kassaApp.azertyOskShortcutsSave')}
-        </button>
       </div>
     </div>
   )

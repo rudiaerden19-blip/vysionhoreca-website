@@ -3648,7 +3648,7 @@
     "azertyOskHide": "Nascondi tastiera",
     "azertyOskShortcutsNumpadTitle": "Opzioni",
     "azertyOskShortcutsTitle": "Testi rapidi nota",
-    "azertyOskShortcutsHint": "14 campi, 15 caratteri — nota prodotto o tastierino.",
+    "azertyOskShortcutsHint": "10 campi, 15 caratteri — nota prodotto o tastierino. Salvataggio automatico.",
     "azertyOskShortcutInsertHint": "Doppio clic o Invio = nella nota",
     "azertyOskShortcutPlaceholder": "es. Marco o senza cipolla",
     "azertyOskShortcutsSave": "Salva",

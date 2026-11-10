@@ -3148,7 +3148,7 @@
     "azertyOskHide": "Tastatur ausblenden",
     "azertyOskShortcutsNumpadTitle": "Optionen",
     "azertyOskShortcutsTitle": "Schnelltexte Bemerkung",
-    "azertyOskShortcutsHint": "14 Felder, je 15 Zeichen — Produkt- oder Numpad-Bemerkung.",
+    "azertyOskShortcutsHint": "10 Felder, je 15 Zeichen — Produkt- oder Numpad-Bemerkung. Automatisch gespeichert.",
     "azertyOskShortcutInsertHint": "Doppelklick oder Enter = in Bemerkung",
     "azertyOskShortcutPlaceholder": "z. B. Jan oder ohne Zwiebel",
     "azertyOskShortcutsSave": "Speichern",

@@ -3648,7 +3648,7 @@
     "azertyOskHide": "Ocultar teclado",
     "azertyOskShortcutsNumpadTitle": "Opciones",
     "azertyOskShortcutsTitle": "Textos rápidos nota",
-    "azertyOskShortcutsHint": "14 campos, 15 caracteres — nota de producto o teclado numérico.",
+    "azertyOskShortcutsHint": "10 campos, 15 caracteres — nota de producto o teclado numérico. Guardado automático.",
     "azertyOskShortcutInsertHint": "Doble clic o Enter = en la nota",
     "azertyOskShortcutPlaceholder": "ej. Juan o sin cebolla",
     "azertyOskShortcutsSave": "Guardar",
