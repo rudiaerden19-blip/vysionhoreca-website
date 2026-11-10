@@ -8,7 +8,10 @@ import {
   buildKassaLayoutPreviewKassaUrl,
   type KassaLayoutLabFrame,
 } from '@/lib/kassa-layout-preview'
-import { kassaLabPhysicalBoxCm } from '@/lib/kassa-layout-lab-physical'
+import {
+  kassaLabPhysicalBoxCm,
+  labIframeScaleForPhysicalBox,
+} from '@/lib/kassa-layout-lab-physical'
 
 const SCREEN_IDS = ['15', '17', '21'] as const
 
@@ -18,10 +21,6 @@ const LABELS: Record<(typeof SCREEN_IDS)[number], string> = {
   '21': '21 inch',
 }
 
-function labIframeCoverScale(boxW: number, boxH: number, cssW: number, cssH: number): number {
-  if (!(boxW > 0 && boxH > 0 && cssW > 0 && cssH > 0)) return 0.25
-  return Math.max(boxW / cssW, boxH / cssH)
-}
 
 function Preview({
   frame,
@@ -51,7 +50,7 @@ function Preview({
     const measure = () => {
       const r = el.getBoundingClientRect()
       if (r.width > 0 && r.height > 0) {
-        setScale(labIframeCoverScale(r.width, r.height, frame.cssW, frame.cssH))
+        setScale(labIframeScaleForPhysicalBox(r.width, frame.cssW))
       }
     }
     measure()
