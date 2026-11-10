@@ -11,6 +11,7 @@ import {
   isKassaHorecaPosPath,
   isAdminOskNextFormField,
   isKassaOskLineNoteField,
+  isKassaOskShortcutSlotField,
   isKassaOskLineShortcutsEnabled,
   normalizeKassaOskLineShortcuts,
   shouldOpenAzertyOskForFieldFocus,
@@ -175,7 +176,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       healOskBlockedTextField(el)
       activeRef.current = el
       armKassaOskInput(el)
-      setLineNoteFieldActive(isKassaOskLineNoteField(el) || isAdminOskNextFormField(el))
+      setLineNoteFieldActive(
+        isKassaOskLineNoteField(el) ||
+          isAdminOskNextFormField(el) ||
+          isKassaOskShortcutSlotField(el),
+      )
       if (shouldOpenAzertyOskForFieldFocus(manualOpen, keyboardPinned, el)) {
         setVisible(true)
       }

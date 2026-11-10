@@ -1,6 +1,5 @@
 'use client'
 
-import { useRef } from 'react'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
@@ -39,8 +38,6 @@ export function KassaOskLineShortcutsPad({
   onInsert,
 }: Props) {
   const { t } = useLanguage()
-  const pressRef = useRef<{ at: number; index: number; timer?: number } | null>(null)
-  const LONG_PRESS_MS = 450
 
   const setSlot = (index: number, value: string) => {
     const next = [...draft]
@@ -49,8 +46,12 @@ export function KassaOskLineShortcutsPad({
   }
 
   const fieldClass = speelsDark
-    ? `kassa-osk-shortcut-field ${OSK_SHORTCUT_FIELD_HEIGHT} rounded-xl px-1 text-center text-xs font-bold outline-none sm:text-sm`
-    : `${OSK_SHORTCUT_FIELD_HEIGHT} rounded-xl border border-neutral-500 bg-neutral-900 px-1 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:text-sm`
+    ? `kassa-osk-shortcut-field ${OSK_SHORTCUT_FIELD_HEIGHT} rounded-xl pl-1 pr-8 text-center text-xs font-bold outline-none sm:text-sm`
+    : `${OSK_SHORTCUT_FIELD_HEIGHT} rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-8 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:text-sm`
+
+  const insertBtnClass = speelsDark
+    ? 'absolute right-0.5 top-1/2 flex h-7 w-7 -translate-y-1/2 touch-manipulation items-center justify-center rounded-md text-base font-bold text-[#58CCFF] active:opacity-80'
+    : 'absolute right-0.5 top-1/2 flex h-7 w-7 -translate-y-1/2 touch-manipulation items-center justify-center rounded-md border border-neutral-600 bg-neutral-700 text-base font-bold text-[#58CCFF] active:bg-neutral-600'
 
   const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
 
@@ -87,51 +88,46 @@ export function KassaOskLineShortcutsPad({
       >
         {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
           const label = draft[index] ?? ''
+          const trimmed = label.trim()
           return (
-            <input
-              key={`slot-${index}`}
-              type="text"
-              maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
-              value={label}
-              onChange={(e) => setSlot(index, e.target.value)}
-              onPointerDown={(e) => {
-                const trimmed = label.trim()
-                const at = Date.now()
-                const target = e.currentTarget
-                pressRef.current = { at, index }
-                if (!trimmed) return
-                e.preventDefault()
-                pressRef.current.timer = window.setTimeout(() => {
-                  target.focus()
-                }, LONG_PRESS_MS)
-              }}
-              onPointerUp={(e) => {
-                const trimmed = label.trim()
-                const press = pressRef.current
-                if (press?.timer !== undefined) window.clearTimeout(press.timer)
-                pressRef.current = null
-                if (!trimmed || !press || press.index !== index) return
-                if (Date.now() - press.at < LONG_PRESS_MS) {
-                  e.preventDefault()
-                  onInsert(trimmed)
-                }
-              }}
-              onPointerCancel={() => {
-                const press = pressRef.current
-                if (press?.timer !== undefined) window.clearTimeout(press.timer)
-                pressRef.current = null
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  const trimmed = label.trim()
+            <div key={`slot-${index}`} className="relative max-w-[3cm] w-full min-w-0">
+              <input
+                type="text"
+                maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
+                value={label}
+                autoComplete="off"
+                inputMode="text"
+                data-kassa-osk-shortcut-slot="true"
+                onChange={(e) => setSlot(index, e.target.value)}
+                onPointerDown={(e) => {
+                  if (e.currentTarget instanceof HTMLInputElement) {
+                    e.currentTarget.focus()
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    if (trimmed) onInsert(trimmed)
+                  }
+                }}
+                placeholder={`${index + 1}`}
+                title={t('kassaApp.azertyOskShortcutEditHint')}
+                className={fieldClass}
+              />
+              <button
+                type="button"
+                disabled={!trimmed}
+                title={t('kassaApp.azertyOskShortcutInsertHint')}
+                aria-label={t('kassaApp.azertyOskShortcutInsertHint')}
+                className={`${insertBtnClass} disabled:pointer-events-none disabled:opacity-25`}
+                onPointerDown={(e) => e.preventDefault()}
+                onClick={() => {
                   if (trimmed) onInsert(trimmed)
-                }
-              }}
-              placeholder={`${index + 1}`}
-              title={t('kassaApp.azertyOskShortcutInsertHint')}
-              className={fieldClass}
-            />
+                }}
+              >
+                ›
+              </button>
+            </div>
           )
         })}
       </div>

@@ -4,6 +4,7 @@ import { isKassaAzertyOskManualOpenEnabled, readKassaOskFieldValue } from '@/lib
 export const KASSA_OSK_LINE_SHORTCUT_SLOTS = 10
 export const KASSA_OSK_LINE_SHORTCUT_MAX_LEN = 15
 export const KASSA_OSK_LINE_NOTE_ATTR = 'data-kassa-osk-line-note'
+export const KASSA_OSK_SHORTCUT_SLOT_ATTR = 'data-kassa-osk-shortcut-slot'
 
 export function isKassaOskLineShortcutsEnabled(tenantSlug: string): boolean {
   return isKassaAzertyOskManualOpenEnabled(tenantSlug)
@@ -12,6 +13,11 @@ export function isKassaOskLineShortcutsEnabled(tenantSlug: string): boolean {
 export function isKassaOskLineNoteField(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   return target.getAttribute(KASSA_OSK_LINE_NOTE_ATTR) === 'true'
+}
+
+export function isKassaOskShortcutSlotField(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  return target.getAttribute(KASSA_OSK_SHORTCUT_SLOT_ATTR) === 'true'
 }
 
 /** Handmatige OSK-knop uit, maar opmerking-veld focust → toch tonen. */
@@ -28,7 +34,11 @@ export function shouldOpenAzertyOskForFieldFocus(
   target: EventTarget | null,
 ): boolean {
   if (!manualOpen || keyboardPinned) return true
-  return isKassaOskLineNoteField(target) || isAdminOskNextFormField(target)
+  return (
+    isKassaOskLineNoteField(target) ||
+    isAdminOskNextFormField(target) ||
+    isKassaOskShortcutSlotField(target)
+  )
 }
 
 export function isKassaHorecaPosPath(pathname: string): boolean {

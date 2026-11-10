@@ -3,6 +3,7 @@ import {
   normalizeKassaOskLineShortcuts,
   sanitizeKassaOskLineShortcutLabel,
   isAdminOskNextFormField,
+  isKassaOskShortcutSlotField,
   shouldOpenAzertyOskForFieldFocus,
 } from '@/lib/kassa-osk-line-shortcuts'
 
@@ -25,6 +26,13 @@ describe('kassa-osk-line-shortcuts', () => {
     document.body.appendChild(root)
     expect(isAdminOskNextFormField(input)).toBe(true)
     document.body.removeChild(root)
+  })
+
+  it('sneltekst-slot telt als OSK-veld', () => {
+    const input = document.createElement('input')
+    input.setAttribute('data-kassa-osk-shortcut-slot', 'true')
+    expect(isKassaOskShortcutSlotField(input)).toBe(true)
+    expect(shouldOpenAzertyOskForFieldFocus(true, false, input)).toBe(true)
   })
 
   it('opmerking-veld opent OSK ook bij handmatige modus', () => {
