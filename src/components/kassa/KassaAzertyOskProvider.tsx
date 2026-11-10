@@ -150,7 +150,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk"]')) {
         return
       }
-      if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk-toggle-bar"]')) {
+      if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk-toggle"]')) {
         return
       }
       if (!(e.target instanceof HTMLElement) || !isKassaAzertyOskTextTarget(e.target)) {
@@ -222,17 +222,22 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     }
   }, [attachField, hideKeyboard, keyboardPinned])
 
-  const toggleBarTopClass = pathname.includes('/admin/')
-    ? 'top-14'
-    : 'top-0 pt-[max(env(safe-area-inset-top),0px)]'
-
   const chromeValue = useMemo(
     () => ({
       visible: showKeyboardPanel && !suppressedRef.current,
       heightPx: KASSA_AZERTY_OSK_HEIGHT_PX,
       dismiss: dismissAzertyOsk,
+      manualToggleEnabled: manualOpen,
+      keyboardPinned,
+      toggleKeyboard: onToggleKeyboardPinned,
     }),
-    [dismissAzertyOsk, showKeyboardPanel],
+    [
+      dismissAzertyOsk,
+      keyboardPinned,
+      manualOpen,
+      onToggleKeyboardPinned,
+      showKeyboardPanel,
+    ],
   )
 
   const sendEdit = (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
@@ -250,26 +255,6 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   return (
     <KassaAzertyOskContext.Provider value={chromeValue}>
-      {enabled && manualOpen ? (
-        <div
-          className={`fixed left-0 right-0 z-[105] flex justify-center border-b border-neutral-600 bg-neutral-900/95 px-3 py-1.5 backdrop-blur-sm ${toggleBarTopClass}`}
-          data-testid="kassa-azerty-osk-toggle-bar"
-        >
-          <button
-            type="button"
-            className={`touch-manipulation min-h-[2.25rem] w-full max-w-md rounded-lg border px-3 text-sm font-bold sm:min-h-[2.5rem] sm:text-base ${
-              keyboardPinned
-                ? 'border-neutral-300 bg-neutral-600 text-white'
-                : 'border-neutral-500 bg-neutral-700 text-white active:bg-neutral-600'
-            }`}
-            aria-pressed={keyboardPinned}
-            data-testid="kassa-azerty-osk-toggle"
-            onClick={onToggleKeyboardPinned}
-          >
-            {keyboardPinned ? t('kassaApp.azertyOskHide') : t('kassaApp.azertyOskShow')}
-          </button>
-        </div>
-      ) : null}
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div

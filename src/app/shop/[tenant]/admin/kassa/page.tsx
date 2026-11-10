@@ -319,6 +319,8 @@ import { useKassaCloudTerminals } from '@/lib/kassa-payment-terminal-client'
 import { KassaSplitPaymentModal } from '@/components/kassa/KassaSplitPaymentModal'
 import { KassaSuccessReceiptModal } from '@/components/kassa/KassaSuccessReceiptModal'
 import { KassaProductOptionsModal } from '@/components/kassa/KassaProductOptionsModal'
+import { KassaAzertyOskHeaderToggle } from '@/components/kassa/KassaAzertyOskHeaderToggle'
+import { isKassaAzertyOskManualOpenEnabled } from '@/lib/kassa-azerty-osk'
 import { KassaCheckoutVatModal } from '@/components/kassa/KassaCheckoutVatModal'
 import { KassaBtwBonModal } from '@/components/kassa/KassaBtwBonModal'
 import { KassaStaffClockModal, KassaStaffSalesSummaryModal } from '@/components/kassa/KassaStaffClockUi'
@@ -6356,6 +6358,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </span>
           </button>
 
+          {isKassaAzertyOskManualOpenEnabled(tenant) && !kassaPosLuxury ? (
+            <KassaAzertyOskHeaderToggle
+              className={headerQuickLinkBtnClass}
+              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+            />
+          ) : null}
+
           {isOnline !== null && !kassaPosLuxury ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
@@ -6403,6 +6412,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             >
               <span className="truncate">{t('kassaApp.remove')}</span>
             </button>
+          ) : null}
+
+          {isKassaAzertyOskManualOpenEnabled(tenant) && kassaPosLuxury ? (
+            <KassaAzertyOskHeaderToggle
+              className={headerQuickLinkBtnClass}
+              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+            />
           ) : null}
 
           {isOnline !== null && kassaPosLuxury ? (

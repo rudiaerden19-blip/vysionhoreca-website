@@ -40,10 +40,8 @@ import {
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
 import { OskLegacyFieldCleanup } from '@/components/admin/OskLegacyFieldCleanup'
-import {
-  isKassaAzertyOskManualOpenEnabled,
-  KASSA_AZERTY_OSK_TOGGLE_BAR_PX,
-} from '@/lib/kassa-azerty-osk'
+import { isKassaAzertyOskManualOpenEnabled } from '@/lib/kassa-azerty-osk'
+import { KassaAzertyOskHeaderToggle } from '@/components/kassa/KassaAzertyOskHeaderToggle'
 import {
   buildShopInternalReturnPath,
   clearTenantOwnerSession,
@@ -553,9 +551,8 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     )
   }
 
-  const azertyOskToggleBar = isKassaAzertyOskManualOpenEnabled(params.tenant)
-  const adminScrollTopPx =
-    56 + (!kassaHelpOpen && azertyOskToggleBar ? KASSA_AZERTY_OSK_TOGGLE_BAR_PX : 0)
+  const azertyOskHeaderToggle =
+    isKassaAzertyOskManualOpenEnabled(params.tenant) && !isHorecaKassaPos
 
   return (
     <ReservationOwnerAlertProvider
@@ -651,6 +648,9 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
               }
             />
           )}
+          {azertyOskHeaderToggle && (
+            <KassaAzertyOskHeaderToggle className="touch-manipulation flex shrink-0 items-center gap-1.5 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-white/20" />
+          )}
           <LanguageSelector />
         </div>
       </div>
@@ -664,9 +664,8 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
         className={
           kassaHelpOpen
             ? 'z-0 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]'
-            : 'fixed inset-x-0 bottom-0 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]'
+            : 'fixed inset-x-0 bottom-0 top-14 z-0 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-manipulation [-webkit-overflow-scrolling:touch]'
         }
-        style={kassaHelpOpen ? undefined : { top: adminScrollTopPx }}
       >
         <div
           className={`max-w-full p-4 md:p-6 ${

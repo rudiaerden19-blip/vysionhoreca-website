@@ -12,6 +12,9 @@ export type KassaAzertyOskChrome = {
   visible: boolean
   heightPx: number
   dismiss: () => void
+  manualToggleEnabled: boolean
+  keyboardPinned: boolean
+  toggleKeyboard: () => void
 }
 
 export const KassaAzertyOskContext = createContext<KassaAzertyOskChrome | null>(null)

@@ -16,9 +16,6 @@ export const KASSA_AZERTY_OSK_LIVE = true
  */
 export const KASSA_AZERTY_OSK_MANUAL_OPEN = true
 
-/** Vaste hoogte balk met «Toetsenbord»-knop (admin-layout reserveert dit). */
-export const KASSA_AZERTY_OSK_TOGGLE_BAR_PX = 46
-
 export function isKassaAzertyOskManualOpenEnabled(tenantSlug: string): boolean {
   if (!KASSA_AZERTY_OSK_LIVE || !KASSA_AZERTY_OSK_MANUAL_OPEN) return false
   return isKassaAzertyOskEnabled(tenantSlug)
