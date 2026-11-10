@@ -6739,7 +6739,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     kassaSxgaDenseTiles
                       ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                       : kassaWide15Chrome
-                        ? 'gap-2 grid-cols-5'
+                        ? 'gap-2 grid-cols-4'
                         : kassaDefaultMenuGridColsClass
                   } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                   style={
@@ -6792,7 +6792,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       kassaSxgaDenseTiles
                         ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                         : kassaWide15Chrome
-                          ? 'gap-2 grid-cols-5'
+                          ? 'gap-2 grid-cols-4'
                           : kassaDefaultMenuGridColsClass
                     } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                     style={

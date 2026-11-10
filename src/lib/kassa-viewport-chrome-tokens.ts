@@ -46,7 +46,7 @@ const WIDE15: KassaViewportChromeTokens = {
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX,
   oskRightInsetPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX + OSK_EDGE_GUTTER_PX,
   menuGridHorizontalPadPx: 32,
-  menuClassicGridCols: 5,
+  menuClassicGridCols: 4,
   menuTileHeightBoost: 1.06,
   menuGridGapPx: KASSA_MENU_GRID_GAP_PX_DEFAULT,
   menuVisibleRows: KASSA_MENU_VISIBLE_ROWS_DEFAULT,

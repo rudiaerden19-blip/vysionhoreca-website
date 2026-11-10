@@ -173,8 +173,8 @@ export function readKassaViewportProfileFromWindow(): KassaViewportProfile {
 
 export function kassaMenuGridColumnCountWide15(vpWcss: number): number {
   if (!Number.isFinite(vpWcss) || vpWcss <= 0) return 2
-  if (vpWcss >= 1280) return 5
-  if (vpWcss >= 1024) return 5
+  if (vpWcss >= 1280) return 4
+  if (vpWcss >= 1024) return 4
   if (vpWcss >= 768) return 4
   if (vpWcss >= 640) return 3
   return 2

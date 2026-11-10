@@ -31,7 +31,7 @@ describe('kassa-viewport-chrome-tokens', () => {
     expect(vars['--kassa-sidebar-width']).toBe('352px')
     expect(vars['--kassa-osk-right-inset']).toBe('356px')
     expect(vars['--kassa-menu-tile-boost']).toBe('1.06')
-    expect(w15.menuClassicGridCols).toBe(5)
+    expect(w15.menuClassicGridCols).toBe(4)
   })
 
   it('vijf platformprofielen met vaste defaults', () => {
