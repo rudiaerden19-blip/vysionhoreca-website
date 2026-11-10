@@ -404,6 +404,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             ) : null}
           <div className="relative flex w-full items-start gap-0">
             <div className="flex min-w-0 flex-1 flex-col gap-2">
+            {showLineShortcutsColumn ? (
+              <div className="mb-1 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
+            ) : null}
             <div className="grid grid-cols-10 gap-2">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
                 <button
