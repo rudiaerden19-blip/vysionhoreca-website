@@ -166,6 +166,7 @@ export function KassaProductOptionsModal({
               id="kassa-line-note"
               type="text"
               data-testid="kassa-line-note-input"
+              data-kassa-osk-line-note="true"
               value={model.lineNote ?? ''}
               maxLength={120}
               onChange={(e) => onLineNoteChange(e.target.value)}

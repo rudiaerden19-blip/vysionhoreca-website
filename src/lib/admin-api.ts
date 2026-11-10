@@ -227,6 +227,8 @@ export interface TenantSettings {
   kassa_checkout_vat_mode?: string
   /** true = tabs op naam + op rekening v2 (kassa popup; rapport pas bij betaling) */
   kassa_name_account_v2?: boolean
+  /** Max 10 snelteksten (15 tekens) voor kassa-regelopmerking + AZERTY */
+  kassa_osk_line_shortcuts?: string[] | null
   /** true = consumptiejetons op kassa (pilot per tenant) */
   kassa_jeton_enabled?: boolean
   kassa_jeton_black_cents?: number
@@ -425,6 +427,34 @@ export async function saveTenantKassaLanPrintEnabled(
       ok: false,
       error:
         'Geen tenant_settings bijgewerkt. Voer supabase/kassa_lan_print_migration.sql uit.',
+    }
+  }
+  cache.invalidate(cacheKey('tenant_settings', tenantSlug))
+  return { ok: true }
+}
+
+/** Horeca-kassa: 10 snelteksten naast toetsenbord (regel-opmerking). */
+export async function saveKassaOskLineShortcuts(
+  tenantSlug: string,
+  shortcuts: string[],
+): Promise<{ ok: boolean; error?: string }> {
+  const { normalizeKassaOskLineShortcuts } = await import('@/lib/kassa-osk-line-shortcuts')
+  const payload = normalizeKassaOskLineShortcuts(shortcuts)
+  const { data, error } = await supabase
+    .from('tenant_settings')
+    .update({ kassa_osk_line_shortcuts: payload })
+    .eq('tenant_slug', tenantSlug)
+    .select('tenant_slug')
+
+  if (error) {
+    console.error('saveKassaOskLineShortcuts:', error.message)
+    return { ok: false, error: error.message }
+  }
+  if (!data || data.length === 0) {
+    return {
+      ok: false,
+      error:
+        'Geen tenant_settings bijgewerkt. Voer supabase/tenant_settings_kassa_osk_line_shortcuts.sql uit.',
     }
   }
   cache.invalidate(cacheKey('tenant_settings', tenantSlug))

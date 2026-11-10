@@ -7244,6 +7244,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <input
                     type="text"
                     data-testid="kassa-numpad-line-note"
+                    data-kassa-osk-line-note="true"
                     value={numpadLineNote}
                     maxLength={120}
                     onChange={(e) => setNumpadLineNote(e.target.value)}
@@ -7388,6 +7389,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   <input
                     type="text"
                     data-testid="kassa-numpad-line-note"
+                    data-kassa-osk-line-note="true"
                     value={numpadLineNote}
                     maxLength={120}
                     onChange={(e) => setNumpadLineNote(e.target.value)}

@@ -2,8 +2,17 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { getTenantSettings, saveKassaOskLineShortcuts } from '@/lib/admin-api'
 import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
+import { KassaOskLineShortcutsConfigModal } from '@/components/kassa/KassaOskLineShortcutsConfigModal'
+import {
+  applyKassaOskLineShortcut,
+  isKassaHorecaPosPath,
+  isKassaOskLineNoteField,
+  isKassaOskLineShortcutsEnabled,
+  normalizeKassaOskLineShortcuts,
+} from '@/lib/kassa-osk-line-shortcuts'
 import {
   KASSA_AZERTY_LETTER_ROWS,
   KASSA_AZERTY_AT_CHAR,
@@ -39,16 +48,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     typeof window !== 'undefined' ? getCurrentTenantSlug() : null,
   )
 
-  useEffect(() => {
-    setHostTenantSlug(getCurrentTenantSlug())
-    releaseLegacyOskInputGuards()
-    disarmAllKassaOskInputs()
-    setKeyboardPinned(false)
-    setVisible(false)
-  }, [pathname])
-
   const [visible, setVisible] = useState(false)
   const [keyboardPinned, setKeyboardPinned] = useState(false)
+  const [lineNoteFieldActive, setLineNoteFieldActive] = useState(false)
+  const [lineShortcuts, setLineShortcuts] = useState<string[]>(() =>
+    normalizeKassaOskLineShortcuts([]),
+  )
+  const [shortcutsConfigOpen, setShortcutsConfigOpen] = useState(false)
+  const [shortcutsSaving, setShortcutsSaving] = useState(false)
   const [shift, setShift] = useState(false)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
@@ -73,8 +80,34 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   )
 
   const manualOpen = enabled && isKassaAzertyOskManualOpenEnabled(tenantSlugForOsk)
+  const lineShortcutsPilot =
+    isKassaOskLineShortcutsEnabled(tenantSlugForOsk) && isKassaHorecaPosPath(pathname)
 
   const showKeyboardPanel = enabled && visible && (!manualOpen || keyboardPinned)
+  const showLineShortcutsColumn =
+    lineShortcutsPilot && showKeyboardPanel && lineNoteFieldActive && !suppressedRef.current
+
+  useEffect(() => {
+    setHostTenantSlug(getCurrentTenantSlug())
+    releaseLegacyOskInputGuards()
+    disarmAllKassaOskInputs()
+    setKeyboardPinned(false)
+    setVisible(false)
+    setLineNoteFieldActive(false)
+    setShortcutsConfigOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!lineShortcutsPilot) return
+    let cancelled = false
+    void getTenantSettings(tenantSlugForOsk).then((settings) => {
+      if (cancelled) return
+      setLineShortcuts(normalizeKassaOskLineShortcuts(settings?.kassa_osk_line_shortcuts))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [lineShortcutsPilot, tenantSlugForOsk])
 
   const hideKeyboard = useCallback((disarm: boolean) => {
     if (disarm) {
@@ -85,6 +118,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     activeRef.current = null
     setVisible(false)
     setKeyboardPinned(false)
+    setLineNoteFieldActive(false)
     setShift(false)
     releaseAllOskScrollPadding()
   }, [])
@@ -97,6 +131,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       healOskBlockedTextField(el)
       activeRef.current = el
       armKassaOskInput(el)
+      setLineNoteFieldActive(isKassaOskLineNoteField(el))
       if (!manualOpen || keyboardPinned) {
         setVisible(true)
       }
@@ -152,6 +187,13 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         return
       }
       if (related instanceof Element && related.closest('[data-testid="kassa-azerty-osk-toggle"]')) {
+        return
+      }
+      if (
+        related instanceof Element &&
+        (related.closest('[data-testid="kassa-azerty-osk-shortcuts"]') ||
+          related.closest('[data-testid="kassa-osk-shortcuts-config"]'))
+      ) {
         return
       }
       if (!(e.target instanceof HTMLElement) || !isKassaAzertyOskTextTarget(e.target)) {
@@ -251,6 +293,30 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     e.preventDefault()
   }
 
+  const insertLineShortcut = useCallback((label: string) => {
+    const el = activeRef.current
+    if (!el?.isConnected || !isKassaOskLineNoteField(el)) return
+    applyKassaOskLineShortcut(el, label)
+    el.focus()
+  }, [])
+
+  const saveLineShortcuts = useCallback(
+    async (slots: string[]) => {
+      setShortcutsSaving(true)
+      const normalized = normalizeKassaOskLineShortcuts(slots)
+      const result = await saveKassaOskLineShortcuts(tenantSlugForOsk, normalized)
+      setShortcutsSaving(false)
+      if (result.ok) {
+        setLineShortcuts(normalized)
+        setShortcutsConfigOpen(false)
+      }
+    },
+    [tenantSlugForOsk],
+  )
+
+  const shortcutBtnClass =
+    'touch-manipulation min-h-[2.65rem] w-full truncate rounded-xl border border-neutral-500 bg-neutral-700 px-2 text-center text-sm font-bold text-white active:bg-neutral-600 sm:min-h-[2.85rem] sm:text-base'
+
   const keyBtnClass =
     'min-h-[3rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-lg font-bold text-white active:bg-neutral-500 sm:min-h-[3.15rem] sm:text-xl'
 
@@ -259,12 +325,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div
-          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480]"
+          className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-[max(0.75rem,env(safe-area-inset-left))] z-[480] flex max-w-[96vw] items-end gap-2"
           role="presentation"
-          style={{ width: KASSA_AZERTY_OSK_PANEL_WIDTH, maxWidth: KASSA_AZERTY_OSK_PANEL_WIDTH }}
         >
           <div
-            className="pointer-events-auto rounded-2xl border border-neutral-600 bg-neutral-800/95 px-3.5 pb-2.5 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
+            className="pointer-events-auto shrink-0 rounded-2xl border border-neutral-600 bg-neutral-800/95 px-3.5 pb-2.5 pt-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
@@ -358,8 +423,45 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             </div>
           </div>
           </div>
+          {showLineShortcutsColumn ? (
+            <div
+              className="pointer-events-auto flex max-h-[min(70vh,420px)] w-[min(10.5rem,26vw)] min-w-[8.5rem] flex-col gap-1.5 overflow-y-auto rounded-2xl border border-neutral-600 bg-neutral-800/95 p-2 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-md"
+              data-testid="kassa-azerty-osk-shortcuts"
+            >
+              {lineShortcuts.map((label, index) =>
+                label.trim() ? (
+                  <button
+                    key={`osk-sc-${index}`}
+                    type="button"
+                    className={shortcutBtnClass}
+                    title={label}
+                    onPointerDown={onKeyPointerDown}
+                    onClick={() => insertLineShortcut(label)}
+                  >
+                    {label}
+                  </button>
+                ) : null,
+              )}
+              <button
+                type="button"
+                className="touch-manipulation min-h-[2.25rem] rounded-xl border border-dashed border-neutral-500 bg-neutral-900/80 px-2 text-xs font-semibold text-neutral-300 active:bg-neutral-700"
+                title={t('kassaApp.azertyOskShortcutsConfigure')}
+                onPointerDown={onKeyPointerDown}
+                onClick={() => setShortcutsConfigOpen(true)}
+              >
+                ⚙ {t('kassaApp.azertyOskShortcutsConfigure')}
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : null}
+      <KassaOskLineShortcutsConfigModal
+        open={shortcutsConfigOpen}
+        initial={lineShortcuts}
+        saving={shortcutsSaving}
+        onClose={() => setShortcutsConfigOpen(false)}
+        onSave={saveLineShortcuts}
+      />
     </KassaAzertyOskContext.Provider>
   )
 }
