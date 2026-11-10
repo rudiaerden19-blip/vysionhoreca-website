@@ -14,24 +14,12 @@ import {
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
 
-/** Alleen deze drie — vaste cm, fysieke preview. */
 const KASSA_SUPADMIN_SCREEN_IDS = ['15', '17', '21'] as const
 
 const SCREEN_TITLES: Record<(typeof KASSA_SUPADMIN_SCREEN_IDS)[number], string> = {
-  '15': '15 inch breedbeeld',
-  '17': '17 inch vierkant (SXGA)',
-  '21': '21 inch (Full HD)',
-}
-
-const VASTE_PANELEN_TEKST = KASSA_SUPADMIN_SCREEN_IDS.map((id) => {
-  const b = KASSA_LAB_FIXED_BOX_CM[id]
-  return `${id}″ ${b.widthCm}×${b.heightCm} cm`
-}).join(' · ')
-
-function labViewportFitShrink(naturalBoxWidthPx: number, viewportInnerWidth: number): number {
-  const budget = Math.max(280, viewportInnerWidth - 40)
-  if (!(naturalBoxWidthPx > 0)) return 1
-  return Math.min(1, budget / naturalBoxWidthPx)
+  '15': '15 inch',
+  '17': '17 inch vierkant',
+  '21': '21 inch',
 }
 
 function KassaPhysicalPreview({
@@ -40,17 +28,15 @@ function KassaPhysicalPreview({
   tenantSlug,
   origin,
   iframeKey,
-  viewportW,
 }: {
   frame: KassaLayoutLabFrame
   title: string
   tenantSlug: string
   origin: string
   iframeKey: number
-  viewportW: number
 }) {
-  const measureRef = useRef<HTMLDivElement>(null)
-  const [naturalBoxPx, setNaturalBoxPx] = useState({ w: 400, h: 300 })
+  const boxRef = useRef<HTMLDivElement>(null)
+  const [iframeScale, setIframeScale] = useState(0.25)
   const physical = useMemo(() => kassaLabPhysicalBoxCm(frame), [frame])
 
   const src = useMemo(
@@ -58,29 +44,18 @@ function KassaPhysicalPreview({
     [frame, origin, tenantSlug],
   )
 
-  const fitShrink = useMemo(
-    () => labViewportFitShrink(naturalBoxPx.w, viewportW),
-    [naturalBoxPx.w, viewportW],
-  )
-
-  const clipW = Math.max(1, Math.round(naturalBoxPx.w * fitShrink))
-  const clipH = Math.max(1, Math.round(naturalBoxPx.h * fitShrink))
-  const iframeScale = labIframeScaleForPhysicalBox(naturalBoxPx.w, frame.cssW)
-
   useLayoutEffect(() => {
-    const el = measureRef.current
+    const el = boxRef.current
     if (!el) return undefined
     const measure = () => {
-      const r = el.getBoundingClientRect()
-      if (r.width > 0 && r.height > 0) {
-        setNaturalBoxPx({ w: r.width, h: r.height })
-      }
+      const w = el.getBoundingClientRect().width
+      if (w > 0) setIframeScale(labIframeScaleForPhysicalBox(w, frame.cssW))
     }
     measure()
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
     ro?.observe(el)
     return () => ro?.disconnect()
-  }, [physical.heightCm, physical.widthCm])
+  }, [frame.cssW, physical.heightCm, physical.widthCm])
 
   const openLogicalWindow = () => {
     window.open(
@@ -90,66 +65,43 @@ function KassaPhysicalPreview({
     )
   }
 
-  const lineaalHint =
-    fitShrink < 0.999
-      ? `Op dit scherm verkleind (${Math.round(fitShrink * 100)}%) zodat je alles ziet zonder scroll. Lineaal op echt paneel: ${physical.widthCm}×${physical.heightCm} cm.`
-      : `Lineaal op oranje rand: ${physical.widthCm}×${physical.heightCm} cm.`
-
   return (
-    <section className="flex w-full max-w-full flex-col gap-2 border-b border-white/10 pb-10 last:border-0">
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 className="text-base font-bold text-white">{title}</h2>
-        <span className="text-sm text-zinc-400">
+    <article className="flex shrink-0 flex-col gap-1.5">
+      <div className="flex flex-col gap-0.5">
+        <h2 className="text-sm font-bold text-white">{title}</h2>
+        <p className="text-xs text-zinc-400">
           {physical.widthCm}×{physical.heightCm} cm · {frame.cssW}×{frame.cssH} · vp={frame.vp}
-        </span>
+        </p>
         <button
           type="button"
           onClick={openLogicalWindow}
-          className="ml-auto text-xs text-[#58CCFF] underline-offset-2 hover:underline"
+          className="text-left text-xs text-[#58CCFF] hover:underline"
         >
-          Echt venster (volledige kassa)
+          Echt venster
         </button>
       </div>
       <div
-        ref={measureRef}
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 -z-10 opacity-0"
+        ref={boxRef}
+        className="relative overflow-hidden rounded-lg border-[3px] border-amber-500 bg-black shadow-xl"
         style={{
           width: `${physical.widthCm}cm`,
           height: `${physical.heightCm}cm`,
         }}
-      />
-      <div
-        className="overflow-hidden rounded-lg border-[3px] border-amber-500 bg-black shadow-xl"
-        style={{ width: clipW, height: clipH }}
       >
-        <div className="relative overflow-hidden" style={{ width: clipW, height: clipH }}>
-          <div
-            className="absolute left-0 top-0"
-            style={{
-              width: `${physical.widthCm}cm`,
-              height: `${physical.heightCm}cm`,
-              transform: `scale(${fitShrink})`,
-              transformOrigin: 'top left',
-            }}
-          >
-            <iframe
-              key={`${frame.id}-${iframeKey}`}
-              title={`${title} — ${tenantSlug}`}
-              src={src}
-              className="absolute left-0 top-0 border-0"
-              style={{
-                width: frame.cssW,
-                height: frame.cssH,
-                transform: `scale(${iframeScale})`,
-                transformOrigin: 'top left',
-              }}
-            />
-          </div>
-        </div>
+        <iframe
+          key={`${frame.id}-${iframeKey}`}
+          title={`${title} — ${tenantSlug}`}
+          src={src}
+          className="absolute left-0 top-0 border-0"
+          style={{
+            width: frame.cssW,
+            height: frame.cssH,
+            transform: `scale(${iframeScale})`,
+            transformOrigin: 'top left',
+          }}
+        />
       </div>
-      <p className="text-xs text-zinc-500">{lineaalHint}</p>
-    </section>
+    </article>
   )
 }
 
@@ -158,16 +110,6 @@ export default function SuperadminKassaLayoutLabPage() {
   const initialTenant = (searchParams?.get('tenant') || '').trim().toLowerCase()
   const [tenantSlug, setTenantSlug] = useState(initialTenant)
   const [iframeKey, setIframeKey] = useState(0)
-  const [viewportW, setViewportW] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1200,
-  )
-
-  useLayoutEffect(() => {
-    const onResize = () => setViewportW(window.innerWidth)
-    onResize()
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
 
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
@@ -198,14 +140,18 @@ export default function SuperadminKassaLayoutLabPage() {
     }
   }, [origin, screens, tenantSlug])
 
+  const sizesLine = KASSA_SUPADMIN_SCREEN_IDS.map(
+    (id) => `${id}″ ${KASSA_LAB_FIXED_BOX_CM[id].widthCm}×${KASSA_LAB_FIXED_BOX_CM[id].heightCm} cm`,
+  ).join(' · ')
+
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#0f1419] text-zinc-100">
-      <header className="shrink-0 border-b border-white/10 px-4 py-3">
-        <div className="mx-auto flex max-w-full flex-wrap items-center gap-2">
+    <div className="min-h-screen bg-[#0f1419] text-zinc-100">
+      <header className="border-b border-white/10 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Link href="/superadmin" className="text-sm font-semibold text-[#58CCFF]">
             ← Superadmin
           </Link>
-          <h1 className="text-lg font-bold">Kassa — 15″ · 17″ vierkant · 21″</h1>
+          <h1 className="text-lg font-bold">Kassa 15″ · 17″ · 21″</h1>
           <input
             type="text"
             value={tenantSlug}
@@ -218,7 +164,7 @@ export default function SuperadminKassaLayoutLabPage() {
               href={entryKassaHref}
               className="rounded-lg bg-[#58CCFF] px-3 py-1.5 text-sm font-bold text-[#063042]"
             >
-              1× Kassa login
+              Kassa login
             </a>
           ) : null}
           <button
@@ -235,30 +181,31 @@ export default function SuperadminKassaLayoutLabPage() {
             disabled={!tenantSlug}
             className="rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-bold text-black disabled:opacity-40"
           >
-            Open 3 echte vensters
+            Open 3 vensters
           </button>
         </div>
-        <p className="mx-auto mt-2 max-w-full text-sm text-zinc-400">
-          Paneelmaten: <span className="text-amber-200">{VASTE_PANELEN_TEKST}</span>. Preview past
-          in je scherm — <strong className="font-normal text-zinc-300">geen</strong> scroll links/rechts.
+        <p className="mt-2 text-sm text-zinc-400">
+          Vaste paneelmaten op je scherm: <span className="text-amber-200">{sizesLine}</span>. Geen
+          zoom — drie kaders naast elkaar op breedbeeld.
         </p>
       </header>
 
-      <main className="mx-auto w-full max-w-full overflow-x-hidden px-4 py-4">
+      <main className="p-4">
         {!tenantSlug ? (
-          <p className="text-zinc-400">Vul tenant slug in → Kassa login → Vernieuwen.</p>
+          <p className="text-zinc-400">Tenant slug → Kassa login → Vernieuwen.</p>
         ) : (
-          screens.map(({ frame, title }) => (
-            <KassaPhysicalPreview
-              key={frame.id}
-              frame={frame}
-              title={title}
-              tenantSlug={tenantSlug}
-              origin={origin}
-              iframeKey={iframeKey}
-              viewportW={viewportW}
-            />
-          ))
+          <div className="flex flex-row flex-nowrap items-end justify-start gap-[1.2cm]">
+            {screens.map(({ frame, title }) => (
+              <KassaPhysicalPreview
+                key={frame.id}
+                frame={frame}
+                title={title}
+                tenantSlug={tenantSlug}
+                origin={origin}
+                iframeKey={iframeKey}
+              />
+            ))}
+          </div>
         )}
       </main>
     </div>
