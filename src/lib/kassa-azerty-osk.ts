@@ -1,3 +1,5 @@
+import { setNativeInputValue } from '@/lib/dom-input-value'
+
 /**
  * Horeca-kassa: vast AZERTY-schermtoetsenbord (alle tenants).
  */
@@ -175,29 +177,8 @@ export function isKassaAzertyOskTextTarget(
   return true
 }
 
-const inputValueSetter =
-  typeof window !== 'undefined'
-    ? Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-    : undefined
-
-const textareaValueSetter =
-  typeof window !== 'undefined'
-    ? Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
-    : undefined
-
 export function readKassaOskFieldValue(el: HTMLInputElement | HTMLTextAreaElement): string {
   return el.value
-}
-
-function writeNativeValue(el: HTMLInputElement | HTMLTextAreaElement, next: string): void {
-  if (el instanceof HTMLInputElement && inputValueSetter) {
-    inputValueSetter.call(el, next)
-  } else if (el instanceof HTMLTextAreaElement && textareaValueSetter) {
-    textareaValueSetter.call(el, next)
-  } else {
-    el.value = next
-  }
-  el.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
 export function applyKassaAzertyOskEdit(
@@ -219,7 +200,7 @@ export function applyKassaAzertyOskEdit(
     value = value.slice(0, max)
   }
 
-  writeNativeValue(el, value)
+  setNativeInputValue(el, value)
 }
 
 /** Alleen markeer — geen inputMode/readOnly (blokkeerde typen overal). */

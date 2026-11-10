@@ -361,7 +361,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       }
       if (!el?.isConnected || !isKassaOskLineNoteField(el)) return
       applyKassaOskLineShortcut(el, label)
-      el.focus()
+      attachField(el)
     },
     [attachField],
   )

@@ -1,3 +1,4 @@
+import { setNativeInputValue } from '@/lib/dom-input-value'
 import { isKassaAzertyOskManualOpenEnabled, readKassaOskFieldValue } from '@/lib/kassa-azerty-osk'
 
 export const KASSA_OSK_LINE_SHORTCUT_SLOTS = 10
@@ -49,24 +50,6 @@ export function sanitizeKassaOskLineShortcutLabel(value: string): string {
   return value.trim().slice(0, KASSA_OSK_LINE_SHORTCUT_MAX_LEN)
 }
 
-function writeNativeShortcutValue(
-  el: HTMLInputElement | HTMLTextAreaElement,
-  next: string,
-): void {
-  const inputValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
-  const textareaValueSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')
-    ?.set
-  if (el instanceof HTMLInputElement && inputValueSetter) {
-    inputValueSetter.call(el, next)
-  } else if (el instanceof HTMLTextAreaElement && textareaValueSetter) {
-    textareaValueSetter.call(el, next)
-  } else {
-    el.value = next
-  }
-  el.dispatchEvent(new Event('input', { bubbles: true }))
-  el.dispatchEvent(new Event('change', { bubbles: true }))
-}
-
 /** Voeg sneltekst toe in regel-opmerking (spatie ertussen indien nodig). */
 export function applyKassaOskLineShortcut(
   el: HTMLInputElement | HTMLTextAreaElement,
@@ -87,7 +70,7 @@ export function applyKassaOskLineShortcut(
   if (max !== undefined && next.length > max) {
     next = next.slice(0, max)
   }
-  writeNativeShortcutValue(el, next)
+  setNativeInputValue(el, next)
   const caret = Math.min(next.length, before.length + insert.length)
   try {
     el.setSelectionRange(caret, caret)

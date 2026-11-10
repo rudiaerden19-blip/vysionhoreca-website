@@ -3649,7 +3649,7 @@
     "azertyOskShortcutsNumpadTitle": "Opciones",
     "azertyOskShortcutsTitle": "Textos rápidos nota",
     "azertyOskShortcutsHint": "10 campos, 15 caracteres — nota de producto o teclado numérico. Guardado automático.",
-    "azertyOskShortcutInsertHint": "Doble clic o Enter = en la nota",
+    "azertyOskShortcutInsertHint": "Toque = en la nota · mantener = editar texto",
     "azertyOskShortcutPlaceholder": "ej. Juan o sin cebolla",
     "azertyOskShortcutsSave": "Guardar",
     "azertyOskShortcutsConfigure": "Editar textos rápidos",

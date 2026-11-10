@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { useLanguage } from '@/i18n'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
@@ -38,6 +39,8 @@ export function KassaOskLineShortcutsPad({
   onInsert,
 }: Props) {
   const { t } = useLanguage()
+  const pressRef = useRef<{ at: number; index: number; timer?: number } | null>(null)
+  const LONG_PRESS_MS = 450
 
   const setSlot = (index: number, value: string) => {
     const next = [...draft]
@@ -91,16 +94,39 @@ export function KassaOskLineShortcutsPad({
               maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
               value={label}
               onChange={(e) => setSlot(index, e.target.value)}
+              onPointerDown={(e) => {
+                const trimmed = label.trim()
+                const at = Date.now()
+                const target = e.currentTarget
+                pressRef.current = { at, index }
+                if (!trimmed) return
+                e.preventDefault()
+                pressRef.current.timer = window.setTimeout(() => {
+                  target.focus()
+                }, LONG_PRESS_MS)
+              }}
+              onPointerUp={(e) => {
+                const trimmed = label.trim()
+                const press = pressRef.current
+                if (press?.timer !== undefined) window.clearTimeout(press.timer)
+                pressRef.current = null
+                if (!trimmed || !press || press.index !== index) return
+                if (Date.now() - press.at < LONG_PRESS_MS) {
+                  e.preventDefault()
+                  onInsert(trimmed)
+                }
+              }}
+              onPointerCancel={() => {
+                const press = pressRef.current
+                if (press?.timer !== undefined) window.clearTimeout(press.timer)
+                pressRef.current = null
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
                   const trimmed = label.trim()
                   if (trimmed) onInsert(trimmed)
                 }
-              }}
-              onDoubleClick={() => {
-                const trimmed = label.trim()
-                if (trimmed) onInsert(trimmed)
               }}
               placeholder={`${index + 1}`}
               title={t('kassaApp.azertyOskShortcutInsertHint')}
