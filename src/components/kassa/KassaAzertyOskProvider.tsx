@@ -12,6 +12,7 @@ import {
   isKassaOskLineNoteField,
   isKassaOskLineShortcutsEnabled,
   normalizeKassaOskLineShortcuts,
+  shouldOpenAzertyOskForFieldFocus,
 } from '@/lib/kassa-osk-line-shortcuts'
 import {
   KASSA_AZERTY_LETTER_ROWS,
@@ -93,7 +94,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     isKassaOskLineShortcutsEnabled(tenantSlugForOsk) && isKassaHorecaPosPath(pathname)
   const speelsDarkOsk = useKassaSpeelsDarkOskChrome(pathname)
 
-  const showKeyboardPanel = enabled && visible && (!manualOpen || keyboardPinned)
+  const showKeyboardPanel =
+    enabled && visible && (!manualOpen || keyboardPinned || lineNoteFieldActive)
   const showLineShortcutsColumn =
     lineShortcutsPilot && showKeyboardPanel && !suppressedRef.current
 
@@ -170,7 +172,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       activeRef.current = el
       armKassaOskInput(el)
       setLineNoteFieldActive(isKassaOskLineNoteField(el))
-      if (!manualOpen || keyboardPinned) {
+      if (shouldOpenAzertyOskForFieldFocus(manualOpen, keyboardPinned, el)) {
         setVisible(true)
       }
     },
@@ -233,6 +235,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       ) {
         return
       }
+      if (related instanceof Element && related.closest('[data-testid="kassa-options-modal"]')) {
+        return
+      }
       if (!(e.target instanceof HTMLElement) || !isKassaAzertyOskTextTarget(e.target)) {
         return
       }
@@ -242,10 +247,12 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         const active = document.activeElement
         if (isKassaAzertyOskTextTarget(active)) {
           activeRef.current = active
-          if (!manualOpen || keyboardPinned) setVisible(true)
+          if (shouldOpenAzertyOskForFieldFocus(manualOpen, keyboardPinned, active)) {
+            setVisible(true)
+          }
           return
         }
-        if (manualOpen && keyboardPinned) {
+        if (manualOpen && (keyboardPinned || lineNoteFieldActive)) {
           return
         }
         const tracked = activeRef.current
@@ -269,25 +276,15 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       document.removeEventListener('focusout', onFocusOut, true)
       disarmAllKassaOskInputs()
     }
-  }, [attachField, enabled, hideKeyboard, keyboardPinned, manualOpen])
+  }, [attachField, enabled, hideKeyboard, keyboardPinned, lineNoteFieldActive, manualOpen])
 
   const dismissAzertyOsk = useCallback(() => {
     suppressedRef.current = true
-    setVisible(false)
-    releaseAllOskScrollPadding()
-    if (!manualOpen) {
-      hideKeyboard(true)
-      window.setTimeout(() => {
-        suppressedRef.current = false
-      }, 400)
-      return
-    }
-    /** Kort onderdrukken na modal-sluit — geen vaste blur (blokkeerde 2e keer typen). */
+    hideKeyboard(true)
     window.setTimeout(() => {
       suppressedRef.current = false
-      if (keyboardPinned) setVisible(true)
     }, 400)
-  }, [hideKeyboard, keyboardPinned, manualOpen])
+  }, [hideKeyboard])
 
   const onToggleKeyboardPinned = useCallback(() => {
     if (keyboardPinned) {

@@ -2,6 +2,7 @@ import {
   applyKassaOskLineShortcut,
   normalizeKassaOskLineShortcuts,
   sanitizeKassaOskLineShortcutLabel,
+  shouldOpenAzertyOskForFieldFocus,
 } from '@/lib/kassa-osk-line-shortcuts'
 
 describe('kassa-osk-line-shortcuts', () => {
@@ -13,6 +14,15 @@ describe('kassa-osk-line-shortcuts', () => {
 
   it('kapt labels af op 15 tekens', () => {
     expect(sanitizeKassaOskLineShortcutLabel('  abcdefghijklmnop  ')).toBe('abcdefghijklmno')
+  })
+
+  it('opmerking-veld opent OSK ook bij handmatige modus', () => {
+    const input = document.createElement('input')
+    input.setAttribute('data-kassa-osk-line-note', 'true')
+    expect(shouldOpenAzertyOskForFieldFocus(true, false, input)).toBe(true)
+    const plain = document.createElement('input')
+    expect(shouldOpenAzertyOskForFieldFocus(true, false, plain)).toBe(false)
+    expect(shouldOpenAzertyOskForFieldFocus(true, true, plain)).toBe(true)
   })
 
   it('voegt sneltekst toe met spatie', () => {

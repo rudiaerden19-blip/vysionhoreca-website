@@ -170,6 +170,11 @@ export function KassaProductOptionsModal({
               value={model.lineNote ?? ''}
               maxLength={120}
               onChange={(e) => onLineNoteChange(e.target.value)}
+              onPointerDown={(e) => {
+                if (e.currentTarget instanceof HTMLInputElement) {
+                  e.currentTarget.focus()
+                }
+              }}
               placeholder={t('kassaApp.cartLineNotePlaceholder')}
               className={
                 dark

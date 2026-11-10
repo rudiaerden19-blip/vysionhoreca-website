@@ -13,6 +13,16 @@ export function isKassaOskLineNoteField(target: EventTarget | null): boolean {
   return target.getAttribute(KASSA_OSK_LINE_NOTE_ATTR) === 'true'
 }
 
+/** Handmatige OSK-knop uit, maar opmerking-veld focust → toch tonen. */
+export function shouldOpenAzertyOskForFieldFocus(
+  manualOpen: boolean,
+  keyboardPinned: boolean,
+  target: EventTarget | null,
+): boolean {
+  if (!manualOpen || keyboardPinned) return true
+  return isKassaOskLineNoteField(target)
+}
+
 export function isKassaHorecaPosPath(pathname: string): boolean {
   const path = (pathname || '').split('?')[0]
   return /\/shop\/[^/]+\/admin\/kassa(?:\/|$)/.test(path)
