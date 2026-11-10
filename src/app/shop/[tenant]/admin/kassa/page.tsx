@@ -6360,7 +6360,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isKassaAzertyOskManualOpenEnabled(tenant) && !kassaPosLuxury ? (
             <KassaAzertyOskHeaderToggle
-              className={headerQuickLinkBtnClass}
+              className={kassaHeaderQuickLinkShell}
               labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
             />
           ) : null}
@@ -6416,7 +6416,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isKassaAzertyOskManualOpenEnabled(tenant) && kassaPosLuxury ? (
             <KassaAzertyOskHeaderToggle
-              className={headerQuickLinkBtnClass}
+              className={kassaHeaderQuickLinkShell}
               labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
             />
           ) : null}

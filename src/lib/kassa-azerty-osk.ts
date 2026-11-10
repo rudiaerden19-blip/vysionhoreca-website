@@ -16,6 +16,10 @@ export const KASSA_AZERTY_OSK_LIVE = true
  */
 export const KASSA_AZERTY_OSK_MANUAL_OPEN = true
 
+/** Zelfde blauw als admin «Naar kassa» / POS-quicklink. */
+export const KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS =
+  'touch-manipulation [-webkit-tap-highlight-color:transparent] inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] active:brightness-95 sm:px-4'
+
 export function isKassaAzertyOskManualOpenEnabled(tenantSlug: string): boolean {
   if (!KASSA_AZERTY_OSK_LIVE || !KASSA_AZERTY_OSK_MANUAL_OPEN) return false
   return isKassaAzertyOskEnabled(tenantSlug)

@@ -649,7 +649,7 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
             />
           )}
           {azertyOskHeaderToggle && (
-            <KassaAzertyOskHeaderToggle className="touch-manipulation flex shrink-0 items-center gap-1.5 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-white/20" />
+            <KassaAzertyOskHeaderToggle />
           )}
           <LanguageSelector />
         </div>
