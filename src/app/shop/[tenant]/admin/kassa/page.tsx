@@ -398,6 +398,12 @@ import {
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
 import { resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
+import {
+  estimateKassaSidebarWidthPxForInnerWidth,
+  getKassaViewportChromeTokens,
+  kassaViewportChromeCssVars,
+  type KassaViewportChromeProfile,
+} from '@/lib/kassa-viewport-chrome-tokens'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -452,17 +458,12 @@ function shouldApplyKassaWide15Chrome(): boolean {
   return readKassaChromeFlagsFromWindow().wide15
 }
 
-/** Standaard numpadbalk (`w-80`/ `sm:w-96`/ `lg:w-[380px]`). */
-const KASSA_SIDEBAR_WIDTH_BASE_PX = 320
-const KASSA_SIDEBAR_WIDTH_SM_PX = 384
-const KASSA_SIDEBAR_WIDTH_LG_PX = 380
-/**
- * 17″ kiosk (SXGA): zijbalkbreedte — sync met `w-[332px]`en `.cursor/rules/kassa-17inch-sxga.mdc`.
- * Niet verkleinen zonder footer/header opnieuw te meten op 1280×1024.
- */
-const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
-/** 15″ breedbeeld — smaller dan 17″ SXGA, anders oogt de zijbalk ingezoomd. */
-const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 268
+function readKassaViewportChromeProfileFromWindow(): KassaViewportChromeProfile {
+  const flags = readKassaChromeFlagsFromWindow()
+  if (flags.sxgaDense) return 'sxga'
+  if (flags.wide15) return 'wide15'
+  return 'default'
+}
 const KASSA_SIDEBAR_FOOTER_LEFT_COL_WIDE15 =
   'w-[5.25rem] min-w-[5.25rem] max-w-[5.25rem] shrink-0'
 
@@ -1774,17 +1775,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const iw = Math.floor(
       vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth,
     )
-    const kioskSxga = shouldApplyKassaCompactSquareMonitorTileCap()
-    const wide15 = shouldApplyKassaWide15Chrome()
-    const sidebarPx = kioskSxga
-      ? KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX
-      : wide15
-        ? KASSA_SIDEBAR_WIDTH_WIDE15_PX
-      : iw >= 1024
-        ? KASSA_SIDEBAR_WIDTH_LG_PX
-        : iw >= 640
-          ? KASSA_SIDEBAR_WIDTH_SM_PX
-          : KASSA_SIDEBAR_WIDTH_BASE_PX
+    const profile = readKassaViewportChromeProfileFromWindow()
+    const sidebarPx = estimateKassaSidebarWidthPxForInnerWidth(profile, iw)
     const horizontalPadGuess = 32
     return Math.max(200, iw - sidebarPx - horizontalPadGuess)
   }
@@ -5775,6 +5767,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     : kassaSxgaDenseTiles
       ? 'sxga'
       : 'default'
+  const kassaViewportChromeTokens = getKassaViewportChromeTokens(kassaChromeDensity)
+  const kassaRootChromeStyle = kassaViewportChromeCssVars(
+    kassaViewportChromeTokens,
+  ) as React.CSSProperties
   const kassaSidebarFooterLeftCol = kassaWide15Chrome
     ? KASSA_SIDEBAR_FOOTER_LEFT_COL_WIDE15
     : KASSA_SIDEBAR_FOOTER_LEFT_COL
@@ -6060,6 +6056,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-testid="kassa-app"
       data-kassa-layout={kassaLayout}
       data-kassa-vp={kassaChromeDensity}
+      data-kassa-ipad={kassaIpadMenuGridCap ? '1' : '0'}
+      style={kassaRootChromeStyle}
     >
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
@@ -6833,11 +6831,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           data-kassa-sidebar="1"
           className={`${
-            kassaWide15Chrome
-              ? 'w-[268px] max-w-[30vw]'
-              : kassaCompactChrome
-                ? 'w-[332px] max-w-[38vw]'
-                : 'w-80 sm:w-96 lg:w-[380px]'
+            kassaCompactChrome
+              ? 'w-[var(--kassa-sidebar-width)] max-w-[38vw]'
+              : 'w-80 sm:w-96 lg:w-[var(--kassa-sidebar-width)]'
+          } ${
+            kassaWide15Chrome ? 'max-w-[30vw]' : ''
           } relative flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${

@@ -1,0 +1,43 @@
+---
+description: Kassa layout per schermprofiel — geen gedeelde sm/lg-chrome meer zonder drie profielen te checken
+globs:
+  - src/app/shop/**/admin/kassa/**
+  - src/lib/kassa-viewport-chrome-tokens.ts
+  - src/lib/kassa-viewport-profile.ts
+  - src/app/globals.css
+  - src/app/superadmin/kassa-layout-lab/**
+alwaysApply: false
+---
+
+# Kassa viewport — geïsoleerde profielen (21″ / 15″ / 17″)
+
+**Eigenaar:** wijziging aan één scherm mag **niet** stilletjes andere schermen breken.
+
+## Profielen
+
+| `data-kassa-vp` | Mand (px) | Bron tokens |
+|-----------------|-----------|-------------|
+| `default` | 380 | 21″ Full HD |
+| `wide15` | 268 | 15″ breedbeeld |
+| `sxga` | 332 | 17″ SXGA |
+
+Alle vaste chrome-waarden → **`src/lib/kassa-viewport-chrome-tokens.ts`** (niet opnieuw in `page.tsx`).
+
+## Regels
+
+1. **Mand + OSK-anker:** `--kassa-sidebar-width` en `--kassa-osk-right-inset` op `[data-testid='kassa-app']` — geen losse `rem`-media-queries voor OSK.
+2. **Geen** gedeelde `sm:`/`lg:` op header/sidebar/footer die bedoeld zijn voor **één** profiel — gebruik tokens of `data-kassa-vp`.
+3. **SXGA 17″:** zie ook `kassa-17inch-sxga.mdc` — niet verkleinen zonder regressie.
+4. **Vóór commit:** superadmin **Kassa layout-lab** → modus **Regressie 21·15·17** + tenant slug; groen = ok voor deploy.
+
+## OSK shortcuts/typ-logica
+
+Blijft **HEILIG** (`kassa-osk-snelteksten-sacred.mdc`) — alleen CSS/positie via tokens en globals, geen provider-refactor zonder ontgrendelzin.
+
+## Tests
+
+```bash
+npm test -- --testPathPatterns=kassa-viewport-chrome-tokens
+npm test -- --testPathPatterns=kassa-layout-preview
+npx tsc --noEmit
+```
