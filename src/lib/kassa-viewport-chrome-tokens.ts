@@ -29,7 +29,7 @@ export type KassaViewportChromeTokens = {
 /** 17″ SXGA — sync `.cursor/rules/kassa-17inch-sxga.mdc` (niet wijzigen zonder 17″-opdracht). */
 export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
 /** 15″ breedbeeld — smallere (smaller) tegels, hogere rij, bredere mand (nov 2026). */
-export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 352
+export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 400
 /** 21″ / grote desktop (lg breakpoint in kassa). */
 export const KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX = 380
 export const KASSA_SIDEBAR_WIDTH_DEFAULT_SM_PX = 384

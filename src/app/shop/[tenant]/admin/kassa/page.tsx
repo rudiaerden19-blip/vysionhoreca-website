@@ -6922,10 +6922,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           data-kassa-sidebar="1"
           className={`${
             kassaCompactChrome
-              ? 'w-[var(--kassa-sidebar-width)] max-w-[42vw]'
+              ? 'w-[var(--kassa-sidebar-width)] max-w-[46vw]'
               : 'w-80 sm:w-96 lg:w-[var(--kassa-sidebar-width)]'
           } ${
-            kassaWide15Chrome ? 'max-w-[38vw]' : ''
+            kassaWide15Chrome ? 'max-w-[46vw]' : ''
           } relative flex min-h-0 min-w-0 flex-shrink-0 flex-col overflow-y-hidden ${
             kassaSxgaDenseTiles ? 'overflow-x-visible': 'overflow-hidden'
           } ${

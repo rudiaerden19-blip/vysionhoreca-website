@@ -16,7 +16,7 @@ describe('kassa layout lab chrome', () => {
     window.history.replaceState(
       {},
       '',
-      '/shop/x/admin/kassa?kassa_layout_preview=1&vp=wide15&kvp=wide15&k_sidebar=352&k_boost=1.06&k_cols=4&k_gap=16&k_rows=3',
+      '/shop/x/admin/kassa?kassa_layout_preview=1&vp=wide15&kvp=wide15&k_sidebar=400&k_boost=1.06&k_cols=4&k_gap=16&k_rows=3',
     )
   try {
     const t = resolveKassaChromeTokensForKassa('wide15', {
@@ -28,7 +28,7 @@ describe('kassa layout lab chrome', () => {
         menuVisibleRows: 3,
       },
     })
-    expect(t.sidebarWidthPx).toBe(352)
+    expect(t.sidebarWidthPx).toBe(400)
     expect(t.menuTileHeightBoost).toBe(1.06)
     expect(t.menuClassicGridCols).toBe(4)
   } finally {
