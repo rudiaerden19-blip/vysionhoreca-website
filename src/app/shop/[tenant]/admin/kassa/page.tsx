@@ -84,6 +84,7 @@ import {
   kassaNumpadShowsCustomLinePanel,
   parseKassaNumpadAmount,
 } from '@/lib/kassa-numpad-custom-amount'
+import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import {
   isValidLanPrintHost,
   probeLocalVysionPrintAgent,
@@ -726,6 +727,50 @@ async function fetchOpenTableOrdersForTenant(tenantSlug: string): Promise<OpenTa
     return null
   }
   return ((data ?? []) as OpenTableOrderRow[]).filter(isDineInOpenTableDraftRow)
+}
+
+/** Zelfde OSK-sync als productmodal — controlled veld luistert op programmatic event. */
+function KassaNumpadOskLineNoteInput({
+  value,
+  onValueChange,
+  className,
+  placeholder,
+  maxLength = 120,
+}: {
+  value: string
+  onValueChange: (next: string) => void
+  className: string
+  placeholder: string
+  maxLength?: number
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    const onProgrammaticInput = (e: Event) => {
+      const detail = (e as CustomEvent<{ value?: string }>).detail
+      const next = detail?.value
+      if (typeof next !== 'string') return
+      flushSync(() => onValueChange(next))
+    }
+    el.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
+    return () => el.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
+  }, [onValueChange])
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      data-testid="kassa-numpad-line-note"
+      data-kassa-osk-line-note="true"
+      value={value}
+      maxLength={maxLength}
+      onChange={(e) => onValueChange(e.target.value)}
+      placeholder={placeholder}
+      className={className}
+    />
+  )
 }
 
 function buildKassaCustomerDisplayLines(cart: CartItem[]): KassaCustomerDisplayLine[] {
@@ -7395,13 +7440,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
               {kassaNumpadShowsCustomLinePanel(numpadValue) && (
                 <>
-                  <input
-                    type="text"
-                    data-testid="kassa-numpad-line-note"
-                    data-kassa-osk-line-note="true"
+                  <KassaNumpadOskLineNoteInput
                     value={numpadLineNote}
-                    maxLength={120}
-                    onChange={(e) => setNumpadLineNote(e.target.value)}
+                    onValueChange={setNumpadLineNote}
                     placeholder={t('kassaApp.numpadLineNotePlaceholder')}
                     className={
                       kassaAppearanceDark
@@ -7540,13 +7581,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               </div>
               {kassaNumpadShowsCustomLinePanel(numpadValue) && (
                 <>
-                  <input
-                    type="text"
-                    data-testid="kassa-numpad-line-note"
-                    data-kassa-osk-line-note="true"
+                  <KassaNumpadOskLineNoteInput
                     value={numpadLineNote}
-                    maxLength={120}
-                    onChange={(e) => setNumpadLineNote(e.target.value)}
+                    onValueChange={setNumpadLineNote}
                     placeholder={t('kassaApp.numpadLineNotePlaceholder')}
                     className="mt-3 w-full shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-[#3C4D6B]"
                   />
