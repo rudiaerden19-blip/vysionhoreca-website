@@ -3,8 +3,10 @@ export type { KassaViewportProfileSettingsMap } from '@/lib/kassa-viewport-profi
 import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
 import { applyProfileSettingsToChromeTokens } from '@/lib/kassa-viewport-profile-settings'
 import type { KassaViewportChromeTokens } from '@/lib/kassa-viewport-chrome-tokens'
+import { isKassaLayoutPreviewSearchParams } from '@/lib/kassa-layout-preview'
+import { readKassaLayoutPreviewSettingsPatch } from '@/lib/kassa-layout-preview-settings'
 
-const SESSION_KEY = 'vysion-kassa-vp-settings-v1'
+const SESSION_KEY = 'vysion-kassa-vp-settings-v2'
 
 const EMPTY_SETTINGS = { version: '0', map: {} as KassaViewportProfileSettingsMap }
 
@@ -67,6 +69,28 @@ export function resolveKassaChromeTokensForProfile(
   try {
     const patch = map[profileId] ?? {}
     return applyProfileSettingsToChromeTokens(profileId, patch)
+  } catch {
+    return applyProfileSettingsToChromeTokens(profileId, {})
+  }
+}
+
+/**
+ * Kassa-pagina: layout-lab negeert Supabase-studio (anders zie je refresh geen deploy-defaults).
+ * Optionele k_* query = live draft bovenop code-defaults.
+ */
+export function resolveKassaChromeTokensForKassa(
+  profileId: KassaViewportProfileId,
+  map: KassaViewportProfileSettingsMap,
+): KassaViewportChromeTokens {
+  try {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search)
+      if (isKassaLayoutPreviewSearchParams(sp)) {
+        const urlPatch = readKassaLayoutPreviewSettingsPatch(sp) ?? {}
+        return applyProfileSettingsToChromeTokens(profileId, urlPatch)
+      }
+    }
+    return resolveKassaChromeTokensForProfile(profileId, map)
   } catch {
     return applyProfileSettingsToChromeTokens(profileId, {})
   }

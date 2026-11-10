@@ -28,10 +28,10 @@ describe('kassa-viewport-chrome-tokens', () => {
   it('CSS-variabelen op root', () => {
     const w15 = getKassaViewportChromeTokens('wide15')
     const vars = kassaViewportChromeCssVars(w15)
-    expect(vars['--kassa-sidebar-width']).toBe('318px')
-    expect(vars['--kassa-osk-right-inset']).toBe('322px')
-    expect(vars['--kassa-menu-tile-boost']).toBe('0.86')
-    expect(w15.menuClassicGridCols).toBe(4)
+    expect(vars['--kassa-sidebar-width']).toBe('352px')
+    expect(vars['--kassa-osk-right-inset']).toBe('356px')
+    expect(vars['--kassa-menu-tile-boost']).toBe('1.06')
+    expect(w15.menuClassicGridCols).toBe(5)
   })
 
   it('vijf platformprofielen met vaste defaults', () => {

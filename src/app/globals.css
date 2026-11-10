@@ -1417,7 +1417,7 @@ html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field::placeh
 
   [data-testid='kassa-app'][data-kassa-vp='wide15'] [data-kassa-sidebar='1'] {
     width: var(--kassa-sidebar-width) !important;
-    max-width: 38vw !important;
+    max-width: 42vw !important;
   }
 
   [data-testid='kassa-app']:not([data-kassa-vp='sxga17']):not([data-kassa-vp='wide15'])

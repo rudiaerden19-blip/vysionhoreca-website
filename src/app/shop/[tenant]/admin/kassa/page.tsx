@@ -398,6 +398,7 @@ import {
 } from '@/lib/kassa-viewport-profile'
 import {
   applyKassaLayoutPreviewViewportFromSearchParams,
+  isKassaLayoutPreviewSearchParams,
   resolveKassaLayoutPreviewChrome,
 } from '@/lib/kassa-layout-preview'
 import {
@@ -408,7 +409,7 @@ import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profi
 import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
 import {
   fetchKassaViewportProfileSettingsMap,
-  resolveKassaChromeTokensForProfile,
+  resolveKassaChromeTokensForKassa,
   type KassaViewportProfileSettingsMap,
 } from '@/lib/kassa-viewport-profile-settings-client'
 
@@ -548,20 +549,20 @@ const KASSA_REMOVE_BTN_FACE =
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(density: KassaChromeDensity): string {
-  if (density === 'wide15') return 'min-h-[2.75rem] py-2'
+  if (density === 'wide15') return 'min-h-[3rem] py-2'
   if (density === 'sxga') return 'min-h-[3.25rem] py-2.5'
   return 'min-h-[2.75rem] py-2'
 }
 
 function kassaOrderTypeButtonTouchClass(density: KassaChromeDensity): string {
-  if (density === 'wide15') return 'min-h-[2.75rem] py-2'
+  if (density === 'wide15') return 'min-h-[3rem] py-2'
   if (density === 'sxga') return 'min-h-[3.25rem] py-2.5'
   return 'min-h-[3rem] py-2.5'
 }
 
 /** Sidebar-footer: touch-vriendelijke hoogte (BTW-bon / Bon / Verwijder). */
 function kassaFooterActionTouchMinHClass(density: KassaChromeDensity, denseBill: boolean): string {
-  if (density === 'wide15') return 'min-h-[3.15rem] py-2'
+  if (density === 'wide15') return 'min-h-[3.35rem] py-2.5'
   if (density === 'sxga') return 'min-h-[4.75rem] py-2.5'
   if (denseBill) return 'min-h-[4rem] py-2'
   return 'min-h-[4.25rem] py-2.5'
@@ -1311,9 +1312,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     useState<KassaViewportProfileSettingsMap>({})
 
   const kassaActiveChromeTokens = useMemo(
-    () => resolveKassaChromeTokensForProfile(kassaViewportProfileId, kassaViewportSettingsMap),
+    () => resolveKassaChromeTokensForKassa(kassaViewportProfileId, kassaViewportSettingsMap),
     [kassaViewportProfileId, kassaViewportSettingsMap],
   )
+
+  const kassaLayoutLabPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return isKassaLayoutPreviewSearchParams(new URLSearchParams(window.location.search))
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -5846,7 +5852,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     : 'gap-1.5'
 
   const kassaSidebarActionLabelClass =
-    kassaAppearanceDark && kassaCompactChrome
+    kassaAppearanceDark && kassaWide15Chrome
+      ? 'text-center text-xs font-semibold leading-tight tracking-[0.02em]'
+      : kassaAppearanceDark && kassaCompactChrome
       ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
       : kassaAppearanceDark
         ? `text-center ${KASSA_SIDEBAR_FOOTER_BTN_LABEL}`
@@ -6118,8 +6126,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-kassa-vp={kassaChromeDensity}
       data-kassa-profile-id={kassaViewportProfileId}
       data-kassa-ipad={kassaIpadMenuGridCap ? '1' : '0'}
+      data-kassa-lab-preview={kassaLayoutLabPreview ? '1' : '0'}
       style={kassaRootChromeStyle}
     >
+      {kassaLayoutLabPreview ? (
+        <div
+          className="pointer-events-none absolute bottom-1 left-1 z-[80] max-w-[min(100%,28rem)] rounded bg-black/85 px-2 py-1 font-mono text-[10px] leading-tight text-lime-300"
+          data-testid="kassa-layout-lab-debug"
+        >
+          lab · profiel {kassaViewportProfileId} · vp {kassaChromeDensity} · mand{' '}
+          {kassaActiveChromeTokens.sidebarWidthPx}px · boost {KASSA_MENU_TILE_HEIGHT_BOOST} · rij{' '}
+          {kassaMenuRowPx}px
+        </div>
+      ) : null}
       <LogoutSoftwareConfirmModal
         open={logoutSoftwareConfirmOpen}
         kassaSpeelsChrome={kassaPosLuxury}
@@ -6720,14 +6739,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     kassaSxgaDenseTiles
                       ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                       : kassaWide15Chrome
-                        ? 'gap-2 grid-cols-4'
+                        ? 'gap-2 grid-cols-5'
                         : kassaDefaultMenuGridColsClass
                   } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                   style={
                     kassaSxgaDenseTiles
                       ? { gridAutoRows: 'max-content' }
                       : kassaWide15Chrome
-                        ? { gridAutoRows: `${kassaMenuRowPx}px`, gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }
+                        ? {
+                            gridAutoRows: `${kassaMenuRowPx}px`,
+                            gridTemplateColumns: `repeat(${kassaMenuClassicGridCols}, minmax(0, 1fr))`,
+                          }
                     : { gridAutoRows: `${kassaMenuRowPx}px`}
                   }
                 >
@@ -6770,14 +6792,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       kassaSxgaDenseTiles
                         ? 'gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5'
                         : kassaWide15Chrome
-                          ? 'gap-2 grid-cols-4'
+                          ? 'gap-2 grid-cols-5'
                           : kassaDefaultMenuGridColsClass
                     } [&>*]:min-h-0 ${kassaSxgaDenseTiles ? 'items-start': 'items-stretch'}`}
                     style={
                       kassaSxgaDenseTiles
                         ? { gridAutoRows: 'max-content' }
                         : kassaWide15Chrome
-                          ? { gridAutoRows: `${kassaMenuRowPx}px`, gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }
+                          ? {
+                              gridAutoRows: `${kassaMenuRowPx}px`,
+                              gridTemplateColumns: `repeat(${kassaMenuClassicGridCols}, minmax(0, 1fr))`,
+                            }
                       : { gridAutoRows: `${kassaMenuRowPx}px`}
                     }
                   >
@@ -6897,7 +6922,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           data-kassa-sidebar="1"
           className={`${
             kassaCompactChrome
-              ? 'w-[var(--kassa-sidebar-width)] max-w-[38vw]'
+              ? 'w-[var(--kassa-sidebar-width)] max-w-[42vw]'
               : 'w-80 sm:w-96 lg:w-[var(--kassa-sidebar-width)]'
           } ${
             kassaWide15Chrome ? 'max-w-[38vw]' : ''

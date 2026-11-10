@@ -1,4 +1,9 @@
 import type { KassaViewportProfile } from '@/lib/kassa-viewport-profile'
+import { kassaDefaultProfileSettingsFromTokens } from '@/lib/kassa-viewport-profile-settings'
+import {
+  isKassaViewportProfileId,
+  type KassaViewportProfileId,
+} from '@/lib/kassa-viewport-profile-id'
 
 /** Alleen superadmin layout-lab; geen productie-feature voor zaken. */
 export const KASSA_LAYOUT_PREVIEW_QUERY = 'kassa_layout_preview'
@@ -137,5 +142,12 @@ export function buildKassaLayoutPreviewKassaUrl(
     [KASSA_LAYOUT_PREVIEW_LAB_W]: String(frame.cssW),
     [KASSA_LAYOUT_PREVIEW_LAB_H]: String(frame.cssH),
   })
+  const profileId: KassaViewportProfileId = isKassaViewportProfileId(kvp) ? kvp : 'default'
+  const defs = kassaDefaultProfileSettingsFromTokens(profileId)
+  q.set('k_sidebar', String(defs.sidebarWidthPx))
+  q.set('k_boost', String(defs.menuTileHeightBoost))
+  q.set('k_cols', String(defs.menuClassicGridCols))
+  q.set('k_gap', String(defs.menuGridGapPx))
+  q.set('k_rows', String(defs.menuVisibleRows))
   return `${origin.replace(/\/$/, '')}/shop/${encodeURIComponent(slug)}/admin/kassa?${q.toString()}`
 }
