@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -12,6 +12,11 @@ import {
   kassaLabPhysicalBoxCm,
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
+import {
+  normalizeKassaLayoutLabTenantSlug,
+  readKassaLayoutLabTenantSlug,
+  writeKassaLayoutLabTenantSlug,
+} from '@/lib/kassa-layout-lab-tenant'
 
 const SCREEN_IDS = ['15', '17', '21', 'ipad-pro-13', 'ipad-10'] as const
 
@@ -94,10 +99,26 @@ function Preview({
 
 export default function SuperadminKassaLayoutLabPage() {
   const searchParams = useSearchParams()
-  const initialTenant = (searchParams?.get('tenant') || '').trim().toLowerCase()
-  const [tenantSlug, setTenantSlug] = useState(initialTenant)
+  const urlTenant = normalizeKassaLayoutLabTenantSlug(searchParams?.get('tenant') || '')
+  const [tenantSlug, setTenantSlug] = useState(() => readKassaLayoutLabTenantSlug(urlTenant))
   const [iframeKey, setIframeKey] = useState(0)
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
+
+  useLayoutEffect(() => {
+    if (urlTenant) return
+    const remembered = readKassaLayoutLabTenantSlug('')
+    if (remembered && remembered !== tenantSlug) setTenantSlug(remembered)
+  }, [urlTenant, tenantSlug])
+
+  useEffect(() => {
+    if (!tenantSlug) return
+    writeKassaLayoutLabTenantSlug(tenantSlug)
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('tenant') === tenantSlug) return
+    url.searchParams.set('tenant', tenantSlug)
+    window.history.replaceState(null, '', `${url.pathname}?${url.searchParams.toString()}`)
+  }, [tenantSlug])
 
   const screens = useMemo(
     () =>
@@ -123,13 +144,17 @@ export default function SuperadminKassaLayoutLabPage() {
             ← Superadmin
           </Link>
           <span className="text-sm font-bold">15″ · 17″ · 21″ · iPad 12,9″ · iPad 10″</span>
-          <input
-            type="text"
-            value={tenantSlug}
-            onChange={(e) => setTenantSlug(e.target.value.trim().toLowerCase())}
-            placeholder="tenant slug"
-            className="w-32 rounded border border-zinc-600 bg-zinc-900 px-2 py-1 text-sm"
-          />
+          <label className="flex items-center gap-1.5 text-xs text-zinc-400">
+            <span className="sr-only">Preview-zaak</span>
+            <input
+              type="text"
+              value={tenantSlug}
+              onChange={(e) => setTenantSlug(normalizeKassaLayoutLabTenantSlug(e.target.value))}
+              placeholder="preview-zaak"
+              title="Alleen menu/mand in iframe — layout-code geldt voor alle tenants op Vercel"
+              className="w-36 rounded border border-zinc-600 bg-zinc-900 px-2 py-1 text-sm text-white"
+            />
+          </label>
           {entryHref ? (
             <a
               href={entryHref}
@@ -141,18 +166,19 @@ export default function SuperadminKassaLayoutLabPage() {
           <button
             type="button"
             onClick={refresh}
-            disabled={!tenantSlug}
-            className="rounded border border-zinc-600 px-2 py-1 text-sm disabled:opacity-40"
+            className="rounded border border-zinc-600 px-2 py-1 text-sm"
           >
             Vernieuwen
           </button>
         </div>
+        <p className="mt-2 text-xs text-zinc-500">
+          Eén deploy op main = dezelfde kassa-layout voor alle 500+ tenants. Slug hier = alleen welke zaak je in de
+          preview ziet (wordt onthouden).
+        </p>
       </header>
 
       <main className="overflow-x-auto overflow-y-visible px-4 py-6">
-        {!tenantSlug ? (
-          <p className="text-zinc-400">Tenant slug invullen.</p>
-        ) : (
+        {tenantSlug ? (
           screens.map(({ frame, label }) => (
             <Preview
               key={frame.id}
@@ -163,7 +189,7 @@ export default function SuperadminKassaLayoutLabPage() {
               iframeKey={iframeKey}
             />
           ))
-        )}
+        ) : null}
       </main>
     </div>
   )
