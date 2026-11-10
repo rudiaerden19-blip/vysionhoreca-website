@@ -470,7 +470,9 @@ function readKassaViewportChromeProfileFromWindow(): KassaViewportProfileId {
   return readKassaViewportProfileIdFromWindow()
 }
 const KASSA_SIDEBAR_FOOTER_LEFT_COL_WIDE15 =
-  'w-[5.25rem] min-w-[5.25rem] max-w-[5.25rem] shrink-0'
+  'w-[5.75rem] min-w-[5.75rem] max-w-[5.75rem] shrink-0'
+/** Snel menu + Totaal-balk op 15″ — iets hoger dan overige footerknoppen. */
+const KASSA_WIDE15_FOOTER_TOTAL_ROW_MIN_H = 'min-h-[4.25rem]'
 
 type KassaChromeDensity = 'wide15' | 'sxga' | 'default'
 
@@ -5858,7 +5860,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const kassaSidebarActionLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
-      ? 'text-center text-xs font-semibold leading-tight tracking-[0.02em]'
+      ? 'text-center text-[13px] font-semibold leading-snug tracking-[0.02em]'
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
       : kassaAppearanceDark
@@ -5908,7 +5910,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }`
 
   const kassaSidebarZoneLabelClass =
-    kassaAppearanceDark && kassaCompactChrome
+    kassaAppearanceDark && kassaWide15Chrome
+      ? 'text-sm font-semibold tracking-[0.02em]'
+      : kassaAppearanceDark && kassaCompactChrome
       ? 'text-xs font-medium tracking-[0.02em]'
       : kassaAppearanceDark
         ? KASSA_POS_ZONE_BTN_LABEL
@@ -7547,7 +7551,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className={`flex w-full touch-manipulation select-none ${kassaCompactChrome ? 'gap-2': 'gap-3'} ${
                 isTheLagoonTenant(tenant)
                   ? 'min-h-[5.25rem]'
-                  : kassaFooterActionTouchMinHClass(kassaChromeDensity, kassaSidebarFooterTier === 'dense')
+                  : kassaWide15Chrome
+                    ? KASSA_WIDE15_FOOTER_TOTAL_ROW_MIN_H
+                    : kassaFooterActionTouchMinHClass(
+                        kassaChromeDensity,
+                        kassaSidebarFooterTier === 'dense',
+                      )
               }`}
             >
               {isTheLagoonTenant(tenant) ? null : (
@@ -7556,7 +7565,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-quick-menu"
                 aria-pressed={kassaQuickMenuVisible}
                 onClick={toggleKassaQuickMenu}
-                className={`flex items-center justify-center px-3 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)}`}
+                className={`flex items-center justify-center px-2 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)} ${
+                  kassaWide15Chrome ? 'h-full min-h-[4.25rem] self-stretch' : ''
+                }`}
                 title={t('kassaApp.quickMenu')}
               >
                 <span className={`leading-tight ${kassaSidebarActionLabelClass}`}>{t('kassaApp.quickMenu')}</span>
@@ -7565,10 +7576,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div
                 role="status"
                 aria-live="polite"
-                className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)}`}
+                className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
+                  kassaWide15Chrome ? 'min-h-[4.25rem] py-2' : ''
+                }`}
               >
                 <span className={`shrink-0 font-bold tracking-[0.04em] ${ui.numpadMeta} ${
-                  isTheLagoonTenant(tenant) ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'
+                  isTheLagoonTenant(tenant)
+                    ? 'text-xl sm:text-2xl'
+                    : kassaWide15Chrome
+                      ? 'text-lg'
+                      : 'text-base sm:text-lg'
                 }`}>
                   {t('kassaApp.cartTotal')}
                 </span>
@@ -7576,7 +7593,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
                     isTheLagoonTenant(tenant)
                       ? 'text-3xl sm:text-[2.15rem]'
-                      : kassaCompactChrome || kassaSidebarFooterTier !== 'dense'? 'text-2xl sm:text-[1.65rem]': 'text-xl'
+                      : kassaWide15Chrome
+                        ? 'text-[1.75rem]'
+                        : kassaCompactChrome || kassaSidebarFooterTier !== 'dense'
+                          ? 'text-2xl sm:text-[1.65rem]'
+                          : 'text-xl'
                   }`}
                 >
                   €{payableTotal.toFixed(2)}
