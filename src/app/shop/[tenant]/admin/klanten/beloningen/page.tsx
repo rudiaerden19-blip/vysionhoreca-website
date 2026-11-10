@@ -9,10 +9,17 @@ import { getLoyaltyRewards, saveLoyaltyReward, deleteLoyaltyReward, LoyaltyRewar
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import { AdminIconTrash } from '@/lib/admin-action-icons'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
+import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
 
 export default function BeloningenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
+  const azertyOsk = useKassaAzertyOskChrome()
+  const oskContentPad =
+    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 16 : 0
+  const oskModalMaxHeight =
+    oskContentPad > 0 ? `calc(100vh - ${72 + oskContentPad}px)` : undefined
   const [rewards, setRewards] = useState<LoyaltyReward[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -31,6 +38,20 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
     loadRewards()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
+
+  const closeRewardModal = () => {
+    azertyOsk?.dismiss()
+    setShowModal(false)
+    setEditingReward(null)
+  }
+
+  useEffect(() => {
+    if (oskContentPad <= 0) return
+    const active = document.activeElement
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      scheduleScrollInputAboveKeyboard(active)
+    }
+  }, [oskContentPad, showModal])
 
   async function loadRewards() {
     const data = await getLoyaltyRewards(params.tenant)
@@ -82,7 +103,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
     const success = await saveLoyaltyReward(rewardData)
     if (success) {
       await loadRewards()
-      setShowModal(false)
+      closeRewardModal()
     }
     setSaving(false)
   }
@@ -120,7 +141,13 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div
+      className="max-w-4xl mx-auto"
+      data-osk-scroll
+      data-osk-next="true"
+      data-testid="admin-osk-form-modal"
+      style={{ paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined }}
+    >
       <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -245,17 +272,25 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowModal(false)}
+            className={`fixed inset-0 z-[130] flex bg-black/50 p-4 ${
+              oskContentPad > 0
+                ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+                : 'items-center justify-center'
+            }`}
+            onClick={closeRewardModal}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto touch-pan-y"
               data-osk-scroll
               data-osk-next="true"
+              style={{
+                paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+                maxHeight: oskModalMaxHeight,
+              }}
             >
               <div className="p-6 border-b">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -270,10 +305,12 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   </label>
                   <input
                     type="text"
+                    inputMode="text"
+                    autoComplete="off"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={t('rewardsPage.form.namePlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full min-h-[44px] px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation"
                   />
                 </div>
 
@@ -283,10 +320,12 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   </label>
                   <input
                     type="text"
+                    inputMode="text"
+                    autoComplete="off"
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder={t('rewardsPage.form.descriptionPlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full min-h-[44px] px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation"
                   />
                 </div>
 
@@ -360,12 +399,14 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
 
               <div className="p-6 border-t bg-gray-50 flex gap-3">
                 <button
-                  onClick={() => setShowModal(false)}
+                  type="button"
+                  onClick={closeRewardModal}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium transition-colors"
                 >
                   {t('adminPages.common.cancel')}
                 </button>
                 <button
+                  type="button"
                   onClick={handleSave}
                   disabled={saving || !formData.name || !formData.points_required}
                   className="flex-1 px-4 py-3 bg-gray-900 hover:bg-black disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
