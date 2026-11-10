@@ -9,7 +9,8 @@ import {
   type KassaLayoutLabFrame,
 } from '@/lib/kassa-layout-preview'
 import {
-  KASSA_LAB_DEFAULT_PANEL_WIDTH_CM,
+  KASSA_LAB_PANEL_DIAGONAL_CM,
+  kassaLabDefaultPanelWidthCmForFrame,
   kassaLabPhysicalBoxCm,
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
@@ -417,13 +418,20 @@ export default function SuperadminKassaLayoutLabPage() {
         </p>
         {sizeMode === 'physical' ? (
           <div className="mx-auto mt-2 flex max-w-[1800px] flex-wrap items-center gap-3 text-xs text-zinc-400">
-            <span className="font-semibold text-amber-200/90">Paneelbreedte (cm) 21·15·17:</span>
+            <span className="font-semibold text-amber-200/90">Beeldbreedte (cm) 21·15·17:</span>
             {KASSA_LAYOUT_REGRESSION_FRAME_IDS.map((id) => {
-              const def = KASSA_LAB_DEFAULT_PANEL_WIDTH_CM[id] ?? 34.5
+              const frame = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === id)!
+              const def = kassaLabDefaultPanelWidthCmForFrame(frame)
+              const diag = KASSA_LAB_PANEL_DIAGONAL_CM[id]
               const val = cmOverrides[id] ?? def
               return (
                 <label key={id} className="flex items-center gap-1">
                   {id}″
+                  {diag ? (
+                    <span className="text-zinc-500" title="Diagonaal paneel">
+                      ({diag} cm diag)
+                    </span>
+                  ) : null}
                   <input
                     type="number"
                     min={20}
