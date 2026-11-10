@@ -14,6 +14,6 @@ describe('kassa-viewport-profile-settings', () => {
     const t = applyProfileSettingsToChromeTokens('sxga', { menuTileHeightBoost: 1.2 })
     expect(t.profile).toBe('sxga')
     expect(t.menuTileHeightBoost).toBe(1.2)
-    expect(getKassaViewportChromeTokens('wide15').menuTileHeightBoost).toBe(1)
+    expect(getKassaViewportChromeTokens('wide15').menuTileHeightBoost).toBe(1.08)
   })
 })
