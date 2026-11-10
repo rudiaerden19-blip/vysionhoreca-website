@@ -3,14 +3,16 @@ import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
 /**
  * Vaste beeldmates hardware (eigenaar) — letterlijk, geen herberekening in UI.
  * 15″ diag 39 cm (breedte gemeten 34,5 cm) · 17″ diag 43 cm vierkant · 21″ diag 54,6 cm iiyama FHD.
+ * iPad Pro 12,9″ actief beeld ~26,06×19,49 cm (landschap 1366×1024).
  */
 export const KASSA_LAB_FIXED_BOX_CM: Record<
-  '21' | '15' | '17',
+  '21' | '15' | '17' | 'ipad-pro-13',
   { widthCm: number; heightCm: number }
 > = {
   '15': { widthCm: 34.5, heightCm: 19.4 },
   '17': { widthCm: 33.6, heightCm: 26.9 },
   '21': { widthCm: 47.5, heightCm: 26.7 },
+  'ipad-pro-13': { widthCm: 26.06, heightCm: 19.49 },
 }
 
 export function kassaLabPhysicalBoxCm(

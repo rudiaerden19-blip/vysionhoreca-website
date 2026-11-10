@@ -13,12 +13,13 @@ import {
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
 
-const SCREEN_IDS = ['15', '17', '21'] as const
+const SCREEN_IDS = ['15', '17', '21', 'ipad-pro-13'] as const
 
 const LABELS: Record<(typeof SCREEN_IDS)[number], string> = {
   '15': '15 inch',
   '17': '17 inch vierkant',
   '21': '21 inch',
+  'ipad-pro-13': 'iPad 12,9 inch',
 }
 
 
@@ -120,7 +121,7 @@ export default function SuperadminKassaLayoutLabPage() {
           <Link href="/superadmin" className="text-sm text-[#58CCFF]">
             ← Superadmin
           </Link>
-          <span className="text-sm font-bold">15″ · 17″ vierkant · 21″</span>
+          <span className="text-sm font-bold">15″ · 17″ · 21″ · iPad 12,9″</span>
           <input
             type="text"
             value={tenantSlug}
