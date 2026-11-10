@@ -1415,7 +1415,13 @@ html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field::placeh
     gap: 0.25rem !important;
   }
 
-  [data-testid='kassa-app']:not([data-kassa-vp='sxga17']) [data-kassa-sidebar='1'] {
+  [data-testid='kassa-app'][data-kassa-vp='wide15'] [data-kassa-sidebar='1'] {
+    width: var(--kassa-sidebar-width) !important;
+    max-width: 32vw !important;
+  }
+
+  [data-testid='kassa-app']:not([data-kassa-vp='sxga17']):not([data-kassa-vp='wide15'])
+    [data-kassa-sidebar='1'] {
     width: 268px !important;
     max-width: 30vw !important;
   }

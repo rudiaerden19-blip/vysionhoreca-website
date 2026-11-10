@@ -28,8 +28,8 @@ export type KassaViewportChromeTokens = {
 
 /** 17″ SXGA — sync `.cursor/rules/kassa-17inch-sxga.mdc`. */
 export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
-/** 15″ breedbeeld. */
-export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 268
+/** 15″ breedbeeld — bredere mand + 4 tegels/rij (test nov 2026). */
+export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 296
 /** 21″ / grote desktop (lg breakpoint in kassa). */
 export const KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX = 380
 export const KASSA_SIDEBAR_WIDTH_DEFAULT_SM_PX = 384
@@ -46,8 +46,8 @@ const WIDE15: KassaViewportChromeTokens = {
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX,
   oskRightInsetPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX + OSK_EDGE_GUTTER_PX,
   menuGridHorizontalPadPx: 32,
-  menuClassicGridCols: 5,
-  menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
+  menuClassicGridCols: 4,
+  menuTileHeightBoost: 1.08,
   menuGridGapPx: KASSA_MENU_GRID_GAP_PX_DEFAULT,
   menuVisibleRows: KASSA_MENU_VISIBLE_ROWS_DEFAULT,
 }

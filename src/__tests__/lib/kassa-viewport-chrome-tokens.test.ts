@@ -27,8 +27,8 @@ describe('kassa-viewport-chrome-tokens', () => {
 
   it('CSS-variabelen op root', () => {
     const vars = kassaViewportChromeCssVars(getKassaViewportChromeTokens('wide15'))
-    expect(vars['--kassa-sidebar-width']).toBe('268px')
-    expect(vars['--kassa-osk-right-inset']).toBe('272px')
+    expect(vars['--kassa-sidebar-width']).toBe('296px')
+    expect(vars['--kassa-osk-right-inset']).toBe('300px')
     expect(vars['--kassa-menu-tile-boost']).toBe('1')
   })
 
