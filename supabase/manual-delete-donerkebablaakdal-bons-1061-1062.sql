@@ -1,27 +1,25 @@
 -- =============================================================================
--- Döner kebab Laakdal — bon 1061 en 1062 verwijderen
+-- Döner kebab Laakdal — bon 1061 + 1062
+-- Supabase SQL Editor · service role
 --
--- STAP A + B alleen lezen. STAP C apart plakken en Run (niet hele bestand tegelijk).
--- Na COMMIT: admin → Z-rapport → fiscale dag(en) uit STAP B → Vernieuwen.
---
--- Pas indien nodig: laatste regel slug (standaard dnerkebablaakdal uit tenant_settings).
+-- Gebruik: eerst query-blok CONTROLE uitvoeren, daarna VERWIJDEREN (aparte run).
+-- Vervang 'dnerkebablaakdal' door slug uit CONTROLE indien nodig.
+-- Na verwijderen: admin → Z-rapport → fiscale dag → Vernieuwen.
 -- =============================================================================
 
--- ── STAP A: tenant_slug controleren ──
+-- ########## CONTROLE — alleen dit selecteren en Run ##########
+
 SELECT tenant_slug, business_name
 FROM tenant_settings
 WHERE tenant_slug IN ('dnerkebablaakdal', 'donerkebablaakdal')
    OR business_name ILIKE '%laakdal%';
 
--- ── STAP B: PREVIEW ──
-SELECT tenant_slug, id, order_number, status, payment_status, total,
+SELECT tenant_slug, id, order_number, status, payment_status, payment_method, total,
        created_at AT TIME ZONE 'Europe/Brussels' AS created_brussels
 FROM orders
 WHERE tenant_slug = 'dnerkebablaakdal'
   AND order_number IN (1061, 1062)
 ORDER BY order_number;
-
--- Werkt bovenstaand 0 rijen? Vervang in STAP C `dnerkebablaakdal` door slug uit STAP A.
 
 SELECT oi.order_id, o.order_number, oi.product_name, oi.quantity, oi.total_price
 FROM order_items oi
@@ -30,9 +28,14 @@ WHERE o.tenant_slug = 'dnerkebablaakdal'
   AND o.order_number IN (1061, 1062)
 ORDER BY o.order_number;
 
--- =============================================================================
--- STAP C — alleen dit blok uitvoeren na goede PREVIEW
--- =============================================================================
+SELECT DISTINCT
+  tenant_slug,
+  (created_at AT TIME ZONE 'Europe/Brussels')::date AS z_rapport_dag_vernieuwen
+FROM orders
+WHERE tenant_slug = 'dnerkebablaakdal'
+  AND order_number IN (1061, 1062);
+
+-- ########## VERWIJDEREN — alleen na goede CONTROLE ##########
 
 BEGIN;
 
@@ -47,7 +50,7 @@ DELETE FROM orders
 WHERE tenant_slug = 'dnerkebablaakdal'
   AND order_number IN (1061, 1062);
 
-SELECT tenant_slug, order_number, COUNT(*) AS remaining
+SELECT tenant_slug, order_number, COUNT(*) AS remaining_must_be_zero
 FROM orders
 WHERE tenant_slug = 'dnerkebablaakdal'
   AND order_number IN (1061, 1062)
