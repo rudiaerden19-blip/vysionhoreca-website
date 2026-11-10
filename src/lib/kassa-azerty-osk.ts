@@ -82,8 +82,8 @@ export function isTenantAzertyOskRoute(pathname: string, tenantSlug: string): bo
   return false
 }
 
-/** Zaak-login op www heeft vaak geen ?next= — pilot OSK toch op /login. */
-export function isAzertyOskPilotOwnerLoginPath(pathname: string): boolean {
+/** Eigenaar-login op www heeft vaak geen ?next= — OSK toch op /login (alle tenants). */
+export function isOwnerLoginPathForAzertyOsk(pathname: string): boolean {
   const path = (pathname || '').split('?')[0].replace(/\/+$/, '').toLowerCase()
   return OWNER_LOGIN_PATHS.has(path)
 }
@@ -95,7 +95,7 @@ export function isAzertyOskActiveForSession(input: {
   hostTenantSlug?: string | null
 }): boolean {
   if (!KASSA_AZERTY_OSK_LIVE) return false
-  if (isAzertyOskPilotOwnerLoginPath(input.pathname)) {
+  if (isOwnerLoginPathForAzertyOsk(input.pathname)) {
     return true
   }
   const tenant = resolveAzertyOskTenantSlug(input)

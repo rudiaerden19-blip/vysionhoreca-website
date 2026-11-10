@@ -94,14 +94,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   )
 
   const manualOpen = enabled && isKassaAzertyOskManualOpenEnabled(tenantSlugForOsk)
-  const lineShortcutsPilot =
+  const lineShortcutsOnKassaPos =
     isKassaOskLineShortcutsEnabled(tenantSlugForOsk) && isKassaHorecaPosPath(pathname)
   const speelsDarkOsk = useKassaSpeelsDarkOskChrome(pathname)
 
   const showKeyboardPanel =
     enabled && visible && (!manualOpen || keyboardPinned || lineNoteFieldActive)
   const showLineShortcutsColumn =
-    lineShortcutsPilot && showKeyboardPanel && !suppressedRef.current
+    lineShortcutsOnKassaPos && showKeyboardPanel && !suppressedRef.current
 
   useEffect(() => {
     setHostTenantSlug(getCurrentTenantSlug())
@@ -113,7 +113,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   }, [pathname])
 
   useEffect(() => {
-    if (!lineShortcutsPilot) return
+    if (!lineShortcutsOnKassaPos) return
     let cancelled = false
     lineShortcutsLoadedRef.current = false
     void getTenantSettings(tenantSlugForOsk).then((settings) => {
@@ -126,10 +126,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     return () => {
       cancelled = true
     }
-  }, [lineShortcutsPilot, tenantSlugForOsk])
+  }, [lineShortcutsOnKassaPos, tenantSlugForOsk])
 
   useEffect(() => {
-    if (!lineShortcutsPilot || !lineShortcutsLoadedRef.current) return
+    if (!lineShortcutsOnKassaPos || !lineShortcutsLoadedRef.current) return
     const normalized = normalizeKassaOskLineShortcuts(lineShortcutDraft)
     const payloadKey = JSON.stringify(normalized)
     if (payloadKey === lineShortcutsLastSavedRef.current) return
@@ -151,7 +151,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         window.clearTimeout(lineShortcutsSaveTimerRef.current)
       }
     }
-  }, [lineShortcutDraft, lineShortcutsPilot, tenantSlugForOsk])
+  }, [lineShortcutDraft, lineShortcutsOnKassaPos, tenantSlugForOsk])
 
   const hideKeyboard = useCallback((disarm: boolean) => {
     if (disarm) {
@@ -367,7 +367,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   )
 
   const oskStretchToCart =
-    lineShortcutsPilot && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
+    lineShortcutsOnKassaPos && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
   const keyBtnClass = speelsDarkOsk
     ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[3rem] px-0.5 text-center text-lg font-bold sm:min-h-[3.15rem] sm:text-xl`

@@ -10,7 +10,7 @@ type Props = {
   labelClassName?: string
 }
 
-/** Pilot: zelfde plek/stijl als kassa-header (bv. naast Online). */
+/** Alle tenants: zelfde plek/stijl als kassa-header (bv. naast Online). */
 export function KassaAzertyOskHeaderToggle({ className = '', labelClassName }: Props) {
   const { t } = useLanguage()
   const chrome = useKassaAzertyOskChrome()

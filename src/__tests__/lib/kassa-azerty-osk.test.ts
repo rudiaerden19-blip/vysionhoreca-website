@@ -55,7 +55,7 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskTextTarget(tel)).toBe(true)
   })
 
-  it('healOskBlockedTextField verwijdert inputMode=none na pilot-resten', () => {
+  it('healOskBlockedTextField verwijdert inputMode=none na oude build-resten', () => {
     const input = document.createElement('input')
     input.type = 'text'
     input.setAttribute('inputMode', 'none')
