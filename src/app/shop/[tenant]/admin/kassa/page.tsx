@@ -5862,7 +5862,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const kassaSidebarActionLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
-      ? 'text-center text-[13px] font-semibold leading-snug tracking-[0.02em]'
+      ? 'text-center text-sm font-semibold leading-snug tracking-[0.02em]'
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
       : kassaAppearanceDark
@@ -5913,7 +5913,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const kassaSidebarZoneLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
-      ? 'text-sm font-semibold tracking-[0.02em]'
+      ? 'text-[15px] font-semibold tracking-[0.02em]'
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-xs font-medium tracking-[0.02em]'
       : kassaAppearanceDark
@@ -7807,7 +7807,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   setNumpadPanelVisible((v) => !v)
                 }}
                 className={`flex items-center justify-center px-3 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[3.5rem] py-2.5 text-sm' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
+                  kassaWide15Chrome ? 'min-h-[3.5rem] py-2.5 text-base' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
                 }`}
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
@@ -7825,7 +7825,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   isTheLagoonTenant(tenant)
                     ? 'min-h-[4.25rem] py-3 text-2xl font-bold'
                     : kassaWide15Chrome
-                      ? 'min-h-[3.6rem] py-3 text-base font-bold'
+                      ? 'min-h-[3.6rem] py-3 text-lg font-bold'
                       : kassaCompactChrome
                         ? 'min-h-[4rem] py-3.5 text-lg'
                         : 'min-h-[3.5rem] py-3 text-lg'
@@ -8065,7 +8065,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`flex items-center justify-center rounded-xl ${kassaWide15Chrome ? 'min-h-[3.25rem] py-2 text-xs' : 'min-h-[3.5rem] py-3 text-sm sm:text-base'} font-bold ${kassaSidebarFooterLeftCol} ${
+                className={`flex items-center justify-center rounded-xl ${kassaWide15Chrome ? 'min-h-[3.25rem] py-2 text-sm' : 'min-h-[3.5rem] py-3 text-sm sm:text-base'} font-bold ${kassaSidebarFooterLeftCol} ${
                   kassaLight
                     ? numpadPanelVisible
                       ? KASSA_LIGHT_BTN_FACE_ON
