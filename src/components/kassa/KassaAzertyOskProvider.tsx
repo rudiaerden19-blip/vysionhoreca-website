@@ -465,6 +465,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             />
           ) : null}
           </div>
+          </div>
         </div>
       ) : null}
     </KassaAzertyOskContext.Provider>
