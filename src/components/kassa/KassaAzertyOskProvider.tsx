@@ -369,7 +369,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
           role="presentation"
         >
           <div
-            className={`pointer-events-auto flex w-full flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
+            className={`pointer-events-auto relative flex w-full flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
@@ -387,22 +387,12 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                   }
             }
           >
-          <div className="mb-1.5 flex shrink-0 items-center justify-between gap-2">
-            <span
-              className={
-                speelsDarkOsk
-                  ? `text-xs font-semibold uppercase tracking-wide ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS}`
-                  : 'text-xs font-semibold uppercase tracking-wide text-neutral-300'
-              }
-            >
-              {t('kassaApp.azertyOskTitle')}
-            </span>
             <button
               type="button"
               className={
                 speelsDarkOsk
-                  ? `${kassaSpeelsGrayChromeButtonClass()} min-h-[2.25rem] min-w-[2.25rem] px-2.5 text-base font-bold`
-                  : 'touch-manipulation min-h-[2.25rem] min-w-[2.25rem] rounded-lg border border-neutral-500 bg-neutral-600 px-2.5 text-base font-bold text-white active:bg-neutral-500'
+                  ? `absolute right-2 top-2 z-10 ${kassaSpeelsGrayChromeButtonClass()} min-h-[2.25rem] min-w-[2.25rem] px-2.5 text-base font-bold`
+                  : 'absolute right-2 top-2 z-10 touch-manipulation min-h-[2.25rem] min-w-[2.25rem] rounded-lg border border-neutral-500 bg-neutral-600 px-2.5 text-base font-bold text-white active:bg-neutral-500'
               }
               aria-label={t('kassaApp.azertyOskClose')}
               data-testid="kassa-azerty-osk-close"
@@ -410,8 +400,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             >
               ✕
             </button>
-          </div>
-          <div className="flex w-full items-start gap-0">
+          <div className={`relative flex w-full items-start gap-0 ${showLineShortcutsColumn ? 'pr-9' : ''}`}>
             <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="grid grid-cols-10 gap-2">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
