@@ -2,11 +2,11 @@
 
 import { createContext, useContext } from 'react'
 
-/** Reserve voor scroll-padding + modals; compact paneel ~max 280px hoog. */
-export const KASSA_AZERTY_OSK_HEIGHT_PX = 268
+/** Reserve onderaan (zwevend paneel + marge) voor scroll-padding in modals. */
+export const KASSA_AZERTY_OSK_HEIGHT_PX = 320
 
-/** Toetsen niet over volle desktop-breedte. */
-export const KASSA_AZERTY_OSK_MAX_WIDTH_PX = 560
+/** Zwevend paneel — geen full-width balk. */
+export const KASSA_AZERTY_OSK_MAX_WIDTH_PX = 640
 
 export type KassaAzertyOskChrome = {
   visible: boolean
