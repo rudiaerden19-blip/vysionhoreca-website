@@ -181,26 +181,54 @@ export function readKassaOskFieldValue(el: HTMLInputElement | HTMLTextAreaElemen
   return el.value
 }
 
+function oskSelectionRange(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
+  const start = el.selectionStart ?? value.length
+  const end = el.selectionEnd ?? value.length
+  return {
+    start: Math.max(0, Math.min(start, value.length)),
+    end: Math.max(0, Math.min(end, value.length)),
+  }
+}
+
 export function applyKassaAzertyOskEdit(
   el: HTMLInputElement | HTMLTextAreaElement,
   edit: 'backspace' | 'space' | { char: string },
 ): void {
   const max = el.maxLength > 0 ? el.maxLength : undefined
-  let value = readKassaOskFieldValue(el)
+  const value = readKassaOskFieldValue(el)
+  const { start, end } = oskSelectionRange(el, value)
+  let next = value
+  let caret = start
 
   if (edit === 'backspace') {
-    value = value.slice(0, -1)
+    if (start === end && start > 0) {
+      next = value.slice(0, start - 1) + value.slice(end)
+      caret = start - 1
+    } else if (start !== end) {
+      next = value.slice(0, start) + value.slice(end)
+      caret = start
+    } else {
+      return
+    }
   } else if (edit === 'space') {
-    value = `${value} `
+    next = `${value.slice(0, start)} ${value.slice(end)}`
+    caret = start + 1
   } else {
-    value = `${value}${edit.char}`
+    next = `${value.slice(0, start)}${edit.char}${value.slice(end)}`
+    caret = start + edit.char.length
   }
 
-  if (max !== undefined && value.length > max) {
-    value = value.slice(0, max)
+  if (max !== undefined && next.length > max) {
+    next = next.slice(0, max)
+    caret = Math.min(caret, next.length)
   }
 
-  setNativeInputValue(el, value)
+  setNativeInputValue(el, next)
+  try {
+    el.setSelectionRange(caret, caret)
+  } catch {
+    /* date/time, etc. */
+  }
 }
 
 /** Alleen markeer — geen inputMode/readOnly (blokkeerde typen overal). */

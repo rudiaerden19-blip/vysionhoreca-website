@@ -60,6 +60,11 @@ export function sanitizeKassaOskLineShortcutLabel(value: string): string {
   return value.trim().slice(0, KASSA_OSK_LINE_SHORTCUT_MAX_LEN)
 }
 
+/** Tijdens typen in sneltekst-slot: geen trim (spatiebalk mag spaties zetten). */
+export function clampKassaOskLineShortcutDraft(value: string): string {
+  return value.slice(0, KASSA_OSK_LINE_SHORTCUT_MAX_LEN)
+}
+
 /** Voeg sneltekst toe in regel-opmerking (spatie ertussen indien nodig). */
 export function applyKassaOskLineShortcut(
   el: HTMLInputElement | HTMLTextAreaElement,

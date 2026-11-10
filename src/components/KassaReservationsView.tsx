@@ -4963,7 +4963,7 @@ export default function KassaReservationsView({
           }}
         >
           <div
-            className="w-full max-w-lg touch-pan-y overflow-y-auto rounded-2xl bg-white p-6 shadow-xl [color-scheme:light]"
+            className="mx-auto w-full max-w-lg shrink-0 touch-pan-y overflow-y-auto rounded-2xl bg-white p-6 shadow-xl [color-scheme:light]"
             data-vysion-light-form
             data-osk-scroll
             data-osk-next="true"
@@ -5276,7 +5276,7 @@ export default function KassaReservationsView({
             }}
           >
             <div
-              className="flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl touch-pan-y overflow-y-auto"
+              className="mx-auto flex w-full max-w-md min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl touch-pan-y overflow-y-auto"
               data-osk-scroll
               data-osk-next="true"
               style={{
@@ -5449,7 +5449,7 @@ function EditReservationModal({
 }: EditReservationModalProps) {
   const oskModalOverlayClass =
     oskContentPad > 0
-      ? 'items-start overflow-y-auto overscroll-y-contain pt-14 pb-2'
+      ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
       : 'items-center justify-center'
   const { t } = useLanguage()
   const rk = useMemo(() => makeReservationKassaRk(t), [t])
@@ -5530,12 +5530,11 @@ function EditReservationModal({
       onClick={onClose}
     >
       <div
-        className="flex w-full max-w-lg flex-col overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl touch-pan-y"
+        className="mx-auto flex w-full max-w-lg min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
         data-osk-scroll
         data-osk-next="true"
         style={{
-          maxHeight: oskModalMaxHeight ?? '92vh',
-          paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+          maxHeight: oskModalMaxHeight ?? 'min(92vh, calc(100dvh - 2rem))',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -5557,7 +5556,12 @@ function EditReservationModal({
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
+        <div
+          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-5 touch-pan-y"
+          style={{
+            paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+          }}
+        >
 
           {/* Naam */}
           <div>
@@ -6294,7 +6298,7 @@ function NewReservationModal({
 }: NewReservationModalProps) {
   const oskModalOverlayClass =
     oskContentPad > 0
-      ? 'items-start overflow-y-auto overscroll-y-contain pt-14 pb-2'
+      ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
       : 'items-center justify-center'
   const [formData, setFormData] = useState({
     guest_first_name: '',
@@ -6418,18 +6422,21 @@ function NewReservationModal({
     `w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors[field] ? 'border-red-500': 'border-gray-200'} focus:border-green-500 outline-none`
 
   return (
-    <div className={`fixed inset-0 z-[60] flex bg-black/50 p-4 ${oskModalOverlayClass}`}>
+  <div
+    className={`fixed inset-0 z-[60] flex bg-black/50 p-4 ${oskModalOverlayClass}`}
+    onClick={onClose}
+  >
       <div
-        className="w-full max-w-xl touch-pan-y overflow-y-auto rounded-2xl bg-white max-h-[90vh]"
+        className="mx-auto flex w-full max-w-xl min-h-0 shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
         data-osk-scroll
         data-osk-next="true"
         style={{
-          paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
-          maxHeight: oskModalMaxHeight,
+          maxHeight: oskModalMaxHeight ?? 'min(90vh, calc(100dvh - 2rem))',
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white p-6 pb-4 border-b border-gray-200">
+        <div className="shrink-0 border-b border-gray-200 bg-white p-6 pb-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <CalendarDays size={24} className="text-green-500" />
@@ -6442,7 +6449,12 @@ function NewReservationModal({
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-4">
+        <div
+          className="min-h-0 flex-1 touch-pan-y space-y-4 overflow-y-auto p-6"
+          style={{
+            paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+          }}
+        >
 
           {/* Voornaam & Achternaam */}
           <div className="grid grid-cols-2 gap-4">
@@ -6666,12 +6678,15 @@ function NewReservationModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white p-6 pt-4 border-t border-gray-200 flex gap-3">
-          <button onClick={onClose}
-            className="flex-1 py-3 rounded-xl bg-gray-100 font-medium hover:bg-gray-200 transition-colors">
+        <div className="flex shrink-0 gap-3 border-t border-gray-200 bg-white p-6 pt-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-xl bg-gray-100 py-3 font-medium transition-colors hover:bg-gray-200"
+          >
             {rk('cancel')}
           </button>
-          <button onClick={handleSubmit}
+          <button type="button" onClick={handleSubmit}
             className="flex-1 py-3 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors">
             {rk('createReservation')}
           </button>

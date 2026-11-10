@@ -4,7 +4,7 @@ import { useLanguage } from '@/i18n'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
-  sanitizeKassaOskLineShortcutLabel,
+  clampKassaOskLineShortcutDraft,
 } from '@/lib/kassa-osk-line-shortcuts'
 import {
   KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH,
@@ -24,7 +24,7 @@ type Props = {
 
 /** Zelfde rij-hoogte als `kassa-azerty-osk-key` in KassaAzertyOskProvider. */
 const OSK_SHORTCUT_FIELD_HEIGHT =
-  'min-h-[3rem] w-full max-w-[3cm] min-w-0 sm:min-h-[3.15rem]'
+  'min-h-[2.75rem] w-full min-w-0 sm:min-h-[2.9rem]'
 
 /**
  * Numpad-zone rechts van AZERTY — zelfde behuizing, verticale scheiding (zoals fysiek toetsenbord).
@@ -41,13 +41,13 @@ export function KassaOskLineShortcutsPad({
 
   const setSlot = (index: number, value: string) => {
     const next = [...draft]
-    next[index] = sanitizeKassaOskLineShortcutLabel(value)
+    next[index] = clampKassaOskLineShortcutDraft(value)
     onDraftChange(next)
   }
 
   const fieldClass = speelsDark
-    ? `kassa-osk-shortcut-field ${OSK_SHORTCUT_FIELD_HEIGHT} rounded-xl pl-1 pr-8 text-center text-xs font-bold outline-none sm:text-sm`
-    : `${OSK_SHORTCUT_FIELD_HEIGHT} rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-8 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:text-sm`
+    ? `kassa-osk-shortcut-field ${OSK_SHORTCUT_FIELD_HEIGHT} w-full rounded-xl pl-1 pr-8 text-center text-xs font-bold outline-none sm:text-sm`
+    : `${OSK_SHORTCUT_FIELD_HEIGHT} w-full rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-8 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:text-sm`
 
   const insertBtnClass = speelsDark
     ? 'absolute right-0.5 top-1/2 flex h-7 w-7 -translate-y-1/2 touch-manipulation items-center justify-center rounded-md text-base font-bold text-[#58CCFF] active:opacity-80'
@@ -83,14 +83,18 @@ export function KassaOskLineShortcutsPad({
         </div>
       ) : null}
       <div
-        className="grid gap-2"
+        className="grid gap-1.5"
         style={{ gridTemplateColumns: `repeat(2, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})` }}
       >
         {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
           const label = draft[index] ?? ''
           const trimmed = label.trim()
           return (
-            <div key={`slot-${index}`} className="relative max-w-[3cm] w-full min-w-0">
+            <div
+              key={`slot-${index}`}
+              className="relative w-full min-w-0"
+              style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}
+            >
               <input
                 type="text"
                 maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}

@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { getTenantSettings, saveKassaOskLineShortcuts } from '@/lib/admin-api'
+import { focusInputForProgrammaticEdit } from '@/lib/dom-input-value'
 import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
 import { KassaOskLineShortcutsPad } from '@/components/kassa/KassaOskLineShortcutsPad'
@@ -343,10 +344,25 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   )
 
   const sendEdit = (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => {
-    const el = activeRef.current
+    let el = activeRef.current
+    if (!el?.isConnected) {
+      const active = document.activeElement
+      if (isKassaAzertyOskTextTarget(active)) {
+        el = active
+        activeRef.current = active
+      }
+    }
     if (!el?.isConnected) return
+    focusInputForProgrammaticEdit(el)
     applyKassaAzertyOskEdit(el, edit)
   }
+
+  const onOskKeyPointerUp =
+    (edit: Parameters<typeof applyKassaAzertyOskEdit>[1]) => (e: React.PointerEvent) => {
+      e.preventDefault()
+      if (e.button !== 0) return
+      sendEdit(edit)
+    }
 
   const onKeyPointerDown = (e: React.PointerEvent) => {
     e.preventDefault()
@@ -375,8 +391,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     lineShortcutsOnKassaPos && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
   const keyBtnClass = speelsDarkOsk
-    ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[3rem] px-0.5 text-center text-lg font-bold sm:min-h-[3.15rem] sm:text-xl`
-    : 'kassa-azerty-osk-key min-h-[3rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-lg font-bold text-white active:bg-neutral-500 sm:min-h-[3.15rem] sm:text-xl'
+    ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[2.75rem] px-0.5 text-center text-base font-bold sm:min-h-[2.9rem] sm:text-lg`
+    : 'kassa-azerty-osk-key min-h-[2.75rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:min-h-[2.9rem] sm:text-lg'
 
   const oskShellSpeels = `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS}`
   const oskPanelShell = speelsDarkOsk
@@ -394,7 +410,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
           role="presentation"
         >
           <div
-            className={`pointer-events-auto relative flex w-full flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
+            className={`pointer-events-auto relative flex w-full flex-col rounded-2xl px-3 pb-2 pt-1.5 ${oskPanelShell}`}
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
@@ -428,18 +444,18 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
             ) : null}
           <div className="relative flex w-full items-start gap-0">
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             {showLineShortcutsColumn ? (
-              <div className="mb-1 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
+              <div className="mb-0.5 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
             ) : null}
-            <div className="grid grid-cols-10 gap-2">
+            <div className="grid grid-cols-10 gap-1.5">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
                 <button
                   key={`n-${key}`}
                   type="button"
                   className={keyBtnClass}
                   onPointerDown={onKeyPointerDown}
-                  onClick={() => sendEdit({ char: kassaAzertyKeyDisplay(key, shift) })}
+                  onPointerUp={onOskKeyPointerUp({ char: kassaAzertyKeyDisplay(key, shift) })}
                 >
                   {kassaAzertyKeyDisplay(key, shift)}
                 </button>
@@ -448,7 +464,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             {KASSA_AZERTY_LETTER_ROWS.map((row, ri) => (
               <div
                 key={`r-${ri}`}
-                className="grid gap-2"
+                className="grid gap-1.5"
                 style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))` }}
               >
                 {row.map((key) => (
@@ -457,17 +473,17 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                     type="button"
                     className={keyBtnClass}
                     onPointerDown={onKeyPointerDown}
-                    onClick={() => sendEdit({ char: kassaAzertyKeyDisplay(key, shift) })}
+                    onPointerUp={onOskKeyPointerUp({ char: kassaAzertyKeyDisplay(key, shift) })}
                   >
                     {kassaAzertyKeyDisplay(key, shift)}
                   </button>
                 ))}
               </div>
             ))}
-            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-2">
+            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-1.5">
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
+                className={`${keyBtnClass} min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => setShift((s) => !s)}
               >
@@ -475,26 +491,28 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-2.5 sm:min-w-[3.5rem]`}
+                className={`${keyBtnClass} min-w-[2.85rem] px-2 sm:min-w-[3rem]`}
                 onPointerDown={onKeyPointerDown}
-                onClick={() => sendEdit({ char: KASSA_AZERTY_AT_CHAR })}
+                onPointerUp={onOskKeyPointerUp({ char: KASSA_AZERTY_AT_CHAR })}
                 data-testid="kassa-azerty-osk-at"
               >
                 @
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} text-base`}
+                className={`${keyBtnClass} text-base tracking-widest text-neutral-300`}
                 onPointerDown={onKeyPointerDown}
-                onClick={() => sendEdit('space')}
+                onPointerUp={onOskKeyPointerUp('space')}
+                data-testid="kassa-azerty-osk-space"
+                aria-label={t('kassaApp.azertyOskSpace')}
               >
-                {' '}
+                ␣
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem]`}
+                className={`${keyBtnClass} min-w-[2.85rem] px-2.5 sm:min-w-[3rem]`}
                 onPointerDown={onKeyPointerDown}
-                onClick={() => sendEdit('backspace')}
+                onPointerUp={onOskKeyPointerUp('backspace')}
               >
                 ⌫
               </button>

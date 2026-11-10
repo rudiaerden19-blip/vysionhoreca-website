@@ -99,6 +99,19 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskTextTarget(visible)).toBe(true)
   })
 
+  it('voegt spatie toe op caret', () => {
+    const input = document.createElement('input')
+    input.value = 'Jan'
+    document.body.appendChild(input)
+    input.setSelectionRange(3, 3)
+    applyKassaAzertyOskEdit(input, 'space')
+    expect(input.value).toBe('Jan ')
+    input.setSelectionRange(0, 0)
+    applyKassaAzertyOskEdit(input, 'space')
+    expect(input.value).toBe(' Jan ')
+    document.body.removeChild(input)
+  })
+
   it('voegt @ toe via apply edit', () => {
     const input = document.createElement('input')
     document.body.appendChild(input)
