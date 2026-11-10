@@ -6486,7 +6486,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             />
           ) : null}
 
-          {isOnline !== null && !kassaPosLuxury ? (
+          {isOnline !== null && !kassaPosLuxury && !kassaWide15Chrome ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
@@ -6542,7 +6542,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             />
           ) : null}
 
-          {isOnline !== null && kassaPosLuxury ? (
+          {isOnline !== null && kassaPosLuxury && !kassaWide15Chrome ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
@@ -6561,41 +6561,43 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : null}
 
-          <div ref={langRef} className="relative z-[40] shrink-0">
-            <button
-              ref={langTriggerRef}
-              type="button"
-              aria-haspopup="listbox"
-              aria-expanded={langOpen}
-              aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
-              onClick={() => setLangOpen(o => !o)}
-              className={
-                kassaPosLuxury
-                  ? headerUtilityBtnClass(langOpen)
-                  : `inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium transition-colors sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3 ${
-                      kassaLight
-                        ? KASSA_LIGHT_BTN_FACE
-                        : KASSA_CLASSIC_BTN_FACE
-                    }`
-              }
-            >
-              <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
-              <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            <LocalePickerPortalMenu
-              isOpen={langOpen}
-              onOpenChange={setLangOpen}
-              triggerRef={langTriggerRef}
-              panelClassName={
-                kassaAppearanceDark
-                  ? 'overflow-hidden rounded-xl border border-zinc-600 bg-[#151a21] shadow-xl py-1'
-                  : 'overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl py-1'
-              }
-              rowHoverClassName={ui.langRowHover}
-              rowActiveClassName={ui.langRowActive}
-              rowInactiveClassName={ui.langRowInactive}
-            />
-          </div>
+          {!kassaWide15Chrome ? (
+            <div ref={langRef} className="relative z-[40] shrink-0">
+              <button
+                ref={langTriggerRef}
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded={langOpen}
+                aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
+                onClick={() => setLangOpen(o => !o)}
+                className={
+                  kassaPosLuxury
+                    ? headerUtilityBtnClass(langOpen)
+                    : `inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium transition-colors sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3 ${
+                        kassaLight
+                          ? KASSA_LIGHT_BTN_FACE
+                          : KASSA_CLASSIC_BTN_FACE
+                      }`
+                }
+              >
+                <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
+                <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              <LocalePickerPortalMenu
+                isOpen={langOpen}
+                onOpenChange={setLangOpen}
+                triggerRef={langTriggerRef}
+                panelClassName={
+                  kassaAppearanceDark
+                    ? 'overflow-hidden rounded-xl border border-zinc-600 bg-[#151a21] shadow-xl py-1'
+                    : 'overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl py-1'
+                }
+                rowHoverClassName={ui.langRowHover}
+                rowActiveClassName={ui.langRowActive}
+                rowInactiveClassName={ui.langRowInactive}
+              />
+            </div>
+          ) : null}
 
         <button
           type="button"
@@ -7597,21 +7599,27 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div
                 role="status"
                 aria-live="polite"
-                className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[4.25rem] py-2' : ''
+                className={`flex min-w-0 flex-1 justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
+                  kassaWide15Chrome
+                    ? 'min-h-[4.25rem] items-start pt-1.5 pb-2'
+                    : 'items-center'
                 }`}
               >
-                <span className={`shrink-0 font-bold tracking-[0.04em] ${ui.numpadMeta} ${
+                <span
+                  className={`shrink-0 font-bold tracking-[0.04em] ${ui.numpadMeta} ${
                   isTheLagoonTenant(tenant)
                     ? 'text-xl sm:text-2xl'
                     : kassaWide15Chrome
-                      ? 'text-lg'
+                      ? 'text-lg leading-none'
                       : 'text-base sm:text-lg'
-                }`}>
+                }`}
+                >
                   {t('kassaApp.cartTotal')}
                 </span>
                 <span
                   className={`min-w-0 truncate text-right font-bold tabular-nums tracking-tight ${ui.priceAccentClass} ${
+                    kassaWide15Chrome ? 'self-center' : ''
+                  } ${
                     isTheLagoonTenant(tenant)
                       ? 'text-3xl sm:text-[2.15rem]'
                       : kassaWide15Chrome
