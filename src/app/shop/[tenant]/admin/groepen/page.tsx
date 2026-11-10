@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
+import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
 import { AdminIconArchive, AdminIconPencil, AdminIconUsers } from '@/lib/admin-action-icons'
 
 interface OrderGroup {
@@ -31,11 +33,31 @@ interface OrderGroup {
 export default function GroupsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
+  const azertyOsk = useKassaAzertyOskChrome()
+  const oskModalPad =
+    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 12 : 0
+  const oskModalMaxHeight =
+    oskModalPad > 0 ? `calc(100vh - ${72 + oskModalPad}px)` : undefined
+
   const [groups, setGroups] = useState<OrderGroup[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editGroup, setEditGroup] = useState<OrderGroup | null>(null)
   const [featureEnabled, setFeatureEnabled] = useState(false)
+
+  const closeGroupModal = () => {
+    azertyOsk?.dismiss()
+    setShowModal(false)
+    setEditGroup(null)
+  }
+
+  useEffect(() => {
+    if (!showModal || oskModalPad <= 0) return
+    const active = document.activeElement
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      scheduleScrollInputAboveKeyboard(active)
+    }
+  }, [oskModalPad, showModal])
 
   const [formData, setFormData] = useState({
     name: '',
@@ -290,13 +312,24 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4">
+        <div
+          className={`fixed inset-0 z-[130] flex bg-black/50 p-4 ${
+            oskModalPad > 0
+              ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+              : 'items-center justify-center'
+          }`}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto touch-pan-y"
             data-osk-scroll
             data-osk-next="true"
+            data-testid="admin-osk-form-modal"
+            style={{
+              paddingBottom: oskModalPad > 0 ? `${oskModalPad}px` : undefined,
+              maxHeight: oskModalMaxHeight,
+            }}
           >
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               {editGroup ? t('groupsModule.groups.editGroup') : t('groupsModule.groups.createGroup')}
@@ -371,7 +404,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">
+                <button type="button" onClick={closeGroupModal} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl">
                   {t('groupsModule.groups.cancel')}
                 </button>
                 <button type="submit" disabled={saving} className="px-6 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-medium disabled:opacity-50">

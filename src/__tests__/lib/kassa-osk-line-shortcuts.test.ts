@@ -2,6 +2,7 @@ import {
   applyKassaOskLineShortcut,
   normalizeKassaOskLineShortcuts,
   sanitizeKassaOskLineShortcutLabel,
+  isAdminOskNextFormField,
   shouldOpenAzertyOskForFieldFocus,
 } from '@/lib/kassa-osk-line-shortcuts'
 
@@ -14,6 +15,16 @@ describe('kassa-osk-line-shortcuts', () => {
 
   it('kapt labels af op 15 tekens', () => {
     expect(sanitizeKassaOskLineShortcutLabel('  abcdefghijklmnop  ')).toBe('abcdefghijklmno')
+  })
+
+  it('admin data-osk-next veld telt als OSK-formulier', () => {
+    const root = document.createElement('div')
+    root.setAttribute('data-osk-next', 'true')
+    const input = document.createElement('input')
+    root.appendChild(input)
+    document.body.appendChild(root)
+    expect(isAdminOskNextFormField(input)).toBe(true)
+    document.body.removeChild(root)
   })
 
   it('opmerking-veld opent OSK ook bij handmatige modus', () => {

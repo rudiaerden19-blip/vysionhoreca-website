@@ -148,17 +148,26 @@ function readTouchLikeFromWindow(): boolean {
   }
 }
 
+function readAzertyOskReservePx(): number {
+  if (typeof document === 'undefined') return 0
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--kassa-azerty-osk-reserve')
+  const n = parseFloat(raw)
+  return Number.isFinite(n) && n > 0 ? n : 0
+}
+
 function readKeyboardBottomReservePx(): number {
+  const azertyReserve = readAzertyOskReservePx()
   const vv = window.visualViewport
   const cover = keyboardCoverPxFromViewport({
     innerHeight: window.innerHeight,
     visualViewport: vv ? { offsetTop: vv.offsetTop, height: vv.height } : null,
   })
-  return keyboardBottomReservePx({
+  const base = keyboardBottomReservePx({
     keyboardCoverPx: cover,
     innerHeight: window.innerHeight,
     touchLike: readTouchLikeFromWindow(),
   })
+  return Math.max(base, azertyReserve + 16)
 }
 
 /** Schuif het gefocuste vak boven het schermtoetsenbord. */

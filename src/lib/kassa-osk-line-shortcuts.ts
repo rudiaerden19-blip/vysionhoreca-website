@@ -14,13 +14,20 @@ export function isKassaOskLineNoteField(target: EventTarget | null): boolean {
 }
 
 /** Handmatige OSK-knop uit, maar opmerking-veld focust → toch tonen. */
+export function isAdminOskNextFormField(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return false
+  const root = target.closest('[data-osk-next="true"]')
+  return root instanceof HTMLElement
+}
+
 export function shouldOpenAzertyOskForFieldFocus(
   manualOpen: boolean,
   keyboardPinned: boolean,
   target: EventTarget | null,
 ): boolean {
   if (!manualOpen || keyboardPinned) return true
-  return isKassaOskLineNoteField(target)
+  return isKassaOskLineNoteField(target) || isAdminOskNextFormField(target)
 }
 
 export function isKassaHorecaPosPath(pathname: string): boolean {

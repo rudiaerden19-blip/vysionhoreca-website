@@ -9,6 +9,7 @@ import { KassaOskLineShortcutsPad } from '@/components/kassa/KassaOskLineShortcu
 import {
   applyKassaOskLineShortcut,
   isKassaHorecaPosPath,
+  isAdminOskNextFormField,
   isKassaOskLineNoteField,
   isKassaOskLineShortcutsEnabled,
   normalizeKassaOskLineShortcuts,
@@ -37,7 +38,11 @@ import {
   KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
   kassaSpeelsGrayChromeButtonClass,
 } from '@/lib/kassa-pos-surface'
-import { releaseAllOskScrollPadding } from '@/lib/scroll-input-above-keyboard'
+import {
+  isEditableCatalogTextField,
+  releaseAllOskScrollPadding,
+  scheduleScrollInputAboveKeyboard,
+} from '@/lib/scroll-input-above-keyboard'
 import {
   KASSA_AZERTY_OSK_HEIGHT_PX,
   KASSA_AZERTY_OSK_PANEL_MIN_WIDTH,
@@ -170,7 +175,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       healOskBlockedTextField(el)
       activeRef.current = el
       armKassaOskInput(el)
-      setLineNoteFieldActive(isKassaOskLineNoteField(el))
+      setLineNoteFieldActive(isKassaOskLineNoteField(el) || isAdminOskNextFormField(el))
       if (shouldOpenAzertyOskForFieldFocus(manualOpen, keyboardPinned, el)) {
         setVisible(true)
       }
@@ -194,12 +199,25 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (!showKeyboardPanel) {
       document.documentElement.style.paddingBottom = ''
+      document.documentElement.style.removeProperty('--kassa-azerty-osk-reserve')
       return
     }
     document.documentElement.style.paddingBottom = `${KASSA_AZERTY_OSK_HEIGHT_PX}px`
+    document.documentElement.style.setProperty(
+      '--kassa-azerty-osk-reserve',
+      `${KASSA_AZERTY_OSK_HEIGHT_PX}px`,
+    )
     return () => {
       document.documentElement.style.paddingBottom = ''
+      document.documentElement.style.removeProperty('--kassa-azerty-osk-reserve')
     }
+  }, [showKeyboardPanel])
+
+  useEffect(() => {
+    if (!showKeyboardPanel) return
+    const active = document.activeElement
+    if (!isEditableCatalogTextField(active) && !isKassaAzertyOskTextTarget(active)) return
+    return scheduleScrollInputAboveKeyboard(active)
   }, [showKeyboardPanel])
 
   useEffect(() => {
@@ -235,6 +253,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         return
       }
       if (related instanceof Element && related.closest('[data-testid="kassa-options-modal"]')) {
+        return
+      }
+      if (related instanceof Element && related.closest('[data-osk-next="true"]')) {
         return
       }
       if (!(e.target instanceof HTMLElement) || !isKassaAzertyOskTextTarget(e.target)) {
