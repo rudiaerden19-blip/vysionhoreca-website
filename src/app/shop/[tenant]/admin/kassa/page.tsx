@@ -564,7 +564,7 @@ function kassaOrderTypeButtonTouchClass(density: KassaChromeDensity): string {
 
 /** Sidebar-footer: touch-vriendelijke hoogte (BTW-bon / Bon / Verwijder). */
 function kassaFooterActionTouchMinHClass(density: KassaChromeDensity, denseBill: boolean): string {
-  if (density === 'wide15') return 'min-h-[3.65rem] py-2.5'
+  if (density === 'wide15') return 'min-h-[3.5rem]'
   if (density === 'sxga') return 'min-h-[4.75rem] py-2.5'
   if (denseBill) return 'min-h-[4rem] py-2'
   return 'min-h-[4.25rem] py-2.5'
@@ -5860,9 +5860,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       : 'gap-4'
     : 'gap-1.5'
 
+  /** 15″: label in bovenste glansband (niet verticaal midden — oogt te laag op gloss-knop). */
+  const kassaSidebarFooterBtnFlexClass = kassaWide15Chrome
+    ? 'flex items-start justify-center pt-2 pb-2.5'
+    : 'flex items-center justify-center'
+
   const kassaSidebarActionLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
-      ? 'text-center text-sm font-semibold leading-snug tracking-[0.02em]'
+      ? 'text-center text-base font-semibold leading-tight tracking-[0.02em]'
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
       : kassaAppearanceDark
@@ -7588,7 +7593,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 data-testid="kassa-quick-menu"
                 aria-pressed={kassaQuickMenuVisible}
                 onClick={toggleKassaQuickMenu}
-                className={`flex items-center justify-center px-2 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)} ${
+                className={`${kassaSidebarFooterBtnFlexClass} px-2 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(kassaQuickMenuVisible, posChrome)} ${
                   kassaWide15Chrome ? 'h-full min-h-[4.25rem] self-stretch' : ''
                 }`}
                 title={t('kassaApp.quickMenu')}
@@ -7600,7 +7605,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 role="status"
                 aria-live="polite"
                 className={`flex min-w-0 flex-1 items-center justify-between gap-2 px-2.5 ${kassaPosRaisedStripClass(posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[4.25rem] py-2' : ''
+                  kassaWide15Chrome ? 'min-h-[4.25rem] py-1.5' : ''
                 }`}
               >
                 <span
@@ -7642,7 +7647,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   void openCashDrawer(printAgentSendContext)
                 }}
-                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                className={`${kassaSidebarFooterBtnFlexClass} px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
                   kassaChromeDensity,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
@@ -7672,7 +7677,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   }
                   setShowBtwBonModal(true)
                 }}
-                className={`flex items-center justify-center px-1 disabled:pointer-events-none disabled:opacity-45 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                className={`${kassaSidebarFooterBtnFlexClass} px-1 disabled:pointer-events-none disabled:opacity-45 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
                   kassaChromeDensity,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
@@ -7688,7 +7693,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   void printDraftBonFromCart({ draftCopies: 1 })
                 }}
                 disabled={draftBonLineItems.length === 0 || draftBonPrinting}
-                className={`flex items-center justify-center px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
+                className={`${kassaSidebarFooterBtnFlexClass} px-1 ${kassaPosButtonClass(false, posChrome)} ${kassaFooterActionTouchMinHClass(
                   kassaChromeDensity,
                   kassaSidebarFooterTier === 'dense',
                 )}`}
@@ -7707,7 +7712,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   type="button"
                   onClick={clearCart}
                   disabled={billLines.length === 0}
-                  className={`flex items-center justify-center px-1 ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosRemoveButtonClass(posChrome)} ${kassaFooterActionTouchMinHClass(
+                  className={`${kassaSidebarFooterBtnFlexClass} px-1 ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosRemoveButtonClass(posChrome)} ${kassaFooterActionTouchMinHClass(
                     kassaChromeDensity,
                     kassaSidebarFooterTier === 'dense',
                   )}`}
@@ -7806,8 +7811,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`flex items-center justify-center px-3 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
-                  kassaWide15Chrome ? 'min-h-[3.5rem] py-2.5 text-base' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
+                className={`${kassaSidebarFooterBtnFlexClass} px-3 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
+                  kassaWide15Chrome ? 'min-h-[3.5rem]' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
                 }`}
               >
                 <span className={kassaSidebarActionLabelClass}>{t('kassaApp.numpadToggle')}</span>
@@ -7821,11 +7826,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   requestCheckout()
                 }}
                 disabled={billLines.length === 0 || payInFlight}
-                className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosCheckoutButtonClass(posChrome)} ${
+                className={`min-w-0 flex-1 ${kassaSidebarFooterBtnFlexClass} ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${kassaPosCheckoutButtonClass(posChrome)} ${
                   isTheLagoonTenant(tenant)
                     ? 'min-h-[4.25rem] py-3 text-2xl font-bold'
                     : kassaWide15Chrome
-                      ? 'min-h-[3.6rem] py-3 text-lg font-bold'
+                      ? 'min-h-[3.6rem] text-lg font-bold'
                       : kassaCompactChrome
                         ? 'min-h-[4rem] py-3.5 text-lg'
                         : 'min-h-[3.5rem] py-3 text-lg'
@@ -8086,7 +8091,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }}
                 disabled={billLines.length === 0 || payInFlight}
                 className={`flex min-w-0 flex-1 items-center justify-center rounded-xl ${KASSA_BLONKYS_KEEP_CHROME_CLASS} bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 ${
-                  kassaWide15Chrome ? 'min-h-[3.35rem] py-2.5 text-sm' : 'min-h-[3.5rem] py-3 text-lg'
+                  kassaWide15Chrome ? 'min-h-[3.35rem] py-2.5 text-base font-bold' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
                 {t('kassaApp.checkout')}
