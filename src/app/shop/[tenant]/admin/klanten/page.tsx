@@ -7,9 +7,16 @@ import { motion } from 'framer-motion'
 import { adminDb } from '@/lib/admin-db-client'
 import { Customer } from '@/lib/admin-api'
 import { ControlledNumberInput } from '@/components/ControlledNumberInput'
+import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
 
 export default function KlantenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const azertyOsk = useKassaAzertyOskChrome()
+  const oskContentPad =
+    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 16 : 0
+  const oskModalMaxHeight =
+    oskContentPad > 0 ? `calc(100vh - ${72 + oskContentPad}px)` : undefined
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -21,6 +28,14 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
     loadCustomers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
+
+  useEffect(() => {
+    if (oskContentPad <= 0) return
+    const active = document.activeElement
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      scheduleScrollInputAboveKeyboard(active)
+    }
+  }, [oskContentPad])
 
   async function loadCustomers() {
     // Server-side via admin-db-proxy: anon-key heeft (na lockdown) geen
@@ -84,8 +99,20 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
     )
   }
 
+  const closeCustomerModal = () => {
+    azertyOsk?.dismiss()
+    setSelectedCustomer(null)
+    setEditingPoints(false)
+  }
+
   return (
-    <div className="max-w-6xl mx-auto">
+    <div
+      className="max-w-6xl mx-auto"
+      data-osk-scroll
+      data-osk-next="true"
+      data-testid="admin-osk-form-modal"
+      style={{ paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined }}
+    >
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('customersPage.title')}</h1>
@@ -138,10 +165,12 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
       <div className="mb-6">
         <input
           type="text"
+          inputMode="text"
+          autoComplete="off"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={` ${t('customersPage.search')}`}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full min-h-[44px] px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation"
         />
       </div>
 
@@ -218,16 +247,24 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setSelectedCustomer(null)}
+          className={`fixed inset-0 z-[130] flex bg-black/50 p-4 ${
+            oskContentPad > 0
+              ? 'items-start justify-center overflow-y-auto overscroll-y-contain pt-14 pb-2'
+              : 'items-center justify-center'
+          }`}
+          onClick={closeCustomerModal}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-2xl max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-2xl max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto touch-pan-y"
             data-osk-scroll
             data-osk-next="true"
+            style={{
+              paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined,
+              maxHeight: oskModalMaxHeight,
+            }}
           >
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
@@ -241,7 +278,8 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
                   </div>
                 </div>
                 <button 
-                  onClick={() => setSelectedCustomer(null)}
+                  type="button"
+                  onClick={closeCustomerModal}
                   className="text-gray-400 hover:text-gray-600 text-2xl"
                 >
                   ×
