@@ -117,9 +117,22 @@ export function buildKassaLayoutPreviewKassaUrl(
   origin: string,
 ): string {
   const slug = tenantSlug.trim().toLowerCase()
+  const kvp =
+    frame.id === '15'
+      ? 'wide15'
+      : frame.id === '17'
+        ? 'sxga'
+        : frame.id === '21'
+          ? 'default'
+          : frame.id === 'ipad-pro-13'
+            ? 'ipad_129'
+            : frame.id === 'ipad-10'
+              ? 'ipad_10'
+              : 'default'
   const q = new URLSearchParams({
     [KASSA_LAYOUT_PREVIEW_QUERY]: '1',
     vp: frame.vp,
+    kvp,
     ipad: frame.ipadClient ? '1' : '0',
     [KASSA_LAYOUT_PREVIEW_LAB_W]: String(frame.cssW),
     [KASSA_LAYOUT_PREVIEW_LAB_H]: String(frame.cssH),

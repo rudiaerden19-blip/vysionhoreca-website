@@ -1,0 +1,81 @@
+/**
+ * Platform-profielen — één ID per schermklasse (superadmin studio + tokens).
+ * Wijzigingen aan één ID raken nooit een ander ID.
+ */
+
+import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
+import { KASSA_LAYOUT_LAB_FRAMES } from '@/lib/kassa-layout-preview'
+import { readKassaViewportProfileIdFromBrowser } from '@/lib/kassa-viewport-profile-id-helpers'
+
+export const KASSA_VIEWPORT_PROFILE_IDS = [
+  'wide15',
+  'sxga',
+  'default',
+  'ipad_129',
+  'ipad_10',
+] as const
+
+export type KassaViewportProfileId = (typeof KASSA_VIEWPORT_PROFILE_IDS)[number]
+
+export const KASSA_PLATFORM_TENANT_SLUG = '_platform'
+
+export type KassaViewportProfileMeta = {
+  id: KassaViewportProfileId
+  labelNl: string
+  /** Layout-lab frame id */
+  labFrameId: string
+}
+
+export const KASSA_VIEWPORT_PROFILE_REGISTRY: Record<
+  KassaViewportProfileId,
+  KassaViewportProfileMeta
+> = {
+  wide15: { id: 'wide15', labelNl: '15 inch breedbeeld', labFrameId: '15' },
+  sxga: { id: 'sxga', labelNl: '17 inch vierkant (SXGA)', labFrameId: '17' },
+  default: { id: 'default', labelNl: '21 inch Full HD', labFrameId: '21' },
+  ipad_129: { id: 'ipad_129', labelNl: 'iPad 12,9 inch', labFrameId: 'ipad-pro-13' },
+  ipad_10: { id: 'ipad_10', labelNl: 'iPad 10 inch', labFrameId: 'ipad-10' },
+}
+
+export function kassaLabFrameForProfileId(
+  profileId: KassaViewportProfileId,
+): KassaLayoutLabFrame | undefined {
+  const labId = KASSA_VIEWPORT_PROFILE_REGISTRY[profileId]?.labFrameId
+  return KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === labId)
+}
+
+export function isKassaViewportProfileId(raw: string | null | undefined): raw is KassaViewportProfileId {
+  if (!raw) return false
+  return (KASSA_VIEWPORT_PROFILE_IDS as readonly string[]).includes(raw.trim())
+}
+
+/** iPad landschap: logische viewport → ipad-profiel (anders desktop-profielen). */
+export function resolveKassaViewportProfileIdFromWindow(input: {
+  wide15: boolean
+  sxgaDense: boolean
+  ipadClient: boolean
+  cssW: number
+  cssH: number
+  forcedProfileId?: KassaViewportProfileId | null
+}): KassaViewportProfileId {
+  if (input.forcedProfileId) return input.forcedProfileId
+  if (input.wide15) return 'wide15'
+  if (input.sxgaDense) return 'sxga'
+  if (input.ipadClient) {
+    const w = Math.max(input.cssW, input.cssH)
+    const h = Math.min(input.cssW, input.cssH)
+    if (w >= 1050 && w <= 1110 && h >= 780 && h <= 830) return 'ipad_10'
+    if (w >= 1320 && w <= 1400 && h >= 1000 && h <= 1050) return 'ipad_129'
+    if (h > 0 && w / h >= 1.28 && w / h <= 1.34) return 'ipad_10'
+    return 'ipad_129'
+  }
+  return 'default'
+}
+
+export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
+  if (typeof window === 'undefined') return 'default'
+  const sp = new URLSearchParams(window.location.search)
+  const forced = sp.get('kvp')
+  if (isKassaViewportProfileId(forced)) return forced
+  return readKassaViewportProfileIdFromBrowser()
+}

@@ -403,10 +403,15 @@ import {
 } from '@/lib/kassa-layout-preview'
 import {
   estimateKassaSidebarWidthPxForInnerWidth,
-  getKassaViewportChromeTokens,
   kassaViewportChromeCssVars,
-  type KassaViewportChromeProfile,
 } from '@/lib/kassa-viewport-chrome-tokens'
+import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
+import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
+import {
+  fetchKassaViewportProfileSettingsMap,
+  resolveKassaChromeTokensForProfile,
+  type KassaViewportProfileSettingsMap,
+} from '@/lib/kassa-viewport-profile-settings-client'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -461,11 +466,8 @@ function shouldApplyKassaWide15Chrome(): boolean {
   return readKassaChromeFlagsFromWindow().wide15
 }
 
-function readKassaViewportChromeProfileFromWindow(): KassaViewportChromeProfile {
-  const flags = readKassaChromeFlagsFromWindow()
-  if (flags.sxgaDense) return 'sxga'
-  if (flags.wide15) return 'wide15'
-  return 'default'
+function readKassaViewportChromeProfileFromWindow(): KassaViewportProfileId {
+  return readKassaViewportProfileIdFromWindow()
 }
 const KASSA_SIDEBAR_FOOTER_LEFT_COL_WIDE15 =
   'w-[5.25rem] min-w-[5.25rem] max-w-[5.25rem] shrink-0'
@@ -1304,6 +1306,44 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }, [])
 
+  const [kassaViewportProfileId, setKassaViewportProfileId] =
+    useState<KassaViewportProfileId>('default')
+  const [kassaViewportSettingsMap, setKassaViewportSettingsMap] =
+    useState<KassaViewportProfileSettingsMap>({})
+
+  const kassaActiveChromeTokens = useMemo(
+    () => resolveKassaChromeTokensForProfile(kassaViewportProfileId, kassaViewportSettingsMap),
+    [kassaViewportProfileId, kassaViewportSettingsMap],
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      const { map } = await fetchKassaViewportProfileSettingsMap()
+      if (!cancelled) setKassaViewportSettingsMap(map)
+    })()
+    const poll = window.setInterval(() => {
+      void fetchKassaViewportProfileSettingsMap().then(({ map }) => {
+        if (!cancelled) setKassaViewportSettingsMap(map)
+      })
+    }, 60_000)
+    return () => {
+      cancelled = true
+      clearInterval(poll)
+    }
+  }, [])
+
+  useEffect(() => {
+    const sync = () => setKassaViewportProfileId(readKassaViewportProfileIdFromWindow())
+    sync()
+    window.addEventListener('resize', sync)
+    window.visualViewport?.addEventListener?.('resize', sync)
+    return () => {
+      window.removeEventListener('resize', sync)
+      window.visualViewport?.removeEventListener?.('resize', sync)
+    }
+  }, [])
+
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
   const audioUnlockOnceRef = useRef(false)
   useEffect(() => {
@@ -1769,12 +1809,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Batch geladen bij loadMenu; fallback naar getOptionsForProduct bij miss/leeg+link. */
   const optionsByProductIdRef = useRef<Record<string, ProductOption[]>>({})
 
-  /** gap-4 (16px) op categorie-/productgrid; zelfde waarde in ResizeObserver-formule. */
-  const KASSA_MENU_GRID_GAP_PX = 16
-
-  const KASSA_MENU_VISIBLE_ROWS = 3
-  /** 1 = rijhoogte past bij KASSA_MENU_VISIBLE_ROWS in scrollport (min gap); hogere rijen = grotere tegels / meer tekstruimte (o.a. 15"). */
-  const KASSA_MENU_TILE_HEIGHT_BOOST = 1
+  const KASSA_MENU_GRID_GAP_PX = kassaActiveChromeTokens.menuGridGapPx
+  const KASSA_MENU_VISIBLE_ROWS = kassaActiveChromeTokens.menuVisibleRows
+  const KASSA_MENU_TILE_HEIGHT_BOOST = kassaActiveChromeTokens.menuTileHeightBoost
   /**
    * SXGA gebruikt deze waarde niet meer (inhoud‑rij); argument blijft voor API-compat.
    */
@@ -2254,7 +2291,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       window.visualViewport?.removeEventListener?.('resize', onLayoutSignal)
       ro?.disconnect()
     }
-  }, [selectedCategory, menuLoading, kassaSxgaDenseTiles, kassaWide15Chrome])
+  }, [
+    selectedCategory,
+    menuLoading,
+    kassaSxgaDenseTiles,
+    kassaWide15Chrome,
+    kassaViewportProfileId,
+    kassaActiveChromeTokens.menuGridGapPx,
+    kassaActiveChromeTokens.menuTileHeightBoost,
+    kassaActiveChromeTokens.menuVisibleRows,
+  ])
 
   // Laad tafels + barkrukken + openstaande bestellingen (Supabase)
 
@@ -5768,17 +5814,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       : ''
 
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
-  const kassaMenuClassicGridCols = kassaDefaultMenuClassicGridCols({
-    compactChrome: kassaCompactChrome,
-    ipadClient: kassaIpadMenuGridCap,
-  })
+  const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
   const kassaChromeDensity: KassaChromeDensity = kassaWide15Chrome
     ? 'wide15'
     : kassaSxgaDenseTiles
       ? 'sxga'
       : 'default'
-  const kassaViewportChromeTokens = getKassaViewportChromeTokens(kassaChromeDensity)
+  const kassaViewportChromeTokens = kassaActiveChromeTokens
   const kassaRootChromeStyle = kassaViewportChromeCssVars(
     kassaViewportChromeTokens,
   ) as React.CSSProperties
@@ -6067,6 +6110,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-testid="kassa-app"
       data-kassa-layout={kassaLayout}
       data-kassa-vp={kassaChromeDensity}
+      data-kassa-profile-id={kassaViewportProfileId}
       data-kassa-ipad={kassaIpadMenuGridCap ? '1' : '0'}
       style={kassaRootChromeStyle}
     >

@@ -29,6 +29,13 @@ describe('kassa-viewport-chrome-tokens', () => {
     const vars = kassaViewportChromeCssVars(getKassaViewportChromeTokens('wide15'))
     expect(vars['--kassa-sidebar-width']).toBe('268px')
     expect(vars['--kassa-osk-right-inset']).toBe('272px')
+    expect(vars['--kassa-menu-tile-boost']).toBe('1')
+  })
+
+  it('vijf platformprofielen met vaste defaults', () => {
+    const ipad = getKassaViewportChromeTokens('ipad_10')
+    expect(ipad.menuClassicGridCols).toBe(4)
+    expect(ipad.profile).toBe('ipad_10')
   })
 
   it('regressie-frames bevatten 21, 15 en 17', () => {

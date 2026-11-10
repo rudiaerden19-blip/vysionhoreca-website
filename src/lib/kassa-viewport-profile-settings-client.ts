@@ -1,0 +1,62 @@
+import type { KassaViewportProfileSettingsMap } from '@/lib/kassa-viewport-profile-settings'
+export type { KassaViewportProfileSettingsMap } from '@/lib/kassa-viewport-profile-settings'
+import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
+import { applyProfileSettingsToChromeTokens } from '@/lib/kassa-viewport-profile-settings'
+import type { KassaViewportChromeTokens } from '@/lib/kassa-viewport-chrome-tokens'
+
+const SESSION_KEY = 'vysion-kassa-vp-settings-v1'
+
+export function readCachedKassaViewportProfileSettings(): {
+  version: string
+  map: KassaViewportProfileSettingsMap
+} | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { version?: string; map?: KassaViewportProfileSettingsMap }
+    if (!parsed.map) return null
+    return { version: parsed.version ?? '0', map: parsed.map }
+  } catch {
+    return null
+  }
+}
+
+export function writeCachedKassaViewportProfileSettings(
+  version: string,
+  map: KassaViewportProfileSettingsMap,
+): void {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ version, map }))
+  } catch {
+    /* ignore quota */
+  }
+}
+
+export async function fetchKassaViewportProfileSettingsMap(): Promise<{
+  version: string
+  map: KassaViewportProfileSettingsMap
+}> {
+  const res = await fetch('/api/kassa/viewport-profile-settings', {
+    credentials: 'same-origin',
+    cache: 'no-store',
+  })
+  if (!res.ok) {
+    const cached = readCachedKassaViewportProfileSettings()
+    return cached ?? { version: '0', map: {} }
+  }
+  const body = (await res.json()) as { version?: string; map?: KassaViewportProfileSettingsMap }
+  const version = body.version ?? '0'
+  const map = body.map ?? {}
+  writeCachedKassaViewportProfileSettings(version, map)
+  return { version, map }
+}
+
+export function resolveKassaChromeTokensForProfile(
+  profileId: KassaViewportProfileId,
+  map: KassaViewportProfileSettingsMap,
+): KassaViewportChromeTokens {
+  const patch = map[profileId] ?? {}
+  return applyProfileSettingsToChromeTokens(profileId, patch)
+}

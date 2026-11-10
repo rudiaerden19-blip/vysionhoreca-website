@@ -517,6 +517,12 @@ export default function SuperAdminDashboard() {
             >
                Kassa 15″ · 17″ · 21″
             </Link>
+            <Link
+              href="/superadmin/kassa-profiel-studio"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-colors"
+            >
+              Kassa profiel studio
+            </Link>
             <button
               onClick={handleCleanupExpired}
               className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors border border-red-500/30"
