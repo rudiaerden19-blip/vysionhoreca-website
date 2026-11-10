@@ -16,6 +16,8 @@ import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
 import MediaPicker from '@/components/MediaPicker'
+import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
+import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
 
 type CategoryRowProps = {
   category: MenuCategory
@@ -157,6 +159,9 @@ function CategoryReorderRow({
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const { ask, ConfirmModal } = useAdminConfirm(t)
+  const azertyOsk = useKassaAzertyOskChrome()
+  const oskContentPad =
+    azertyOsk?.visible && azertyOsk.heightPx > 0 ? azertyOsk.heightPx + 16 : 0
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [newCategory, setNewCategory] = useState('')
   const [newCategoryImageUrl, setNewCategoryImageUrl] = useState('')
@@ -197,6 +202,14 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       cancelled = true
     }
   }, [refreshCategoriesAndProductCounts])
+
+  useEffect(() => {
+    if (oskContentPad <= 0) return
+    const active = document.activeElement
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+      scheduleScrollInputAboveKeyboard(active)
+    }
+  }, [oskContentPad])
 
   const toggleVisible = (id: string) => {
     setCategories(prev => prev.map(c => 
@@ -329,7 +342,13 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
 
   return (
     <PinGate tenant={params.tenant}>
-    <div className="max-w-3xl mx-auto">
+    <div
+      className="max-w-3xl mx-auto"
+      data-osk-scroll
+      data-osk-next="true"
+      data-testid="admin-osk-form-modal"
+      style={{ paddingBottom: oskContentPad > 0 ? `${oskContentPad}px` : undefined }}
+    >
       <ConfirmModal />
       <div className="flex items-center justify-between mb-8">
         <div>
