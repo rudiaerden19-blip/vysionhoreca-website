@@ -2,12 +2,15 @@ import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
 
 /**
  * Actieve beeldbreedte op echt paneel (lineaal), niet de CSS-viewport.
- * 15″: eigenaar ~34,5 cm; 21″/17″ typische kassa-panelen — aanpasbaar in lab-ui.
+ * Pas aan in superadmin-lab als jouw kassa-hardware afwijkt (lineaal op rand preview).
  */
 export const KASSA_LAB_DEFAULT_PANEL_WIDTH_CM: Record<string, number> = {
+  /** 21–22″ FHD landschap — viewable ~47–48 cm */
   '21': 47.6,
+  /** 15–15,6″ 1366×768 */
   '15': 34.5,
-  '17': 34,
+  /** 17″ SXGA 1280×1024 (4∶3) — breedte ~33,8 cm, hoogte ~27 cm */
+  '17': 33.8,
   'ipad-mini': 19.3,
   'ipad-10': 20.8,
   'ipad-11': 23.5,

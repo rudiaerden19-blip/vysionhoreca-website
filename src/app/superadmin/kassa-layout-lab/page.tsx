@@ -169,7 +169,8 @@ function KassaLayoutPreviewFrame({
         </div>
         {sizeMode === 'physical' ? (
           <p className="mt-1 text-[11px] text-amber-200/80">
-            Meet de gekleurde rand met een lineaal: breedte ≈ {physical.widthCm} cm (15″-kassa ≈ 34,5 cm).
+            Meet de oranje rand: breedte moet {physical.widthCm.toFixed(1)} cm zijn (hoogte{' '}
+            {physical.heightCm.toFixed(1)} cm).
           </p>
         ) : null}
       </div>
@@ -270,6 +271,26 @@ export default function SuperadminKassaLayoutLabPage() {
       )
     }
   }, [origin, regressionFrames, tenantSlug])
+
+  function CmCalibrationStrip() {
+    return (
+      <div className="mb-4 flex flex-wrap items-center gap-4 rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-xs">
+        <span className="font-semibold text-amber-100">Kalibratie lineaal:</span>
+        <div className="flex items-center gap-2">
+          <div
+            className="h-3 shrink-0 rounded-sm bg-amber-400"
+            style={{ width: '10cm' }}
+            title="10 cm"
+          />
+          <span className="text-amber-100/90">= 10 cm</span>
+        </div>
+        <span className="text-zinc-400">
+          Klopt 10 cm niet op jouw scherm? Pas paneelbreedte hieronder aan tot de preview overeenkomt
+          met de kassa-PC in de zaak.
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-[#0f1419] text-zinc-100">
@@ -390,9 +411,13 @@ export default function SuperadminKassaLayoutLabPage() {
             </p>
           )}
         </div>
+        <p className="mx-auto mt-2 max-w-[1800px] text-xs text-zinc-500">
+          Dit lab wijzigt <strong className="text-zinc-300">geen</strong> kassa bij klanten — alleen
+          vooraf kijken. Wat zij op de toog zien = echte PC → «Open 3 vensters» of kassa in de zaak.
+        </p>
         {sizeMode === 'physical' ? (
           <div className="mx-auto mt-2 flex max-w-[1800px] flex-wrap items-center gap-3 text-xs text-zinc-400">
-            <span className="font-semibold text-amber-200/90">Paneelbreedte (cm):</span>
+            <span className="font-semibold text-amber-200/90">Paneelbreedte (cm) 21·15·17:</span>
             {KASSA_LAYOUT_REGRESSION_FRAME_IDS.map((id) => {
               const def = KASSA_LAB_DEFAULT_PANEL_WIDTH_CM[id] ?? 34.5
               const val = cmOverrides[id] ?? def
@@ -442,6 +467,7 @@ export default function SuperadminKassaLayoutLabPage() {
           <p className="text-zinc-400">Vul een tenant slug in (bv. oh-green).</p>
         ) : viewMode === 'regression' ? (
           <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-10">
+            {sizeMode === 'physical' ? <CmCalibrationStrip /> : null}
             {regressionFrames.map((frame) => (
               <KassaLayoutPreviewFrame
                 key={frame.id}
@@ -456,6 +482,8 @@ export default function SuperadminKassaLayoutLabPage() {
             ))}
           </div>
         ) : (
+          <>
+            {sizeMode === 'physical' ? <CmCalibrationStrip /> : null}
           <KassaLayoutPreviewFrame
             frame={activeFrame}
             tenantSlug={tenantSlug}
@@ -465,6 +493,7 @@ export default function SuperadminKassaLayoutLabPage() {
             cmOverrides={cmOverrides}
             iframeKey={iframeKey}
           />
+          </>
         )}
       </main>
     </div>
