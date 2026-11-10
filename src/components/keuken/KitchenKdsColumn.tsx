@@ -21,8 +21,16 @@ import {
 const KDS_HEADER_BLUE = '#163a66'
 const KDS_HEADER_RED = '#9b1c1c'
 
-/** Zelfde breedte als de paginering op het keukenscherm. */
+/** Standaard kds-kolom (17″ / groot scherm). */
 export const KDS_COLUMN_WIDTH_PX = 400
+/** Compacter op 15″ breedbeeld (1366×768). */
+export const KDS_COLUMN_WIDTH_WIDE15_PX = 300
+
+export type KitchenKdsDensity = 'default' | 'wide15'
+
+export function kdsColumnWidthPx(density: KitchenKdsDensity): number {
+  return density === 'wide15' ? KDS_COLUMN_WIDTH_WIDE15_PX : KDS_COLUMN_WIDTH_PX
+}
 
 /** Regel in de bon: index in `order.items`, zodat twee dezelfde producten apart afgevinkt worden. */
 export function kitchenItemLineKey(index: number): string {
@@ -35,12 +43,15 @@ export function KitchenItemMadeMark({
   label,
   onToggle,
   onDark = true,
+  size = 'md',
 }: {
   made: boolean
   label: string
   onToggle: () => void
   onDark?: boolean
+  size?: 'sm' | 'md'
 }) {
+  const box = size === 'sm' ? 'h-7 w-7 text-lg' : 'h-9 w-9 text-2xl'
   return (
     <button
       type="button"
@@ -50,7 +61,7 @@ export function KitchenItemMadeMark({
         e.stopPropagation()
         onToggle()
       }}
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 text-2xl font-black leading-none touch-manipulation ${
+      className={`flex shrink-0 items-center justify-center rounded-md border-2 font-black leading-none touch-manipulation ${box} ${
         made
           ? 'border-red-500 bg-red-600 text-white'
           : onDark
@@ -86,6 +97,7 @@ type Props = {
   onToggleMade?: (lineKey: string) => void
   bodyRef?: (el: HTMLDivElement | null) => void
   onBodyScroll?: () => void
+  density?: KitchenKdsDensity
 }
 
 function formatElapsed(createdAt: string, now: Date): string {
@@ -138,7 +150,10 @@ export function KitchenKdsColumn({
   onToggleMade,
   bodyRef,
   onBodyScroll,
+  density = 'default',
 }: Props) {
+  const compact = density === 'wide15'
+  const colW = kdsColumnWidthPx(density)
   const elapsed = formatElapsed(order.created_at, now)
   const dineInSeat = adminDineInSeatAuditLine(order, t)
   const schedLine = isWebshopOrder(order)
@@ -175,54 +190,80 @@ export function KitchenKdsColumn({
       className={`flex h-full shrink-0 flex-col border bg-transparent [touch-action:pan-x] ${
         isNew ? 'ring-2 ring-inset ring-sky-300' : ''
       }`}
-      style={{ borderColor: headerColor, width: KDS_COLUMN_WIDTH_PX }}
+      style={{ borderColor: headerColor, width: colW }}
     >
-      <header className="shrink-0 px-4 py-3 text-white" style={{ backgroundColor: headerColor }}>
-        <div className="flex items-start justify-between gap-3">
+      <header
+        className={`shrink-0 text-white ${compact ? 'px-2.5 py-2' : 'px-4 py-3'}`}
+        style={{ backgroundColor: headerColor }}
+      >
+        <div className={`flex items-start justify-between ${compact ? 'gap-2' : 'gap-3'}`}>
           <button
             type="button"
             onClick={onOpen}
             className="min-w-0 text-left"
           >
-            <span className="block text-5xl font-black leading-none tabular-nums">
+            <span
+              className={`block font-black leading-none tabular-nums ${compact ? 'text-3xl' : 'text-5xl'}`}
+            >
               {order.order_number}
             </span>
             {tableNr ? (
-              <span className="mt-2 block text-3xl font-black leading-none">
+              <span className={`mt-1 block font-black leading-none ${compact ? 'text-xl' : 'text-3xl'}`}>
                 {t('kassaApp.tableWord')} {tableNr}
               </span>
             ) : null}
-            <span className="mt-2 block truncate text-lg font-bold uppercase tracking-wide text-white/90">
+            <span
+              className={`mt-1 block truncate font-bold uppercase tracking-wide text-white/90 ${
+                compact ? 'text-sm' : 'text-lg'
+              }`}
+            >
               {headerStatus}
             </span>
           </button>
-          <span className="shrink-0 rounded bg-black/25 px-2.5 py-1 font-mono text-2xl font-bold tabular-nums">
+          <span
+            className={`shrink-0 rounded bg-black/25 font-mono font-bold tabular-nums ${
+              compact ? 'px-1.5 py-0.5 text-base' : 'px-2.5 py-1 text-2xl'
+            }`}
+          >
             {elapsed}
           </span>
         </div>
-        <p className="mt-2 truncate text-xl font-semibold text-white/95">
+        <p className={`mt-1 truncate font-semibold text-white/95 ${compact ? 'text-sm' : 'text-xl'}`}>
           {typeLine}
           {dineInSeat ? ` · ${dineInSeat}` : ''}
         </p>
         {headingNames.map((name) => (
-          <p key={name} className="mt-2 text-4xl font-black leading-tight text-white">
+          <p
+            key={name}
+            className={`mt-1 font-black leading-tight text-white ${compact ? 'text-xl' : 'text-4xl'}`}
+          >
             {name}
           </p>
         ))}
-        <p className="truncate text-xl font-medium text-white/90">{order.customer_name}</p>
-        {schedLine ? <p className="truncate text-lg text-white/80">{schedLine}</p> : null}
+        <p className={`truncate font-medium text-white/90 ${compact ? 'text-sm' : 'text-xl'}`}>
+          {order.customer_name}
+        </p>
+        {schedLine ? (
+          <p className={`truncate text-white/80 ${compact ? 'text-xs' : 'text-lg'}`}>{schedLine}</p>
+        ) : null}
       </header>
 
       <div
         ref={bodyRef}
-        className="min-h-0 flex-1 cursor-pointer overflow-y-auto overscroll-y-contain px-4 py-3 [touch-action:pan-x_pan-y]"
+        className={`min-h-0 flex-1 cursor-pointer overflow-y-auto overscroll-y-contain [touch-action:pan-x_pan-y] ${
+          compact ? 'px-2.5 py-2' : 'px-4 py-3'
+        }`}
         onClick={onOpen}
         onScroll={onBodyScroll}
       >
         {groups.map((group, gi) => (
           <div key={`${group.title}-${gi}`} className="mb-2">
             {group.title ? (
-              <p className="mb-1.5 text-lg font-bold uppercase tracking-wide text-sky-300">
+              <p
+                className={`mb-1 font-bold uppercase tracking-wide text-sky-300 ${
+                  compact ? 'text-sm' : 'text-lg'
+                }`}
+              >
                 {group.title}
                 <span className="ml-1 text-white/40">({group.lines.length})</span>
               </p>
@@ -235,8 +276,11 @@ export function KitchenKdsColumn({
                 const noteStr = kassaOrderItemKitchenLineNote(item) ?? ''
                 const made = madeLineKeys?.has(lineKey) === true
                 return (
-                  <li key={lineKey} className={`text-2xl leading-snug ${made ? 'text-red-500' : 'text-white'}`}>
-                    <div className="flex items-start gap-3">
+                  <li
+                    key={lineKey}
+                    className={`leading-snug ${compact ? 'text-base' : 'text-2xl'} ${made ? 'text-red-500' : 'text-white'}`}
+                  >
+                    <div className={`flex items-start ${compact ? 'gap-2' : 'gap-3'}`}>
                       <p className="min-w-0 flex-1 font-semibold">
                         <span className={`tabular-nums ${made ? 'text-red-400' : 'text-white/80'}`}>{qty} x </span>
                         {label}
@@ -245,15 +289,24 @@ export function KitchenKdsColumn({
                         made={made}
                         label={madeLabel}
                         onToggle={() => onToggleMade?.(lineKey)}
+                        onDark
+                        size={compact ? 'sm' : 'md'}
                       />
                     </div>
                     {optLines.map((line, j) => (
-                      <p key={j} className={`pl-5 text-xl ${made ? 'text-red-400' : 'text-white/70'}`}>
+                      <p
+                        key={j}
+                        className={`pl-4 ${compact ? 'text-sm' : 'pl-5 text-xl'} ${made ? 'text-red-400' : 'text-white/70'}`}
+                      >
                         {line}
                       </p>
                     ))}
                     {noteStr ? (
-                      <p className={`pl-5 text-xl ${made ? 'text-red-300' : 'text-amber-200/90'}`}>{noteStr}</p>
+                      <p
+                        className={`pl-4 ${compact ? 'text-sm' : 'pl-5 text-xl'} ${made ? 'text-red-300' : 'text-amber-200/90'}`}
+                      >
+                        {noteStr}
+                      </p>
                     ) : null}
                   </li>
                 )
@@ -262,18 +315,28 @@ export function KitchenKdsColumn({
           </div>
         ))}
         {order.customer_notes ? (
-          <p className="mt-3 border-t border-white/10 pt-3 text-xl text-amber-100/90">
+          <p
+            className={`mt-2 border-t border-white/10 pt-2 text-amber-100/90 ${
+              compact ? 'text-sm' : 'mt-3 pt-3 text-xl'
+            }`}
+          >
             {order.customer_notes}
           </p>
         ) : null}
       </div>
 
-      <footer className="flex shrink-0 flex-col gap-2 border-t border-black/40 bg-transparent p-3">
+      <footer
+        className={`flex shrink-0 flex-col border-t border-black/40 bg-transparent ${
+          compact ? 'gap-1.5 p-2' : 'gap-2 p-3'
+        }`}
+      >
         <button
           type="button"
           disabled={started}
           onClick={onStart}
-          className={`${kassaSpeelsGrayChromeButtonClass()} w-full py-3.5 text-2xl disabled:opacity-60`}
+          className={`${kassaSpeelsGrayChromeButtonClass()} w-full disabled:opacity-60 ${
+            compact ? 'py-2 text-base' : 'py-3.5 text-2xl'
+          }`}
         >
           <span>{startLabel}</span>
         </button>
@@ -281,14 +344,18 @@ export function KitchenKdsColumn({
         <button
           type="button"
           onClick={onPrint}
-          className={`${kassaSpeelsGrayChromeButtonClass()} px-4 py-3.5 text-xl`}
+          className={`${kassaSpeelsGrayChromeButtonClass()} ${
+            compact ? 'px-2.5 py-2 text-sm' : 'px-4 py-3.5 text-xl'
+          }`}
         >
           {printLabel}
         </button>
         <button
           type="button"
           onClick={onReady}
-          className={`${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} min-h-[64px] flex-1 text-2xl font-black uppercase tracking-wide`}
+          className={`${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} flex-1 font-black uppercase tracking-wide ${
+            compact ? 'min-h-[48px] text-base' : 'min-h-[64px] text-2xl'
+          }`}
         >
           {readyLabel}
         </button>

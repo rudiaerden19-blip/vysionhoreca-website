@@ -34,11 +34,13 @@ import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
 import {
-  KDS_COLUMN_WIDTH_PX,
+  kdsColumnWidthPx,
+  type KitchenKdsDensity,
   KitchenItemMadeMark,
   KitchenKdsColumn,
   kitchenItemLineKey,
 } from '@/components/keuken/KitchenKdsColumn'
+import { readKassaViewportProfileFromWindow } from '@/lib/kassa-viewport-profile'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -47,8 +49,6 @@ import {
   kassaSpeelsGreenGlossButtonClass,
 } from '@/lib/kassa-pos-surface'
 
-/** Zelfde vakbreedte als KitchenKdsColumn. Het vak rekt niet over het hele scherm. */
-const KDS_COL_PX = KDS_COLUMN_WIDTH_PX
 const KDS_COL_GAP_PX = 16
 const KDS_BOARD_PAD_PX = 24
 
@@ -141,6 +141,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }, [soundActivated])
   const boardRef = useRef<HTMLDivElement>(null)
   const boardScrollRef = useRef<HTMLDivElement>(null)
+  const [kdsDensity, setKdsDensity] = useState<KitchenKdsDensity>('default')
+  const kdsColPx = useMemo(() => kdsColumnWidthPx(kdsDensity), [kdsDensity])
   const [colsPerPage, setColsPerPage] = useState(5)
   const [kdsPage, setKdsPage] = useState(0)
   const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
@@ -250,18 +252,28 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }, [])
 
   useEffect(() => {
+    const syncVp = () => {
+      const d: KitchenKdsDensity = readKassaViewportProfileFromWindow() === 'wide15' ? 'wide15' : 'default'
+      setKdsDensity((prev) => (prev === d ? prev : d))
+    }
+    syncVp()
+    window.addEventListener('resize', syncVp)
+    return () => window.removeEventListener('resize', syncVp)
+  }, [])
+
+  useEffect(() => {
     const el = boardRef.current
     if (!el) return
     const measure = () => {
       const inner = Math.max(0, el.clientWidth - KDS_BOARD_PAD_PX)
-      const n = Math.max(1, Math.floor((inner + KDS_COL_GAP_PX) / (KDS_COL_PX + KDS_COL_GAP_PX)))
+      const n = Math.max(1, Math.floor((inner + KDS_COL_GAP_PX) / (kdsColPx + KDS_COL_GAP_PX)))
       setColsPerPage(n)
     }
     measure()
     const ro = new ResizeObserver(measure)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [loading])
+  }, [loading, kdsColPx])
 
   useEffect(() => {
     const count = Math.max(1, Math.ceil(orders.length / Math.max(1, colsPerPage)))
@@ -516,7 +528,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   const kdsPageCount = Math.max(1, Math.ceil(orders.length / Math.max(1, colsPerPage)))
   const kdsPageSafe = Math.min(kdsPage, kdsPageCount - 1)
-  const kdsPageStride = Math.max(1, colsPerPage) * (KDS_COL_PX + KDS_COL_GAP_PX)
+  const kdsPageStride = Math.max(1, colsPerPage) * (kdsColPx + KDS_COL_GAP_PX)
   const scrollBoardToPage = useCallback(
     (page: number) => {
       const el = boardScrollRef.current
@@ -675,11 +687,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           <div
             ref={boardScrollRef}
             onScroll={onBoardScroll}
-            className="flex h-full w-full min-w-0 touch-pan-x gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-3 py-3 [-webkit-overflow-scrolling:touch]"
+            className={`flex h-full w-full min-w-0 touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-contain px-3 py-3 [-webkit-overflow-scrolling:touch] ${
+              kdsDensity === 'wide15' ? 'gap-3' : 'gap-4'
+            }`}
           >
             {orders.map((order) => (
               <KitchenKdsColumn
                 key={order.id}
+                density={kdsDensity}
                 order={order}
                 locale={locale}
                 now={currentTime}
