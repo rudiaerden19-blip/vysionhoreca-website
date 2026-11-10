@@ -6,13 +6,17 @@ import {
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
   sanitizeKassaOskLineShortcutLabel,
 } from '@/lib/kassa-osk-line-shortcuts'
-import { KASSA_AZERTY_OSK_NUMPAD_WIDTH } from '@/lib/kassa-azerty-osk-context'
+import {
+  KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH,
+  KASSA_AZERTY_OSK_NUMPAD_WIDTH,
+  KASSA_AZERTY_OSK_OPTION_BTN_WIDTH,
+} from '@/lib/kassa-azerty-osk-context'
 
 type Props = {
   draft: string[]
   speelsDark?: boolean
-  /** Kassa-POS: kolom vult rest tot mand (bredere snelknoppen). */
-  fillToCart?: boolean
+  /** Kassa-POS: vaste 3 cm knoppen, geen rek over mand. */
+  kassaNumpad?: boolean
   onDraftChange: (next: string[]) => void
   onInsert: (label: string) => void
 }
@@ -23,7 +27,7 @@ type Props = {
 export function KassaOskLineShortcutsPad({
   draft,
   speelsDark = false,
-  fillToCart = false,
+  kassaNumpad = false,
   onDraftChange,
   onInsert,
 }: Props) {
@@ -36,23 +40,26 @@ export function KassaOskLineShortcutsPad({
   }
 
   const fieldClass = speelsDark
-    ? 'kassa-osk-shortcut-field min-h-[2.75rem] w-full min-w-0 rounded-xl px-1.5 text-center text-xs font-bold outline-none sm:min-h-[3rem] sm:text-sm'
-    : 'min-h-[2.75rem] w-full min-w-0 rounded-xl border border-neutral-500 bg-neutral-900 px-1.5 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[3rem] sm:text-sm'
+    ? 'kassa-osk-shortcut-field min-h-[2.75rem] w-full max-w-[3cm] min-w-0 rounded-xl px-1 text-center text-xs font-bold outline-none sm:min-h-[3rem] sm:text-sm'
+    : 'min-h-[2.75rem] w-full max-w-[3cm] min-w-0 rounded-xl border border-neutral-500 bg-neutral-900 px-1 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:min-h-[3rem] sm:text-sm'
 
   const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
 
-  const gridGap = fillToCart ? 'gap-2' : 'gap-1.5'
+  const stripWidth = kassaNumpad ? KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH : KASSA_AZERTY_OSK_NUMPAD_WIDTH
 
   return (
     <div
-      className={`flex flex-col self-start border-l pl-2 ${fillToCart ? 'min-w-[9rem] flex-1 pr-0' : 'shrink-0 pl-2.5'} ${dividerClass}`}
-      style={fillToCart ? undefined : { width: KASSA_AZERTY_OSK_NUMPAD_WIDTH }}
+      className={`flex shrink-0 flex-col self-start border-l pl-2 ${dividerClass}`}
+      style={{ width: stripWidth }}
       data-testid="kassa-azerty-osk-shortcuts"
     >
       <div className="mb-1 shrink-0 pt-0.5 text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:text-xs">
         {t('kassaApp.azertyOskShortcutsNumpadTitle')}
       </div>
-      <div className={`grid grid-cols-2 ${gridGap}`}>
+      <div
+        className="grid gap-1.5"
+        style={{ gridTemplateColumns: `repeat(2, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})` }}
+      >
         {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
           const label = draft[index] ?? ''
           return (
