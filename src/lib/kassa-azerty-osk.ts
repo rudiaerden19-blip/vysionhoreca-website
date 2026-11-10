@@ -1,4 +1,8 @@
-import { setNativeInputValue } from '@/lib/dom-input-value'
+import {
+  dispatchKassaOskProgrammaticValue,
+  isKassaOskReactControlledSyncField,
+  setNativeInputValue,
+} from '@/lib/dom-input-value'
 
 /**
  * Horeca-kassa: vast AZERTY-schermtoetsenbord (alle tenants).
@@ -181,7 +185,12 @@ export function readKassaOskFieldValue(el: HTMLInputElement | HTMLTextAreaElemen
   return el.value
 }
 
-function oskSelectionRange(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
+export type KassaAzertyOskEdit = 'backspace' | 'space' | { char: string }
+
+export function kassaOskSelectionRange(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+): { start: number; end: number } {
   const start = el.selectionStart ?? value.length
   const end = el.selectionEnd ?? value.length
   return {
@@ -190,13 +199,14 @@ function oskSelectionRange(el: HTMLInputElement | HTMLTextAreaElement, value: st
   }
 }
 
-export function applyKassaAzertyOskEdit(
-  el: HTMLInputElement | HTMLTextAreaElement,
-  edit: 'backspace' | 'space' | { char: string },
-): void {
-  const max = el.maxLength > 0 ? el.maxLength : undefined
-  const value = readKassaOskFieldValue(el)
-  const { start, end } = oskSelectionRange(el, value)
+/** Pure edit — voor controlled sneltekst-slots (React-draft als bron). */
+export function nextKassaAzertyOskEditValue(
+  value: string,
+  selection: { start: number; end: number },
+  edit: KassaAzertyOskEdit,
+  maxLength?: number,
+): { next: string; caret: number } | null {
+  const { start, end } = selection
   let next = value
   let caret = start
 
@@ -208,7 +218,7 @@ export function applyKassaAzertyOskEdit(
       next = value.slice(0, start) + value.slice(end)
       caret = start
     } else {
-      return
+      return null
     }
   } else if (edit === 'space') {
     next = `${value.slice(0, start)} ${value.slice(end)}`
@@ -218,14 +228,39 @@ export function applyKassaAzertyOskEdit(
     caret = start + edit.char.length
   }
 
-  if (max !== undefined && next.length > max) {
-    next = next.slice(0, max)
+  if (maxLength !== undefined && maxLength > 0 && next.length > maxLength) {
+    next = next.slice(0, maxLength)
     caret = Math.min(caret, next.length)
   }
 
-  setNativeInputValue(el, next)
+  return { next, caret }
+}
+
+export function applyKassaAzertyOskEdit(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  edit: KassaAzertyOskEdit,
+): void {
+  const max = el.maxLength > 0 ? el.maxLength : undefined
+  const value = readKassaOskFieldValue(el)
+  const result = nextKassaAzertyOskEditValue(value, kassaOskSelectionRange(el, value), edit, max)
+  if (!result) return
+
+  if (isKassaOskReactControlledSyncField(el)) {
+    dispatchKassaOskProgrammaticValue(el, result.next)
+    const caret = result.caret
+    requestAnimationFrame(() => {
+      try {
+        el.setSelectionRange(caret, caret)
+      } catch {
+        /* date/time, etc. */
+      }
+    })
+    return
+  }
+
+  setNativeInputValue(el, result.next)
   try {
-    el.setSelectionRange(caret, caret)
+    el.setSelectionRange(result.caret, result.caret)
   } catch {
     /* date/time, etc. */
   }

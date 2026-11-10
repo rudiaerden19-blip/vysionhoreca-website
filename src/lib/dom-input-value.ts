@@ -44,6 +44,26 @@ function setValueViaNativePrototype(el: HTMLInputElement | HTMLTextAreaElement, 
 /** Bubbelt na programmatische wijziging — controlled React-velden (kassa-opmerking). */
 export const KASSA_OSK_PROGRAMMATIC_INPUT_EVENT = 'kassa-osk-programmatic-input'
 
+/** Controlled kassa-velden: alleen React-state, geen tussentijdse DOM (voorkomt “flits en weg”). */
+export function isKassaOskReactControlledSyncField(el: HTMLElement): boolean {
+  return (
+    el.getAttribute('data-kassa-osk-line-note') === 'true' ||
+    el.getAttribute('data-kassa-osk-shortcut-slot') === 'true'
+  )
+}
+
+export function dispatchKassaOskProgrammaticValue(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  value: string,
+): void {
+  el.dispatchEvent(
+    new CustomEvent(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, {
+      bubbles: true,
+      detail: { value },
+    }),
+  )
+}
+
 /**
  * Zet de DOM-waarde en vuurt één bubbling `input`(klassiek Event — React verwacht deze keten).
  */

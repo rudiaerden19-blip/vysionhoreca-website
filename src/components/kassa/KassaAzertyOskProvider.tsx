@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { getTenantSettings, saveKassaOskLineShortcuts } from '@/lib/admin-api'
 import { focusInputForProgrammaticEdit } from '@/lib/dom-input-value'
+import { flushSync } from 'react-dom'
 import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
 import { KassaOskLineShortcutsPad } from '@/components/kassa/KassaOskLineShortcutsPad'
@@ -15,6 +16,7 @@ import {
   isKassaOskLineNoteField,
   isKassaOskShortcutSlotField,
   isKassaOskLineShortcutsEnabled,
+  clampKassaOskLineShortcutDraft,
   normalizeKassaOskLineShortcuts,
   shouldOpenAzertyOskForFieldFocus,
 } from '@/lib/kassa-osk-line-shortcuts'
@@ -23,6 +25,8 @@ import {
   KASSA_AZERTY_AT_CHAR,
   KASSA_AZERTY_NUMBER_ROW,
   applyKassaAzertyOskEdit,
+  kassaOskSelectionRange,
+  nextKassaAzertyOskEditValue,
   armKassaOskInput,
   disarmAllKassaOskInputs,
   disarmKassaOskInput,
@@ -72,7 +76,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   )
   const [shift, setShift] = useState(false)
   const shiftRef = useRef(false)
-  const oskKeyActivateRef = useRef<{ token: string; at: number } | null>(null)
+  const oskEditPointerRef = useRef<{ token: string; at: number } | null>(null)
+  const lineShortcutDraftRef = useRef(lineShortcutDraft)
+  lineShortcutDraftRef.current = lineShortcutDraft
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const suppressedRef = useRef(false)
   const focusOutTimerRef = useRef<number | undefined>(undefined)
@@ -456,23 +462,49 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       const el = resolveOskEditTarget()
       if (!el?.isConnected) return
       focusInputForProgrammaticEdit(el)
-      applyKassaAzertyOskEdit(el, edit)
+
+      if (
+        shortcutSlotsEditable &&
+        el instanceof HTMLInputElement &&
+        isKassaOskShortcutSlotField(el)
+      ) {
+        const idx = Number(el.getAttribute('data-kassa-osk-shortcut-index'))
+        if (!Number.isFinite(idx) || idx < 0) return
+        const value = lineShortcutDraftRef.current[idx] ?? ''
+        const max = el.maxLength > 0 ? el.maxLength : undefined
+        const result = nextKassaAzertyOskEditValue(
+          value,
+          kassaOskSelectionRange(el, value),
+          edit,
+          max,
+        )
+        if (!result) return
+        const clamped = clampKassaOskLineShortcutDraft(result.next)
+        const caret = Math.min(result.caret, clamped.length)
+        flushSync(() => {
+          setLineShortcutDraft((prev) => {
+            if (prev[idx] === clamped) return prev
+            const next = [...prev]
+            next[idx] = clamped
+            lineShortcutDraftRef.current = next
+            return next
+          })
+        })
+        requestAnimationFrame(() => {
+          try {
+            el.setSelectionRange(caret, caret)
+          } catch {
+            /* noop */
+          }
+        })
+      } else {
+        applyKassaAzertyOskEdit(el, edit)
+      }
+
       activeRef.current = el
       armKassaOskInput(el)
     },
-    [resolveOskEditTarget],
-  )
-
-  const activateOskKey = useCallback(
-    (token: string, run: () => void) => {
-      const now = Date.now()
-      const prev = oskKeyActivateRef.current
-      if (prev?.token === token && now - prev.at < 120) return
-      oskKeyActivateRef.current = { token, at: now }
-      clearFocusOutTimer()
-      run()
-    },
-    [clearFocusOutTimer],
+    [resolveOskEditTarget, shortcutSlotsEditable],
   )
 
   const makeOskEditKeyHandlers = useCallback(
@@ -481,15 +513,20 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         if (e.button !== 0) return
         e.preventDefault()
         e.stopPropagation()
-        activateOskKey(token, () => sendEdit(getEdit()))
+        clearFocusOutTimer()
+        oskEditPointerRef.current = { token, at: Date.now() }
+        sendEdit(getEdit())
       },
       onClick: (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
-        activateOskKey(token, () => sendEdit(getEdit()))
+        const pd = oskEditPointerRef.current
+        if (pd?.token === token && Date.now() - pd.at < 500) return
+        clearFocusOutTimer()
+        sendEdit(getEdit())
       },
     }),
-    [activateOskKey, sendEdit],
+    [clearFocusOutTimer, sendEdit],
   )
 
   const shiftKeyHandlers = useMemo(
@@ -498,15 +535,18 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         if (e.button !== 0) return
         e.preventDefault()
         e.stopPropagation()
-        activateOskKey('shift', () => setShift((s) => !s))
+        oskEditPointerRef.current = { token: 'shift', at: Date.now() }
+        setShift((s) => !s)
       },
       onClick: (e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
-        activateOskKey('shift', () => setShift((s) => !s))
+        const pd = oskEditPointerRef.current
+        if (pd?.token === 'shift' && Date.now() - pd.at < 500) return
+        setShift((s) => !s)
       },
     }),
-    [activateOskKey],
+    [],
   )
 
   const insertLineShortcut = useCallback(

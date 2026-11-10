@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { flushSync } from 'react-dom'
 import { useLanguage } from '@/i18n'
 import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import {
@@ -66,7 +67,7 @@ export function KassaOskLineShortcutsPad({
       if (typeof value !== 'string') return
       const next = [...draftRef.current]
       next[idx] = clampKassaOskLineShortcutDraft(value)
-      onDraftChange(next)
+      flushSync(() => onDraftChange(next))
     }
     container.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammatic, true)
     return () => container.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammatic, true)

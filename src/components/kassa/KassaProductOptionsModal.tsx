@@ -21,6 +21,7 @@ import {
 } from '@/lib/kassa-azerty-osk'
 import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
 import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
+import { flushSync } from 'react-dom'
 import { scheduleScrollInputAboveKeyboard } from '@/lib/scroll-input-above-keyboard'
 import { useEffect, useRef } from 'react'
 
@@ -66,8 +67,9 @@ export function KassaProductOptionsModal({
     if (!el) return
     const onProgrammaticInput = (e: Event) => {
       const detail = (e as CustomEvent<{ value?: string }>).detail
-      if (typeof detail?.value !== 'string') return
-      onLineNoteChange(detail.value)
+      const next = detail?.value
+      if (typeof next !== 'string') return
+      flushSync(() => onLineNoteChange(next))
     }
     el.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)
     return () => el.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammaticInput)

@@ -1,5 +1,7 @@
+import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import {
   applyKassaAzertyOskEdit,
+  nextKassaAzertyOskEditValue,
   healOskBlockedTextField,
   isKassaAzertyOskEnabled,
   isKassaAzertyOskManualOpenEnabled,
@@ -99,6 +101,28 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskTextTarget(visible)).toBe(true)
   })
 
+  it('nextKassaAzertyOskEditValue: Zonder zout met spaties en dubbele letters', () => {
+    let value = 'Z'
+    const append = (ch: string) => {
+      const r = nextKassaAzertyOskEditValue(
+        value,
+        { start: value.length, end: value.length },
+        { char: ch },
+      )
+      expect(r).not.toBeNull()
+      value = r!.next
+    }
+    for (const ch of 'onder') append(ch)
+    const sp = nextKassaAzertyOskEditValue(
+      value,
+      { start: value.length, end: value.length },
+      'space',
+    )
+    value = sp!.next
+    for (const ch of 'zout') append(ch)
+    expect(value).toBe('Zonder zout')
+  })
+
   it('voegt spatie toe op caret', () => {
     const input = document.createElement('input')
     input.value = 'Jan'
@@ -109,6 +133,22 @@ describe('kassa-azerty-osk', () => {
     input.setSelectionRange(0, 0)
     applyKassaAzertyOskEdit(input, 'space')
     expect(input.value).toBe(' Jan ')
+    document.body.removeChild(input)
+  })
+
+  it('controlled opmerking: sync via programmatic event (geen DOM-flits)', () => {
+    const input = document.createElement('input')
+    input.setAttribute('data-kassa-osk-line-note', 'true')
+    document.body.appendChild(input)
+    let model = ''
+    input.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, (e) => {
+      model = (e as CustomEvent<{ value: string }>).detail.value
+      input.value = model
+    })
+    applyKassaAzertyOskEdit(input, { char: 'Z' })
+    applyKassaAzertyOskEdit(input, { char: 'o' })
+    expect(model).toBe('Zo')
+    expect(input.value).toBe('Zo')
     document.body.removeChild(input)
   })
 
