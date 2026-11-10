@@ -1,77 +1,109 @@
 ---
-description: HEILIG — kassa AZERTY + snelteksten → opmerking (twee modi); nooit breken
+description: HEILIG — kassa AZERTY, snelteksten & numpad-opmerking → mand/keuken/bon
 alwaysApply: true
 ---
 
-# Kassa — AZERTY OSK & snelteksten (HEILIG)
+# Kassa — AZERTY OSK, snelteksten & numpad-opmerking (HEILIG)
 
-**Eigenaar:** flow potlood → opmerking → mand/keuken/bon + blauw **Toetsenbord** → snelknoppen bewerken. Meerdere keren kapot door AI. **Geen agent wijzigt dit** tenzij de gebruiker in **dezelfde opdracht** expliciet schrijft dat **snelteksten / OSK opmerking-flow** **mag** worden aangepast.
+**Eigenaar:** (1) potlood → opmerking productmodal; (2) blauw **Toetsenbord** → snelknoppen bewerken; (3) **numpad** vrije bedrag + opmerking → mand. Meerdere keren kapot door AI. **Geen agent wijzigt dit** tenzij de gebruiker in **dezelfde opdracht** expliciet schrijft dat **snelteksten / OSK / numpad-opmerkingen** **mag** worden aangepast.
 
 ## Beschermde paden (geen writes zonder expliciete opdracht)
+
+**OSK & snelteksten**
 
 - `src/components/kassa/KassaAzertyOskProvider.tsx`
 - `src/components/kassa/KassaOskLineShortcutsPad.tsx`
 - `src/lib/kassa-osk-line-shortcuts.ts`
-- `src/lib/dom-input-value.ts` (o.a. `KASSA_OSK_PROGRAMMATIC_INPUT_EVENT`, `setNativeInputValue`)
-- `src/components/kassa/KassaProductOptionsModal.tsx` — alleen als diff **line note / OSK-sync** raakt (`data-kassa-osk-line-note`, `KASSA_OSK_PROGRAMMATIC_INPUT_EVENT`, `onLineNoteChange`)
+- `src/lib/dom-input-value.ts` (`KASSA_OSK_PROGRAMMATIC_INPUT_EVENT`, `setNativeInputValue`)
+- `src/components/kassa/KassaProductOptionsModal.tsx` — alleen als diff **line note / OSK-sync** raakt
 - `src/__tests__/lib/kassa-osk-line-shortcuts.test.ts`
 - `src/__tests__/lib/kassa-azerty-osk.test.ts`
 
-**Niet** `src/app/shop/[tenant]/admin/kassa/page.tsx` aanraken voor OSK-fixes (horeca-kassa-regel). Alleen reads.
+**Numpad-opmerking (vrije bedragregel)**
+
+- `src/lib/kassa-numpad-custom-amount.ts` (`parseKassaNumpadAmount`, `kassaNumpadShowsCustomLinePanel`, `kassaNumpadCustomLineCanAdd`)
+- `src/lib/kassa-cart-line-key.ts` (`normalizeKassaLineNote`, `buildKassaCartLineKey`, `kassaCartLineOrderNotes`, bon/keuken-helpers die opmerking doorgeven)
+- `src/__tests__/lib/kassa-numpad-custom-amount.test.ts`
+- `src/__tests__/lib/kassa-cart-line-key.test.ts`
+
+**Horeca-kassa UI (alleen bij expliciete opdracht die numpad/OSK noemt):**
+
+- `src/app/shop/[tenant]/admin/kassa/page.tsx` — uitsluitend `numpadLineNote`, `addCustomAmount`, `data-testid="kassa-numpad-line-note"`, `data-kassa-osk-line-note` in zijbalk. **Geen** brede page-refactors.
 
 ## Verplicht vóór commit (als expliciet vrijgegeven)
 
 ```bash
 npm test -- --testPathPatterns=kassa-osk-line-shortcuts
 npm test -- --testPathPatterns=kassa-azerty-osk
+npm test -- --testPathPatterns=kassa-numpad-custom-amount
+npm test -- --testPathPatterns=kassa-cart-line-key
 npx tsc --noEmit
 ```
 
 Faalt een test → **geen** commit.
 
-## Twee modi (niet samenvoegen)
+## Twee modi snelteksten (niet samenvoegen)
 
 | Modus | Wanneer | Snelknoppen UI | Toetsenbord typt naar |
 |-------|---------|----------------|------------------------|
-| **Invullen** | Productmodal open (`data-testid="kassa-options-modal"`) **of** OSK zonder vast Toetsenbord | Knoppen (tik = insert), **geen** `data-kassa-osk-shortcut-slot` inputs | `findKassaOskLineNoteInput` → **Opmerking** in modal (niet numpad) |
-| **Bewerken** | Blauw **Toetsenbord** vast (`keyboardPinned`) **én** géén productmodal | `<input data-kassa-osk-shortcut-slot>` | Actief sneltekst-slot (focus eerste slot bij pin) |
+| **Invullen** | Productmodal open **of** OSK zonder vast Toetsenbord | Knoppen (tik = insert) | `findKassaOskLineNoteInput` |
+| **Bewerken** | `keyboardPinned` **én** géén productmodal | `<input data-kassa-osk-shortcut-slot>` | Actief sneltekst-slot |
 
-- `shortcutSlotsEditable = keyboardPinned && !optionsModalOpen` (modal via MutationObserver).
+- `shortcutSlotsEditable = keyboardPinned && !optionsModalOpen`.
 - `preferOskLineNoteTarget = lineShortcutsOnKassaPos && !shortcutSlotsEditable`.
-- Potlood/opmerking-flow **nooit** regresseren voor bewerk-modus.
 
-## Vast gedrag (niet “verbeteren”)
+## Numpad-opmerking (vast gedrag)
 
-1. **`findKassaOskLineNoteInput`:** productopties-modal **wint** vóór verborgen `data-kassa-osk-line-note` in zijbalk/numpad.
-2. **› / snelknop tik:** `pointerdown` (geen alleen `pointerup`/`onClick` op touch).
-3. **AZERTY-toetsen:** `pointerdown` + `clearFocusOutTimer`; `resolveOskEditTarget` geen shortcut-slot als `preferOskLineNoteTarget`.
-4. **React controlled opmerking:** na programmatische invoer `setNativeInputValue` + event `kassa-osk-programmatic-input`; modal luistert en roept `onLineNoteChange`.
-5. **Opslaan** in productmodal → `lineNote` in mand, keuken, bon (bestaande `normalizeKassaLineNote` op page — niet herschrijven vanuit OSK-taak).
-6. **Sneltekst draft:** tijdens typen `clampKassaOskLineShortcutDraft` (geen trim); trim bij ›/opslaan via `sanitizeKassaOskLineShortcutLabel`.
-7. **Multi-tenant:** shortcuts per zaak (`saveKassaOskLineShortcuts`); geen hardcoded slug.
+1. **Zichtbaarheid:** opmerkingveld + toevoegen pas als numpad geldig bedrag toont (`kassaNumpadShowsCustomLinePanel`).
+2. **Toevoegen:** `addCustomAmount` → `normalizeKassaLineNote(numpadLineNote)`; `kassaNumpadCustomLineCanAdd`: **€0 + opmerking** is toegestaan; bedrag > 0 zonder opmerking ook.
+3. **Mandregel:** `lineNote` op cart item; `cartKey` via `buildKassaCartLineKey` (opmerking maakt aparte regel).
+4. **Bon/keuken/Z:** via `kassaCartLineOrderNotes` / bestaande bon-flow — **niet** dupliceren of os narre pad.
+
+### OSK + numpad-opmerking
+
+- Zelfde attribuut: `data-kassa-osk-line-note="true"` op `data-testid="kassa-numpad-line-note"` (zijbalk; **twee layouts** in page — beide synchroon houden).
+- **`findKassaOskLineNoteInput`:** productopties-modal **altijd eerst**; zonder modal → **zichtbaar** numpad-opmerkingveld (niet verborgen eerste in DOM).
+- Sneltekst › / AZERTY in **numpad-context** (geen productmodal): invoer naar **numpad**-opmerking, `onChange` → `setNumpadLineNote` (geen aparte custom listener nodig zolang `input`-event blijft werken).
+- Sneltekst in **productmodal-context:** `KASSA_OSK_PROGRAMMATIC_INPUT_EVENT` + `onLineNoteChange` (niet stukmaken voor numpad-pad).
+
+## Productmodal opmerking (vast gedrag)
+
+1. **`findKassaOskLineNoteInput`:** modal wint vóór numpad.
+2. **› / snelknop:** `pointerdown`.
+3. **AZERTY:** `pointerdown` + `clearFocusOutTimer`; geen shortcut-slot als `preferOskLineNoteTarget`.
+4. **React sync:** `kassa-osk-programmatic-input` op `#kassa-line-note`.
+5. **Opslaan** → `lineNote` mand/keuken/bon.
+
+## Gemeenschappelijk
+
+- Sneltekst draft: `clampKassaOskLineShortcutDraft`; trim bij insert via `sanitizeKassaOskLineShortcutLabel`.
+- Multi-tenant shortcuts: `saveKassaOskLineShortcuts`.
+- Alle tenants.
 
 ## Verboden
 
 ```typescript
-// NOOIT — sneltekst gaat naar numpad i.p.v. Opmerking
-document.querySelector('[data-kassa-osk-line-note="true"]') // eerste in DOM
+// NOOIT — verkeerd opmerking-doel
+document.querySelector('[data-kassa-osk-line-note="true"]')
 
-// NOOIT — potlood-flow weer tekstvak in snelknoppen
-slotsEditable={true} // terwijl productmodal open is
+// NOOIT — modal open maar snelknoppen bewerkbaar
+shortcutSlotsEditable === true && optionsModalOpen
 
-// NOOIT — typen via shortcut-slot terwijl opmerking bedoeld is
-preferOskLineNoteTarget = false // in insert-context
+// NOOIT — €0 regel zonder opmerking toelaten
+kassaNumpadCustomLineCanAdd(0, '') === true
 
-// NOOIT — OSK alleen op pointerup op kiosks
-onClick={() => sendEdit(...)} // zonder pointerdown-pad
+// NOOIT — lineNote uit mand halen bij merge cartKey
+buildKassaCartLineKey(pid, choices) // opmerking weglaten terwijl UI wel note toont
+
+// NOOIT — kiosk-only pointerup
+onPointerUp only voor toetsen of ›
 ```
 
 ## Scope
 
-- Alle tenants; geen pilot-slugs.
-- **Geen** wijzigingen onder `apps/vysion-print-agent/`.
-- Geen horeca-kassa `page.tsx` refactors voor OSK.
+- **Geen** `apps/vysion-print-agent/`.
+- Geen horeca-kassa wijzigingen buiten genoemde numpad/OSK-blokken (zie `horeca-kassa-never-touch.mdc`).
 
 ## Git staging
 
-Bij taken die **niet** over snelteksten gaan: `git diff` op beschermde paden hierboven moet **leeg** zijn.
+Taken die **niet** over OSK/numpad-opmerking gaan: `git diff` op beschermde paden **leeg**.
