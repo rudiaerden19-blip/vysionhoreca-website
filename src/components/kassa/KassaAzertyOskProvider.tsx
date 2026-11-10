@@ -84,7 +84,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const focusOutTimerRef = useRef<number | undefined>(undefined)
   const lineShortcutsLoadedRef = useRef(false)
   const lineShortcutsSaveTimerRef = useRef<number | undefined>(undefined)
+  const lineShortcutsSaveSeqRef = useRef(0)
   const lineShortcutsLastSavedRef = useRef('')
+  const lineShortcutsDirtyRef = useRef(false)
+  const keyboardPinnedRef = useRef(keyboardPinned)
+  keyboardPinnedRef.current = keyboardPinned
   const prevKeyboardPinnedRef = useRef(false)
   const [optionsModalOpen, setOptionsModalOpen] = useState(false)
 
@@ -143,9 +147,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     void getTenantSettings(tenantSlugForOsk).then((settings) => {
       if (cancelled) return
       const normalized = normalizeKassaOskLineShortcuts(settings?.kassa_osk_line_shortcuts)
+      lineShortcutsLoadedRef.current = true
+      if (lineShortcutsDirtyRef.current || keyboardPinnedRef.current) return
       setLineShortcutDraft(normalized)
       lineShortcutsLastSavedRef.current = JSON.stringify(normalized)
-      lineShortcutsLoadedRef.current = true
     })
     return () => {
       cancelled = true
@@ -154,19 +159,20 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (!lineShortcutsOnKassaPos || !lineShortcutsLoadedRef.current) return
-    const normalized = normalizeKassaOskLineShortcuts(lineShortcutDraft)
-    const payloadKey = JSON.stringify(normalized)
+    const apiPayload = normalizeKassaOskLineShortcuts(lineShortcutDraft)
+    const payloadKey = JSON.stringify(apiPayload)
     if (payloadKey === lineShortcutsLastSavedRef.current) return
+
+    const saveSeq = ++lineShortcutsSaveSeqRef.current
 
     if (lineShortcutsSaveTimerRef.current !== undefined) {
       window.clearTimeout(lineShortcutsSaveTimerRef.current)
     }
     lineShortcutsSaveTimerRef.current = window.setTimeout(() => {
-      void saveKassaOskLineShortcuts(tenantSlugForOsk, normalized).then((result) => {
-        if (result.ok) {
-          lineShortcutsLastSavedRef.current = payloadKey
-          setLineShortcutDraft(normalized)
-        }
+      void saveKassaOskLineShortcuts(tenantSlugForOsk, apiPayload).then((result) => {
+        if (!result.ok) return
+        if (saveSeq !== lineShortcutsSaveSeqRef.current) return
+        lineShortcutsLastSavedRef.current = payloadKey
       })
     }, 700)
 
@@ -481,6 +487,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         if (!result) return
         const clamped = clampKassaOskLineShortcutDraft(result.next)
         const caret = Math.min(result.caret, clamped.length)
+        lineShortcutsDirtyRef.current = true
         flushSync(() => {
           setLineShortcutDraft((prev) => {
             if (prev[idx] === clamped) return prev

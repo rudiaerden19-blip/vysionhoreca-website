@@ -1,13 +1,10 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { flushSync } from 'react-dom'
+import { useRef } from 'react'
 import { useLanguage } from '@/i18n'
-import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
-  clampKassaOskLineShortcutDraft,
   sanitizeKassaOskLineShortcutLabel,
 } from '@/lib/kassa-osk-line-shortcuts'
 import { readKassaOskFieldValue } from '@/lib/kassa-azerty-osk'
@@ -42,43 +39,9 @@ export function KassaOskLineShortcutsPad({
   kassaNumpad = false,
   slotsEditable = false,
   onClose,
-  onDraftChange,
   onInsert,
 }: Props) {
   const { t } = useLanguage()
-  const draftRef = useRef(draft)
-  draftRef.current = draft
-
-  useEffect(() => {
-    if (!slotsEditable) return
-    const container = document.querySelector('[data-testid="kassa-azerty-osk-shortcuts"]')
-    if (!(container instanceof HTMLElement)) return
-    const onProgrammatic = (e: Event) => {
-      const path = typeof e.composedPath === 'function' ? e.composedPath() : [e.target]
-      const input = path.find(
-        (node) =>
-          node instanceof HTMLInputElement &&
-          node.getAttribute('data-kassa-osk-shortcut-slot') === 'true',
-      )
-      if (!(input instanceof HTMLInputElement)) return
-      const idx = Number(input.getAttribute('data-kassa-osk-shortcut-index'))
-      if (!Number.isFinite(idx) || idx < 0) return
-      const value = (e as CustomEvent<{ value?: string }>).detail?.value
-      if (typeof value !== 'string') return
-      const next = [...draftRef.current]
-      next[idx] = clampKassaOskLineShortcutDraft(value)
-      flushSync(() => onDraftChange(next))
-    }
-    container.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammatic, true)
-    return () => container.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammatic, true)
-  }, [onDraftChange, slotsEditable])
-
-  const setSlot = (index: number, value: string) => {
-    const next = [...draft]
-    next[index] = clampKassaOskLineShortcutDraft(value)
-    onDraftChange(next)
-  }
-
   const fieldClass = speelsDark
     ? `kassa-osk-shortcut-field ${OSK_SHORTCUT_FIELD_HEIGHT} w-full rounded-xl pl-1 pr-8 text-center text-xs font-bold outline-none sm:text-sm`
     : `${OSK_SHORTCUT_FIELD_HEIGHT} w-full rounded-xl border border-neutral-500 bg-neutral-900 pl-1 pr-8 text-center text-xs font-bold text-white outline-none focus:border-[#58CCFF] sm:text-sm`
@@ -147,11 +110,16 @@ export function KassaOskLineShortcutsPad({
                     type="text"
                     maxLength={KASSA_OSK_LINE_SHORTCUT_MAX_LEN}
                     value={label}
+                    readOnly
                     autoComplete="off"
-                    inputMode="text"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    inputMode="none"
+                    data-no-capitalize="true"
+                    data-kassa-osk-force="true"
                     data-kassa-osk-shortcut-slot="true"
                     data-kassa-osk-shortcut-index={String(index)}
-                    onChange={(e) => setSlot(index, e.target.value)}
                     onPointerDown={(e) => {
                       if (e.currentTarget instanceof HTMLInputElement) {
                         e.currentTarget.focus()

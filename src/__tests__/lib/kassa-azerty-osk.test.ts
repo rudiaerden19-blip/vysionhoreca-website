@@ -82,6 +82,14 @@ describe('kassa-azerty-osk', () => {
     expect(kassaAzertyKeyDisplay(',', true)).toBe('?')
   })
 
+  it('readOnly sneltekst-slot met data-kassa-osk-force blijft OSK-doel', () => {
+    const input = document.createElement('input')
+    input.readOnly = true
+    input.setAttribute('data-kassa-osk-force', 'true')
+    input.setAttribute('data-kassa-osk-shortcut-slot', 'true')
+    expect(isKassaAzertyOskTextTarget(input)).toBe(true)
+  })
+
   it('slaat readOnly numpad display over', () => {
     const input = document.createElement('input')
     input.type = 'text'

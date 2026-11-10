@@ -25,7 +25,9 @@ export function GlobalAutoCapitalize() {
       if (
         target.getAttribute('autocapitalize') === 'off' ||
         target.getAttribute('data-no-capitalize') === 'true' ||
-        target.getAttribute('data-vysion-number-input') === 'true'
+        target.getAttribute('data-vysion-number-input') === 'true' ||
+        target.getAttribute('data-kassa-osk-shortcut-slot') === 'true' ||
+        target.getAttribute('data-kassa-osk-line-note') === 'true'
       ) {
         return
       }

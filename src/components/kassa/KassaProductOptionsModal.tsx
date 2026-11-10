@@ -204,6 +204,9 @@ export function KassaProductOptionsModal({
               type="text"
               data-testid="kassa-line-note-input"
               data-kassa-osk-line-note="true"
+              data-no-capitalize="true"
+              autoCapitalize="off"
+              autoCorrect="off"
               value={model.lineNote ?? ''}
               maxLength={120}
               onChange={(e) => onLineNoteChange(e.target.value)}
