@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { useLanguage } from '@/i18n'
+import { KASSA_OSK_PROGRAMMATIC_INPUT_EVENT } from '@/lib/dom-input-value'
 import {
   KASSA_OSK_LINE_SHORTCUT_MAX_LEN,
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
@@ -43,6 +45,32 @@ export function KassaOskLineShortcutsPad({
   onInsert,
 }: Props) {
   const { t } = useLanguage()
+  const draftRef = useRef(draft)
+  draftRef.current = draft
+
+  useEffect(() => {
+    if (!slotsEditable) return
+    const container = document.querySelector('[data-testid="kassa-azerty-osk-shortcuts"]')
+    if (!(container instanceof HTMLElement)) return
+    const onProgrammatic = (e: Event) => {
+      const path = typeof e.composedPath === 'function' ? e.composedPath() : [e.target]
+      const input = path.find(
+        (node) =>
+          node instanceof HTMLInputElement &&
+          node.getAttribute('data-kassa-osk-shortcut-slot') === 'true',
+      )
+      if (!(input instanceof HTMLInputElement)) return
+      const idx = Number(input.getAttribute('data-kassa-osk-shortcut-index'))
+      if (!Number.isFinite(idx) || idx < 0) return
+      const value = (e as CustomEvent<{ value?: string }>).detail?.value
+      if (typeof value !== 'string') return
+      const next = [...draftRef.current]
+      next[idx] = clampKassaOskLineShortcutDraft(value)
+      onDraftChange(next)
+    }
+    container.addEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammatic, true)
+    return () => container.removeEventListener(KASSA_OSK_PROGRAMMATIC_INPUT_EVENT, onProgrammatic, true)
+  }, [onDraftChange, slotsEditable])
 
   const setSlot = (index: number, value: string) => {
     const next = [...draft]
@@ -121,6 +149,7 @@ export function KassaOskLineShortcutsPad({
                     autoComplete="off"
                     inputMode="text"
                     data-kassa-osk-shortcut-slot="true"
+                    data-kassa-osk-shortcut-index={String(index)}
                     onChange={(e) => setSlot(index, e.target.value)}
                     onPointerDown={(e) => {
                       if (e.currentTarget instanceof HTMLInputElement) {
