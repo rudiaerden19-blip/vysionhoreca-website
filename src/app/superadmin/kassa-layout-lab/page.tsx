@@ -12,14 +12,16 @@ import {
   KASSA_LAB_FIXED_BOX_CM,
   kassaLabPhysicalBoxCm,
   labIframeScaleForPhysicalBox,
+  labIframeScaleFromPhysicalCm,
 } from '@/lib/kassa-layout-lab-physical'
 
+/** Scherm 1 → 2 → 3, altijd onder elkaar. */
 const KASSA_SUPADMIN_SCREEN_IDS = ['15', '17', '21'] as const
 
 const SCREEN_TITLES: Record<(typeof KASSA_SUPADMIN_SCREEN_IDS)[number], string> = {
-  '15': '15 inch',
-  '17': '17 inch vierkant',
-  '21': '21 inch',
+  '15': 'Scherm 1 — 15 inch',
+  '17': 'Scherm 2 — 17 inch vierkant',
+  '21': 'Scherm 3 — 21 inch',
 }
 
 function KassaPhysicalPreview({
@@ -36,8 +38,10 @@ function KassaPhysicalPreview({
   iframeKey: number
 }) {
   const boxRef = useRef<HTMLDivElement>(null)
-  const [iframeScale, setIframeScale] = useState(0.25)
   const physical = useMemo(() => kassaLabPhysicalBoxCm(frame), [frame])
+  const [iframeScale, setIframeScale] = useState(() =>
+    labIframeScaleFromPhysicalCm(physical.widthCm, frame.cssW),
+  )
 
   const src = useMemo(
     () => buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost'),
@@ -66,18 +70,18 @@ function KassaPhysicalPreview({
   }
 
   return (
-    <article className="flex shrink-0 flex-col gap-1.5">
-      <div className="flex flex-col gap-0.5">
-        <h2 className="text-sm font-bold text-white">{title}</h2>
+    <article className="mb-[1.2cm] flex w-max max-w-full flex-col gap-1.5">
+      <div>
+        <h2 className="text-base font-bold text-white">{title}</h2>
         <p className="text-xs text-zinc-400">
-          {physical.widthCm}×{physical.heightCm} cm · {frame.cssW}×{frame.cssH} · vp={frame.vp}
+          {physical.widthCm}×{physical.heightCm} cm · {frame.cssW}×{frame.cssH}px · vp={frame.vp}
         </p>
         <button
           type="button"
           onClick={openLogicalWindow}
-          className="text-left text-xs text-[#58CCFF] hover:underline"
+          className="text-xs text-[#58CCFF] hover:underline"
         >
-          Echt venster
+          Echt venster openen
         </button>
       </div>
       <div
@@ -92,7 +96,7 @@ function KassaPhysicalPreview({
           key={`${frame.id}-${iframeKey}`}
           title={`${title} — ${tenantSlug}`}
           src={src}
-          className="absolute left-0 top-0 border-0"
+          className="absolute left-0 top-0 m-0 block border-0"
           style={{
             width: frame.cssW,
             height: frame.cssH,
@@ -185,16 +189,16 @@ export default function SuperadminKassaLayoutLabPage() {
           </button>
         </div>
         <p className="mt-2 text-sm text-zinc-400">
-          Vaste paneelmaten op je scherm: <span className="text-amber-200">{sizesLine}</span>. Geen
-          zoom — drie kaders naast elkaar op breedbeeld.
+          {sizesLine}. <strong className="font-medium text-zinc-200">Onder elkaar:</strong> 15″, dan
+          17″ vierkant, dan 21″ — vaste cm, geen zoom.
         </p>
       </header>
 
-      <main className="p-4">
+      <main className="px-4 py-4">
         {!tenantSlug ? (
           <p className="text-zinc-400">Tenant slug → Kassa login → Vernieuwen.</p>
         ) : (
-          <div className="flex flex-row flex-nowrap items-end justify-start gap-[1.2cm]">
+          <div className="flex flex-col items-start">
             {screens.map(({ frame, title }) => (
               <KassaPhysicalPreview
                 key={frame.id}

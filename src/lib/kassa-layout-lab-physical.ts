@@ -55,7 +55,13 @@ export function kassaLabPhysicalBoxCm(
   return { widthCm: 34, heightCm: 19.1 }
 }
 
+export const KASSA_LAB_CM_TO_CSS_PX = 96 / 2.54
+
 export function labIframeScaleForPhysicalBox(boxWidthPx: number, cssW: number): number {
   if (!(boxWidthPx > 0 && cssW > 0)) return 1
   return boxWidthPx / cssW
+}
+
+export function labIframeScaleFromPhysicalCm(widthCm: number, cssW: number): number {
+  return labIframeScaleForPhysicalBox(widthCm * KASSA_LAB_CM_TO_CSS_PX, cssW)
 }
