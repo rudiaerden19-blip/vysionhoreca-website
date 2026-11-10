@@ -1,0 +1,19 @@
+# Kassa layout-tuning — ALLEEN 15″ (eigenaar)
+
+**Vaste opdracht:** layout/chrome-wijzigingen aan de productie-kassa zijn **alleen** voor profiel **`wide15`** (15 inch breedbeeld), tenzij de eigenaar **in dezelfde opdracht** expliciet 17″, 21″ of iPad noemt.
+
+## Toegestaan zonder extra opdracht
+
+- `getKassaViewportChromeTokens('wide15')` / `WIDE15` in `kassa-viewport-chrome-tokens.ts`
+- `data-kassa-vp='wide15'`, `data-kassa-profile-id='wide15'`
+- Tailwind/JS in `kassa/page.tsx` **alleen** binnen `kassaWide15Chrome` / `kassaChromeDensity === 'wide15'`
+- Superadmin **profiel studio** → alleen sliders testen/opruimen voor **15 inch**, of documenteren dat 17/21 niet gewijzigd werden
+
+## Verboden zonder expliciete 17/21/iPad-opdracht
+
+- `sxga`, `default`, `ipad_129`, `ipad_10` in tokens, globals, page.tsx
+- `KASSA_SIDEBAR_WIDTH_SXGA_*`, 17″-grid, SXGA-tegelgeometrie
+
+## Andere profielen
+
+Alleen **lezen** of **terugdraaien** als per ongeluk geraakt — niet “meesturen” optimaliseren.
