@@ -14,10 +14,14 @@ describe('kassa-layout-lab-physical', () => {
       widthCm: 26.06,
       heightCm: 19.49,
     })
+    expect(KASSA_LAB_FIXED_BOX_CM['ipad-10']).toEqual({
+      widthCm: 21.08,
+      heightCm: 15.81,
+    })
   })
 
   it('frames gebruiken vaste box', () => {
-    for (const id of ['15', '17', '21', 'ipad-pro-13'] as const) {
+    for (const id of ['15', '17', '21', 'ipad-pro-13', 'ipad-10'] as const) {
       const frame = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === id)!
       expect(kassaLabPhysicalBoxCm(frame)).toEqual(KASSA_LAB_FIXED_BOX_CM[id])
     }
