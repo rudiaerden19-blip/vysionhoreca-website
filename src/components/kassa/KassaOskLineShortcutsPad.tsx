@@ -11,6 +11,8 @@ import { KASSA_AZERTY_OSK_NUMPAD_WIDTH } from '@/lib/kassa-azerty-osk-context'
 type Props = {
   draft: string[]
   speelsDark?: boolean
+  /** Kassa-POS: kolom vult rest tot mand (bredere snelknoppen). */
+  fillToCart?: boolean
   onDraftChange: (next: string[]) => void
   onInsert: (label: string) => void
 }
@@ -21,6 +23,7 @@ type Props = {
 export function KassaOskLineShortcutsPad({
   draft,
   speelsDark = false,
+  fillToCart = false,
   onDraftChange,
   onInsert,
 }: Props) {
@@ -38,16 +41,18 @@ export function KassaOskLineShortcutsPad({
 
   const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
 
+  const gridGap = fillToCart ? 'gap-2' : 'gap-1.5'
+
   return (
     <div
-      className={`flex shrink-0 flex-col self-start border-l pl-2.5 ${dividerClass}`}
-      style={{ width: KASSA_AZERTY_OSK_NUMPAD_WIDTH }}
+      className={`flex flex-col self-start border-l pl-2 ${fillToCart ? 'min-w-[9rem] flex-1 pr-0' : 'shrink-0 pl-2.5'} ${dividerClass}`}
+      style={fillToCart ? undefined : { width: KASSA_AZERTY_OSK_NUMPAD_WIDTH }}
       data-testid="kassa-azerty-osk-shortcuts"
     >
       <div className="mb-1 shrink-0 pt-0.5 text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-400 sm:text-xs">
         {t('kassaApp.azertyOskShortcutsNumpadTitle')}
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className={`grid grid-cols-2 ${gridGap}`}>
         {Array.from({ length: KASSA_OSK_LINE_SHORTCUT_SLOTS }, (_, index) => {
           const label = draft[index] ?? ''
           return (

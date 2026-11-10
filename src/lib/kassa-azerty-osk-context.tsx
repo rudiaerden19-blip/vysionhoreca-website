@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react'
 
 /** Reserve onderaan (zwevend paneel + marge) voor scroll-padding in modals. */
-export const KASSA_AZERTY_OSK_HEIGHT_PX = 318
+export const KASSA_AZERTY_OSK_HEIGHT_PX = 296
 
 /** Scroll-reserve (≈ paneel + 10 cm breder dan basispaneel 760px). */
 /** Basispaneel + numpad (~180px). */

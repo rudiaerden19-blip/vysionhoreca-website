@@ -1180,13 +1180,19 @@ html.kassa-dark-appearance.kassa-speels-layout .kassa-osk-shortcut-field::placeh
 
 /* AZERTY OSK op kassa: breedte tot start mand (sidebar). */
 .kassa-azerty-osk-kassa-anchor {
-  right: max(0.5rem, calc(20rem + 0.35rem));
+  right: max(0.25rem, calc(20rem + 0.1rem));
   max-width: none;
 }
 
 @media (min-width: 640px) {
   .kassa-azerty-osk-kassa-anchor {
-    right: max(0.5rem, calc(24rem + 0.35rem));
+    right: max(0.25rem, calc(24rem + 0.1rem));
+  }
+}
+
+@media (orientation: landscape) and (min-width: 980px) and (max-width: 1760px) and (max-height: 990px) {
+  [data-testid='kassa-app']:not([data-kassa-vp='sxga17']) .kassa-azerty-osk-kassa-anchor {
+    right: max(0.25rem, calc(268px + 0.1rem));
   }
 }
 

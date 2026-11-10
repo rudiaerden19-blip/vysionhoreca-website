@@ -352,9 +352,20 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const oskStretchToCart =
     lineShortcutsPilot && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
+  const oskKeyCompact = oskStretchToCart
   const keyBtnClass = speelsDarkOsk
-    ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[3rem] px-0.5 text-center text-lg font-bold sm:min-h-[3.15rem] sm:text-xl`
-    : 'kassa-azerty-osk-key min-h-[3rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-lg font-bold text-white active:bg-neutral-500 sm:min-h-[3.15rem] sm:text-xl'
+    ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key ${
+        oskKeyCompact
+          ? 'min-h-[2.65rem] text-base sm:min-h-[2.75rem] sm:text-lg'
+          : 'min-h-[3rem] text-lg sm:min-h-[3.15rem] sm:text-xl'
+      } px-0.5 text-center font-bold`
+    : `kassa-azerty-osk-key touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center font-bold text-white active:bg-neutral-500 ${
+        oskKeyCompact
+          ? 'min-h-[2.65rem] text-base sm:min-h-[2.75rem] sm:text-lg'
+          : 'min-h-[3rem] text-lg sm:min-h-[3.15rem] sm:text-xl'
+      }`
+  const oskKeyRowGap = oskKeyCompact ? 'gap-1.5' : 'gap-2'
+  const oskModifierMinW = oskKeyCompact ? 'min-w-[2.85rem] sm:min-w-[3rem]' : 'min-w-[3.25rem] sm:min-w-[3.5rem]'
 
   const oskShellSpeels = `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS}`
   const oskPanelShell = speelsDarkOsk
@@ -372,13 +383,15 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
           role="presentation"
         >
           <div
-            className={`pointer-events-auto flex w-full flex-col rounded-2xl px-3.5 pb-2.5 pt-2 ${oskPanelShell}`}
+            className={`pointer-events-auto flex w-full flex-col rounded-2xl ${oskPanelShell} ${
+              oskStretchToCart ? 'px-2.5 pb-2 pt-1.5' : 'px-3.5 pb-2.5 pt-2'
+            }`}
             role="region"
             aria-label={t('kassaApp.azertyOskTitle')}
             data-testid="kassa-azerty-osk"
             style={
               oskStretchToCart
-                ? { minWidth: KASSA_AZERTY_OSK_PANEL_MIN_WIDTH }
+                ? undefined
                 : {
                     width: showLineShortcutsColumn
                       ? KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH
@@ -414,9 +427,13 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               ✕
             </button>
           </div>
-          <div className="flex items-start gap-0">
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <div className="grid grid-cols-10 gap-2">
+          <div className="flex w-full items-start gap-0">
+            <div
+              className={`flex min-w-0 flex-col ${oskKeyRowGap} ${
+                oskStretchToCart ? 'w-[54%] max-w-[33rem] shrink-0' : 'flex-1'
+              }`}
+            >
+            <div className={`grid grid-cols-10 ${oskKeyRowGap}`}>
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
                 <button
                   key={`n-${key}`}
@@ -432,7 +449,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             {KASSA_AZERTY_LETTER_ROWS.map((row, ri) => (
               <div
                 key={`r-${ri}`}
-                className="grid gap-2"
+                className={`grid ${oskKeyRowGap}`}
                 style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))` }}
               >
                 {row.map((key) => (
@@ -448,10 +465,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 ))}
               </div>
             ))}
-            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-2">
+            <div className={`grid grid-cols-[auto,auto,1fr,auto] ${oskKeyRowGap}`}>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
+                className={`${keyBtnClass} ${oskModifierMinW} px-3 ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => setShift((s) => !s)}
               >
@@ -459,7 +476,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-2.5 sm:min-w-[3.5rem]`}
+                className={`${keyBtnClass} ${oskModifierMinW} px-2.5`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => sendEdit({ char: KASSA_AZERTY_AT_CHAR })}
                 data-testid="kassa-azerty-osk-at"
@@ -476,7 +493,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[3.25rem] px-3 sm:min-w-[3.5rem]`}
+                className={`${keyBtnClass} ${oskModifierMinW} px-3`}
                 onPointerDown={onKeyPointerDown}
                 onClick={() => sendEdit('backspace')}
               >
@@ -488,6 +505,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             <KassaOskLineShortcutsPad
               draft={lineShortcutDraft}
               speelsDark={speelsDarkOsk}
+              fillToCart={oskStretchToCart}
               onDraftChange={setLineShortcutDraft}
               onInsert={insertLineShortcut}
             />
