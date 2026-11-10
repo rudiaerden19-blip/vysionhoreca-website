@@ -41,6 +41,7 @@ import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspens
 import { AdminWindowsOskSupport } from '@/hooks/useScrollFocusedInputAboveKeyboard'
 import { OskLegacyFieldCleanup } from '@/components/admin/OskLegacyFieldCleanup'
 import { isKassaAzertyOskManualOpenEnabled } from '@/lib/kassa-azerty-osk'
+import { isKassaLayoutPreviewSearchParams } from '@/lib/kassa-layout-preview'
 import { KassaAzertyOskHeaderToggle } from '@/components/kassa/KassaAzertyOskHeaderToggle'
 import {
   buildShopInternalReturnPath,
@@ -239,6 +240,14 @@ function AdminLayoutBody({ children, params }: AdminLayoutProps) {
     if (demoPublicUnauthenticated) {
       setAdminAccess('ok')
       return
+    }
+
+    if (isKassaLayoutPreviewSearchParams(sp)) {
+      mirrorSuperadminSessionFromCookieToLocalStorage()
+      if (isSuperAdminLoggedIn() || peekSuperadminFromBrowserCookie()) {
+        setAdminAccess('verifying')
+        return
+      }
     }
 
     const hasAccess =
