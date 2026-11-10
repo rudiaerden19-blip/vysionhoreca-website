@@ -391,8 +391,8 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               type="button"
               className={
                 speelsDarkOsk
-                  ? `absolute right-2 top-2 z-10 ${kassaSpeelsGrayChromeButtonClass()} min-h-[2.25rem] min-w-[2.25rem] px-2.5 text-base font-bold`
-                  : 'absolute right-2 top-2 z-10 touch-manipulation min-h-[2.25rem] min-w-[2.25rem] rounded-lg border border-neutral-500 bg-neutral-600 px-2.5 text-base font-bold text-white active:bg-neutral-500'
+                  ? `absolute right-1.5 top-1.5 z-20 flex h-8 w-8 touch-manipulation items-center justify-center rounded-md text-xl font-bold leading-none text-[#b0b0b0] active:opacity-80`
+                  : 'absolute right-1.5 top-1.5 z-20 flex h-8 w-8 touch-manipulation items-center justify-center rounded-md text-xl font-bold leading-none text-neutral-300 active:text-white'
               }
               aria-label={t('kassaApp.azertyOskClose')}
               data-testid="kassa-azerty-osk-close"
@@ -400,7 +400,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             >
               ✕
             </button>
-          <div className={`relative flex w-full items-start gap-0 ${showLineShortcutsColumn ? 'pr-9' : ''}`}>
+          <div className="relative flex w-full items-start gap-0">
             <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="grid grid-cols-10 gap-2">
               {KASSA_AZERTY_NUMBER_ROW.map((key) => (
