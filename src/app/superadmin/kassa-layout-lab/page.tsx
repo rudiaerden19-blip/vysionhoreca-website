@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -13,45 +13,36 @@ import {
   kassaLabPhysicalBoxCm,
   labIframeScaleForPhysicalBox,
 } from '@/lib/kassa-layout-lab-physical'
-import { KASSA_LAYOUT_REGRESSION_FRAME_IDS } from '@/lib/kassa-viewport-chrome-tokens'
 
-const VASTE_PANELEN_TEKST = (['21', '15', '17'] as const)
-  .map((id) => {
-    const b = KASSA_LAB_FIXED_BOX_CM[id]
-    return `${id}″ ${b.widthCm}×${b.heightCm} cm`
-  })
-  .join(' · ')
+/** Alleen deze drie — vaste cm, fysieke preview. */
+const KASSA_SUPADMIN_SCREEN_IDS = ['15', '17', '21'] as const
 
-/** Passend in beeld (niet lineaal). */
-const DEFAULT_FIT_SCALE = 0.88
-
-type LabViewMode = 'single' | 'regression'
-type LabSizeMode = 'physical' | 'fit' | 'logical'
-
-function labFitScale(cssW: number, viewportInnerWidth: number): number {
-  if (!Number.isFinite(cssW) || cssW <= 0) return DEFAULT_FIT_SCALE
-  const budget = Math.max(320, Math.min(1680, viewportInnerWidth - 56))
-  const fit = budget / cssW
-  return Math.min(1, Math.max(0.32, Math.round(fit * 100) / 100))
+const SCREEN_TITLES: Record<(typeof KASSA_SUPADMIN_SCREEN_IDS)[number], string> = {
+  '15': '15 inch breedbeeld',
+  '17': '17 inch vierkant (SXGA)',
+  '21': '21 inch (Full HD)',
 }
 
-function KassaLayoutPreviewFrame({
+const VASTE_PANELEN_TEKST = KASSA_SUPADMIN_SCREEN_IDS.map((id) => {
+  const b = KASSA_LAB_FIXED_BOX_CM[id]
+  return `${SCREEN_TITLES[id].split(' ')[0]} ${b.widthCm}×${b.heightCm} cm`
+}).join(' · ')
+
+function KassaPhysicalPreview({
   frame,
+  title,
   tenantSlug,
   origin,
-  sizeMode,
-  fitScale,
   iframeKey,
 }: {
   frame: KassaLayoutLabFrame
+  title: string
   tenantSlug: string
   origin: string
-  sizeMode: LabSizeMode
-  fitScale: number
   iframeKey: number
 }) {
   const boxRef = useRef<HTMLDivElement>(null)
-  const [physicalScale, setPhysicalScale] = useState(0.25)
+  const [scale, setScale] = useState(0.3)
   const physical = useMemo(() => kassaLabPhysicalBoxCm(frame), [frame])
 
   const src = useMemo(
@@ -59,15 +50,12 @@ function KassaLayoutPreviewFrame({
     [frame, origin, tenantSlug],
   )
 
-  const scale =
-    sizeMode === 'physical' ? physicalScale : sizeMode === 'logical' ? 1 : fitScale
-
   useLayoutEffect(() => {
-    if (sizeMode !== 'physical' || !boxRef.current) return undefined
     const el = boxRef.current
+    if (!el) return undefined
     const measure = () => {
       const w = el.getBoundingClientRect().width
-      if (w > 0) setPhysicalScale(labIframeScaleForPhysicalBox(w, frame.cssW))
+      if (w > 0) setScale(labIframeScaleForPhysicalBox(w, frame.cssW))
     }
     measure()
     const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null
@@ -77,90 +65,54 @@ function KassaLayoutPreviewFrame({
       ro?.disconnect()
       window.removeEventListener('resize', measure)
     }
-  }, [frame.cssW, physical.widthCm, physical.heightCm, sizeMode])
+  }, [frame.cssW, physical.heightCm, physical.widthCm])
 
-  const scaledW =
-    sizeMode === 'physical'
-      ? Math.round(physicalScale * frame.cssW)
-      : Math.round(frame.cssW * scale)
-  const scaledH =
-    sizeMode === 'physical'
-      ? Math.round(physicalScale * frame.cssH)
-      : Math.round(frame.cssH * scale)
-
-  const openExact = () => {
+  const openLogicalWindow = () => {
     window.open(
       src,
-      '_blank',
+      `_blank-kassa-${frame.id}`,
       `popup=1,width=${frame.cssW},height=${frame.cssH},noopener,noreferrer`,
     )
   }
 
-  const sizeLabel =
-    sizeMode === 'physical'
-      ? `lineaal ~${physical.widthCm.toFixed(1)}×${physical.heightCm.toFixed(1)} cm · ${frame.cssW}px logisch`
-      : `${frame.cssW}×${frame.cssH}px · zoom ${Math.round(scale * 100)}%`
-
   return (
-    <section className="flex w-full max-w-full flex-col gap-1.5">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-sm font-bold text-zinc-200">{frame.label}</h2>
-        <span className="text-xs text-zinc-500">
-          {sizeLabel} · vp={frame.vp}
-          {frame.ipadClient ? ' · iPad' : ''}
+    <section className="flex w-full flex-col gap-2 border-b border-white/10 pb-10 last:border-0">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h2 className="text-base font-bold text-white">{title}</h2>
+        <span className="text-sm text-zinc-400">
+          {physical.widthCm}×{physical.heightCm} cm beeld · {frame.cssW}×{frame.cssH} kassa · vp=
+          {frame.vp}
         </span>
         <button
           type="button"
-          onClick={openExact}
-          className="ml-auto rounded border border-zinc-600 px-2 py-0.5 text-[11px] text-zinc-300"
+          onClick={openLogicalWindow}
+          className="ml-auto text-xs text-[#58CCFF] underline-offset-2 hover:underline"
         >
-          Logische px ({frame.cssW}×{frame.cssH})
+          Echt venster openen
         </button>
       </div>
-      <div className="max-w-full overflow-x-auto overflow-y-hidden pb-1">
-        <div
-          ref={sizeMode === 'physical' ? boxRef : undefined}
-          className="inline-block overflow-hidden rounded-lg border-2 border-amber-500/40 bg-black shadow-xl"
-          style={
-            sizeMode === 'physical'
-              ? {
-                  width: `${physical.widthCm}cm`,
-                  height: `${physical.heightCm}cm`,
-                }
-              : { width: scaledW, height: scaledH }
-          }
-        >
-          <div
-            className="relative h-full w-full overflow-hidden"
-            style={
-              sizeMode === 'physical'
-                ? undefined
-                : { width: scaledW, height: scaledH }
-            }
-          >
-            <iframe
-              key={`${frame.id}-${iframeKey}`}
-              title={`${frame.label} — ${tenantSlug}`}
-              src={src}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: frame.cssW,
-                height: frame.cssH,
-                transform: `scale(${scale})`,
-                transformOrigin: 'top left',
-                border: 'none',
-              }}
-            />
-          </div>
+      <div
+        ref={boxRef}
+        className="inline-block overflow-hidden rounded-lg border-[3px] border-amber-500 bg-black shadow-xl"
+        style={{
+          width: `${physical.widthCm}cm`,
+          height: `${physical.heightCm}cm`,
+        }}
+      >
+        <div className="relative h-full w-full overflow-hidden">
+          <iframe
+            key={`${frame.id}-${iframeKey}`}
+            title={`${title} — ${tenantSlug}`}
+            src={src}
+            className="absolute left-0 top-0 border-0"
+            style={{
+              width: frame.cssW,
+              height: frame.cssH,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+            }}
+          />
         </div>
-        {sizeMode === 'physical' ? (
-          <p className="mt-1 text-[11px] text-amber-200/80">
-            Meet de oranje rand: breedte moet {physical.widthCm.toFixed(1)} cm zijn (hoogte{' '}
-            {physical.heightCm.toFixed(1)} cm).
-          </p>
-        ) : null}
       </div>
     </section>
   )
@@ -170,46 +122,18 @@ export default function SuperadminKassaLayoutLabPage() {
   const searchParams = useSearchParams()
   const initialTenant = (searchParams?.get('tenant') || '').trim().toLowerCase()
   const [tenantSlug, setTenantSlug] = useState(initialTenant)
-  const [viewMode, setViewMode] = useState<LabViewMode>('regression')
-  const [sizeMode, setSizeMode] = useState<LabSizeMode>('physical')
-  const [scale, setScale] = useState(DEFAULT_FIT_SCALE)
-  const [activeId, setActiveId] = useState<KassaLayoutLabFrame['id']>('15')
   const [iframeKey, setIframeKey] = useState(0)
-  const [viewportW, setViewportW] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1440,
-  )
-
-  useEffect(() => {
-    const onResize = () => setViewportW(window.innerWidth)
-    onResize()
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
 
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
-  const activeFrame = useMemo(
-    () => KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === activeId) ?? KASSA_LAYOUT_LAB_FRAMES[0],
-    [activeId],
-  )
-
-  const regressionFrames = useMemo(
+  const screens = useMemo(
     () =>
-      KASSA_LAYOUT_REGRESSION_FRAME_IDS.map(
-        (id) => KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === id)!,
-      ).filter(Boolean),
+      KASSA_SUPADMIN_SCREEN_IDS.map((id) => {
+        const frame = KASSA_LAYOUT_LAB_FRAMES.find((f) => f.id === id)!
+        return { id, frame, title: SCREEN_TITLES[id] }
+      }),
     [],
   )
-
-  const fitScaleForFrame = useCallback(
-    (frame: KassaLayoutLabFrame) => labFitScale(frame.cssW, viewportW),
-    [viewportW],
-  )
-
-  const kassaSrc = useMemo(() => {
-    if (!tenantSlug || !activeFrame) return ''
-    return buildKassaLayoutPreviewKassaUrl(tenantSlug, activeFrame, origin || 'https://localhost')
-  }, [activeFrame, origin, tenantSlug])
 
   const entryKassaHref = tenantSlug
     ? `/api/auth/superadmin-tenant-entry?slug=${encodeURIComponent(tenantSlug)}&path=${encodeURIComponent('/admin/kassa')}`
@@ -217,18 +141,9 @@ export default function SuperadminKassaLayoutLabPage() {
 
   const refreshPreview = useCallback(() => setIframeKey((k) => k + 1), [])
 
-  const openExactWindow = useCallback(() => {
-    if (!kassaSrc) return
-    window.open(
-      kassaSrc,
-      '_blank',
-      `popup=1,width=${activeFrame.cssW},height=${activeFrame.cssH},noopener,noreferrer`,
-    )
-  }, [activeFrame.cssH, activeFrame.cssW, kassaSrc])
-
-  const openAllRegressionWindows = useCallback(() => {
+  const openAllThree = useCallback(() => {
     if (!tenantSlug || !origin) return
-    for (const frame of regressionFrames) {
+    for (const { frame } of screens) {
       const url = buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin)
       window.open(
         url,
@@ -236,16 +151,16 @@ export default function SuperadminKassaLayoutLabPage() {
         `popup=1,width=${frame.cssW},height=${frame.cssH},noopener,noreferrer`,
       )
     }
-  }, [origin, regressionFrames, tenantSlug])
+  }, [origin, screens, tenantSlug])
 
   return (
     <div className="flex min-h-screen flex-col bg-[#0f1419] text-zinc-100">
-      <header className="shrink-0 border-b border-white/10 bg-[#0f1419] px-4 py-3">
-        <div className="mx-auto flex max-w-[1800px] flex-wrap items-center gap-2">
+      <header className="shrink-0 border-b border-white/10 px-4 py-3">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-2">
           <Link href="/superadmin" className="text-sm font-semibold text-[#58CCFF]">
             ← Superadmin
           </Link>
-          <h1 className="text-lg font-bold">Kassa layout-lab</h1>
+          <h1 className="text-lg font-bold">Kassa — 15″ · 17″ vierkant · 21″</h1>
           <input
             type="text"
             value={tenantSlug}
@@ -258,7 +173,7 @@ export default function SuperadminKassaLayoutLabPage() {
               href={entryKassaHref}
               className="rounded-lg bg-[#58CCFF] px-3 py-1.5 text-sm font-bold text-[#063042]"
             >
-              Kassa openen (login)
+              1× Kassa login (iframes)
             </a>
           ) : null}
           <button
@@ -269,147 +184,36 @@ export default function SuperadminKassaLayoutLabPage() {
           >
             Vernieuwen
           </button>
-          <div className="flex rounded-lg border border-zinc-600 p-0.5 text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => setViewMode('regression')}
-              className={`rounded-md px-2.5 py-1 ${
-                viewMode === 'regression' ? 'bg-[#58CCFF] text-[#063042]' : 'text-zinc-400'
-              }`}
-            >
-              Regressie 21·15·17
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('single')}
-              className={`rounded-md px-2.5 py-1 ${
-                viewMode === 'single' ? 'bg-[#58CCFF] text-[#063042]' : 'text-zinc-400'
-              }`}
-            >
-              Eén scherm
-            </button>
-          </div>
-          <div className="flex rounded-lg border border-amber-500/40 p-0.5 text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => setSizeMode('physical')}
-              className={`rounded-md px-2 py-1 ${
-                sizeMode === 'physical' ? 'bg-amber-500 text-black' : 'text-zinc-400'
-              }`}
-            >
-              Lineaal (cm)
-            </button>
-            <button
-              type="button"
-              onClick={() => setSizeMode('fit')}
-              className={`rounded-md px-2 py-1 ${
-                sizeMode === 'fit' ? 'bg-amber-500 text-black' : 'text-zinc-400'
-              }`}
-            >
-              Passend scherm
-            </button>
-            <button
-              type="button"
-              onClick={() => setSizeMode('logical')}
-              className={`rounded-md px-2 py-1 ${
-                sizeMode === 'logical' ? 'bg-amber-500 text-black' : 'text-zinc-400'
-              }`}
-            >
-              1 CSS-px
-            </button>
-          </div>
-          {viewMode === 'regression' ? (
-            <button
-              type="button"
-              onClick={openAllRegressionWindows}
-              disabled={!tenantSlug}
-              className="rounded-lg border border-amber-500/50 bg-amber-900/30 px-3 py-1.5 text-sm disabled:opacity-40"
-            >
-              Open 3 vensters (live check)
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={openExactWindow}
-              disabled={!kassaSrc}
-              className="rounded-lg border border-teal-500/50 bg-teal-900/40 px-3 py-1.5 text-sm"
-            >
-              Nieuw venster (logische px)
-            </button>
-          )}
-          {viewMode === 'single' && sizeMode === 'fit' ? (
-            <label className="ml-auto flex items-center gap-2 text-sm text-zinc-400">
-              Zoom {Math.round(scale * 100)}%
-              <input
-                type="range"
-                min={0.45}
-                max={1}
-                step={0.01}
-                value={scale}
-                onChange={(e) => setScale(Number(e.target.value))}
-              />
-            </label>
-          ) : (
-            <p className="ml-auto max-w-lg text-right text-xs text-zinc-500">
-              {sizeMode === 'physical'
-                ? '1366×768 = logische resolutie van de kassa; Lineaal (cm) = fysieke grootte zoals op het echte paneel.'
-                : 'Lineaal-modus: meet de rand van de preview — niet je browser op 1366px breed.'}
-            </p>
-          )}
+          <button
+            type="button"
+            onClick={openAllThree}
+            disabled={!tenantSlug}
+            className="rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-bold text-black disabled:opacity-40"
+          >
+            Open 3 echte vensters
+          </button>
         </div>
-        <p className="mx-auto mt-2 max-w-[1800px] text-xs text-zinc-500">
-          Lab raakt klanten niet. Vaste panelen (lineaal):{' '}
-          <span className="text-amber-200/90">{VASTE_PANELEN_TEKST}</span>
+        <p className="mx-auto mt-2 max-w-[1200px] text-sm text-zinc-400">
+          Vaste maten: <span className="text-amber-200">{VASTE_PANELEN_TEKST}</span>. Meet de{' '}
+          <span className="text-amber-400">oranje rand</span> met een lineaal. Wijzigt niets bij
+          klanten.
         </p>
-        {viewMode === 'single' ? (
-          <div className="mx-auto mt-2 flex max-w-[1800px] flex-wrap gap-1.5">
-            {KASSA_LAYOUT_LAB_FRAMES.map((frame) => (
-              <button
-                key={frame.id}
-                type="button"
-                onClick={() => {
-                  setActiveId(frame.id)
-                  setIframeKey((k) => k + 1)
-                }}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
-                  frame.id === activeId
-                    ? 'bg-[#58CCFF] text-[#063042]'
-                    : 'bg-zinc-800 text-zinc-300'
-                }`}
-              >
-                {frame.label}
-              </button>
-            ))}
-          </div>
-        ) : null}
       </header>
 
-      <main className="min-h-0 flex-1 overflow-auto p-4">
+      <main className="mx-auto w-full max-w-[1200px] flex-1 overflow-auto p-4">
         {!tenantSlug ? (
-          <p className="text-zinc-400">Vul een tenant slug in (bv. oh-green).</p>
-        ) : viewMode === 'regression' ? (
-          <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-10">
-            {regressionFrames.map((frame) => (
-              <KassaLayoutPreviewFrame
-                key={frame.id}
-                frame={frame}
-                tenantSlug={tenantSlug}
-                origin={origin}
-                sizeMode={sizeMode}
-                fitScale={fitScaleForFrame(frame)}
-                iframeKey={iframeKey}
-              />
-            ))}
-          </div>
+          <p className="text-zinc-400">Vul tenant slug in, dan «Kassa login», dan Vernieuwen.</p>
         ) : (
-          <KassaLayoutPreviewFrame
-            frame={activeFrame}
-            tenantSlug={tenantSlug}
-            origin={origin}
-            sizeMode={sizeMode === 'fit' ? 'fit' : sizeMode}
-            fitScale={sizeMode === 'fit' ? scale : fitScaleForFrame(activeFrame)}
-            iframeKey={iframeKey}
-          />
+          screens.map(({ frame, title }) => (
+            <KassaPhysicalPreview
+              key={frame.id}
+              frame={frame}
+              title={title}
+              tenantSlug={tenantSlug}
+              origin={origin}
+              iframeKey={iframeKey}
+            />
+          ))
         )}
       </main>
     </div>

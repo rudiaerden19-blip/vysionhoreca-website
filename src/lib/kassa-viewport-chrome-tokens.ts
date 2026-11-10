@@ -59,7 +59,7 @@ const PROFILE_TABLE: Record<KassaViewportChromeProfile, KassaViewportChromeToken
 }
 
 /** Lab + documentatie: kritieke schermen vóór deploy. */
-export const KASSA_LAYOUT_REGRESSION_FRAME_IDS = ['21', '15', '17'] as const
+export const KASSA_LAYOUT_REGRESSION_FRAME_IDS = ['15', '17', '21'] as const
 
 export function getKassaViewportChromeTokens(
   profile: KassaViewportChromeProfile,

@@ -32,6 +32,6 @@ describe('kassa-viewport-chrome-tokens', () => {
   })
 
   it('regressie-frames bevatten 21, 15 en 17', () => {
-    expect(KASSA_LAYOUT_REGRESSION_FRAME_IDS).toEqual(['21', '15', '17'])
+    expect(KASSA_LAYOUT_REGRESSION_FRAME_IDS).toEqual(['15', '17', '21'])
   })
 })
