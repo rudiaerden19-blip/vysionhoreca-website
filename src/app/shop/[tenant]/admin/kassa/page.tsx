@@ -6421,7 +6421,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {kassaPosLuxury ? (
+        {kassaPosLuxury && !kassaIpad10Chrome ? (
           <div
             className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5rem] sm:px-[8rem] md:px-[10rem]"
             aria-hidden={false}
@@ -6459,7 +6459,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         <div
           className={`relative flex min-h-0 min-w-0 flex-1 items-center ${
-            kassaWide15Chrome ? 'ml-1.5' : kassaCompactChrome ? 'ml-[2cm]' : 'ml-[4cm]'
+            kassaWide15Chrome
+              ? 'ml-1.5'
+              : kassaIpad10Chrome
+                ? 'ml-0'
+                : kassaCompactChrome
+                  ? 'ml-[2cm]'
+                  : 'ml-[4cm]'
           }`}
         >
           <nav
