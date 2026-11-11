@@ -5916,6 +5916,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }`
       : ''
 
+  const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
   const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
@@ -7044,8 +7045,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           data-kassa-sidebar="1"
           className={`${
-            kassaCompactChrome
-              ? 'w-[var(--kassa-sidebar-width)] max-w-[46vw]'
+            kassaCompactChrome || kassaIpad10Chrome
+              ? `w-[var(--kassa-sidebar-width)] ${kassaIpad10Chrome ? 'max-w-[42vw]' : 'max-w-[46vw]'}`
               : 'w-80 sm:w-96 lg:w-[var(--kassa-sidebar-width)]'
           } ${
             kassaWide15Chrome ? 'max-w-[46vw]' : ''

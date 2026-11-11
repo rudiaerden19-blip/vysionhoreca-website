@@ -3,6 +3,7 @@ import {
   KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX,
   KASSA_SIDEBAR_WIDTH_WIDE15_PX,
   KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX,
+  KASSA_SIDEBAR_WIDTH_IPAD_10_PX,
   getKassaViewportChromeTokens,
   kassaViewportChromeCssVars,
 } from '@/lib/kassa-viewport-chrome-tokens'
@@ -21,8 +22,9 @@ describe('kassa-viewport-chrome-tokens', () => {
   it('OSK-inset volgt mand per profiel', () => {
     const w15 = getKassaViewportChromeTokens('wide15')
     expect(w15.oskRightInsetPx).toBe(w15.sidebarWidthPx + 4)
-    const def = getKassaViewportChromeTokens('default')
-    expect(def.oskRightInsetPx).toBeGreaterThan(w15.oskRightInsetPx)
+    const ipad = getKassaViewportChromeTokens('ipad_10')
+    expect(ipad.oskRightInsetPx).toBe(ipad.sidebarWidthPx + 4)
+    expect(w15.oskRightInsetPx).toBeGreaterThan(ipad.oskRightInsetPx)
   })
 
   it('CSS-variabelen op root', () => {
@@ -38,6 +40,8 @@ describe('kassa-viewport-chrome-tokens', () => {
     const ipad = getKassaViewportChromeTokens('ipad_10')
     expect(ipad.menuClassicGridCols).toBe(4)
     expect(ipad.profile).toBe('ipad_10')
+    expect(ipad.sidebarWidthPx).toBe(KASSA_SIDEBAR_WIDTH_IPAD_10_PX)
+    expect(ipad.oskRightInsetPx).toBe(KASSA_SIDEBAR_WIDTH_IPAD_10_PX + 4)
   })
 
   it('regressie-frames bevatten 21, 15 en 17', () => {

@@ -30,6 +30,8 @@ export type KassaViewportChromeTokens = {
 export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
 /** 15″ breedbeeld — smallere (smaller) tegels, hogere rij, bredere mand (nov 2026). */
 export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 400
+/** iPad 10.2″ landschap — smallere tegels, bredere mand (nov 2026). */
+export const KASSA_SIDEBAR_WIDTH_IPAD_10_PX = 360
 /** 21″ / grote desktop (lg breakpoint in kassa). */
 export const KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX = 380
 export const KASSA_SIDEBAR_WIDTH_DEFAULT_SM_PX = 384
@@ -87,8 +89,8 @@ const IPAD_129: KassaViewportChromeTokens = {
 
 const IPAD_10: KassaViewportChromeTokens = {
   profile: 'ipad_10',
-  sidebarWidthPx: 300,
-  oskRightInsetPx: 300 + OSK_EDGE_GUTTER_PX,
+  sidebarWidthPx: KASSA_SIDEBAR_WIDTH_IPAD_10_PX,
+  oskRightInsetPx: KASSA_SIDEBAR_WIDTH_IPAD_10_PX + OSK_EDGE_GUTTER_PX,
   menuGridHorizontalPadPx: 28,
   menuClassicGridCols: 4,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
