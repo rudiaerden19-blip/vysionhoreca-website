@@ -6434,6 +6434,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
         ) : null}
 
+        {kassaPosLuxury && kassaIpad10Chrome ? (
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[16] flex items-center justify-center"
+            aria-hidden={false}
+          >
+            <div
+              data-testid="kassa-tablet-header-tenant-name"
+              className="pointer-events-auto flex min-w-0 max-w-[11rem] -translate-x-[4cm] items-center justify-center px-1.5 sm:max-w-[12rem]"
+            >
+              {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}
+            </div>
+          </div>
+        ) : null}
+
         <div className="relative z-20 flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
         {!kassaPosLuxury ? (
         <div
@@ -6704,7 +6718,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : null}
 
-          {kassaPosLuxury && kassaTabletViewportChrome ? (
+          {kassaPosLuxury && kassaTabletViewportChrome && !kassaIpad10Chrome ? (
             <div
               data-testid="kassa-tablet-header-tenant-name"
               className="relative z-[25] flex min-w-0 max-w-[11rem] shrink-0 items-center justify-center px-1.5 sm:max-w-[12rem]"
