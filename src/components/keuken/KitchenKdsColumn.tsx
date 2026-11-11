@@ -27,7 +27,7 @@ export const KDS_COLUMN_WIDTH_PX = 400
 /** Compacter op 15″ breedbeeld (1366×768). */
 export const KDS_COLUMN_WIDTH_WIDE15_PX = 300
 /** iPad 10″ landschap (~1080×810). */
-export const KDS_COLUMN_WIDTH_IPAD10_PX = 260
+export const KDS_COLUMN_WIDTH_IPAD10_PX = 285
 
 export type KitchenKdsDensity = 'default' | 'wide15' | 'ipad10'
 

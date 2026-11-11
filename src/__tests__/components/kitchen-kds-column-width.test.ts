@@ -19,7 +19,7 @@ describe('kdsColumnWidthPx', () => {
 
   it('gebruikt smalle kolom op ipad_10', () => {
     expect(kdsColumnWidthPx('ipad10')).toBe(KDS_COLUMN_WIDTH_IPAD10_PX)
-    expect(KDS_COLUMN_WIDTH_IPAD10_PX).toBe(260)
+    expect(KDS_COLUMN_WIDTH_IPAD10_PX).toBe(285)
     expect(kitchenKdsDensityFromViewportProfileId('ipad_10')).toBe('ipad10')
   })
 })
