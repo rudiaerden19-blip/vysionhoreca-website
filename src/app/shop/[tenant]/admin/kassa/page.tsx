@@ -6202,7 +6202,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       }`
     : 'min-h-0 flex-1 overflow-y-auto overscroll-y-contain'
 
-  const kassaSidebarToolsSlidePanel = isTheLagoonTenant(tenant) || kassaWide15Chrome
+  const kassaSidebarToolsSlidePanel =
+    isTheLagoonTenant(tenant) || kassaWide15Chrome || kassaIpad10Chrome
   const kassaSidebarToolsOpen = isTheLagoonTenant(tenant)
     ? lagoonSidebarToolsOpen
     : kassaWide15SidebarToolsOpen
