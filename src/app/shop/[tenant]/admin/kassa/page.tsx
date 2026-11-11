@@ -5868,13 +5868,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} />
   }
 
-  const kassaDarkHeaderBtnShell = kassaWide15Chrome
-    ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-2.5 py-2'
-    : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-3.5 py-2 sm:min-h-[2.85rem] sm:px-4 sm:py-2.5'
+  const kassaDarkHeaderBtnShell = kassaPosLuxury
+    ? kassaWide15Chrome
+      ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
+      : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
+    : kassaWide15Chrome
+      ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-2.5 py-2'
+      : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-3.5 py-2 sm:min-h-[2.85rem] sm:px-4 sm:py-2.5'
 
-  const kassaHeaderQuickLinkShell = kassaWide15Chrome
-    ? 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.55rem] px-2 py-2'
-    : 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2'
+  const kassaHeaderQuickLinkShell = kassaPosLuxury
+    ? kassaWide15Chrome
+      ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
+      : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
+    : kassaWide15Chrome
+      ? 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.55rem] px-2 py-2'
+      : 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2'
+
+  const kassaHeaderQuickLinkLabelClass = kassaPosLuxury
+    ? 'whitespace-nowrap text-[11px] leading-snug sm:text-xs'
+    : KASSA_HEADER_QUICK_LINK_LABEL
 
   const kassaSpeelsTopChromeTextClass =
     kassaPosLuxury && posChrome === 'speels' ? KASSA_SPEELS_TOP_CHROME_BTN_CLASS : ''
@@ -6314,7 +6326,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               setHamburgerSubOpen(null)
             }}
             className={`flex items-center transition-colors ${
-              kassaWide15Chrome ? 'gap-1 px-1.5 py-1' : 'gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3'
+              kassaPosLuxury
+                ? kassaWide15Chrome
+                  ? 'gap-1 px-2 py-1'
+                  : 'gap-1.5 px-3 py-1.5 sm:gap-2 sm:px-3.5 sm:py-1.5'
+                : kassaWide15Chrome
+                  ? 'gap-1 px-1.5 py-1'
+                  : 'gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3'
             } ${
               kassaPosLuxury
                 ? `${kassaSpeelsBlackGlossButtonClass(hamburgerOpen)} ${kassaSpeelsTopChromeTextClass}`
@@ -6412,7 +6430,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {kassaPosLuxury && !kassaTabletViewportChrome ? (
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5rem] sm:px-[8rem] md:px-[10rem]"
+            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5.5rem] sm:px-[9rem] md:px-[11rem]"
             aria-hidden={false}
           >
             <div className="pointer-events-auto flex min-w-0 max-w-full justify-center">
@@ -6492,7 +6510,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : headerQuickLinkBtnClass
               }`}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navReservations')}</span>
+              <span className={kassaHeaderQuickLinkLabelClass}>{t('kassaApp.navReservations')}</span>
               {(pendingReservCount > 0 || onlineReservNavBlink) && (
                 <span className="absolute -right-1 -top-1.5 flex h-7 min-w-[26px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1.5 text-sm font-black text-white shadow-lg sm:-right-2 sm:-top-2">
                   {pendingReservCount > 0 ? pendingReservCount : '!'}
@@ -6512,7 +6530,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden': ''
               }`}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.openCustomerDisplay')}</span>
+              <span className={kassaHeaderQuickLinkLabelClass}>{t('kassaApp.openCustomerDisplay')}</span>
             </button>
           )}
 
@@ -6523,7 +6541,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               title={t('kassaApp.navShopDisplay')}
               className={headerQuickLinkBtnClass}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navShopDisplay')}</span>
+              <span className={kassaHeaderQuickLinkLabelClass}>{t('kassaApp.navShopDisplay')}</span>
             </Link>
           )}
 
@@ -6533,7 +6551,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               title={t('kassaApp.navKitchenDisplay')}
               className={headerQuickLinkBtnClass}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.navKitchenDisplay')}</span>
+              <span className={kassaHeaderQuickLinkLabelClass}>{t('kassaApp.navKitchenDisplay')}</span>
             </Link>
           )}
 
@@ -6543,7 +6561,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               onSelect={setKassaLayout}
               t={t}
               triggerClassName={`${headerQuickLinkBtnClass} gap-0.5 sm:gap-1`}
-              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              labelClassName={kassaHeaderQuickLinkLabelClass}
               panelClassName={`overflow-hidden rounded-xl border shadow-xl ${ui.flyMenuBorder} ${kassaPosLuxury ? kassaPlateBgClass : kassaAppearanceDark ? 'bg-[#151a21]' : 'bg-white'}`}
               rowHoverClassName={ui.langRowHover}
               rowActiveClassName={ui.langRowActive}
@@ -6560,7 +6578,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               title="Hotmix Radio"
               className={`${headerQuickLinkBtnClass} gap-0.5 sm:gap-1`}
             >
-              <span className={KASSA_HEADER_QUICK_LINK_LABEL}>Hotmix Radio</span>
+              <span className={kassaHeaderQuickLinkLabelClass}>Hotmix Radio</span>
             </a>
           ) : null}
 
@@ -6582,7 +6600,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }
             title={t('kassaApp.helpVideoButton')}
           >
-            <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.helpVideoButton')}</span>
+            <span className={kassaHeaderQuickLinkLabelClass}>{t('kassaApp.helpVideoButton')}</span>
           </button>
 
           <button
@@ -6595,7 +6613,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             } ${KASSA_HEADER_HIDE_CUSTOMER_DISPLAY_AND_SOUND ? 'hidden': ''}`}
             title={soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
           >
-            <span className={KASSA_HEADER_QUICK_LINK_LABEL}>
+            <span className={kassaHeaderQuickLinkLabelClass}>
               {soundsOn ? t('kassaApp.soundOnTitle') : t('kassaApp.soundOffTitle')}
             </span>
           </button>
@@ -6603,7 +6621,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isKassaAzertyOskManualOpenEnabled(tenant) && !kassaPosLuxury ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
-              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              labelClassName={kassaHeaderQuickLinkLabelClass}
               resolveFaceClass={kassaAzertyOskHeaderFaceClass}
             />
           ) : null}
@@ -6643,7 +6661,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isKassaAzertyOskManualOpenEnabled(tenant) && kassaPosLuxury ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
-              labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              labelClassName={kassaHeaderQuickLinkLabelClass}
               resolveFaceClass={kassaAzertyOskHeaderFaceClass}
             />
           ) : null}
@@ -6675,7 +6693,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`
           }
         >
-          <span className={kassaPosLuxury ? KASSA_HEADER_QUICK_LINK_LABEL : 'leading-snug'}>
+          <span className={kassaPosLuxury ? kassaHeaderQuickLinkLabelClass : 'leading-snug'}>
             {t('kassaApp.logout')}
           </span>
         </button>
