@@ -5,23 +5,34 @@ import { KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS } from '@/lib/kassa-azerty-osk'
 import { useKassaAzertyOskChrome } from '@/lib/kassa-azerty-osk-context'
 
 type Props = {
-  /** Extra shell (min-h/padding) bovenop standaard blauw. */
   className?: string
   labelClassName?: string
+  /** Kassa-header: grijs chrome i.p.v. standaard blauw. */
+  resolveFaceClass?: (keyboardPinned: boolean) => string
 }
 
-/** Alle tenants: zelfde plek/stijl als kassa-header (bv. naast Online). */
-export function KassaAzertyOskHeaderToggle({ className = '', labelClassName }: Props) {
+/** Alle tenants: kassa-header of admin (standaard blauw). */
+export function KassaAzertyOskHeaderToggle({
+  className = '',
+  labelClassName,
+  resolveFaceClass,
+}: Props) {
   const { t } = useLanguage()
   const chrome = useKassaAzertyOskChrome()
   if (!chrome?.manualToggleEnabled) return null
 
+  const faceClass = resolveFaceClass
+    ? resolveFaceClass(chrome.keyboardPinned)
+    : KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS
+  const pinnedRing =
+    resolveFaceClass || !chrome.keyboardPinned
+      ? ''
+      : 'ring-2 ring-white/80 ring-offset-1 ring-offset-black'
+
   return (
     <button
       type="button"
-      className={`${KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS} ${className} ${
-        chrome.keyboardPinned ? 'ring-2 ring-white/80 ring-offset-1 ring-offset-black' : ''
-      }`}
+      className={`${faceClass} ${className} ${pinnedRing}`}
       aria-pressed={chrome.keyboardPinned}
       data-testid="kassa-azerty-osk-toggle"
       title={

@@ -5897,6 +5897,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? KASSA_CLASSIC_HEADER_QUICK_LINK_BTN
         : KASSA_HEADER_QUICK_LINK_BTN
 
+  const kassaAzertyOskHeaderFaceClass = (keyboardPinned: boolean) => {
+    if (kassaPosLuxury) {
+      return `${kassaDarkHeaderBtnShell} ${kassaPosButtonClass(keyboardPinned, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+    }
+    return keyboardPinned
+      ? kassaLight
+        ? KASSA_LIGHT_BTN_FACE_ON
+        : KASSA_CLASSIC_BTN_FACE_ON
+      : kassaLight
+        ? KASSA_LIGHT_BTN_FACE
+        : KASSA_CLASSIC_BTN_FACE
+  }
+
   const kassaIpadTabletChrome = kassaTabletViewportChrome
   const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
@@ -6583,6 +6596,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              resolveFaceClass={kassaAzertyOskHeaderFaceClass}
             />
           ) : null}
 
@@ -6622,6 +6636,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
+              resolveFaceClass={kassaAzertyOskHeaderFaceClass}
             />
           ) : null}
 
