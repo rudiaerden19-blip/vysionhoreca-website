@@ -1400,6 +1400,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaIpadMenuGridCap = kassaIpadTabletLayoutActive(kassaViewportProfileId)
   const kassaTabletViewportChrome = isKassaTabletViewportProfile(kassaViewportProfileId)
   const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
+  const kassaIpad129Chrome = kassaViewportProfileId === 'ipad_129'
+  /** iPad 10″ + 12,9″: tenantnaam gecentreerd in de headerbalk. */
+  const kassaTabletHeaderTenantCentered =
+    kassaIpad10Chrome || kassaIpad129Chrome
   const keukenNavHref = useKassaViewportProfileHref(`/keuken/${tenant}`)
   const shopDisplayNavHref = useKassaViewportProfileHref(`/shop/${tenant}/display`)
   const kassaCompactChrome = kassaCompactChromeFromProfileId(kassaViewportProfileId)
@@ -6453,14 +6457,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </div>
         ) : null}
 
-        {kassaPosLuxury && kassaIpad10Chrome ? (
+        {kassaPosLuxury && kassaTabletHeaderTenantCentered ? (
           <div
             className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[24] flex items-center justify-center"
             aria-hidden={false}
           >
             <div
               data-testid="kassa-tablet-header-tenant-name"
-              className="pointer-events-auto flex min-w-0 max-w-[11rem] items-center justify-center px-1.5 sm:max-w-[12rem]"
+              className={`pointer-events-auto flex min-w-0 items-center justify-center px-1.5 ${
+                kassaIpad129Chrome
+                  ? 'max-w-[13rem] sm:max-w-[15rem]'
+                  : 'max-w-[11rem] sm:max-w-[12rem]'
+              }`}
             >
               {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}
             </div>
@@ -6669,15 +6677,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               labelClassName={kassaHeaderQuickLinkLabelClass}
               resolveFaceClass={kassaAzertyOskHeaderFaceClass}
             />
-          ) : null}
-
-          {kassaPosLuxury && kassaTabletViewportChrome && !kassaIpad10Chrome ? (
-            <div
-              data-testid="kassa-tablet-header-tenant-name"
-              className="relative z-[25] flex min-w-0 max-w-[11rem] shrink-0 items-center justify-center px-1.5 sm:max-w-[12rem]"
-            >
-              {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}
-            </div>
           ) : null}
 
         <button
