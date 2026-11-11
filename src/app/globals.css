@@ -586,12 +586,15 @@ input[type="number"] {
 /*
  * Speels header + categoriebalk — donkerder labelgrijs (zijbalk/footer blijft #b0b0b0).
  */
-.kassa-speels-top-chrome-btn,
-.kassa-speels-top-chrome-btn.kassa-speels-order-type-btn,
-.kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn,
 .kassa-speels-top-chrome-btn.kassa-speels-red-gloss-btn {
   color: #858585;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.82);
+}
+
+.kassa-speels-top-chrome-btn.kassa-speels-order-type-btn,
+.kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10'] .kassa-speels-top-chrome-btn,
@@ -602,47 +605,36 @@ input[type="number"] {
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
   .kassa-speels-top-chrome-btn.kassa-speels-red-gloss-btn {
   color: #ffffff;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /*
- * Speels besteltype — chrome/glossy grijs: lichte bovenkant + glaslaag (::before), tekst erboven.
+ * Speels grijs — glossy pill: witte rand, donkere gradient, glans bovenaan (::before).
  */
 .kassa-speels-order-type-btn {
-  color: #b0b0b0;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
-  background: linear-gradient(
-    180deg,
-    #686868 0%,
-    #545454 5%,
-    #3a3a3a 18%,
-    #2c2c2c 40%,
-    #222222 62%,
-    #1a1a1a 100%
-  );
-  border: 1px solid #0a0a0a;
-  border-top-color: #323232;
-  border-bottom-color: #050505;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(180deg, #9a9a9f 0%, #7a7a7f 12%, #4a4a4e 48%, #323236 100%);
+  border: 2.5px solid #ffffff;
   box-shadow:
-    0 3px 7px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 5px 14px rgba(0, 0, 0, 0.18);
 }
 
 .kassa-speels-order-type-btn::before {
   content: '';
   pointer-events: none;
   position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  height: 46%;
+  left: 6%;
+  right: 6%;
+  top: 5%;
+  height: 54%;
   z-index: 0;
-  border-radius: 0.65rem 0.65rem 45% 45%;
+  border-radius: 9999px 9999px 58% 58%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.82) 0%,
-    rgba(255, 255, 255, 0.38) 42%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.42) 48%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -652,10 +644,8 @@ input[type="number"] {
   z-index: 1;
 }
 
-/* Onderkant: lichte glans die naar boven uitfadet (Bon + alle speels-chrome knoppen). */
-.kassa-speels-order-type-btn::after,
+/* Onderkant: lichte glans (blauw/rood/groen). Grijze pills alleen glans boven. */
 .kassa-speels-blue-gloss-btn::after,
-.kassa-speels-black-gloss-btn::after,
 .kassa-speels-red-gloss-btn::after,
 .kassa-speels-green-gloss-btn::after {
   content: '';
@@ -677,41 +667,42 @@ input[type="number"] {
 }
 
 .kassa-speels-order-type-btn:active {
-  background: linear-gradient(180deg, #2e2e2e 0%, #202020 55%, #181818 100%);
-  border-top-color: #282828;
+  background: linear-gradient(180deg, #6e6e73 0%, #3a3a3e 52%, #222226 100%);
   box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.5),
-    inset 0 3px 7px rgba(0, 0, 0, 0.55);
+    0 1px 2px rgba(0, 0, 0, 0.14),
+    inset 0 3px 8px rgba(0, 0, 0, 0.38);
 }
 
-.kassa-speels-order-type-btn:active::before,
-.kassa-speels-order-type-btn:active::after {
-  opacity: 0.35;
+.kassa-speels-order-type-btn:active::before {
+  opacity: 0.45;
 }
 
 .kassa-speels-order-type-btn--selected {
-  background: linear-gradient(
-    180deg,
-    #747474 0%,
-    #5a5a5a 5%,
-    #404040 18%,
-    #323232 42%,
-    #282828 100%
-  );
-  border-top-color: #404040;
+  background: linear-gradient(180deg, #b0b0b5 0%, #8a8a8f 14%, #5a5a5f 50%, #3e3e42 100%);
+  border-color: #ffffff;
   box-shadow:
-    0 3px 9px rgba(0, 0, 0, 0.58),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
+    0 2px 4px rgba(0, 0, 0, 0.14),
+    0 6px 16px rgba(0, 0, 0, 0.22);
 }
 
 .kassa-speels-order-type-btn--selected::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
     rgba(255, 255, 255, 0) 100%
   );
+}
+
+/* Lichtere grijze pill — Totaal-balk in zijbalk. */
+.kassa-speels-order-type-btn.kassa-speels-gray-pill--light {
+  color: #2a2a2e;
+  text-shadow: none;
+  background: linear-gradient(180deg, #e8e8ea 0%, #c4c4c8 22%, #9a9a9f 58%, #65656a 100%);
+}
+
+.kassa-speels-order-type-btn.kassa-speels-gray-pill--light:active {
+  background: linear-gradient(180deg, #d0d0d4 0%, #a8a8ac 48%, #6e6e73 100%);
 }
 
 /*
@@ -808,37 +799,32 @@ input[type="number"] {
 }
 
 /*
- * Speels — zwart glanzend (Menu, Uitloggen, geselecteerde knoppen).
+ * Speels — donkere glossy pill (Menu open, actieve grijze keuze, Snel menu aan).
  */
 .kassa-speels-black-gloss-btn {
-  color: #b0b0b0;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
-  background: linear-gradient(180deg, #0d0d0d 0%, #171717 46%, #050505 100%);
-  border: 1px solid #0c0c0c;
-  border-top-color: #2e2e2e;
-  border-bottom-color: #050505;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(180deg, #6e6e73 0%, #3a3a3e 42%, #18181b 100%);
+  border: 2.5px solid #ffffff;
   box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.64),
-    0 11px 26px rgba(0, 0, 0, 0.51),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.48);
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 5px 14px rgba(0, 0, 0, 0.18);
 }
 
 .kassa-speels-black-gloss-btn::before {
   content: '';
   pointer-events: none;
   position: absolute;
-  left: 2px;
-  right: 2px;
-  top: 2px;
-  height: 48%;
+  left: 6%;
+  right: 6%;
+  top: 5%;
+  height: 54%;
   z-index: 0;
-  border-radius: 0.65rem 0.65rem 45% 45%;
+  border-radius: 9999px 9999px 58% 58%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.22) 38%,
-    rgba(255, 255, 255, 0.06) 72%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.38) 46%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -849,32 +835,28 @@ input[type="number"] {
 }
 
 .kassa-speels-black-gloss-btn:active {
-  background: linear-gradient(180deg, #050505 0%, #121212 52%, #020202 100%);
+  background: linear-gradient(180deg, #525256 0%, #28282c 54%, #101014 100%);
   box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.55),
-    inset 0 3px 8px rgba(0, 0, 0, 0.55);
+    0 1px 2px rgba(0, 0, 0, 0.14),
+    inset 0 3px 8px rgba(0, 0, 0, 0.42);
 }
 
-.kassa-speels-black-gloss-btn:active::before,
-.kassa-speels-black-gloss-btn:active::after {
-  opacity: 0.4;
+.kassa-speels-black-gloss-btn:active::before {
+  opacity: 0.45;
 }
 
 .kassa-speels-black-gloss-btn--emphasis {
-  border-top-color: #383838;
+  background: linear-gradient(180deg, #7a7a7f 0%, #48484c 38%, #141418 100%);
   box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.64),
-    0 11px 26px rgba(0, 0, 0, 0.51),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.48);
+    0 2px 4px rgba(0, 0, 0, 0.14),
+    0 7px 18px rgba(0, 0, 0, 0.24);
 }
 
 .kassa-speels-black-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.68) 0%,
-    rgba(255, 255, 255, 0.3) 40%,
-    rgba(255, 255, 255, 0.08) 75%,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.48) 52%,
     rgba(255, 255, 255, 0) 100%
   );
 }

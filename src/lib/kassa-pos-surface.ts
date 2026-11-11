@@ -46,6 +46,9 @@ export const KASSA_POS_RULE_BLACK = 'border-black'
 
 export const KASSA_POS_BTN_SHAPE = 'rounded-xl'
 
+/** Speels grijs/zwart chrome — capsule/pill (referentie glossy). */
+export const KASSA_SPEELS_GRAY_BTN_SHAPE = 'rounded-full'
+
 export const KASSA_POS_SELECTED_ACCENT_TEXT = 'text-[#1a1612]'
 
 export const KASSA_POS_SELECTED_TOP_RIM = 'border-t-[#f0d9a8]/55'
@@ -222,13 +225,19 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
 ].join(' ')
 
 /** Dark/speels — glanzend grijs (Ter plaatse / Afhalen / Levering, niet geselecteerd). */
-/** Tekst op speels grijs/zwart chrome-knoppen (niet rood/groen). */
+/** Tekst op speels blauw/rood/groen chrome-knoppen. */
 export const KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS = 'text-[#b0b0b0]'
+
+/** Wit label op grijs/zwart glossy pills. */
+export const KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS = 'text-white font-semibold'
 
 /** Header + categoriebalk — iets donkerder grijs dan overige chrome-knoppen. */
 export const KASSA_SPEELS_TOP_CHROME_BTN_CLASS = 'kassa-speels-top-chrome-btn'
 
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
+
+/** Lichtere glossy pill (Totaal-balk). */
+export const KASSA_SPEELS_GRAY_PILL_LIGHT_CLASS = 'kassa-speels-gray-pill--light'
 
 export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
 export const KASSA_SPEELS_BLUE_GLOSS_BTN_CLASS = 'kassa-speels-blue-gloss-btn'
@@ -255,21 +264,21 @@ const KASSA_SPEELS_CHROME_BTN_SHELL = [
 
 export function kassaSpeelsGrayChromeButtonClass(): string {
   return [
-    KASSA_POS_BTN_SHAPE,
+    KASSA_SPEELS_GRAY_BTN_SHAPE,
     KASSA_SPEELS_ORDER_TYPE_BTN_CLASS,
     KASSA_SPEELS_CHROME_BTN_SHELL,
-    KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+    KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
   ].join(' ')
 }
 
 /** Zwart + zilverrand + glans (::before) — Menu, Uitloggen, actieve keuze. */
 export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
   return [
-    KASSA_POS_BTN_SHAPE,
+    KASSA_SPEELS_GRAY_BTN_SHAPE,
     KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS,
     emphasis ? 'kassa-speels-black-gloss-btn--emphasis' : '',
     KASSA_SPEELS_CHROME_BTN_SHELL,
-    KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+    KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
   ]
     .filter(Boolean)
     .join(' ')
@@ -351,7 +360,12 @@ export function kassaPosRemoveButtonClass(look: KassaPosChromeLook = 'luxe'): st
   return kassaPosButtonClass(false, look)
 }
 
+export function kassaSpeelsGrayPillLightStripClass(): string {
+  return `${kassaSpeelsGrayChromeButtonClass()} ${KASSA_SPEELS_GRAY_PILL_LIGHT_CLASS}`
+}
+
 export function kassaPosRaisedStripClass(look: KassaPosChromeLook = 'luxe'): string {
+  if (look === 'speels') return kassaSpeelsGrayPillLightStripClass()
   return kassaPosButtonClass(false, look)
 }
 
