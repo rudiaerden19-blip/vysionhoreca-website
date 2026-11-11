@@ -115,7 +115,7 @@ describe('Speels bruine knoppen', () => {
     expect(kassaPosCartTrashButtonClass(false, 'luxe')).not.toContain('kassa-speels-red-gloss-btn')
   })
 
-  it('maakt Speels-categoriebalk mat grijs (actief iets lichter)', () => {
+  it('maakt Speels-categoriebalk mat donkerblauw (actief lichter blauw)', () => {
     expect(kassaSpeelsCategoryStripButtonClass(false)).toContain('kassa-speels-category-strip-btn')
     expect(kassaSpeelsCategoryStripButtonClass(true)).toContain(
       'kassa-speels-category-strip-btn--selected',

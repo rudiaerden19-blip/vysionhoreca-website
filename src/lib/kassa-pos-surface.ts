@@ -328,7 +328,7 @@ export function kassaSpeelsChromeButtonClass(selected: boolean): string {
   return kassaSpeelsGrayChromeButtonClass()
 }
 
-/** Speels categoriebalk — mat grijs; actieve tab iets lichter (geen glossy). */
+/** Speels categoriebalk — donkerblauw mat; actieve tab lichter blauw (geen glossy). */
 export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
   return [
     KASSA_SPEELS_GRAY_BTN_SHAPE,

@@ -737,15 +737,16 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   );
 }
 
-/* Speels categoriebalk — mat grijs (geen glossy). */
+/* Speels categoriebalk — donkerblauw mat (zelfde kleur als vroeger, géén glossy ::before). */
 .kassa-speels-category-strip-btn {
   color: #b0b0b0;
   text-shadow: none;
-  background: #2c2c2c;
-  border: 1px solid #161616;
-  border-top-color: #3a3a3a;
+  background: #101c2c;
+  border: 1px solid #0a0a0a;
+  border-top-color: #243850;
+  border-bottom-color: #050505;
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.48);
 }
 
 .kassa-speels-category-strip-btn::before,
@@ -756,17 +757,18 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 
 .kassa-speels-category-strip-btn--selected {
   color: #e0e0e0;
-  background: #3a3a3a;
-  border-color: #454545;
-  border-top-color: #525252;
+  background: #223548;
+  border-color: #0a0a0a;
+  border-top-color: #2f4868;
+  border-bottom-color: #050505;
   box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.48),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    0 1px 4px rgba(0, 0, 0, 0.52),
+    inset 0 0 0 1px rgba(88, 204, 255, 0.24);
 }
 
 .kassa-speels-category-strip-btn:active {
-  background: #242424;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.52);
+  background: #0c1624;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
 }
 
 /*
