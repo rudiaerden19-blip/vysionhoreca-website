@@ -8,12 +8,31 @@ import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
 /** @deprecated Gebruik `KassaViewportProfileId` — alias voor bestaande density UI. */
 export type KassaViewportChromeProfile = KassaViewportProfileId
 
+/** AZERTY-numpad: max breedte één toets (CSS-lengte). */
+export const KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_DEFAULT = '4cm'
+/** 15″ / 17″: smallere cijferstrook → meer ruimte voor AZERTY. */
+export const KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT = '3.35cm'
+
+export function kassaAzertyOskNumpadStripWidthFromKeyWidth(keyWidth: string): string {
+  return `calc(calc(${keyWidth} * 2 + 0.35rem) + 0.65rem)`
+}
+
+export function resolveKassaOskNumpadKeyWidth(profile: KassaViewportProfileId): string {
+  if (profile === 'wide15' || profile === 'sxga') {
+    return KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT
+  }
+  return KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_DEFAULT
+}
+
 export type KassaViewportChromeTokens = {
   profile: KassaViewportProfileId
   /** Vaste mandbreedte (px); sync met sidebar Tailwind `w-[…px]`. */
   sidebarWidthPx: number
   /** OSK vast → rechter inset tot start mand. */
   oskRightInsetPx: number
+  /** Numpad links in AZERTY-panel (kassa). */
+  oskNumpadKeyWidth: string
+  oskNumpadStripWidth: string
   /** Ruimte voor menu-raster schatting (sidebar + horizontale padding). */
   menuGridHorizontalPadPx: number
   /** Max menu-kolommen (classic grid hint; iPad cap apart). */
@@ -58,6 +77,10 @@ const WIDE15: KassaViewportChromeTokens = {
   profile: 'wide15',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX,
   oskRightInsetPx: resolveKassaOskRightInsetPx('wide15', KASSA_SIDEBAR_WIDTH_WIDE15_PX),
+  oskNumpadKeyWidth: resolveKassaOskNumpadKeyWidth('wide15'),
+  oskNumpadStripWidth: kassaAzertyOskNumpadStripWidthFromKeyWidth(
+    resolveKassaOskNumpadKeyWidth('wide15'),
+  ),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 4,
   menuTileHeightBoost: 1.06,
@@ -71,6 +94,10 @@ const SXGA: KassaViewportChromeTokens = {
   profile: 'sxga',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX,
   oskRightInsetPx: resolveKassaOskRightInsetPx('sxga', KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX),
+  oskNumpadKeyWidth: resolveKassaOskNumpadKeyWidth('sxga'),
+  oskNumpadStripWidth: kassaAzertyOskNumpadStripWidthFromKeyWidth(
+    resolveKassaOskNumpadKeyWidth('sxga'),
+  ),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 5,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -84,6 +111,10 @@ const DEFAULT_DESKTOP: KassaViewportChromeTokens = {
   profile: 'default',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX,
   oskRightInsetPx: resolveKassaOskRightInsetPx('default', KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX),
+  oskNumpadKeyWidth: resolveKassaOskNumpadKeyWidth('default'),
+  oskNumpadStripWidth: kassaAzertyOskNumpadStripWidthFromKeyWidth(
+    resolveKassaOskNumpadKeyWidth('default'),
+  ),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 6,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -97,6 +128,10 @@ const IPAD_129: KassaViewportChromeTokens = {
   profile: 'ipad_129',
   sidebarWidthPx: 340,
   oskRightInsetPx: resolveKassaOskRightInsetPx('ipad_129', 340),
+  oskNumpadKeyWidth: resolveKassaOskNumpadKeyWidth('ipad_129'),
+  oskNumpadStripWidth: kassaAzertyOskNumpadStripWidthFromKeyWidth(
+    resolveKassaOskNumpadKeyWidth('ipad_129'),
+  ),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 4,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -110,6 +145,10 @@ const IPAD_10: KassaViewportChromeTokens = {
   profile: 'ipad_10',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_IPAD_10_PX,
   oskRightInsetPx: resolveKassaOskRightInsetPx('ipad_10', KASSA_SIDEBAR_WIDTH_IPAD_10_PX),
+  oskNumpadKeyWidth: resolveKassaOskNumpadKeyWidth('ipad_10'),
+  oskNumpadStripWidth: kassaAzertyOskNumpadStripWidthFromKeyWidth(
+    resolveKassaOskNumpadKeyWidth('ipad_10'),
+  ),
   menuGridHorizontalPadPx: 28,
   menuClassicGridCols: 4,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -151,6 +190,8 @@ export function kassaViewportChromeCssVars(tokens: KassaViewportChromeTokens): R
   return {
     '--kassa-sidebar-width': `${tokens.sidebarWidthPx}px`,
     '--kassa-osk-right-inset': `${tokens.oskRightInsetPx}px`,
+    '--kassa-osk-numpad-key-max-width': tokens.oskNumpadKeyWidth,
+    '--kassa-osk-numpad-strip-width': tokens.oskNumpadStripWidth,
     '--kassa-menu-tile-boost': String(tokens.menuTileHeightBoost),
   }
 }

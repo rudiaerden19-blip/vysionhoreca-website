@@ -67,7 +67,9 @@ export function KassaOskNumericPad({
   return (
     <div
       className={`mr-2 flex shrink-0 flex-col self-start border-r pr-2 ${dividerClass}`}
-      style={{ width: KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH }}
+      style={{
+        width: `var(--kassa-osk-numpad-strip-width, ${KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH})`,
+      }}
       data-testid="kassa-azerty-osk-numpad"
       aria-label={t('kassaApp.azertyOskNumericPadTitle')}
     >
@@ -86,20 +88,37 @@ export function KassaOskNumericPad({
           <div
             key={`cell-${digit}`}
             className="min-w-0"
-            style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}
+            style={{
+              maxWidth: `var(--kassa-osk-numpad-key-max-width, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})`,
+            }}
           >
             {renderKey(digit, `np:${digit}`, digit, digitHandlers(digit))}
           </div>
         ))}
       </div>
       <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-        <div className="min-w-0" style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}>
+        <div
+          className="min-w-0"
+          style={{
+            maxWidth: `var(--kassa-osk-numpad-key-max-width, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})`,
+          }}
+        >
           {renderKey('comma', 'np:,', ',', punctHandlers.comma)}
         </div>
-        <div className="min-w-0" style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}>
+        <div
+          className="min-w-0"
+          style={{
+            maxWidth: `var(--kassa-osk-numpad-key-max-width, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})`,
+          }}
+        >
           {renderKey('0', 'np:0', '0', digitHandlers('0'))}
         </div>
-        <div className="min-w-0" style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}>
+        <div
+          className="min-w-0"
+          style={{
+            maxWidth: `var(--kassa-osk-numpad-key-max-width, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})`,
+          }}
+        >
           {renderKey('dot', 'np:.', '.', punctHandlers.dot)}
         </div>
       </div>

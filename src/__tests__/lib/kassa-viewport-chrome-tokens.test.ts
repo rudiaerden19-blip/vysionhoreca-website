@@ -1,4 +1,6 @@
 import {
+  KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_DEFAULT,
+  KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT,
   KASSA_LAYOUT_REGRESSION_FRAME_IDS,
   KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX,
   KASSA_SIDEBAR_WIDTH_WIDE15_PX,
@@ -19,6 +21,18 @@ describe('kassa-viewport-chrome-tokens', () => {
     expect(new Set([w15.sidebarWidthPx, sxga.sidebarWidthPx, def.sidebarWidthPx]).size).toBe(3)
   })
 
+  it('15/17: compacter numpad; 21″ ongewijzigd (4cm)', () => {
+    expect(getKassaViewportChromeTokens('wide15').oskNumpadKeyWidth).toBe(
+      KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT,
+    )
+    expect(getKassaViewportChromeTokens('sxga').oskNumpadKeyWidth).toBe(
+      KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT,
+    )
+    expect(getKassaViewportChromeTokens('default').oskNumpadKeyWidth).toBe(
+      KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_DEFAULT,
+    )
+  })
+
   it('15/17: OSK over volle breedte; overige profielen inset = mand + gutter', () => {
     expect(getKassaViewportChromeTokens('wide15').oskRightInsetPx).toBe(4)
     expect(getKassaViewportChromeTokens('sxga').oskRightInsetPx).toBe(4)
@@ -34,6 +48,9 @@ describe('kassa-viewport-chrome-tokens', () => {
     expect(vars['--kassa-sidebar-width']).toBe('400px')
     expect(vars['--kassa-osk-right-inset']).toBe('4px')
     expect(vars['--kassa-menu-tile-boost']).toBe('1.06')
+    expect(vars['--kassa-osk-numpad-key-max-width']).toBe(
+      KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT,
+    )
     expect(w15.menuClassicGridCols).toBe(4)
   })
 

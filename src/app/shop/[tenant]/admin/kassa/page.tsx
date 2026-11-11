@@ -1445,18 +1445,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [])
 
-  /** OSK-provider staat naast kassa-app — inset op html zodat anchor breedte klopt per profiel. */
+  /** OSK-provider staat naast kassa-app — chrome-vars op html (inset + numpad per profiel). */
   useLayoutEffect(() => {
     if (typeof document === 'undefined') return
     const root = document.documentElement
-    root.style.setProperty(
-      '--kassa-osk-right-inset',
-      `${kassaActiveChromeTokens.oskRightInsetPx}px`,
-    )
+    const t = kassaActiveChromeTokens
+    root.style.setProperty('--kassa-osk-right-inset', `${t.oskRightInsetPx}px`)
+    root.style.setProperty('--kassa-osk-numpad-key-max-width', t.oskNumpadKeyWidth)
+    root.style.setProperty('--kassa-osk-numpad-strip-width', t.oskNumpadStripWidth)
     return () => {
       root.style.removeProperty('--kassa-osk-right-inset')
+      root.style.removeProperty('--kassa-osk-numpad-key-max-width')
+      root.style.removeProperty('--kassa-osk-numpad-strip-width')
     }
-  }, [kassaActiveChromeTokens.oskRightInsetPx])
+  }, [
+    kassaActiveChromeTokens.oskRightInsetPx,
+    kassaActiveChromeTokens.oskNumpadKeyWidth,
+    kassaActiveChromeTokens.oskNumpadStripWidth,
+  ])
 
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
   const audioUnlockOnceRef = useRef(false)
