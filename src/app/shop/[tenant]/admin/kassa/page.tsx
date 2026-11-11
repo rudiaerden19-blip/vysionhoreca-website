@@ -5923,9 +5923,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }`
       : ''
 
+  const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
   const kassaIpadTabletChrome =
     kassaIpadMenuGridCap &&
-    (kassaViewportProfileId === 'ipad_10' || kassaViewportProfileId === 'ipad_129')
+    (kassaIpad10Chrome || kassaViewportProfileId === 'ipad_129')
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
   const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
@@ -6470,7 +6471,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             }`}
           >
 
-          {kassaReservationsNavEnabled && (
+          {kassaReservationsNavEnabled && !kassaIpad10Chrome && (
             <button
               type="button"
               onClick={() => {
@@ -6508,7 +6509,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           )}
 
-          {isAdminSubmenuEnabled('sm_orders_display', tenant, effectiveAccess, effectiveJson) && (
+          {isAdminSubmenuEnabled('sm_orders_display', tenant, effectiveAccess, effectiveJson) &&
+            !kassaIpad10Chrome && (
             <Link
               href={`/shop/${tenant}/display`}
               title={t('kassaApp.navShopDisplay')}
@@ -6590,7 +6592,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             />
           ) : null}
 
-          {isOnline !== null && !kassaPosLuxury && !kassaWide15Chrome ? (
+          {isOnline !== null && !kassaPosLuxury && !kassaWide15Chrome && !kassaIpad10Chrome ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
@@ -6646,7 +6648,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             />
           ) : null}
 
-          {isOnline !== null && kassaPosLuxury && !kassaWide15Chrome ? (
+          {isOnline !== null && kassaPosLuxury && !kassaWide15Chrome && !kassaIpad10Chrome ? (
             <div
               className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
                 isOnline
@@ -6665,7 +6667,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : null}
 
-          {!kassaWide15Chrome ? (
+          {!kassaWide15Chrome && !kassaIpad10Chrome ? (
             <div ref={langRef} className="relative z-[40] shrink-0">
               <button
                 ref={langTriggerRef}
