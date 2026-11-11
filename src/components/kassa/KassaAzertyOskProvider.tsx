@@ -40,10 +40,10 @@ import {
 } from '@/lib/kassa-azerty-osk'
 import { useKassaSpeelsDarkOskChrome } from '@/hooks/useKassaSpeelsDarkOskChrome'
 import {
-  KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS,
+  KASSA_SPEELS_GRAY_BTN_SHAPE,
+  KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS,
-  kassaSpeelsGrayChromeButtonClass,
 } from '@/lib/kassa-pos-surface'
 import {
   isEditableCatalogTextField,
@@ -734,7 +734,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     lineShortcutsOnKassaPos && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
   const keyBtnClass = speelsDarkOsk
-    ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[2.75rem] px-0.5 text-center text-base font-bold sm:min-h-[2.9rem] sm:text-lg`
+    ? [
+        KASSA_SPEELS_GRAY_BTN_SHAPE,
+        'kassa-azerty-osk-key kassa-azerty-osk-key--flat',
+        'touch-manipulation select-none relative',
+        'transition-transform duration-100 ease-out active:translate-y-px',
+        KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
+        'min-h-[2.75rem] px-0.5 text-center text-base font-bold sm:min-h-[2.9rem] sm:text-lg',
+      ].join(' ')
     : 'kassa-azerty-osk-key min-h-[2.75rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:min-h-[2.9rem] sm:text-lg'
 
   const keyBtnClassFor = useCallback(
@@ -842,7 +849,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 type="button"
                 className={keyBtnClassFor(
                   'shift',
-                  `min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`,
+                  `min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'kassa-azerty-osk-key--latched' : ''}`,
                 )}
                 {...shiftKeyHandlers}
               >
