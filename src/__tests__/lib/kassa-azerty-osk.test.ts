@@ -86,7 +86,7 @@ describe('kassa-azerty-osk', () => {
   })
 
   it('geen custom AZERTY op iPad-client', () => {
-    jest.mocked(readKassaIpadClientFromWindow).mockReturnValueOnce(true)
+    jest.mocked(readKassaIpadClientFromWindow).mockReturnValue(true)
     expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(false)
     expect(
       isAzertyOskActiveForSession({
@@ -94,8 +94,8 @@ describe('kassa-azerty-osk', () => {
         routeParamTenant: 'demo-frituur',
       }),
     ).toBe(false)
-    jest.mocked(readKassaIpadClientFromWindow).mockReturnValueOnce(true)
     expect(isAzertyOskActiveForSession({ pathname: '/login' })).toBe(false)
+    jest.mocked(readKassaIpadClientFromWindow).mockReturnValue(false)
   })
 
   it('shift voor letters en leestekens', () => {
