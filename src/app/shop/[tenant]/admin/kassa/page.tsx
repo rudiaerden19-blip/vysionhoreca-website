@@ -5868,25 +5868,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return <KassaSoundActivationScreen ui={ui} onActivate={activateSound} />
   }
 
-  const kassaDarkHeaderBtnShell = kassaPosLuxury
-    ? kassaWide15Chrome
-      ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
-      : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
-    : kassaWide15Chrome
-      ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-2.5 py-2'
-      : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-3.5 py-2 sm:min-h-[2.85rem] sm:px-4 sm:py-2.5'
+  const kassaDarkHeaderBtnShell = kassaWide15Chrome
+    ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
+    : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
 
-  const kassaHeaderQuickLinkShell = kassaPosLuxury
-    ? kassaWide15Chrome
-      ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
-      : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
-    : kassaWide15Chrome
-      ? 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.55rem] px-2 py-2'
-      : 'inline-flex min-w-0 max-w-full shrink touch-manipulation items-center justify-center overflow-hidden font-semibold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2'
+  const kassaHeaderQuickLinkShell = kassaWide15Chrome
+    ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
+    : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
 
-  const kassaHeaderQuickLinkLabelClass = kassaPosLuxury
-    ? 'whitespace-nowrap text-[11px] leading-snug sm:text-xs'
-    : KASSA_HEADER_QUICK_LINK_LABEL
+  const kassaHeaderQuickLinkLabelClass =
+    'whitespace-nowrap text-[11px] leading-snug sm:text-xs'
 
   const kassaSpeelsTopChromeTextClass =
     kassaPosLuxury && posChrome === 'speels' ? KASSA_SPEELS_TOP_CHROME_BTN_CLASS : ''
@@ -6326,13 +6317,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               setHamburgerSubOpen(null)
             }}
             className={`flex items-center transition-colors ${
-              kassaPosLuxury
-                ? kassaWide15Chrome
-                  ? 'gap-1 px-2 py-1'
-                  : 'gap-1.5 px-3 py-1.5 sm:gap-2 sm:px-3.5 sm:py-1.5'
-                : kassaWide15Chrome
-                  ? 'gap-1 px-1.5 py-1'
-                  : 'gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3'
+              kassaWide15Chrome
+                ? 'gap-1 px-2 py-1'
+                : 'gap-1.5 px-3 py-1.5 sm:gap-2 sm:px-3.5 sm:py-1.5'
             } ${
               kassaPosLuxury
                 ? `${kassaSpeelsBlackGlossButtonClass(hamburgerOpen)} ${kassaSpeelsTopChromeTextClass}`
@@ -6489,10 +6476,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className={`flex min-h-0 min-w-0 flex-1 items-center justify-start ${
-              kassaWide15Chrome
-                ? 'flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-                : 'flex-nowrap gap-1.5 sm:gap-2'
+            className={`flex min-h-0 min-w-0 flex-1 items-center justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+              kassaWide15Chrome ? 'flex-nowrap gap-1' : 'flex-nowrap gap-1.5 sm:gap-2'
             }`}
           >
 
@@ -6693,9 +6678,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 }`
           }
         >
-          <span className={kassaPosLuxury ? kassaHeaderQuickLinkLabelClass : 'leading-snug'}>
-            {t('kassaApp.logout')}
-          </span>
+          <span className={kassaHeaderQuickLinkLabelClass}>{t('kassaApp.logout')}</span>
         </button>
         </div>
         </div>
