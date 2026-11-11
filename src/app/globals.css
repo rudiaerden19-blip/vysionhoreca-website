@@ -550,6 +550,19 @@ input[type="number"] {
 }
 
 /* Dun zwart kader rond de tegel dekt de witte streep. Foto blijft onaangeroerd. */
+html.kassa-speels-layout .kassa-speels-menu-tile {
+  border: 0 !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+  background-color: #1a1a1a !important;
+  box-shadow:
+    0 0 0 1px #000000,
+    0 8px 22px rgba(0, 0, 0, 0.92),
+    0 18px 40px rgba(0, 0, 0, 0.82),
+    0 4px 14px rgba(0, 0, 0, 0.68) !important;
+}
+
+/* Fallback zonder html-class (zelfde Mode Dark-tegel). */
 .kassa-speels-menu-tile {
   border: 0 !important;
   outline: none !important;
@@ -557,8 +570,9 @@ input[type="number"] {
   background-color: #1a1a1a !important;
   box-shadow:
     0 0 0 1px #000000,
-    0 6px 16px rgba(0, 0, 0, 0.85),
-    0 12px 28px rgba(0, 0, 0, 0.72) !important;
+    0 8px 22px rgba(0, 0, 0, 0.92),
+    0 18px 40px rgba(0, 0, 0, 0.82),
+    0 4px 14px rgba(0, 0, 0, 0.68) !important;
 }
 
 .kassa-speels-menu-tile::before {
@@ -572,6 +586,23 @@ input[type="number"] {
   box-shadow: none;
 }
 
+html.kassa-speels-layout .kassa-speels-menu-tile::after,
+.kassa-speels-menu-tile::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 28;
+  border-radius: inherit;
+  box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.42);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.16) 0%,
+    rgba(0, 0, 0, 0.04) 42%,
+    rgba(0, 0, 0, 0.32) 100%
+  );
+}
+
 .kassa-speels-menu-tile:hover,
 .kassa-speels-menu-tile:focus,
 .kassa-speels-menu-tile:focus-visible {
@@ -579,8 +610,9 @@ input[type="number"] {
   border: 0 !important;
   box-shadow:
     0 0 0 1px #000000,
-    0 6px 16px rgba(0, 0, 0, 0.85),
-    0 12px 28px rgba(0, 0, 0, 0.72) !important;
+    0 8px 22px rgba(0, 0, 0, 0.92),
+    0 18px 40px rgba(0, 0, 0, 0.82),
+    0 4px 14px rgba(0, 0, 0, 0.68) !important;
 }
 
 /*
