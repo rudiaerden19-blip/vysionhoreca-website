@@ -6704,7 +6704,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : null}
 
-          {kassaPosLuxury && kassaTabletViewportChrome && !kassaIpad10Chrome ? (
+          {kassaPosLuxury && kassaTabletViewportChrome ? (
             <div
               data-testid="kassa-tablet-header-tenant-name"
               className="relative z-[25] flex min-w-0 max-w-[11rem] shrink-0 items-center justify-center px-1.5 sm:max-w-[12rem]"
@@ -7109,9 +7109,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           id="kassa-sidebar-tools-panel"
           className={
             kassaSidebarToolsSlidePanel
-              ? `absolute inset-x-0 z-20 transition-transform duration-300 ease-out ${kassaPlateBgClass} ${
-                  kassaIpad10Chrome ? 'top-10' : 'top-0'
-                } ${
+              ? `absolute inset-x-0 top-0 z-20 transition-transform duration-300 ease-out ${kassaPlateBgClass} ${
                   kassaSidebarToolsOpen
                     ? 'translate-y-0 shadow-[0_14px_28px_rgba(0,0,0,0.5)]'
                     : 'pointer-events-none -translate-y-full'
@@ -7119,17 +7117,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               : 'contents'
           }
         >
-        <div className={kassaIpad10Chrome ? 'relative' : undefined}>
-          {kassaIpad10Chrome ? (
-            <div
-              data-testid="kassa-ipad10-sidebar-tenant-name"
-              className="pointer-events-none absolute left-1/2 top-1/2 z-[25] w-full max-w-[min(100%,13rem)] -translate-x-[calc(50%+3cm)] -translate-y-1/2"
-            >
-              <div className="pointer-events-auto flex justify-center">
-                {renderKassaTenantNameButton('text-sm sm:text-base', 'max-w-full')}
-              </div>
-            </div>
-          ) : null}
         {/* Zone: Verkoop / Binnen / Terras */}
         <div
           className={`shrink-0 ${
@@ -7358,7 +7345,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               {t('kassaApp.clearTableBanner')}
             </button>
           ) : null}
-        </div>
         </div>
         </div>
 
