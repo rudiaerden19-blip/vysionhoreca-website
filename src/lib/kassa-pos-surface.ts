@@ -328,7 +328,7 @@ export function kassaSpeelsChromeButtonClass(selected: boolean): string {
   return kassaSpeelsGrayChromeButtonClass()
 }
 
-/** Speels categoriebalk — donkerblauw mat; actieve tab lichter blauw (geen glossy). */
+/** Speels categoriebalk — donkerblauw met dezelfde gloss-stack als Afrekenen (zonder sweep). */
 export function kassaSpeelsCategoryStripButtonClass(selected: boolean): string {
   return [
     KASSA_SPEELS_GRAY_BTN_SHAPE,
@@ -355,7 +355,7 @@ export function kassaPosButtonClass(selected: boolean, look: KassaPosChromeLook 
 
 export function kassaPosCheckoutButtonClass(look: KassaPosChromeLook = 'luxe'): string {
   if (look === 'speels') {
-    return `${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
+    return `${kassaSpeelsGreenGlossButtonClass(false)} font-bold ${KASSA_POS_BTN_DISABLED_SAME_LOOK}`
   }
   return KASSA_POS_CHECKOUT_BTN
 }

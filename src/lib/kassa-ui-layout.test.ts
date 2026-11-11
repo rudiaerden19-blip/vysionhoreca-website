@@ -108,6 +108,7 @@ describe('Speels bruine knoppen', () => {
   it('maakt Afrekenen in Speels groen glanzend', () => {
     expect(kassaPosCheckoutButtonClass('speels')).toContain('kassa-speels-green-gloss-btn')
     expect(kassaPosCheckoutButtonClass('speels')).not.toContain('kassa-speels-black-gloss-btn')
+    expect(kassaPosCheckoutButtonClass('speels')).not.toContain('kassa-speels-green-glow-sweep')
   })
 
   it('maakt mand-vuilbak in Speels rood glanzend als Verwijder', () => {

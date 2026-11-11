@@ -14,7 +14,6 @@ import {
 import type { KitchenStyleOrder } from '@/components/shop-display/KitchenStyleOrderCard'
 import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
 import {
-  KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   kassaSpeelsGrayChromeButtonClass,
   kassaSpeelsGreenGlossButtonClass,
 } from '@/lib/kassa-pos-surface'
@@ -372,7 +371,7 @@ export function KitchenKdsColumn({
         <button
           type="button"
           onClick={onReady}
-          className={`${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} flex-1 font-black uppercase tracking-wide ${
+          className={`${kassaSpeelsGreenGlossButtonClass(false)} flex-1 font-black uppercase tracking-wide ${
             compact ? 'min-h-[48px] text-base' : 'min-h-[64px] text-2xl'
           }`}
         >

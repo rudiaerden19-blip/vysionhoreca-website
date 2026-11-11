@@ -42,7 +42,6 @@ import {
   type KassaViewportProfileId,
 } from '@/lib/kassa-viewport-profile-id'
 import {
-  KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
   kassaSpeelsBlueGlossButtonClass,
   kassaSpeelsGrayChromeButtonClass,
@@ -978,7 +977,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     whileTap={{ scale: 0.99 }}
                     type="button"
                     onClick={() => handleReady(selectedOrder)}
-                    className={`py-5 text-lg ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS}`}
+                    className={`py-5 text-lg ${kassaSpeelsGreenGlossButtonClass(false)}`}
                   >
                     {tx('markReady')}
                   </motion.button>
