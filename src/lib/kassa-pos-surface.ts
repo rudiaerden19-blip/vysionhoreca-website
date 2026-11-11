@@ -250,8 +250,8 @@ export const KASSA_SPEELS_ONLINE_STATUS_SWEEP_CLASS = KASSA_SPEELS_GREEN_GLOW_SW
 /** Mand-prijzen — zelfde groen als Afrekenen (speels green gloss). */
 export const KASSA_SPEELS_PRICE_ACCENT_CLASS = 'text-[#4aad7a]'
 
-/** Header zaaknaam — zelfde rood als Verwijder (speels red gloss). */
-export const KASSA_SPEELS_TENANT_NAME_CLASS = 'text-[#b84848]'
+/** Header zaaknaam — zelfde gedempt grijs als chrome-knoppen. */
+export const KASSA_SPEELS_TENANT_NAME_CLASS = 'text-[#b0b0b0]'
 
 const KASSA_SPEELS_CHROME_BTN_SHELL = [
   'touch-manipulation select-none relative isolate overflow-hidden font-semibold',

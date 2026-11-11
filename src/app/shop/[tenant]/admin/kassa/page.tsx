@@ -6216,7 +6216,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const kassaTenantNameColorClass =
     kassaPosLuxury && posChrome === 'speels'
-      ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#d06060] active:text-[#9a3838]`
+      ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#c4c4c4] active:text-[#989898]`
       : 'text-white hover:bg-white/15 active:bg-white/25'
 
   const renderKassaTenantNameButton = (sizeClass: string, maxWidthClass: string) => (
