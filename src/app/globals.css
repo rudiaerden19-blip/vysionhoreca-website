@@ -641,7 +641,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 }
 
 /*
- * Speels — één gloss-stack (zelfde verhouding als Afrekenen; statische onder-glans, geen sweep).
+ * Speels — boven-glans (::before); geen statische onder-glans (::after uit, sweep zie groen).
  */
 .kassa-speels-black-gloss-btn::before,
 .kassa-speels-blue-gloss-btn::before,
@@ -654,14 +654,14 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   left: 2px;
   right: 2px;
   top: 2px;
-  height: 50%;
+  height: 46%;
   z-index: 0;
   border-radius: 0.65rem 0.65rem 45% 45%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.44) 40%,
-    rgba(255, 255, 255, 0.08) 78%,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(255, 255, 255, 0.26) 38%,
+    rgba(255, 255, 255, 0.05) 76%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -671,22 +671,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 .kassa-speels-red-gloss-btn::after,
 .kassa-speels-green-gloss-btn::after,
 .kassa-speels-category-strip-btn::after {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  bottom: 2px;
-  height: 40%;
-  z-index: 0;
-  border-radius: 45% 45% 0.65rem 0.65rem;
-  background: linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.26) 0%,
-    rgba(255, 255, 255, 0.12) 38%,
-    rgba(255, 255, 255, 0.04) 68%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  content: none;
+  display: none;
 }
 
 .kassa-speels-category-strip-btn > * {
@@ -696,12 +682,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 
 .kassa-speels-black-gloss-btn:active::before,
 .kassa-speels-category-strip-btn:active::before {
-  opacity: 0.35;
-}
-
-.kassa-speels-black-gloss-btn:active::after,
-.kassa-speels-category-strip-btn:active::after {
-  opacity: 0.35;
+  opacity: 0.4;
 }
 
 /* Speels categoriebalk — zelfde blauw + gloss-stack als overige chrome-knoppen. */
@@ -778,9 +759,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
 }
 
-.kassa-speels-blue-gloss-btn:active::before,
-.kassa-speels-blue-gloss-btn:active::after {
-  opacity: 0.35;
+.kassa-speels-blue-gloss-btn:active::before {
+  opacity: 0.4;
 }
 
 .kassa-speels-blue-gloss-btn--selected {
@@ -930,9 +910,13 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   }
 }
 
-/* Alleen Afrekenen (voorbeeldknop) — bewegende lichtband; andere groen-knoppen: statische ::after. */
+/* Alleen Afrekenen — bewegende lichtband (override ::after uit). */
 .kassa-speels-green-gloss-btn.kassa-speels-green-glow-sweep::after,
 .kassa-speels-green-gloss-btn.kassa-speels-online-status-sweep::after {
+  content: '';
+  display: block;
+  pointer-events: none;
+  position: absolute;
   left: 0;
   right: auto;
   top: 0;
@@ -954,11 +938,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 
 .kassa-speels-red-gloss-btn:active::before,
 .kassa-speels-green-gloss-btn:active::before,
-.kassa-speels-black-gloss-btn:active::before,
-.kassa-speels-red-gloss-btn:active::after,
-.kassa-speels-green-gloss-btn:active::after,
-.kassa-speels-black-gloss-btn:active::after {
-  opacity: 0.35;
+.kassa-speels-black-gloss-btn:active::before {
+  opacity: 0.4;
 }
 
 .kassa-speels-red-gloss-btn--emphasis,
@@ -975,8 +956,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 .kassa-speels-black-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.88) 0%,
-    rgba(255, 255, 255, 0.4) 45%,
+    rgba(255, 255, 255, 0.64) 0%,
+    rgba(255, 255, 255, 0.28) 42%,
     rgba(255, 255, 255, 0) 100%
   );
 }
