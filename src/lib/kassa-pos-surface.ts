@@ -46,8 +46,8 @@ export const KASSA_POS_RULE_BLACK = 'border-black'
 
 export const KASSA_POS_BTN_SHAPE = 'rounded-xl'
 
-/** Speels grijs/zwart chrome — capsule/pill (referentie glossy). */
-export const KASSA_SPEELS_GRAY_BTN_SHAPE = 'rounded-full'
+/** Speels grijs/zwart chrome —zelfde rechthoek als Afrekenen/Verwijder. */
+export const KASSA_SPEELS_GRAY_BTN_SHAPE = KASSA_POS_BTN_SHAPE
 
 export const KASSA_POS_SELECTED_ACCENT_TEXT = 'text-[#1a1612]'
 
@@ -228,16 +228,13 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
 /** Tekst op speels blauw/rood/groen chrome-knoppen. */
 export const KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS = 'text-[#b0b0b0]'
 
-/** Wit label op grijs/zwart glossy pills. */
+/** Grijs chrome — wit label (referentie). */
 export const KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS = 'text-white font-semibold'
 
 /** Header + categoriebalk — iets donkerder grijs dan overige chrome-knoppen. */
 export const KASSA_SPEELS_TOP_CHROME_BTN_CLASS = 'kassa-speels-top-chrome-btn'
 
 export const KASSA_SPEELS_ORDER_TYPE_BTN_CLASS = 'kassa-speels-order-type-btn'
-
-/** Lichtere glossy pill (Totaal-balk). */
-export const KASSA_SPEELS_GRAY_PILL_LIGHT_CLASS = 'kassa-speels-gray-pill--light'
 
 export const KASSA_SPEELS_BLACK_GLOSS_BTN_CLASS = 'kassa-speels-black-gloss-btn'
 export const KASSA_SPEELS_BLUE_GLOSS_BTN_CLASS = 'kassa-speels-blue-gloss-btn'
@@ -360,12 +357,8 @@ export function kassaPosRemoveButtonClass(look: KassaPosChromeLook = 'luxe'): st
   return kassaPosButtonClass(false, look)
 }
 
-export function kassaSpeelsGrayPillLightStripClass(): string {
-  return `${kassaSpeelsGrayChromeButtonClass()} ${KASSA_SPEELS_GRAY_PILL_LIGHT_CLASS}`
-}
-
 export function kassaPosRaisedStripClass(look: KassaPosChromeLook = 'luxe'): string {
-  if (look === 'speels') return kassaSpeelsGrayPillLightStripClass()
+  if (look === 'speels') return kassaSpeelsGrayChromeButtonClass()
   return kassaPosButtonClass(false, look)
 }
 
