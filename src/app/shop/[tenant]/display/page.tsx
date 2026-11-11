@@ -10,6 +10,7 @@ import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
 import { getAdminKassaEntryHref, getFirstAccessibleAdminPath } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
 import { 
@@ -95,6 +96,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     !modulesLoading && !kassaEntryHref
       ? getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
       : null
+  const kassaEntryHrefNav = useKassaViewportProfileHref(kassaEntryHref ?? '')
+  const adminMenuHrefNav = useKassaViewportProfileHref(adminMenuHref ?? '')
+  const keukenNavHref = useKassaViewportProfileHref(`/keuken/${params.tenant}`)
   const showReservations = !modulesLoading && moduleAccess.reservaties
   
   // Translation helper for shopDisplay keys
@@ -919,7 +923,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             {kassaEntryHref && (
               <Link
-                href={kassaEntryHref}
+                href={kassaEntryHrefNav}
                 className="flex shrink-0 items-center gap-2 rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe]"
               >
                 <span className="text-base leading-none" aria-hidden>
@@ -930,7 +934,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             )}
             {!kassaEntryHref && adminMenuHref && (
               <Link
-                href={adminMenuHref}
+                href={adminMenuHrefNav}
                 className={ui.adminMenuLink}
               >
                 ← {t('adminLayout.menu')}
@@ -1005,7 +1009,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             )}
 
             <Link
-              href={`/keuken/${params.tenant}`}
+              href={keukenNavHref}
               className="px-3 py-2 bg-accent hover:bg-accent/90 rounded-xl text-sm font-bold text-white"
             >
                {tx('kitchen')}

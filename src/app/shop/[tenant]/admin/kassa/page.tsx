@@ -403,6 +403,8 @@ import {
   isKassaLayoutPreviewSearchParams,
   resolveKassaLayoutPreviewChrome,
 } from '@/lib/kassa-layout-preview'
+import { applyKassaViewportProfileContextFromSession } from '@/lib/kassa-viewport-profile-context'
+import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
 import {
   estimateKassaSidebarWidthPxForInnerWidth,
   kassaViewportChromeCssVars,
@@ -1384,9 +1386,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   /** Layout-lab iframe: viewport = lab_w×lab_h, niet device-width van desktop. */
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
-    return applyKassaLayoutPreviewViewportFromSearchParams(
-      new URLSearchParams(window.location.search),
-    )
+    const sp = new URLSearchParams(window.location.search)
+    let cleanup = applyKassaLayoutPreviewViewportFromSearchParams(sp)
+    if (!cleanup) cleanup = applyKassaViewportProfileContextFromSession()
+    return cleanup
   }, [])
 
   const [kassaViewportProfileId, setKassaViewportProfileId] = useState<KassaViewportProfileId>(
@@ -1407,6 +1410,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaIpadMenuGridCap = kassaIpadTabletLayoutActive(kassaViewportProfileId)
   const kassaTabletViewportChrome = isKassaTabletViewportProfile(kassaViewportProfileId)
   const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
+  const keukenNavHref = useKassaViewportProfileHref(`/keuken/${tenant}`)
+  const shopDisplayNavHref = useKassaViewportProfileHref(`/shop/${tenant}/display`)
   const kassaCompactChrome = kassaCompactChromeFromProfileId(kassaViewportProfileId)
   const kassaChromeDensity = kassaChromeDensityFromProfileId(kassaViewportProfileId)
 
@@ -6525,7 +6530,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           {isAdminSubmenuEnabled('sm_orders_display', tenant, effectiveAccess, effectiveJson) &&
             !kassaIpad10Chrome && (
             <Link
-              href={`/shop/${tenant}/display`}
+              href={shopDisplayNavHref}
               title={t('kassaApp.navShopDisplay')}
               className={headerQuickLinkBtnClass}
             >
@@ -6535,7 +6540,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isAdminSubmenuEnabled('sm_orders_keuken', tenant, effectiveAccess, effectiveJson) && (
             <Link
-              href={`/keuken/${tenant}`}
+              href={keukenNavHref}
               title={t('kassaApp.navKitchenDisplay')}
               className={headerQuickLinkBtnClass}
             >

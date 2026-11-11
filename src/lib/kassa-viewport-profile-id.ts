@@ -6,6 +6,10 @@
 import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
 import { KASSA_LAYOUT_LAB_FRAMES, resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
 import {
+  persistKassaViewportProfileContext,
+  stickyKassaViewportProfileId,
+} from '@/lib/kassa-viewport-profile-context'
+import {
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
@@ -100,7 +104,13 @@ export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
   try {
     const sp = new URLSearchParams(window.location.search)
     const forced = sp.get('kvp')
-    if (isKassaViewportProfileId(forced)) return forced
+    if (isKassaViewportProfileId(forced)) {
+      persistKassaViewportProfileContext(forced, sp)
+      return forced
+    }
+    const sticky = stickyKassaViewportProfileId()
+    if (sticky) return sticky
+
     const flags = readKassaChromeFlagsForProfileId()
     const vv = window.visualViewport
     const cssW = Math.max(
@@ -111,11 +121,13 @@ export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
       1,
       Math.floor(vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight),
     )
-    return resolveKassaViewportProfileIdFromWindow({
+    const resolved = resolveKassaViewportProfileIdFromWindow({
       ...flags,
       cssW,
       cssH,
     })
+    persistKassaViewportProfileContext(resolved, sp)
+    return resolved
   } catch {
     return 'default'
   }

@@ -41,6 +41,7 @@ import {
   kitchenKdsDensityFromViewportProfileId,
   kitchenItemLineKey,
 } from '@/components/keuken/KitchenKdsColumn'
+import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
 import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
@@ -91,6 +92,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     !modulesLoading && !kassaEntryHref
       ? getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
       : null
+  const kassaEntryHrefNav = useKassaViewportProfileHref(kassaEntryHref ?? '')
+  const adminMenuHrefNav = useKassaViewportProfileHref(adminMenuHref ?? '')
   
   // Translation helper for kitchenDisplay keys
   const tx = (key: string) => t(`kitchenDisplay.${key}`)
@@ -636,12 +639,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <div className="flex min-w-0 items-center justify-between gap-2">
           <div className="flex min-w-0 shrink items-center gap-2">
             {kassaEntryHref && (
-              <Link href={kassaEntryHref} className={`flex shrink-0 items-center gap-2 ${kdsChromeBtn}`}>
+              <Link href={kassaEntryHrefNav} className={`flex shrink-0 items-center gap-2 ${kdsChromeBtn}`}>
                 {t('adminLayout.pos')}
               </Link>
             )}
             {!kassaEntryHref && adminMenuHref && (
-              <Link href={adminMenuHref} className={`flex shrink-0 items-center gap-2 ${kdsChromeBtn}`}>
+              <Link href={adminMenuHrefNav} className={`flex shrink-0 items-center gap-2 ${kdsChromeBtn}`}>
                 ← {t('adminLayout.menu')}
               </Link>
             )}
