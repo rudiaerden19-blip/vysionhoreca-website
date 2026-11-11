@@ -96,7 +96,6 @@ type StockActivityLine = {
   delta: number
   mode: 'stockCount' |  'goodsReceipt'
 }
-import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { LogoutSoftwareConfirmModal } from '@/components/LogoutSoftwareConfirmModal'
 import { authFetch, buildShopInternalReturnPath } from '@/lib/auth-headers'
@@ -211,7 +210,7 @@ const RETAIL_GRAY_TRAY_TILES: RetailGrayTrayTile[] = [
 
 export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const baseUrl = `/shop/${tenant}/admin`
-  const { t, locale, setLocale, locales, localeNames } = useLanguage()
+  const { t, locale } = useLanguage()
   const { layout: kassaLayout, dark: appearanceDark, setLayout: setKassaLayout } =
     useKassaUiLayoutSync(tenant)
   const kassaPlateBgClass = kassaLayoutPlateBgClass(kassaLayout)
@@ -253,7 +252,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const cartScrollRef = useRef<HTMLDivElement>(null)
   const listScrollTargetRef = useRef<string | null>(null)
   const [listScrollTick, setListScrollTick] = useState(0)
-  const langRef = useRef<HTMLDivElement>(null)
 
   const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
   const staffClockEnabled = !!tenantInfo?.kassa_staff_clock_enabled
@@ -307,7 +305,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const [thermalPrintBanner, setThermalPrintBanner] = useState<string | null>(null)
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
-  const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSplitModal, setShowSplitModal] = useState(false)
@@ -553,15 +550,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
       scanRef.current?.blur()
     }
   }, [])
-
-  useEffect(() => {
-    if (!langOpen) return
-    const onDoc = (e: MouseEvent) => {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false)
-    }
-    document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
-  }, [langOpen])
 
   const promoCharges = useMemo(
     () =>
@@ -3139,45 +3127,6 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
               rowInactiveClassName={ui.langRowInactive}
             />
           ) : null}
-
-          <div ref={langRef} className="relative z-[40] shrink-0">
-            <button
-              type="button"
-              aria-haspopup="listbox"
-              aria-expanded={langOpen}
-              aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
-              onClick={() => setLangOpen((o) => !o)}
-              className={headerUtilityBtnClass(langOpen)}
-            >
-              <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
-              <svg
-                className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {langOpen && (
-              <div className={ui.langPanel}>
-                {locales.map((lang) => (
-                  <button
-                    key={lang}
-                    type="button"
-                    onClick={() => {
-                      setLocale(lang)
-                      setLangOpen(false)
-                    }}
-                    className={`flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors ${ui.langRowHover} ${locale === lang ? ui.langRowActive : ui.langRowInactive}`}
-                  >
-                    <LocaleFlagEmoji locale={lang} />
-                    <span>{localeNames[lang]}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
 
           <button
             type="button"

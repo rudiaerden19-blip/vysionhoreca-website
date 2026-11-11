@@ -8,7 +8,6 @@ import { isWebshopChannelNewOrder } from '@/lib/admin-api-order-helpers'
 import { formatOrderScheduleDetail } from '@/lib/format-order-schedule'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
-import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import { useKassaPosViewportBootstrap } from '@/hooks/useKassaPosViewportBootstrap'
 import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
@@ -87,7 +86,7 @@ interface Reservation {
 
 export default function ShopDisplayPage({ params }: { params: { tenant: string } }) {
   useKassaPosViewportBootstrap()
-  const { t, locale, setLocale, locales, localeNames } = useLanguage()
+  const { t, locale } = useLanguage()
   const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const adminBase = `/shop/${params.tenant}/admin`
   const kassaEntryHref =
@@ -134,8 +133,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [activeTab, setActiveTab] = useState<'active' |  'completed'>('active')
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [showReservationsModal, setShowReservationsModal] = useState(false)
-  const [displayLangOpen, setDisplayLangOpen] = useState(false)
-  const displayLangRef = useRef<HTMLDivElement>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -155,16 +152,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       }
     }
   }, [params.tenant])
-
-  useEffect(() => {
-    function handlePointerOutside(e: PointerEvent) {
-      if (displayLangRef.current && !displayLangRef.current.contains(e.target as Node)) {
-        setDisplayLangOpen(false)
-      }
-    }
-    document.addEventListener('pointerdown', handlePointerOutside, true)
-    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
-  }, [])
 
   // Load pending reservations (alleen tenants met reservatiemodule)
   useEffect(() => {
@@ -1017,44 +1004,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                {tx('kitchen')}
             </Link>
 
-            <div className="relative z-[130]" ref={displayLangRef}>
-              <button
-                type="button"
-                onClick={() => setDisplayLangOpen((o) => !o)}
-                className={ui.langBtn}
-                title={t('languageSwitcher.selectLanguage')}
-              >
-                <LocaleFlagEmoji locale={locale} className="text-base" />
-                <svg
-                  className={`size-3.5 shrink-0 transition-transform ${displayLangOpen ? 'rotate-180': ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {displayLangOpen && (
-                <div className={ui.langDropdown}>
-                  {locales.map((lang) => (
-                    <button
-                      key={lang}
-                      type="button"
-                      onClick={() => {
-                        setLocale(lang)
-                        setDisplayLangOpen(false)
-                      }}
-                      className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-colors ${
-                        locale === lang ? ui.langItemActive : ui.langItem
-                      }`}
-                    >
-                      <LocaleFlagEmoji locale={lang} />
-                      <span>{localeNames[lang]}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </header>

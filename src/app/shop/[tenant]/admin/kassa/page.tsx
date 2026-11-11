@@ -231,8 +231,6 @@ import {
   writeKassaOrderTypeChoice,
 } from '@/lib/kassa-order-type-choice'
 import { KassaTablePickerGrid } from '@/components/kassa/KassaTablePickerGrid'
-import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
-import { LocalePickerPortalMenu } from '@/components/LocalePickerPortalMenu'
 import { KassaRegisterSuspenseFallback } from '@/components/KassaRegisterSuspenseFallback'
 import type {
   KassaCartItem as CartItem,
@@ -1312,7 +1310,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }, [kassaAppearanceDark, kassaLayout, blonkysFlatButtons])
 
   const baseUrl = `/shop/${tenant}/admin`
-  const { t, locale, setLocale, locales, localeNames } = useLanguage()
+  const { t, locale } = useLanguage()
 
   const {
     moduleAccess,
@@ -1512,10 +1510,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const [soundsOn, setSoundsOn] = useState(true)
   const [isOnline, setIsOnline] = useState<boolean | null>(null)
   const flushOfflineOrdersRef = useRef<() => Promise<void>>(async () => {})
-  const [langOpen, setLangOpen] = useState(false)
   const [logoutSoftwareConfirmOpen, setLogoutSoftwareConfirmOpen] = useState(false)
-  const langRef = useRef<HTMLDivElement>(null)
-  const langTriggerRef = useRef<HTMLButtonElement>(null)
   const handleProductClickRef = useRef<(product: MenuProduct) => Promise<void>>(async () => {})
   /** Touch/WebView: voorkom dubbele afhandeling (pointerup + synthetische click). */
   const suppressProductGridClickRef = useRef(false)
@@ -3490,17 +3485,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       window.removeEventListener('offline', goOffline)
     }
   }, [tenant])
-
-  // Sluit taalmenu bij tik buiten (pointerdown: betrouwbaar op Windows-touch / Edge)
-  useEffect(() => {
-    function handlePointerOutside(e: PointerEvent) {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) {
-        setLangOpen(false)
-      }
-    }
-    document.addEventListener('pointerdown', handlePointerOutside, true)
-    return () => document.removeEventListener('pointerdown', handlePointerOutside, true)
-  }, [])
 
   const toggleSound = () => {
     const next = !soundsOn
@@ -5913,15 +5897,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? KASSA_CLASSIC_HEADER_QUICK_LINK_BTN
         : KASSA_HEADER_QUICK_LINK_BTN
 
-  const headerUtilityBtnClass = (selected: boolean) =>
-    kassaPosLuxury
-      ? `${kassaDarkHeaderBtnShell} gap-0.5 sm:gap-1 ${
-          posChrome === 'speels'
-            ? kassaSpeelsBlueGlossButtonClass(selected)
-            : `${kassaPosButtonClass(selected, posChrome)} ${kassaSpeelsTopChromeTextClass}`
-        }`
-      : ''
-
   const kassaIpadTabletChrome = kassaTabletViewportChrome
   const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
@@ -6611,23 +6586,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             />
           ) : null}
 
-          {isOnline !== null && !kassaPosLuxury && !kassaWide15Chrome && !kassaIpad10Chrome ? (
-            <div
-              className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
-                isOnline
-                  ? `min-h-[2.65rem] rounded-xl px-4 py-2 text-sm font-bold sm:min-h-[2.85rem] sm:px-5 sm:text-base ${kassaLight ? KASSA_LIGHT_BTN_FACE : KASSA_CLASSIC_BTN_FACE}`
-                  : 'min-h-[2.65rem] rounded-xl bg-red-600/95 px-4 py-2 text-sm font-bold text-white sm:min-h-[2.85rem] sm:px-5 sm:text-base'
-              }`}
-              title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
-              role="status"
-              aria-live="polite"
-            >
-              <span className="truncate">
-                {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
-              </span>
-            </div>
-          ) : null}
-
           {activeKassaStaff && !demoViewOnly && (
             <div className="flex max-w-[7rem] shrink-0 items-center rounded-md bg-emerald-600/90 px-1.5 py-1 text-[10px] font-bold text-white md:max-w-[10rem] md:text-xs">
               <span className="truncate" title={activeKassaStaff.name}>
@@ -6665,63 +6623,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className={kassaHeaderQuickLinkShell}
               labelClassName={KASSA_HEADER_QUICK_LINK_LABEL}
             />
-          ) : null}
-
-          {isOnline !== null && kassaPosLuxury && !kassaWide15Chrome && !kassaIpad10Chrome ? (
-            <div
-              className={`inline-flex shrink-0 items-center justify-center overflow-hidden leading-tight ${
-                isOnline
-                  ? posChrome === 'speels'
-                    ? `${kassaDarkHeaderBtnShell} min-w-[5.25rem] px-4 sm:min-w-[5.75rem] sm:px-5 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaSpeelsGreenGlossButtonClass(false)}`
-                    : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-4 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} ${kassaSpeelsTopChromeTextClass}`
-                  : `${kassaDarkHeaderBtnShell} min-w-[5rem] px-3 ${KASSA_HEADER_QUICK_LINK_LABEL} ${kassaPosButtonClass(false, posChrome)} bg-red-600/95 text-white`
-              }`}
-              title={isOnline ? t('kassaApp.onlineModeLiveTitle') : t('kassaApp.offlineModeActive')}
-              role="status"
-              aria-live="polite"
-            >
-              <span className="truncate">
-                {isOnline ? t('kassaApp.onlineModeLive') : t('kassaApp.offlineModeActive')}
-              </span>
-            </div>
-          ) : null}
-
-          {!kassaWide15Chrome && !kassaIpad10Chrome ? (
-            <div ref={langRef} className="relative z-[40] shrink-0">
-              <button
-                ref={langTriggerRef}
-                type="button"
-                aria-haspopup="listbox"
-                aria-expanded={langOpen}
-                aria-label={`${t('nav.language')}: ${localeNames[locale]}`}
-                onClick={() => setLangOpen(o => !o)}
-                className={
-                  kassaPosLuxury
-                    ? headerUtilityBtnClass(langOpen)
-                    : `inline-flex touch-manipulation items-center gap-0.5 whitespace-nowrap rounded-lg px-1.5 py-1.5 font-medium transition-colors sm:gap-1 sm:rounded-xl sm:px-2 sm:py-2 md:px-3 ${
-                        kassaLight
-                          ? KASSA_LIGHT_BTN_FACE
-                          : KASSA_CLASSIC_BTN_FACE
-                      }`
-                }
-              >
-                <LocaleFlagEmoji locale={locale} variant="inline" className="text-sm text-white sm:text-[15px]" />
-                <svg className={`size-4 shrink-0 transition-transform ${langOpen ? 'rotate-180': ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-              </button>
-              <LocalePickerPortalMenu
-                isOpen={langOpen}
-                onOpenChange={setLangOpen}
-                triggerRef={langTriggerRef}
-                panelClassName={
-                  kassaAppearanceDark
-                    ? 'overflow-hidden rounded-xl border border-zinc-600 bg-[#151a21] shadow-xl py-1'
-                    : 'overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl py-1'
-                }
-                rowHoverClassName={ui.langRowHover}
-                rowActiveClassName={ui.langRowActive}
-                rowInactiveClassName={ui.langRowInactive}
-              />
-            </div>
           ) : null}
 
           {kassaPosLuxury && kassaTabletViewportChrome && !kassaIpad10Chrome ? (
