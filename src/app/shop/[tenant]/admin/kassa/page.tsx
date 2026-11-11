@@ -451,10 +451,15 @@ function readKassaChromeFlagsFromWindow(): {
     const preview = resolveKassaLayoutPreviewChrome(new URLSearchParams(window.location.search))
     if (preview) return preview
   }
+  const ipadClient = readKassaIpadClientFromWindow()
+  if (ipadClient) {
+    return { sxgaDense: false, wide15: false, ipadClient: true }
+  }
+  const vp = readKassaViewportProfileFromWindow()
   return {
-    sxgaDense: readKassaViewportProfileFromWindow() === 'sxga17',
-    wide15: readKassaViewportProfileFromWindow() === 'wide15',
-    ipadClient: readKassaIpadClientFromWindow(),
+    sxgaDense: vp === 'sxga17',
+    wide15: vp === 'wide15',
+    ipadClient: false,
   }
 }
 
@@ -1379,8 +1384,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     )
   }, [])
 
-  const [kassaViewportProfileId, setKassaViewportProfileId] =
-    useState<KassaViewportProfileId>('default')
+  const [kassaViewportProfileId, setKassaViewportProfileId] = useState<KassaViewportProfileId>(
+    () =>
+      typeof window !== 'undefined' ? readKassaViewportProfileIdFromWindow() : 'default',
+  )
   const [kassaViewportSettingsMap, setKassaViewportSettingsMap] =
     useState<KassaViewportProfileSettingsMap>({})
 
@@ -5916,7 +5923,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }`
       : ''
 
-  const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
+  const kassaIpadTabletChrome =
+    kassaIpadMenuGridCap &&
+    (kassaViewportProfileId === 'ipad_10' || kassaViewportProfileId === 'ipad_129')
   const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
   const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
@@ -7045,8 +7054,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           data-kassa-sidebar="1"
           className={`${
-            kassaCompactChrome || kassaIpad10Chrome
-              ? `w-[var(--kassa-sidebar-width)] ${kassaIpad10Chrome ? 'max-w-[42vw]' : 'max-w-[46vw]'}`
+            kassaCompactChrome || kassaIpadTabletChrome
+              ? `w-[var(--kassa-sidebar-width)] ${kassaIpadTabletChrome ? 'max-w-[42vw]' : 'max-w-[46vw]'}`
               : 'w-80 sm:w-96 lg:w-[var(--kassa-sidebar-width)]'
           } ${
             kassaWide15Chrome ? 'max-w-[46vw]' : ''

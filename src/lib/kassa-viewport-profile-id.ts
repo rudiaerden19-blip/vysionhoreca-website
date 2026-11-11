@@ -61,11 +61,15 @@ function readKassaChromeFlagsForProfileId(): {
     const preview = resolveKassaLayoutPreviewChrome(new URLSearchParams(window.location.search))
     if (preview) return preview
   }
+  const ipadClient = readKassaIpadClientFromWindow()
+  if (ipadClient) {
+    return { sxgaDense: false, wide15: false, ipadClient: true }
+  }
   const vp = readKassaViewportProfileFromWindow()
   return {
     sxgaDense: vp === 'sxga17',
     wide15: vp === 'wide15',
-    ipadClient: readKassaIpadClientFromWindow(),
+    ipadClient: false,
   }
 }
 
@@ -79,16 +83,15 @@ export function resolveKassaViewportProfileIdFromWindow(input: {
   forcedProfileId?: KassaViewportProfileId | null
 }): KassaViewportProfileId {
   if (input.forcedProfileId) return input.forcedProfileId
-  if (input.wide15) return 'wide15'
-  if (input.sxgaDense) return 'sxga'
   if (input.ipadClient) {
     const w = Math.max(input.cssW, input.cssH)
     const h = Math.min(input.cssW, input.cssH)
-    if (w >= 1050 && w <= 1110 && h >= 780 && h <= 830) return 'ipad_10'
-    if (w >= 1320 && w <= 1400 && h >= 1000 && h <= 1050) return 'ipad_129'
-    if (h > 0 && w / h >= 1.28 && w / h <= 1.34) return 'ipad_10'
-    return 'ipad_129'
+    /* 12.9″ Pro-klasse (lab ~1366×1024); alle andere iPads → ipad_10 chrome. */
+    if (w >= 1300 && h >= 980) return 'ipad_129'
+    return 'ipad_10'
   }
+  if (input.wide15) return 'wide15'
+  if (input.sxgaDense) return 'sxga'
   return 'default'
 }
 
