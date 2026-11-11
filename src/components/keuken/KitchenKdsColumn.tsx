@@ -12,6 +12,7 @@ import {
   kassaOrderItemKitchenLineNote,
 } from '@/lib/kassa-cart-line-key'
 import type { KitchenStyleOrder } from '@/components/shop-display/KitchenStyleOrderCard'
+import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   kassaSpeelsGrayChromeButtonClass,
@@ -25,11 +26,23 @@ const KDS_HEADER_RED = '#9b1c1c'
 export const KDS_COLUMN_WIDTH_PX = 400
 /** Compacter op 15″ breedbeeld (1366×768). */
 export const KDS_COLUMN_WIDTH_WIDE15_PX = 300
+/** iPad 10″ landschap (~1080×810). */
+export const KDS_COLUMN_WIDTH_IPAD10_PX = 260
 
-export type KitchenKdsDensity = 'default' | 'wide15'
+export type KitchenKdsDensity = 'default' | 'wide15' | 'ipad10'
 
 export function kdsColumnWidthPx(density: KitchenKdsDensity): number {
-  return density === 'wide15' ? KDS_COLUMN_WIDTH_WIDE15_PX : KDS_COLUMN_WIDTH_PX
+  if (density === 'wide15') return KDS_COLUMN_WIDTH_WIDE15_PX
+  if (density === 'ipad10') return KDS_COLUMN_WIDTH_IPAD10_PX
+  return KDS_COLUMN_WIDTH_PX
+}
+
+export function kitchenKdsDensityFromViewportProfileId(
+  profileId: KassaViewportProfileId,
+): KitchenKdsDensity {
+  if (profileId === 'wide15') return 'wide15'
+  if (profileId === 'ipad_10') return 'ipad10'
+  return 'default'
 }
 
 /** Regel in de bon: index in `order.items`, zodat twee dezelfde producten apart afgevinkt worden. */
@@ -152,7 +165,7 @@ export function KitchenKdsColumn({
   onBodyScroll,
   density = 'default',
 }: Props) {
-  const compact = density === 'wide15'
+  const compact = density === 'wide15' || density === 'ipad10'
   const colW = kdsColumnWidthPx(density)
   const elapsed = formatElapsed(order.created_at, now)
   const dineInSeat = adminDineInSeatAuditLine(order, t)

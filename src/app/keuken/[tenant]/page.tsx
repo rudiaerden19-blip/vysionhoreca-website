@@ -38,9 +38,10 @@ import {
   type KitchenKdsDensity,
   KitchenItemMadeMark,
   KitchenKdsColumn,
+  kitchenKdsDensityFromViewportProfileId,
   kitchenItemLineKey,
 } from '@/components/keuken/KitchenKdsColumn'
-import { readKassaViewportProfileFromWindow } from '@/lib/kassa-viewport-profile'
+import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -143,6 +144,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const boardScrollRef = useRef<HTMLDivElement>(null)
   const [kdsDensity, setKdsDensity] = useState<KitchenKdsDensity>('default')
   const kdsColPx = useMemo(() => kdsColumnWidthPx(kdsDensity), [kdsDensity])
+  const kdsCompactLayout = kdsDensity !== 'default'
   const [colsPerPage, setColsPerPage] = useState(5)
   const [kdsPage, setKdsPage] = useState(0)
   const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
@@ -253,7 +255,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   useEffect(() => {
     const syncVp = () => {
-      const d: KitchenKdsDensity = readKassaViewportProfileFromWindow() === 'wide15' ? 'wide15' : 'default'
+      const d = kitchenKdsDensityFromViewportProfileId(readKassaViewportProfileIdFromWindow())
       setKdsDensity((prev) => (prev === d ? prev : d))
     }
     syncVp()
@@ -653,12 +655,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
           <div
             className={`flex shrink-0 flex-nowrap items-center justify-end overflow-x-auto ${
-              kdsDensity === 'wide15' ? 'gap-0' : 'gap-2'
+              kdsCompactLayout ? 'gap-0' : 'gap-2'
             }`}
           >
             <div
               className={`flex shrink-0 flex-nowrap items-center gap-1.5 sm:gap-2 ${
-                kdsDensity === 'wide15' ? 'mr-[1cm]' : ''
+                kdsCompactLayout ? 'mr-[1cm]' : ''
               }`}
             >
               <div className={`shrink-0 whitespace-nowrap ${kdsChromeBtn}`}>
@@ -698,7 +700,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             ref={boardScrollRef}
             onScroll={onBoardScroll}
             className={`flex h-full w-full min-w-0 touch-pan-x overflow-x-auto overflow-y-hidden overscroll-x-contain px-3 py-3 [-webkit-overflow-scrolling:touch] ${
-              kdsDensity === 'wide15' ? 'gap-3' : 'gap-4'
+              kdsCompactLayout ? 'gap-3' : 'gap-4'
             }`}
           >
             {orders.map((order) => (
