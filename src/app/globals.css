@@ -594,6 +594,17 @@ input[type="number"] {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.82);
 }
 
+[data-testid='kassa-app'][data-kassa-profile-id='ipad_10'] .kassa-speels-top-chrome-btn,
+[data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
+  .kassa-speels-top-chrome-btn.kassa-speels-order-type-btn,
+[data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
+  .kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn,
+[data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
+  .kassa-speels-top-chrome-btn.kassa-speels-red-gloss-btn {
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.82);
+}
+
 /*
  * Speels besteltype — chrome/glossy grijs: lichte bovenkant + glaslaag (::before), tekst erboven.
  */
