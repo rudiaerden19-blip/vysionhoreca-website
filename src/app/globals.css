@@ -609,33 +609,34 @@ input[type="number"] {
 }
 
 /*
- * Speels grijs — referentie: bijna zwart, witte rand, glasglans boven (rounded-xl = groen/rood).
+ * Speels grijs — referentie knop 2: bijna zwart, witte rand, glans alleen bovenkant, rounded-xl.
  */
-.kassa-speels-order-type-btn {
+.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn) {
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-  background: linear-gradient(180deg, #4a4a4e 0%, #323236 28%, #1a1a1e 62%, #0c0c10 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #2c2c30 0%, #18181c 42%, #0a0a0e 78%, #050508 100%);
   border: 2px solid #ffffff;
+  border-radius: 0.75rem;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.14),
-    0 5px 14px rgba(0, 0, 0, 0.22);
+    0 2px 4px rgba(0, 0, 0, 0.16),
+    0 5px 14px rgba(0, 0, 0, 0.24);
 }
 
-.kassa-speels-order-type-btn::before {
+.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn)::before {
   content: '';
   pointer-events: none;
   position: absolute;
-  left: 4px;
-  right: 4px;
-  top: 3px;
-  height: 52%;
+  left: 3px;
+  right: 3px;
+  top: 2px;
+  height: 48%;
   z-index: 0;
-  border-radius: 0.6rem 0.6rem 52% 52%;
+  border-radius: 0.65rem 0.65rem 46% 46%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.88) 0%,
-    rgba(255, 255, 255, 0.36) 46%,
-    rgba(255, 255, 255, 0.04) 82%,
+    rgba(255, 255, 255, 0.72) 0%,
+    rgba(255, 255, 255, 0.22) 44%,
+    rgba(255, 255, 255, 0.02) 76%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -672,15 +673,15 @@ input[type="number"] {
   display: none;
 }
 
-.kassa-speels-order-type-btn:active {
-  background: linear-gradient(180deg, #323236 0%, #1a1a1e 52%, #08080c 100%);
+.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn):active {
+  background: linear-gradient(180deg, #1a1a1e 0%, #0c0c10 52%, #030306 100%);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.18),
-    inset 0 3px 8px rgba(0, 0, 0, 0.42);
+    inset 0 3px 8px rgba(0, 0, 0, 0.45);
 }
 
-.kassa-speels-order-type-btn:active::before {
-  opacity: 0.42;
+.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn):active::before {
+  opacity: 0.4;
 }
 
 .kassa-speels-order-type-btn--selected {
@@ -798,29 +799,30 @@ input[type="number"] {
  */
 .kassa-speels-black-gloss-btn {
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-  background: linear-gradient(180deg, #3a3a3e 0%, #242428 32%, #121216 66%, #06060a 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #343438 0%, #1c1c20 40%, #0a0a0e 76%, #040408 100%);
   border: 2px solid #ffffff;
+  border-radius: 0.75rem;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.14),
-    0 5px 14px rgba(0, 0, 0, 0.22);
+    0 2px 4px rgba(0, 0, 0, 0.16),
+    0 5px 14px rgba(0, 0, 0, 0.24);
 }
 
 .kassa-speels-black-gloss-btn::before {
   content: '';
   pointer-events: none;
   position: absolute;
-  left: 4px;
-  right: 4px;
-  top: 3px;
-  height: 52%;
+  left: 3px;
+  right: 3px;
+  top: 2px;
+  height: 48%;
   z-index: 0;
-  border-radius: 0.6rem 0.6rem 52% 52%;
+  border-radius: 0.65rem 0.65rem 46% 46%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.34) 46%,
-    rgba(255, 255, 255, 0.03) 82%,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.26) 44%,
+    rgba(255, 255, 255, 0.02) 76%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -1471,6 +1473,17 @@ html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   text-shadow: none !important;
+}
+
+/* Blonkys: zonder ::before-glans toch referentie-grijs + witte rand. */
+html.kassa-blonkys-flat-btns button.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn),
+html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
+  background: linear-gradient(180deg, #2c2c30 0%, #18181c 48%, #06060a 100%) !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 0.75rem !important;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.16),
+    0 5px 14px rgba(0, 0, 0, 0.24) !important;
 }
 
 html.kassa-blonkys-flat-btns

@@ -5996,15 +5996,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     return kassaLightOrderTypeButtonClass(selected)
   }
 
-  /** Zelfde vaste hoogte als Ter plaatse / Afhalen / Levering (geen extra regel). */
+  const kassaLagoonSidebarMaxHClass =
+    kassaChromeDensity === 'wide15'
+      ? 'max-h-[3.5rem]'
+      : kassaChromeDensity === 'sxga'
+        ? 'max-h-[3.25rem]'
+        : 'max-h-[3rem]'
+
+  /** Ter plaatse / Afhalen / Levering. */
   const kassaLagoonMatchOrderTypeBtnClass = (selected: boolean) =>
-    `${kassaPosOrderTypeButtonClass(selected)} ${
-      kassaChromeDensity === 'wide15'
-        ? 'max-h-[3.5rem]'
-        : kassaChromeDensity === 'sxga'
-          ? 'max-h-[3.25rem]'
-          : 'max-h-[3rem]'
-    }`
+    `${kassaPosOrderTypeButtonClass(selected)} ${kassaLagoonSidebarMaxHClass}`
+
+  /** Snel menu, Num pad, Op rekening — grijs chrome, geen besteltype-blauw. */
+  const kassaLagoonSidebarUtilityBtnClass = (selected: boolean) => {
+    const shell = `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)}`
+    if (kassaLayout === 'speels') {
+      return `${shell} ${kassaPosButtonClass(selected, posChrome)} ${kassaLagoonSidebarMaxHClass}`
+    }
+    return `${shell} ${kassaLightOrderTypeButtonClass(selected)} ${kassaLagoonSidebarMaxHClass}`
+  }
 
   const kassaSidebarZoneLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
@@ -7304,7 +7314,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 aria-pressed={kassaQuickMenuVisible}
                 onClick={toggleKassaQuickMenu}
                 title={t('kassaApp.quickMenu')}
-                className={kassaLagoonMatchOrderTypeBtnClass(kassaQuickMenuVisible)}
+                className={kassaLagoonSidebarUtilityBtnClass(kassaQuickMenuVisible)}
               >
                 <span className="max-w-full whitespace-nowrap text-center text-[13px] font-medium leading-none tracking-[0.02em]">
                   {t('kassaApp.quickMenu')}
@@ -7318,7 +7328,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={openNameAccountModalFromSidebar}
                   title={t('kassaOnAccount.title')}
                   aria-label={t('kassaOnAccount.title')}
-                  className={kassaLagoonMatchOrderTypeBtnClass(false)}
+                  className={kassaLagoonSidebarUtilityBtnClass(false)}
                 >
                   <span className="max-w-full whitespace-nowrap text-center text-[13px] font-medium leading-none tracking-[0.02em]">
                     {t('kassaOnAccount.title')}
@@ -7335,7 +7345,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={kassaLagoonMatchOrderTypeBtnClass(numpadPanelVisible)}
+                className={kassaLagoonSidebarUtilityBtnClass(numpadPanelVisible)}
               >
                 <span className="max-w-full whitespace-nowrap text-center text-[13px] font-medium leading-none tracking-[0.02em]">
                   {t('kassaApp.numpadToggle')}
