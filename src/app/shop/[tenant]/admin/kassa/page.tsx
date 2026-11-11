@@ -192,6 +192,7 @@ import {
   kassaPosButtonClass,
   kassaSpeelsBlackGlossButtonClass,
   kassaSpeelsGrayChromeButtonClass,
+  kassaSpeelsGrayUtilityButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   kassaSpeelsRedGlossButtonClass,
   kassaSpeelsGreenGlossButtonClass,
@@ -5998,11 +5999,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaLagoonMatchOrderTypeBtnClass = (selected: boolean) =>
     `${kassaPosOrderTypeButtonClass(selected)} ${kassaLagoonSidebarMaxHClass}`
 
-  /** Snel menu, Num pad, Op rekening — grijs chrome, geen besteltype-blauw. */
+  /** Snel menu, Num pad, Op rekening — grijs chrome,zelfde gloss als Afrekenen (zonder sweep). */
   const kassaLagoonSidebarUtilityBtnClass = (selected: boolean) => {
     const shell = `flex min-w-0 flex-1 flex-col items-center justify-center text-center px-2 ${kassaOrderTypeButtonTouchClass(kassaChromeDensity)}`
     if (kassaLayout === 'speels') {
-      return `${shell} ${kassaPosButtonClass(selected, posChrome)} ${kassaLagoonSidebarMaxHClass}`
+      return `${shell} ${kassaSpeelsGrayUtilityButtonClass(selected)} ${kassaLagoonSidebarMaxHClass}`
     }
     return `${shell} ${kassaLightOrderTypeButtonClass(selected)} ${kassaLagoonSidebarMaxHClass}`
   }
@@ -7861,7 +7862,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   playClick()
                   setNumpadPanelVisible((v) => !v)
                 }}
-                className={`${kassaSidebarFooterBtnFlexClass} px-2 ${kassaSidebarFooterLeftCol} ${kassaPosButtonClass(numpadPanelVisible, posChrome)} ${
+                className={`${kassaSidebarFooterBtnFlexClass} px-2 ${kassaSidebarFooterLeftCol} ${
+                  kassaLayout === 'speels'
+                    ? kassaSpeelsGrayUtilityButtonClass(numpadPanelVisible)
+                    : kassaPosButtonClass(numpadPanelVisible, posChrome)
+                } ${
                   kassaWide15Chrome ? 'min-h-[3.5rem] py-2' : kassaCompactChrome ? 'min-h-[4rem] py-3.5': 'min-h-[3.5rem] py-3'
                 }`}
               >

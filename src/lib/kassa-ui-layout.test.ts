@@ -10,6 +10,7 @@ import {
   kassaPosButtonClass,
   kassaPosCheckoutButtonClass,
   kassaSpeelsCategoryStripButtonClass,
+  kassaSpeelsGrayUtilityButtonClass,
   kassaSpeelsOrderTypeButtonClass,
   kassaPosCartTrashButtonClass,
   kassaPosQuickMenuPanelButtonClass,
@@ -103,6 +104,12 @@ describe('Speels bruine knoppen', () => {
     const selected = kassaPosButtonClass(true, 'speels')
     expect(selected).toContain('kassa-speels-black-gloss-btn')
     expect(selected).not.toContain('#c4a46a')
+  })
+
+  it('maakt zijbalk Num pad grijs met dezelfde gloss-classes als chrome (geen zwart)', () => {
+    expect(kassaSpeelsGrayUtilityButtonClass(false)).toContain('kassa-speels-order-type-btn')
+    expect(kassaSpeelsGrayUtilityButtonClass(false)).not.toContain('kassa-speels-black-gloss-btn')
+    expect(kassaSpeelsGrayUtilityButtonClass(true)).toContain('kassa-speels-order-type-btn--selected')
   })
 
   it('maakt Afrekenen in Speels groen glanzend', () => {

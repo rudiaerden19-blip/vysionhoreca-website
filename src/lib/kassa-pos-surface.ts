@@ -271,6 +271,16 @@ export function kassaSpeelsGrayChromeButtonClass(): string {
   ].join(' ')
 }
 
+/** Grijs chrome — zelfde gloss-stack als Afrekenen; actief = lichter grijs (geen zwart). */
+export function kassaSpeelsGrayUtilityButtonClass(active = false): string {
+  return [
+    kassaSpeelsGrayChromeButtonClass(),
+    active ? 'kassa-speels-order-type-btn--selected' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
 /** Zwart + zilverrand + glans (::before) — Menu, Uitloggen, actieve keuze. */
 export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
   return [
