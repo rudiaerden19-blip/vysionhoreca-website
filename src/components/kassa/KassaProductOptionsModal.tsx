@@ -12,6 +12,8 @@ import {
   kassaPosButtonClass,
   kassaSpeelsBlueGlossButtonClass,
   kassaSpeelsChromeButtonClass,
+  kassaSpeelsGreenGlossButtonClass,
+  KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   type KassaPosChromeLook,
 } from '@/lib/kassa-pos-surface'
 import { KassaIconCheck, KassaIconClose } from '@/lib/kassa-ui-icons'
@@ -350,7 +352,9 @@ export function KassaProductOptionsModal({
             onClick={confirmWithOsk}
             className={
               dark
-                ? `flex-[2] py-3.5 text-lg font-bold ${darkActionBtn(false)}${model.editingCartKey ? '' : ' kassa-options-add-glow'}`
+                ? model.editingCartKey
+                  ? `flex-[2] py-3.5 text-lg font-bold ${darkActionBtn(false)}`
+                  : `flex-[2] py-3.5 text-lg font-bold ${KASSA_POS_BTN_SHAPE} ${kassaSpeelsGreenGlossButtonClass(false)} ${KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} ${KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS} kassa-options-add-glow`
                 : `flex-[2] py-3.5 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-lg shadow-md transition-colors${model.editingCartKey ? '' : ' kassa-options-add-glow'}`
             }
           >

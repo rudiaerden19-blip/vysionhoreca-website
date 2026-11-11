@@ -519,30 +519,6 @@ input[type="number"] {
   z-index: 1;
 }
 
-.kassa-speels-black-gloss-btn.kassa-options-add-glow::after,
-.kassa-options-add-glow::after {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  left: 0;
-  right: auto;
-  top: 0;
-  bottom: 0;
-  width: 42%;
-  height: 100%;
-  border-radius: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.22) 42%,
-    rgba(200, 255, 230, 0.65) 50%,
-    rgba(255, 255, 255, 0.22) 58%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: kassa-speels-online-glow-sweep 8s ease-in-out infinite;
-  z-index: 2;
-}
-
 /* Foto zelf: geen schaduw, geen donkere rand. */
 .kassa-speels-menu-tile-photo-well {
   box-sizing: border-box;
@@ -910,7 +886,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   }
 }
 
-/* Alleen Afrekenen — bewegende lichtband (override ::after uit). */
+/* Alleen groene Afreken-knop — sweep; zwart/rood/blauw nooit. */
 .kassa-speels-green-gloss-btn.kassa-speels-green-glow-sweep::after,
 .kassa-speels-green-gloss-btn.kassa-speels-online-status-sweep::after {
   content: '';
@@ -934,6 +910,16 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   );
   animation: kassa-speels-online-glow-sweep 8s ease-in-out infinite;
   z-index: 2;
+}
+
+.kassa-speels-black-gloss-btn::after,
+.kassa-speels-red-gloss-btn::after,
+.kassa-speels-blue-gloss-btn::after,
+.kassa-speels-category-strip-btn::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+  background: none !important;
 }
 
 .kassa-speels-red-gloss-btn:active::before,

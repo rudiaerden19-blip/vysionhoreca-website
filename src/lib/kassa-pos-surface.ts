@@ -245,7 +245,7 @@ export const KASSA_SPEELS_RED_GLOSS_BTN_CLASS = 'kassa-speels-red-gloss-btn'
 export const KASSA_SPEELS_GREEN_GLOSS_BTN_CLASS = 'kassa-speels-green-gloss-btn'
 export const KASSA_SPEELS_GRAY_GLOSS_BTN_CLASS = 'kassa-speels-gray-gloss-btn'
 
-/** Groene gloss-knoppen — herhalende glow sweep links→rechts (online, Afrekenen). */
+/** Alleen Afrekenen — sweep op groen; nooit op zwarte chrome-knoppen. */
 export const KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS = 'kassa-speels-green-glow-sweep'
 
 /** @deprecated alias — gebruik {@link KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS} */

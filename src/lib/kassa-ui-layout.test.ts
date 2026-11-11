@@ -109,6 +109,7 @@ describe('Speels bruine knoppen', () => {
   it('maakt zijbalk Num pad zwart met dezelfde gloss-stack als Afrekenen (geen groen)', () => {
     expect(kassaSpeelsGrayUtilityButtonClass(false)).toContain('kassa-speels-black-gloss-btn')
     expect(kassaSpeelsGrayUtilityButtonClass(false)).not.toContain('kassa-speels-green-gloss-btn')
+    expect(kassaSpeelsGrayUtilityButtonClass(false)).not.toContain('kassa-speels-green-glow-sweep')
     expect(kassaSpeelsGrayUtilityButtonClass(true)).toContain('kassa-speels-black-gloss-btn--emphasis')
   })
 
