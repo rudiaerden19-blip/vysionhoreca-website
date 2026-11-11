@@ -6441,7 +6441,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           >
             <div
               data-testid="kassa-tablet-header-tenant-name"
-              className="pointer-events-auto flex min-w-0 max-w-[11rem] -translate-x-[2cm] items-center justify-center px-1.5 sm:max-w-[12rem]"
+              className="pointer-events-auto flex min-w-0 max-w-[11rem] items-center justify-center px-1.5 sm:max-w-[12rem]"
             >
               {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}
             </div>
