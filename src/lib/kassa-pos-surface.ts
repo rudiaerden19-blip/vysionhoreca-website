@@ -263,35 +263,7 @@ const KASSA_SPEELS_CHROME_BTN_SHELL = [
   'active:translate-y-px',
 ].join(' ')
 
-/** Grijs chrome — zelfde class-stack + CSS als {@link kassaSpeelsGreenGlossButtonClass}. */
-export function kassaSpeelsGrayGlossButtonClass(options?: {
-  emphasis?: boolean
-  selected?: boolean
-}): string {
-  const emphasis = options?.emphasis === true
-  const selected = options?.selected === true
-  return [
-    KASSA_SPEELS_GRAY_BTN_SHAPE,
-    KASSA_SPEELS_GRAY_GLOSS_BTN_CLASS,
-    emphasis ? 'kassa-speels-gray-gloss-btn--emphasis' : '',
-    selected ? 'kassa-speels-gray-gloss-btn--selected' : '',
-    KASSA_SPEELS_CHROME_BTN_SHELL,
-    KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
-  ]
-    .filter(Boolean)
-    .join(' ')
-}
-
-export function kassaSpeelsGrayChromeButtonClass(): string {
-  return kassaSpeelsGrayGlossButtonClass()
-}
-
-/** Grijs utility (Num pad, Snel menu, …) — zelfde opbouw als groen, geen sweep. */
-export function kassaSpeelsGrayUtilityButtonClass(active = false): string {
-  return kassaSpeelsGrayGlossButtonClass({ selected: active })
-}
-
-/** Zwart + zilverrand + glans (::before) — Menu, Uitloggen, actieve keuze. */
+/** Zwart — zelfde class-stack + gloss/mat als {@link kassaSpeelsGreenGlossButtonClass} (geen sweep). */
 export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
   return [
     KASSA_SPEELS_GRAY_BTN_SHAPE,
@@ -302,6 +274,25 @@ export function kassaSpeelsBlackGlossButtonClass(emphasis = false): string {
   ]
     .filter(Boolean)
     .join(' ')
+}
+
+/** @deprecated gebruik {@link kassaSpeelsBlackGlossButtonClass} */
+export function kassaSpeelsGrayGlossButtonClass(options?: {
+  emphasis?: boolean
+  selected?: boolean
+}): string {
+  return kassaSpeelsBlackGlossButtonClass(
+    options?.emphasis === true || options?.selected === true,
+  )
+}
+
+export function kassaSpeelsGrayChromeButtonClass(): string {
+  return kassaSpeelsBlackGlossButtonClass(false)
+}
+
+/** Zijbalk/footer utility — zwart gloss; actief = emphasis (lichter zwart). */
+export function kassaSpeelsGrayUtilityButtonClass(active = false): string {
+  return kassaSpeelsBlackGlossButtonClass(active)
 }
 
 /** Donkerblauw — zelfde gloss-stack als grijs/groen (`kassa-speels-*-gloss-btn`). */
@@ -344,8 +335,7 @@ export function kassaSpeelsGreenGlossButtonClass(emphasis = false): string {
 }
 
 export function kassaSpeelsChromeButtonClass(selected: boolean): string {
-  if (selected) return kassaSpeelsBlackGlossButtonClass(true)
-  return kassaSpeelsGrayChromeButtonClass()
+  return kassaSpeelsBlackGlossButtonClass(selected)
 }
 
 /** Speels categoriebalk — donkerblauw met dezelfde gloss-stack als Afrekenen (zonder sweep). */

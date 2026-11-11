@@ -519,7 +519,7 @@ input[type="number"] {
   z-index: 1;
 }
 
-.kassa-speels-gray-gloss-btn.kassa-options-add-glow::after,
+.kassa-speels-black-gloss-btn.kassa-options-add-glow::after,
 .kassa-options-add-glow::after {
   content: '';
   pointer-events: none;
@@ -623,7 +623,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.82);
 }
 
-.kassa-speels-top-chrome-btn.kassa-speels-gray-gloss-btn,
+.kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn,
 .kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn {
   color: #b0b0b0;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
@@ -631,7 +631,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10'] .kassa-speels-top-chrome-btn,
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
-  .kassa-speels-top-chrome-btn.kassa-speels-gray-gloss-btn,
+  .kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn,
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
   .kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn,
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10']
@@ -647,7 +647,6 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 .kassa-speels-blue-gloss-btn::before,
 .kassa-speels-red-gloss-btn::before,
 .kassa-speels-green-gloss-btn::before,
-.kassa-speels-gray-gloss-btn::before,
 .kassa-speels-category-strip-btn::before {
   content: '';
   pointer-events: none;
@@ -671,7 +670,6 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 .kassa-speels-blue-gloss-btn::after,
 .kassa-speels-red-gloss-btn::after,
 .kassa-speels-green-gloss-btn::after,
-.kassa-speels-gray-gloss-btn::after,
 .kassa-speels-category-strip-btn::after {
   content: '';
   pointer-events: none;
@@ -812,50 +810,11 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 }
 
 /*
- * Speels — donkerder grijs (menu/Snel menu aan), zelfde referentie-stijl.
- */
-.kassa-speels-black-gloss-btn {
-  color: #b0b0b0;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
-  background: linear-gradient(180deg, #343438 0%, #1c1c20 40%, #0a0a0e 76%, #040408 100%);
-  border: 1px solid #0c0c0c;
-  border-top-color: #404040;
-  border-bottom-color: #010101;
-  border-radius: 0.75rem;
-  box-shadow:
-    0 3px 7px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.42);
-}
-
-.kassa-speels-black-gloss-btn > * {
-  position: relative;
-  z-index: 1;
-}
-
-.kassa-speels-black-gloss-btn:active {
-  background: linear-gradient(180deg, #28282c 0%, #16161a 54%, #040408 100%);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.18),
-    inset 0 3px 8px rgba(0, 0, 0, 0.45);
-}
-
-.kassa-speels-black-gloss-btn--emphasis {
-  background: linear-gradient(180deg, #4e4e52 0%, #323236 28%, #1a1a1e 62%, #0a0a0e 100%);
-  border-top-color: #4a4a4a;
-  box-shadow:
-    0 4px 9px rgba(0, 0, 0, 0.64),
-    0 11px 26px rgba(0, 0, 0, 0.51),
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.45);
-}
-
-/*
- * Speels — rood/groen/grijs met dezelfde chrome-gloss-stack.
+ * Speels — rood/groen/zwart met dezelfde chrome-gloss-stack als Afrekenen.
  */
 .kassa-speels-red-gloss-btn,
 .kassa-speels-green-gloss-btn,
-.kassa-speels-gray-gloss-btn {
+.kassa-speels-black-gloss-btn {
   color: #b0b0b0;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   box-shadow:
@@ -894,25 +853,25 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   border-bottom-color: #021008;
 }
 
-/* Zelfde structuur als .kassa-speels-green-gloss-btn — andere kleurstops. */
-.kassa-speels-gray-gloss-btn {
+/* Zelfde 6-stop structuur als groen — zwarte kleurstops. */
+.kassa-speels-black-gloss-btn {
   background: linear-gradient(
     180deg,
-    #525256 0%,
-    #46464a 5%,
-    #3a3a3e 18%,
-    #323236 40%,
-    #2a2a2e 62%,
-    #222228 100%
+    #2a2a2e 0%,
+    #222228 5%,
+    #1a1a1e 18%,
+    #141418 40%,
+    #0e0e12 62%,
+    #08080c 100%
   );
   border: 1px solid #0a0a0a;
-  border-top-color: #484848;
+  border-top-color: #3a3a3a;
   border-bottom-color: #050505;
 }
 
 .kassa-speels-red-gloss-btn > *,
 .kassa-speels-green-gloss-btn > *,
-.kassa-speels-gray-gloss-btn > * {
+.kassa-speels-black-gloss-btn > * {
   position: relative;
   z-index: 1;
 }
@@ -933,23 +892,23 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
 }
 
-.kassa-speels-gray-gloss-btn:active {
-  background: linear-gradient(180deg, #2a2a2e 0%, #222228 55%, #1a1a1e 100%);
-  border-top-color: #3a3a3e;
+.kassa-speels-black-gloss-btn:active {
+  background: linear-gradient(180deg, #16161a 0%, #101014 55%, #08080c 100%);
+  border-top-color: #2a2a2e;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.5),
     inset 0 3px 7px rgba(0, 0, 0, 0.55);
 }
 
-.kassa-speels-gray-gloss-btn--selected {
+.kassa-speels-black-gloss-btn--emphasis {
   background: linear-gradient(
     180deg,
-    #5e5e62 0%,
-    #525256 5%,
-    #46464a 18%,
-    #3e3e42 40%,
-    #36363a 62%,
-    #2e2e32 100%
+    #4e4e52 0%,
+    #424246 5%,
+    #36363a 18%,
+    #2e2e32 40%,
+    #26262a 62%,
+    #1e1e22 100%
   );
   border-top-color: #565656;
 }
@@ -995,16 +954,16 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 
 .kassa-speels-red-gloss-btn:active::before,
 .kassa-speels-green-gloss-btn:active::before,
-.kassa-speels-gray-gloss-btn:active::before,
+.kassa-speels-black-gloss-btn:active::before,
 .kassa-speels-red-gloss-btn:active::after,
 .kassa-speels-green-gloss-btn:active::after,
-.kassa-speels-gray-gloss-btn:active::after {
+.kassa-speels-black-gloss-btn:active::after {
   opacity: 0.35;
 }
 
 .kassa-speels-red-gloss-btn--emphasis,
 .kassa-speels-green-gloss-btn--emphasis,
-.kassa-speels-gray-gloss-btn--emphasis {
+.kassa-speels-black-gloss-btn--emphasis {
   box-shadow:
     0 3px 9px rgba(0, 0, 0, 0.58),
     inset 0 1px 0 rgba(255, 255, 255, 0.34),
@@ -1013,7 +972,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 
 .kassa-speels-red-gloss-btn--emphasis::before,
 .kassa-speels-green-gloss-btn--emphasis::before,
-.kassa-speels-gray-gloss-btn--emphasis::before {
+.kassa-speels-black-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.88) 0%,
@@ -1504,8 +1463,8 @@ html.kassa-dark-appearance.kassa-speels-layout
  */
 html.kassa-blonkys-flat-btns button:not(.kassa-speels-menu-tile)::before,
 html.kassa-blonkys-flat-btns button:not(.kassa-speels-menu-tile)::after,
-html.kassa-blonkys-flat-btns a.kassa-speels-gray-gloss-btn::before,
-html.kassa-blonkys-flat-btns a.kassa-speels-gray-gloss-btn::after,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn::before,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn::after,
 html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn::before,
 html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn::after,
 html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn::before,
@@ -1532,7 +1491,7 @@ html.kassa-blonkys-flat-btns
   button:not(.kassa-speels-menu-tile):not(.kassa-mode-picker__option):not(.kassa-table-picker__tile):not(
     .kassa-table-picker__close
   ):not(.kassa-table-picker__muted-action),
-html.kassa-blonkys-flat-btns a.kassa-speels-gray-gloss-btn,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn,
 html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn,
 html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn,
 html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn,
@@ -1543,7 +1502,7 @@ html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn {
 }
 
 /* Blonkys: zonder ::before-glans — zelfde donkere rand als speels-grijs. */
-html.kassa-blonkys-flat-btns button.kassa-speels-gray-gloss-btn,
+html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn,
 html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
   color: #b0b0b0 !important;
   -webkit-text-fill-color: #b0b0b0 !important;
@@ -1558,7 +1517,7 @@ html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
     inset 0 -2px 0 rgba(0, 0, 0, 0.42) !important;
 }
 
-html.kassa-blonkys-flat-btns button.kassa-speels-gray-gloss-btn *,
+html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn *,
 html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn * {
   color: #b0b0b0 !important;
   -webkit-text-fill-color: #b0b0b0 !important;
@@ -1569,7 +1528,7 @@ html.kassa-blonkys-flat-btns
     .kassa-table-picker__close
   ):not(.kassa-table-picker__muted-action)
   *,
-html.kassa-blonkys-flat-btns a.kassa-speels-gray-gloss-btn *,
+html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn *,
 html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn *,
 html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn *,
 html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn *,
