@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
+import { KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS } from '@/lib/kassa-azerty-osk'
 import {
   KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH,
   KASSA_AZERTY_OSK_OPTION_BTN_WIDTH,
@@ -13,8 +14,7 @@ const NUMPAD_ROWS = [
   ['7', '8', '9'],
 ] as const
 
-const NUMPAD_KEY_HEIGHT =
-  'min-h-[2.75rem] w-full min-w-0 sm:min-h-[2.9rem]'
+const NUMPAD_KEY_HEIGHT = `${KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS} w-full min-w-0`
 
 type KeyHandlers = Pick<
   ComponentPropsWithoutRef<'button'>,

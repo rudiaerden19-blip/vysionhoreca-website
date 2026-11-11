@@ -25,6 +25,8 @@ import {
   KASSA_AZERTY_LETTER_ROWS,
   KASSA_AZERTY_AT_CHAR,
   KASSA_AZERTY_NUMBER_ROW,
+  KASSA_AZERTY_OSK_KEYBOARD_ROW_MIN_HEIGHT_KASSA_CLASS,
+  KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS,
   applyKassaAzertyOskEdit,
   nextKassaAzertyOskEditValue,
   seedKassaOskControlledFieldEditState,
@@ -734,6 +736,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const oskStretchToCart =
     lineShortcutsOnKassaPos && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
+  const azertyRowMinH =
+    showLineShortcutsColumn && lineShortcutsOnKassaPos
+      ? KASSA_AZERTY_OSK_KEYBOARD_ROW_MIN_HEIGHT_KASSA_CLASS
+      : KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS
+
   const keyBtnClass = speelsDarkOsk
     ? [
         KASSA_SPEELS_GRAY_BTN_SHAPE,
@@ -741,9 +748,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         'touch-manipulation select-none relative',
         'transition-transform duration-100 ease-out active:translate-y-px',
         KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
-        'min-h-[2.75rem] px-0.5 text-center text-base font-bold sm:min-h-[2.9rem] sm:text-lg',
+        `${azertyRowMinH} px-0.5 text-center text-base font-bold sm:text-lg`,
       ].join(' ')
-    : 'kassa-azerty-osk-key min-h-[2.75rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:min-h-[2.9rem] sm:text-lg'
+    : `kassa-azerty-osk-key ${azertyRowMinH} touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:text-lg`
 
   const keyBtnClassFor = useCallback(
     (token: string, extra = '') =>
@@ -841,7 +848,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               className={`flex min-w-0 flex-col gap-1.5 ${showLineShortcutsColumn ? 'min-w-0 max-w-full flex-1' : 'w-full flex-1'}`}
             >
             {showLineShortcutsColumn ? (
-              <div className="mb-0.5 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
+              <div className="mb-1 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
             ) : null}
             {!showLineShortcutsColumn ? (
               <div className="grid grid-cols-10 gap-1.5">

@@ -6,7 +6,10 @@ import {
   KASSA_OSK_LINE_SHORTCUT_SLOTS,
   sanitizeKassaOskLineShortcutLabel,
 } from '@/lib/kassa-osk-line-shortcuts'
-import { readKassaOskFieldValue } from '@/lib/kassa-azerty-osk'
+import {
+  KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS,
+  readKassaOskFieldValue,
+} from '@/lib/kassa-azerty-osk'
 import {
   KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH,
   KASSA_AZERTY_OSK_NUMPAD_WIDTH,
@@ -26,9 +29,8 @@ type Props = {
   onInsert: (label: string) => void
 }
 
-/** Zelfde rij-hoogte als `kassa-azerty-osk-key` in KassaAzertyOskProvider. */
-const OSK_SHORTCUT_FIELD_HEIGHT =
-  'min-h-[2.75rem] w-full min-w-0 sm:min-h-[2.9rem]'
+/** Zelfde rij-hoogte als standaard OSK-toets (niet de hogere kassa-AZERTY-middenkolom). */
+const OSK_SHORTCUT_FIELD_HEIGHT = `${KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS} w-full min-w-0`
 
 /**
  * Numpad-zone rechts van AZERTY — zelfde behuizing, verticale scheiding (zoals fysiek toetsenbord).
