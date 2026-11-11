@@ -3,6 +3,7 @@ import {
   isKassaOskReactControlledSyncField,
   setNativeInputValue,
 } from '@/lib/dom-input-value'
+import { readKassaIpadClientFromWindow } from '@/lib/kassa-viewport-profile'
 
 /**
  * Horeca-kassa: vast AZERTY-schermtoetsenbord (alle tenants).
@@ -22,7 +23,14 @@ export const KASSA_AZERTY_OSK_MANUAL_OPEN = true
 export const KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS =
   'touch-manipulation [-webkit-tap-highlight-color:transparent] inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] active:brightness-95 sm:px-4'
 
+/** iPad: systeemtoetsenbord — géén Vysion AZERTY-balk (alle tenants). */
+export function isKassaCustomAzertyOskSuppressedOnIpad(): boolean {
+  if (typeof window === 'undefined') return false
+  return readKassaIpadClientFromWindow()
+}
+
 export function isKassaAzertyOskManualOpenEnabled(tenantSlug: string): boolean {
+  if (isKassaCustomAzertyOskSuppressedOnIpad()) return false
   if (!KASSA_AZERTY_OSK_LIVE || !KASSA_AZERTY_OSK_MANUAL_OPEN) return false
   return isKassaAzertyOskEnabled(tenantSlug)
 }
@@ -99,6 +107,7 @@ export function isAzertyOskActiveForSession(input: {
   hostTenantSlug?: string | null
 }): boolean {
   if (!KASSA_AZERTY_OSK_LIVE) return false
+  if (isKassaCustomAzertyOskSuppressedOnIpad()) return false
   if (isOwnerLoginPathForAzertyOsk(input.pathname)) {
     return true
   }

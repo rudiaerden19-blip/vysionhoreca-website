@@ -13,6 +13,12 @@ import {
   kassaAzertyKeyDisplay,
   resolveAzertyOskTenantSlug,
 } from '@/lib/kassa-azerty-osk'
+import { readKassaIpadClientFromWindow } from '@/lib/kassa-viewport-profile'
+
+jest.mock('@/lib/kassa-viewport-profile', () => ({
+  ...jest.requireActual('@/lib/kassa-viewport-profile'),
+  readKassaIpadClientFromWindow: jest.fn(() => false),
+}))
 
 describe('kassa-azerty-osk', () => {
   it('azerty route op admin, zaak-login en account-login', () => {
@@ -77,6 +83,19 @@ describe('kassa-azerty-osk', () => {
     expect(isKassaAzertyOskManualOpenEnabled('lomichillplay')).toBe(true)
     expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(true)
     expect(isKassaAzertyOskManualOpenEnabled('')).toBe(false)
+  })
+
+  it('geen custom AZERTY op iPad-client', () => {
+    jest.mocked(readKassaIpadClientFromWindow).mockReturnValueOnce(true)
+    expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(false)
+    expect(
+      isAzertyOskActiveForSession({
+        pathname: '/shop/demo-frituur/admin/kassa',
+        routeParamTenant: 'demo-frituur',
+      }),
+    ).toBe(false)
+    jest.mocked(readKassaIpadClientFromWindow).mockReturnValueOnce(true)
+    expect(isAzertyOskActiveForSession({ pathname: '/login' })).toBe(false)
   })
 
   it('shift voor letters en leestekens', () => {
