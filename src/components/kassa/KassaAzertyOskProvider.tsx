@@ -844,7 +844,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 ))}
               </div>
             ))}
-            <div className="grid grid-cols-[auto,auto,1fr,auto] gap-1.5">
+            <div className="grid grid-cols-[auto,auto,auto,auto,minmax(3.25rem,0.5fr),auto] gap-1.5">
               <button
                 type="button"
                 className={keyBtnClassFor(
@@ -854,6 +854,25 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 {...shiftKeyHandlers}
               >
                 ⇧
+              </button>
+              <button
+                type="button"
+                className={keyBtnClassFor('tld:be', 'min-w-[2.65rem] px-1 text-sm sm:min-w-[2.85rem] sm:text-base')}
+                {...makeOskEditKeyHandlers('tld:be', () => ({ char: '.be' }))}
+                data-testid="kassa-azerty-osk-tld-be"
+              >
+                .be
+              </button>
+              <button
+                type="button"
+                className={keyBtnClassFor(
+                  'tld:com',
+                  'min-w-[2.85rem] px-1 text-sm sm:min-w-[3rem] sm:text-base',
+                )}
+                {...makeOskEditKeyHandlers('tld:com', () => ({ char: '.com' }))}
+                data-testid="kassa-azerty-osk-tld-com"
+              >
+                .com
               </button>
               <button
                 type="button"
