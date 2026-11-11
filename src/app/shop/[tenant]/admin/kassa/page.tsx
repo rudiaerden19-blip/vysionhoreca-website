@@ -6567,11 +6567,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <button
             type="button"
             onClick={() => openKassaHelp()}
-            className={`${
+            className={
               kassaPosLuxury
-                ? `${kassaHeaderQuickLinkShell} ${kassaSpeelsRedGlossButtonClass(kassaHelpOpen)} ${kassaSpeelsTopChromeTextClass}`
-                : `${kassaHeaderQuickLinkShell} rounded-xl font-bold ${KASSA_REMOVE_BTN_FACE}`
-            } ${kassaHelpOpen && !kassaPosLuxury ? 'ring-2 ring-white/75 ring-offset-2 ring-offset-[#0f1319]' : ''}`}
+                ? `${kassaHeaderQuickLinkShell} ${kassaPosButtonClass(kassaHelpOpen, posChrome)} ${kassaSpeelsTopChromeTextClass}`
+                : `${kassaHeaderQuickLinkShell} rounded-xl font-bold ${
+                    kassaHelpOpen
+                      ? kassaLight
+                        ? KASSA_LIGHT_BTN_FACE_ON
+                        : KASSA_CLASSIC_BTN_FACE_ON
+                      : kassaLight
+                        ? KASSA_LIGHT_BTN_FACE
+                        : KASSA_CLASSIC_BTN_FACE
+                  }`
+            }
             title={t('kassaApp.helpVideoButton')}
           >
             <span className={KASSA_HEADER_QUICK_LINK_LABEL}>{t('kassaApp.helpVideoButton')}</span>
