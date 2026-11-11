@@ -107,9 +107,9 @@ describe('Speels bruine knoppen', () => {
   })
 
   it('maakt zijbalk Num pad grijs met dezelfde gloss-classes als chrome (geen zwart)', () => {
-    expect(kassaSpeelsGrayUtilityButtonClass(false)).toContain('kassa-speels-order-type-btn')
+    expect(kassaSpeelsGrayUtilityButtonClass(false)).toContain('kassa-speels-gray-gloss-btn')
     expect(kassaSpeelsGrayUtilityButtonClass(false)).not.toContain('kassa-speels-black-gloss-btn')
-    expect(kassaSpeelsGrayUtilityButtonClass(true)).toContain('kassa-speels-order-type-btn--selected')
+    expect(kassaSpeelsGrayUtilityButtonClass(true)).toContain('kassa-speels-gray-gloss-btn--selected')
   })
 
   it('maakt Afrekenen in Speels groen glanzend', () => {
@@ -133,8 +133,7 @@ describe('Speels bruine knoppen', () => {
 
   it('maakt geselecteerd besteltype speels donkerblauw; rest grijs chrome', () => {
     expect(kassaSpeelsOrderTypeButtonClass(true)).toContain('kassa-speels-blue-gloss-btn')
-    expect(kassaSpeelsOrderTypeButtonClass(true)).not.toContain('kassa-speels-blue-gloss-btn--selected')
-    expect(kassaSpeelsOrderTypeButtonClass(true)).toContain('kassa-speels-order-type-btn--selected')
-    expect(kassaSpeelsOrderTypeButtonClass(false)).toContain('kassa-speels-order-type-btn')
+    expect(kassaSpeelsOrderTypeButtonClass(true)).toContain('kassa-speels-blue-gloss-btn--selected')
+    expect(kassaSpeelsOrderTypeButtonClass(false)).toContain('kassa-speels-gray-gloss-btn')
   })
 })
