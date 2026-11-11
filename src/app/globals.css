@@ -630,14 +630,14 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   left: 2px;
   right: 2px;
   top: 2px;
-  height: 46%;
+  height: 36%;
   z-index: 0;
   border-radius: 0.65rem 0.65rem 45% 45%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.58) 0%,
-    rgba(255, 255, 255, 0.26) 38%,
-    rgba(255, 255, 255, 0.05) 76%,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.12) 42%,
+    rgba(255, 255, 255, 0.02) 78%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -775,7 +775,7 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   box-shadow:
     0 3px 7px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
     inset 0 -2px 0 rgba(0, 0, 0, 0.42);
 }
 
@@ -942,8 +942,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 .kassa-speels-black-gloss-btn--emphasis::before {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.64) 0%,
-    rgba(255, 255, 255, 0.28) 42%,
+    rgba(255, 255, 255, 0.36) 0%,
+    rgba(255, 255, 255, 0.14) 44%,
     rgba(255, 255, 255, 0) 100%
   );
 }
