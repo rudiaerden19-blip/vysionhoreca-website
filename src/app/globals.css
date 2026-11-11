@@ -643,7 +643,6 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 /*
  * Speels — één gloss-stack (zelfde verhouding als Afrekenen; statische onder-glans, geen sweep).
  */
-.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn)::before,
 .kassa-speels-black-gloss-btn::before,
 .kassa-speels-blue-gloss-btn::before,
 .kassa-speels-red-gloss-btn::before,
@@ -704,12 +703,12 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   background: linear-gradient(
     180deg,
-    #4a4a4e 0%,
-    #3a3a3e 5%,
-    #2c2c30 18%,
-    #222228 40%,
-    #141418 62%,
-    #0a0a0e 100%
+    #3d4a44 0%,
+    #323a38 5%,
+    #2a3230 18%,
+    #222a28 40%,
+    #181e1c 62%,
+    #101412 100%
   );
   border: 1px solid #0a0a0a;
   border-top-color: #3a3a3a;
@@ -724,6 +723,27 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
 .kassa-speels-order-type-btn > * {
   position: relative;
   z-index: 1;
+}
+
+/* Grijs chrome — zelfde ::before-structuur als Afrekenen; iets zachter wit op neutraal grijs. */
+.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn)::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 2px;
+  height: 50%;
+  z-index: 0;
+  border-radius: 0.65rem 0.65rem 45% 45%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.44) 40%,
+    rgba(255, 255, 255, 0.08) 78%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  mix-blend-mode: soft-light;
 }
 
 .kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn):active {
