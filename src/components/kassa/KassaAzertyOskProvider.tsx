@@ -564,6 +564,23 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     [applyLineShortcutDraft, resolveOskEditTarget],
   )
 
+  const [pressedOskKey, setPressedOskKey] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!pressedOskKey) return
+    const release = () => setPressedOskKey(null)
+    window.addEventListener('pointerup', release)
+    window.addEventListener('pointercancel', release)
+    return () => {
+      window.removeEventListener('pointerup', release)
+      window.removeEventListener('pointercancel', release)
+    }
+  }, [pressedOskKey])
+
+  const pressOskKey = useCallback((token: string) => {
+    setPressedOskKey(token)
+  }, [])
+
   const makeOskEditKeyHandlers = useCallback(
     (token: string, getEdit: () => Parameters<typeof applyKassaAzertyOskEdit>[1]) => ({
       onPointerDown: (e: React.PointerEvent) => {
@@ -571,6 +588,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         e.preventDefault()
         e.stopPropagation()
         clearFocusOutTimer()
+        pressOskKey(token)
         oskEditPointerRef.current = { token, at: Date.now() }
         sendEdit(getEdit())
       },
@@ -580,10 +598,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         const pd = oskEditPointerRef.current
         if (pd?.token === token && Date.now() - pd.at < 320) return
         clearFocusOutTimer()
+        pressOskKey(token)
         sendEdit(getEdit())
       },
     }),
-    [clearFocusOutTimer, sendEdit],
+    [clearFocusOutTimer, pressOskKey, sendEdit],
   )
 
   const shiftKeyHandlers = useMemo(
@@ -592,6 +611,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         if (e.button !== 0) return
         e.preventDefault()
         e.stopPropagation()
+        pressOskKey('shift')
         oskEditPointerRef.current = { token: 'shift', at: Date.now() }
         setShift((s) => !s)
       },
@@ -600,10 +620,11 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         e.stopPropagation()
         const pd = oskEditPointerRef.current
         if (pd?.token === 'shift' && Date.now() - pd.at < 320) return
+        pressOskKey('shift')
         setShift((s) => !s)
       },
     }),
-    [],
+    [pressOskKey],
   )
 
   const insertLineShortcut = useCallback(
@@ -625,6 +646,18 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const keyBtnClass = speelsDarkOsk
     ? `${kassaSpeelsGrayChromeButtonClass()} kassa-azerty-osk-key min-h-[2.75rem] px-0.5 text-center text-base font-bold sm:min-h-[2.9rem] sm:text-lg`
     : 'kassa-azerty-osk-key min-h-[2.75rem] touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:min-h-[2.9rem] sm:text-lg'
+
+  const keyBtnClassFor = useCallback(
+    (token: string, extra = '') =>
+      [
+        keyBtnClass,
+        extra,
+        pressedOskKey === token ? 'kassa-azerty-osk-key--pressed' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    [keyBtnClass, pressedOskKey],
+  )
 
   const oskShellSpeels = `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS}`
   const oskPanelShell = speelsDarkOsk
@@ -685,7 +718,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 <button
                   key={`n-${key}`}
                   type="button"
-                  className={keyBtnClass}
+                  className={keyBtnClassFor(`n:${key}`)}
                   {...makeOskEditKeyHandlers(`n:${key}`, () => ({
                     char: kassaAzertyKeyDisplay(key, shiftRef.current),
                   }))}
@@ -704,7 +737,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                   <button
                     key={key}
                     type="button"
-                    className={keyBtnClass}
+                    className={keyBtnClassFor(`l:${key}`)}
                     {...makeOskEditKeyHandlers(`l:${key}`, () => ({
                       char: kassaAzertyKeyDisplay(key, shiftRef.current),
                     }))}
@@ -717,14 +750,17 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
             <div className="grid grid-cols-[auto,auto,1fr,auto] gap-1.5">
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`}
+                className={keyBtnClassFor(
+                  'shift',
+                  `min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'brightness-110' : ''}`,
+                )}
                 {...shiftKeyHandlers}
               >
                 ⇧
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[2.85rem] px-2 sm:min-w-[3rem]`}
+                className={keyBtnClassFor('at', 'min-w-[2.85rem] px-2 sm:min-w-[3rem]')}
                 {...makeOskEditKeyHandlers('at', () => ({ char: KASSA_AZERTY_AT_CHAR }))}
                 data-testid="kassa-azerty-osk-at"
               >
@@ -732,7 +768,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} text-base tracking-widest text-neutral-300`}
+                className={keyBtnClassFor('space', 'text-base tracking-widest text-neutral-300')}
                 {...makeOskEditKeyHandlers('space', () => 'space')}
                 data-testid="kassa-azerty-osk-space"
                 aria-label={t('kassaApp.azertyOskSpace')}
@@ -741,7 +777,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               </button>
               <button
                 type="button"
-                className={`${keyBtnClass} min-w-[2.85rem] px-2.5 sm:min-w-[3rem]`}
+                className={keyBtnClassFor('backspace', 'min-w-[2.85rem] px-2.5 sm:min-w-[3rem]')}
                 {...makeOskEditKeyHandlers('backspace', () => 'backspace')}
               >
                 ⌫
