@@ -6436,12 +6436,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {kassaPosLuxury && kassaIpad10Chrome ? (
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[16] flex items-center justify-center"
+            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[24] flex items-center justify-center"
             aria-hidden={false}
           >
             <div
               data-testid="kassa-tablet-header-tenant-name"
-              className="pointer-events-auto flex min-w-0 max-w-[11rem] -translate-x-[4cm] items-center justify-center px-1.5 sm:max-w-[12rem]"
+              className="pointer-events-auto flex min-w-0 max-w-[11rem] -translate-x-[2cm] items-center justify-center px-1.5 sm:max-w-[12rem]"
             >
               {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}
             </div>
