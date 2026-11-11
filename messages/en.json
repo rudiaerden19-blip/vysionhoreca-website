@@ -4305,6 +4305,7 @@
     "azertyOskShortcutsTitle": "Note quick texts",
     "azertyOskShortcutsHint": "10 fields, 15 characters each — product or numpad notes. Saved automatically.",
     "azertyOskShortcutInsertHint": "› or Enter = insert into note",
+    "azertyOskInsertLineNoteLabel": "Insert note",
     "azertyOskShortcutEditHint": "Type label — auto-saved per business",
     "azertyOskShortcutPlaceholder": "e.g. John or no onion",
     "azertyOskShortcutsSave": "Save",

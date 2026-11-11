@@ -3650,6 +3650,7 @@
     "azertyOskShortcutsTitle": "نصوص سريعة للملاحظة",
     "azertyOskShortcutsHint": "10 حقول، 15 حرفًا لكل منها — لملاحظة المنتج أو لوحة الأرقام. يُحفظ تلقائيًا.",
     "azertyOskShortcutInsertHint": "› أو Enter = في الملاحظة",
+    "azertyOskInsertLineNoteLabel": "إدراج ملاحظة",
     "azertyOskShortcutEditHint": "اكتب النص — يُحفظ تلقائيًا لكل منشأة",
     "azertyOskShortcutPlaceholder": "مثال: أحمد أو بدون بصل",
     "azertyOskShortcutsSave": "حفظ",

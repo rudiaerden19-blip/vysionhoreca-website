@@ -83,14 +83,21 @@ export function KassaOskLineShortcutsPad({
       data-testid="kassa-azerty-osk-shortcuts"
       aria-label={numpadTitle}
     >
-      {onClose ? (
-        <div className="mb-1 flex h-7 shrink-0 items-center justify-end">
+      <div className="mb-1 flex h-7 shrink-0 items-center justify-between gap-1">
+        <span
+          className={`min-w-0 flex-1 truncate text-[10px] font-semibold leading-tight sm:text-[11px] ${
+            speelsDark ? 'text-[#909090]' : 'text-neutral-400'
+          }`}
+        >
+          {t('kassaApp.azertyOskInsertLineNoteLabel')}
+        </span>
+        {onClose ? (
           <button
             type="button"
             className={
               speelsDark
-                ? 'flex h-7 w-7 touch-manipulation items-center justify-center text-lg font-bold leading-none text-[#b0b0b0] active:opacity-80'
-                : 'flex h-7 w-7 touch-manipulation items-center justify-center text-lg font-bold leading-none text-neutral-300 active:text-white'
+                ? 'flex h-7 w-7 shrink-0 touch-manipulation items-center justify-center text-lg font-bold leading-none text-[#b0b0b0] active:opacity-80'
+                : 'flex h-7 w-7 shrink-0 touch-manipulation items-center justify-center text-lg font-bold leading-none text-neutral-300 active:text-white'
             }
             aria-label={t('kassaApp.azertyOskClose')}
             data-testid="kassa-azerty-osk-close"
@@ -98,8 +105,10 @@ export function KassaOskLineShortcutsPad({
           >
             ✕
           </button>
-        </div>
-      ) : null}
+        ) : (
+          <span className="h-7 w-7 shrink-0" aria-hidden="true" />
+        )}
+      </div>
       <div
         className="grid gap-1.5"
         style={{ gridTemplateColumns: `repeat(2, ${KASSA_AZERTY_OSK_OPTION_BTN_WIDTH})` }}
