@@ -6421,27 +6421,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {kassaPosLuxury ? (
+        {kassaPosLuxury && !kassaIpad10Chrome ? (
           <div
             className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5rem] sm:px-[8rem] md:px-[10rem]"
             aria-hidden={false}
           >
-            <div
-              className={`pointer-events-auto flex min-w-0 max-w-full justify-center ${
-                kassaIpad10Chrome ? 'translate-x-[5.25rem]' : ''
-              }`}
-            >
+            <div className="pointer-events-auto flex min-w-0 max-w-full justify-center">
               {renderKassaTenantNameButton(
                 kassaWide15Chrome
                   ? 'text-base sm:text-lg'
-                  : kassaIpad10Chrome
-                    ? 'text-base sm:text-lg'
-                    : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
+                  : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
                 kassaWide15Chrome
                   ? 'max-w-[min(100%,16rem)]'
-                  : kassaIpad10Chrome
-                    ? 'max-w-[min(100%,14rem)]'
-                    : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
+                  : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
               )}
             </div>
           </div>
@@ -6467,7 +6459,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         <div
           className={`relative flex min-h-0 min-w-0 flex-1 items-center ${
-            kassaWide15Chrome ? 'ml-1.5' : kassaCompactChrome ? 'ml-[2cm]' : 'ml-[4cm]'
+            kassaWide15Chrome || kassaIpad10Chrome
+              ? 'ml-1.5'
+              : kassaCompactChrome
+                ? 'ml-[2cm]'
+                : 'ml-[4cm]'
           }`}
         >
           <nav
@@ -6710,6 +6706,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 rowActiveClassName={ui.langRowActive}
                 rowInactiveClassName={ui.langRowInactive}
               />
+            </div>
+          ) : null}
+
+          {kassaPosLuxury && kassaIpad10Chrome ? (
+            <div
+              data-testid="kassa-ipad10-header-tenant-name"
+              className="relative z-[25] flex min-w-0 max-w-[11rem] shrink-0 items-center justify-center px-1.5 sm:max-w-[12rem]"
+            >
+              {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}
             </div>
           ) : null}
 
