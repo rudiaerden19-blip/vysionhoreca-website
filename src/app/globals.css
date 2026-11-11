@@ -1173,10 +1173,12 @@ html.kassa-dark-appearance.kassa-speels-layout
   box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.55);
 }
 
-/* AZERTY OSK op kassa: breedte tot start mand — sync `kassa-viewport-chrome-tokens` + root CSS vars. */
+/* AZERTY OSK op kassa: linker/rechter rand — 15/17 = volle breedte over mand (`--kassa-osk-right-inset` ≈ 4px). */
 .kassa-azerty-osk-kassa-anchor {
+  left: max(0.25rem, env(safe-area-inset-left, 0px));
   right: max(0.25rem, var(--kassa-osk-right-inset, calc(24rem + 0.1rem)));
   max-width: none;
+  width: auto;
 }
 
 /* ===========================================

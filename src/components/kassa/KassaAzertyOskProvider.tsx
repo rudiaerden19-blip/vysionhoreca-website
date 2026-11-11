@@ -798,8 +798,10 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
       {children}
       {showKeyboardPanel && !suppressedRef.current ? (
         <div
-          className={`pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[480] left-[max(0.75rem,env(safe-area-inset-left))] ${
-            oskStretchToCart ? 'kassa-azerty-osk-kassa-anchor' : 'max-w-[96vw]'
+          className={`pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[480] ${
+            oskStretchToCart
+              ? 'kassa-azerty-osk-kassa-anchor'
+              : 'left-[max(0.75rem,env(safe-area-inset-left))] max-w-[96vw]'
           }`}
           role="presentation"
         >

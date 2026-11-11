@@ -1445,6 +1445,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
   }, [])
 
+  /** OSK-provider staat naast kassa-app — inset op html zodat anchor breedte klopt per profiel. */
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') return
+    const root = document.documentElement
+    root.style.setProperty(
+      '--kassa-osk-right-inset',
+      `${kassaActiveChromeTokens.oskRightInsetPx}px`,
+    )
+    return () => {
+      root.style.removeProperty('--kassa-osk-right-inset')
+    }
+  }, [kassaActiveChromeTokens.oskRightInsetPx])
+
   /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
   const audioUnlockOnceRef = useRef(false)
   useEffect(() => {

@@ -19,19 +19,20 @@ describe('kassa-viewport-chrome-tokens', () => {
     expect(new Set([w15.sidebarWidthPx, sxga.sidebarWidthPx, def.sidebarWidthPx]).size).toBe(3)
   })
 
-  it('OSK-inset volgt mand per profiel', () => {
-    const w15 = getKassaViewportChromeTokens('wide15')
-    expect(w15.oskRightInsetPx).toBe(w15.sidebarWidthPx + 4)
+  it('15/17: OSK over volle breedte; overige profielen inset = mand + gutter', () => {
+    expect(getKassaViewportChromeTokens('wide15').oskRightInsetPx).toBe(4)
+    expect(getKassaViewportChromeTokens('sxga').oskRightInsetPx).toBe(4)
+    const def = getKassaViewportChromeTokens('default')
+    expect(def.oskRightInsetPx).toBe(def.sidebarWidthPx + 4)
     const ipad = getKassaViewportChromeTokens('ipad_10')
     expect(ipad.oskRightInsetPx).toBe(ipad.sidebarWidthPx + 4)
-    expect(w15.oskRightInsetPx).toBeGreaterThan(ipad.oskRightInsetPx)
   })
 
   it('CSS-variabelen op root', () => {
     const w15 = getKassaViewportChromeTokens('wide15')
     const vars = kassaViewportChromeCssVars(w15)
     expect(vars['--kassa-sidebar-width']).toBe('400px')
-    expect(vars['--kassa-osk-right-inset']).toBe('404px')
+    expect(vars['--kassa-osk-right-inset']).toBe('4px')
     expect(vars['--kassa-menu-tile-boost']).toBe('1.06')
     expect(w15.menuClassicGridCols).toBe(4)
   })

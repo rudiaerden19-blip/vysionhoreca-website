@@ -45,10 +45,19 @@ export const KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT = 1
 
 const OSK_EDGE_GUTTER_PX = 4
 
+/** 15″ / 17″: OSK over volle breedte (ook over mand); 21″+ stopt vóór mand. */
+export function resolveKassaOskRightInsetPx(
+  profile: KassaViewportProfileId,
+  sidebarWidthPx: number,
+): number {
+  if (profile === 'wide15' || profile === 'sxga') return OSK_EDGE_GUTTER_PX
+  return sidebarWidthPx + OSK_EDGE_GUTTER_PX
+}
+
 const WIDE15: KassaViewportChromeTokens = {
   profile: 'wide15',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX,
-  oskRightInsetPx: KASSA_SIDEBAR_WIDTH_WIDE15_PX + OSK_EDGE_GUTTER_PX,
+  oskRightInsetPx: resolveKassaOskRightInsetPx('wide15', KASSA_SIDEBAR_WIDTH_WIDE15_PX),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 4,
   menuTileHeightBoost: 1.06,
@@ -61,7 +70,7 @@ const WIDE15: KassaViewportChromeTokens = {
 const SXGA: KassaViewportChromeTokens = {
   profile: 'sxga',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX,
-  oskRightInsetPx: KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX + OSK_EDGE_GUTTER_PX,
+  oskRightInsetPx: resolveKassaOskRightInsetPx('sxga', KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 5,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -74,7 +83,7 @@ const SXGA: KassaViewportChromeTokens = {
 const DEFAULT_DESKTOP: KassaViewportChromeTokens = {
   profile: 'default',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX,
-  oskRightInsetPx: KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX + OSK_EDGE_GUTTER_PX,
+  oskRightInsetPx: resolveKassaOskRightInsetPx('default', KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 6,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -87,7 +96,7 @@ const DEFAULT_DESKTOP: KassaViewportChromeTokens = {
 const IPAD_129: KassaViewportChromeTokens = {
   profile: 'ipad_129',
   sidebarWidthPx: 340,
-  oskRightInsetPx: 340 + OSK_EDGE_GUTTER_PX,
+  oskRightInsetPx: resolveKassaOskRightInsetPx('ipad_129', 340),
   menuGridHorizontalPadPx: 32,
   menuClassicGridCols: 4,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
@@ -100,7 +109,7 @@ const IPAD_129: KassaViewportChromeTokens = {
 const IPAD_10: KassaViewportChromeTokens = {
   profile: 'ipad_10',
   sidebarWidthPx: KASSA_SIDEBAR_WIDTH_IPAD_10_PX,
-  oskRightInsetPx: KASSA_SIDEBAR_WIDTH_IPAD_10_PX + OSK_EDGE_GUTTER_PX,
+  oskRightInsetPx: resolveKassaOskRightInsetPx('ipad_10', KASSA_SIDEBAR_WIDTH_IPAD_10_PX),
   menuGridHorizontalPadPx: 28,
   menuClassicGridCols: 4,
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,

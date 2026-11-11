@@ -2,6 +2,7 @@ import type { KassaViewportProfileId } from '@/lib/kassa-viewport-profile-id'
 import {
   type KassaViewportChromeTokens,
   getKassaViewportChromeTokens,
+  resolveKassaOskRightInsetPx,
 } from '@/lib/kassa-viewport-chrome-tokens'
 
 /** Alleen chrome — geen flows, geen print. */
@@ -94,7 +95,7 @@ export function applyProfileSettingsToChromeTokens(
     ...base,
     profile: profileId,
     sidebarWidthPx: merged.sidebarWidthPx,
-    oskRightInsetPx: merged.sidebarWidthPx + 4,
+    oskRightInsetPx: resolveKassaOskRightInsetPx(profileId, merged.sidebarWidthPx),
     menuClassicGridCols: merged.menuClassicGridCols,
     menuTileHeightBoost: merged.menuTileHeightBoost,
     menuGridGapPx: merged.menuGridGapPx,
