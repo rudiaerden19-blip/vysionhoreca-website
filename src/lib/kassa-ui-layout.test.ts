@@ -115,10 +115,12 @@ describe('Speels bruine knoppen', () => {
     expect(kassaPosCartTrashButtonClass(false, 'luxe')).not.toContain('kassa-speels-red-gloss-btn')
   })
 
-  it('maakt Speels-categoriebalk donkerblauw glanzend (actief lichter blauw)', () => {
-    expect(kassaSpeelsCategoryStripButtonClass(false)).toContain('kassa-speels-blue-gloss-btn')
-    expect(kassaSpeelsCategoryStripButtonClass(true)).toContain('kassa-speels-blue-gloss-btn--selected')
-    expect(kassaSpeelsCategoryStripButtonClass(false)).not.toContain('kassa-speels-black-gloss-btn')
+  it('maakt Speels-categoriebalk mat grijs (actief iets lichter)', () => {
+    expect(kassaSpeelsCategoryStripButtonClass(false)).toContain('kassa-speels-category-strip-btn')
+    expect(kassaSpeelsCategoryStripButtonClass(true)).toContain(
+      'kassa-speels-category-strip-btn--selected',
+    )
+    expect(kassaSpeelsCategoryStripButtonClass(false)).not.toContain('kassa-speels-blue-gloss-btn')
   })
 
   it('maakt geselecteerd besteltype speels donkerblauw; rest grijs chrome', () => {

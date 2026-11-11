@@ -1,8 +1,8 @@
 /** Speels-chrome zonder glans — alleen Blonkys restaurant en snackbar/eethuis. */
 
 import {
+  kassaSpeelsCategoryStripButtonClass,
   kassaSpeelsGrayChromeButtonClass,
-  kassaSpeelsOrderTypeButtonClass,
 } from '@/lib/kassa-pos-surface'
 
 export const KASSA_BLONKYS_FLAT_HTML_CLASS = 'kassa-blonkys-flat-btns'
@@ -26,9 +26,9 @@ export function isBlonkysFlatBlackKassaTenant(slug: string | null | undefined): 
   return BLONKYS_MATTE_KASSA_SLUGS.has(s)
 }
 
-/** Categoriebalk — grijs chrome i.p.v. donkerblauw (alleen Blonkys). */
+/** Categoriebalk — zelfde matte strip als alle tenants (Blonkys hook blijft voor page-switch). */
 export function blonkysSpeelsCategoryStripButtonClass(active: boolean): string {
-  return kassaSpeelsOrderTypeButtonClass(active)
+  return kassaSpeelsCategoryStripButtonClass(active)
 }
 
 /** Snelmenu-paneel — zelfde grijs chrome als Verkoop/Binnen (alleen Blonkys). */

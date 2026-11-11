@@ -20,7 +20,7 @@ describe('isBlonkysFlatBlackKassaTenant', () => {
   })
 
   it('gebruikt grijs speels-chrome voor categorie en snelmenu', () => {
-    expect(blonkysSpeelsCategoryStripButtonClass(false)).toContain('kassa-speels-order-type-btn')
+    expect(blonkysSpeelsCategoryStripButtonClass(false)).toContain('kassa-speels-category-strip-btn')
     expect(blonkysSpeelsCategoryStripButtonClass(false)).not.toContain('kassa-speels-blue-gloss-btn')
     expect(blonkysSpeelsQuickMenuPanelButtonClass()).toContain('kassa-speels-order-type-btn')
     expect(blonkysSpeelsQuickMenuPanelButtonClass()).not.toContain('kassa-speels-blue-gloss-btn')
