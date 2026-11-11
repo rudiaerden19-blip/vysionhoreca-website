@@ -38,16 +38,30 @@ export function writeCachedKassaViewportProfileSettings(
   }
 }
 
+function isKassaLayoutLabPreviewClient(): boolean {
+  if (typeof window === 'undefined') return false
+  const v = new URLSearchParams(window.location.search).get('kassa_layout_preview')
+  return v === '1' || v === 'true'
+}
+
 export async function fetchKassaViewportProfileSettingsMap(): Promise<{
   version: string
   map: KassaViewportProfileSettingsMap
 }> {
   try {
+    if (isKassaLayoutLabPreviewClient()) {
+      try {
+        sessionStorage.removeItem(SESSION_KEY)
+      } catch {
+        /* ignore */
+      }
+    }
     const res = await fetch('/api/kassa/viewport-profile-settings', {
       credentials: 'same-origin',
       cache: 'no-store',
     })
     if (!res.ok) {
+      if (isKassaLayoutLabPreviewClient()) return EMPTY_SETTINGS
       const cached = readCachedKassaViewportProfileSettings()
       return cached ?? EMPTY_SETTINGS
     }

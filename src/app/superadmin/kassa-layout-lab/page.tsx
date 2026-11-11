@@ -46,10 +46,11 @@ function Preview({
   const physical = useMemo(() => kassaLabPhysicalBoxCm(frame), [frame])
   const [scale, setScale] = useState(0.25)
 
-  const src = useMemo(
-    () => buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost'),
-    [frame, origin, tenantSlug],
-  )
+  const src = useMemo(() => {
+    const url = new URL(buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost'))
+    url.searchParams.set('lab_ts', String(iframeKey))
+    return url.toString()
+  }, [frame, iframeKey, origin, tenantSlug])
 
   useLayoutEffect(() => {
     const el = boxRef.current
@@ -172,8 +173,8 @@ export default function SuperadminKassaLayoutLabPage() {
           </button>
         </div>
         <p className="mt-2 text-xs text-zinc-500">
-          Eén deploy op main = dezelfde kassa-layout voor alle 500+ tenants. Slug hier = alleen welke zaak je in de
-          preview ziet (wordt onthouden).
+          Eén deploy op main = dezelfde layout voor alle tenants. Na studio of deploy: alleen{' '}
+          <strong className="text-zinc-300">Vernieuwen</strong> — geen extra stappen.
         </p>
       </header>
 

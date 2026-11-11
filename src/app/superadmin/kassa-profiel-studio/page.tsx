@@ -45,8 +45,10 @@ function LabPreview({
   const src = useMemo(() => {
     if (!frame || !tenantSlug) return ''
     const base = buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost')
-    return appendKassaPreviewSettingsToUrl(base, settings)
-  }, [frame, origin, settings, tenantSlug])
+    const url = new URL(appendKassaPreviewSettingsToUrl(base, settings))
+    url.searchParams.set('lab_ts', String(iframeKey))
+    return url.toString()
+  }, [frame, iframeKey, origin, settings, tenantSlug])
 
   useLayoutEffect(() => {
     const el = boxRef.current
