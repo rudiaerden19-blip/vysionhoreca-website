@@ -7119,7 +7119,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           id="kassa-sidebar-tools-panel"
           className={
             kassaSidebarToolsSlidePanel
-              ? `absolute inset-x-0 top-0 z-20 transition-transform duration-300 ease-out ${kassaPlateBgClass} ${
+              ? `absolute inset-x-0 top-10 z-20 transition-transform duration-300 ease-out ${kassaPlateBgClass} ${
                   kassaSidebarToolsOpen
                     ? 'translate-y-0 shadow-[0_14px_28px_rgba(0,0,0,0.5)]'
                     : 'pointer-events-none -translate-y-full'
