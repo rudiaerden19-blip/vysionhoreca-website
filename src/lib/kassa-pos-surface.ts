@@ -228,8 +228,8 @@ export const KASSA_SPEELS_CHECKOUT_BTN = [
 /** Tekst op speels blauw/rood/groen chrome-knoppen. */
 export const KASSA_SPEELS_CHROME_MUTED_TEXT_CLASS = 'text-[#b0b0b0]'
 
-/** Grijs chrome — wit label (referentie). */
-export const KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS = 'text-white font-semibold'
+/** Grijs chrome — gedempt label (niet fel wit). */
+export const KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS = 'text-[#b0b0b0] font-semibold'
 
 /** Header + categoriebalk — iets donkerder grijs dan overige chrome-knoppen. */
 export const KASSA_SPEELS_TOP_CHROME_BTN_CLASS = 'kassa-speels-top-chrome-btn'

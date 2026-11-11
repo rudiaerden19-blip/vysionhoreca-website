@@ -593,8 +593,8 @@ input[type="number"] {
 
 .kassa-speels-top-chrome-btn.kassa-speels-order-type-btn,
 .kassa-speels-top-chrome-btn.kassa-speels-black-gloss-btn {
-  color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  color: #b0b0b0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
 }
 
 [data-testid='kassa-app'][data-kassa-profile-id='ipad_10'] .kassa-speels-top-chrome-btn,
@@ -612,8 +612,8 @@ input[type="number"] {
  * Speels grijs — bijna zwart, zelfde rand/schaduw als groen/rood (geen witte lijn).
  */
 .kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn) {
-  color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  color: #b0b0b0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   background: linear-gradient(180deg, #2c2c30 0%, #18181c 42%, #0a0a0e 78%, #050508 100%);
   border: 1px solid #0a0a0a;
   border-top-color: #3a3a3a;
@@ -802,8 +802,8 @@ input[type="number"] {
  * Speels — donkerder grijs (menu/Snel menu aan), zelfde referentie-stijl.
  */
 .kassa-speels-black-gloss-btn {
-  color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  color: #b0b0b0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
   background: linear-gradient(180deg, #343438 0%, #1c1c20 40%, #0a0a0e 76%, #040408 100%);
   border: 1px solid #0c0c0c;
   border-top-color: #404040;
@@ -1488,6 +1488,8 @@ html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn {
 /* Blonkys: zonder ::before-glans — zelfde donkere rand als speels-grijs. */
 html.kassa-blonkys-flat-btns button.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn),
 html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
+  color: #b0b0b0 !important;
+  -webkit-text-fill-color: #b0b0b0 !important;
   background: linear-gradient(180deg, #2c2c30 0%, #18181c 48%, #06060a 100%) !important;
   border: 1px solid #0a0a0a !important;
   border-top-color: #3a3a3a !important;
@@ -1497,6 +1499,12 @@ html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
     0 3px 7px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     inset 0 -2px 0 rgba(0, 0, 0, 0.42) !important;
+}
+
+html.kassa-blonkys-flat-btns button.kassa-speels-order-type-btn:not(.kassa-speels-blue-gloss-btn) *,
+html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn * {
+  color: #b0b0b0 !important;
+  -webkit-text-fill-color: #b0b0b0 !important;
 }
 
 html.kassa-blonkys-flat-btns
