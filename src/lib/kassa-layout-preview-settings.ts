@@ -8,7 +8,7 @@ import {
   type KassaViewportProfileSettingsPatch,
 } from '@/lib/kassa-viewport-profile-settings'
 
-/** Draft van studio in preview-URL — zelfde chrome als kassa in de zaak (logisch 1366×768). */
+/** Optionele draft in preview-URL — overschrijft studio-map; zonder k_* = alleen Supabase + profiel. */
 export const KASSA_PREVIEW_PARAM_SIDEBAR = 'k_sidebar'
 export const KASSA_PREVIEW_PARAM_BOOST = 'k_boost'
 export const KASSA_PREVIEW_PARAM_COLS = 'k_cols'

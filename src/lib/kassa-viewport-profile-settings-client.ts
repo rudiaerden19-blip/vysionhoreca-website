@@ -75,22 +75,22 @@ export function resolveKassaChromeTokensForProfile(
 }
 
 /**
- * Kassa-pagina: layout-lab negeert Supabase-studio (anders zie je refresh geen deploy-defaults).
- * Optionele k_* query = live draft bovenop code-defaults.
+ * Kassa-pagina + layout-lab: zelfde studio-map als in de zaak; k_* in preview-URL overschrijft draft.
  */
 export function resolveKassaChromeTokensForKassa(
   profileId: KassaViewportProfileId,
   map: KassaViewportProfileSettingsMap,
 ): KassaViewportChromeTokens {
   try {
+    const studioPatch = map[profileId] ?? {}
     if (typeof window !== 'undefined') {
       const sp = new URLSearchParams(window.location.search)
-      if (isKassaLayoutPreviewSearchParams(sp)) {
-        const urlPatch = readKassaLayoutPreviewSettingsPatch(sp) ?? {}
-        return applyProfileSettingsToChromeTokens(profileId, urlPatch)
-      }
+      const urlPatch = isKassaLayoutPreviewSearchParams(sp)
+        ? (readKassaLayoutPreviewSettingsPatch(sp) ?? {})
+        : {}
+      return applyProfileSettingsToChromeTokens(profileId, { ...studioPatch, ...urlPatch })
     }
-    return resolveKassaChromeTokensForProfile(profileId, map)
+    return applyProfileSettingsToChromeTokens(profileId, studioPatch)
   } catch {
     return applyProfileSettingsToChromeTokens(profileId, {})
   }

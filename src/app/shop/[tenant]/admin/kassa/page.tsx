@@ -414,6 +414,13 @@ import {
   resolveKassaChromeTokensForKassa,
   type KassaViewportProfileSettingsMap,
 } from '@/lib/kassa-viewport-profile-settings-client'
+import {
+  type KassaChromeDensity,
+  kassaChromeDensityFromProfileId,
+  kassaCompactChromeFromProfileId,
+  isKassaTabletViewportProfile,
+  kassaIpadTabletLayoutActive,
+} from '@/lib/kassa-chrome-from-profile'
 
 /** Tik-feedback ná paint — zwakkere touch-terminals blijven UI-updates beter bijbenen */
 function scheduleKassaTapSound(play: () => void) {
@@ -480,8 +487,6 @@ const KASSA_SIDEBAR_FOOTER_LEFT_COL_WIDE15 =
   'w-[7.5rem] min-w-[7.5rem] max-w-[7.5rem] shrink-0'
 /** Snel menu + Totaal-balk op 15″ — iets hoger dan overige footerknoppen. */
 const KASSA_WIDE15_FOOTER_TOTAL_ROW_MIN_H = 'min-h-[4.25rem]'
-
-type KassaChromeDensity = 'wide15' | 'sxga' | 'default'
 
 /**
  * SXGA (~17″): rij gelijk aan **vierkante foto** (celbreedte) + lichte gap + titel — overige schermen ongemoeid.
@@ -1396,6 +1401,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [kassaViewportProfileId, kassaViewportSettingsMap],
   )
 
+  /** Lab + zaak: chrome uit profiel-id, niet uit losse viewport-flags. */
+  const kassaWide15Chrome = kassaViewportProfileId === 'wide15'
+  const kassaSxgaDenseTiles = kassaViewportProfileId === 'sxga'
+  const kassaIpadMenuGridCap = kassaIpadTabletLayoutActive(kassaViewportProfileId)
+  const kassaTabletViewportChrome = isKassaTabletViewportProfile(kassaViewportProfileId)
+  const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
+  const kassaCompactChrome = kassaCompactChromeFromProfileId(kassaViewportProfileId)
+  const kassaChromeDensity = kassaChromeDensityFromProfileId(kassaViewportProfileId)
+
   const kassaLayoutLabPreview = useMemo(() => {
     if (typeof window === 'undefined') return false
     return isKassaLayoutPreviewSearchParams(new URLSearchParams(window.location.search))
@@ -1960,13 +1974,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaPrevSelectedCategoryIdRef = useRef<string | null>(null)
 
   const [kassaMenuRowPx, setKassaMenuRowPx] = useState(computeInitialKassaMenuRowPx)
-  /** SXGA ~17″: dichtere titel+vierkante fotobak — alleen daar `sxgaDenseTileLayout`naar tegels */
-  const [kassaSxgaDenseTiles, setKassaSxgaDenseTiles] = useState(shouldApplyKassaCompactSquareMonitorTileCap)
-  const [kassaWide15Chrome, setKassaWide15Chrome] = useState(shouldApplyKassaWide15Chrome)
-  /** iPad: max 4 tegels/rij (desktop 21″ blijft 6 op xl). */
-  const [kassaIpadMenuGridCap, setKassaIpadMenuGridCap] = useState(
-    () => readKassaChromeFlagsFromWindow().ipadClient,
-  )
 
   /** Na swap categorie⇄product: kort géén pointers op de verse grid (zelfde coörd = ghost tik). */
   useLayoutEffect(() => {
@@ -2327,16 +2334,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useLayoutEffect(() => {
     let rafId = 0
 
-    /** Moet synchroon: geen `rAF`— anders eerste categorie-frame nog “niet‑SXGA” (te groot). */
-    function syncSxgaDenseFromViewport() {
-      const flags = readKassaChromeFlagsFromWindow()
-      setKassaSxgaDenseTiles((prev) => (prev === flags.sxgaDense ? prev : flags.sxgaDense))
-      setKassaWide15Chrome((prev) => (prev === flags.wide15 ? prev : flags.wide15))
-      setKassaIpadMenuGridCap((prev) => (prev === flags.ipadClient ? prev : flags.ipadClient))
-    }
-
     const measure = () => {
-      syncSxgaDenseFromViewport()
+      try {
+        setKassaViewportProfileId(readKassaViewportProfileIdFromWindow())
+      } catch {
+        /* profile sync bij resize */
+      }
       cancelAnimationFrame(rafId)
       const el = kassaMenuScrollRef.current
       if (!el || typeof ResizeObserver === 'undefined') return
@@ -5923,18 +5926,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }`
       : ''
 
-  const kassaIpad10Chrome = kassaViewportProfileId === 'ipad_10'
-  const kassaIpadTabletChrome =
-    kassaIpadMenuGridCap &&
-    (kassaIpad10Chrome || kassaViewportProfileId === 'ipad_129')
-  const kassaCompactChrome = kassaSxgaDenseTiles || kassaWide15Chrome
+  const kassaIpadTabletChrome = kassaTabletViewportChrome
   const kassaMenuClassicGridCols = kassaActiveChromeTokens.menuClassicGridCols
   const kassaDefaultMenuGridColsClass = kassaDefaultMenuGridTailwindCols(kassaIpadMenuGridCap)
-  const kassaChromeDensity: KassaChromeDensity = kassaWide15Chrome
-    ? 'wide15'
-    : kassaSxgaDenseTiles
-      ? 'sxga'
-      : 'default'
   const kassaViewportChromeTokens = kassaActiveChromeTokens
   const kassaRootChromeStyle = kassaViewportChromeCssVars(
     kassaViewportChromeTokens,
@@ -6421,7 +6415,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {kassaPosLuxury && !kassaIpad10Chrome ? (
+        {kassaPosLuxury && !kassaTabletViewportChrome ? (
           <div
             className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5rem] sm:px-[8rem] md:px-[10rem]"
             aria-hidden={false}
@@ -6459,7 +6453,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         <div
           className={`relative flex min-h-0 min-w-0 flex-1 items-center ${
-            kassaWide15Chrome || kassaIpad10Chrome
+            kassaWide15Chrome || kassaTabletViewportChrome
               ? 'ml-1.5'
               : kassaCompactChrome
                 ? 'ml-[2cm]'
@@ -6709,9 +6703,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </div>
           ) : null}
 
-          {kassaPosLuxury && kassaIpad10Chrome ? (
+          {kassaPosLuxury && kassaTabletViewportChrome ? (
             <div
-              data-testid="kassa-ipad10-header-tenant-name"
+              data-testid="kassa-tablet-header-tenant-name"
               className="relative z-[25] flex min-w-0 max-w-[11rem] shrink-0 items-center justify-center px-1.5 sm:max-w-[12rem]"
             >
               {renderKassaTenantNameButton('text-base sm:text-lg', 'w-full')}

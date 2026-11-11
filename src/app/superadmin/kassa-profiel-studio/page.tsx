@@ -10,6 +10,7 @@ import {
   type KassaViewportProfileId,
 } from '@/lib/kassa-viewport-profile-id'
 import { buildKassaLayoutPreviewKassaUrl } from '@/lib/kassa-layout-preview'
+import { appendKassaPreviewSettingsToUrl } from '@/lib/kassa-layout-preview-settings'
 import {
   KASSA_VIEWPORT_SETTINGS_LIMITS,
   type KassaViewportProfileSettings,
@@ -43,8 +44,9 @@ function LabPreview({
 
   const src = useMemo(() => {
     if (!frame || !tenantSlug) return ''
-    return buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost')
-  }, [frame, origin, tenantSlug])
+    const base = buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost')
+    return appendKassaPreviewSettingsToUrl(base, settings)
+  }, [frame, origin, settings, tenantSlug])
 
   useLayoutEffect(() => {
     const el = boxRef.current
