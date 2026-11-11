@@ -58,6 +58,9 @@ import {
   KassaAzertyOskContext,
 } from '@/lib/kassa-azerty-osk-context'
 
+const KASSA_OSK_BACKSPACE_REPEAT_DELAY_MS = 380
+const KASSA_OSK_BACKSPACE_REPEAT_INTERVAL_MS = 45
+
 function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }) {
   const params = useParams()
   const pathname = usePathname() ?? ''
@@ -77,6 +80,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const [shift, setShift] = useState(false)
   const shiftRef = useRef(false)
   const oskEditPointerRef = useRef<{ token: string; at: number } | null>(null)
+  const oskBackspaceRepeatDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const oskBackspaceRepeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const oskBackspaceDidRepeatRef = useRef(false)
   const lineShortcutDraftRef = useRef(lineShortcutDraft)
   const oskShortcutCaretRef = useRef<{ idx: number; caret: number } | null>(null)
   const activeRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
@@ -566,20 +572,48 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
 
   const [pressedOskKey, setPressedOskKey] = useState<string | null>(null)
 
+  const stopOskBackspaceRepeat = useCallback(() => {
+    if (oskBackspaceRepeatDelayRef.current !== null) {
+      clearTimeout(oskBackspaceRepeatDelayRef.current)
+      oskBackspaceRepeatDelayRef.current = null
+    }
+    if (oskBackspaceRepeatIntervalRef.current !== null) {
+      clearInterval(oskBackspaceRepeatIntervalRef.current)
+      oskBackspaceRepeatIntervalRef.current = null
+    }
+  }, [])
+
+  useEffect(() => () => stopOskBackspaceRepeat(), [stopOskBackspaceRepeat])
+
   useEffect(() => {
     if (!pressedOskKey) return
-    const release = () => setPressedOskKey(null)
+    const release = () => {
+      setPressedOskKey(null)
+      stopOskBackspaceRepeat()
+    }
     window.addEventListener('pointerup', release)
     window.addEventListener('pointercancel', release)
     return () => {
       window.removeEventListener('pointerup', release)
       window.removeEventListener('pointercancel', release)
     }
-  }, [pressedOskKey])
+  }, [pressedOskKey, stopOskBackspaceRepeat])
 
   const pressOskKey = useCallback((token: string) => {
     setPressedOskKey(token)
   }, [])
+
+  const startOskBackspaceRepeat = useCallback(() => {
+    stopOskBackspaceRepeat()
+    oskBackspaceRepeatDelayRef.current = setTimeout(() => {
+      oskBackspaceRepeatDelayRef.current = null
+      oskBackspaceDidRepeatRef.current = true
+      sendEdit('backspace')
+      oskBackspaceRepeatIntervalRef.current = setInterval(() => {
+        sendEdit('backspace')
+      }, KASSA_OSK_BACKSPACE_REPEAT_INTERVAL_MS)
+    }, KASSA_OSK_BACKSPACE_REPEAT_DELAY_MS)
+  }, [sendEdit, stopOskBackspaceRepeat])
 
   const makeOskEditKeyHandlers = useCallback(
     (token: string, getEdit: () => Parameters<typeof applyKassaAzertyOskEdit>[1]) => ({
@@ -588,6 +622,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         e.preventDefault()
         e.stopPropagation()
         clearFocusOutTimer()
+        stopOskBackspaceRepeat()
         pressOskKey(token)
         oskEditPointerRef.current = { token, at: Date.now() }
         sendEdit(getEdit())
@@ -602,7 +637,62 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         sendEdit(getEdit())
       },
     }),
-    [clearFocusOutTimer, pressOskKey, sendEdit],
+    [clearFocusOutTimer, pressOskKey, sendEdit, stopOskBackspaceRepeat],
+  )
+
+  const backspaceKeyHandlers = useMemo(
+    () => ({
+      onPointerDown: (e: React.PointerEvent) => {
+        if (e.button !== 0) return
+        e.preventDefault()
+        e.stopPropagation()
+        clearFocusOutTimer()
+        oskBackspaceDidRepeatRef.current = false
+        pressOskKey('backspace')
+        oskEditPointerRef.current = { token: 'backspace', at: Date.now() }
+        sendEdit('backspace')
+        startOskBackspaceRepeat()
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId)
+        } catch {
+          /* noop */
+        }
+      },
+      onPointerUp: (e: React.PointerEvent) => {
+        stopOskBackspaceRepeat()
+        try {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId)
+          }
+        } catch {
+          /* noop */
+        }
+      },
+      onPointerCancel: (e: React.PointerEvent) => {
+        stopOskBackspaceRepeat()
+        try {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId)
+          }
+        } catch {
+          /* noop */
+        }
+      },
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (oskBackspaceDidRepeatRef.current) {
+          oskBackspaceDidRepeatRef.current = false
+          return
+        }
+        const pd = oskEditPointerRef.current
+        if (pd?.token === 'backspace' && Date.now() - pd.at < 320) return
+        clearFocusOutTimer()
+        pressOskKey('backspace')
+        sendEdit('backspace')
+      },
+    }),
+    [clearFocusOutTimer, pressOskKey, sendEdit, startOskBackspaceRepeat, stopOskBackspaceRepeat],
   )
 
   const shiftKeyHandlers = useMemo(
@@ -778,7 +868,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               <button
                 type="button"
                 className={keyBtnClassFor('backspace', 'min-w-[2.85rem] px-2.5 sm:min-w-[3rem]')}
-                {...makeOskEditKeyHandlers('backspace', () => 'backspace')}
+                {...backspaceKeyHandlers}
               >
                 ⌫
               </button>
