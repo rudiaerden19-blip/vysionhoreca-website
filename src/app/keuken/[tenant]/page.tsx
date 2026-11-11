@@ -33,16 +33,14 @@ import { adminDineInSeatAuditLine } from '@/lib/admin-order-display'
 import { getShopDisplaySurface } from '@/lib/shop-display-surface'
 import { KassaIconClose } from '@/lib/kassa-ui-icons'
 import { useKassaUiDarkSync } from '@/lib/kassa-register-ui-dark-preference'
-import {
-  kdsColumnWidthPx,
-  type KitchenKdsDensity,
-  KitchenItemMadeMark,
-  KitchenKdsColumn,
-  kitchenKdsDensityFromViewportProfileId,
-  kitchenItemLineKey,
-} from '@/components/keuken/KitchenKdsColumn'
+import { KitchenItemMadeMark, KitchenKdsColumn, kitchenItemLineKey } from '@/components/keuken/KitchenKdsColumn'
+import { useKassaPosViewportBootstrap } from '@/hooks/useKassaPosViewportBootstrap'
 import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
-import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
+import { kitchenKdsLayoutFromProfileId } from '@/lib/kassa-viewport-chrome-tokens'
+import {
+  readKassaViewportProfileIdFromWindow,
+  type KassaViewportProfileId,
+} from '@/lib/kassa-viewport-profile-id'
 import {
   KASSA_SPEELS_GREEN_GLOW_SWEEP_CLASS,
   KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS,
@@ -81,6 +79,7 @@ interface BusinessSettings {
 }
 
 export default function KeukenDisplayPage({ params }: { params: { tenant: string } }) {
+  useKassaPosViewportBootstrap()
   const { t, locale } = useLanguage()
   const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const adminBase = `/shop/${params.tenant}/admin`
@@ -145,9 +144,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }, [soundActivated])
   const boardRef = useRef<HTMLDivElement>(null)
   const boardScrollRef = useRef<HTMLDivElement>(null)
-  const [kdsDensity, setKdsDensity] = useState<KitchenKdsDensity>('default')
-  const kdsColPx = useMemo(() => kdsColumnWidthPx(kdsDensity), [kdsDensity])
-  const kdsCompactLayout = kdsDensity !== 'default'
+  const [kdsProfileId, setKdsProfileId] = useState<KassaViewportProfileId>(() =>
+    typeof window !== 'undefined' ? readKassaViewportProfileIdFromWindow() : 'default',
+  )
+  const kdsLayout = useMemo(() => kitchenKdsLayoutFromProfileId(kdsProfileId), [kdsProfileId])
+  const kdsColPx = kdsLayout.columnWidthPx
+  const kdsCompactLayout = kdsLayout.compactTypography
   const [colsPerPage, setColsPerPage] = useState(5)
   const [kdsPage, setKdsPage] = useState(0)
   const ticketBodyRefs = useRef(new Map<string, HTMLDivElement>())
@@ -258,8 +260,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   useEffect(() => {
     const syncVp = () => {
-      const d = kitchenKdsDensityFromViewportProfileId(readKassaViewportProfileIdFromWindow())
-      setKdsDensity((prev) => (prev === d ? prev : d))
+      const id = readKassaViewportProfileIdFromWindow()
+      setKdsProfileId((prev) => (prev === id ? prev : id))
     }
     syncVp()
     window.addEventListener('resize', syncVp)
@@ -709,7 +711,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             {orders.map((order) => (
               <KitchenKdsColumn
                 key={order.id}
-                density={kdsDensity}
+                columnWidthPx={kdsColPx}
+                compactTypography={kdsLayout.compactTypography}
                 order={order}
                 locale={locale}
                 now={currentTime}

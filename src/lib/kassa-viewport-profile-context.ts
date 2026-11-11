@@ -118,3 +118,22 @@ export function applyKassaViewportProfileContextFromSession(): (() => void) | un
   if (!session?.params) return undefined
   return applyKassaLayoutPreviewViewportFromSearchParams(new URLSearchParams(session.params))
 }
+
+/** URL + sessie — lab-preview en kvp blijven gelden op keuken/display. */
+export function mergedKassaPosSearchParams(): URLSearchParams {
+  const merged = new URLSearchParams()
+  const session = readKassaViewportProfileContextSession()
+  if (session?.params) {
+    for (const [k, v] of Object.entries(session.params)) {
+      if (v) merged.set(k, v)
+    }
+  }
+  if (typeof window !== 'undefined') {
+    const cur = new URLSearchParams(window.location.search)
+    for (const key of PASSTHROUGH_QUERY_KEYS) {
+      const v = cur.get(key)
+      if (v != null && v !== '') merged.set(key, v)
+    }
+  }
+  return merged
+}

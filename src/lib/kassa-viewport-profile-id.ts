@@ -6,6 +6,7 @@
 import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
 import { KASSA_LAYOUT_LAB_FRAMES, resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
 import {
+  mergedKassaPosSearchParams,
   persistKassaViewportProfileContext,
   stickyKassaViewportProfileId,
 } from '@/lib/kassa-viewport-profile-context'
@@ -62,7 +63,7 @@ function readKassaChromeFlagsForProfileId(): {
   ipadClient: boolean
 } {
   if (typeof window !== 'undefined') {
-    const preview = resolveKassaLayoutPreviewChrome(new URLSearchParams(window.location.search))
+    const preview = resolveKassaLayoutPreviewChrome(mergedKassaPosSearchParams())
     if (preview) return preview
   }
   const ipadClient = readKassaIpadClientFromWindow()
@@ -105,7 +106,7 @@ export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
     const sp = new URLSearchParams(window.location.search)
     const forced = sp.get('kvp')
     if (isKassaViewportProfileId(forced)) {
-      persistKassaViewportProfileContext(forced, sp)
+      persistKassaViewportProfileContext(forced, mergedKassaPosSearchParams())
       return forced
     }
     const sticky = stickyKassaViewportProfileId()
@@ -126,7 +127,7 @@ export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
       cssW,
       cssH,
     })
-    persistKassaViewportProfileContext(resolved, sp)
+    persistKassaViewportProfileContext(resolved, mergedKassaPosSearchParams())
     return resolved
   } catch {
     return 'default'

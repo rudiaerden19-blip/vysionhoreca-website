@@ -399,11 +399,10 @@ import {
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
 import {
-  applyKassaLayoutPreviewViewportFromSearchParams,
   isKassaLayoutPreviewSearchParams,
   resolveKassaLayoutPreviewChrome,
 } from '@/lib/kassa-layout-preview'
-import { applyKassaViewportProfileContextFromSession } from '@/lib/kassa-viewport-profile-context'
+import { useKassaPosViewportBootstrap } from '@/hooks/useKassaPosViewportBootstrap'
 import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
 import {
   estimateKassaSidebarWidthPxForInnerWidth,
@@ -1271,6 +1270,7 @@ function snapshotCartItemsForAsyncPrint(items: CartItem[]): CartItem[] {
 const KASSA_DRAFT_RECEIPT_COOLDOWN_MS = 450
 
 function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
+  useKassaPosViewportBootstrap()
   const tenant = params.tenant
   const { layout: kassaLayout, dark: kassaAppearanceDark, setLayout: setKassaLayout } =
     useKassaUiLayoutSync(tenant)
@@ -1381,15 +1381,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       html.classList.remove('vysion-kassa-root')
       body.classList.remove('vysion-kassa-root')
     }
-  }, [])
-
-  /** Layout-lab iframe: viewport = lab_w×lab_h, niet device-width van desktop. */
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined
-    const sp = new URLSearchParams(window.location.search)
-    let cleanup = applyKassaLayoutPreviewViewportFromSearchParams(sp)
-    if (!cleanup) cleanup = applyKassaViewportProfileContextFromSession()
-    return cleanup
   }, [])
 
   const [kassaViewportProfileId, setKassaViewportProfileId] = useState<KassaViewportProfileId>(

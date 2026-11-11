@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
   KASSA_LAYOUT_LAB_FRAMES,
-  buildKassaLayoutPreviewKassaUrl,
+  buildKassaLayoutPreviewPosUrl,
   type KassaLayoutLabFrame,
+  type KassaLayoutLabPosPath,
 } from '@/lib/kassa-layout-preview'
 import {
   kassaLabPhysicalBoxCm,
@@ -35,22 +36,26 @@ function Preview({
   tenantSlug,
   origin,
   iframeKey,
+  posPath,
 }: {
   frame: KassaLayoutLabFrame
   label: string
   tenantSlug: string
   origin: string
   iframeKey: number
+  posPath: KassaLayoutLabPosPath
 }) {
   const boxRef = useRef<HTMLDivElement>(null)
   const physical = useMemo(() => kassaLabPhysicalBoxCm(frame), [frame])
   const [scale, setScale] = useState(0.25)
 
   const src = useMemo(() => {
-    const url = new URL(buildKassaLayoutPreviewKassaUrl(tenantSlug, frame, origin || 'https://localhost'))
+    const url = new URL(
+      buildKassaLayoutPreviewPosUrl(tenantSlug, frame, origin || 'https://localhost', posPath),
+    )
     url.searchParams.set('lab_ts', String(iframeKey))
     return url.toString()
-  }, [frame, iframeKey, origin, tenantSlug])
+  }, [frame, iframeKey, origin, posPath, tenantSlug])
 
   useLayoutEffect(() => {
     const el = boxRef.current
@@ -103,6 +108,7 @@ export default function SuperadminKassaLayoutLabPage() {
   const urlTenant = normalizeKassaLayoutLabTenantSlug(searchParams?.get('tenant') || '')
   const [tenantSlug, setTenantSlug] = useState(() => readKassaLayoutLabTenantSlug(urlTenant))
   const [iframeKey, setIframeKey] = useState(0)
+  const [posPath, setPosPath] = useState<KassaLayoutLabPosPath>('kassa')
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
   useLayoutEffect(() => {
@@ -171,6 +177,21 @@ export default function SuperadminKassaLayoutLabPage() {
           >
             Vernieuwen
           </button>
+          <span className="ml-2 text-xs text-zinc-500">Scherm:</span>
+          <button
+            type="button"
+            onClick={() => setPosPath('kassa')}
+            className={`rounded border px-2 py-1 text-sm ${posPath === 'kassa' ? 'border-amber-500 bg-amber-500/20' : 'border-zinc-600'}`}
+          >
+            Kassa
+          </button>
+          <button
+            type="button"
+            onClick={() => setPosPath('keuken')}
+            className={`rounded border px-2 py-1 text-sm ${posPath === 'keuken' ? 'border-amber-500 bg-amber-500/20' : 'border-zinc-600'}`}
+          >
+            Keuken
+          </button>
         </div>
         <p className="mt-2 text-xs text-zinc-500">
           Eén deploy op main = dezelfde layout voor alle tenants. Na studio of deploy: alleen{' '}
@@ -188,6 +209,7 @@ export default function SuperadminKassaLayoutLabPage() {
               tenantSlug={tenantSlug}
               origin={origin}
               iframeKey={iframeKey}
+              posPath={posPath}
             />
           ))
         ) : null}

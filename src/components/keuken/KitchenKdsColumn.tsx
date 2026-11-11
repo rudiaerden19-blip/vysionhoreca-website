@@ -111,6 +111,9 @@ type Props = {
   bodyRef?: (el: HTMLDivElement | null) => void
   onBodyScroll?: () => void
   density?: KitchenKdsDensity
+  /** Profiel-tokens (lab = device); overschrijft density-breedte. */
+  columnWidthPx?: number
+  compactTypography?: boolean
 }
 
 function formatElapsed(createdAt: string, now: Date): string {
@@ -164,9 +167,12 @@ export function KitchenKdsColumn({
   bodyRef,
   onBodyScroll,
   density = 'default',
+  columnWidthPx,
+  compactTypography,
 }: Props) {
-  const compact = density === 'wide15' || density === 'ipad10'
-  const colW = kdsColumnWidthPx(density)
+  const compact =
+    compactTypography ?? (density === 'wide15' || density === 'ipad10')
+  const colW = columnWidthPx ?? kdsColumnWidthPx(density)
   const elapsed = formatElapsed(order.created_at, now)
   const dineInSeat = adminDineInSeatAuditLine(order, t)
   const schedLine = isWebshopOrder(order)

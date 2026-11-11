@@ -10,6 +10,7 @@ import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { LocaleFlagEmoji } from '@/components/LocaleFlagEmoji'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { useKassaPosViewportBootstrap } from '@/hooks/useKassaPosViewportBootstrap'
 import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
 import { getAdminKassaEntryHref, getFirstAccessibleAdminPath } from '@/lib/tenant-modules'
 import { shopDisplayOrderTypeKey, nlBrowserPrintOrderTypeBanner } from '@/lib/shop-display-order-type'
@@ -85,6 +86,7 @@ interface Reservation {
 }
 
 export default function ShopDisplayPage({ params }: { params: { tenant: string } }) {
+  useKassaPosViewportBootstrap()
   const { t, locale, setLocale, locales, localeNames } = useLanguage()
   const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
   const adminBase = `/shop/${params.tenant}/admin`

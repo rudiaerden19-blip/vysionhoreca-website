@@ -24,6 +24,8 @@ export type KassaViewportChromeTokens = {
   menuGridGapPx: number
   /** Doelrijen in scrollport voor row-hoogte berekening. */
   menuVisibleRows: number
+  kdsColumnWidthPx: number
+  kdsColumnCompactTypography: boolean
 }
 
 /** 17″ SXGA — sync `.cursor/rules/kassa-17inch-sxga.mdc` (niet wijzigen zonder 17″-opdracht). */
@@ -52,6 +54,8 @@ const WIDE15: KassaViewportChromeTokens = {
   menuTileHeightBoost: 1.06,
   menuGridGapPx: KASSA_MENU_GRID_GAP_PX_DEFAULT,
   menuVisibleRows: KASSA_MENU_VISIBLE_ROWS_DEFAULT,
+  kdsColumnWidthPx: 300,
+  kdsColumnCompactTypography: true,
 }
 
 const SXGA: KassaViewportChromeTokens = {
@@ -63,6 +67,8 @@ const SXGA: KassaViewportChromeTokens = {
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
   menuGridGapPx: KASSA_MENU_GRID_GAP_PX_DEFAULT,
   menuVisibleRows: KASSA_MENU_VISIBLE_ROWS_DEFAULT,
+  kdsColumnWidthPx: 400,
+  kdsColumnCompactTypography: false,
 }
 
 const DEFAULT_DESKTOP: KassaViewportChromeTokens = {
@@ -74,6 +80,8 @@ const DEFAULT_DESKTOP: KassaViewportChromeTokens = {
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
   menuGridGapPx: KASSA_MENU_GRID_GAP_PX_DEFAULT,
   menuVisibleRows: KASSA_MENU_VISIBLE_ROWS_DEFAULT,
+  kdsColumnWidthPx: 400,
+  kdsColumnCompactTypography: false,
 }
 
 const IPAD_129: KassaViewportChromeTokens = {
@@ -85,6 +93,8 @@ const IPAD_129: KassaViewportChromeTokens = {
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
   menuGridGapPx: KASSA_MENU_GRID_GAP_PX_DEFAULT,
   menuVisibleRows: KASSA_MENU_VISIBLE_ROWS_DEFAULT,
+  kdsColumnWidthPx: 300,
+  kdsColumnCompactTypography: true,
 }
 
 const IPAD_10: KassaViewportChromeTokens = {
@@ -96,6 +106,8 @@ const IPAD_10: KassaViewportChromeTokens = {
   menuTileHeightBoost: KASSA_MENU_TILE_HEIGHT_BOOST_DEFAULT,
   menuGridGapPx: 14,
   menuVisibleRows: 3,
+  kdsColumnWidthPx: 285,
+  kdsColumnCompactTypography: true,
 }
 
 const PROFILE_TABLE: Record<KassaViewportProfileId, KassaViewportChromeTokens> = {
@@ -113,6 +125,17 @@ export function getKassaViewportChromeTokens(
   profile: KassaViewportProfileId,
 ): KassaViewportChromeTokens {
   return PROFILE_TABLE[profile] ?? DEFAULT_DESKTOP
+}
+
+export function kitchenKdsLayoutFromProfileId(profileId: KassaViewportProfileId): {
+  columnWidthPx: number
+  compactTypography: boolean
+} {
+  const t = getKassaViewportChromeTokens(profileId)
+  return {
+    columnWidthPx: t.kdsColumnWidthPx,
+    compactTypography: t.kdsColumnCompactTypography,
+  }
 }
 
 export function kassaViewportChromeCssVars(tokens: KassaViewportChromeTokens): Record<string, string> {

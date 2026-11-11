@@ -112,24 +112,27 @@ export function applyKassaLayoutPreviewViewportFromSearchParams(
   }
 }
 
-export function buildKassaLayoutPreviewKassaUrl(
+export type KassaLayoutLabPosPath = 'kassa' | 'keuken'
+
+export function kassaLayoutLabProfileIdForFrame(
+  frame: KassaLayoutLabFrame,
+): import('@/lib/kassa-viewport-profile-id').KassaViewportProfileId {
+  if (frame.id === '15') return 'wide15'
+  if (frame.id === '17') return 'sxga'
+  if (frame.id === '21') return 'default'
+  if (frame.id === 'ipad-pro-13') return 'ipad_129'
+  if (frame.id === 'ipad-10') return 'ipad_10'
+  return 'default'
+}
+
+export function buildKassaLayoutPreviewPosUrl(
   tenantSlug: string,
   frame: KassaLayoutLabFrame,
   origin: string,
+  posPath: KassaLayoutLabPosPath,
 ): string {
   const slug = tenantSlug.trim().toLowerCase()
-  const kvp =
-    frame.id === '15'
-      ? 'wide15'
-      : frame.id === '17'
-        ? 'sxga'
-        : frame.id === '21'
-          ? 'default'
-          : frame.id === 'ipad-pro-13'
-            ? 'ipad_129'
-            : frame.id === 'ipad-10'
-              ? 'ipad_10'
-              : 'default'
+  const kvp = kassaLayoutLabProfileIdForFrame(frame)
   const q = new URLSearchParams({
     [KASSA_LAYOUT_PREVIEW_QUERY]: '1',
     vp: frame.vp,
@@ -138,5 +141,18 @@ export function buildKassaLayoutPreviewKassaUrl(
     [KASSA_LAYOUT_PREVIEW_LAB_W]: String(frame.cssW),
     [KASSA_LAYOUT_PREVIEW_LAB_H]: String(frame.cssH),
   })
-  return `${origin.replace(/\/$/, '')}/shop/${encodeURIComponent(slug)}/admin/kassa?${q.toString()}`
+  const base = origin.replace(/\/$/, '')
+  const path =
+    posPath === 'keuken'
+      ? `${base}/keuken/${encodeURIComponent(slug)}`
+      : `${base}/shop/${encodeURIComponent(slug)}/admin/kassa`
+  return `${path}?${q.toString()}`
+}
+
+export function buildKassaLayoutPreviewKassaUrl(
+  tenantSlug: string,
+  frame: KassaLayoutLabFrame,
+  origin: string,
+): string {
+  return buildKassaLayoutPreviewPosUrl(tenantSlug, frame, origin, 'kassa')
 }
