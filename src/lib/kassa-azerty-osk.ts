@@ -4,12 +4,6 @@ import {
   setNativeInputValue,
 } from '@/lib/dom-input-value'
 import { readKassaIpadClientFromWindow } from '@/lib/kassa-viewport-profile'
-import {
-  readKassaViewportProfileIdFromWindow,
-  type KassaViewportProfileId,
-} from '@/lib/kassa-viewport-profile-id'
-
-const KASSA_TABLET_VIEWPORT_PROFILES = new Set<KassaViewportProfileId>(['ipad_10', 'ipad_129'])
 
 /**
  * Horeca-kassa: vast AZERTY-schermtoetsenbord (alle tenants).
@@ -29,16 +23,26 @@ export const KASSA_AZERTY_OSK_MANUAL_OPEN = true
 export const KASSA_AZERTY_OSK_TOGGLE_BTN_CLASS =
   'touch-manipulation [-webkit-tap-highlight-color:transparent] inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-[#58CCFF] px-3 py-2 text-sm font-bold text-[#063042] shadow-md transition-colors hover:bg-[#47c6fe] active:brightness-95 sm:px-4'
 
+function isKassaTabletViewportProfileHint(): boolean {
+  try {
+    const kvp = new URLSearchParams(window.location.search).get('kvp')?.trim()
+    if (kvp === 'ipad_10' || kvp === 'ipad_129') return true
+  } catch {
+    /* ignore */
+  }
+  if (typeof document === 'undefined') return false
+  const pid = document
+    .querySelector('[data-testid="kassa-app"]')
+    ?.getAttribute('data-kassa-profile-id')
+    ?.trim()
+  return pid === 'ipad_10' || pid === 'ipad_129'
+}
+
 /** iPad: systeemtoetsenbord — géén Vysion AZERTY-balk (alle tenants + layout-lab ipad-profiel). */
 export function isKassaCustomAzertyOskSuppressedOnIpad(): boolean {
   if (typeof window === 'undefined') return false
   if (readKassaIpadClientFromWindow()) return true
-  try {
-    const profile = readKassaViewportProfileIdFromWindow()
-    return KASSA_TABLET_VIEWPORT_PROFILES.has(profile)
-  } catch {
-    return false
-  }
+  return isKassaTabletViewportProfileHint()
 }
 
 export function isKassaAzertyOskManualOpenEnabled(tenantSlug: string): boolean {

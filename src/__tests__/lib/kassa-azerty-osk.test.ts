@@ -14,16 +14,10 @@ import {
   resolveAzertyOskTenantSlug,
 } from '@/lib/kassa-azerty-osk'
 import { readKassaIpadClientFromWindow } from '@/lib/kassa-viewport-profile'
-import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
 
 jest.mock('@/lib/kassa-viewport-profile', () => ({
   ...jest.requireActual('@/lib/kassa-viewport-profile'),
   readKassaIpadClientFromWindow: jest.fn(() => false),
-}))
-
-jest.mock('@/lib/kassa-viewport-profile-id', () => ({
-  ...jest.requireActual('@/lib/kassa-viewport-profile-id'),
-  readKassaViewportProfileIdFromWindow: jest.fn(() => 'default'),
 }))
 
 describe('kassa-azerty-osk', () => {
@@ -102,20 +96,24 @@ describe('kassa-azerty-osk', () => {
     ).toBe(false)
     expect(isAzertyOskActiveForSession({ pathname: '/login' })).toBe(false)
     jest.mocked(readKassaIpadClientFromWindow).mockReturnValue(false)
-    jest.mocked(readKassaViewportProfileIdFromWindow).mockReturnValue('default')
   })
 
-  it('geen custom AZERTY bij ipad_10-profiel (layout-lab zonder iPad-UA)', () => {
+  it('geen custom AZERTY bij kvp=ipad_10 (layout-lab zonder iPad-UA)', () => {
     jest.mocked(readKassaIpadClientFromWindow).mockReturnValue(false)
-    jest.mocked(readKassaViewportProfileIdFromWindow).mockReturnValue('ipad_10')
+    const prev = window.location.href
+    window.history.replaceState({}, '', 'http://localhost/shop/x/admin/kassa?kvp=ipad_10')
     expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(false)
-    expect(
-      isAzertyOskActiveForSession({
-        pathname: '/shop/demo-frituur/admin/kassa',
-        routeParamTenant: 'demo-frituur',
-      }),
-    ).toBe(false)
-    jest.mocked(readKassaViewportProfileIdFromWindow).mockReturnValue('default')
+    window.history.replaceState({}, '', prev)
+  })
+
+  it('geen custom AZERTY bij data-kassa-profile-id op kassa-app', () => {
+    jest.mocked(readKassaIpadClientFromWindow).mockReturnValue(false)
+    const app = document.createElement('div')
+    app.setAttribute('data-testid', 'kassa-app')
+    app.setAttribute('data-kassa-profile-id', 'ipad_10')
+    document.body.appendChild(app)
+    expect(isKassaAzertyOskManualOpenEnabled('demo-frituur')).toBe(false)
+    app.remove()
   })
 
   it('shift voor letters en leestekens', () => {
