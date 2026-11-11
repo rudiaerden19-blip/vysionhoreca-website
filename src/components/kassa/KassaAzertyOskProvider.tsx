@@ -25,7 +25,7 @@ import {
   KASSA_AZERTY_LETTER_ROWS,
   KASSA_AZERTY_AT_CHAR,
   KASSA_AZERTY_NUMBER_ROW,
-  KASSA_AZERTY_OSK_KEYBOARD_ROW_MIN_HEIGHT_KASSA_CLASS,
+  KASSA_AZERTY_OSK_KEYBOARD_ROW_STRETCH_CLASS,
   KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS,
   applyKassaAzertyOskEdit,
   nextKassaAzertyOskEditValue,
@@ -736,10 +736,12 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
   const oskStretchToCart =
     lineShortcutsOnKassaPos && showLineShortcutsColumn && isKassaHorecaPosPath(pathname)
 
-  const azertyRowMinH =
+  const azertyKassaStretchRows =
     showLineShortcutsColumn && lineShortcutsOnKassaPos
-      ? KASSA_AZERTY_OSK_KEYBOARD_ROW_MIN_HEIGHT_KASSA_CLASS
-      : KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS
+
+  const azertyKeySizeClass = azertyKassaStretchRows
+    ? KASSA_AZERTY_OSK_KEYBOARD_ROW_STRETCH_CLASS
+    : KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS
 
   const keyBtnClass = speelsDarkOsk
     ? [
@@ -748,9 +750,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
         'touch-manipulation select-none relative',
         'transition-transform duration-100 ease-out active:translate-y-px',
         KASSA_SPEELS_GRAY_CHROME_TEXT_CLASS,
-        `${azertyRowMinH} px-0.5 text-center text-base font-bold sm:text-lg`,
+        `${azertyKeySizeClass} px-0.5 text-center text-base font-bold sm:text-lg`,
       ].join(' ')
-    : `kassa-azerty-osk-key ${azertyRowMinH} touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:text-lg`
+    : `kassa-azerty-osk-key ${azertyKeySizeClass} touch-manipulation select-none rounded-xl border border-neutral-500 bg-neutral-600 px-0.5 text-center text-base font-bold text-white active:bg-neutral-500 sm:text-lg`
 
   const keyBtnClassFor = useCallback(
     (token: string, extra = '') =>
@@ -835,7 +837,9 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 ✕
               </button>
             ) : null}
-          <div className="relative flex w-full min-w-0 items-start gap-0">
+          <div
+            className={`relative flex w-full min-w-0 gap-0 ${azertyKassaStretchRows ? 'items-stretch' : 'items-start'}`}
+          >
             {showLineShortcutsColumn ? (
               <KassaOskNumericPad
                 speelsDark={speelsDarkOsk}
@@ -845,103 +849,117 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
               />
             ) : null}
             <div
-              className={`flex min-w-0 flex-col gap-1.5 ${showLineShortcutsColumn ? 'min-w-0 max-w-full flex-1' : 'w-full flex-1'}`}
+              className={`flex min-w-0 flex-col ${showLineShortcutsColumn ? 'min-w-0 max-w-full flex-1' : 'w-full flex-1'} ${azertyKassaStretchRows ? 'min-h-0' : 'gap-1.5'}`}
             >
-            {showLineShortcutsColumn ? (
-              <div className="mb-1 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
-            ) : null}
-            {!showLineShortcutsColumn ? (
-              <div className="grid grid-cols-10 gap-1.5">
-                {KASSA_AZERTY_NUMBER_ROW.map((key) => (
-                  <button
-                    key={`n-${key}`}
-                    type="button"
-                    className={keyBtnClassFor(`n:${key}`)}
-                    {...makeOskEditKeyHandlers(`n:${key}`, () => ({
-                      char: kassaAzertyKeyDisplay(key, shiftRef.current),
-                    }))}
-                  >
-                    {kassaAzertyKeyDisplay(key, shift)}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-            {KASSA_AZERTY_LETTER_ROWS.map((row, ri) => (
+              {showLineShortcutsColumn ? (
+                <div
+                  className="mb-1 h-7 shrink-0"
+                  aria-hidden="true"
+                  data-testid="kassa-osk-keyboard-row-offset"
+                />
+              ) : null}
               <div
-                key={`r-${ri}`}
-                className="grid gap-1.5"
-                style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))` }}
+                className={
+                  azertyKassaStretchRows
+                    ? 'flex min-h-0 flex-1 flex-col gap-1.5'
+                    : 'flex flex-col gap-1.5'
+                }
               >
-                {row.map((key) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className={keyBtnClassFor(`l:${key}`)}
-                    {...makeOskEditKeyHandlers(`l:${key}`, () => ({
-                      char: kassaAzertyKeyDisplay(key, shiftRef.current),
-                    }))}
+                {!showLineShortcutsColumn ? (
+                  <div className="grid grid-cols-10 gap-1.5">
+                    {KASSA_AZERTY_NUMBER_ROW.map((key) => (
+                      <button
+                        key={`n-${key}`}
+                        type="button"
+                        className={keyBtnClassFor(`n:${key}`)}
+                        {...makeOskEditKeyHandlers(`n:${key}`, () => ({
+                          char: kassaAzertyKeyDisplay(key, shiftRef.current),
+                        }))}
+                      >
+                        {kassaAzertyKeyDisplay(key, shift)}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+                {KASSA_AZERTY_LETTER_ROWS.map((row, ri) => (
+                  <div
+                    key={`r-${ri}`}
+                    className={`grid gap-1.5 ${azertyKassaStretchRows ? 'min-h-0 flex-1' : ''}`}
+                    style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))` }}
                   >
-                    {kassaAzertyKeyDisplay(key, shift)}
-                  </button>
+                    {row.map((key) => (
+                      <button
+                        key={key}
+                        type="button"
+                        className={keyBtnClassFor(`l:${key}`)}
+                        {...makeOskEditKeyHandlers(`l:${key}`, () => ({
+                          char: kassaAzertyKeyDisplay(key, shiftRef.current),
+                        }))}
+                      >
+                        {kassaAzertyKeyDisplay(key, shift)}
+                      </button>
+                    ))}
+                  </div>
                 ))}
+                <div
+                  className={`grid grid-cols-[auto,auto,auto,auto,minmax(3.25rem,0.5fr),auto] gap-1.5 ${azertyKassaStretchRows ? 'min-h-0 flex-1' : ''}`}
+                >
+                  <button
+                    type="button"
+                    className={keyBtnClassFor(
+                      'shift',
+                      `min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'kassa-azerty-osk-key--latched' : ''}`,
+                    )}
+                    {...shiftKeyHandlers}
+                  >
+                    ⇧
+                  </button>
+                  <button
+                    type="button"
+                    className={keyBtnClassFor('tld:be', 'min-w-[2.65rem] px-1 text-sm sm:min-w-[2.85rem] sm:text-base')}
+                    {...makeOskEditKeyHandlers('tld:be', () => ({ char: '.be' }))}
+                    data-testid="kassa-azerty-osk-tld-be"
+                  >
+                    .be
+                  </button>
+                  <button
+                    type="button"
+                    className={keyBtnClassFor(
+                      'tld:com',
+                      'min-w-[2.85rem] px-1 text-sm sm:min-w-[3rem] sm:text-base',
+                    )}
+                    {...makeOskEditKeyHandlers('tld:com', () => ({ char: '.com' }))}
+                    data-testid="kassa-azerty-osk-tld-com"
+                  >
+                    .com
+                  </button>
+                  <button
+                    type="button"
+                    className={keyBtnClassFor('at', 'min-w-[2.85rem] px-2 sm:min-w-[3rem]')}
+                    {...makeOskEditKeyHandlers('at', () => ({ char: KASSA_AZERTY_AT_CHAR }))}
+                    data-testid="kassa-azerty-osk-at"
+                  >
+                    @
+                  </button>
+                  <button
+                    type="button"
+                    className={keyBtnClassFor('space', 'text-base tracking-widest text-neutral-300')}
+                    {...makeOskEditKeyHandlers('space', () => 'space')}
+                    data-testid="kassa-azerty-osk-space"
+                    aria-label={t('kassaApp.azertyOskSpace')}
+                  >
+                    ␣
+                  </button>
+                  <button
+                    type="button"
+                    className={keyBtnClassFor('backspace', 'min-w-[2.85rem] px-2.5 sm:min-w-[3rem]')}
+                    {...backspaceKeyHandlers}
+                  >
+                    ⌫
+                  </button>
+                </div>
               </div>
-            ))}
-            <div className="grid grid-cols-[auto,auto,auto,auto,minmax(3.25rem,0.5fr),auto] gap-1.5">
-              <button
-                type="button"
-                className={keyBtnClassFor(
-                  'shift',
-                  `min-w-[2.85rem] px-2.5 sm:min-w-[3rem] ${shift && !speelsDarkOsk ? 'border-neutral-300 bg-neutral-500' : ''} ${shift && speelsDarkOsk ? 'kassa-azerty-osk-key--latched' : ''}`,
-                )}
-                {...shiftKeyHandlers}
-              >
-                ⇧
-              </button>
-              <button
-                type="button"
-                className={keyBtnClassFor('tld:be', 'min-w-[2.65rem] px-1 text-sm sm:min-w-[2.85rem] sm:text-base')}
-                {...makeOskEditKeyHandlers('tld:be', () => ({ char: '.be' }))}
-                data-testid="kassa-azerty-osk-tld-be"
-              >
-                .be
-              </button>
-              <button
-                type="button"
-                className={keyBtnClassFor(
-                  'tld:com',
-                  'min-w-[2.85rem] px-1 text-sm sm:min-w-[3rem] sm:text-base',
-                )}
-                {...makeOskEditKeyHandlers('tld:com', () => ({ char: '.com' }))}
-                data-testid="kassa-azerty-osk-tld-com"
-              >
-                .com
-              </button>
-              <button
-                type="button"
-                className={keyBtnClassFor('at', 'min-w-[2.85rem] px-2 sm:min-w-[3rem]')}
-                {...makeOskEditKeyHandlers('at', () => ({ char: KASSA_AZERTY_AT_CHAR }))}
-                data-testid="kassa-azerty-osk-at"
-              >
-                @
-              </button>
-              <button
-                type="button"
-                className={keyBtnClassFor('space', 'text-base tracking-widest text-neutral-300')}
-                {...makeOskEditKeyHandlers('space', () => 'space')}
-                data-testid="kassa-azerty-osk-space"
-                aria-label={t('kassaApp.azertyOskSpace')}
-              >
-                ␣
-              </button>
-              <button
-                type="button"
-                className={keyBtnClassFor('backspace', 'min-w-[2.85rem] px-2.5 sm:min-w-[3rem]')}
-                {...backspaceKeyHandlers}
-              >
-                ⌫
-              </button>
             </div>
-          </div>
           {showLineShortcutsColumn ? (
             <KassaOskLineShortcutsPad
               draft={lineShortcutDraft}

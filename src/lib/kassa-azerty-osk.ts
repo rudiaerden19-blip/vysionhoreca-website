@@ -145,12 +145,9 @@ export const KASSA_AZERTY_LETTER_ROWS = [
 export const KASSA_AZERTY_OSK_ROW_MIN_HEIGHT_CLASS =
   'min-h-[2.75rem] sm:min-h-[2.9rem]'
 
-/**
- * Kassa 3-kolommen: AZERTY heeft 4 toetsrijen, opmerkingen 5 — hogere toetsen,
- * onderkant gelijk met opmerkingen (niet met het linkse cijferblok).
- */
-export const KASSA_AZERTY_OSK_KEYBOARD_ROW_MIN_HEIGHT_KASSA_CLASS =
-  'min-h-[3.5rem] sm:min-h-[3.65rem]'
+/** Kassa 3-kolommen: toetsen vullen rijhoogte (flex); minimaal leesbaar op 15″/17″/21″. */
+export const KASSA_AZERTY_OSK_KEYBOARD_ROW_STRETCH_CLASS =
+  'h-full min-h-[2.5rem] sm:min-h-[2.65rem]'
 
 const AZERTY_SHIFT_MAP: Record<string, string> = {
   ',': '?',
