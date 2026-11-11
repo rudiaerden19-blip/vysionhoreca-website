@@ -4307,6 +4307,7 @@
     "azertyOskShortcutInsertHint": "› or Enter = insert into note",
     "azertyOskInsertLineNoteLabel": "Insert note",
     "azertyOskNumericPadTitle": "Numbers",
+    "azertyOskInsertNumberLabel": "Insert numbers",
     "azertyOskShortcutEditHint": "Type label — auto-saved per business",
     "azertyOskShortcutPlaceholder": "e.g. John or no onion",
     "azertyOskShortcutsSave": "Save",

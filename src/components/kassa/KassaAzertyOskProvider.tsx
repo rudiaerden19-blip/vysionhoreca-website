@@ -771,6 +771,14 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     [makeOskEditKeyHandlers],
   )
 
+  const numpadPunctHandlers = useMemo(
+    () => ({
+      comma: makeOskEditKeyHandlers('np:,', () => ({ char: ',' })),
+      dot: makeOskEditKeyHandlers('np:.', () => ({ char: '.' })),
+    }),
+    [makeOskEditKeyHandlers],
+  )
+
   const oskShellSpeels = `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS}`
   const oskPanelShell = speelsDarkOsk
     ? `${oskShellSpeels} shadow-[0_12px_40px_rgba(0,0,0,0.55)]`
@@ -826,6 +834,7 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 speelsDark={speelsDarkOsk}
                 keyClassFor={numpadKeyClassFor}
                 digitHandlers={numpadDigitHandlers}
+                punctHandlers={numpadPunctHandlers}
               />
             ) : null}
             <div

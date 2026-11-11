@@ -25,6 +25,10 @@ type Props = {
   speelsDark?: boolean
   keyClassFor: (token: string) => string
   digitHandlers: (digit: string) => KeyHandlers
+  punctHandlers: {
+    comma: KeyHandlers
+    dot: KeyHandlers
+  }
 }
 
 /**
@@ -34,6 +38,7 @@ export function KassaOskNumericPad({
   speelsDark = false,
   keyClassFor,
   digitHandlers,
+  punctHandlers,
 }: Props) {
   const { t } = useLanguage()
   const dividerClass = speelsDark ? 'border-[#252525]' : 'border-neutral-600'
@@ -42,15 +47,20 @@ export function KassaOskNumericPad({
     ? `kassa-osk-shortcut-field kassa-azerty-osk-numpad-key ${NUMPAD_KEY_HEIGHT} touch-manipulation rounded-xl border pl-1 pr-1 text-center text-base font-bold outline-none active:border-[#58CCFF] sm:text-lg`
     : `${NUMPAD_KEY_HEIGHT} touch-manipulation rounded-xl border border-neutral-500 bg-neutral-900 text-center text-base font-bold text-white outline-none focus:border-[#58CCFF] active:border-[#58CCFF] sm:text-lg`
 
-  const renderKey = (digit: string) => (
+  const renderKey = (
+    id: string,
+    token: string,
+    label: string,
+    handlers: KeyHandlers,
+  ) => (
     <button
-      key={`np-${digit}`}
+      key={id}
       type="button"
-      className={[keyClass, keyClassFor(`np:${digit}`)].filter(Boolean).join(' ')}
-      data-testid={`kassa-azerty-osk-numpad-${digit}`}
-      {...digitHandlers(digit)}
+      className={[keyClass, keyClassFor(token)].filter(Boolean).join(' ')}
+      data-testid={`kassa-azerty-osk-numpad-${id}`}
+      {...handlers}
     >
-      {digit}
+      {label}
     </button>
   )
 
@@ -61,7 +71,16 @@ export function KassaOskNumericPad({
       data-testid="kassa-azerty-osk-numpad"
       aria-label={t('kassaApp.azertyOskNumericPadTitle')}
     >
-      <div className="mb-1 h-7 shrink-0" aria-hidden="true" />
+      <div className="mb-1 flex h-7 shrink-0 items-center justify-between gap-1">
+        <span
+          className={`min-w-0 flex-1 truncate text-[10px] font-semibold leading-tight sm:text-[11px] ${
+            speelsDark ? 'text-[#909090]' : 'text-neutral-400'
+          }`}
+        >
+          {t('kassaApp.azertyOskInsertNumberLabel')}
+        </span>
+        <span className="h-7 w-7 shrink-0" aria-hidden="true" />
+      </div>
       <div className="grid grid-cols-3 gap-1.5">
         {NUMPAD_ROWS.flat().map((digit) => (
           <div
@@ -69,16 +88,20 @@ export function KassaOskNumericPad({
             className="min-w-0"
             style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}
           >
-            {renderKey(digit)}
+            {renderKey(digit, `np:${digit}`, digit, digitHandlers(digit))}
           </div>
         ))}
       </div>
       <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-        <span aria-hidden="true" />
         <div className="min-w-0" style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}>
-          {renderKey('0')}
+          {renderKey('comma', 'np:,', ',', punctHandlers.comma)}
         </div>
-        <span aria-hidden="true" />
+        <div className="min-w-0" style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}>
+          {renderKey('0', 'np:0', '0', digitHandlers('0'))}
+        </div>
+        <div className="min-w-0" style={{ maxWidth: KASSA_AZERTY_OSK_OPTION_BTN_WIDTH }}>
+          {renderKey('dot', 'np:.', '.', punctHandlers.dot)}
+        </div>
       </div>
     </div>
   )
