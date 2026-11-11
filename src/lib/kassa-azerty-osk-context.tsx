@@ -22,7 +22,8 @@ export const KASSA_AZERTY_OSK_NUMPAD_WIDTH = `calc(${KASSA_AZERTY_OSK_OPTION_BTN
 /** Strip incl. scheidlijn-padding. */
 export const KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH = `calc(${KASSA_AZERTY_OSK_NUMPAD_WIDTH} + 0.65rem)`
 
-export const KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH = `min(94vw, calc(680px + 6cm + ${KASSA_AZERTY_OSK_NUMPAD_WIDTH}))`
+/** Kassa: cijfertoetsen links + opmerkingen rechts. */
+export const KASSA_AZERTY_OSK_PANEL_WITH_NUMPAD_WIDTH = `min(94vw, calc(680px + 6cm + ${KASSA_AZERTY_OSK_NUMPAD_STRIP_WIDTH} * 2))`
 
 export type KassaAzertyOskChrome = {
   visible: boolean

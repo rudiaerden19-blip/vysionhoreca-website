@@ -3651,6 +3651,7 @@
     "azertyOskShortcutsHint": "10 campos, 15 caracteres — nota de producto o teclado numérico. Guardado automático.",
     "azertyOskShortcutInsertHint": "› o Enter = en la nota",
     "azertyOskInsertLineNoteLabel": "Insertar nota",
+    "azertyOskNumericPadTitle": "Números",
     "azertyOskShortcutEditHint": "Escribir texto — guardado auto por negocio",
     "azertyOskShortcutPlaceholder": "ej. Juan o sin cebolla",
     "azertyOskShortcutsSave": "Guardar",

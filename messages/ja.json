@@ -3651,6 +3651,7 @@
     "azertyOskShortcutsHint": "10フィールド、各15文字 — 商品またはテンキーの備考用。自動保存。",
     "azertyOskShortcutInsertHint": "› または Enter で備考へ",
     "azertyOskInsertLineNoteLabel": "備考を入力",
+    "azertyOskNumericPadTitle": "数字",
     "azertyOskShortcutEditHint": "入力して保存 — 店舗ごとに自動保存",
     "azertyOskShortcutPlaceholder": "例: 田中、玉ねぎなし",
     "azertyOskShortcutsSave": "保存",

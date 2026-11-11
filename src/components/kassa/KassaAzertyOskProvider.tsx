@@ -8,6 +8,7 @@ import { flushSync } from 'react-dom'
 import { getCurrentTenantSlug } from '@/lib/tenant-url'
 import { useLanguage } from '@/i18n'
 import { KassaOskLineShortcutsPad } from '@/components/kassa/KassaOskLineShortcutsPad'
+import { KassaOskNumericPad } from '@/components/kassa/KassaOskNumericPad'
 import {
   applyKassaOskLineShortcut,
   findKassaOskLineNoteInput,
@@ -756,6 +757,20 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
     [keyBtnClass, pressedOskKey],
   )
 
+  const numpadKeyClassFor = useCallback(
+    (token: string) =>
+      pressedOskKey === token ? 'kassa-azerty-osk-numpad-key--pressed' : '',
+    [pressedOskKey],
+  )
+
+  const numpadDigitHandlers = useCallback(
+    (digit: string) =>
+      makeOskEditKeyHandlers(`np:${digit}`, () => ({
+        char: kassaAzertyKeyDisplay(digit, shiftRef.current),
+      })),
+    [makeOskEditKeyHandlers],
+  )
+
   const oskShellSpeels = `${KASSA_SPEELS_MENU_PLATE_SHELL_BG_CLASS} ${KASSA_SPEELS_SIDEBAR_CART_VAK_CLASS}`
   const oskPanelShell = speelsDarkOsk
     ? `${oskShellSpeels} shadow-[0_12px_40px_rgba(0,0,0,0.55)]`
@@ -805,25 +820,36 @@ function KassaAzertyOskProviderInner({ children }: { children: React.ReactNode }
                 ✕
               </button>
             ) : null}
-          <div className="relative flex w-full items-start gap-0">
-            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="relative flex w-full min-w-0 items-start gap-0">
+            {showLineShortcutsColumn ? (
+              <KassaOskNumericPad
+                speelsDark={speelsDarkOsk}
+                keyClassFor={numpadKeyClassFor}
+                digitHandlers={numpadDigitHandlers}
+              />
+            ) : null}
+            <div
+              className={`flex min-w-0 flex-col gap-1.5 ${showLineShortcutsColumn ? 'min-w-0 max-w-full flex-1' : 'w-full flex-1'}`}
+            >
             {showLineShortcutsColumn ? (
               <div className="mb-0.5 h-7 shrink-0" aria-hidden="true" data-testid="kassa-osk-keyboard-row-offset" />
             ) : null}
-            <div className="grid grid-cols-10 gap-1.5">
-              {KASSA_AZERTY_NUMBER_ROW.map((key) => (
-                <button
-                  key={`n-${key}`}
-                  type="button"
-                  className={keyBtnClassFor(`n:${key}`)}
-                  {...makeOskEditKeyHandlers(`n:${key}`, () => ({
-                    char: kassaAzertyKeyDisplay(key, shiftRef.current),
-                  }))}
-                >
-                  {kassaAzertyKeyDisplay(key, shift)}
-                </button>
-              ))}
-            </div>
+            {!showLineShortcutsColumn ? (
+              <div className="grid grid-cols-10 gap-1.5">
+                {KASSA_AZERTY_NUMBER_ROW.map((key) => (
+                  <button
+                    key={`n-${key}`}
+                    type="button"
+                    className={keyBtnClassFor(`n:${key}`)}
+                    {...makeOskEditKeyHandlers(`n:${key}`, () => ({
+                      char: kassaAzertyKeyDisplay(key, shiftRef.current),
+                    }))}
+                  >
+                    {kassaAzertyKeyDisplay(key, shift)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             {KASSA_AZERTY_LETTER_ROWS.map((row, ri) => (
               <div
                 key={`r-${ri}`}
