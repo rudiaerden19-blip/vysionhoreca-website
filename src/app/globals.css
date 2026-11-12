@@ -1691,3 +1691,7 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
   border-width: 2px !important;
 }
 
+[data-kassa-layout='light'] .kassa-light-cart-vak {
+  background-color: #e3e3e3 !important;
+}
+

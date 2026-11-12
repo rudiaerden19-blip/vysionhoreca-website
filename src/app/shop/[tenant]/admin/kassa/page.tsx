@@ -124,6 +124,7 @@ import {
   KASSA_LIGHT_REMOVE_BTN_FACE,
   KASSA_LIGHT_MENU_TILE_BORDER,
   KASSA_LIGHT_MENU_TILE_BORDER_CLASS,
+  KASSA_LIGHT_CART_VAK_CLASS,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutMenuScrollFlatBgClass,
   kassaLayoutPlateBgClass,
@@ -7404,6 +7405,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {/* Cart / numpad (toggle via footer) */}
         <div
           className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
+            kassaLight && !kassaPosLuxury
+              ? `${KASSA_LIGHT_CART_VAK_CLASS} ${kassaLayoutPlateBgClass('light')}`
+              : ''
+          } ${
             kassaSidebarToolsSlidePanel && !kassaSidebarToolsOpen
               ? `pt-10 ${
                   kassaAppearanceDark
@@ -8005,7 +8010,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <div className={`shrink-0 border-t ${
             kassaWide15Chrome ? 'px-2 py-1.5 space-y-1.5' : 'px-3 py-2.5 space-y-2.5'
           } ${
-            kassaClassicDark ? 'border-zinc-700' : 'border-gray-200'
+            kassaClassicDark
+              ? 'border-zinc-700'
+              : kassaLight
+                ? 'border-gray-200 bg-white'
+                : 'border-gray-200'
           }`}>
             <div
               className={`flex w-full gap-2 ${kassaFooterActionTouchMinHClass(
