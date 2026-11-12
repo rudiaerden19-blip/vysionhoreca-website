@@ -23,17 +23,18 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
 
   it('Light gebruikt Facebook-blauw, geen grijs en geen luxe-goud', () => {
     const cls = kassaLayoutChromeBtnClass('light', false)
-    expect(cls).toContain('#1877F2')
+    expect(cls).toContain('#3b5998')
     expect(cls).not.toContain('#4a4a4a')
     expect(cls).not.toContain('#c4a46a')
-    expect(kassaLayoutQuickMenuTileClass('light')).toContain('#1877F2')
+    expect(kassaLayoutQuickMenuTileClass('light')).toContain('#3b5998')
     expect(kassaLayoutPlateBgClass('light')).toBe('bg-[#e3e3e3]')
     expect(kassaLayoutHeaderBarClass('light')).toBe('bg-black')
     expect(kassaLayoutCheckoutBtnClass('light')).toContain('bg-green-600')
   })
 
   it('Light menu-tegels hebben Facebook-blauw kader-token', () => {
-    expect(KASSA_LIGHT_MENU_TILE_BORDER).toContain('#1877F2')
+    expect(KASSA_LIGHT_MENU_TILE_BORDER).toContain('#3b5998')
+    expect(KASSA_LIGHT_MENU_TILE_BORDER).toContain('border-2')
   })
 
   it('Klassiek gebruikt lichter grijs voor knoppen, het kader blijft donker', () => {

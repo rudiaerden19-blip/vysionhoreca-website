@@ -25,17 +25,21 @@ export const RETAIL_GRAY_BTN_FACE =
 export const RETAIL_GRAY_BTN_FACE_ON =
   `touch-manipulation [-webkit-tap-highlight-color:transparent] rounded-xl border border-[#8d8d8d] bg-[#707070] text-white shadow-[0_3px_8px_rgba(0,0,0,0.4)] ring-2 ring-white/65 active:bg-[#626262] ${RETAIL_BTN_HOVER_LIFT_ON}`
 
-/** Light mode — Facebook-blauw voor utility-/actiekknoppen (alle tenants). */
-/** Licht Facebook-blauw kader rond menu-/categorietegels (Mode Light). */
-export const KASSA_LIGHT_MENU_TILE_BORDER = 'border border-[#1877F2]/65'
+/** Mode Light — klassiek Facebook-blauw (#3b5998), alle tenants. */
+export const KASSA_LIGHT_FB_BLUE = '#3b5998'
+export const KASSA_LIGHT_FB_BLUE_HOVER = '#344e86'
+export const KASSA_LIGHT_FB_BLUE_ACTIVE = '#2d4373'
+
+/** Tegelkader: iets dikker dan 1px, zelfde blauw. */
+export const KASSA_LIGHT_MENU_TILE_BORDER = 'border-2 border-[#3b5998]'
 export const KASSA_LIGHT_MENU_TILE_BORDER_CLASS = 'kassa-light-menu-tile-frame'
 
 export const KASSA_LIGHT_UTILITY_BTN_CLASS = 'kassa-light-utility-btn'
 export const KASSA_LIGHT_CHECKOUT_BTN_CLASS = 'kassa-light-checkout-btn'
 export const KASSA_LIGHT_REMOVE_BTN_CLASS = 'kassa-light-remove-btn'
 
-export const KASSA_LIGHT_BTN_FACE = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#1877F2] text-white [@media(hover:hover)]:hover:bg-[#166FE5] active:bg-[#1565C0]`
-export const KASSA_LIGHT_BTN_FACE_ON = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#1877F2] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]`
+export const KASSA_LIGHT_BTN_FACE = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#3b5998] text-white [@media(hover:hover)]:hover:bg-[#344e86] active:bg-[#2d4373]`
+export const KASSA_LIGHT_BTN_FACE_ON = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#3b5998] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]`
 export const KASSA_LIGHT_CHECKOUT_BTN_FACE = `${KASSA_LIGHT_CHECKOUT_BTN_CLASS} bg-green-600 text-white [@media(hover:hover)]:hover:bg-green-700 active:bg-green-800 disabled:bg-green-900/45`
 export const KASSA_LIGHT_REMOVE_BTN_FACE = `${KASSA_LIGHT_REMOVE_BTN_CLASS} bg-red-600 text-white [@media(hover:hover)]:hover:bg-red-500 active:bg-red-700 disabled:opacity-100 disabled:pointer-events-none`
 export const KASSA_CLASSIC_BTN_FACE =
