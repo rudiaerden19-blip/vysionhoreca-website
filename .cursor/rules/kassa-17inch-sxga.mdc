@@ -14,7 +14,7 @@ alwaysApply: true
 
 - **Standaard:** layout/kassa-werk **alleen** profiel **`sxga`** (17″ vierkant, ~1280×1024) — tokens `KASSA_SXGA_*`, `kassaSxgaDenseTiles`, `data-kassa-vp="sxga"`, lab-frame **17**.
 - **Niet** 15″ (`wide15`), **niet** 21″ (`default`), **niet** iPad-paden aanpassen, refactoren of “meenemen” zonder dat de gebruiker **expliciet** een ander profiel noemt.
-- Gedeelde code wél aanraken als de diff **uitsluitend** onder `kassaSxgaDenseTiles` / `kassaLuxuryHeaderTenant17Chrome` / sxga-tokens valt; geen globale `sm:`/`lg:` of default-paden wijzigen.
+- Gedeelde code wél aanraken als de diff **uitsluitend** onder `kassaSxgaDenseTiles` / `kassaSxga17HeaderRowLayout` / sxga-tokens valt; geen globale `sm:`/`lg:` of default-paden wijzigen.
 - Regressie **21·15** in layout-lab alleen op verzoek van de eigenaar — niet na elke 17″-taak.
 
 **Doel:** op klassieke **17″ kassa-touchscreens** (Elo, 1280×1024-klasse, 4∶3) blijven **alle zijbalk- en header-knoppen volledig zichtbaar en tikbaar**. Dit is bewust getuned; **niet** terug naar “te smalle” sidebar of grote header-marges.

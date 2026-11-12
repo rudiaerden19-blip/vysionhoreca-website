@@ -6270,8 +6270,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tenantInfo?.business_name ||
     tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
-  const kassaLuxuryHeaderTenant17Chrome =
-    kassaPosLuxury &&
+  /** 17″ vierkant: zelfde header-volgorde in Light, Classic én Dark/speels. */
+  const kassaSxga17HeaderRowLayout =
     !kassaTabletViewportChrome &&
     (kassaSxgaDenseTiles || kassaCssViewportMatchesSxga17)
 
@@ -6317,7 +6317,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-kassa-profile-id={kassaViewportProfileId}
       data-kassa-ipad={kassaIpadMenuGridCap ? '1' : '0'}
       data-kassa-lab-preview={kassaLayoutLabPreview ? '1' : '0'}
-      data-kassa-sxga-header-tenant={kassaLuxuryHeaderTenant17Chrome ? '1' : '0'}
+      data-kassa-sxga-header-tenant={kassaSxga17HeaderRowLayout ? '1' : '0'}
       style={kassaRootChromeStyle}
     >
       {kassaLayoutLabPreview ? (
@@ -6491,7 +6491,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {kassaPosLuxury && !kassaTabletViewportChrome && !kassaLuxuryHeaderTenant17Chrome ? (
+        {kassaPosLuxury && !kassaTabletViewportChrome && !kassaSxga17HeaderRowLayout ? (
           <div
             className={`pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center overflow-visible ${KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT}`}
             aria-hidden={false}
@@ -6529,7 +6529,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) : null}
 
         <div className="relative z-20 flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        {!kassaPosLuxury ? (
+        {!kassaPosLuxury && !kassaSxga17HeaderRowLayout ? (
         <div
           className={`flex min-w-0 shrink-0 flex-col justify-center px-0.5 ${
             kassaWide15Chrome
@@ -6548,11 +6548,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         <div
           className={`relative flex min-h-0 min-w-0 items-center ${
-            kassaLuxuryHeaderTenant17Chrome
+            kassaSxga17HeaderRowLayout
               ? 'ml-1 shrink-0'
               : 'min-w-0 flex-1'
           } ${
-            kassaLuxuryHeaderTenant17Chrome
+            kassaSxga17HeaderRowLayout
               ? ''
               : kassaWide15Chrome || kassaTabletViewportChrome
                 ? 'ml-1.5'
@@ -6564,7 +6564,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
             className={`flex min-h-0 min-w-0 items-center justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
-              kassaLuxuryHeaderTenant17Chrome
+              kassaSxga17HeaderRowLayout
                 ? 'max-w-none shrink-0 flex-nowrap gap-1'
                 : kassaWide15Chrome
                   ? 'min-w-0 flex-1 flex-nowrap gap-1'
@@ -6695,7 +6695,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </button>
 
           {isKassaAzertyOskManualOpenEnabled(tenant) &&
-          (kassaLuxuryHeaderTenant17Chrome || !kassaPosLuxury) ? (
+          (kassaSxga17HeaderRowLayout || !kassaPosLuxury) ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={kassaHeaderQuickLinkLabelClass}
@@ -6713,7 +6713,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </nav>
         </div>
 
-        {kassaLuxuryHeaderTenant17Chrome ? (
+        {kassaSxga17HeaderRowLayout ? (
           <div
             data-testid="kassa-header-tenant-inline"
             className="relative z-20 flex min-w-0 flex-1 items-center justify-start overflow-visible px-1.5 sm:px-2"
@@ -6750,7 +6750,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isKassaAzertyOskManualOpenEnabled(tenant) &&
           kassaPosLuxury &&
-          !kassaLuxuryHeaderTenant17Chrome ? (
+          !kassaSxga17HeaderRowLayout ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={kassaHeaderQuickLinkLabelClass}
