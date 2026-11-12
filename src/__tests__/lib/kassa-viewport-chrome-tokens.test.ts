@@ -3,7 +3,10 @@ import {
   KASSA_AZERTY_OSK_NUMPAD_KEY_WIDTH_WIDE_COMPACT,
   KASSA_LAYOUT_REGRESSION_FRAME_IDS,
   KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT,
+  KASSA_SXGA_HEADER_QUICK_LINK_LABEL,
+  KASSA_SXGA_INLINE_BTN_LABEL,
   KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING,
+  KASSA_SXGA_SIDEBAR_ACTION_LABEL,
   KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX,
   KASSA_SIDEBAR_WIDTH_WIDE15_PX,
   KASSA_SIDEBAR_WIDTH_DEFAULT_LG_PX,
@@ -66,6 +69,13 @@ describe('kassa-viewport-chrome-tokens', () => {
 
   it('regressie-frames bevatten 21, 15 en 17', () => {
     expect(KASSA_LAYOUT_REGRESSION_FRAME_IDS).toEqual(['15', '17', '21'])
+  })
+
+  it('17″ chrome-labels groter dan 11px baseline (lab = sxga profiel)', () => {
+    expect(KASSA_SXGA_HEADER_QUICK_LINK_LABEL).toContain('text-xs')
+    expect(KASSA_SXGA_HEADER_QUICK_LINK_LABEL).toContain('sm:text-sm')
+    expect(KASSA_SXGA_SIDEBAR_ACTION_LABEL).toContain('sm:text-sm')
+    expect(KASSA_SXGA_INLINE_BTN_LABEL).not.toContain('text-[11px]')
   })
 
   it('17″ speels header: asymmetrische zaaknaam-inset, niet gelijk aan 21″', () => {

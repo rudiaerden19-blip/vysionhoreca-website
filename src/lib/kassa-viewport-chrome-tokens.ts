@@ -55,6 +55,16 @@ export const KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING =
 /** 15″ / 21″ / overige: bestaande symmetrische inset. */
 export const KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT =
   'px-[5.5rem] sm:px-[9rem] md:px-[11rem]'
+/** 17″ knoplabels — sync lab (1280×1024) en kiosk; 15″/21″ ongewijzigd. */
+export const KASSA_SXGA_HEADER_QUICK_LINK_LABEL =
+  'whitespace-nowrap text-xs leading-snug sm:text-sm'
+export const KASSA_SXGA_HEADER_MENU_LABEL = 'font-bold text-xs leading-tight sm:text-sm'
+export const KASSA_SXGA_SIDEBAR_ACTION_LABEL =
+  'text-center text-xs font-semibold leading-tight tracking-[0.02em] sm:text-sm'
+export const KASSA_SXGA_SIDEBAR_ZONE_LABEL = 'text-sm font-semibold tracking-[0.02em]'
+/** Snelmenu-paneel + tafel parkeren — zelfde stap als andere 17″ chrome-labels. */
+export const KASSA_SXGA_INLINE_BTN_LABEL =
+  'text-xs font-medium leading-tight tracking-[0.01em] sm:text-sm'
 /** 15″ breedbeeld — smallere (smaller) tegels, hogere rij, bredere mand (nov 2026). */
 export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 400
 /** iPad 10.2″ landschap — smallere tegels, bredere mand (nov 2026). */

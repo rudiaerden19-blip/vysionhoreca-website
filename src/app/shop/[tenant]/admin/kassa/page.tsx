@@ -406,7 +406,12 @@ import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref
 import {
   estimateKassaSidebarWidthPxForInnerWidth,
   KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT,
+  KASSA_SXGA_HEADER_MENU_LABEL,
+  KASSA_SXGA_HEADER_QUICK_LINK_LABEL,
   KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING,
+  KASSA_SXGA_INLINE_BTN_LABEL,
+  KASSA_SXGA_SIDEBAR_ACTION_LABEL,
+  KASSA_SXGA_SIDEBAR_ZONE_LABEL,
   kassaViewportChromeCssVars,
 } from '@/lib/kassa-viewport-chrome-tokens'
 import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
@@ -5860,10 +5865,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setShowNameAccountModal(true)
   }, [tenant])
 
+  const kassaSxgaInlineBtnLabelClass = kassaSxgaDenseTiles
+    ? KASSA_SXGA_INLINE_BTN_LABEL
+    : 'text-[11px] font-medium leading-tight tracking-[0.01em] sm:text-xs'
+
   const kassaQuickMenuPanelBtnClass = useCallback(
     (enabled: boolean) =>
       [
-        'flex w-full min-h-[2.5rem] min-w-0 items-center justify-center overflow-hidden whitespace-normal break-words px-1 py-1 text-center text-[11px] font-medium leading-tight tracking-[0.01em] sm:min-h-[2.65rem] sm:text-xs',
+        `flex w-full min-h-[2.5rem] min-w-0 items-center justify-center overflow-hidden whitespace-normal break-words px-1 py-1 text-center ${kassaSxgaInlineBtnLabelClass} sm:min-h-[2.65rem]`,
         kassaPosLuxury
           ? blonkysFlatButtons
             ? blonkysSpeelsQuickMenuPanelButtonClass()
@@ -5877,7 +5886,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             : 'pointer-events-none opacity-40'
           : '',
       ].join(' '),
-    [kassaPosLuxury, kassaClassicDark, kassaLight, posChrome, blonkysFlatButtons],
+    [kassaPosLuxury, kassaClassicDark, kassaLight, posChrome, blonkysFlatButtons, kassaSxgaInlineBtnLabelClass],
   )
   const paymentMethodOptions = useMemo<KassaPayOption[]>(
     () => [
@@ -5902,8 +5911,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ? 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.55rem] px-3.5 py-2'
     : 'inline-flex shrink-0 touch-manipulation items-center justify-center whitespace-nowrap font-semibold transition-colors min-h-[2.65rem] px-4 py-2 sm:min-h-[2.85rem] sm:px-[1.2rem] sm:py-2.5'
 
-  const kassaHeaderQuickLinkLabelClass =
-    'whitespace-nowrap text-[11px] leading-snug sm:text-xs'
+  const kassaHeaderQuickLinkLabelClass = kassaSxgaDenseTiles
+    ? KASSA_SXGA_HEADER_QUICK_LINK_LABEL
+    : 'whitespace-nowrap text-[11px] leading-snug sm:text-xs'
 
   const kassaSpeelsTopChromeTextClass =
     kassaPosLuxury && posChrome === 'speels' ? KASSA_SPEELS_TOP_CHROME_BTN_CLASS : ''
@@ -5970,6 +5980,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaSidebarActionLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
       ? 'text-center text-[15px] font-semibold leading-none tracking-[0.02em]'
+      : kassaAppearanceDark && kassaSxgaDenseTiles
+        ? KASSA_SXGA_SIDEBAR_ACTION_LABEL
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-center text-[11px] font-medium leading-tight tracking-[0.02em]'
       : kassaAppearanceDark
@@ -6036,6 +6048,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaSidebarZoneLabelClass =
     kassaAppearanceDark && kassaWide15Chrome
       ? 'text-[15px] font-semibold tracking-[0.02em]'
+      : kassaAppearanceDark && kassaSxgaDenseTiles
+        ? KASSA_SXGA_SIDEBAR_ZONE_LABEL
       : kassaAppearanceDark && kassaCompactChrome
       ? 'text-xs font-medium tracking-[0.02em]'
       : kassaAppearanceDark
@@ -6358,7 +6372,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             aria-expanded={hamburgerOpen}
           >
             <svg className="h-5 w-5 shrink-0 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
-            <span className="font-bold text-[11px] leading-tight sm:text-xs">{t('kassaApp.hamburgerMenu')}</span>
+            <span
+              className={
+                kassaSxgaDenseTiles
+                  ? KASSA_SXGA_HEADER_MENU_LABEL
+                  : 'font-bold text-[11px] leading-tight sm:text-xs'
+              }
+            >
+              {t('kassaApp.hamburgerMenu')}
+            </span>
           </button>
           {hamburgerOpen && !hamburgerMenuPinOpen && (() => {
             const modules = filteredHamburgerModules
@@ -7837,7 +7859,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: false })}
                   title={t('kassaApp.parkTableAdd')}
                   aria-label={t('kassaApp.parkTableAdd')}
-                  className={`w-full font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
+                  className={`w-full font-semibold flex items-center justify-center text-center px-2 py-3 ${kassaSxgaInlineBtnLabelClass} ${kassaPosButtonClass(false, posChrome)} ${
                     kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
@@ -7850,7 +7872,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: true, printKassaSlip: false })}
                   title={t('kassaApp.parkTableKitchenBonAria')}
                   aria-label={t('kassaApp.parkTableKitchenBonAria')}
-                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
+                  className={`min-w-0 flex-1 font-semibold flex items-center justify-center text-center px-2 py-3 ${kassaSxgaInlineBtnLabelClass} ${kassaPosButtonClass(false, posChrome)} ${
                     kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
@@ -7861,7 +7883,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   onClick={() => parkOrder({ printKitchen: false, printKassaSlip: true })}
                   title={t('kassaApp.parkTableKassaBonAria')}
                   aria-label={t('kassaApp.parkTableKassaBonAria')}
-                  className={`min-w-0 flex-1 font-semibold flex flex-col items-center justify-center gap-0.5 text-center px-2 py-2 text-[11px] leading-tight sm:text-xs ${kassaPosButtonClass(false, posChrome)} ${
+                  className={`min-w-0 flex-1 font-semibold flex flex-col items-center justify-center gap-0.5 text-center px-2 py-2 ${kassaSxgaInlineBtnLabelClass} ${kassaPosButtonClass(false, posChrome)} ${
                     kassaCompactChrome ? 'min-h-[2.875rem]': 'min-h-[2.5rem]'
                   }`}
                 >
@@ -7910,7 +7932,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     ? 'min-h-[4.25rem] py-3 text-2xl font-bold'
                     : kassaWide15Chrome
                       ? 'min-h-[3.6rem] py-2 text-lg font-bold'
-                      : kassaCompactChrome
+                      : kassaSxgaDenseTiles
+                      ? 'min-h-[4rem] py-3.5 text-xl font-bold'
+                    : kassaCompactChrome
                         ? 'min-h-[4rem] py-3.5 text-lg'
                         : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
