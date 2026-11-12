@@ -49,6 +49,12 @@ export type KassaViewportChromeTokens = {
 
 /** 17″ SXGA — sync `.cursor/rules/kassa-17inch-sxga.mdc` (niet wijzigen zonder 17″-opdracht). */
 export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
+/** Speels/luxury: gecentreerde zaaknaam — alleen 17″, naast snelkoppelingen (geen overlap). */
+export const KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING =
+  'pl-[10.5rem] pr-[4rem] sm:pl-[10.5rem] sm:pr-[4rem]'
+/** 15″ / 21″ / overige: bestaande symmetrische inset. */
+export const KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT =
+  'px-[5.5rem] sm:px-[9rem] md:px-[11rem]'
 /** 15″ breedbeeld — smallere (smaller) tegels, hogere rij, bredere mand (nov 2026). */
 export const KASSA_SIDEBAR_WIDTH_WIDE15_PX = 400
 /** iPad 10.2″ landschap — smallere tegels, bredere mand (nov 2026). */

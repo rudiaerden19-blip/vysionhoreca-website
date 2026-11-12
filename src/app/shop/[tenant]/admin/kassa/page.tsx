@@ -405,6 +405,8 @@ import { useKassaPosViewportBootstrap } from '@/hooks/useKassaPosViewportBootstr
 import { useKassaViewportProfileHref } from '@/hooks/useKassaViewportProfileHref'
 import {
   estimateKassaSidebarWidthPxForInnerWidth,
+  KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT,
+  KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING,
   kassaViewportChromeCssVars,
 } from '@/lib/kassa-viewport-chrome-tokens'
 import { readKassaViewportProfileIdFromWindow } from '@/lib/kassa-viewport-profile-id'
@@ -6441,7 +6443,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {kassaPosLuxury && !kassaTabletViewportChrome ? (
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center px-[5.5rem] sm:px-[9rem] md:px-[11rem]"
+            className={`pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center ${
+              kassaSxgaDenseTiles
+                ? KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING
+                : KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT
+            }`}
             aria-hidden={false}
           >
             <div className="pointer-events-auto flex min-w-0 max-w-full justify-center">
