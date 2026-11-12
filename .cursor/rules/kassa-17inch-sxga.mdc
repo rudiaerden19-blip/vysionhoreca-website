@@ -10,10 +10,11 @@ alwaysApply: true
 
 # 17″ kiosk / SXGA (~1280×1024) — productie-kassa
 
-## Scope eigenaar (nov 2026) — **alleen 17 inch vierkant**
+## Scope eigenaar (nov 2026)
 
-- **Standaard:** layout/kassa-werk **alleen** profiel **`sxga`** (17″ vierkant, ~1280×1024) — tokens `KASSA_SXGA_*`, `kassaSxgaDenseTiles`, `data-kassa-vp="sxga"`, lab-frame **17**.
-- **Niet** 15″ (`wide15`), **niet** 21″ (`default`), **niet** iPad-paden aanpassen, refactoren of “meenemen” zonder dat de gebruiker **expliciet** een ander profiel noemt.
+- **Mode Dark / speels op 17″:** nog steeds **alleen** profiel **`sxga`** — tokens `KASSA_SXGA_*`, `kassaSxgaDenseTiles` (zie `kassaSxga17HeaderRowSpeels`).
+- **Mode Light platformbreed:** alle schermen → `kassa-light-mode-all-viewports.mdc` (niet Dark-paden mee wijzigen).
+- **15″ / 21″ / iPad Dark:** niet aanpassen in Light-taken of omgekeerd.
 - **Light vs Dark (17″):** `kassaSxga17HeaderRowLight` (layout `light`) en `kassaSxga17HeaderRowSpeels` (`kassaPosLuxury`) **gescheiden** — Light-taken **nooit** alleen `kassaSxga17HeaderRowLayout` wijzigen als Dark/speels mee verandert; verplicht splitsen of `kassaLight` / `kassaPosLuxury` in conditie.
 - Gedeelde chrome alleen via `kassaSxga17ViewportChrome` + `KASSA_SXGA_*` tokens; geen globale `sm:`/`lg:` op 21″/15″.
 - Regressie **21·15** in layout-lab alleen op verzoek van de eigenaar — niet na elke 17″-taak.

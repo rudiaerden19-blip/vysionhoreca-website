@@ -1,0 +1,61 @@
+---
+description: Kassa Mode Light — alle tenants, alle schermprofielen (15/17/21/iPad)
+globs:
+  - src/app/shop/**/admin/kassa/**
+  - src/lib/kassa-register-ui-theme.ts
+  - src/lib/kassa-layout-chrome.ts
+  - src/lib/kassa-viewport-chrome-tokens.ts
+  - src/app/globals.css
+alwaysApply: true
+---
+
+# Kassa Mode Light — alle tenants, alle schermen
+
+**Eigenaar (nov 2026):** productie-kassa **Mode Light** (`kassaLayout === 'light'`, `kassaLight === true`) wordt **platformbreed** verbeterd — **500+ tenants**, **geen** hardcoded slug.
+
+## Scope
+
+| Profiel | `data-kassa-profile-id` | Lab-frame |
+|---------|-------------------------|-----------|
+| 21″ | `default` | 21 inch |
+| 15″ | `wide15` | 15 inch |
+| 17″ | `sxga` | 17 inch vierkant |
+| iPad | `ipad_10` / `ipad_129` | iPad 10 / 12,9″ |
+
+Elke wijziging die **per scherm** verschilt: eigen tak (`kassaLight && kassaSxgaDenseTiles`, `kassaLight && kassaWide15Chrome`, …) of **light-only** tokens in `kassa-viewport-chrome-tokens.ts` — **niet** één globale class die 21″/Dark mee raakt.
+
+## Verplicht — Light vs Dark scheiding
+
+- **Light:** condities met `kassaLight` of `createKassaThemeForLayout('light')` / `ui` uit light-theme.
+- **Dark/speels (Mode Dark):** `kassaPosLuxury`, `kassaSpeels*`, `kassaPlateBgClass`, globals onder `.kassa-dark-appearance` / `.kassa-speels-layout` — **niet** wijzigen in een Light-taak.
+- **Classic:** `kassaClassicDark` — niet meenemen tenzij expliciet gevraagd.
+
+Voorbeeld 17″ header (bestaand):
+
+- `kassaSxga17HeaderRowLight` — alleen Light  
+- `kassaSxga17HeaderRowSpeels` — alleen Dark/speels  
+
+## Blonkys / globals
+
+- `html.kassa-blonkys-flat-btns` wit-op-wit fixes alleen onder **`.kassa-dark-appearance`** — Light gebruikt `ui.categoryStripText` e.d.
+- Geen nieuwe `!important` op alle `button` zonder `kassaLight`-scope.
+
+## Multi-tenant
+
+- **Verboden:** `if (tenant === '…')` voor Light UI.
+- **Toegestaan:** tenant-data (menu, kleuren uit DB) — geen layout-uitzondering per slug.
+
+## Test vóór commit (Light-wijzigingen)
+
+```bash
+npx tsc --noEmit
+npm test -- --testPathPatterns=kassa-layout-chrome
+npm test -- --testPathPatterns=kassa-viewport-chrome-tokens
+```
+
+**Handmatig:** superadmin **Kassa layout-lab** → tenant naar keuze → **Mode Light** in kassa → **Vernieuwen** op **15, 17, 21, iPad**-iframes.
+
+## Niet verward met
+
+- **17″ Dark-tuning:** blijft `kassa-17inch-sxga.mdc` + `kassaSxga17HeaderRowSpeels`.
+- **OSK / snelteksten:** `kassa-osk-snelteksten-sacred.mdc` — niet zonder ontgrendeling.

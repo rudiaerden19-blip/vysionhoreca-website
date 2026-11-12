@@ -13,7 +13,7 @@ alwaysApply: false
 
 **Eigenaar:** wijziging aan één scherm mag **niet** stilletjes andere schermen breken.
 
-**Actieve werkscope (nov 2026):** alleen **17″ vierkant (`sxga`)** — zie `kassa-17inch-sxga.mdc`. Andere profielen **niet** wijzigen tenzij expliciet gevraagd.
+**Actieve werkscope (nov 2026):** **Mode Light** op **alle profielen** — `kassa-light-mode-all-viewports.mdc`. **Mode Dark/speels op 17″** apart — `kassa-17inch-sxga.mdc`. Geen enkele diff die Light + Dark tegelijk zonder `kassaLight`/`kassaPosLuxury`-split raakt.
 
 ## Profielen
 
