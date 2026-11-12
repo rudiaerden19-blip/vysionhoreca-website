@@ -533,9 +533,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile {
   background-color: #1a1a1a !important;
   box-shadow:
     0 0 0 1px #000000,
-    0 7px 20px rgba(0, 0, 0, 0.84),
-    0 15px 34px rgba(0, 0, 0, 0.74),
-    0 3px 12px rgba(0, 0, 0, 0.58) !important;
+    0 5px 14px rgba(0, 0, 0, 0.62),
+    0 10px 22px rgba(0, 0, 0, 0.46) !important;
 }
 
 /* Fallback zonder html-class (zelfde Mode Dark-tegel). */
@@ -546,9 +545,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile {
   background-color: #1a1a1a !important;
   box-shadow:
     0 0 0 1px #000000,
-    0 7px 20px rgba(0, 0, 0, 0.84),
-    0 15px 34px rgba(0, 0, 0, 0.74),
-    0 3px 12px rgba(0, 0, 0, 0.58) !important;
+    0 5px 14px rgba(0, 0, 0, 0.62),
+    0 10px 22px rgba(0, 0, 0, 0.46) !important;
 }
 
 .kassa-speels-menu-tile::before {
@@ -570,12 +568,12 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   inset: 0;
   z-index: 28;
   border-radius: inherit;
-  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.36);
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.28);
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.16) 0%,
-    rgba(0, 0, 0, 0.04) 42%,
-    rgba(0, 0, 0, 0.32) 100%
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.03) 42%,
+    rgba(0, 0, 0, 0.22) 100%
   );
 }
 
@@ -586,9 +584,8 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   border: 0 !important;
   box-shadow:
     0 0 0 1px #000000,
-    0 7px 20px rgba(0, 0, 0, 0.84),
-    0 15px 34px rgba(0, 0, 0, 0.74),
-    0 3px 12px rgba(0, 0, 0, 0.58) !important;
+    0 5px 14px rgba(0, 0, 0, 0.62),
+    0 10px 22px rgba(0, 0, 0, 0.46) !important;
 }
 
 /*
