@@ -1,7 +1,9 @@
 import { KASSA_UI_LAYOUT_OPTIONS } from './kassa-ui-layout'
 import {
   KASSA_LIGHT_CART_VAK_SHELL,
+  KASSA_LIGHT_HEADER_LINK_LABEL,
   KASSA_LIGHT_MENU_TILE_BORDER,
+  KASSA_LIGHT_SIDEBAR_ACTION_LABEL,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutChromeBtnClass,
   kassaLayoutHeaderBarClass,
@@ -41,6 +43,12 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
   it('Light winkelmand-vak deelt tegelkader', () => {
     expect(KASSA_LIGHT_CART_VAK_SHELL).toContain('kassa-light-menu-tile-frame')
     expect(KASSA_LIGHT_CART_VAK_SHELL).toContain('#1e293b')
+  })
+
+  it('Light knoplabels zijn groter op alle viewports', () => {
+    expect(KASSA_LIGHT_HEADER_LINK_LABEL).toContain('text-sm')
+    expect(KASSA_LIGHT_SIDEBAR_ACTION_LABEL).toContain('text-sm')
+    expect(KASSA_LIGHT_HEADER_LINK_LABEL).toContain('sm:text-[15px]')
   })
 
   it('Klassiek gebruikt lichter grijs voor knoppen, het kader blijft donker', () => {

@@ -40,6 +40,14 @@ export const KASSA_LIGHT_CART_VAK_SHELL = `mx-2 mb-2 min-h-0 flex-1 rounded-xl o
 
 export const KASSA_LIGHT_UTILITY_BTN_CLASS = 'kassa-light-utility-btn'
 
+/** Mode Light — grotere knoplabels (alle viewports). */
+export const KASSA_LIGHT_HEADER_LINK_LABEL =
+  'whitespace-nowrap text-sm font-bold leading-tight sm:text-[15px]'
+export const KASSA_LIGHT_SIDEBAR_ACTION_LABEL =
+  'text-center text-sm font-bold leading-tight sm:text-[15px]'
+export const KASSA_LIGHT_SIDEBAR_ZONE_LABEL = 'text-sm font-bold sm:text-[15px]'
+export const KASSA_LIGHT_ORDER_TYPE_LABEL = 'text-sm font-bold sm:text-[15px]'
+
 /** Mand +/- en potlood (Mode Light) — zelfde donkerblauw. */
 export const KASSA_LIGHT_CART_QTY_BTN_FACE =
   `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#1e293b] text-white font-bold [@media(hover:hover)]:hover:bg-[#172033] active:bg-[#0f172a]`
