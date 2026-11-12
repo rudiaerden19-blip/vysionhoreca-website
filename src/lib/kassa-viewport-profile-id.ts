@@ -4,13 +4,19 @@
  */
 
 import type { KassaLayoutLabFrame } from '@/lib/kassa-layout-preview'
-import { KASSA_LAYOUT_LAB_FRAMES, resolveKassaLayoutPreviewChrome } from '@/lib/kassa-layout-preview'
+import {
+  KASSA_LAYOUT_LAB_FRAMES,
+  isKassaLayoutPreviewSearchParams,
+  resolveKassaLayoutPreviewChrome,
+  resolveKassaLayoutPreviewViewportPixels,
+} from '@/lib/kassa-layout-preview'
 import {
   mergedKassaPosSearchParams,
   persistKassaViewportProfileContext,
   stickyKassaViewportProfileId,
 } from '@/lib/kassa-viewport-profile-context'
 import {
+  isSxga17CssViewport,
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
 } from '@/lib/kassa-viewport-profile'
@@ -104,13 +110,37 @@ export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
   if (typeof window === 'undefined') return 'default'
   try {
     const sp = new URLSearchParams(window.location.search)
-    const forced = sp.get('kvp')
-    if (isKassaViewportProfileId(forced)) {
-      persistKassaViewportProfileContext(forced, mergedKassaPosSearchParams())
-      return forced
+    const merged = mergedKassaPosSearchParams()
+
+    const forcedUrl = sp.get('kvp')
+    if (isKassaViewportProfileId(forcedUrl)) {
+      persistKassaViewportProfileContext(forcedUrl, merged)
+      return forcedUrl
     }
+
+    const previewChrome =
+      resolveKassaLayoutPreviewChrome(merged) ?? resolveKassaLayoutPreviewChrome(sp)
+    if (previewChrome?.sxgaDense) {
+      persistKassaViewportProfileContext('sxga', merged)
+      return 'sxga'
+    }
+    if (previewChrome?.wide15) {
+      persistKassaViewportProfileContext('wide15', merged)
+      return 'wide15'
+    }
+
+    const labDims =
+      resolveKassaLayoutPreviewViewportPixels(merged) ??
+      resolveKassaLayoutPreviewViewportPixels(sp)
+    if (labDims && isSxga17CssViewport(labDims.w, labDims.h)) {
+      persistKassaViewportProfileContext('sxga', merged)
+      return 'sxga'
+    }
+
+    const labPreview =
+      isKassaLayoutPreviewSearchParams(sp) || isKassaLayoutPreviewSearchParams(merged)
     const sticky = stickyKassaViewportProfileId()
-    if (sticky) return sticky
+    if (sticky && labPreview) return sticky
 
     const flags = readKassaChromeFlagsForProfileId()
     const vv = window.visualViewport
@@ -127,7 +157,7 @@ export function readKassaViewportProfileIdFromWindow(): KassaViewportProfileId {
       cssW,
       cssH,
     })
-    persistKassaViewportProfileContext(resolved, mergedKassaPosSearchParams())
+    persistKassaViewportProfileContext(resolved, merged)
     return resolved
   } catch {
     return 'default'

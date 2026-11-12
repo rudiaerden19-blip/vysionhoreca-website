@@ -194,8 +194,11 @@ export default function SuperadminKassaLayoutLabPage() {
           </button>
         </div>
         <p className="mt-2 text-xs text-zinc-500">
-          Eén deploy op main = dezelfde layout voor alle tenants. Na studio of deploy: alleen{' '}
-          <strong className="text-zinc-300">Vernieuwen</strong> — geen extra stappen.
+          Eén deploy op main = dezelfde layout voor alle tenants. Na deploy:{' '}
+          <strong className="text-zinc-300">Vernieuwen</strong> op elk iframe. Preview = oranje
+          kader hieronder (niet &quot;Kassa login&quot; — die mist 17″-params). In de kassa linksonder:{' '}
+          <strong className="text-zinc-300">profiel sxga</strong> en{' '}
+          <strong className="text-zinc-300">data-kassa-sxga-header-tenant=1</strong>.
         </p>
       </header>
 
