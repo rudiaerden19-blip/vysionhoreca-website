@@ -393,6 +393,7 @@ import {
   formatKassaVatInvoiceNumber,
 } from '@/lib/kassa-vat-invoice-layout'
 import {
+  isSxga17CssViewport,
   kassaDefaultMenuGridTailwindCols,
   readKassaIpadClientFromWindow,
   readKassaViewportProfileFromWindow,
@@ -1395,6 +1396,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () =>
       typeof window !== 'undefined' ? readKassaViewportProfileIdFromWindow() : 'default',
   )
+  const [kassaCssViewportMatchesSxga17, setKassaCssViewportMatchesSxga17] = useState(false)
   const [kassaViewportSettingsMap, setKassaViewportSettingsMap] =
     useState<KassaViewportProfileSettingsMap>({})
 
@@ -1448,6 +1450,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       } catch {
         setKassaViewportProfileId('default')
       }
+      const vv = window.visualViewport
+      const w = Math.max(1, Math.floor(vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth))
+      const h = Math.max(1, Math.floor(vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight))
+      setKassaCssViewportMatchesSxga17(isSxga17CssViewport(w, h))
     }
     sync()
     window.addEventListener('resize', sync)
@@ -6259,6 +6265,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tenantInfo?.business_name ||
     tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
+  const kassaLuxuryHeaderTenant17Chrome =
+    kassaPosLuxury &&
+    !kassaTabletViewportChrome &&
+    (kassaSxgaDenseTiles || kassaCssViewportMatchesSxga17)
+
   const kassaTenantNameColorClass =
     kassaPosLuxury && posChrome === 'speels'
       ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#c4c4c4] active:text-[#989898]`
@@ -6275,8 +6286,12 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         if (draftBonLineItems.length === 0 || draftBonPrinting) return
         void printDraftBonFromCart({ draftCopies: 2 })
       }}
-      className={`max-w-full rounded-md px-2 py-0.5 text-center font-bold leading-tight tracking-tight transition-colors ${truncateName ? 'truncate' : 'whitespace-nowrap'} ${sizeClass} ${maxWidthClass} ${kassaTenantNameColorClass}`}
-      title={t('kassaApp.cartBonTitle')}
+      className={`rounded-md px-2 py-0.5 text-center font-bold leading-tight tracking-tight transition-colors ${sizeClass} ${maxWidthClass} ${kassaTenantNameColorClass} ${
+        truncateName
+          ? 'max-w-full truncate'
+          : 'inline-flex w-auto max-w-none shrink-0 overflow-visible whitespace-nowrap'
+      }`}
+      title={kassaTenantDisplayName}
       aria-label={`${kassaTenantDisplayName} — ${t('kassaApp.cartBonTitle')}`}
     >
       {kassaTenantDisplayName}
@@ -6471,26 +6486,26 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {kassaPosLuxury && !kassaTabletViewportChrome ? (
           <div
-            className={`pointer-events-none absolute inset-y-0 z-[15] flex items-center justify-center ${
-              kassaSxgaDenseTiles
+            className={`pointer-events-none absolute inset-y-0 z-[15] flex items-center justify-center overflow-visible ${
+              kassaLuxuryHeaderTenant17Chrome
                 ? KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET
                 : `left-0 right-0 ${KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT}`
             }`}
             aria-hidden={false}
           >
-            <div className="pointer-events-auto flex min-w-0 w-full justify-center">
+            <div className="pointer-events-auto flex w-full justify-center overflow-visible">
               {renderKassaTenantNameButton(
                 kassaWide15Chrome
                   ? 'text-base sm:text-lg'
-                  : kassaSxgaDenseTiles
+                  : kassaLuxuryHeaderTenant17Chrome
                     ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS
                     : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
                 kassaWide15Chrome
                   ? 'max-w-[min(100%,16rem)]'
-                  : kassaSxgaDenseTiles
+                  : kassaLuxuryHeaderTenant17Chrome
                     ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS
                     : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
-                !kassaSxgaDenseTiles,
+                !kassaLuxuryHeaderTenant17Chrome,
               )}
             </div>
           </div>

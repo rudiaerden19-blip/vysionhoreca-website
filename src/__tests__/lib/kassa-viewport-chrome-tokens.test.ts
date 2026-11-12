@@ -85,6 +85,6 @@ describe('kassa-viewport-chrome-tokens', () => {
     expect(KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT).toContain('px-[5.5rem]')
     expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS).toContain('text-sm')
     expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS).not.toContain('text-lg')
-    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS).toContain('max-w-full')
+    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS).toContain('max-w-none')
   })
 })

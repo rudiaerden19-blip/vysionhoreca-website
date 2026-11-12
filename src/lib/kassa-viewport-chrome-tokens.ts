@@ -56,7 +56,9 @@ export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
 export const KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET =
   'left-[26rem] right-[12.5rem]'
 export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS = 'text-sm font-bold sm:text-base'
-export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS = 'w-full max-w-full min-w-0'
+/** Inhoudsbreedte — geen truncate / geen flex-shrink naar 0. */
+export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS =
+  'inline-flex w-auto max-w-none shrink-0 overflow-visible'
 /** 15″ / 21″ / overige: bestaande symmetrische inset. */
 export const KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT =
   'px-[5.5rem] sm:px-[9rem] md:px-[11rem]'
