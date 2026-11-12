@@ -616,8 +616,9 @@ html.kassa-speels-layout .kassa-speels-menu-tile::after,
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-/* 17″ SXGA — zaaknaam volledig in vrije band; alleen wanneer header-17 hook actief is. */
-[data-testid='kassa-app'][data-kassa-sxga-header-tenant='1'] [data-testid='kassa-header-tenant-name'] {
+/* 17″ SXGA — volledige zaaknaam (Light én Dark hook). */
+[data-testid='kassa-app'][data-kassa-sxga-header-tenant-light='1'] [data-testid='kassa-header-tenant-name'],
+[data-testid='kassa-app'][data-kassa-sxga-header-tenant-speels='1'] [data-testid='kassa-header-tenant-name'] {
   display: inline-flex !important;
   width: auto !important;
   max-width: none !important;

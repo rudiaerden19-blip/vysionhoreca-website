@@ -198,7 +198,8 @@ export default function SuperadminKassaLayoutLabPage() {
           <strong className="text-zinc-300">Vernieuwen</strong> op elk iframe. Preview = oranje
           kader hieronder (niet &quot;Kassa login&quot; — die mist 17″-params). In de kassa linksonder:{' '}
           <strong className="text-zinc-300">profiel sxga</strong> en{' '}
-          <strong className="text-zinc-300">data-kassa-sxga-header-tenant=1</strong>.
+          <strong className="text-zinc-300">data-kassa-sxga-header-tenant-light=1</strong> (Light) of{' '}
+          <strong className="text-zinc-300">-speels=1</strong> (Dark).
         </p>
       </header>
 

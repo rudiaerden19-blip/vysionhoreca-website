@@ -6270,10 +6270,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     tenantInfo?.business_name ||
     tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
-  /** 17″ vierkant: zelfde header-volgorde in Light, Classic én Dark/speels. */
-  const kassaSxga17HeaderRowLayout =
+  const kassaSxga17ViewportChrome =
     !kassaTabletViewportChrome &&
     (kassaSxgaDenseTiles || kassaCssViewportMatchesSxga17)
+  /** 17″ + Mode Light — apart van Dark/speels; Light-wijzigingen hier alleen. */
+  const kassaSxga17HeaderRowLight = kassaLight && kassaSxga17ViewportChrome
+  /** 17″ + Mode Dark (layout speels) — niet meenemen bij Light-taken. */
+  const kassaSxga17HeaderRowSpeels = kassaPosLuxury && kassaSxga17ViewportChrome
+  const kassaSxga17HeaderRowLayout =
+    kassaSxga17HeaderRowLight || kassaSxga17HeaderRowSpeels
 
   const kassaTenantNameColorClass =
     kassaPosLuxury && posChrome === 'speels'
@@ -6317,7 +6322,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-kassa-profile-id={kassaViewportProfileId}
       data-kassa-ipad={kassaIpadMenuGridCap ? '1' : '0'}
       data-kassa-lab-preview={kassaLayoutLabPreview ? '1' : '0'}
-      data-kassa-sxga-header-tenant={kassaSxga17HeaderRowLayout ? '1' : '0'}
+      data-kassa-sxga-header-tenant-light={kassaSxga17HeaderRowLight ? '1' : '0'}
+      data-kassa-sxga-header-tenant-speels={kassaSxga17HeaderRowSpeels ? '1' : '0'}
       style={kassaRootChromeStyle}
     >
       {kassaLayoutLabPreview ? (
@@ -6491,7 +6497,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {kassaPosLuxury && !kassaTabletViewportChrome && !kassaSxga17HeaderRowLayout ? (
+        {kassaPosLuxury && !kassaTabletViewportChrome && !kassaSxga17HeaderRowSpeels ? (
           <div
             className={`pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center overflow-visible ${KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT}`}
             aria-hidden={false}
@@ -6529,7 +6535,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) : null}
 
         <div className="relative z-20 flex min-w-0 flex-1 items-center gap-1 sm:gap-1.5">
-        {!kassaPosLuxury && !kassaSxga17HeaderRowLayout ? (
+        {!kassaPosLuxury && !kassaSxga17HeaderRowLight ? (
         <div
           className={`flex min-w-0 shrink-0 flex-col justify-center px-0.5 ${
             kassaWide15Chrome
@@ -6695,7 +6701,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </button>
 
           {isKassaAzertyOskManualOpenEnabled(tenant) &&
-          (kassaSxga17HeaderRowLayout || !kassaPosLuxury) ? (
+          (kassaSxga17HeaderRowLight || kassaSxga17HeaderRowSpeels || !kassaPosLuxury) ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={kassaHeaderQuickLinkLabelClass}
@@ -6750,7 +6756,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
           {isKassaAzertyOskManualOpenEnabled(tenant) &&
           kassaPosLuxury &&
-          !kassaSxga17HeaderRowLayout ? (
+          !kassaSxga17HeaderRowSpeels ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={kassaHeaderQuickLinkLabelClass}
