@@ -37,6 +37,10 @@ export const KASSA_LIGHT_MENU_TILE_BORDER_CLASS = 'kassa-light-menu-tile-frame'
 /** Alleen winkelmand-vak in zijbalk (zelfde grijs als menu-tegels; footer-knoppen blijven wit). */
 export const KASSA_LIGHT_CART_VAK_CLASS = 'kassa-light-cart-vak'
 
+/** Mand +/- en potlood (Mode Light) — zelfde donkerblauw. */
+export const KASSA_LIGHT_CART_QTY_BTN_FACE =
+  `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#1e293b] text-white font-bold [@media(hover:hover)]:hover:bg-[#172033] active:bg-[#0f172a]`
+
 export const KASSA_LIGHT_UTILITY_BTN_CLASS = 'kassa-light-utility-btn'
 export const KASSA_LIGHT_CHECKOUT_BTN_CLASS = 'kassa-light-checkout-btn'
 export const KASSA_LIGHT_REMOVE_BTN_CLASS = 'kassa-light-remove-btn'

@@ -125,6 +125,7 @@ import {
   KASSA_LIGHT_MENU_TILE_BORDER,
   KASSA_LIGHT_MENU_TILE_BORDER_CLASS,
   KASSA_LIGHT_CART_VAK_CLASS,
+  KASSA_LIGHT_CART_QTY_BTN_FACE,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutMenuScrollFlatBgClass,
   kassaLayoutPlateBgClass,
@@ -6071,6 +6072,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ? KASSA_POS_ZONE_BTN_LABEL
         : 'font-bold'
 
+  const kassaLightCartQtyBtnShell = (compact: boolean, iconSize: 'base' | 'sm') =>
+    `touch-manipulation rounded-lg flex items-center justify-center active:brightness-95 ${
+      kassaLight
+        ? KASSA_LIGHT_CART_QTY_BTN_FACE
+        : 'bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52]'
+    } ${
+      compact
+        ? iconSize === 'sm'
+          ? 'h-8 w-8 text-sm'
+          : 'h-8 w-8 text-base'
+        : iconSize === 'sm'
+          ? 'h-9 w-9 text-sm'
+          : 'h-9 w-9 text-lg'
+    }`
+
   const renderSidebarCartLine = (item: (typeof cartLinesByCategory)[number]) => {
     const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
     const lineTotal = ((item.product.price + choicesTotal) * item.quantity).toFixed(2)
@@ -6144,9 +6160,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                 className={
                   kassaAppearanceDark
                     ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)} ${kassaWide15CartQtyExtra} text-sm`
-                    : `touch-manipulation rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 active:brightness-95 ${
-                        cartLineQtyBtnCompact ? 'h-8 w-8 text-sm': 'h-9 w-9 text-sm'
-                      }`
+                    : kassaLightCartQtyBtnShell(cartLineQtyBtnCompact, 'sm')
                 }
                 title={t('kassaApp.ariaEditLine')}
                 aria-label={t('kassaApp.ariaEditLine')}
@@ -6161,9 +6175,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             className={
               kassaAppearanceDark
                 ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)} ${kassaWide15CartQtyExtra}`
-                : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
-                    cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
-                  }`
+                : kassaLightCartQtyBtnShell(cartLineQtyBtnCompact, 'base')
             }
             aria-label={t('kassaApp.ariaIncreaseQty')}
           >
@@ -6227,9 +6239,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               className={
                 kassaAppearanceDark
                   ? `touch-manipulation ${kassaPosCartQtyButtonClass(cartLineQtyBtnCompact, posChrome)} ${kassaWide15CartQtyExtra}`
-                  : `touch-manipulation rounded-lg bg-[#3C4D6B] text-white font-bold flex items-center justify-center hover:bg-[#2D3A52] active:brightness-95 ${
-                      cartLineQtyBtnCompact ? 'h-8 w-8 text-base': 'h-9 w-9 text-lg'
-                    }`
+                  : kassaLightCartQtyBtnShell(cartLineQtyBtnCompact, 'base')
               }
               aria-label={t('kassaApp.ariaIncreaseQty')}
             >

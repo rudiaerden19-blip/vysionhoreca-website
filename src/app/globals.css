@@ -1692,3 +1692,8 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
   background-color: #e3e3e3 !important;
 }
 
+[data-kassa-layout='light'] [data-testid='kassa-cart-lines'] button.kassa-light-utility-btn:not(:disabled) {
+  background-color: #1e293b !important;
+  border-color: #0f172a !important;
+}
+
