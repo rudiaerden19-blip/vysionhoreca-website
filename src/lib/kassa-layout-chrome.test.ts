@@ -1,5 +1,6 @@
 import { KASSA_UI_LAYOUT_OPTIONS } from './kassa-ui-layout'
 import {
+  KASSA_LIGHT_CART_VAK_SHELL,
   KASSA_LIGHT_MENU_TILE_BORDER,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutChromeBtnClass,
@@ -35,6 +36,11 @@ describe('kassa-layout-chrome — zelfde modes als gewone kassa', () => {
   it('Light menu-tegels hebben Facebook-blauw kader-token', () => {
     expect(KASSA_LIGHT_MENU_TILE_BORDER).toContain('#1e293b')
     expect(KASSA_LIGHT_MENU_TILE_BORDER).toContain('border-2')
+  })
+
+  it('Light winkelmand-vak deelt tegelkader', () => {
+    expect(KASSA_LIGHT_CART_VAK_SHELL).toContain('kassa-light-menu-tile-frame')
+    expect(KASSA_LIGHT_CART_VAK_SHELL).toContain('#1e293b')
   })
 
   it('Klassiek gebruikt lichter grijs voor knoppen, het kader blijft donker', () => {

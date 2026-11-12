@@ -34,8 +34,9 @@ export const KASSA_LIGHT_FB_BLUE_ACTIVE = '#0f172a'
 export const KASSA_LIGHT_MENU_TILE_BORDER = 'border-2 border-[#1e293b]'
 export const KASSA_LIGHT_MENU_TILE_BORDER_CLASS = 'kassa-light-menu-tile-frame'
 
-/** Alleen winkelmand-vak in zijbalk (zelfde grijs als menu-tegels; footer-knoppen blijven wit). */
+/** Alleen winkelmand-vak in zijbalk (zelfde grijs + kader als tegels; geen rand om boven/onder). */
 export const KASSA_LIGHT_CART_VAK_CLASS = 'kassa-light-cart-vak'
+export const KASSA_LIGHT_CART_VAK_SHELL = `mx-2 mb-2 min-h-0 flex-1 rounded-xl overflow-hidden ${KASSA_LIGHT_MENU_TILE_BORDER_CLASS} ${KASSA_LIGHT_MENU_TILE_BORDER}`
 
 export const KASSA_LIGHT_UTILITY_BTN_CLASS = 'kassa-light-utility-btn'
 

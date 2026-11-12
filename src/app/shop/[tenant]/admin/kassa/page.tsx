@@ -125,6 +125,7 @@ import {
   KASSA_LIGHT_MENU_TILE_BORDER,
   KASSA_LIGHT_MENU_TILE_BORDER_CLASS,
   KASSA_LIGHT_CART_VAK_CLASS,
+  KASSA_LIGHT_CART_VAK_SHELL,
   KASSA_LIGHT_CART_QTY_BTN_FACE,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutMenuScrollFlatBgClass,
@@ -7414,10 +7415,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Cart / numpad (toggle via footer) */}
         <div
-          className={`flex min-h-0 flex-1 flex-col overflow-hidden touch-pan-y ${
+          data-testid={kassaLight && !kassaPosLuxury ? 'kassa-light-cart-vak' : undefined}
+          className={`flex min-h-0 flex-1 flex-col touch-pan-y ${
             kassaLight && !kassaPosLuxury
-              ? `${KASSA_LIGHT_CART_VAK_CLASS} ${kassaLayoutPlateBgClass('light')}`
-              : ''
+              ? `${KASSA_LIGHT_CART_VAK_CLASS} ${KASSA_LIGHT_CART_VAK_SHELL} ${kassaLayoutPlateBgClass('light')}`
+              : 'overflow-hidden'
           } ${
             kassaSidebarToolsSlidePanel && !kassaSidebarToolsOpen
               ? `pt-10 ${

@@ -1690,6 +1690,10 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
 
 [data-kassa-layout='light'] .kassa-light-cart-vak {
   background-color: #e3e3e3 !important;
+  border-color: #1e293b !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-radius: 0.75rem !important;
 }
 
 [data-kassa-layout='light'] [data-testid='kassa-cart-lines'] button.kassa-light-utility-btn:not(:disabled) {
