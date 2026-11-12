@@ -49,9 +49,15 @@ export type KassaViewportChromeTokens = {
 
 /** 17″ SXGA — sync `.cursor/rules/kassa-17inch-sxga.mdc` (niet wijzigen zonder 17″-opdracht). */
 export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
-/** Speels/luxury: gecentreerde zaaknaam — alleen 17″, naast snelkoppelingen (geen overlap). */
-export const KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING =
-  'pl-[10.5rem] pr-[4rem] sm:pl-[10.5rem] sm:pr-[4rem]'
+/**
+ * Speels/luxury 17″: zaaknaam in band tussen snelkoppelingen (links) en Toetsenbord/Uitloggen (rechts).
+ * Geen padding-truc — echte horizontale centrering in die band; knoppen blijven op hun plek.
+ */
+export const KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET =
+  'left-[26rem] right-[12.5rem]'
+export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS = 'text-sm font-bold sm:text-base'
+export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS =
+  'max-w-[min(100%,15rem)] sm:max-w-[min(100%,18rem)]'
 /** 15″ / 21″ / overige: bestaande symmetrische inset. */
 export const KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT =
   'px-[5.5rem] sm:px-[9rem] md:px-[11rem]'

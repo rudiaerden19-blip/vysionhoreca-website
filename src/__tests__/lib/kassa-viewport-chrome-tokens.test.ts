@@ -5,7 +5,8 @@ import {
   KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT,
   KASSA_SXGA_HEADER_QUICK_LINK_LABEL,
   KASSA_SXGA_INLINE_BTN_LABEL,
-  KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING,
+  KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS,
+  KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET,
   KASSA_SXGA_SIDEBAR_ACTION_LABEL,
   KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX,
   KASSA_SIDEBAR_WIDTH_WIDE15_PX,
@@ -78,11 +79,10 @@ describe('kassa-viewport-chrome-tokens', () => {
     expect(KASSA_SXGA_INLINE_BTN_LABEL).not.toContain('text-[11px]')
   })
 
-  it('17″ speels header: asymmetrische zaaknaam-inset, niet gelijk aan 21″', () => {
-    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING).toContain('pl-[10.5rem]')
+  it('17″ speels header: zaaknaam-band tussen knopgroepen, kleiner dan 21″', () => {
+    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET).toMatch(/left-\[.+\] right-\[.+\]/)
     expect(KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT).toContain('px-[5.5rem]')
-    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING).not.toBe(
-      KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT,
-    )
+    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS).toContain('text-sm')
+    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS).not.toContain('text-lg')
   })
 })

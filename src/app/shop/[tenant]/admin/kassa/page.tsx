@@ -408,7 +408,9 @@ import {
   KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT,
   KASSA_SXGA_HEADER_MENU_LABEL,
   KASSA_SXGA_HEADER_QUICK_LINK_LABEL,
-  KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING,
+  KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS,
+  KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS,
+  KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET,
   KASSA_SXGA_INLINE_BTN_LABEL,
   KASSA_SXGA_SIDEBAR_ACTION_LABEL,
   KASSA_SXGA_SIDEBAR_ZONE_LABEL,
@@ -6465,21 +6467,25 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {kassaPosLuxury && !kassaTabletViewportChrome ? (
           <div
-            className={`pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center ${
+            className={`pointer-events-none absolute inset-y-0 z-[15] flex items-center justify-center ${
               kassaSxgaDenseTiles
-                ? KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_PADDING
-                : KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT
+                ? KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET
+                : `left-0 right-0 ${KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT}`
             }`}
             aria-hidden={false}
           >
-            <div className="pointer-events-auto flex min-w-0 max-w-full justify-center">
+            <div className="pointer-events-auto flex min-w-0 w-full justify-center">
               {renderKassaTenantNameButton(
                 kassaWide15Chrome
                   ? 'text-base sm:text-lg'
-                  : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
+                  : kassaSxgaDenseTiles
+                    ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS
+                    : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
                 kassaWide15Chrome
                   ? 'max-w-[min(100%,16rem)]'
-                  : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
+                  : kassaSxgaDenseTiles
+                    ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS
+                    : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
               )}
             </div>
           </div>
