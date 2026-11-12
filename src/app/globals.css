@@ -1644,3 +1644,32 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
   color: #fff !important;
 }
 
+/* Mode Light (data-kassa-layout=light) — utility/blauw, afreken groen, verwijder rood. Dark/speels ongemoeid. */
+[data-kassa-layout='light'] button.kassa-light-utility-btn:not(.kassa-speels-menu-tile):not(:disabled),
+[data-kassa-layout='light'] a.kassa-light-utility-btn {
+  background-color: #1877f2 !important;
+  background-image: none !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  border-color: #1565c0 !important;
+}
+[data-kassa-layout='light'] button.kassa-light-utility-btn:not(.kassa-speels-menu-tile):not(:disabled) *,
+[data-kassa-layout='light'] a.kassa-light-utility-btn * {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
+[data-kassa-layout='light'] button.kassa-light-checkout-btn:not(:disabled) {
+  background-color: #16a34a !important;
+  background-image: none !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  border-color: #15803d !important;
+}
+[data-kassa-layout='light'] button.kassa-light-remove-btn:not(:disabled) {
+  background-color: #dc2626 !important;
+  background-image: none !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  border-color: #b91c1c !important;
+}
+

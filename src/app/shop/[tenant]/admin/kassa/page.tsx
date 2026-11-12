@@ -119,6 +119,10 @@ import {
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
 import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
 import {
+  KASSA_LIGHT_BTN_FACE,
+  KASSA_LIGHT_BTN_FACE_ON,
+  KASSA_LIGHT_REMOVE_BTN_FACE,
+  kassaLayoutCheckoutBtnClass,
   kassaLayoutMenuScrollFlatBgClass,
   kassaLayoutPlateBgClass,
   kassaLayoutPosChrome,
@@ -542,10 +546,6 @@ const KASSA_HEADER_QUICK_LINK_BTN =
   'inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl bg-[#3C4D6B] font-bold text-white transition-colors hover:bg-[#2D3A52] min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2'
 const KASSA_HEADER_QUICK_LINK_LABEL = 'min-w-0 max-w-full truncate text-xs leading-snug sm:text-sm'
 
-/** Light mode — middelgrijs (niet zwart zoals Klassiek #2d2d2d). */
-const KASSA_LIGHT_BTN_FACE = 'bg-[#4a4a4a] text-white hover:bg-[#5a5a5a]'
-const KASSA_LIGHT_BTN_FACE_ON =
-  'bg-[#4a4a4a] text-white outline outline-[3px] outline-[#3C4D6B] outline-offset-2'
 const KASSA_LIGHT_HEADER_QUICK_LINK_BTN =
   `inline-flex min-w-0 max-w-full shrink items-center justify-center overflow-hidden rounded-xl font-bold transition-colors min-h-[2.65rem] px-2.5 py-2 sm:min-h-[2.85rem] sm:px-3 sm:py-2 ${KASSA_LIGHT_BTN_FACE}`
 
@@ -569,8 +569,7 @@ const KASSA_CLASSIC_TILE_PRICE_SXGA =
 
 const KASSA_TERRACE_BTN_FACE = 'bg-emerald-600 text-white hover:bg-emerald-500'
 const KASSA_TERRACE_BTN_FACE_ON = 'bg-emerald-600 text-white ring-2 ring-white/80'
-const KASSA_REMOVE_BTN_FACE =
-  'bg-red-600 text-white hover:bg-red-500 disabled:opacity-100 disabled:pointer-events-none'
+const KASSA_REMOVE_BTN_FACE = KASSA_LIGHT_REMOVE_BTN_FACE
 
 /** Alleen Binnen/Terras — groter dan besteltype-knoppen eronder. */
 function kassaFloorZoneButtonTouchClass(density: KassaChromeDensity): string {
@@ -8250,7 +8249,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   requestCheckout()
                 }}
                 disabled={billLines.length === 0 || payInFlight}
-                className={`flex min-w-0 flex-1 items-center justify-center rounded-xl ${KASSA_BLONKYS_KEEP_CHROME_CLASS} bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45 ${
+                className={`flex min-w-0 flex-1 items-center justify-center ${KASSA_BLONKYS_KEEP_CHROME_CLASS} ${
+                  kassaLight ? kassaLayoutCheckoutBtnClass('light') : 'rounded-xl bg-emerald-500 font-bold text-white hover:bg-emerald-600 disabled:bg-emerald-900/45'
+                } ${
                   kassaWide15Chrome ? 'min-h-[3.35rem] py-2.5 text-base font-bold' : 'min-h-[3.5rem] py-3 text-lg'
                 }`}
               >
