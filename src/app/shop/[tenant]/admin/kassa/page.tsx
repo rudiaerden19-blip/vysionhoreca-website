@@ -6264,14 +6264,18 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       ? `${KASSA_SPEELS_TENANT_NAME_CLASS} hover:text-[#c4c4c4] active:text-[#989898]`
       : 'text-white hover:bg-white/15 active:bg-white/25'
 
-  const renderKassaTenantNameButton = (sizeClass: string, maxWidthClass: string) => (
+  const renderKassaTenantNameButton = (
+    sizeClass: string,
+    maxWidthClass: string,
+    truncateName = true,
+  ) => (
     <button
       type="button"
       onClick={() => {
         if (draftBonLineItems.length === 0 || draftBonPrinting) return
         void printDraftBonFromCart({ draftCopies: 2 })
       }}
-      className={`max-w-full truncate rounded-md px-2 py-0.5 text-center font-bold leading-tight tracking-tight transition-colors ${sizeClass} ${maxWidthClass} ${kassaTenantNameColorClass}`}
+      className={`max-w-full rounded-md px-2 py-0.5 text-center font-bold leading-tight tracking-tight transition-colors ${truncateName ? 'truncate' : 'whitespace-nowrap'} ${sizeClass} ${maxWidthClass} ${kassaTenantNameColorClass}`}
       title={t('kassaApp.cartBonTitle')}
       aria-label={`${kassaTenantDisplayName} — ${t('kassaApp.cartBonTitle')}`}
     >
@@ -6486,6 +6490,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                   : kassaSxgaDenseTiles
                     ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS
                     : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
+                !kassaSxgaDenseTiles,
               )}
             </div>
           </div>

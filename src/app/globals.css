@@ -1456,23 +1456,24 @@ html.kassa-blonkys-flat-btns .kassa-speels-green-gloss-btn.kassa-speels-online-s
   animation: none !important;
 }
 
-html.kassa-blonkys-flat-btns
+/* Alleen donker/speels — light mode behoudt theme text-gray-* op witte knoppen. */
+html.kassa-blonkys-flat-btns.kassa-dark-appearance
   button:not(.kassa-speels-menu-tile):not(.kassa-mode-picker__option):not(.kassa-table-picker__tile):not(
     .kassa-table-picker__close
   ):not(.kassa-table-picker__muted-action),
-html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn,
-html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn,
-html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn,
-html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn,
-html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn {
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-black-gloss-btn,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-black-gloss-btn,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-blue-gloss-btn,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-red-gloss-btn,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-green-gloss-btn {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   text-shadow: none !important;
 }
 
 /* Blonkys: zonder ::before-glans — zelfde donkere rand als speels-grijs. */
-html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn,
-html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
+html.kassa-blonkys-flat-btns.kassa-dark-appearance button.kassa-speels-black-gloss-btn,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance button.kassa-speels-black-gloss-btn {
   color: #b0b0b0 !important;
   -webkit-text-fill-color: #b0b0b0 !important;
   background: linear-gradient(180deg, #2c2c30 0%, #18181c 48%, #06060a 100%) !important;
@@ -1486,22 +1487,22 @@ html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn {
     inset 0 -2px 0 rgba(0, 0, 0, 0.42) !important;
 }
 
-html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn *,
-html.kassa-blonkys-flat-btns button.kassa-speels-black-gloss-btn * {
+html.kassa-blonkys-flat-btns.kassa-dark-appearance button.kassa-speels-black-gloss-btn *,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance button.kassa-speels-black-gloss-btn * {
   color: #b0b0b0 !important;
   -webkit-text-fill-color: #b0b0b0 !important;
 }
 
-html.kassa-blonkys-flat-btns
+html.kassa-blonkys-flat-btns.kassa-dark-appearance
   button:not(.kassa-speels-menu-tile):not(.kassa-mode-picker__option):not(.kassa-table-picker__tile):not(
     .kassa-table-picker__close
   ):not(.kassa-table-picker__muted-action)
   *,
-html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn *,
-html.kassa-blonkys-flat-btns a.kassa-speels-black-gloss-btn *,
-html.kassa-blonkys-flat-btns a.kassa-speels-blue-gloss-btn *,
-html.kassa-blonkys-flat-btns a.kassa-speels-red-gloss-btn *,
-html.kassa-blonkys-flat-btns a.kassa-speels-green-gloss-btn * {
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-black-gloss-btn *,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-black-gloss-btn *,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-blue-gloss-btn *,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-red-gloss-btn *,
+html.kassa-blonkys-flat-btns.kassa-dark-appearance a.kassa-speels-green-gloss-btn * {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   text-shadow: none !important;
