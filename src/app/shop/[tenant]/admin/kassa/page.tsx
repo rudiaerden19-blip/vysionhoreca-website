@@ -411,7 +411,6 @@ import {
   KASSA_SXGA_HEADER_QUICK_LINK_LABEL,
   KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS,
   KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS,
-  KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET,
   KASSA_SXGA_INLINE_BTN_LABEL,
   KASSA_SXGA_SIDEBAR_ACTION_LABEL,
   KASSA_SXGA_SIDEBAR_ZONE_LABEL,
@@ -6492,28 +6491,20 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           })()}
         </div>
 
-        {kassaPosLuxury && !kassaTabletViewportChrome ? (
+        {kassaPosLuxury && !kassaTabletViewportChrome && !kassaLuxuryHeaderTenant17Chrome ? (
           <div
-            className={`pointer-events-none absolute inset-y-0 z-[15] flex items-center justify-center overflow-visible ${
-              kassaLuxuryHeaderTenant17Chrome
-                ? KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET
-                : `left-0 right-0 ${KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT}`
-            }`}
+            className={`pointer-events-none absolute inset-y-0 left-0 right-0 z-[15] flex items-center justify-center overflow-visible ${KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT}`}
             aria-hidden={false}
           >
             <div className="pointer-events-auto flex w-full justify-center overflow-visible">
               {renderKassaTenantNameButton(
                 kassaWide15Chrome
                   ? 'text-base sm:text-lg'
-                  : kassaLuxuryHeaderTenant17Chrome
-                    ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS
-                    : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
+                  : 'text-lg sm:text-xl md:text-2xl lg:text-3xl min-[1800px]:!text-xl min-[1800px]:translate-x-6',
                 kassaWide15Chrome
                   ? 'max-w-[min(100%,16rem)]'
-                  : kassaLuxuryHeaderTenant17Chrome
-                    ? KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS
-                    : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
-                !kassaLuxuryHeaderTenant17Chrome,
+                  : 'max-w-[min(100%,26rem)] sm:max-w-[min(100%,30rem)] md:max-w-[min(100%,36rem)]',
+                true,
               )}
             </div>
           </div>
@@ -6556,18 +6547,28 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         ) : null}
 
         <div
-          className={`relative flex min-h-0 min-w-0 flex-1 items-center ${
-            kassaWide15Chrome || kassaTabletViewportChrome
-              ? 'ml-1.5'
-              : kassaCompactChrome
-                ? 'ml-[2cm]'
-                : 'ml-[4cm]'
+          className={`relative flex min-h-0 min-w-0 items-center ${
+            kassaLuxuryHeaderTenant17Chrome
+              ? 'ml-1 shrink-0'
+              : 'min-w-0 flex-1'
+          } ${
+            kassaLuxuryHeaderTenant17Chrome
+              ? ''
+              : kassaWide15Chrome || kassaTabletViewportChrome
+                ? 'ml-1.5'
+                : kassaCompactChrome
+                  ? 'ml-[2cm]'
+                  : 'ml-[4cm]'
           }`}
         >
           <nav
             aria-label={t('kassaApp.quickLinksAria')}
-            className={`flex min-h-0 min-w-0 flex-1 items-center justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
-              kassaWide15Chrome ? 'flex-nowrap gap-1' : 'flex-nowrap gap-1.5 sm:gap-2'
+            className={`flex min-h-0 min-w-0 items-center justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+              kassaLuxuryHeaderTenant17Chrome
+                ? 'max-w-none shrink-0 flex-nowrap gap-1'
+                : kassaWide15Chrome
+                  ? 'min-w-0 flex-1 flex-nowrap gap-1'
+                  : 'min-w-0 flex-1 flex-nowrap gap-1.5 sm:gap-2'
             }`}
           >
 
@@ -6693,7 +6694,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </span>
           </button>
 
-          {isKassaAzertyOskManualOpenEnabled(tenant) && !kassaPosLuxury ? (
+          {isKassaAzertyOskManualOpenEnabled(tenant) &&
+          (kassaLuxuryHeaderTenant17Chrome || !kassaPosLuxury) ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={kassaHeaderQuickLinkLabelClass}
@@ -6710,6 +6712,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           )}
           </nav>
         </div>
+
+        {kassaLuxuryHeaderTenant17Chrome ? (
+          <div
+            data-testid="kassa-header-tenant-inline"
+            className="relative z-20 flex min-w-0 flex-1 items-center justify-start overflow-visible px-1.5 sm:px-2"
+          >
+            {renderKassaTenantNameButton(
+              KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS,
+              KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS,
+              false,
+            )}
+          </div>
+        ) : null}
 
         <div
           className={`relative z-20 flex shrink-0 items-center gap-1 sm:gap-1.5 ${
@@ -6733,7 +6748,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             </button>
           ) : null}
 
-          {isKassaAzertyOskManualOpenEnabled(tenant) && kassaPosLuxury ? (
+          {isKassaAzertyOskManualOpenEnabled(tenant) &&
+          kassaPosLuxury &&
+          !kassaLuxuryHeaderTenant17Chrome ? (
             <KassaAzertyOskHeaderToggle
               className={kassaHeaderQuickLinkShell}
               labelClassName={kassaHeaderQuickLinkLabelClass}
