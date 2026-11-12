@@ -8059,10 +8059,24 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     : 'border border-gray-200 bg-gray-50'
                 }`}
               >
-                <span className={`text-sm font-bold ${ui.numpadMeta}`}>{t('kassaApp.cartTotal')}</span>
-                <span className={`truncate text-right text-xl font-bold tabular-nums ${
-                  kassaClassicDark ? 'text-red-500' : 'text-black'
-                }`}>
+                <span
+                  className={
+                    kassaLight
+                      ? 'text-base font-bold leading-tight text-gray-800 sm:text-lg'
+                      : `text-sm font-bold ${ui.numpadMeta}`
+                  }
+                >
+                  {t('kassaApp.cartTotal')}
+                </span>
+                <span
+                  className={`truncate text-right font-bold tabular-nums ${
+                    kassaClassicDark
+                      ? 'text-xl text-red-500'
+                      : kassaLight
+                        ? 'text-2xl text-green-600 sm:text-[1.65rem]'
+                        : 'text-xl text-black'
+                  }`}
+                >
                   €{payableTotal.toFixed(2)}
                 </span>
               </div>
