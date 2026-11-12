@@ -1647,11 +1647,11 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
 /* Mode Light (data-kassa-layout=light) — utility/blauw, afreken groen, verwijder rood. Dark/speels ongemoeid. */
 [data-kassa-layout='light'] button.kassa-light-utility-btn:not(.kassa-speels-menu-tile):not(:disabled),
 [data-kassa-layout='light'] a.kassa-light-utility-btn {
-  background-color: #3b5998 !important;
+  background-color: #1e293b !important;
   background-image: none !important;
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
-  border-color: #2d4373 !important;
+  border-color: #0f172a !important;
 }
 [data-kassa-layout='light'] button.kassa-light-utility-btn:not(.kassa-speels-menu-tile):not(:disabled) *,
 [data-kassa-layout='light'] a.kassa-light-utility-btn * {
@@ -1676,18 +1676,18 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
 [data-kassa-layout='light'] button.kassa-light-menu-tile-frame,
 [data-kassa-layout='light'] button[data-kassa-product-id],
 [data-kassa-layout='light'] button[data-kassa-category-id] {
-  border-color: #3b5998 !important;
+  border-color: #1e293b !important;
   border-width: 2px !important;
   border-style: solid !important;
 }
 [data-kassa-layout='light'] button[data-kassa-strip-category-id][aria-selected='false'] {
-  border-color: #3b5998 !important;
+  border-color: #1e293b !important;
   border-width: 2px !important;
   border-style: solid !important;
 }
 [data-kassa-layout='light'] button[data-kassa-strip-category-id][aria-selected='true'].kassa-light-utility-btn {
-  background-color: #3b5998 !important;
-  border-color: #2d4373 !important;
+  background-color: #1e293b !important;
+  border-color: #0f172a !important;
   border-width: 2px !important;
 }
 
