@@ -81,7 +81,8 @@ describe('kassa-viewport-chrome-tokens', () => {
   })
 
   it('17″ speels header: zaaknaam-band tussen knopgroepen, kleiner dan 21″', () => {
-    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET).toMatch(/left-\[.+\] right-\[.+\]/)
+    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET).toContain('left-[42rem]')
+    expect(KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET).toMatch(/right-\[.+\]/)
     expect(KASSA_LUXURY_HEADER_TENANT_OVERLAY_PADDING_DEFAULT).toContain('px-[5.5rem]')
     expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS).toContain('text-sm')
     expect(KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS).not.toContain('text-lg')

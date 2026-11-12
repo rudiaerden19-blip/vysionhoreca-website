@@ -1396,7 +1396,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     () =>
       typeof window !== 'undefined' ? readKassaViewportProfileIdFromWindow() : 'default',
   )
-  const [kassaCssViewportMatchesSxga17, setKassaCssViewportMatchesSxga17] = useState(false)
+  const [kassaCssViewportMatchesSxga17, setKassaCssViewportMatchesSxga17] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const vv = window.visualViewport
+    const w = Math.max(1, Math.floor(vv?.width != null && vv.width > 0 ? vv.width : window.innerWidth))
+    const h = Math.max(1, Math.floor(vv?.height != null && vv.height > 0 ? vv.height : window.innerHeight))
+    return isSxga17CssViewport(w, h)
+  })
   const [kassaViewportSettingsMap, setKassaViewportSettingsMap] =
     useState<KassaViewportProfileSettingsMap>({})
 
@@ -6282,6 +6288,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   ) => (
     <button
       type="button"
+      data-testid="kassa-header-tenant-name"
       onClick={() => {
         if (draftBonLineItems.length === 0 || draftBonPrinting) return
         void printDraftBonFromCart({ draftCopies: 2 })
@@ -6289,7 +6296,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       className={`rounded-md px-2 py-0.5 text-center font-bold leading-tight tracking-tight transition-colors ${sizeClass} ${maxWidthClass} ${kassaTenantNameColorClass} ${
         truncateName
           ? 'max-w-full truncate'
-          : 'inline-flex w-auto max-w-none shrink-0 overflow-visible whitespace-nowrap'
+          : 'inline-flex w-auto max-w-none shrink-0 overflow-visible whitespace-nowrap [text-overflow:clip]'
       }`}
       title={kassaTenantDisplayName}
       aria-label={`${kassaTenantDisplayName} — ${t('kassaApp.cartBonTitle')}`}
@@ -6311,6 +6318,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       data-kassa-profile-id={kassaViewportProfileId}
       data-kassa-ipad={kassaIpadMenuGridCap ? '1' : '0'}
       data-kassa-lab-preview={kassaLayoutLabPreview ? '1' : '0'}
+      data-kassa-sxga-header-tenant={kassaLuxuryHeaderTenant17Chrome ? '1' : '0'}
       style={kassaRootChromeStyle}
     >
       {kassaLayoutLabPreview ? (

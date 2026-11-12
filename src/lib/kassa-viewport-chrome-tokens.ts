@@ -53,8 +53,9 @@ export const KASSA_SIDEBAR_WIDTH_SXGA_COMPACT_PX = 332
  * Speels/luxury 17″: zaaknaam in band tussen snelkoppelingen (links) en Toetsenbord/Uitloggen (rechts).
  * Geen padding-truc — echte horizontale centrering in die band; knoppen blijven op hun plek.
  */
+/** Na volledige snelkoppelingenrij (menu + ml-2cm + keuken/mode/help); anders clip + «…» onder knoppen. */
 export const KASSA_SXGA_LUXURY_HEADER_TENANT_OVERLAY_INSET =
-  'left-[26rem] right-[12.5rem]'
+  'left-[42rem] right-[11.5rem]'
 export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_SIZE_CLASS = 'text-sm font-bold sm:text-base'
 /** Inhoudsbreedte — geen truncate / geen flex-shrink naar 0. */
 export const KASSA_SXGA_LUXURY_HEADER_TENANT_NAME_MAX_WIDTH_CLASS =
