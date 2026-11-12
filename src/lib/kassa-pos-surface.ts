@@ -544,7 +544,7 @@ export const KASSA_SPEELS_MENU_TILE_PLACEHOLDER_WELL_SXGA =
   `pointer-events-none flex w-full shrink-0 flex-none flex-col items-center justify-center overflow-hidden px-2 aspect-square ${KASSA_SPEELS_MENU_TILE_NO_IMAGE_FACE} ${KASSA_SPEELS_MENU_TILE_IMAGE_WELL_SEAM}`
 
 export const KASSA_SPEELS_MENU_TILE_IMAGE_FILM =
-  'pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_50%_38%,rgba(0,0,0,0.06)_0%,transparent_46%,rgba(0,0,0,0.22)_72%,rgba(0,0,0,0.52)_100%),linear-gradient(180deg,rgba(0,0,0,0.14)_0%,transparent_40%,rgba(0,0,0,0.38)_100%)]'
+  'pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_50%_38%,rgba(0,0,0,0.04)_0%,transparent_50%,rgba(0,0,0,0.14)_74%,rgba(0,0,0,0.34)_100%),linear-gradient(180deg,rgba(0,0,0,0.08)_0%,transparent_44%,rgba(0,0,0,0.24)_100%)]'
 
 export const KASSA_POS_MENU_TILE_PLACEHOLDER_WELL =
   `pointer-events-none flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center overflow-hidden px-2 ${KASSA_POS_MENU_TILE_STUDIO_BG}`
