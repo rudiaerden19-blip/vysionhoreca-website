@@ -122,6 +122,8 @@ import {
   KASSA_LIGHT_BTN_FACE,
   KASSA_LIGHT_BTN_FACE_ON,
   KASSA_LIGHT_REMOVE_BTN_FACE,
+  KASSA_LIGHT_MENU_TILE_BORDER,
+  KASSA_LIGHT_MENU_TILE_BORDER_CLASS,
   kassaLayoutCheckoutBtnClass,
   kassaLayoutMenuScrollFlatBgClass,
   kassaLayoutPlateBgClass,
@@ -845,7 +847,7 @@ const KassaReservationsView = dynamic(() => import('@/components/KassaReservatio
 
 /** Categorie- en producttegel: witte kaart; foto alleen bovenin, titel in vaste strook eronder (niet over de foto). */
 const KASSA_MENU_TILE_BUTTON_CLASS_BASE = [
-  'touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl border border-neutral-200/90 bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)]',
+  `touch-manipulation select-none group relative flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-xl ${KASSA_LIGHT_MENU_TILE_BORDER_CLASS} ${KASSA_LIGHT_MENU_TILE_BORDER} bg-white text-left shadow-[0_8px_30px_rgba(0,0,0,0.35)]`,
   'active:shadow-[inset_0_3px_10px_rgba(0,0,0,0.22)] active:ring-2 active:ring-inset active:ring-accent/45',
   KASSA_MENU_TILE_TOUCH_PRESS,
   KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY,
@@ -6882,7 +6884,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                             ? `rounded-lg border-transparent ${active ? KASSA_CLASSIC_BTN_FACE_ON : KASSA_CLASSIC_BTN_FACE}`
                           : active
                             ? `rounded-lg border-transparent ${KASSA_LIGHT_BTN_FACE_ON}`
-                            : `rounded-lg border-gray-300 bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
+                            : `rounded-lg ${KASSA_LIGHT_MENU_TILE_BORDER_CLASS} ${KASSA_LIGHT_MENU_TILE_BORDER} bg-white ${ui.categoryStripText} ${ui.categoryStripHover}`
                       }`}
                     >
                       {cat.icon ? <span className="mr-0.5 text-sm sm:text-base">{cat.icon}</span> : null}

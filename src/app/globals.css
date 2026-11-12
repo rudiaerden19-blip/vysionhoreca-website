@@ -1673,3 +1673,16 @@ html.kassa-blonkys-flat-btns .kassa-table-picker-modal button.kassa-table-picker
   border-color: #b91c1c !important;
 }
 
+[data-kassa-layout='light'] button.kassa-light-menu-tile-frame,
+[data-kassa-layout='light'] button[data-kassa-product-id],
+[data-kassa-layout='light'] button[data-kassa-category-id] {
+  border-color: rgba(24, 119, 242, 0.65) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+[data-kassa-layout='light'] button[data-kassa-strip-category-id][aria-selected='false'] {
+  border-color: rgba(24, 119, 242, 0.65) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+
