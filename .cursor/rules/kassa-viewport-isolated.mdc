@@ -13,6 +13,8 @@ alwaysApply: false
 
 **Eigenaar:** wijziging aan één scherm mag **niet** stilletjes andere schermen breken.
 
+**Actieve werkscope (nov 2026):** alleen **17″ vierkant (`sxga`)** — zie `kassa-17inch-sxga.mdc`. Andere profielen **niet** wijzigen tenzij expliciet gevraagd.
+
 ## Profielen
 
 | `data-kassa-vp` | Mand (px) | Bron tokens |
