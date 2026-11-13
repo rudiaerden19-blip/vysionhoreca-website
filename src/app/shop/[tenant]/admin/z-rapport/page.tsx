@@ -45,6 +45,7 @@ import {
   CATEGORY_VAT_PERCENT_OPTIONS,
   type CategoryVatPercent,
 } from '@/lib/order-vat'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import { fetchZReportVatContextForTenant } from '@/lib/z-report-vat-context'
 import { buildZReportDayAmountsFromOrders } from '@/lib/z-report-day-builder'
 import { fireBillitLagoonZDaySync } from '@/lib/billit-lagoon-sync-client'
@@ -307,7 +308,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     setLoading(true)
 
     const settings = await getTenantSettings(params.tenant)
-    const settingsBtw = Number(settings?.btw_percentage) || 6
+    const settingsBtw = resolveTenantBtwPercentage(params.tenant, settings?.btw_percentage, 6)
     if (settings) {
       setBusinessInfo(settings)
       setBtwPercentage(settingsBtw)

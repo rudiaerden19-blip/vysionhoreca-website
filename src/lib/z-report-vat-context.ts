@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getMenuCategories, getMenuProducts, getTenantSettings } from '@/lib/admin-api'
+import { lagoonForcesUniformVat21 } from '@/lib/lagoon-vat'
 import { buildCategoryVatLookupForJurisdiction, inferVatJurisdictionCountry } from '@/lib/order-vat'
 
 function normalizeProductNameForVat(name: string): string {
@@ -13,9 +14,12 @@ export type ZReportVatContext = {
   productCategoryByNormalizedName: Map<string, string | null>
   /** NL: geen BTW-split ter plaatse vs afhalen op kassa/Z-rapport. */
   tenantCountry?: string | null
+  /** The Lagoon: alle regels 21%, ook oude bonregels met 6%. */
+  forceUniformVat21?: boolean
 }
 
 export function buildZReportVatContext(
+  tenantSlug: string,
   categories: ReadonlyArray<{
     id?: string | null
     name?: string | null
@@ -37,6 +41,7 @@ export function buildZReportVatContext(
 
   const country = inferVatJurisdictionCountry(tenantCountry, tenantBtwNumber, tenantDefaultPct)
   return {
+    forceUniformVat21: lagoonForcesUniformVat21(tenantSlug),
     categoryById: buildCategoryVatLookupForJurisdiction(categories, country),
     productCategoryById: new Map(
       products
@@ -56,6 +61,7 @@ export async function fetchZReportVatContextForTenant(tenantSlug: string): Promi
     getTenantSettings(tenantSlug),
   ])
   return buildZReportVatContext(
+    tenantSlug,
     categories,
     products,
     settings?.country,
@@ -78,6 +84,7 @@ export async function fetchZReportVatContextFromSupabase(
     client.from('tenant_settings').select('country, btw_number, btw_percentage').eq('tenant_slug', tenantSlug).maybeSingle(),
   ])
   return buildZReportVatContext(
+    tenantSlug,
     categories ?? [],
     products ?? [],
     settings?.country,

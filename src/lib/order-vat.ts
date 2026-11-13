@@ -1,6 +1,7 @@
 import type { MenuCategory } from '@/lib/admin-api-menu-catalog'
 import type { MenuProduct } from '@/lib/admin-api-menu-product-helpers'
 import type { KassaCartItem, KassaRegisterOrderType } from '@/lib/kassa-cart-types'
+import { lagoonUniformVatIfApplicable } from '@/lib/lagoon-vat'
 import { orderItemLineTotalEur } from '@/lib/order-items-display'
 import type { ZReportVatContext } from '@/lib/z-report-vat-context'
 
@@ -248,7 +249,14 @@ export function resolveVatPercentForProductAndOrderType(
   if (isBelgiumVatJurisdiction(country) && looksLikeBelgiumDrinkName(product.name)) {
     return resolveBelgiumBonVatPercent(true, orderType, null)
   }
-  return resolveVatPercentForCategoryAndOrderType(override, tenantDefaultPct, orderType, country)
+  return resolveVatPercentForCategoryAndOrderType(
+    override,
+    tenantDefaultPct,
+    orderType,
+    country,
+    null,
+    null,
+  )
 }
 
 export function resolveVatPercentForCategoryAndOrderType(
@@ -256,7 +264,11 @@ export function resolveVatPercentForCategoryAndOrderType(
   tenantDefaultPct: number,
   orderType: OrderTypeForVat,
   country?: string | null,
+  tenantSlug?: string | null,
+  vatCtx?: ZReportVatContext | null,
 ): CategoryVatPercent {
+  const lagoonUniform = lagoonUniformVatIfApplicable(tenantSlug, vatCtx)
+  if (lagoonUniform != null) return lagoonUniform
   if (isBelgiumVatJurisdiction(country)) {
     const isDrink =
       categoryOverride != null &&
@@ -367,7 +379,11 @@ export function resolveVatPercentWithOptionalServiceMode(
   orderType: OrderTypeForVat,
   country: string | null | undefined,
   serviceMode: VatServiceMode | null,
+  tenantSlug?: string | null,
+  vatCtx?: ZReportVatContext | null,
 ): CategoryVatPercent {
+  const lagoonUniform = lagoonUniformVatIfApplicable(tenantSlug, vatCtx)
+  if (lagoonUniform != null) return lagoonUniform
   if (isBelgiumVatJurisdiction(country)) {
     const isDrink =
       categoryOverride != null &&
@@ -382,7 +398,14 @@ export function resolveVatPercentWithOptionalServiceMode(
     const { dineIn, offPremise } = dineInAndOffPremiseVatRates(tenantDefaultPct, country)
     return serviceMode === 'DINE_IN' ? dineIn : offPremise
   }
-  return resolveVatPercentForCategoryAndOrderType(categoryOverride, tenantDefaultPct, orderType, country)
+  return resolveVatPercentForCategoryAndOrderType(
+    categoryOverride,
+    tenantDefaultPct,
+    orderType,
+    country,
+    tenantSlug,
+    vatCtx,
+  )
 }
 
 /** Kassa-regel: popup Meenemen/Ter plaatse wijzigt BTW; anders besteltype. */
@@ -394,7 +417,10 @@ export function resolveVatPercentForCartLine(
   productCategoryById?: Map<string, string | null>,
   country?: string | null,
   choices?: ReadonlyArray<{ choiceName?: string; optionName?: string; name?: string } | null> | null,
+  tenantSlug?: string | null,
 ): CategoryVatPercent {
+  const lagoonUniform = lagoonUniformVatIfApplicable(tenantSlug, null)
+  if (lagoonUniform != null) return lagoonUniform
   const categoryId = resolveCategoryIdForVatProduct(product, productCategoryById)
   let override = categoryId != null ? categoryById.get(categoryId) : undefined
   if (isBelgiumVatJurisdiction(country) && looksLikeBelgiumDrinkName(product.name)) {
@@ -406,6 +432,8 @@ export function resolveVatPercentForCartLine(
     orderType,
     country,
     vatServiceModeFromCartChoices(choices),
+    tenantSlug,
+    null,
   )
 }
 
@@ -511,6 +539,8 @@ function resolveLineVatRate(
 ): CategoryVatPercent {
   const fb = normalizeCategoryVatPercent(tenantDefaultPct, 21)
 
+  if (ctx?.forceUniformVat21) return 21
+
   const country = ctx?.tenantCountry
   const serviceMode = vatServiceModeFromOrderItemOptions(line.options)
   if (isBelgiumVatJurisdiction(country) && looksLikeBelgiumDrinkName(lineDisplayNameForVat(line))) {
@@ -525,6 +555,8 @@ function resolveLineVatRate(
       orderType,
       country,
       serviceMode,
+      null,
+      ctx,
     )
   }
 
@@ -554,7 +586,7 @@ function resolveLineVatRate(
     }
   }
 
-  if (itemHasExplicitBtw(line)) return lineVatRate(line, fb)
+  if (itemHasExplicitBtw(line) && !ctx?.forceUniformVat21) return lineVatRate(line, fb)
 
   return resolveVatPercentWithOptionalServiceMode(
     undefined,
@@ -562,6 +594,8 @@ function resolveLineVatRate(
     orderType,
     country,
     serviceMode,
+    null,
+    ctx,
   )
 }
 
@@ -574,7 +608,14 @@ export function resolveVatRateForOrderItem(
 ): CategoryVatPercent {
   const country = ctx?.tenantCountry
   if (!item || typeof item !== 'object') {
-    return resolveVatPercentForCategoryAndOrderType(undefined, tenantDefaultPct, orderType, country)
+    return resolveVatPercentForCategoryAndOrderType(
+      undefined,
+      tenantDefaultPct,
+      orderType,
+      country,
+      null,
+      ctx,
+    )
   }
   return resolveLineVatRate(item as Record<string, unknown>, tenantDefaultPct, orderType, ctx)
 }
@@ -623,6 +664,8 @@ export function listOrderVatGrossSlices(
     tenantDefaultPct,
     orderType,
     country,
+    null,
+    ctx,
   )
   const orderTotal = round2(Number(order.total) || 0)
   const items = parseItems(order.items)

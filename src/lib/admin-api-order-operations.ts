@@ -15,6 +15,7 @@ import {
   shopMustHideUnpaidOnlineWebshopOrder,
   type Order,
 } from './admin-api-order-helpers'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import { fetchZReportVatContextFromSupabase } from './z-report-vat-context'
 import {
   buildZReportDayAmountsFromOrders,
@@ -338,7 +339,7 @@ export async function regenerateZReportForDate(
       }
     }
 
-    const btwPercentage = settings?.btw_percentage || 6
+    const btwPercentage = resolveTenantBtwPercentage(tenantSlug, settings?.btw_percentage, 6)
     const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
 
     const amounts = buildZReportDayAmountsFromOrders(orders, btwPercentage, vatContext)

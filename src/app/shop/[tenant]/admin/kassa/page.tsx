@@ -393,6 +393,11 @@ import {
   dineInAndOffPremiseVatRates,
   resolveVatPercentForCartLine,
 } from '@/lib/order-vat'
+import {
+  lagoonForcesUniformVat21,
+  resolveTenantBtwPercentage,
+  THE_LAGOON_UNIFORM_VAT_PERCENT,
+} from '@/lib/lagoon-vat'
 import { normalizeKassaCheckoutVatMode } from '@/lib/kassa-checkout-vat-mode'
 import { sortKassaCartLinesByMenuCategory } from '@/lib/kassa-cart-grouping'
 import {
@@ -2218,8 +2223,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const kassaFooterDrawerButton = kassaShowsDrawerInsteadOfBtwBon(tenantInfo)
 
   const tenantDefaultBtw = useMemo(
-    () => normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21),
-    [tenantInfo?.btw_percentage],
+    () => resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6),
+    [tenant, tenantInfo?.btw_percentage],
   )
   const tenantCountry = inferVatJurisdictionCountry(
     tenantInfo?.country,
@@ -2232,10 +2237,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   )
   const productCategoryById = useMemo(() => buildProductCategoryLookup(products), [products])
   const checkoutVatMode = normalizeKassaCheckoutVatMode(tenantInfo?.kassa_checkout_vat_mode)
-  const checkoutVatRates = useMemo(
-    () => dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry),
-    [tenantDefaultBtw, tenantCountry],
-  )
+  const checkoutVatRates = useMemo(() => {
+    if (lagoonForcesUniformVat21(tenant)) {
+      return {
+        dineIn: THE_LAGOON_UNIFORM_VAT_PERCENT,
+        offPremise: THE_LAGOON_UNIFORM_VAT_PERCENT,
+      }
+    }
+    return dineInAndOffPremiseVatRates(tenantDefaultBtw, tenantCountry)
+  }, [tenant, tenantDefaultBtw, tenantCountry])
   const openPaymentFlow = useCallback(() => {
     if (kassaJetonEnabled && kassaJetonSalePoint === 'bar') {
       setShowJetonPaymentModal(true)
@@ -2280,8 +2290,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         productCategoryById,
         tenantCountry,
         line.choices,
+        tenant,
       ),
-    [categoryVatLookup, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
+    [categoryVatLookup, tenant, tenantDefaultBtw, orderType, productCategoryById, tenantCountry],
   )
 
   useEffect(() => {
@@ -4064,7 +4075,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         .split('-')
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ')
-    const fallbackVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
+    const fallbackVatRate = resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6)
     const totalInclVat = Math.round(payableTotal * 100) / 100
 
     let msg: KassaCustomerDisplayMessage
@@ -4565,6 +4576,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         freshProductCategoryById,
         tenantCountry,
         line.choices,
+        tenant,
       )
     const vatSplit = computeInclusiveVatSplitFromCart(linesForVat, resolveLineVatAtCheckout)
     if (Math.abs(vatSplit.grossTotal - chargeTotal) > 0.03) {
@@ -4893,7 +4905,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }
 
     try {
-    const fbVatRate = normalizeCategoryVatPercent(tenantInfo?.btw_percentage ?? 6, 21)
+    const fbVatRate = resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6)
     let receiptVatComputed = kassaReceiptVatFromPersistedOrder(order)
     if (!receiptVatComputed && order.items.length > 0) {
       let catsForVat = categories
@@ -4919,6 +4931,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         tenantDefaultBtw,
         order.orderType,
         tenantCountry,
+        tenant,
       )
     }
     const subtotal = receiptVatComputed
@@ -5007,6 +5020,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           buildProductCategoryLookup(products),
           tenantCountry,
           line.choices,
+          tenant,
         ),
       )
       bonLines.push(

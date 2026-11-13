@@ -21,11 +21,11 @@ import {
 import { validateNameTabPaymentRequest } from '@/lib/kassa-name-account-guard'
 import { insertKassaOrderForNameAccountPayment } from '@/lib/kassa-name-account-order'
 import { syncZReportAfterOrderSafe } from '@/lib/kassa-z-sync-safe'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import {
   buildCategoryVatLookupForJurisdiction,
   buildProductCategoryLookup,
   inferVatJurisdictionCountry,
-  normalizeCategoryVatPercent,
 } from '@/lib/order-vat'
 
 /** Registreer betaling op open tab → betaalde order + tab bijwerken (Z/verkoop op betaaldatum). */
@@ -98,7 +98,7 @@ export async function registerKassaNameTabPayment(params: {
         getMenuCategories(tenantSlug),
         getMenuProducts(tenantSlug),
       ])
-  const btw = normalizeCategoryVatPercent(settings?.btw_percentage ?? 6, 21)
+  const btw = resolveTenantBtwPercentage(tenantSlug, settings?.btw_percentage, 6)
   const tenantCountry = inferVatJurisdictionCountry(settings?.country, settings?.btw_number, btw) ?? 'BE'
   const cats = dedupeCatalogById(catsRaw.filter((c) => c.is_active))
   const prods = dedupeCatalogById(prodsRaw.filter((p) => p.is_active))

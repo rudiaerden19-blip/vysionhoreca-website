@@ -16,6 +16,7 @@ import {
   type CashbookVatLine,
 } from '@/lib/cashbook-calc'
 import { orderCountsTowardRevenueAndZReport } from '@/lib/admin-api-order-helpers'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import {
   businessDayForOrder,
@@ -157,7 +158,11 @@ export async function loadCashbookDay(
     if (!orderBelongsToCashbookDay(String(row.created_at || ''), bookDate, hours)) return false
     return orderCountsTowardRevenueAndZReport(row as never)
   })
-  const defaultBtw = Number((settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage) || 6
+  const defaultBtw = resolveTenantBtwPercentage(
+    tenantSlug,
+    (settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage,
+    6,
+  )
   const vatAgg = aggregateZReportVatFromOrderRows(
     counting.map((row) => ({
       total: row.total,
@@ -666,7 +671,11 @@ export async function loadCashbookRange(
       .select('date, date_end, reason, holiday_key')
       .eq('tenant_slug', tenantSlug),
   ])
-  const defaultBtw = Number((settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage) || 6
+  const defaultBtw = resolveTenantBtwPercentage(
+    tenantSlug,
+    (settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage,
+    6,
+  )
   const closings = missingTable(closingRes.error)
     ? []
     : ((closingRes.data || []) as Array<{ date: string; date_end?: string | null; reason?: string | null; holiday_key?: string | null }>)

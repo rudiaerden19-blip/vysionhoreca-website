@@ -24,6 +24,7 @@ import {
   monthBoundsUtc,
   sumZReportMonthAmounts,
 } from '@/lib/z-report-month'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
 import {
   shouldKeepOwnerEveningCloseTotals,
@@ -142,7 +143,7 @@ export async function auditTenantZReports(
     ownerSetting?.z_report_owner_evening_close,
   )
 
-  const btw = Number(settings?.btw_percentage) || 6
+  const btw = resolveTenantBtwPercentage(tenantSlug, settings?.btw_percentage, 6)
   const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
   const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
 

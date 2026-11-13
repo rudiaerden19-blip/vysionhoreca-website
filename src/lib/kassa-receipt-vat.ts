@@ -95,6 +95,7 @@ export function computeKassaReceiptVatFromCartLines(
   tenantDefaultBtw: number,
   orderType: KassaRegisterOrderType,
   tenantCountry: string | null,
+  tenantSlug?: string | null,
 ): KassaReceiptVatComputed {
   const categoryVatLookup = buildCategoryVatLookupForJurisdiction(categories, tenantCountry)
   const productCategoryById = buildProductCategoryLookup(products)
@@ -108,6 +109,7 @@ export function computeKassaReceiptVatFromCartLines(
       productCategoryById,
       tenantCountry,
       line.choices,
+      tenantSlug,
     ),
   )
   return {

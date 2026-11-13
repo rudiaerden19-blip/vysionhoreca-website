@@ -6,6 +6,7 @@ describe('aggregateZReportVatFromOrderRows', () => {
   const drinkCatId = 'cat-drink'
 
   const ctx = buildCtx(
+    'demo-frituur',
     [
       { id: foodCatId, default_btw_percentage: 6 },
       { id: drinkCatId, default_btw_percentage: 21 },
@@ -40,6 +41,7 @@ describe('aggregateZReportVatFromOrderRows', () => {
 
   it('eten ter plaatse 12% vs afhalen 6% als categorie zaak-tarief gebruikt', () => {
     const ctxTenantFood = buildCtx(
+      'demo-frituur',
       [
         { id: foodCatId, default_btw_percentage: null },
         { id: drinkCatId, default_btw_percentage: 21 },
@@ -96,6 +98,7 @@ describe('aggregateZReportVatFromOrderRows', () => {
 
   it('BE-zaak (6% default): meenemen-drank op Z is 6%, ter plaatse-drank 21%', () => {
     const beCtx = buildCtx(
+      'demo-frituur',
       [
         { id: foodCatId, name: 'Eten', default_btw_percentage: null },
         { id: drinkCatId, name: 'Dranken', default_btw_percentage: 21 },
@@ -139,6 +142,7 @@ describe('aggregateZReportVatFromOrderRows', () => {
 
   it('NL-zaak: meenemen-drank blijft 21%', () => {
     const nlCtx = buildCtx(
+      'demo-frituur',
       [
         { id: drinkCatId, name: 'Dranken', default_btw_percentage: 21 },
       ],
@@ -161,5 +165,33 @@ describe('aggregateZReportVatFromOrderRows', () => {
     expect(nlCtx.tenantCountry).toBe('NL')
     expect(agg.taxByRate[21]).toBeGreaterThan(0)
     expect(agg.taxByRate[6] || 0).toBe(0)
+  })
+
+  it('thelagoon: alles 21% ongeacht BE-split of oude bonregels met 6%', () => {
+    const lagoonCtx = buildCtx(
+      'thelagoon',
+      [{ id: foodCatId, default_btw_percentage: null }],
+      [{ id: 'p-friet', name: 'Middelfriet', category_id: foodCatId }],
+      'BE',
+      'BE0123456789',
+      6,
+    )
+    expect(lagoonCtx.forceUniformVat21).toBe(true)
+    const agg = aggregateZReportVatFromOrderRows(
+      [
+        {
+          total: 6,
+          order_type: 'TAKEAWAY',
+          items: [
+            { name: 'Middelfriet', quantity: 1, price: 6, btw_percentage: 6, product_id: 'p-friet' },
+          ],
+        },
+      ],
+      6,
+      lagoonCtx,
+    )
+    expect(agg.taxByRate[21]).toBeGreaterThan(0)
+    expect(agg.taxByRate[6] || 0).toBe(0)
+    expect(agg.taxByRate[12] || 0).toBe(0)
   })
 })

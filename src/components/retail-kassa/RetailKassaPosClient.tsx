@@ -597,13 +597,14 @@ export function RetailKassaPosClient({ tenant }: { tenant: string }) {
   const saleVatContext = useMemo(
     () =>
       buildZReportVatContext(
+        tenant,
         saleCategories,
         skus.map((sku) => ({ id: sku.productId, category_id: sku.category_id, name: sku.name })),
         tenantInfo?.country,
         tenantInfo?.btw_number,
         tenantInfo?.btw_percentage,
       ),
-    [saleCategories, skus, tenantInfo],
+    [tenant, saleCategories, skus, tenantInfo],
   )
 
   const cartForPrice = useMemo(

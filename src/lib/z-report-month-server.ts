@@ -7,6 +7,7 @@ import type { Order } from '@/lib/admin-api-order-helpers'
 import { fetchAllOrdersInCreatedAtRange } from '@/lib/admin-api-order-operations'
 import { getBelgiumDateString } from '@/lib/belgium-date-bounds'
 import { fetchOpeningHoursForTenant } from '@/lib/tenant-business-day'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import { fetchZReportVatContextFromSupabase } from '@/lib/z-report-vat-context'
 import {
   buildZReportMonthDayRows,
@@ -92,7 +93,7 @@ export async function buildZReportMonthFromSupabase(
     .eq('tenant_slug', tenantSlug)
     .maybeSingle()
 
-  const btwPercentage = Number(settings?.btw_percentage) || 6
+  const btwPercentage = resolveTenantBtwPercentage(tenantSlug, settings?.btw_percentage, 6)
 
   const hours = await fetchOpeningHoursForTenant(client, tenantSlug)
   const { startUTC, endUTC } = monthBoundsUtc(yearMonth, cap, hours)

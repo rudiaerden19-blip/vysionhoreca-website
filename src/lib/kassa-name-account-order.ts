@@ -74,6 +74,7 @@ export async function insertKassaOrderForNameAccountPayment(params: {
       productCategoryById,
       tenantCountry,
       line.choices,
+      tenantSlug,
     )
   const vatSplit = computeInclusiveVatSplitFromCart(hydrated, resolveLineVat)
   const total = Math.round(vatSplit.grossTotal * 100) / 100

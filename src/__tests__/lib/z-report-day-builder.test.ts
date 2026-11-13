@@ -5,6 +5,7 @@ import type { Order } from '@/lib/admin-api-order-helpers'
 describe('buildZReportDayAmountsFromOrders', () => {
   const foodCatId = 'cat-food'
   const ctx = buildZReportVatContext(
+    'demo-frituur',
     [{ id: foodCatId, default_btw_percentage: 6 }],
     [{ id: 'p1', name: 'Friet', category_id: foodCatId }],
   )

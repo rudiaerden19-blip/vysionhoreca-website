@@ -70,6 +70,7 @@ describe('aggregateZReportArticleLines', () => {
 
   it('splitst dezelfde artikel bij verschillend BTW-tarief', () => {
     const ctx = buildZReportVatContext(
+      'demo-frituur',
       [
         { id: 'food', default_btw_percentage: null },
         { id: 'drink', default_btw_percentage: 21 },

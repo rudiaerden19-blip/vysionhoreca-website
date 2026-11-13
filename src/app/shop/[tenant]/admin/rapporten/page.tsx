@@ -28,6 +28,7 @@ import {
   type ZReportVatContext,
 } from '@/lib/z-report-vat-context'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
+import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 import { authFetch } from '@/lib/auth-headers'
 
@@ -170,6 +171,7 @@ const EXPORT_PERIOD_LABEL_NL: Record<ExportPeriod, string> = {
 }
 
 function computeOmzetOverviewSnapshot(
+  tenantSlug: string,
   exportPeriod: ExportPeriod,
   validOrders: Order[],
   tenantInfo: TenantInfo | null,
@@ -185,7 +187,7 @@ function computeOmzetOverviewSnapshot(
     cash += d.cash
     card += d.card + d.online
   }
-  const defaultBtwPdf = tenantInfo?.btw_percentage ?? 6
+  const defaultBtwPdf = resolveTenantBtwPercentage(tenantSlug, tenantInfo?.btw_percentage, 6)
   const vatAggPdf = aggregateZReportVatFromOrderRows(
     exp.map((o) => ({
       total: o.total,
@@ -752,10 +754,10 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
           items: (o as { items?: unknown }).items,
           order_type: o.order_type,
         })),
-        tenantInfo?.btw_percentage ?? 6,
+        resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6),
         vatContext,
       ),
-    [xOrders, tenantInfo?.btw_percentage, vatContext],
+    [xOrders, tenant, tenantInfo?.btw_percentage, vatContext],
   )
 
   const xData = useMemo(() => {
@@ -781,7 +783,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     }
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
-    const defaultBtw = tenantInfo?.btw_percentage ?? 6
+    const defaultBtw = resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6)
     const xFrom = lastZGeneratedAt ? new Date(lastZGeneratedAt) : startOfDay(now)
     const xTo = new Date(now)
     xTo.setDate(xTo.getDate() + 2)
@@ -857,6 +859,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const end = new Date()
     end.setDate(end.getDate() + 2)
     const snapshot = computeOmzetOverviewSnapshot(
+      tenant,
       exportPeriod,
       (await ensureOrders(from, end, true)).filter(isValidOrder),
       tenantInfo,
@@ -937,6 +940,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const end = new Date()
     end.setDate(end.getDate() + 2)
     const { exp, totalRev, cash, card, vatAggPdf } = computeOmzetOverviewSnapshot(
+      tenant,
       exportPeriod,
       (await ensureOrders(from, end, true)).filter(isValidOrder),
       tenantInfo,
