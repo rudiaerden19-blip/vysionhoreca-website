@@ -117,7 +117,11 @@ import {
   shouldFetchProductOptionsFallback,
 } from '@/lib/kassa-menu-product-options'
 import { createKassaThemeForLayout } from '@/lib/kassa-pos-register-ui-theme'
-import { kassaClassicTileBlueClass } from '@/lib/kassa-classic-tiles'
+import {
+  kassaClassicMenuTileInteractionClass,
+  kassaClassicTileBlueClass,
+  ohGreenClassicFlatMenuTiles,
+} from '@/lib/kassa-classic-tiles'
 import {
   KASSA_LIGHT_BTN_FACE,
   KASSA_LIGHT_BTN_FACE_ON,
@@ -927,6 +931,7 @@ type KassaCategoryTileButtonProps = {
   posLuxuryAppearance?: boolean
   classicDarkAppearance?: boolean
   speelsAppearance?: boolean
+  classicFlatChrome?: boolean
 }
 
 const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
@@ -938,6 +943,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
   posLuxuryAppearance = false,
   classicDarkAppearance = false,
   speelsAppearance = false,
+  classicFlatChrome = false,
 }: KassaCategoryTileButtonProps) {
   const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance, speelsAppearance)
   if (look === 'dark') {
@@ -945,7 +951,7 @@ const KassaCategoryTileButton = memo(function KassaCategoryTileButton({
       <button
         type="button"
         data-kassa-category-id={category.id != null ? String(category.id) : undefined}
-        className={`relative overflow-hidden touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left ${KASSA_MENU_TILE_TOUCH_PRESS} ${KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY} ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+        className={`relative overflow-hidden touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 items-center justify-center rounded-xl px-2 py-3 text-left ${kassaClassicMenuTileInteractionClass(classicFlatChrome)} ${kassaClassicTileBlueClass(tileIndex, classicGridCols, classicFlatChrome)}`}
       >
         <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {category.name}
@@ -1085,6 +1091,7 @@ type KassaProductTileButtonProps = {
   posLuxuryAppearance?: boolean
   classicDarkAppearance?: boolean
   speelsAppearance?: boolean
+  classicFlatChrome?: boolean
 }
 
 const KassaProductTileButton = memo(function KassaProductTileButton({
@@ -1097,6 +1104,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
   posLuxuryAppearance = false,
   classicDarkAppearance = false,
   speelsAppearance = false,
+  classicFlatChrome = false,
 }: KassaProductTileButtonProps) {
   const { t } = useLanguage()
   const look = kassaTileLook(posLuxuryAppearance, classicDarkAppearance, speelsAppearance)
@@ -1105,7 +1113,7 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
       <button
         type="button"
         data-kassa-product-id={product.id != null ? String(product.id) : undefined}
-        className={`relative overflow-hidden touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left ${KASSA_MENU_TILE_TOUCH_PRESS} ${KASSA_MENU_TILE_TOUCH_PRESS_OVERLAY} ${kassaClassicTileBlueClass(tileIndex, classicGridCols)}`}
+        className={`relative overflow-hidden touch-manipulation select-none flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-3 text-left ${kassaClassicMenuTileInteractionClass(classicFlatChrome)} ${kassaClassicTileBlueClass(tileIndex, classicGridCols, classicFlatChrome)}`}
       >
         <p className={sxgaDenseTileLayout ? KASSA_CLASSIC_TILE_NAME_SXGA : KASSA_CLASSIC_TILE_NAME}>
           {product.name}
@@ -1114,7 +1122,11 @@ const KassaProductTileButton = memo(function KassaProductTileButton({
           €{Number(product.price ?? 0).toFixed(2)}
         </span>
         {inCart > 0 ? (
-          <div className="absolute top-1.5 right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white shadow-md">
+          <div
+            className={`absolute top-1.5 right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white ${
+              classicFlatChrome ? '' : 'shadow-md'
+            }`}
+          >
             {inCart}
           </div>
         ) : null}
@@ -3848,6 +3860,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     [billLines],
   )
   const ohGreenKassa = isOhGreenKassaTenant(tenant, tenantInfo?.business_name)
+  const ohGreenClassicFlatTiles = ohGreenClassicFlatMenuTiles(
+    tenant,
+    kassaClassicDark,
+    tenantInfo?.business_name,
+  )
   const [ticketDiscountOn, setTicketDiscountOn] = useState(false)
   const ticketDiscountActive = ohGreenKassa && ticketDiscountOn && total > 0
   const ticketDiscount = useMemo(
@@ -6999,6 +7016,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                         posLuxuryAppearance={kassaPosLuxury}
                         classicDarkAppearance={kassaClassicDark}
                         speelsAppearance={kassaLayout === 'speels'}
+                        classicFlatChrome={ohGreenClassicFlatTiles}
                       />
                     )
                   })}
@@ -7056,6 +7074,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                           posLuxuryAppearance={kassaPosLuxury}
                           classicDarkAppearance={kassaClassicDark}
                           speelsAppearance={kassaLayout === 'speels'}
+                          classicFlatChrome={ohGreenClassicFlatTiles}
                         />
                       )
                     })}
