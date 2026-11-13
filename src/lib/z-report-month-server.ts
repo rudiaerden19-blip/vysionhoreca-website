@@ -133,6 +133,7 @@ export async function buildZReportMonthFromSupabase(
     hours,
     ownerByDate,
     shifts,
+    tenantSlug,
   )
 
   return {

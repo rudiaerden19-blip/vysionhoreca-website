@@ -2527,6 +2527,7 @@
       "categoryVatTypicalRatesHint": "ヒント — 飲食店では例として、飲食・清涼飲料は9%、アルコール飲料は21%と設定することが多いです。不明な場合は税理士または税務署にご確認ください。",
       "categoryVatShort": "消費税",
       "categoryVatUseTenant": "店舗デフォルト",
+      "lagoonCategoryVatLocked": "The Lagoon：カテゴリ消費税は21%固定",
       "categoryImageHelp": "任意 — 商品と同じメディアライブラリとアップロードです。",
       "deleteCategory": "カテゴリを削除"
     },

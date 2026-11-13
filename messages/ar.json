@@ -2527,6 +2527,7 @@
       "categoryVatTypicalRatesHint": "تلميح — شائع في قطاع المطاعم: الطعام والمشروبات غير الكحولية غالبًا 9٪؛ المشروبات الكحولية غالبًا 21٪. عند الشك استشر محاسبك أو الجهة الضريبية.",
       "categoryVatShort": "الضريبة",
       "categoryVatUseTenant": "الافتراضي للمنشأة",
+      "lagoonCategoryVatLocked": "The Lagoon: ضريبة الفئة ثابتة عند 21%",
       "categoryImageHelp": "اختياري — نفس مكتبة الوسائط والرفع كما في المنتجات.",
       "deleteCategory": "حذف الفئة"
     },

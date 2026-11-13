@@ -2527,6 +2527,7 @@
       "categoryVatTypicalRatesHint": "提示 — 餐饮行业常见做法：餐食与软饮料选 9%；酒精饮料选 21%。如有疑问请咨询会计师或税务部门。",
       "categoryVatShort": "增值税",
       "categoryVatUseTenant": "店铺默认",
+      "lagoonCategoryVatLocked": "The Lagoon：分类增值税固定为 21%",
       "categoryImageHelp": "可选 — 与商品相同的媒体库与上传方式。",
       "deleteCategory": "删除分类"
     },

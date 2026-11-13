@@ -342,7 +342,13 @@ export async function regenerateZReportForDate(
     const btwPercentage = resolveTenantBtwPercentage(tenantSlug, settings?.btw_percentage, 6)
     const vatContext = await fetchZReportVatContextFromSupabase(client, tenantSlug)
 
-    const amounts = buildZReportDayAmountsFromOrders(orders, btwPercentage, vatContext)
+    const amounts = buildZReportDayAmountsFromOrders(
+      orders,
+      btwPercentage,
+      vatContext,
+      undefined,
+      tenantSlug,
+    )
 
     const manualTotal = Number(selfRow?.manual_total) || 0
     const ownerFilled =

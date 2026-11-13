@@ -2027,6 +2027,7 @@
       "categoryVatTypicalRatesHint": "Conseil — courant en restauration : aliments et boissons non alcoolisées 9 % ; boissons alcoolisées 21 %. En cas de doute, vérifiez avec votre comptable ou l’administration fiscale.",
       "categoryVatShort": "TVA",
       "categoryVatUseTenant": "Standard établissement",
+      "lagoonCategoryVatLocked": "The Lagoon : TVA catégorie fixée à 21 %",
       "categoryImageHelp": "Facultatif — même médiathèque et envoi que pour les produits.",
       "deleteCategory": "Supprimer la catégorie"
     },

@@ -117,6 +117,7 @@ function buildDayRowFromOrders(
   vatContext: ZReportVatContext,
   manual?: ManualDayExtras | null,
   owner?: ZReportOwnerCloseInput | null,
+  tenantSlug?: string,
 ): ZReportMonthDayRow | null {
   if (hasOwnerCloseValues(owner)) {
     const o = ownerCloseToAmounts(owner!, dayOrders.length)
@@ -133,7 +134,13 @@ function buildDayRowFromOrders(
     }
   }
 
-  const amounts = buildZReportDayAmountsFromOrders(dayOrders, tenantDefaultBtw, vatContext, manual)
+  const amounts = buildZReportDayAmountsFromOrders(
+    dayOrders,
+    tenantDefaultBtw,
+    vatContext,
+    manual,
+    tenantSlug,
+  )
 
   if (amounts.orderCount === 0 && amounts.manualTotalIncl <= 0) return null
 
@@ -162,6 +169,7 @@ export function buildZReportMonthDayRows(
   hours: TenantHourRow[] = [],
   ownerByDate?: Record<string, ZReportOwnerCloseInput>,
   shifts: ShiftReportClose[] = [],
+  tenantSlug?: string,
 ): ZReportMonthDayRow[] {
   const counted = orders.filter((o) =>
     orderCountsTowardRevenueAndZReport(
@@ -188,7 +196,15 @@ export function buildZReportMonthDayRows(
     const dayOrders = byDate.get(date) || []
     const manual = manualByDate?.[date]
     const owner = ownerByDate?.[date]
-    const row = buildDayRowFromOrders(date, dayOrders, tenantDefaultBtw, vatContext, manual, owner)
+    const row = buildDayRowFromOrders(
+      date,
+      dayOrders,
+      tenantDefaultBtw,
+      vatContext,
+      manual,
+      owner,
+      tenantSlug,
+    )
     if (row) rows.push(row)
   }
 

@@ -1,5 +1,8 @@
 import { supabase } from './supabase'
-import { lagoonMenuCategoryDefaultBtwOnSave } from '@/lib/lagoon-vat'
+import {
+  lagoonMenuCategoryDefaultBtwOnSave,
+  normalizeLagoonMenuCategoriesForRead,
+} from '@/lib/lagoon-vat'
 import { cache, CACHE_TTL, cacheKey } from './cache'
 import { throwIfSupabaseFetchAborted } from './admin-api-internal'
 import { adminDb } from './admin-db-client'
@@ -68,7 +71,7 @@ export async function getMenuCategories(tenantSlug: string): Promise<MenuCategor
         console.error('Error fetching menu categories:', error)
         return []
       }
-      return dedupeCatalogById(data || [])
+      return normalizeLagoonMenuCategoriesForRead(tenantSlug, dedupeCatalogById(data || []))
     },
     CACHE_TTL.MENU_CATEGORIES,
   )

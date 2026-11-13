@@ -10,6 +10,7 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { recordAudit, auditRequestMeta, type AuditActorType } from '@/lib/audit-log'
 import { logger } from '@/lib/logger'
+import { lagoonMenuCategoryDefaultBtwOnSave } from '@/lib/lagoon-vat'
 
 const CategoryVatSchema = z.union([z.literal(6), z.literal(9), z.literal(12), z.literal(21)])
 
@@ -75,7 +76,10 @@ export async function POST(req: NextRequest) {
             description: cat.description ?? '',
             sort_order: cat.sort_order,
             is_active: cat.is_active,
-            default_btw_percentage: cat.default_btw_percentage,
+            default_btw_percentage: lagoonMenuCategoryDefaultBtwOnSave(
+              tenantSlug,
+              cat.default_btw_percentage,
+            ),
             image_url: cat.image_url ?? '',
           }
           const { data: updated, error } = await supabase

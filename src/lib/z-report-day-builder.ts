@@ -8,6 +8,7 @@ import {
   orderCountsTowardRevenueAndZReport,
   type Order,
 } from '@/lib/admin-api-order-helpers'
+import { aggregateZReportVatForTenant } from '@/lib/lagoon-vat'
 import {
   aggregateZReportVatFromOrderRows,
   type CategoryVatPercent,
@@ -76,6 +77,7 @@ export function buildZReportDayAmountsFromOrders(
   tenantDefaultBtw: number,
   vatContext: ZReportVatContext,
   manual?: ZReportManualExtras | null,
+  tenantSlug?: string,
 ): ZReportDayAmounts {
   const counted = filterCountedOrders(orders)
 
@@ -96,11 +98,10 @@ export function buildZReportDayAmountsFromOrders(
 
   const manualTotalIncl = round2(Number(manual?.total) || 0)
 
-  const vatAgg = aggregateZReportVatFromOrderRows(
-    toVatSlices(counted),
-    tenantDefaultBtw,
-    vatContext,
-  )
+  const vatAgg =
+    tenantSlug != null && tenantSlug !== ''
+      ? aggregateZReportVatForTenant(tenantSlug, toVatSlices(counted), tenantDefaultBtw, vatContext)
+      : aggregateZReportVatFromOrderRows(toVatSlices(counted), tenantDefaultBtw, vatContext)
 
   return {
     orderCount: counted.length,

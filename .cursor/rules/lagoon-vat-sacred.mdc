@@ -5,7 +5,8 @@
 ## Enige toegestane aanpak
 
 1. **Lezen/schrijven zaak-BTW:** `src/lib/lagoon-vat.ts` — `resolveTenantBtwPercentage`, `normalizeLagoonTenantSettingsForRead`, `lagoonTenantSettingsBeforeUpsert`.
-2. **Z-aggregatie / oude bonregels:** `ZReportVatContext.forceUniformVat21` via `buildZReportVatContext(tenantSlug, …)`.
+2. **Z-aggregatie / rapporten:** `aggregateZReportVatForTenant(tenantSlug, …)` — **niet** rechtstreeks `aggregateZReportVatFromOrderRows` zonder Lagoon-seal.
+3. **Z-aggregatie / oude bonregels:** `ZReportVatContext.forceUniformVat21` via `buildZReportVatContext(tenantSlug, …)` of `sealZReportVatContextForTenant`.
 3. **Kassa-regels:** `resolveVatPercentForCartLine(…, tenantSlug)` + `lagoonUniformVatIfApplicable`.
 
 ## Verplicht vóór commit (raakt BTW/order-vat/tenant_settings/menu_categories)

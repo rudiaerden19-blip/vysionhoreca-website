@@ -22,13 +22,17 @@ import {
   type ZReportOwnerCloseInput,
 } from '@/lib/z-report-owner-close'
 import { businessDayForOrder, getCurrentBusinessDay, listBusinessDaysEndingAt, orderReportDateForShift } from '@/lib/tenant-business-day'
-import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
 import {
   fetchZReportVatContextForTenant,
   type ZReportVatContext,
 } from '@/lib/z-report-vat-context'
 import { escapeHtml } from '@/lib/report-omzet-email-html'
-import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
+import {
+  aggregateZReportVatForTenant,
+  normalizeLagoonStoredZReportVat,
+  resolveTenantBtwPercentage,
+  sealZReportVatContextForTenant,
+} from '@/lib/lagoon-vat'
 import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
 import { authFetch } from '@/lib/auth-headers'
 
@@ -187,14 +191,14 @@ function computeOmzetOverviewSnapshot(
     cash += d.cash
     card += d.card + d.online
   }
-  const defaultBtwPdf = resolveTenantBtwPercentage(tenantSlug, tenantInfo?.btw_percentage, 6)
-  const vatAggPdf = aggregateZReportVatFromOrderRows(
+  const vatAggPdf = aggregateZReportVatForTenant(
+    tenantSlug,
     exp.map((o) => ({
       total: o.total,
       items: (o as { items?: unknown }).items,
       order_type: o.order_type,
     })),
-    defaultBtwPdf,
+    tenantInfo?.btw_percentage,
     vatContext,
   )
   return { exp, totalRev, cash, card, vatAggPdf }
@@ -340,9 +344,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         { start: windowStart.getTime(), end: windowEnd.getTime(), items: false },
       ]
       setOrders(loadedOrders)
-      setZReports((zData || []) as unknown as ZReport[])
+      setZReports(
+        ((zData || []) as unknown as ZReport[]).map((row) => normalizeLagoonStoredZReportVat(tenant, row)),
+      )
       setTenantInfo(info as TenantInfo)
-      setVatContext(vatCtx)
+      setVatContext(vatCtx ? sealZReportVatContextForTenant(tenant, vatCtx) : vatCtx)
 
       const settings = info as TenantSettings | null
       let opening = Number(settings?.report_register_opening_cash ?? 0)
@@ -748,13 +754,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const xVat = useMemo(
     () =>
-      aggregateZReportVatFromOrderRows(
+      aggregateZReportVatForTenant(
+        tenant,
         xOrders.map((o) => ({
           total: o.total,
           items: (o as { items?: unknown }).items,
           order_type: o.order_type,
         })),
-        resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6),
+        tenantInfo?.btw_percentage,
         vatContext,
       ),
     [xOrders, tenant, tenantInfo?.btw_percentage, vatContext],
@@ -783,7 +790,6 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     }
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
-    const defaultBtw = resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6)
     const xFrom = lastZGeneratedAt ? new Date(lastZGeneratedAt) : startOfDay(now)
     const xTo = new Date(now)
     xTo.setDate(xTo.getDate() + 2)
@@ -798,13 +804,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       xCard += d.card + d.online
     }
     const xTotal = xList.reduce((s, o) => s + o.total, 0)
-    const vatAgg = aggregateZReportVatFromOrderRows(
+    const vatAgg = aggregateZReportVatForTenant(
+      tenant,
       xList.map((o) => ({
         total: o.total,
         items: (o as { items?: unknown }).items,
         order_type: o.order_type,
       })),
-      defaultBtw,
+      tenantInfo?.btw_percentage,
       vatContext,
     )
 
@@ -820,7 +827,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
       cash_payments: xCash,
       card_payments: xCard,
       online_payments: 0,
-      btw_percentage: defaultBtw,
+      btw_percentage: resolveTenantBtwPercentage(tenant, tenantInfo?.btw_percentage, 6),
       generated_at: now.toISOString(),
       business_name: tenantInfo?.business_name || tenant,
     }, { tenantSlug: tenant, onConflict: 'tenant_slug,report_date'})

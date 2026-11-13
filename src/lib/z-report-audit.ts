@@ -238,13 +238,24 @@ export async function auditTenantZReports(
       }
     }
 
-    const monthRows = buildZReportMonthDayRows(orders, ym, capYmd, btw, vatContext, undefined, hours, undefined, shifts)
+    const monthRows = buildZReportMonthDayRows(
+      orders,
+      ym,
+      capYmd,
+      btw,
+      vatContext,
+      undefined,
+      hours,
+      undefined,
+      shifts,
+      tenantSlug,
+    )
     const monthSum = monthRows.length ? sumZReportMonthAmounts(monthRows) : null
 
     let computedMonthTotal = 0
     let computedMonthCount = 0
     for (const [, dayOrders] of byFiscal) {
-      const a = buildZReportDayAmountsFromOrders(dayOrders, btw, vatContext)
+      const a = buildZReportDayAmountsFromOrders(dayOrders, btw, vatContext, undefined, tenantSlug)
       computedMonthTotal = round2(computedMonthTotal + a.orderTotalIncl)
       computedMonthCount += a.orderCount
     }
@@ -268,7 +279,7 @@ export async function auditTenantZReports(
     }
 
     for (const [fiscalDate, dayOrders] of byFiscal) {
-      const amounts = buildZReportDayAmountsFromOrders(dayOrders, btw, vatContext)
+      const amounts = buildZReportDayAmountsFromOrders(dayOrders, btw, vatContext, undefined, tenantSlug)
       const z = zByDate.get(fiscalDate)
       const monthRow = monthRows.find((r) => r.date === fiscalDate)
 

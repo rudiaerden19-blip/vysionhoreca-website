@@ -2027,6 +2027,7 @@
       "categoryVatTypicalRatesHint": "Hinweis — in der Gastronomie oft üblich: Speisen und Erfrischungsgetränke 9 %; alkoholische Getränke 21 %. Bei Unsicherheit Steuerberater oder Finanzamt konsultieren.",
       "categoryVatShort": "MwSt.",
       "categoryVatUseTenant": "Betriebsstandard",
+      "lagoonCategoryVatLocked": "The Lagoon: Kategorie-MwSt. fest 21 %",
       "categoryImageHelp": "Optional — dieselbe Medienbibliothek und Uploads wie bei Produkten.",
       "deleteCategory": "Kategorie löschen"
     },

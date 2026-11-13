@@ -2865,6 +2865,7 @@
       "categoryVatTypicalRatesHint": "Tip — veelgebruikt in de sector: eten en frisdranken 9%; alcoholische dranken 21%. Controleer bij twijfel bij je boekhouder of het fiscaal centrum.",
       "categoryVatShort": "BTW",
       "categoryVatUseTenant": "Zaak standaard",
+      "lagoonCategoryVatLocked": "The Lagoon: categorie-BTW vast op 21%",
       "categoryImageHelp": "Optioneel — zelfde mediabibliotheek en upload als bij Producten.",
       "deleteCategory": "Categorie verwijderen"
     },

@@ -16,8 +16,7 @@ import {
   type CashbookVatLine,
 } from '@/lib/cashbook-calc'
 import { orderCountsTowardRevenueAndZReport } from '@/lib/admin-api-order-helpers'
-import { resolveTenantBtwPercentage } from '@/lib/lagoon-vat'
-import { aggregateZReportVatFromOrderRows } from '@/lib/order-vat'
+import { aggregateZReportVatForTenant } from '@/lib/lagoon-vat'
 import {
   businessDayForOrder,
   fetchOpeningHoursForTenant,
@@ -158,18 +157,14 @@ export async function loadCashbookDay(
     if (!orderBelongsToCashbookDay(String(row.created_at || ''), bookDate, hours)) return false
     return orderCountsTowardRevenueAndZReport(row as never)
   })
-  const defaultBtw = resolveTenantBtwPercentage(
+  const vatAgg = aggregateZReportVatForTenant(
     tenantSlug,
-    (settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage,
-    6,
-  )
-  const vatAgg = aggregateZReportVatFromOrderRows(
     counting.map((row) => ({
       total: row.total,
       items: row.items,
       order_type: row.order_type as string,
     })),
-    defaultBtw,
+    (settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage,
     vatCtx,
   )
   const day = storageReady ? (dayRes.data as Record<string, unknown> | null) : null
@@ -671,11 +666,6 @@ export async function loadCashbookRange(
       .select('date, date_end, reason, holiday_key')
       .eq('tenant_slug', tenantSlug),
   ])
-  const defaultBtw = resolveTenantBtwPercentage(
-    tenantSlug,
-    (settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage,
-    6,
-  )
   const closings = missingTable(closingRes.error)
     ? []
     : ((closingRes.data || []) as Array<{ date: string; date_end?: string | null; reason?: string | null; holiday_key?: string | null }>)
@@ -727,9 +717,10 @@ export async function loadCashbookRange(
       ? dayOrders.filter((row) => orderCountsTowardRevenueAndZReport(row as never))
       : []
     const vatAgg = withVat
-      ? aggregateZReportVatFromOrderRows(
+      ? aggregateZReportVatForTenant(
+          tenantSlug,
           counting.map((row) => ({ total: row.total, items: row.items, order_type: row.order_type as string })),
-          defaultBtw,
+          (settingsRes.data as { btw_percentage?: number } | null)?.btw_percentage,
           vatCtx,
         )
       : null

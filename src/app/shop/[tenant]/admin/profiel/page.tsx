@@ -520,27 +520,44 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="kassa-checkout-vat-mode">
                 Kassa: ter plaatse of meenemen
               </label>
-              <select
-                id="kassa-checkout-vat-mode"
-                name="kassa_checkout_vat_mode"
-                value={formData.kassa_checkout_vat_mode || 'off'}
-                onChange={(e) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    kassa_checkout_vat_mode: e.target.value,
-                  }))
-                  setSaved(false)
-                }}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              >
-                <option value="off">Uit — zoals nu (geen extra scherm)</option>
-                <option value="choose">Bij afrekenen kiezen — ter plaatse eten 12% / drank 21%, meenemen alles 6%</option>
-                <option value="dine_in">Alleen ter plaatse (eten 12%, drank 21%, geen extra tik)</option>
-                <option value="takeaway">Alleen meenemen (alles 6%, geen extra tik)</option>
-              </select>
-              <p className="text-xs text-gray-400 mt-1">
-                Alleen voor Belgische zaken die 12% en 6% splitsen. NL-zaken: Uit laten.
-              </p>
+              {isTheLagoonTenant(params.tenant) ? (
+                <>
+                  <select
+                    id="kassa-checkout-vat-mode"
+                    name="kassa_checkout_vat_mode"
+                    value="off"
+                    disabled
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-700 cursor-not-allowed"
+                  >
+                    <option value="off">Uit — vast 21% (The Lagoon)</option>
+                  </select>
+                  <p className="text-xs text-amber-700 mt-1">{t('adminPages.profiel.lagoonBtwLocked')}</p>
+                </>
+              ) : (
+                <>
+                  <select
+                    id="kassa-checkout-vat-mode"
+                    name="kassa_checkout_vat_mode"
+                    value={formData.kassa_checkout_vat_mode || 'off'}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        kassa_checkout_vat_mode: e.target.value,
+                      }))
+                      setSaved(false)
+                    }}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  >
+                    <option value="off">Uit — zoals nu (geen extra scherm)</option>
+                    <option value="choose">Bij afrekenen kiezen — ter plaatse eten 12% / drank 21%, meenemen alles 6%</option>
+                    <option value="dine_in">Alleen ter plaatse (eten 12%, drank 21%, geen extra tik)</option>
+                    <option value="takeaway">Alleen meenemen (alles 6%, geen extra tik)</option>
+                  </select>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Alleen voor Belgische zaken die 12% en 6% splitsen. NL-zaken: Uit laten.
+                  </p>
+                </>
+              )}
             </div>
 
           </div>

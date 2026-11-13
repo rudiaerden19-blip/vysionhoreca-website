@@ -363,6 +363,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       dayOrders,
       settingsBtw,
       vatContext,
+      undefined,
+      params.tenant,
     )
 
     let nextStats: DailyStats =
@@ -492,6 +494,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             reportDate: r.report_date,
             closedAt: r.is_closed ? r.closed_at ?? null : null,
           })),
+        params.tenant,
       )
       setMonthDayRows(days)
       setMonthAmounts(days.length ? sumZReportMonthAmounts(days) : null)
@@ -1178,6 +1181,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             reportDate: r.report_date,
             closedAt: r.is_closed ? r.closed_at ?? null : null,
           })),
+        params.tenant,
       )
 
       if (days.length === 0) {

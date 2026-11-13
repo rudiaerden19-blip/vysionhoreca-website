@@ -12,6 +12,8 @@ import {
   MenuCategory,
 } from '@/lib/admin-api'
 import { CATEGORY_VAT_PERCENT_OPTIONS } from '@/lib/order-vat'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import { THE_LAGOON_UNIFORM_VAT_PERCENT } from '@/lib/lagoon-vat'
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 import { useAdminConfirm } from '@/hooks/useAdminConfirm'
@@ -26,6 +28,7 @@ type CategoryRowProps = {
   updateName: (id: string, name: string) => void
   updateCategoryImage: (id: string, image_url: string) => void
   updateCategoryDefaultBtw: (id: string, value: string) => void
+  lagoonVatLocked: boolean
   toggleVisible: (id: string) => void
   handleDelete: (id: string) => void
   t: (key: string) => string
@@ -39,6 +42,7 @@ function CategoryReorderRow({
   updateName,
   updateCategoryImage,
   updateCategoryDefaultBtw,
+  lagoonVatLocked,
   toggleVisible,
   handleDelete,
   t,
@@ -107,26 +111,38 @@ function CategoryReorderRow({
           <label className="sr-only" htmlFor={`cat-btw-${category.id}`}>
             {t('adminPages.categorieen.categoryVatShort')}
           </label>
-          <select
-            id={`cat-btw-${category.id}`}
-            value={
-              category.default_btw_percentage === 6 ||
-              category.default_btw_percentage === 9 ||
-              category.default_btw_percentage === 12 ||
-              category.default_btw_percentage === 21
-                ? String(category.default_btw_percentage)
-                : 'tenant'
-            }
-            onChange={(e) => updateCategoryDefaultBtw(category.id!, e.target.value)}
-            className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-800 max-w-[9.5rem]"
-          >
-            <option value="tenant">{t('adminPages.categorieen.categoryVatUseTenant')}</option>
-            {CATEGORY_VAT_PERCENT_OPTIONS.map((p) => (
-              <option key={p} value={String(p)}>
-                {p}%
-              </option>
-            ))}
-          </select>
+          {lagoonVatLocked ? (
+            <select
+              id={`cat-btw-${category.id}`}
+              value={String(THE_LAGOON_UNIFORM_VAT_PERCENT)}
+              disabled
+              className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-gray-50 text-gray-600 max-w-[9.5rem] cursor-not-allowed"
+              title={t('adminPages.categorieen.lagoonCategoryVatLocked')}
+            >
+              <option value="21">21%</option>
+            </select>
+          ) : (
+            <select
+              id={`cat-btw-${category.id}`}
+              value={
+                category.default_btw_percentage === 6 ||
+                category.default_btw_percentage === 9 ||
+                category.default_btw_percentage === 12 ||
+                category.default_btw_percentage === 21
+                  ? String(category.default_btw_percentage)
+                  : 'tenant'
+              }
+              onChange={(e) => updateCategoryDefaultBtw(category.id!, e.target.value)}
+              className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-800 max-w-[9.5rem]"
+            >
+              <option value="tenant">{t('adminPages.categorieen.categoryVatUseTenant')}</option>
+              {CATEGORY_VAT_PERCENT_OPTIONS.map((p) => (
+                <option key={p} value={String(p)}>
+                  {p}%
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <span
@@ -275,7 +291,10 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
     setSaved(false)
   }
 
+  const lagoonVatLocked = isTheLagoonTenant(params.tenant)
+
   const updateCategoryDefaultBtw = (id: string, value: string) => {
+    if (lagoonVatLocked) return
     const next: number | null =
       value === '' || value === 'tenant'? null : parseInt(value, 10)
     setCategories((prev) =>
@@ -477,6 +496,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                 updateName={updateName}
                 updateCategoryImage={updateCategoryImage}
                 updateCategoryDefaultBtw={updateCategoryDefaultBtw}
+                lagoonVatLocked={lagoonVatLocked}
                 toggleVisible={toggleVisible}
                 handleDelete={handleDelete}
                 t={t}

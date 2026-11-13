@@ -2865,6 +2865,7 @@
       "categoryVatTypicalRatesHint": "Tip — common in hospitality: food and soft drinks 9%; alcoholic beverages 21%. If unsure, check with your accountant or tax office.",
       "categoryVatShort": "VAT",
       "categoryVatUseTenant": "Business default",
+      "lagoonCategoryVatLocked": "The Lagoon: category VAT locked at 21%",
       "categoryImageHelp": "Optional — same media library and upload as for products.",
       "deleteCategory": "Delete category"
     },

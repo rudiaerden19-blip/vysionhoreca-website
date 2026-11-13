@@ -2527,6 +2527,7 @@
       "categoryVatTypicalRatesHint": "Consejo — habitual en hostelería: comida y refrescos 9 %; bebidas alcohólicas 21 %. Si tienes dudas, consulta a tu asesor o a la administración tributaria.",
       "categoryVatShort": "IVA",
       "categoryVatUseTenant": "Estándar del local",
+      "lagoonCategoryVatLocked": "The Lagoon: IVA de categoría fijado al 21 %",
       "categoryImageHelp": "Opcional — misma biblioteca de medios y subida que en Productos.",
       "deleteCategory": "Eliminar categoría"
     },
