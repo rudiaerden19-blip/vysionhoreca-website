@@ -22,6 +22,7 @@ De **horeca-kassa** (`src/app/shop/[tenant]/admin/kassa/`) **nooit aanraken**
 - **AZERTY-toetsenbord + snelteksten + numpad-opmerking (nov 2026 werkend): NOOIT AANRAKEN** zonder ontgrendeling in de opdracht («JE MAG HET TOETSENBORD / OSK / SNELTEKSTEN WIJZIGEN»). Zie `.cursor/rules/kassa-osk-snelteksten-sacred.mdc`. Zelfde OSK-code voor **alle** tenants. Verplichte tests bij wél wijzigen:
   `npm test -- --testPathPatterns=kassa-osk-line-shortcuts`, `kassa-azerty-osk`, `kassa-numpad-custom-amount`, `kassa-cart-line-key`.
 - **Vysion Music playback/flow niet aanraken** (zie `.cursor/rules/vysion-music-playback-sacred.mdc`) — alleen Soundtrack-lijsten/sync/API zonder `VysionMusicClient` transport.
+- **The Lagoon BTW 21%** (zie `.cursor/rules/lagoon-vat-sacred.mdc`): altijd via `src/lib/lagoon-vat.ts` + Lagoon-tests; geen globale `?? 6` in kassa/Z-paden zonder `resolveTenantBtwPercentage(tenantSlug, …)`.
 
 ### Env / secrets (belangrijk, niet vanzelfsprekend)
 - De app **start prima zonder** `.env.local`; ontbrekende Supabase/Stripe/Zoho/Redis-config leidt

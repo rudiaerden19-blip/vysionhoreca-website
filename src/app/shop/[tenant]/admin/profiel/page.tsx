@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { isTheLagoonTenant } from '@/lib/lagoon-kitchen-screen'
+import { THE_LAGOON_UNIFORM_VAT_PERCENT } from '@/lib/lagoon-vat'
 import MediaPicker from '@/components/MediaPicker'
 import ImageZoomPicker, { parseImageZoomSettings, stringifyImageZoomSettings } from '@/components/ImageZoomPicker'
 import { useLanguage } from '@/i18n'
@@ -473,26 +475,45 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t('adminPages.profiel.btwPercentage') || 'BTW Percentage'} *
               </label>
-              <select
-                name="btw_percentage"
-                value={formData.btw_percentage || 6}
-                onChange={(e) => {
-                  setFormData(prev => ({
-                    ...prev,
-                    btw_percentage: parseInt(e.target.value)
-                  }))
-                  setSaved(false)
-                }}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              >
-                <option value={6}>6% — België: laag tarief (o.a. voeding, afhaal)</option>
-                <option value={9}>9% — Nederland: laag tarief</option>
-                <option value={12}>12% — België: restaurant (ter plaatse)</option>
-                <option value={21}>21% — Hoog tarief</option>
-              </select>
-              <p className="text-xs text-gray-400 mt-1">
-                België: o.a. 6% / 12% / 21%. Nederland: o.a. 9% (laag) en 21% (hoog). Kies het tarief van jouw zaak.
-              </p>
+              {isTheLagoonTenant(params.tenant) ? (
+                <>
+                  <select
+                    name="btw_percentage"
+                    value={THE_LAGOON_UNIFORM_VAT_PERCENT}
+                    disabled
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-700 cursor-not-allowed"
+                  >
+                    <option value={21}>21% — Hoog tarief</option>
+                  </select>
+                  <p className="text-xs text-amber-700 mt-1">
+                    {t('adminPages.profiel.lagoonBtwLocked') ||
+                      'Voor The Lagoon staat BTW vast op 21% (kassa, bonnen en Z-rapport). Dit wordt niet mee gewijzigd bij andere zaken.'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <select
+                    name="btw_percentage"
+                    value={formData.btw_percentage || 6}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        btw_percentage: parseInt(e.target.value)
+                      }))
+                      setSaved(false)
+                    }}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  >
+                    <option value={6}>6% — België: laag tarief (o.a. voeding, afhaal)</option>
+                    <option value={9}>9% — Nederland: laag tarief</option>
+                    <option value={12}>12% — België: restaurant (ter plaatse)</option>
+                    <option value={21}>21% — Hoog tarief</option>
+                  </select>
+                  <p className="text-xs text-gray-400 mt-1">
+                    België: o.a. 6% / 12% / 21%. Nederland: o.a. 9% (laag) en 21% (hoog). Kies het tarief van jouw zaak.
+                  </p>
+                </>
+              )}
             </div>
 
             <div>

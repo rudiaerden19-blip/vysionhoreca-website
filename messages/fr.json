@@ -1815,6 +1815,7 @@
       "fiscalInfoDescription": "Ces informations apparaissent sur les tickets et factures (obligatoire légalement)",
       "btwNumber": "Numéro de TVA",
       "btwPercentage": "Taux de TVA",
+      "lagoonBtwLocked": "Pour The Lagoon, la TVA est fixée à 21 % (caisse, tickets et rapports Z). Cela ne change pas lors des réglages des autres établissements.",
       "kvkNumber": "Numéro d'entreprise",
       "socialMedia": "Réseaux sociaux",
       "facebook": "URL Facebook",

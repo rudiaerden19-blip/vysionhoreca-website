@@ -1,0 +1,46 @@
+# The Lagoon — uniform 21% BTW (HEILIG)
+
+**Eigenaar:** The Lagoon (`thelagoon` / `the-lagoon`) telt **altijd 21%** op kassa, bon, Z-rapport en rapporten. **Geen** Belgische 6/12-split. **Andere tenants** blijven op bestaande `order-vat` logica — wijzig die **niet** globaal om Lagoon te “fixen”.
+
+## Enige toegestane aanpak
+
+1. **Lezen/schrijven zaak-BTW:** `src/lib/lagoon-vat.ts` — `resolveTenantBtwPercentage`, `normalizeLagoonTenantSettingsForRead`, `lagoonTenantSettingsBeforeUpsert`.
+2. **Z-aggregatie / oude bonregels:** `ZReportVatContext.forceUniformVat21` via `buildZReportVatContext(tenantSlug, …)`.
+3. **Kassa-regels:** `resolveVatPercentForCartLine(…, tenantSlug)` + `lagoonUniformVatIfApplicable`.
+
+## Verplicht vóór commit (raakt BTW/order-vat/tenant_settings/menu_categories)
+
+```bash
+npm test -- --testPathPatterns=lagoon-vat
+npx tsc --noEmit
+```
+
+Faalt een Lagoon-test → **geen** commit tot groen.
+
+## Verboden
+
+```typescript
+// NOOIT — Lagoon volgt weer 6% na “algemene” BTW-fix
+tenantInfo?.btw_percentage ?? 6
+Number(settings?.btw_percentage) || 6
+// zonder resolveTenantBtwPercentage(tenantSlug, …) of forceUniformVat21-context
+
+// NOOIT — globale order-vat wijzigen “voor iedereen” om Lagoon te compenseren
+if (country === 'BE') return 6 // zonder lagoonUniformVatIfApplicable / tenantSlug
+
+// NOOIT — slug-check verwijderen of vervangen door tenant_settings alleen
+lagoonForcesUniformVat21 → altijd via lagoon-vat.ts + isTheLagoonTenant
+```
+
+## Beschermde paden (geen writes zonder expliciete Lagoon-BTW-opdracht)
+
+- `src/lib/lagoon-vat.ts`
+- `src/lib/order-vat.ts` — `resolveLineVatRate`, `lagoonUniformVatIfApplicable` call sites
+- `src/lib/z-report-vat-context.ts`
+- `src/lib/admin-api.ts` — `getTenantSettings` / `saveTenantSettings` guards
+
+Wel toegestaan: algemene BTW voor **andere** tenants in `order-vat.ts` **als** Lagoon-tests groen blijven en geen `?? 6` zonder slug in kassa/Z-paden.
+
+## Multi-tenant
+
+Lagoon is **geen** hardcoded uitzondering in **andere** slugs. Alleen `thelagoon` / `the-lagoon`.

@@ -2653,6 +2653,7 @@
       "fiscalInfoDescription": "This information is displayed on receipts and invoices (legally required)",
       "btwNumber": "VAT Number",
       "btwPercentage": "VAT Percentage",
+      "lagoonBtwLocked": "For The Lagoon, VAT is fixed at 21% (POS, receipts, and Z-reports). This is not changed when other venues' settings are updated.",
       "kvkNumber": "Business Registration Number",
       "socialMedia": "Social Media",
       "facebook": "Facebook URL",

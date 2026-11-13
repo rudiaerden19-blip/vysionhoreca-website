@@ -1815,6 +1815,7 @@
       "fiscalInfoDescription": "Diese Angaben werden auf Kassenbons und Rechnungen angezeigt (gesetzlich vorgeschrieben)",
       "btwNumber": "USt-IdNr.",
       "btwPercentage": "MwSt.-Satz",
+      "lagoonBtwLocked": "Für The Lagoon gilt fest 21 % MwSt. (Kasse, Belege, Z-Berichte). Das ändert sich nicht, wenn andere Betriebe angepasst werden.",
       "kvkNumber": "Handelsregisternummer",
       "socialMedia": "Social Media",
       "facebook": "Facebook URL",

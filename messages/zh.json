@@ -2315,6 +2315,7 @@
       "fiscalInfoDescription": "此信息将显示在收据和发票上（法律要求）",
       "btwNumber": "增值税号",
       "btwPercentage": "增值税率",
+      "lagoonBtwLocked": "The Lagoon 的增值税固定为 21%（收银、小票和 Z 报表），不会随其他商户设置而改变。",
       "kvkNumber": "营业执照号",
       "socialMedia": "社交媒体",
       "facebook": "Facebook链接",

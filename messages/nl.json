@@ -2653,6 +2653,7 @@
       "fiscalInfoDescription": "Deze gegevens worden getoond op kassabonnen en facturen (wettelijk verplicht in België)",
       "btwNumber": "BTW Nummer",
       "btwPercentage": "BTW Percentage",
+      "lagoonBtwLocked": "Voor The Lagoon staat BTW vast op 21% (kassa, bonnen en Z-rapport). Dit wordt niet mee gewijzigd bij andere zaken.",
       "kvkNumber": "Ondernemingsnummer",
       "socialMedia": "Social Media",
       "facebook": "Facebook URL",

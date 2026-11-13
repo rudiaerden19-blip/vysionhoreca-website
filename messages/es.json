@@ -2315,6 +2315,7 @@
       "fiscalInfoDescription": "Esta información se muestra en tickets y facturas (obligatorio legalmente)",
       "btwNumber": "Número de IVA",
       "btwPercentage": "Porcentaje de IVA",
+      "lagoonBtwLocked": "Para The Lagoon, el IVA está fijado en el 21 % (TPV, tickets y informes Z). No cambia cuando se ajustan otros locales.",
       "kvkNumber": "Número de registro comercial",
       "socialMedia": "Redes sociales",
       "facebook": "URL de Facebook",

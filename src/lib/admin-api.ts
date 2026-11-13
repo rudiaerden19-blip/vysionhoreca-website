@@ -7,6 +7,10 @@ import { throwIfSupabaseFetchAborted, isPublicDemoTenantSlug } from './admin-api
 import { adminDb } from './admin-db-client'
 import { promotionExpiresAtEndOfDayIso } from '@/lib/webshop-promotion-discount'
 import { tenantSlugQueryVariants } from '@/lib/tenant-slug-variants'
+import {
+  lagoonTenantSettingsBeforeUpsert,
+  normalizeLagoonTenantSettingsForRead,
+} from '@/lib/lagoon-vat'
 
 // Belgium calendar / Z-rapport bounds — single implementation in `belgium-date-bounds.ts`
 // (light routes import that module directly to avoid pulling in admin-api).
@@ -285,7 +289,7 @@ export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal
       }
       delete fullData.stripe_secret_key
       delete fullData.stripe_webhook_secret
-      return fullData as TenantSettings
+      return normalizeLagoonTenantSettingsForRead(tenantSlug, fullData) as TenantSettings
     }
     return data
   }
@@ -537,7 +541,8 @@ export async function saveTenantSettings(settings: Partial<TenantSettings> & { t
   /** PHASE 1: server-side via /api/admin/db (service-role + audit-log + tenant-verify).
    *  De whitelist in `admin-db-proxy-spec.ts`zorgt dat alleen tenant_settings
    *  geüpsert kan worden, en `forbiddenColumns`strip id/created_at automatisch. */
-  const r = await adminDb.upsert('tenant_settings', settings as Record<string, unknown>, {
+  const guarded = lagoonTenantSettingsBeforeUpsert(settings)
+  const r = await adminDb.upsert('tenant_settings', guarded as Record<string, unknown>, {
     onConflict: 'tenant_slug',
     tenantSlug: settings.tenant_slug,
   })
@@ -573,7 +578,7 @@ export async function saveTenantSettings(settings: Partial<TenantSettings> & { t
     console.error('Error saving tenant settings:', r.error)
     return false
   }
-  cache.invalidate(cacheKey('tenant_settings', settings.tenant_slug))
+  cache.invalidate(cacheKey('tenant_settings', guarded.tenant_slug))
   return true
 }
 

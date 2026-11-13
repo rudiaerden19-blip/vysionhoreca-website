@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { lagoonMenuCategoryDefaultBtwOnSave } from '@/lib/lagoon-vat'
 import { cache, CACHE_TTL, cacheKey } from './cache'
 import { throwIfSupabaseFetchAborted } from './admin-api-internal'
 import { adminDb } from './admin-db-client'
@@ -86,6 +87,10 @@ export async function saveMenuCategory(
    * steeds INSERT en verdubbelt categorieën. Bij update: `update`met `{ id, tenant_slug }`; bij nieuw: `insert`.
    */
   const tenantSlug = category.tenant_slug
+  const categoryDefaultBtw =
+    category.default_btw_percentage !== undefined
+      ? lagoonMenuCategoryDefaultBtwOnSave(tenantSlug, category.default_btw_percentage)
+      : undefined
   const row = {
     name: category.name,
     description: category.description ?? '',
@@ -93,8 +98,8 @@ export async function saveMenuCategory(
     image_url: category.image_url ?? '',
     sort_order: category.sort_order,
     is_active: category.is_active,
-    ...(category.default_btw_percentage !== undefined && {
-      default_btw_percentage: category.default_btw_percentage,
+    ...(categoryDefaultBtw !== undefined && {
+      default_btw_percentage: categoryDefaultBtw,
     }),
   } satisfies Record<string, unknown>
 

@@ -2315,6 +2315,7 @@
       "fiscalInfoDescription": "Queste informazioni vengono visualizzate su scontrini e fatture (obbligatorio per legge)",
       "btwNumber": "Partita IVA",
       "btwPercentage": "Aliquota IVA",
+      "lagoonBtwLocked": "Per The Lagoon l'IVA è fissa al 21% (cassa, scontrini e rapporti Z). Non cambia quando si aggiornano altre attività.",
       "kvkNumber": "Numero di registrazione",
       "socialMedia": "Social Media",
       "facebook": "URL Facebook",
