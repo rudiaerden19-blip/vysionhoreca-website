@@ -326,3 +326,15 @@ export function cashbookWriteBlock(
   }
   return null
 }
+
+/** Kasboek UI: beginsaldo-veld na opnieuw laden (bijv. terug van kassa). */
+export function cashbookOpeningFieldFromDayView(view: {
+  status: 'none' | 'open' | 'closed'
+  openingCents: number
+}): { opening: string; confirmed: boolean } {
+  const cents = Math.round(Number(view.openingCents) || 0)
+  if (view.status === 'open' || cents > 0) {
+    return { opening: (cents / 100).toFixed(2), confirmed: view.status === 'open' }
+  }
+  return { opening: '', confirmed: false }
+}

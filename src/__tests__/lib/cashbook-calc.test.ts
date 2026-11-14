@@ -3,6 +3,7 @@ import {
   cashbookClosureChoice,
   cashbookDayNeedsClose,
   isListedClosureDate,
+  cashbookOpeningFieldFromDayView,
   cashbookWriteBlock,
   cashDifferenceCents,
   eurosToCents,
@@ -258,6 +259,18 @@ describe('cashbook berekening', () => {
     expect(cashbookWriteBlock('closed', 'adjustment')).toBeNull()
     expect(cashbookWriteBlock('none', 'close')).toMatch(/beginsaldo/i)
     expect(cashbookWriteBlock('open', 'movement')).toBeNull()
+    expect(cashbookOpeningFieldFromDayView({ status: 'open', openingCents: 12550 })).toEqual({
+      opening: '125.50',
+      confirmed: true,
+    })
+    expect(cashbookOpeningFieldFromDayView({ status: 'none', openingCents: 0 })).toEqual({
+      opening: '',
+      confirmed: false,
+    })
+    expect(cashbookOpeningFieldFromDayView({ status: 'closed', openingCents: 5025 })).toEqual({
+      opening: '50.25',
+      confirmed: false,
+    })
   })
 
   it('telt een sluitingsdag zonder omzet niet als nog af te sluiten', () => {

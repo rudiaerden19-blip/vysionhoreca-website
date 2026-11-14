@@ -5,6 +5,7 @@ import { authFetch } from '@/lib/auth-headers'
 import {
   cashbookBadge,
   cashbookDayNeedsClose,
+  cashbookOpeningFieldFromDayView,
   eurosToCents,
   paymentReconciliation,
   vatReconciliation,
@@ -234,12 +235,18 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     const view = json as DayView
     setDay(view)
     setDate(view.date)
-    if (loadedDate.current !== view.date) {
+    const previousDate = loadedDate.current
+    const dateChanged = previousDate !== '' && previousDate !== view.date
+    if (dateChanged) {
       setCounted('')
       setCloseNote('')
-      setOpening('')
-      setOpeningConfirmed(false)
     }
+    const openingField = cashbookOpeningFieldFromDayView({
+      status: view.status,
+      openingCents: view.openingCents,
+    })
+    setOpening(openingField.opening)
+    setOpeningConfirmed(openingField.confirmed)
     loadedDate.current = view.date
     setLoading(false)
   }, [tenant])
@@ -293,14 +300,8 @@ export default function KasboekPage({ params }: { params: { tenant: string } }) 
     }
     await loadDay(date)
     historySpans.current = []
-    if (body.action === 'opening') {
-      setOpeningConfirmed(true)
-      setOpening(Number(body.openingEuros).toFixed(2))
-    }
     if (body.action === 'close') {
-      setOpening('')
-      setOpeningConfirmed(false)
-      setHistory((rows) => rows.map((row) => row.date === date ? { ...row, status: 'closed' } : row))
+      setHistory((rows) => rows.map((row) => (row.date === date ? { ...row, status: 'closed' } : row)))
     }
     return true
   }
