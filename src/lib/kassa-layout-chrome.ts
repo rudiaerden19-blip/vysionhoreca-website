@@ -56,6 +56,10 @@ export const KASSA_LIGHT_REMOVE_BTN_CLASS = 'kassa-light-remove-btn'
 
 export const KASSA_LIGHT_BTN_FACE = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#1e293b] text-white [@media(hover:hover)]:hover:bg-[#172033] active:bg-[#0f172a]`
 export const KASSA_LIGHT_BTN_FACE_ON = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-[#1e293b] text-white ring-2 ring-white/75 ring-offset-2 ring-offset-[#e3e3e3]`
+
+/** Ter plaatse / Afhalen / Levering — geselecteerd moet duidelijk afwijken (niet alleen ring opzelfde donkerblauw). */
+export const KASSA_LIGHT_ORDER_TYPE_BTN_FACE = KASSA_LIGHT_BTN_FACE
+export const KASSA_LIGHT_ORDER_TYPE_BTN_FACE_ON = `${KASSA_LIGHT_UTILITY_BTN_CLASS} bg-white text-[#1e293b] ring-2 ring-[#1e293b] shadow-md active:bg-[#f1f5f9]`
 export const KASSA_LIGHT_CHECKOUT_BTN_FACE = `${KASSA_LIGHT_CHECKOUT_BTN_CLASS} bg-green-600 text-white [@media(hover:hover)]:hover:bg-green-700 active:bg-green-800 disabled:bg-green-900/45`
 export const KASSA_LIGHT_REMOVE_BTN_FACE = `${KASSA_LIGHT_REMOVE_BTN_CLASS} bg-red-600 text-white [@media(hover:hover)]:hover:bg-red-500 active:bg-red-700 disabled:opacity-100 disabled:pointer-events-none`
 export const KASSA_CLASSIC_BTN_FACE =

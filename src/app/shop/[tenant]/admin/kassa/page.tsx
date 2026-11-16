@@ -125,6 +125,8 @@ import {
 import {
   KASSA_LIGHT_BTN_FACE,
   KASSA_LIGHT_BTN_FACE_ON,
+  KASSA_LIGHT_ORDER_TYPE_BTN_FACE,
+  KASSA_LIGHT_ORDER_TYPE_BTN_FACE_ON,
   KASSA_LIGHT_REMOVE_BTN_FACE,
   KASSA_LIGHT_MENU_TILE_BORDER,
   KASSA_LIGHT_MENU_TILE_BORDER_CLASS,
@@ -6057,13 +6059,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     : 'min-h-[36px] px-2 py-2.5'
 
   const kassaLightOrderTypeButtonClass = (selected: boolean) =>
-    `flex min-w-0 flex-1 flex-col items-center justify-center text-center rounded-lg font-bold shadow-sm ring-1 ring-black/10 transition-colors active:brightness-95 ${kassaLightOrderTypeButtonSizeClass} ${
+    `flex min-w-0 flex-1 flex-col items-center justify-center text-center rounded-lg font-bold transition-colors active:brightness-95 ${kassaLightOrderTypeButtonSizeClass} ${
       kassaLight ? KASSA_LIGHT_ORDER_TYPE_LABEL : 'text-sm'
     } ${
       kassaLight
         ? selected
-          ? KASSA_LIGHT_BTN_FACE_ON
-          : KASSA_LIGHT_BTN_FACE
+          ? KASSA_LIGHT_ORDER_TYPE_BTN_FACE_ON
+          : `shadow-sm ring-1 ring-black/15 ${KASSA_LIGHT_ORDER_TYPE_BTN_FACE}`
         : kassaClassicDark
           ? selected
             ? KASSA_CLASSIC_ACTION_BTN_FACE_ON
